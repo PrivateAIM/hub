@@ -63,7 +63,7 @@ export default defineNuxtComponent({
             <h4 class="title">
                 <FDisplayName
                     :name="user.name"
-                    :display-name="user.display_name"
+                    :display-name="user.displayName"
                 />
                 <span class="sub-title">Profil</span>
             </h4>

@@ -11,7 +11,7 @@ import { z } from 'zod';
 import type { MasterImageCommandArgument } from '../master-image/types.ts';
 
 export class ImageAttributeCommandArgumentsValidator extends Container<MasterImageCommandArgument> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(

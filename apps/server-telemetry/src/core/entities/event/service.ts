@@ -14,6 +14,8 @@ import {
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
+import { eventSchema } from './schema.ts';
 import type { IEventRepository, IEventService } from './types.ts';
 
 type EventServiceContext = {
@@ -39,7 +41,7 @@ export class EventService extends AbstractEntityService implements IEventService
             ],
         });
 
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: eventSchema }));
     }
 
     async getOne(id: string, actor: ActorContext): Promise<Event> {

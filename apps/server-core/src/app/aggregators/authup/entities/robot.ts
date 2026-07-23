@@ -6,9 +6,9 @@
  */
 
 import type {
-    EntityType, 
-    EventRecord, 
-    Robot,
+    Client,
+    EntityType,
+    EventRecord,
 } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
@@ -18,7 +18,10 @@ import {
 } from '../../../components/index.ts';
 import { RegistryProjectEntity } from '../../../../adapters/database/index.ts';
 
-export async function handleAuthupRobotEvent(context: EventRecord<EntityType.ROBOT, Robot>, caller?: RegistryComponentCaller) {
+// Since @authup v1.0.0-beta.53 robots are unified into clients — the
+// registry service identity is now a confidential client named
+// `ServiceID.REGISTRY`, so this handler reacts to CLIENT events.
+export async function handleAuthupRobotEvent(context: EventRecord<EntityType.CLIENT, Client>, caller?: RegistryComponentCaller) {
     if (!context.data.id) {
         return;
     }

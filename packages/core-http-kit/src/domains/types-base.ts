@@ -6,7 +6,7 @@
  */
 
 import type { Client, RequestBaseOptions } from 'hapic';
-import type { BuildInput } from 'rapiq';
+import type { EntityQueryInput } from '../utils';
 
 export type SingleResourceResponse<R> = R;
 export type CollectionResourceResponse<R> = {
@@ -36,8 +36,8 @@ export type DomainEntityID<T> = T extends DomainEntityWithID ?
     never;
 
 export interface DomainAPISlim<T> {
-    getMany(record?: BuildInput<T>) : Promise<CollectionResourceResponse<T>>;
-    getOne(id: DomainEntityID<T>, record?: BuildInput<T>) : Promise<SingleResourceResponse<T>>;
+    getMany(record?: EntityQueryInput<T>) : Promise<CollectionResourceResponse<T>>;
+    getOne(id: DomainEntityID<T>, record?: EntityQueryInput<T>) : Promise<SingleResourceResponse<T>>;
     delete(id: DomainEntityID<T>) : Promise<SingleResourceResponse<T>>;
     create(data: Partial<T>) : Promise<SingleResourceResponse<T>>;
 }

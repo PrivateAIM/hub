@@ -8,15 +8,9 @@
 import type { Node } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import {
-    applyFilters,
-    applyPagination,
-    applyQueryFieldsParseOutput,
-    applyRelations,
-    applySort,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
-import type { ParseAllowedOption } from 'rapiq';
-import { parseQueryFields } from 'rapiq';
+import type { IQuery } from '@rapiq/core';
 import { NodeEntity } from '../../../../../adapters/database/entities/node.ts';
 import type {
     EntityPersistContext,
@@ -25,23 +19,7 @@ import type {
 import type {
     INodeRepository,
 } from '../../../../../core/index.ts';
-
-const DEFAULT_FIELDS: ParseAllowedOption<NodeEntity> = [
-    'id',
-    'name',
-    'client_id',
-    'external_name',
-    'hidden',
-    'type',
-    'online',
-    'public_key',
-    'robot_id',
-    'realm_id',
-    'registry_id',
-    'registry_project_id',
-    'created_at',
-    'updated_at',
-];
+import { applyQuery } from '../query.ts';
 
 export class NodeRepositoryAdapter implements INodeRepository {
     protected dataSource: DataSource;
@@ -53,44 +31,11 @@ export class NodeRepositoryAdapter implements INodeRepository {
         this.repository = dataSource.getRepository(NodeEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Node>> {
-        const {
-            filter,
-            page,
-            fields,
-            include,
-            sort,
-        } = query;
-
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Node>> {
         const qb = this.repository.createQueryBuilder('node');
         qb.groupBy('node.id');
 
-        const fieldsParsed = parseQueryFields<NodeEntity>(fields, {
-            default: DEFAULT_FIELDS,
-            defaultPath: 'node',
-        });
-
-        applyQueryFieldsParseOutput(qb, fieldsParsed, { defaultAlias: 'node' });
-
-        applyRelations(qb, include, {
-            defaultAlias: 'node',
-            allowed: ['registry_project', 'registry'],
-            onJoin: (_property, key, query) => {
-                query.addGroupBy(`${key}.id`);
-            },
-        });
-
-        applySort(qb, sort, {
-            defaultAlias: 'node',
-            allowed: ['name', 'updated_at', 'created_at'],
-        });
-
-        applyFilters(qb, filter, {
-            allowed: ['id', 'name', 'online', 'hidden', 'client_id', 'realm_id', 'robot_id'],
-            defaultAlias: 'node',
-        });
-
-        const pagination = applyPagination(qb, page, { maxLimit: 50 });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

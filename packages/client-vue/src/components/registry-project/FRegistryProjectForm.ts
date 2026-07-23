@@ -126,7 +126,7 @@ export default defineComponent({
                 generateAlias();
             }
 
-            initFormAttributesFromSource(form, manager.data.value);
+            initFormAttributesFromSource(form, manager.data.value ?? undefined);
         };
 
         const updatedAt = useUpdatedAt(props.entity);

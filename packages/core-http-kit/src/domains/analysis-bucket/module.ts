@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString } from '../../utils';
 import type { AnalysisBucket } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
@@ -14,9 +14,9 @@ import type { AnalysisBucketCreatePayload } from './types';
 
 export class AnalysisBucketAPI extends BaseAPI {
     async getMany(
-        options?: BuildInput<AnalysisBucket>,
+        options?: EntityQueryInput<AnalysisBucket>,
     ): Promise<CollectionResourceResponse<AnalysisBucket>> {
-        const response = await this.client.get(`analysis-buckets${buildQuery(options)}`);
+        const response = await this.client.get(`analysis-buckets${buildQueryString(options)}`);
 
         return response.data;
     }

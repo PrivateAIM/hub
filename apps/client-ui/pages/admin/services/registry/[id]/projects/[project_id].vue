@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { DomainType } from '@privateaim/core-kit';
-import type { FieldsBuildInput } from 'rapiq';
+import type { FieldsBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import type {
     Registry,
@@ -35,14 +35,16 @@ export default defineNuxtComponent({
 
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY_PROJECT}`,
-            props: { entityId: route.params.id as string },
-            queryFields: [
-                '+account_id',
-                '+account_name',
-                '+account_secret',
-                '+webhook_exists',
-                '+external_name',
-            ] as FieldsBuildInput<RegistryProject>,
+            props: {
+                entityId: route.params.id as string,
+                queryFields: [
+                    '+account_id',
+                    '+account_name',
+                    '+account_secret',
+                    '+webhook_exists',
+                    '+external_name',
+                ] as FieldsBuildInput<RegistryProject, 3>,
+            },
             onFailed(e) {
                 if (toast) {
                     toast.show({ body: e.message }, { pos: 'top-center' });

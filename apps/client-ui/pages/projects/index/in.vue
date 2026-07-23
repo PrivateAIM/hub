@@ -48,7 +48,7 @@ export default defineNuxtComponent({
         const nodeId : Ref<string | null> = ref(null);
 
         try {
-            const response = await api.node.getMany({ filter: { realm_id: realmId.value } });
+            const response = await api.node.getMany({ filters: { realm_id: realmId.value } });
 
             const node = response.data.pop();
             if (node) {
@@ -89,7 +89,7 @@ export default defineNuxtComponent({
                 :direction="'in'"
                 :target="'project'"
                 :realm-id="realmId"
-                :source-id="nodeId"
+                :source-id="nodeId ?? undefined"
                 :include-project="true"
                 :include-node="true"
             >

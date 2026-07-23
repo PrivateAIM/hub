@@ -6,17 +6,17 @@
  */
 
 import { isObject } from 'smob';
-import type { SortBuildInput } from 'rapiq';
-import { SortDirection } from 'rapiq';
+import type { SortsBuildInput } from '@rapiq/core';
+import { SortDirection } from '@rapiq/core';
 
 type Data = {
     created_at?: string | Date,
     updated_at?: string | Date,
     [key: string]: any
 };
-export function isQuerySortedDescByDate<T extends Data>(input: SortBuildInput<T>) : boolean {
+export function isQuerySortedDescByDate<T extends Data>(input: SortsBuildInput<T>) : boolean {
     if (Array.isArray(input)) {
-        return input.some((el) => isQuerySortedDescByDate(el as SortBuildInput<T>));
+        return input.some((el) => isQuerySortedDescByDate(el as SortsBuildInput<T>));
     }
 
     if (isObject(input)) {

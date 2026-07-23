@@ -10,6 +10,8 @@ import { ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
+import { analysisBucketSchema } from './schema.ts';
 import type { IAnalysisBucketRepository, IAnalysisBucketService } from './types.ts';
 import { AnalysisBucketValidator } from '@privateaim/core-kit';
 
@@ -29,7 +31,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisBucket>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: analysisBucketSchema }));
     }
 
     async getOne(id: string): Promise<AnalysisBucket> {

@@ -12,7 +12,7 @@ import { z } from 'zod';
 import { ValidatorGroup } from '@privateaim/kit';
 
 export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(

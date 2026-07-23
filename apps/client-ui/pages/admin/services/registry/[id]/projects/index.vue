@@ -12,7 +12,7 @@ import { VCButton } from '@vuecs/button';
 import { VCBadge } from '@vuecs/elements';
 import { VCIcon } from '@vuecs/icon';
 import type { TableColumn } from '@vuecs/table';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { 
     computed, 
     ref, 
@@ -58,8 +58,8 @@ export default {
         const toast = useToast();
         const refs = toRefs(props);
 
-        const query : BuildInput<RegistryProject> = {
-            filter: { registry_id: refs.entity.value.id },
+        const query : QueryBuildInput<RegistryProject, 3> = {
+            filters: { registry_id: refs.entity.value.id },
             fields: ['+account_id', '+account_name', '+account_secret'],
         };
 

@@ -11,6 +11,8 @@ import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
+import { masterImageSchema } from './schema.ts';
 import type {
     IMasterImageBuilderCaller,
     IMasterImageRepository,
@@ -51,7 +53,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<MasterImage>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: masterImageSchema }));
     }
 
     async getOne(id: string): Promise<MasterImage> {

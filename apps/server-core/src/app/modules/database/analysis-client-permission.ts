@@ -91,7 +91,7 @@ export class AnalysisClientPermissionService {
         }
 
         const { data, meta } = await this.authup.clientPermission.getMany({
-            filter: { client_id: analysis.client_id },
+            filters: { clientId: analysis.client_id },
             relations: { permission: true },
         });
 
@@ -112,8 +112,8 @@ export class AnalysisClientPermissionService {
         }
 
         return this.authup.clientPermission.create({
-            client_id: analysis.client_id,
-            permission_id: permission.id,
+            clientId: analysis.client_id,
+            permissionId: permission.id,
         });
     }
 
@@ -121,7 +121,7 @@ export class AnalysisClientPermissionService {
         const analysis = await this.resolveAnalysis(analysisId);
         await this.assertWritable(analysis, actor);
 
-        const { data } = await this.authup.clientPermission.getMany({ filter: { client_id: analysis.client_id, permission_id: permissionId } });
+        const { data } = await this.authup.clientPermission.getMany({ filters: { clientId: analysis.client_id, permissionId } });
 
         const [clientPermission] = data;
         if (!clientPermission) {

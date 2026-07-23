@@ -12,14 +12,23 @@ import type { ActorContext } from '@privateaim/server-kit';
  * The subset of an OAuth2 client a credential consumer needs — identity, the
  * human-facing labels and the secret. Projected from the Authup {@link Client}.
  */
-export type ClientCredentials = Pick<Client, 'id' | 'name' | 'display_name' | 'secret'>;
+export type ClientCredentials = {
+    id: Client['id'];
+    name: Client['name'];
+    display_name: Client['displayName'];
+    secret: Client['secret'];
+};
 
 /**
  * Patch applied to an OAuth2 client's credentials. An omitted `secret` rotates
  * to a fresh random one; an omitted `name` / `display_name` leaves that field
  * unchanged. Projected from the Authup {@link Client}.
  */
-export type ClientCredentialsUpdate = Partial<Pick<Client, 'secret' | 'name' | 'display_name'>>;
+export type ClientCredentialsUpdate = Partial<{
+    secret: Client['secret'];
+    name: Client['name'];
+    display_name: Client['displayName'];
+}>;
 
 /**
  * Port for reading and writing an OAuth2 client's credentials (id, name,

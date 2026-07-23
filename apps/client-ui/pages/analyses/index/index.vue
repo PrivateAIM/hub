@@ -8,7 +8,7 @@
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { computed } from 'vue';
 import {
     FAnalyses, 
@@ -46,7 +46,7 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmId } = storeToRefs(store);
 
-        const query = computed<BuildInput<Analysis>>(() => ({ filter: { realm_id: realmId.value } }));
+        const query = computed<QueryBuildInput<Analysis, 3>>(() => ({ filters: { realm_id: realmId.value } }));
 
         return { query };
     },

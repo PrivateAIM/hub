@@ -5,23 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { RegistryProject } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
-import { nullifyEmptyObjectProperties } from '../../utils';
 import type { RegistryProjectCreatePayload, RegistryProjectUpdatePayload } from './types';
 
 export class RegistryProjectAPI extends BaseAPI {
-    async getMany(options?: BuildInput<RegistryProject>): Promise<CollectionResourceResponse<RegistryProject>> {
-        const response = await this.client.get(`registry-projects${buildQuery(options)}`);
+    async getMany(options?: EntityQueryInput<RegistryProject>): Promise<CollectionResourceResponse<RegistryProject>> {
+        const response = await this.client.get(`registry-projects${buildQueryString(options)}`);
 
         return response.data;
     }
 
-    async getOne(id: RegistryProject['id'], options?: BuildInput<RegistryProject>): Promise<SingleResourceResponse<RegistryProject>> {
-        const response = await this.client.get(`registry-projects/${id}${buildQuery(options)}`);
+    async getOne(id: RegistryProject['id'], options?: EntityQueryInput<RegistryProject>): Promise<SingleResourceResponse<RegistryProject>> {
+        const response = await this.client.get(`registry-projects/${id}${buildQueryString(options)}`);
 
         return response.data;
     }

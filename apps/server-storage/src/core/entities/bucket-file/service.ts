@@ -5,12 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { eq } from '@rapiq/core';
 import type { BucketFile } from '@privateaim/storage-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IBucketFileCaller, IBucketFileRepository, IBucketFileService } from './types.ts';
+import { bucketFileSchema } from './schema.ts';
 
 type BucketFileServiceContext = {
     repository: IBucketFileRepository;
@@ -29,12 +32,12 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<BucketFile>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: bucketFileSchema }));
     }
 
     async getOne(id: string, query?: Record<string, any>): Promise<BucketFile> {
         const entity = query ?
-            await this.repository.findMany({ ...query, filter: { id } }).then((r) => r.data[0]) :
+            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: bucketFileSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
 
         if (!entity) {

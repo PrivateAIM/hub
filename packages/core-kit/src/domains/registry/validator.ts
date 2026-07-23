@@ -12,7 +12,7 @@ import { ValidatorGroup } from '@privateaim/kit';
 import type { Registry } from './entity.ts';
 
 export class RegistryValidator extends Container<Registry> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         const nameValidator = createValidator(z.string().min(3).max(128));

@@ -17,10 +17,10 @@ describe('AuthupClientCredentialStore', () => {
                 getOne: async (id: string, options?: any) => {
                     calls.push({ id, options });
                     return {
-                        id, 
-                        name: 'node-1', 
-                        display_name: 'Node 1', 
-                        secret: 'sek', 
+                        id,
+                        name: 'node-1',
+                        displayName: 'Node 1',
+                        secret: 'sek',
                     };
                 },
             },
@@ -126,10 +126,10 @@ describe('AuthupClientCredentialStore', () => {
                 update: async (id: string, data?: any) => {
                     calls.push({ id, data });
                     return {
-                        id, 
-                        name: data.name, 
-                        display_name: data.display_name ?? null, 
-                        secret: data.secret, 
+                        id,
+                        name: data.name,
+                        displayName: data.displayName ?? null,
+                        secret: data.secret,
                     };
                 },
             },
@@ -140,7 +140,7 @@ describe('AuthupClientCredentialStore', () => {
 
         // An omitted secret still rotates; the labels ride along on the update.
         expect(calls[0].data.name).toBe('renamed');
-        expect(calls[0].data.display_name).toBe('Renamed');
+        expect(calls[0].data.displayName).toBe('Renamed');
         expect(typeof calls[0].data.secret).toBe('string');
         expect(calls[0].data.secret.length).toBeGreaterThan(0);
     });

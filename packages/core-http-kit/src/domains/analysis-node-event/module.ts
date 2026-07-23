@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString } from '../../utils';
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
 export class AnalysisNodeEventAPI extends BaseAPI {
-    async getMany(options?: BuildInput<AnalysisNodeEvent>): Promise<CollectionResourceResponse<AnalysisNodeEvent>> {
-        const { data: response } = await this.client.get(`analysis-node-events${buildQuery(options)}`);
+    async getMany(options?: EntityQueryInput<AnalysisNodeEvent>): Promise<CollectionResourceResponse<AnalysisNodeEvent>> {
+        const { data: response } = await this.client.get(`analysis-node-events${buildQueryString(options)}`);
         return response;
     }
 

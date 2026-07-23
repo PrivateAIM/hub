@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { ARobot, AUser } from '@authup/client-web-kit';
+import { AClient, AUser } from '@authup/client-web-kit';
 import type { Project } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
@@ -14,7 +14,7 @@ import FDisplayName from '../FDisplayName';
 export default defineComponent({
     components: {
         AUser,
-        ARobot,
+        AClient,
         FDisplayName,
     },
     props: {
@@ -29,14 +29,15 @@ export default defineComponent({
     <div>
         <template v-if="entity.user_id">
             <AUser :query-filters="{ id: entity.user_id }">
-                <template #default="{ data }">
+                <template #default="scope">
                     <slot
+                        v-if="scope && scope.data"
                         name="default"
-                        :data="data"
+                        :data="scope.data"
                     >
                         <FDisplayName
-                            :name="data.name"
-                            :display-name="data.display_name"
+                            :name="scope.data.name"
+                            :display-name="scope.data.displayName"
                         />
                     </slot>
                 </template>
@@ -51,15 +52,16 @@ export default defineComponent({
             </AUser>
         </template>
         <template v-else-if="entity.robot_id">
-            <ARobot :query-filters="{ id: entity.robot_id }">
-                <template #default="{ data }">
+            <AClient :query-filters="{ id: entity.robot_id }">
+                <template #default="scope">
                     <slot
+                        v-if="scope && scope.data"
                         name="default"
-                        :data="data"
+                        :data="scope.data"
                     >
                         <FDisplayName
-                            :name="data.name"
-                            :display-name="data.display_name"
+                            :name="scope.data.name"
+                            :display-name="scope.data.displayName"
                         />
                     </slot>
                 </template>
@@ -71,7 +73,7 @@ export default defineComponent({
                         {{ entity.robot_id }}
                     </slot>
                 </template>
-            </ARobot>
+            </AClient>
         </template>
         <template v-else>
             ???

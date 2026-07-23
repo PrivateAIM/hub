@@ -31,7 +31,7 @@ export class AuthupClientCredentialStore implements IClientCredentialStore {
         return {
             id: client.id,
             name: client.name,
-            display_name: client.display_name ?? null,
+            display_name: client.displayName ?? null,
             secret: client.secret ?? null,
         };
     }
@@ -42,13 +42,17 @@ export class AuthupClientCredentialStore implements IClientCredentialStore {
         // unchanged.
         const next = data?.secret ?? randomBytes(32).toString('hex');
 
-        const client = await this.authup.client.update(clientId, { ...data, secret: next });
+        const client = await this.authup.client.update(clientId, {
+            name: data?.name,
+            displayName: data?.display_name,
+            secret: next,
+        });
 
         // Return the plaintext we wrote — the stored value may be hashed.
         return {
             id: client.id,
             name: client.name,
-            display_name: client.display_name ?? null,
+            display_name: client.displayName ?? null,
             secret: next,
         };
     }

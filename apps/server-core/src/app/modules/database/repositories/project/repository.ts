@@ -6,18 +6,12 @@
  */
 
 import type { Project } from '@privateaim/core-kit';
+import type { IQuery } from '@rapiq/core';
 import type { DataSource, Repository } from 'typeorm';
 import {
-    applyFilters,
-    applyPagination,
-    applyQueryFieldsParseOutput,
-    applyRelations,
-    applySort,
     isEntityUnique,
     validateEntityJoinColumns,
 } from 'typeorm-extension';
-import type { ParseAllowedOption } from 'rapiq';
-import { parseQueryFields } from 'rapiq';
 import { ProjectEntity } from '../../../../../adapters/database/entities/project.ts';
 import { DatabaseConflictError } from '../../../../../adapters/database/error/index.ts';
 import type {
@@ -27,22 +21,7 @@ import type {
 import type {
     IProjectRepository,
 } from '../../../../../core/index.ts';
-
-const DEFAULT_FIELDS: ParseAllowedOption<ProjectEntity> = [
-    'id',
-    'name',
-    'display_name',
-    'description',
-    'nodes',
-    'analyses',
-    'created_at',
-    'updated_at',
-    'realm_id',
-    'client_id',
-    'robot_id',
-    'user_id',
-    'master_image_id',
-];
+import { applyQuery } from '../query.ts';
 
 export class ProjectRepositoryAdapter implements IProjectRepository {
     protected dataSource: DataSource;
@@ -54,44 +33,11 @@ export class ProjectRepositoryAdapter implements IProjectRepository {
         this.repository = dataSource.getRepository(ProjectEntity);
     }
 
-    async findMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Project>> {
-        const {
-            filter,
-            page,
-            fields,
-            include,
-            sort,
-        } = query;
-
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Project>> {
         const qb = this.repository.createQueryBuilder('project');
         qb.groupBy('project.id');
 
-        const fieldsParsed = parseQueryFields<ProjectEntity>(fields, {
-            default: DEFAULT_FIELDS,
-            defaultPath: 'project',
-        });
-
-        applyQueryFieldsParseOutput(qb, fieldsParsed, { defaultAlias: 'project' });
-
-        applyRelations(qb, include, {
-            defaultAlias: 'project',
-            allowed: ['master_image'],
-            onJoin: (_property, key, query) => {
-                query.addGroupBy(`${key}.id`);
-            },
-        });
-
-        applySort(qb, sort, {
-            defaultAlias: 'project',
-            allowed: ['id', 'updated_at', 'created_at'],
-        });
-
-        applyFilters(qb, filter, {
-            allowed: ['id', 'name', 'display_name', 'realm_id', 'user_id'],
-            defaultAlias: 'project',
-        });
-
-        const pagination = applyPagination(qb, page, { maxLimit: 50 });
+        const { pagination } = applyQuery(qb, query);
 
         const [entities, total] = await qb.getManyAndCount();
 

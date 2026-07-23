@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
@@ -18,10 +17,11 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import type { FiltersBuildInput } from 'rapiq';
-import { parseQuery, parseQueryFilters } from 'rapiq';
+import type { FiltersBuildInput } from '@rapiq/core';
 import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { analysisLogSchema } from '../../../../../core/entities/analysis-log/schema.ts';
+import { collectRootFilterValues, decodeQuery } from '../../../../../core/query/index.ts';
 
 type AnalysisLogControllerContext = {
     telemetryClient?: TelemetryClient;
@@ -40,27 +40,9 @@ export class AnalysisLogController {
     async getMany(
         @DContext() event: IAppEvent,
     ) {
-        const output = parseQuery<AnalysisLog>(
-            useRequestQuery(event),
-            {
-                defaultPath: 'log',
-                filters: {
-                    allowed: [
-                        'level',
-                        'analysis_id',
-                    ],
-                },
-                pagination: { maxLimit: 50 },
-                sort: { allowed: ['time'] },
-            },
-        );
+        const query = decodeQuery(useRequestQuery(event), { schema: analysisLogSchema });
 
-        const filtersNormalized : Partial<Record<keyof AnalysisLog, string>> = {};
-        if (output.filters) {
-            for (let i = 0; i < output.filters.length; i++) {
-                filtersNormalized[output.filters[i].key] = `${output.filters[i].value}`;
-            }
-        }
+        const filtersNormalized = collectRootFilterValues(query);
 
         if (!filtersNormalized.analysis_id) {
             throw new BadRequestError('The filter analysis_id must be defined.');
@@ -80,7 +62,10 @@ export class AnalysisLogController {
         if (this.telemetryClient) {
             return this.telemetryClient.log.getMany({
                 filters,
-                pagination: output.pagination,
+                pagination: {
+                    limit: query.pagination.limit,
+                    offset: query.pagination.offset,
+                },
             });
         }
 
@@ -100,22 +85,12 @@ export class AnalysisLogController {
     async drop(
         @DContext() event: IAppEvent,
     ) {
-        const output = parseQueryFilters<AnalysisLog>(
-            useRequestQuery(event, 'filter'),
-            {
-                allowed: [
-                    'analysis_id',
-                    'level',
-                ],
-            },
-        );
+        const query = decodeQuery(useRequestQuery(event), {
+            schema: analysisLogSchema,
+            parameters: ['filters'],
+        });
 
-        const filtersNormalized : Partial<Record<keyof AnalysisLog, string>> = {};
-        if (output) {
-            for (const element of output) {
-                filtersNormalized[element.key] = `${element.value}`;
-            }
-        }
+        const filtersNormalized = collectRootFilterValues(query);
 
         if (!filtersNormalized.analysis_id) {
             throw new BadRequestError('The filter analysis_id must be defined.');

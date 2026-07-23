@@ -8,4 +8,4 @@
 import { TypedToken } from 'eldin';
 import type { Client } from 'docken';
 
-export const DockerInjectionKey = new TypedToken<Client>('Docker');
+export const DockerInjectionKey: TypedToken<Client> = new TypedToken<Client>('Docker');

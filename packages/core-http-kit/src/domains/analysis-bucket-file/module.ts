@@ -5,19 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BuildInput } from 'rapiq';
-import { buildQuery } from 'rapiq';
+import type { EntityQueryInput } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
-import { nullifyEmptyObjectProperties } from '../../utils';
 import { BaseAPI } from '../base';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import type { AnalysisBucketFileCreatePayload, AnalysisBucketFileUpdatePayload } from './types';
 
 export class AnalysisBucketFileAPI extends BaseAPI {
     async getMany(
-        options?: BuildInput<AnalysisBucketFile>,
+        options?: EntityQueryInput<AnalysisBucketFile>,
     ): Promise<CollectionResourceResponse<AnalysisBucketFile>> {
-        const response = await this.client.get(`analysis-bucket-files${buildQuery(options)}`);
+        const response = await this.client.get(`analysis-bucket-files${buildQueryString(options)}`);
 
         return response.data;
     }

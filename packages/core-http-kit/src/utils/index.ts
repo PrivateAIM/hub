@@ -7,3 +7,4 @@
 
 export * from './duplicate-slashes';
 export * from './object-property';
+export * from './query';

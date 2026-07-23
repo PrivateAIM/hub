@@ -6,4 +6,5 @@
  */
 
 export * from './entities/index.ts';
+export * from './query/index.ts';
 export * from './utils/index.ts';

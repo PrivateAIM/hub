@@ -9,7 +9,7 @@ import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import {
     defineComponent,
@@ -64,9 +64,9 @@ export default defineComponent({
         const busy = ref<boolean>(false);
 
         const vNodes = useTemplateRef<typeof FAnalysisNodes>('analysisNodes');
-        const vNodesQuery : BuildInput<AnalysisNode> = {
+        const vNodesQuery : QueryBuildInput<AnalysisNode, 3> = {
             filters: { analysis_id: props.entity.id },
-            sort: { node: { name: 'ASC' } },
+            sort: 'node.name',
         };
 
         const add = () => toggleModal();

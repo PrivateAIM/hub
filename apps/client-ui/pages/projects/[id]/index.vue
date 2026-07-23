@@ -15,7 +15,7 @@ import {
 } from '@privateaim/client-vue';
 import type { Project, ProjectNode } from '@privateaim/core-kit';
 import { VCIcon } from '@vuecs/icon';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
@@ -41,9 +41,9 @@ export default defineNuxtComponent({
         },
     },
     setup(props) {
-        const projectNodeQuery : BuildInput<ProjectNode> = {
-            filter: { project_id: props.entity.id },
-            sort: { node: { name: 'ASC' } },
+        const projectNodeQuery : QueryBuildInput<ProjectNode, 3> = {
+            filters: { project_id: props.entity.id },
+            sort: 'node.name',
         };
 
         return { projectNodeQuery };
@@ -91,7 +91,9 @@ export default defineNuxtComponent({
                                 <template v-else>
                                     <FMasterImage :entity-id="entity.master_image_id">
                                         <template #default="{ data }">
-                                            {{ data.name }}
+                                            <template v-if="data">
+                                                {{ data.name }}
+                                            </template>
                                         </template>
                                         <template #error>
                                             {{ entity.master_image_id }}
@@ -116,11 +118,13 @@ export default defineNuxtComponent({
                         </div>
                         <div class="h6">
                             <ARealm :entity-id="entity.realm_id">
-                                <template #default="{ data }">
-                                    <FDisplayName
-                                        :name="data.name"
-                                        :display-name="data.display_name"
-                                    />
+                                <template #default="scope">
+                                    <template v-if="scope?.data">
+                                        <FDisplayName
+                                            :name="scope.data.name"
+                                            :display-name="scope.data.displayName"
+                                        />
+                                    </template>
                                 </template>
                                 <template #error>
                                     {{ entity.realm_id }}
@@ -164,7 +168,7 @@ export default defineNuxtComponent({
                             </div>
                             <div class="card-body">
                                 <div>
-                                    <strong>Status</strong> <FProjectNodeApprovalStatus :status="item.approval_status" />
+                                    <strong>Status</strong> <FProjectNodeApprovalStatus :status="item.approval_status ?? undefined" />
                                 </div>
                                 <div>
                                     <strong>Updated</strong> <VCTimeago :datetime="item.updated_at" />

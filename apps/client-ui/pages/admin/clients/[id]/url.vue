@@ -6,7 +6,7 @@ import {
     VCFormCheckbox,
     VCFormInput,
 } from '@vuecs/forms';
-import type { BuildInput } from 'rapiq';
+import type { EntityListQueryInput } from '@authup/client-web-kit';
 import type { PropType } from 'vue';
 import { computed, ref } from 'vue';
 import { useRuntimeConfig } from '#app';
@@ -55,8 +55,8 @@ export default defineNuxtComponent({
             }
         };
 
-        const query : BuildInput<ClientScope> = {
-            filter: { client_id: props.entity.id },
+        const query : EntityListQueryInput<ClientScope> = {
+            filters: { clientId: props.entity.id },
             relations: ['scope'],
         };
 
@@ -95,7 +95,7 @@ export default defineNuxtComponent({
                         <label :for="iProps.id">
                             <FDisplayName
                                 :name="props.data.scope.name"
-                                :display-name="props.data.scope.display_name"
+                                :display-name="props.data.scope.displayName"
                             />
                         </label>
                     </template>

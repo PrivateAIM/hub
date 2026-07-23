@@ -131,13 +131,17 @@ export default defineComponent({
 
         const parseRGB = (input: string): number[] | null => {
             const match = input.match(/rgba?\(([^)]+)\)/);
-            if (!match) {
+            if (!match || !match[1]) {
                 return null;
             }
             // Handles both legacy "r, g, b" and modern "r g b / a" syntaxes.
             const parts = match[1].split(/[\s,/]+/).map((s) => Number.parseFloat(s));
-            if (parts.length >= 3 && parts.slice(0, 3).every((p) => !Number.isNaN(p))) {
-                return [parts[0], parts[1], parts[2]];
+            const [r, g, b] = parts;
+            if (
+                r !== undefined && g !== undefined && b !== undefined &&
+                !Number.isNaN(r) && !Number.isNaN(g) && !Number.isNaN(b)
+            ) {
+                return [r, g, b];
             }
             return null;
         };
@@ -189,7 +193,7 @@ export default defineComponent({
             palette.hub = read('--privateaim-brand-coral', [255, 91, 91]);
         };
 
-        const rgba = (c: number[], a: number) => `rgba(${c[0] | 0}, ${c[1] | 0}, ${c[2] | 0}, ${a})`;
+        const rgba = (c: number[], a: number) => `rgba(${(c[0] ?? 0) | 0}, ${(c[1] ?? 0) | 0}, ${(c[2] ?? 0) | 0}, ${a})`;
 
         const resize = () => {
             const el = canvas.value;
@@ -265,7 +269,12 @@ export default defineComponent({
 
             // 1) persistent links — always visible, so connectivity is explicit
             for (const [i, j] of EDGES) {
-                const c = ctrl(NODES[i], NODES[j]);
+                const a = NODES[i];
+                const b = NODES[j];
+                if (!a || !b) {
+                    continue;
+                }
+                const c = ctrl(a, b);
                 ctx.beginPath();
                 ctx.moveTo(c.x1, c.y1);
                 ctx.quadraticCurveTo(c.cx, c.cy, c.x2, c.y2);
@@ -289,7 +298,17 @@ export default defineComponent({
                 const legIndex = Math.min(Math.floor(pk.t), pk.path.length - 1);
                 const localT = pk.t - legIndex;
                 const leg = pk.path[legIndex];
-                const c = ctrl(NODES[leg[0]], NODES[leg[1]]);
+                const fromIndex = leg?.[0];
+                const toIndex = leg?.[1];
+                if (fromIndex === undefined || toIndex === undefined) {
+                    continue;
+                }
+                const fromNode = NODES[fromIndex];
+                const toNode = NODES[toIndex];
+                if (!fromNode || !toNode) {
+                    continue;
+                }
+                const c = ctrl(fromNode, toNode);
                 const tail = 9;
                 for (let k = 0; k < tail; k++) {
                     const tt = localT - k * 0.02;
@@ -306,6 +325,9 @@ export default defineComponent({
 
             // 3) nodes — central hub distinct (coral), data nodes ringed (teal)
             NODES.forEach((n, idx) => {
+                if (!ctx) {
+                    return;
+                }
                 const [x, y] = toPx(n[0], n[1]);
                 const central = idx === 0;
                 const color = central ? palette.hub : palette.node;

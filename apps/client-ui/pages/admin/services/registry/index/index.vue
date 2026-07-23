@@ -12,7 +12,7 @@ import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
 import type { Registry } from '@privateaim/core-kit';
-import type { BuildInput } from 'rapiq';
+import type { QueryBuildInput } from '@rapiq/core';
 import { ref, resolveComponent } from 'vue';
 import {
     FEntityDelete,
@@ -68,7 +68,7 @@ export default defineNuxtComponent({
             },
         ];
 
-        const query : BuildInput<Registry> = { sort: { updated_at: 'DESC' } };
+        const query : QueryBuildInput<Registry> = { sort: { updated_at: 'DESC' } };
 
         const canManage = usePermissionCheck({ name: PermissionName.REGISTRY_MANAGE });
 

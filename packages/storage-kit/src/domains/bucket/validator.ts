@@ -12,7 +12,7 @@ import type { Bucket } from './entity.ts';
 import { ValidatorGroup } from '@privateaim/kit';
 
 export class BucketValidator extends Container<Partial<Bucket>> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(

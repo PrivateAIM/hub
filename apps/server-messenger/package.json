@@ -20,8 +20,8 @@
     "license": "Apache-2.0",
     "description": "This package contains the realtime application which connects the API with socket based clients.",
     "dependencies": {
-        "@authup/core-kit": "^1.0.0-beta.52",
-        "@authup/kit": "^1.0.0-beta.52",
+        "@authup/core-kit": "^1.0.0-beta.54",
+        "@authup/kit": "^1.0.0-beta.54",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/kit": "^0.12.2",
         "@privateaim/messenger-kit": "^0.12.1",
@@ -55,7 +55,7 @@
         "cli": "node dist/cli/index.mjs",
         "cli-dev": "ts-node src/cli/index.ts",
         "build:js": "tsdown",
-        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
         "build": "rimraf dist/ && npm run build:js && npm run build:types",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },

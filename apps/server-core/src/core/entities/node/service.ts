@@ -17,6 +17,9 @@ import {
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { eq } from '@rapiq/core';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { nodeSchema } from './schema.ts';
 import type { INodeRepository, INodeService, IRegistryManager } from './types.ts';
 
 type NodeServiceContext = {
@@ -39,12 +42,17 @@ export class NodeService extends AbstractEntityService implements INodeService {
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Node>> {
-        return this.repository.findMany(query);
+        return this.repository.findMany(decodeQuery(query, { schema: nodeSchema }));
     }
 
     async getOne(id: string, query?: Record<string, any>): Promise<Node> {
         const entity = query ?
-            await this.repository.findMany({ ...query, filter: { id } }).then((r) => r.data[0]) :
+            await this.repository.findMany(
+                appendQueryConditions(
+                    decodeQuery(query, { schema: nodeSchema, parameters: ['fields', 'relations'] }),
+                    eq('id', id),
+                ),
+            ).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
 
         if (!entity) {

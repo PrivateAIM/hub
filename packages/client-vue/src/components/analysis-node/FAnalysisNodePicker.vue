@@ -67,11 +67,7 @@ export default defineComponent({
             filters: {
                 project_id: projectId
             },
-            sort: {
-                node: {
-                    name: 'ASC'
-                }
-            }
+            sort: 'node.name'
         }"
     >
         <template #header="props">

@@ -22,7 +22,9 @@
     "license": "Apache-2.0",
     "description": "This package contains common constants, functions, types, ... for the server side.",
     "scripts": {
-        "build": "rimraf ./dist && tsdown",
+        "build:js": "rimraf ./dist && tsdown",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
+        "build": "npm run build:js && npm run build:types",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
@@ -40,21 +42,21 @@
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
-        "@authup/access": "^1.0.0-beta.52",
-        "@authup/core-http-kit": "^1.0.0-beta.52",
-        "@authup/core-kit": "^1.0.0-beta.52",
+        "@authup/access": "^1.0.0-beta.54",
+        "@authup/core-http-kit": "^1.0.0-beta.54",
+        "@authup/core-kit": "^1.0.0-beta.54",
+        "@rapiq/core": "^2.0.0-beta.7",
         "amqp-extension": "^4.0.0",
-        "rapiq": "^0.9.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.0.0-beta.1",
         "vitest": "^4.1.9"
     },
     "peerDependencies": {
-        "@authup/access": "^1.0.0-beta.52",
-        "@authup/core-http-kit": "^1.0.0-beta.52",
-        "@authup/core-kit": "^1.0.0-beta.52",
+        "@authup/access": "^1.0.0-beta.54",
+        "@authup/core-http-kit": "^1.0.0-beta.54",
+        "@authup/core-kit": "^1.0.0-beta.54",
+        "@rapiq/core": "^2.0.0-beta.7",
         "amqp-extension": "^4.0.0",
-        "rapiq": "^0.9.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.0.0-beta.1"
     },

@@ -37,7 +37,7 @@ export default defineComponent({
         <template #default="{ data, update, busy }">
             <template v-if="data">
                 <FImageCommandArguments
-                    :items="data.image_command_arguments || data.master_image?.command_arguments"
+                    :items="(data.image_command_arguments || data.master_image?.command_arguments) ?? undefined"
                     :readonly="readonly || busy"
 
                     @submit="(value) => {

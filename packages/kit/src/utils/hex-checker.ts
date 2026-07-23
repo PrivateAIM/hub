@@ -11,7 +11,7 @@ export function isHex(value: string) : boolean {
 
 export function hexToUTF8(value: string) {
     try {
-        return decodeURIComponent(`%${value.match(/.{1,2}/g).join('%')}`);
+        return decodeURIComponent(`%${(value.match(/.{1,2}/g) ?? []).join('%')}`);
     } catch (e) {
         if (e instanceof URIError) {
             return value;

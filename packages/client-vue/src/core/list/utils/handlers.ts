@@ -70,22 +70,22 @@ export class ListHandlers<T extends ObjectLiteral> {
                 break;
             }
             case 'updated': {
-                if (index !== -1) {
+                const target = index !== -1 ? this.data.value[index] : undefined;
+                if (target) {
                     const keys = Object.keys(item.data) as (keyof T)[];
                     for (const key of keys) {
-                        this.data.value[index][key] = item.data[key];
+                        target[key] = item.data[key];
                     }
 
                     if (this.options.updated) {
-                        this.options.updated(this.data.value[index]);
+                        this.options.updated(target);
                     }
                 }
                 break;
             }
             case 'deleted': {
-                if (index !== -1) {
-                    const output = this.data.value[index];
-
+                const output = index !== -1 ? this.data.value[index] : undefined;
+                if (output) {
                     this.data.value.splice(index, 1);
 
                     if (this.options.deleted) {

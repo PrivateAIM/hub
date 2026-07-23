@@ -22,8 +22,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import type { FiltersBuildInput } from 'rapiq';
-import { parseQuery, parseQueryFilters } from 'rapiq';
+import type { FiltersBuildInput } from '@rapiq/core';
 import type { IAppEvent } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ForceLoggedInMiddleware, useRequestIdentityRealm } from '@privateaim/server-http-kit';
@@ -32,6 +31,8 @@ import {
     AnalysisEntity,
     NodeEntity,
 } from '../../../../database/index.ts';
+import { analysisNodeLogSchema } from '../../../../../core/entities/analysis-node-log/schema.ts';
+import { collectRootFilterValues, decodeQuery } from '../../../../../core/query/index.ts';
 
 type AnalysisNodeLogControllerContext = {
     telemetryClient?: TelemetryClient;
@@ -50,24 +51,9 @@ export class AnalysisNodeLogController {
     async getMany(
         @DContext() event: IAppEvent,
     ) {
-        const output = parseQuery<AnalysisNodeLog>(useRequestQuery(event), {
-            filters: {
-                allowed: [
-                    'level',
-                    'analysis_id',
-                    'node_id',
-                ],
-            },
-            pagination: { maxLimit: 50 },
-            sort: { allowed: ['time'] },
-        });
+        const query = decodeQuery(useRequestQuery(event), { schema: analysisNodeLogSchema });
 
-        const filtersNormalized : Partial<Record<keyof AnalysisNodeLog, string>> = {};
-        if (output.filters) {
-            for (let i = 0; i < output.filters.length; i++) {
-                filtersNormalized[output.filters[i].key] = `${output.filters[i].value}`;
-            }
-        }
+        const filtersNormalized = collectRootFilterValues(query);
 
         if (!filtersNormalized.analysis_id || !filtersNormalized.node_id) {
             throw new BadRequestError('The filters node_id and analysis_id must be defined.');
@@ -88,7 +74,10 @@ export class AnalysisNodeLogController {
         if (this.telemetryClient) {
             return this.telemetryClient.log.getMany({
                 filters,
-                pagination: output.pagination,
+                pagination: {
+                    limit: query.pagination.limit,
+                    offset: query.pagination.offset,
+                },
             });
         }
 
@@ -184,22 +173,12 @@ export class AnalysisNodeLogController {
     async drop(
         @DContext() event: IAppEvent,
     ) {
-        const output = parseQueryFilters<AnalysisNodeLog>(
-            useRequestQuery(event, 'filter'),
-            {
-                allowed: [
-                    'analysis_id',
-                    'node_id',
-                ],
-            },
-        );
+        const query = decodeQuery(useRequestQuery(event), {
+            schema: analysisNodeLogSchema,
+            parameters: ['filters'],
+        });
 
-        const filtersNormalized : Partial<Record<keyof AnalysisNodeLog, string>> = {};
-        if (output) {
-            for (const element of output) {
-                filtersNormalized[element.key] = `${element.value}`;
-            }
-        }
+        const filtersNormalized = collectRootFilterValues(query);
 
         if (!filtersNormalized.analysis_id || !filtersNormalized.node_id) {
             throw new BadRequestError('The filters node_id and analysis_id must be defined.');

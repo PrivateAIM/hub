@@ -15,7 +15,7 @@ import type {
     ProjectNode,
 } from '@privateaim/core-kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
-import type { FiltersBuildInput } from 'rapiq';
+import type { FiltersBuildInput } from '@rapiq/core';
 import {
     defineComponent, 
     h,
@@ -41,7 +41,7 @@ export default defineComponent({
     props: {
         entity: { type: Object as PropType<ProjectNode> },
         entityId: { type: String },
-        queryFilters: { type: Object as PropType<FiltersBuildInput<ProjectNode>> },
+        queryFilters: { type: Object as PropType<FiltersBuildInput<ProjectNode, 3>> },
         direction: { type: String as PropType<`${Direction.IN}` | `${Direction.OUT}`> },
         target: { type: String as PropType<`${Target.NODE}` | `${Target.PROJECT}`> },
     },

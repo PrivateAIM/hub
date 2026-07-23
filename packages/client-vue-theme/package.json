@@ -21,7 +21,9 @@
         "src/index.css"
     ],
     "scripts": {
-        "build": "rimraf ./dist && tsdown"
+        "build:js": "rimraf ./dist && tsdown",
+        "build:types": "tsc --noEmit -p tsconfig.build.json",
+        "build": "npm run build:js && npm run build:types"
     },
     "keywords": [
         "privateaim",
@@ -45,7 +47,7 @@
     },
     "homepage": "https://github.com/PrivateAim/hub#readme",
     "dependencies": {
-        "@authup/client-web-kit-theme": "^1.0.0-beta.52",
+        "@authup/client-web-kit-theme": "^1.0.0-beta.54",
         "@vuecs/design": "^1.0.8",
         "@vuecs/theme-tailwind": "^6.3.0"
     },

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client, Realm, Robot } from '@authup/core-kit';
+import type { Client, Realm } from '@authup/core-kit';
 import type { RegistryProject } from '../registry-project';
 import type { Registry } from '../registry';
 import type { NodeType } from './constants';
@@ -42,7 +42,7 @@ export interface Node {
     /**
      * @deprecated
      */
-    robot_id: Robot['id'] | null;
+    robot_id: Client['id'] | null;
 
     // ------------------------------------------------------------------
 

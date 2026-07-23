@@ -164,20 +164,22 @@ export default defineComponent({
                                             @failed="bucketFilesProps.failed"
                                         >
                                             <template #default="bucketFileProps">
-                                                <div class="flex flex-row items-center gap-2 p-1 w-full">
-                                                    <div>
-                                                        {{ bucketFileProps.data.path }}
-                                                    </div>
+                                                <template v-if="bucketFileProps.data">
+                                                    <div class="flex flex-row items-center gap-2 p-1 w-full">
+                                                        <div>
+                                                            {{ bucketFileProps.data.path }}
+                                                        </div>
 
-                                                    <div class="ms-auto">
-                                                        <template v-if="!entity.configuration_locked">
-                                                            <FAnalysisBucketFileRootToggler
-                                                                :entity="bucketFileProps!.data!"
-                                                                @updated="(value) => bucketFileProps!.update(value)"
-                                                            />
-                                                        </template>
+                                                        <div class="ms-auto">
+                                                            <template v-if="!entity.configuration_locked">
+                                                                <FAnalysisBucketFileRootToggler
+                                                                    :entity="bucketFileProps.data"
+                                                                    @updated="(value) => bucketFileProps.update(value)"
+                                                                />
+                                                            </template>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </template>
                                             </template>
                                         </FAnalysisBucketFile>
                                     </template>
