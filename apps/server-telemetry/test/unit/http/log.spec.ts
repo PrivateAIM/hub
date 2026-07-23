@@ -13,16 +13,19 @@ import {
     it,
 } from 'vitest';
 import { wait } from '@privateaim/kit';
+import { createAdminAuthorizationHeader } from '@privateaim/server-test-kit';
 import { LogChannel, LogLevel } from '@privateaim/telemetry-kit';
 import { createTestSuite } from '../../utils';
 
 describe('log HTTP endpoints', () => {
     const suite = createTestSuite();
     let baseURL: string;
+    let authorization: string;
 
     beforeAll(async () => {
         await suite.setup();
         baseURL = suite.client().getBaseURL().replace(/\/+$/, '');
+        authorization = await createAdminAuthorizationHeader();
     });
 
     afterAll(async () => {
@@ -43,7 +46,7 @@ describe('log HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(logPayload),
             });
@@ -56,7 +59,7 @@ describe('log HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(logPayload),
             });
@@ -79,7 +82,7 @@ describe('log HTTP endpoints', () => {
 
             const response = await fetch(`${baseURL}/logs?filter[foo]=bar`, {
                 method: 'GET',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(200);
@@ -97,7 +100,7 @@ describe('log HTTP endpoints', () => {
         it('should return 400 when no filter labels provided', async () => {
             const response = await fetch(`${baseURL}/logs`, {
                 method: 'GET',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(400);
@@ -109,7 +112,7 @@ describe('log HTTP endpoints', () => {
 
             const response = await fetch(`${baseURL}/logs?filter[foo]=bar&page[limit]=1&page[offset]=0`, {
                 method: 'GET',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(200);
@@ -125,7 +128,7 @@ describe('log HTTP endpoints', () => {
         it('should delete logs with 202 status', async () => {
             const response = await fetch(`${baseURL}/logs?filter[foo]=bar`, {
                 method: 'DELETE',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(202);
@@ -134,7 +137,7 @@ describe('log HTTP endpoints', () => {
         it('should return 400 when no filter labels provided', async () => {
             const response = await fetch(`${baseURL}/logs`, {
                 method: 'DELETE',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(400);

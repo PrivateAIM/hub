@@ -14,6 +14,7 @@ import {
 } from 'vitest';
 import path from 'node:path';
 import fs from 'node:fs';
+import { createAdminAuthorizationHeader } from '@privateaim/server-test-kit';
 import {
     createTestSuite,
 } from '../../utils/index.ts';
@@ -21,9 +22,11 @@ import { createTestBucket } from '../../utils/domains/index.ts';
 
 describe('bucket HTTP endpoints', () => {
     const suite = createTestSuite();
+    let authorization: string;
 
     beforeAll(async () => {
         await suite.up();
+        authorization = await createAdminAuthorizationHeader();
     });
 
     afterAll(async () => {
@@ -48,7 +51,7 @@ describe('bucket HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(input),
             });
@@ -70,7 +73,7 @@ describe('bucket HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(input),
             });
@@ -87,7 +90,7 @@ describe('bucket HTTP endpoints', () => {
 
     describe('GET /buckets', () => {
         it('should return collection with data and meta', async () => {
-            const response = await fetch(`${getBaseURL()}/buckets`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/buckets`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBe(200);
 
@@ -100,7 +103,7 @@ describe('bucket HTTP endpoints', () => {
         });
 
         it('should support pagination', async () => {
-            const response = await fetch(`${getBaseURL()}/buckets?page[limit]=1&page[offset]=0`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/buckets?page[limit]=1&page[offset]=0`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBe(200);
 
@@ -113,7 +116,7 @@ describe('bucket HTTP endpoints', () => {
 
     describe('GET /buckets/:id', () => {
         it('should return single bucket', async () => {
-            const response = await fetch(`${getBaseURL()}/buckets/${bucketId}`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/buckets/${bucketId}`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBe(200);
 
@@ -124,7 +127,7 @@ describe('bucket HTTP endpoints', () => {
         });
 
         it('should return 404 for non-existent bucket', async () => {
-            const response = await fetch(`${getBaseURL()}/buckets/00000000-0000-0000-0000-000000000000`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/buckets/00000000-0000-0000-0000-000000000000`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBeGreaterThanOrEqual(400);
         });
@@ -140,7 +143,7 @@ describe('bucket HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(input),
             });
@@ -154,11 +157,11 @@ describe('bucket HTTP endpoints', () => {
 
             await fetch(`${getBaseURL()}/buckets/${streamBucketId}/upload`, {
                 method: 'POST',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
                 body: formData,
             });
 
-            const response = await fetch(`${getBaseURL()}/buckets/${streamBucketId}/stream`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/buckets/${streamBucketId}/stream`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBe(200);
 
@@ -169,7 +172,7 @@ describe('bucket HTTP endpoints', () => {
         });
 
         it('should have Content-Type application/x-tar', async () => {
-            const response = await fetch(`${getBaseURL()}/buckets/${streamBucketId}/stream`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/buckets/${streamBucketId}/stream`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBe(200);
 
@@ -179,7 +182,7 @@ describe('bucket HTTP endpoints', () => {
         });
 
         it('should contain uploaded files in tar', async () => {
-            const response = await fetch(`${getBaseURL()}/buckets/${streamBucketId}/stream`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/buckets/${streamBucketId}/stream`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBe(200);
 
@@ -197,7 +200,7 @@ describe('bucket HTTP endpoints', () => {
 
             const response = await fetch(`${getBaseURL()}/buckets/${bucketId}/upload`, {
                 method: 'POST',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
                 body: formData,
             });
 
@@ -212,7 +215,7 @@ describe('bucket HTTP endpoints', () => {
 
             const response = await fetch(`${getBaseURL()}/buckets/${bucketId}/upload`, {
                 method: 'POST',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
                 body: formData,
             });
 
@@ -233,7 +236,7 @@ describe('bucket HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify({}),
             });
@@ -249,7 +252,7 @@ describe('bucket HTTP endpoints', () => {
         it('should delete bucket with 202 status', async () => {
             const response = await fetch(`${getBaseURL()}/buckets/${bucketId}`, {
                 method: 'DELETE',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(202);
@@ -261,7 +264,7 @@ describe('bucket HTTP endpoints', () => {
         it('should return 404 for non-existent bucket', async () => {
             const response = await fetch(`${getBaseURL()}/buckets/00000000-0000-0000-0000-000000000000`, {
                 method: 'DELETE',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBeGreaterThanOrEqual(400);

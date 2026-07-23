@@ -8,7 +8,9 @@ import 'reflect-metadata';
 
 import type { TestProject } from 'vitest/node';
 import { GenericContainer, Wait } from 'testcontainers';
+import { PermissionName } from '@privateaim/kit';
 import { LoggerModule } from '@privateaim/server-kit';
+import { provideAuthup, provideDatabase, stopTestContainers } from '@privateaim/server-test-kit';
 import { Application } from 'orkos';
 import { ConfigModule } from '../src/app/modules/config/index.ts';
 import { createTestDatabaseModule } from './app/database.ts';
@@ -19,6 +21,16 @@ declare module 'vitest' {
         VL_CONTAINER_PORT: number
     }
 }
+
+// The permissions server-telemetry's authorization middleware checks.
+const PERMISSIONS: PermissionName[] = [
+    PermissionName.EVENT_CREATE,
+    PermissionName.EVENT_READ,
+    PermissionName.EVENT_DELETE,
+    PermissionName.LOG_CREATE,
+    PermissionName.LOG_READ,
+    PermissionName.LOG_DELETE,
+];
 
 async function setup(project: TestProject) {
     const containerConfig = new GenericContainer('docker.io/victoriametrics/victoria-logs:v1.43.1')
@@ -31,6 +43,11 @@ async function setup(project: TestProject) {
     project.provide('VL_CONTAINER_PORT', container.getFirstMappedPort());
 
     globalThis.VL_CONTAINER = container;
+
+    // Provide a database + Authup instance: an externally configured service
+    // (CI) is used as-is, otherwise a testcontainer is started.
+    await provideDatabase(project);
+    await provideAuthup(project, PERMISSIONS);
 
     const app = new Application({
         modules: [
@@ -45,7 +62,13 @@ async function setup(project: TestProject) {
 }
 
 async function teardown() {
-    await globalThis.VL_CONTAINER.stop();
+    // Stop the shared containers even if the Victoria Logs teardown rejects, so
+    // Authup / PostgreSQL containers cannot leak; the VL failure is still surfaced.
+    try {
+        await globalThis.VL_CONTAINER.stop();
+    } finally {
+        await stopTestContainers();
+    }
 }
 
 export {

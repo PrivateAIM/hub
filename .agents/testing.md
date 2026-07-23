@@ -87,22 +87,69 @@ Services with databases (server-core, server-telemetry, server-storage) share th
 |------|---------|
 | `test/app/module.ts` | `TestApplication extends Application` with `get dataSource()` accessor |
 | `test/app/http.ts` | `TestHTTPApplication extends TestApplication` with `get client` (API client) |
-| `test/app/database.ts` | `createTestDatabaseModule()` for per-test DB with SQLite fallback |
+| `test/app/database.ts` | `createTestDatabaseModule()` for per-test DB, using the configured database or a PostgreSQL testcontainer by default |
 | `test/app/factory.ts` | `createTestApplication()` returns `TestHTTPApplication` with `PORT=0` |
 
 Each test application wires the same DI modules as production but uses `createTestDatabaseModule()` instead of the real `DatabaseModule`.
+
+## Testcontainers & Always-On Authup
+
+The HTTP-facing services (`server-core`, `server-storage`, `server-telemetry`) run
+their suites against a **real Authup instance** and a **real database**, and the
+authorization middleware **actually enforces** permissions (no `dryRun`). Each
+dependency is provided one of two ways, decided by env:
+
+| Dependency | External (used as-is)             | Otherwise (testcontainer)          |
+|------------|-----------------------------------|------------------------------------|
+| Database   | `DB_TYPE` set (CI services, `test:mysql`, `test:psql`) | PostgreSQL container |
+| Authup     | `AUTHUP_URL` set                  | `authup/authup` container          |
+
+The shared helpers live in `@privateaim/server-test-kit`
+(`src/testcontainers/`, `src/authup-token.ts`, `src/setup.ts`):
+
+- `provideDatabase(project)` — start a PostgreSQL container when no `DB_TYPE` is set,
+  else use the configured database. Publishes the connection to the workers via
+  vitest `provide`.
+- `provideAuthup(project, permissionNames)` — start an Authup container (unless
+  `AUTHUP_URL` is set), provisioned with exactly the permission names the calling
+  service checks. Each service passes its own set (`server-storage` 3, `server-telemetry`
+  6, `server-core` 19), listed in its `test/setup.ts`. The built-in `admin` role's
+  `globalPermissions: ['*']` picks those up at provisioning time, so the `admin`/`master`
+  token resolves them via introspection. The generated `.mjs` is mounted at
+  `/usr/src/app/writable/provisioning/hub.mjs`.
+- Authup runs on the **same database engine as hub** in each environment
+  (`resolveAuthupDatabaseEnv`): a dedicated `authup` database on the same
+  MySQL/PostgreSQL server (reached via `host.docker.internal`), or its own in-memory
+  SQLite on the sqlite leg. This keeps the whole stack on one engine per run.
+- `hydrateTestEnv()` — worker-side; the side-effecting `@privateaim/server-test-kit/setup`
+  module (wired into each `vitest.config` `setupFiles` alongside `reflect-metadata`)
+  copies the provided values into `process.env` before the test app is built.
+- `stopTestContainers()` — teardown.
+- `createAdminAccessToken()` / `createAdminAuthorizationHeader()` — mint a real
+  `admin`/`master` token for tests that issue raw `fetch` requests (uploads,
+  streaming) instead of the authenticated API client.
+
+The Authup image is `authup/authup` (currently beta.54, matching `@authup/*`). Each
+test app registers `AuthupHookModule` + `AuthupClientModule` so the middleware takes
+the real introspection path rather than the fake-identity fallback.
+
+Enabling the Authup client does **not** activate `NodeClientService` /
+`AnalysisClientService`: the test database module builds serviceless subscribers
+that short-circuit, keeping enforcement and client-provisioning decoupled.
 
 ## Database Testing
 
 Tests run against real databases (not mocks). The CI matrix tests three backends:
 
-| Backend          | Driver           | CI Service         |
-|------------------|------------------|--------------------|
-| MySQL 9          | `mysql2`         | Docker container   |
-| PostgreSQL 18    | `pg`             | Docker container   |
-| SQLite           | `better-sqlite3` | In-memory          |
+| Backend          | Driver           | CI Service / Source |
+|------------------|------------------|---------------------|
+| MySQL 9          | `mysql2`         | Docker service      |
+| PostgreSQL 18    | `pg`             | Docker service      |
+| SQLite           | `better-sqlite3` | In-memory           |
 
-Local database testing uses `docker-compose.yml`:
+Locally, with no `DB_TYPE` configured, the DB-backed suites start a PostgreSQL
+testcontainer (the SQLite in-memory fallback was removed for these services).
+To target an already-running database instead:
 
 ```bash
 docker-compose up -d    # Start MySQL (3306) + Postgres (5432)
@@ -171,18 +218,21 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
 1. **Install** — `npm ci` with Node 22
 2. **Build** — `npm run build` (Nx with caching)
 3. **Test** — Parallel matrix: MySQL, Postgres, SQLite
-   - Spins up Authup service on port 3000
-   - Database-specific env vars set per matrix entry
+   - Database provided as a workflow service (external), selected per matrix entry
+   - Authup is **not** a workflow service — each suite starts it via testcontainers
+     (a service container cannot mount the workspace provisioning file, which is only
+     checked out after services start)
 4. **Lint** — `npm run lint`
 
 ## Test Environment Variables
 
 | Variable                  | Purpose                        |
 |---------------------------|--------------------------------|
-| `DB_TYPE`                 | Selects database driver        |
+| `DB_TYPE`                 | Selects database driver; unset ⇒ Postgres testcontainer |
 | `DB_HOST`, `DB_PORT`      | Database connection            |
 | `DB_USERNAME`, `DB_PASSWORD` | Database credentials        |
 | `DB_DATABASE`             | Database name                  |
+| `AUTHUP_URL`              | External Authup URL; unset ⇒ Authup testcontainer |
 | `SKIP_PROJECT_APPROVAL`   | Skip approval flow in tests    |
 | `SKIP_ANALYSIS_APPROVAL`  | Skip approval flow in tests    |
 
@@ -192,8 +242,10 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
 - Use `@faker-js/faker` for test data generation
 - HTTP integration tests: use `TestSuite` which wires controllers via DI modules
 - Service-level tests: use `FakeEntityRepository` and fake callers
-- SQLite tests use in-memory databases and need no external services
-- MySQL/Postgres tests need docker-compose services running
+- Service-level (core/entity) tests use fakes and need no database or Authup
+- HTTP-facing suites (core/storage/telemetry) need Docker: they start Authup (always)
+  and, unless `DB_TYPE` is set, a PostgreSQL container. Set `DB_TYPE`/`DB_HOST`
+  (or use `test:mysql`/`test:psql`) to target an already-running database instead.
 
 ## Fakes Over Mocks
 

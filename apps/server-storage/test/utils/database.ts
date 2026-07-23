@@ -28,16 +28,7 @@ export class TestDatabase {
         }
 
         const optionsBuilder = new DataSourceOptionsBuilder();
-
-        let options : DataSourceOptions;
-        try {
-            options = optionsBuilder.buildWithEnv();
-        } catch {
-            options = optionsBuilder.buildWith({
-                type: 'better-sqlite3',
-                database: ':memory:',
-            });
-        }
+        const options : DataSourceOptions = optionsBuilder.buildWithEnv();
 
         this.options = options;
         return this.options;
