@@ -12,15 +12,18 @@ import {
     expect,
     it,
 } from 'vitest';
+import { createAdminAuthorizationHeader } from '@privateaim/server-test-kit';
 import { createTestSuite } from '../../utils';
 
 describe('event HTTP endpoints', () => {
     const suite = createTestSuite();
     let baseURL: string;
+    let authorization: string;
 
     beforeAll(async () => {
         await suite.setup();
         baseURL = suite.client().getBaseURL().replace(/\/+$/, '');
+        authorization = await createAdminAuthorizationHeader();
     });
 
     afterAll(async () => {
@@ -51,7 +54,7 @@ describe('event HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(eventPayload),
             });
@@ -64,7 +67,7 @@ describe('event HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(eventPayload),
             });
@@ -82,7 +85,7 @@ describe('event HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(eventPayload),
             });
@@ -110,7 +113,7 @@ describe('event HTTP endpoints', () => {
         it('should return collection with data array and meta', async () => {
             const response = await fetch(`${baseURL}/events`, {
                 method: 'GET',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(200);
@@ -124,7 +127,7 @@ describe('event HTTP endpoints', () => {
         it('should contain created event in collection', async () => {
             const response = await fetch(`${baseURL}/events`, {
                 method: 'GET',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             const body = await response.json();
@@ -139,7 +142,7 @@ describe('event HTTP endpoints', () => {
         it('should return single event by id', async () => {
             const response = await fetch(`${baseURL}/events/${createdId}`, {
                 method: 'GET',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(200);
@@ -155,7 +158,7 @@ describe('event HTTP endpoints', () => {
         it('should return 404 for non-existent event', async () => {
             const response = await fetch(`${baseURL}/events/00000000-0000-0000-0000-000000000000`, {
                 method: 'GET',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(404);
@@ -169,7 +172,7 @@ describe('event HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(eventPayload),
             });
@@ -177,7 +180,7 @@ describe('event HTTP endpoints', () => {
 
             const response = await fetch(`${baseURL}/events/${created.id}`, {
                 method: 'DELETE',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(202);
@@ -189,7 +192,7 @@ describe('event HTTP endpoints', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer test',
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(eventPayload),
             });
@@ -197,7 +200,7 @@ describe('event HTTP endpoints', () => {
 
             const response = await fetch(`${baseURL}/events/${created.id}`, {
                 method: 'DELETE',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             const body = await response.json();
@@ -208,7 +211,7 @@ describe('event HTTP endpoints', () => {
         it('should return 404 for non-existent event', async () => {
             const response = await fetch(`${baseURL}/events/00000000-0000-0000-0000-000000000000`, {
                 method: 'DELETE',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(404);

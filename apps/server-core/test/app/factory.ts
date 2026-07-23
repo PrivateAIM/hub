@@ -6,6 +6,8 @@
  */
 
 import {
+    AuthupClientModule,
+    AuthupHookModule,
     CacheInjectionKey,
     CacheModule,
     LoggerModule,
@@ -42,6 +44,8 @@ export function createTestApplication(): TestHTTPApplication {
         new ConfigModule(),
         new LoggerModule(),
         new CacheModule(),
+        new AuthupHookModule(),
+        new AuthupClientModule(),
         createTestDatabaseModule(),
         createTestComponentsModule(),
         new AnalysisModule(),

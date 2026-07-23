@@ -40,16 +40,7 @@ export function createTestDatabaseModule(): IModule {
 
         async setup(container: IContainer): Promise<void> {
             const optionsBuilder = new DataSourceOptionsBuilder();
-
-            let options;
-            try {
-                options = optionsBuilder.buildWithEnv();
-            } catch {
-                options = optionsBuilder.buildWith({
-                    type: 'better-sqlite3',
-                    database: ':memory:',
-                });
-            }
+            const options = optionsBuilder.buildWithEnv();
 
             await createDatabase({
                 options,
@@ -99,16 +90,7 @@ export function createTestDatabaseModuleForSetup(): IModule {
 
         async setup(): Promise<void> {
             const optionsBuilder = new DataSourceOptionsBuilder();
-
-            let options;
-            try {
-                options = optionsBuilder.buildWithEnv();
-            } catch {
-                options = optionsBuilder.buildWith({
-                    type: 'better-sqlite3',
-                    database: ':memory:',
-                });
-            }
+            const options = optionsBuilder.buildWithEnv();
 
             await createDatabase({
                 options,

@@ -14,6 +14,7 @@ import {
 } from 'vitest';
 import path from 'node:path';
 import fs from 'node:fs';
+import { createAdminAuthorizationHeader } from '@privateaim/server-test-kit';
 import {
     createTestSuite,
 } from '../../utils/index.ts';
@@ -21,9 +22,11 @@ import { createTestBucket } from '../../utils/domains/index.ts';
 
 describe('bucket-file HTTP endpoints', () => {
     const suite = createTestSuite();
+    let authorization: string;
 
     beforeAll(async () => {
         await suite.up();
+        authorization = await createAdminAuthorizationHeader();
     });
 
     afterAll(async () => {
@@ -59,7 +62,7 @@ describe('bucket-file HTTP endpoints', () => {
 
     describe('GET /bucket-files', () => {
         it('should return collection with data and meta', async () => {
-            const response = await fetch(`${getBaseURL()}/bucket-files`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/bucket-files`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBe(200);
 
@@ -75,7 +78,7 @@ describe('bucket-file HTTP endpoints', () => {
 
     describe('GET /bucket-files/:id', () => {
         it('should return single bucket file', async () => {
-            const response = await fetch(`${getBaseURL()}/bucket-files/${fileId}`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/bucket-files/${fileId}`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBe(200);
 
@@ -88,7 +91,7 @@ describe('bucket-file HTTP endpoints', () => {
         });
 
         it('should return 404 for non-existent bucket file', async () => {
-            const response = await fetch(`${getBaseURL()}/bucket-files/00000000-0000-0000-0000-000000000000`, { headers: { Authorization: 'Bearer test' } });
+            const response = await fetch(`${getBaseURL()}/bucket-files/00000000-0000-0000-0000-000000000000`, { headers: { Authorization: authorization } });
 
             expect(response.status).toBeGreaterThanOrEqual(400);
         });
@@ -104,7 +107,7 @@ describe('bucket-file HTTP endpoints', () => {
 
             const uploadResponse = await fetch(`${getBaseURL()}/buckets/${bucketId}/upload`, {
                 method: 'POST',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
                 body: formData,
             });
             const uploadBody = await uploadResponse.json();
@@ -112,7 +115,7 @@ describe('bucket-file HTTP endpoints', () => {
 
             const response = await fetch(`${getBaseURL()}/bucket-files/${deleteFileId}`, {
                 method: 'DELETE',
-                headers: { Authorization: 'Bearer test' },
+                headers: { Authorization: authorization },
             });
 
             expect(response.status).toBe(202);

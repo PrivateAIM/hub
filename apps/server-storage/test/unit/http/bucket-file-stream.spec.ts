@@ -14,6 +14,7 @@ import {
 } from 'vitest';
 import { Readable } from 'node:stream';
 import { streamToBuffer } from '../../../src/core/index.ts';
+import { createAdminAuthorizationHeader } from '@privateaim/server-test-kit';
 import {
     createTestSuite,
 } from '../../utils/index.ts';
@@ -21,9 +22,11 @@ import { createTestBucket } from '../../utils/domains/index.ts';
 
 describe('bucket-file stream endpoint', () => {
     const suite = createTestSuite();
+    let authorization: string;
 
     beforeAll(async () => {
         await suite.up();
+        authorization = await createAdminAuthorizationHeader();
     });
 
     afterAll(async () => {
@@ -52,7 +55,7 @@ describe('bucket-file stream endpoint', () => {
         const client = suite.client();
         const baseURL = client.getBaseURL().replace(/\/+$/, '');
 
-        const response = await fetch(`${baseURL}/bucket-files/${fileId}/stream`, { headers: { Authorization: 'Bearer test' } });
+        const response = await fetch(`${baseURL}/bucket-files/${fileId}/stream`, { headers: { Authorization: authorization } });
 
         expect(response.status).toBe(200);
 
@@ -78,7 +81,7 @@ describe('bucket-file stream endpoint', () => {
 
         const response = await fetch(`${baseURL}/bucket-files/${fileId}/stream`, {
             headers: {
-                Authorization: 'Bearer test',
+                Authorization: authorization,
                 'Accept-Encoding': 'gzip, deflate',
             },
         });
@@ -99,7 +102,7 @@ describe('bucket-file stream endpoint', () => {
         const client = suite.client();
         const baseURL = client.getBaseURL().replace(/\/+$/, '');
 
-        const response = await fetch(`${baseURL}/bucket-files/00000000-0000-0000-0000-000000000000/stream`, { headers: { Authorization: 'Bearer test' } });
+        const response = await fetch(`${baseURL}/bucket-files/00000000-0000-0000-0000-000000000000/stream`, { headers: { Authorization: authorization } });
 
         expect(response.status).toBeGreaterThanOrEqual(400);
     });

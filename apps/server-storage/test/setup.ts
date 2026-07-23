@@ -8,6 +8,7 @@ import 'reflect-metadata';
 
 import type { TestProject } from 'vitest/node';
 import { GenericContainer } from 'testcontainers';
+import { provideAuthup, provideDatabase, stopTestContainers } from '@privateaim/server-test-kit';
 import { TestDatabase } from './utils/index.ts';
 
 declare module 'vitest' {
@@ -32,12 +33,18 @@ async function setup(project: TestProject) {
 
     globalThis.MINIO_CONTAINER = container;
 
+    // Provide a database + Authup instance: an externally configured service
+    // (CI) is used as-is, otherwise a testcontainer is started.
+    await provideDatabase(project);
+    await provideAuthup(project);
+
     const database = new TestDatabase();
     await database.setup();
 }
 
 async function teardown() {
     await globalThis.MINIO_CONTAINER.stop();
+    await stopTestContainers();
 }
 
 export {

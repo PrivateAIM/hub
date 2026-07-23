@@ -52,24 +52,11 @@ jobs:
             matrix:
                 db: [ mysql, postgres, sqlite ]
 
+        # Authup is started per-suite via testcontainers (see
+        # packages/server-test-kit) so the hub provisioning file can be mounted —
+        # a GitHub service container cannot mount the workspace, which is only
+        # checked out after services start. The database is still provided here.
         services:
-            authup:
-                image: authup/authup
-                ports:
-                    - 3000:3000
-                options: >-
-                    --health-cmd "echo 0"
-                    --health-interval 30s
-                    --health-timeout 10s
-                    --health-retries 5
-                    --health-start-period 30s
-                env:
-                    DB_TYPE: "better-sqlite3"
-                    DB_DATABASE: ":memory:"
-                    NODE_ENV: "development"
-                    CLIENT_SYSTEM_ENABLED: "true"
-                    CLIENT_SYSTEM_SECRET: "start123"
-                    CLIENT_SYSTEM_SECRET_RESET: "true"
             mysql:
                 image: mysql:9
                 env:
@@ -132,7 +119,6 @@ jobs:
                     PORT: 4000
                     SKIP_PROJECT_APPROVAL: true
                     SKIP_ANALYSIS_APPROVAL: true
-                    AUTHUP_URL: http://localhost:3000/
                 run: |
                     npm run test
 

@@ -9,6 +9,7 @@ import 'reflect-metadata';
 import type { TestProject } from 'vitest/node';
 import { GenericContainer, Wait } from 'testcontainers';
 import { LoggerModule } from '@privateaim/server-kit';
+import { provideAuthup, provideDatabase, stopTestContainers } from '@privateaim/server-test-kit';
 import { Application } from 'orkos';
 import { ConfigModule } from '../src/app/modules/config/index.ts';
 import { createTestDatabaseModule } from './app/database.ts';
@@ -32,6 +33,11 @@ async function setup(project: TestProject) {
 
     globalThis.VL_CONTAINER = container;
 
+    // Provide a database + Authup instance: an externally configured service
+    // (CI) is used as-is, otherwise a testcontainer is started.
+    await provideDatabase(project);
+    await provideAuthup(project);
+
     const app = new Application({
         modules: [
             new ConfigModule(),
@@ -46,6 +52,7 @@ async function setup(project: TestProject) {
 
 async function teardown() {
     await globalThis.VL_CONTAINER.stop();
+    await stopTestContainers();
 }
 
 export {
