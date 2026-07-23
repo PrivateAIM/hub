@@ -5,15 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BadRequestError } from '@ebec/http';
 import { createURLCodec } from '@rapiq/codec-url';
 import type {
     ICondition,
     IFilter,
+    IFilters,
     IQuery,
     ObjectLiteral,
     Schema,
 } from '@rapiq/core';
 import {
+    FilterCompoundOperator,
+    FilterFieldOperator,
     Query,
     SchemaRegistry,
     isFilters,
@@ -125,30 +129,47 @@ export function appendQueryConditions(query: IQuery, ...conditions: ICondition[]
 }
 
 /**
- * Flatten the (equality-style) leaf filters of a decoded query into a
- * `field -> string value` map. Nested compound groups are walked; the last
- * value wins per field. Used by the telemetry-backed log controllers,
+ * Flatten the equality leaf filters of a decoded query into a
+ * `field -> string value` map. Used by the telemetry-backed log controllers,
  * which forward a small set of allow-listed scalar filters (e.g.
- * `analysis_id`, `node_id`, `level`) to the telemetry client.
+ * `analysis_id`, `node_id`, `level`) to the telemetry client as label
+ * equalities.
+ *
+ * Only positive equality (`eq`) leaves combined with `and` are meaningful
+ * here — the telemetry label API has no notion of negation/comparison/OR.
+ * The rapiq v2 expression dialect *can* express those (`not(eq(...))`,
+ * `or(...)`, `lt(...)`), and the schema allow-list constrains field names but
+ * not operators. Silently flattening such a filter to a bare equality would
+ * forward the **inverse** (or an arbitrary last-wins branch) to the log
+ * read/delete endpoints, so reject any non-`eq` leaf or non-`and` compound
+ * with a 400 instead.
  */
 export function collectRootFilterValues(query: IQuery): Record<string, string> {
     const out: Record<string, string> = {};
 
-    const visit = (conditions: readonly ICondition[]) => {
-        for (const condition of conditions) {
+    const visitGroup = (group: IFilters) => {
+        if (group.operator !== FilterCompoundOperator.AND) {
+            throw new BadRequestError(`The filter compound operator '${group.operator}' is not supported here; only 'and' of equality filters is allowed.`);
+        }
+
+        for (const condition of group.value) {
             if (isFilters(condition)) {
-                visit(condition.value);
+                visitGroup(condition);
                 continue;
             }
 
             // A non-compound condition is a leaf `Filter` (carries a field).
             const leaf = condition as IFilter;
+            if (leaf.operator !== FilterFieldOperator.EQUAL) {
+                throw new BadRequestError(`The filter operator '${leaf.operator}' on '${leaf.field}' is not supported here; only equality (eq) filters are allowed.`);
+            }
+
             out[leaf.field] = `${leaf.value}`;
         }
     };
 
     if (isFilters(query.filters)) {
-        visit(query.filters.value);
+        visitGroup(query.filters);
     }
 
     return out;
