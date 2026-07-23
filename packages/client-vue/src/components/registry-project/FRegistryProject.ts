@@ -40,7 +40,7 @@ import {
 } from '../../core';
 
 class RegistryProjectSecretValidator extends Container<{ secret: string }> {
-    protected initialize() {
+    protected override initialize() {
         super.initialize();
 
         this.mount(

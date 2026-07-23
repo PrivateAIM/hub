@@ -27,15 +27,15 @@ const FAnalysisBucketFiles = defineComponent({
     setup(props, setup) {
         // todo: include sort
 
-        const filters = computed<FiltersBuildInput<AnalysisBucketFile>>(
+        const filters = computed<FiltersBuildInput<AnalysisBucketFile, 3>>(
             () => {
                 if (props.query) {
                     // query.filters may be a compound ICondition; this list only
                     // reads the flat build-input record form.
-                    return props.query.filters as FiltersBuildInput<AnalysisBucketFile>;
+                    return props.query.filters as FiltersBuildInput<AnalysisBucketFile, 3>;
                 }
 
-                return {} as FiltersBuildInput<AnalysisBucketFile>;
+                return {} as FiltersBuildInput<AnalysisBucketFile, 3>;
             },
         );
 

@@ -42,7 +42,7 @@ export default defineComponent({
     props: {
         entity: { type: Object as PropType<AnalysisNode> },
         entityId: { type: String },
-        queryFilters: { type: Object as PropType<FiltersBuildInput<AnalysisNode>> },
+        queryFilters: { type: Object as PropType<FiltersBuildInput<AnalysisNode, 3>> },
         direction: { type: String as PropType<`${Direction.IN}` | `${Direction.OUT}`> },
         target: { type: String as PropType<`${Target.NODE}` | `${Target.ANALYSIS}`> },
     },

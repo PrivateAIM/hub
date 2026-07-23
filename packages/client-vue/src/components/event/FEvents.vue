@@ -20,7 +20,7 @@ import FEvent from './FEvent';
 
 export default defineComponent({
     components: { FEvent },
-    props: { query: { type: Object as PropType<QueryBuildInput<Event>> } },
+    props: { query: { type: Object as PropType<QueryBuildInput<Event, 3>> } },
     setup(props) {
         const httpClient = injectTelemetryHTTPClient();
 
@@ -33,7 +33,7 @@ export default defineComponent({
         const busy = ref(false);
         const data = ref<Event[]>([]);
 
-        const resolve = async (query?: QueryBuildInput<Event>) => {
+        const resolve = async (query?: QueryBuildInput<Event, 3>) => {
             busy.value = true;
 
             const response = await httpClient.event.getMany(query);

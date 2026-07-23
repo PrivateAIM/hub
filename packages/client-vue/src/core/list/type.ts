@@ -31,7 +31,7 @@ type Entity<T> = T;
 // expands over hub's cyclic entity graph (analysis ↔ project ↔ node) into a
 // type too large for vue-tsc to serialize into the emitted .d.ts (TS7056).
 // UI queries never address more than three relation segments.
-export type ListMeta<T> = ObjectLiteralKeys<{
+export type ListMeta<T extends Record<string, any>> = ObjectLiteralKeys<{
     total?: number,
     busy?: boolean,
     [Parameter.PAGINATION]?: PaginationBuildInput,
@@ -103,13 +103,13 @@ export type ListRenderOptions<T> = {
     loading?: ListLoadingOptions<T> | boolean
 };
 
-export type ListProps<T> = {
+export type ListProps<T extends Record<string, any>> = {
     realmId?: string,
     query?: QueryBuildInput<Entity<T>, 3>,
     loadOnSetup?: boolean,
 } & ListRenderOptions<T>;
 
-export type List<T> = {
+export type List<T extends Record<string, any>> = {
     render() : VNodeChild;
     load: ListLoadFn<ListMeta<T>>,
     handleCreated(item: T) : void;
@@ -122,7 +122,7 @@ export type List<T> = {
     total: Ref<number>,
 };
 
-export type ListSlotsType<T> = ObjectLiteralKeys<{
+export type ListSlotsType<T extends Record<string, any>> = ObjectLiteralKeys<{
     [EntityListSlotName.BODY]: ListBodySlotProps<T, ListMeta<T>>,
     [EntityListSlotName.DEFAULT]: ListSlotProps<T, ListMeta<T>>,
     [EntityListSlotName.ITEM]: ListItemSlotProps<T>, // todo: add generic

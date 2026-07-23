@@ -18,7 +18,7 @@ import type { ListMeta } from '../../core';
 import { injectStorageHTTPClient } from '../../core';
 
 export default defineComponent({
-    props: { query: { type: Object as PropType<QueryBuildInput<BucketFile>> } },
+    props: { query: { type: Object as PropType<QueryBuildInput<BucketFile, 3>> } },
     emits: ['deleted', 'failed', 'created'],
     setup(props, { emit, expose }) {
         const httpClient = injectStorageHTTPClient();
@@ -34,7 +34,7 @@ export default defineComponent({
 
         const data = ref<BucketFile[]>([]);
 
-        const resolve = async (query?: QueryBuildInput<BucketFile>) => {
+        const resolve = async (query?: QueryBuildInput<BucketFile, 3>) => {
             busy.value = true;
 
             const response = await httpClient.bucketFile.getMany(query);

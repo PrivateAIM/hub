@@ -26,13 +26,13 @@ type EntityID<T> = T extends EntityWithID ?
 
 export type EntityManagerRenderFn = () => VNodeChild;
 
-export type EntityManagerResolveContext<T> = {
+export type EntityManagerResolveContext<T extends Record<string, any>> = {
     id?: EntityID<T> | null,
     reset?: boolean,
-    query?: QueryBuildInput<T>
+    query?: QueryBuildInput<T, 3>
 };
 
-export type EntityManager<T> = {
+export type EntityManager<T extends Record<string, any>> = {
     busy: Ref<boolean>,
     data: Ref<T | null>,
     error: Ref<Error | undefined>,
@@ -50,21 +50,21 @@ export type EntityManager<T> = {
     render(content?: VNodeChild | EntityManagerRenderFn) : VNodeChild;
 };
 
-export type EntityManagerProps<T> = {
+export type EntityManagerProps<T extends Record<string, any>> = {
     entity?: T,
     entityId?: EntityID<T>,
-    queryFilters?: FiltersBuildInput<T>,
-    queryFields?: FieldsBuildInput<T>,
-    query?: QueryBuildInput<T>
+    queryFilters?: FiltersBuildInput<T, 3>,
+    queryFields?: FieldsBuildInput<T, 3>,
+    query?: QueryBuildInput<T, 3>
 };
 
-export type EntityManagerSlotProps<T> = {
+export type EntityManagerSlotProps<T extends Record<string, any>> = {
     [K in keyof EntityManager<T>]: EntityManager<T>[K] extends Ref<infer U> ?
         U :
         EntityManager<T>[K]
 };
 
-export type EntityManagerSlotsType<T> = {
+export type EntityManagerSlotsType<T extends Record<string, any>> = {
     default?: EntityManagerSlotProps<T>,
     error?: Error
 };

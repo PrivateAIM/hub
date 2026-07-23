@@ -26,7 +26,7 @@ export function defineListEvents<T>() : ListEventsType<T> {
         updated: (_item: T) => true,
     };
 }
-export function defineListProps<T>() {
+export function defineListProps<T extends Record<string, any>>() {
     return {
         query: {
             // Depth-bounded to 3 (matching @authup/client-web-kit's

@@ -41,12 +41,12 @@ export default defineComponent({
     },
     emits: ['deleted', 'failed', 'updated'],
     setup(props, { emit }) {
-        const bucketQuery = computed<QueryBuildInput<AnalysisBucket>>(() => ({
+        const bucketQuery = computed<QueryBuildInput<AnalysisBucket, 3>>(() => ({
             filters: {
                 type: AnalysisBucketType.CODE,
                 analysis_id: props.entity.analysis_id,
             },
-        } satisfies QueryBuildInput<AnalysisBucket>));
+        } satisfies QueryBuildInput<AnalysisBucket, 3>));
 
         const handleDeleted = (data: AnalysisNode) => {
             emit('deleted', data);

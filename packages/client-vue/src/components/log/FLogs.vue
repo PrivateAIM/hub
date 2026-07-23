@@ -20,7 +20,7 @@ import FLog from './FLog';
 
 export default defineComponent({
     components: { FLog },
-    props: { query: { type: Object as PropType<QueryBuildInput<Log>> } },
+    props: { query: { type: Object as PropType<QueryBuildInput<Log, 3>> } },
     setup(props) {
         const httpClient = injectTelemetryHTTPClient();
 
@@ -33,7 +33,7 @@ export default defineComponent({
         const busy = ref(false);
         const data = ref<Log[]>([]);
 
-        const resolve = async (query?: QueryBuildInput<Log>) => {
+        const resolve = async (query?: QueryBuildInput<Log, 3>) => {
             busy.value = true;
 
             const response = await httpClient.log.getMany(query);

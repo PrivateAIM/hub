@@ -63,7 +63,7 @@ export default defineComponent({
         provide('files', selected);
 
         const vNode = useTemplateRef<typeof FBucketFiles>('bucketFiles');
-        const query = computed<QueryBuildInput<BucketFile>>(() => ({ filters: { bucket_id: props.entityId } }));
+        const query = computed<QueryBuildInput<BucketFile, 3>>(() => ({ filters: { bucket_id: props.entityId } }));
 
         const handleCreated = (entity: BucketFile) => {
             emit('created', entity);

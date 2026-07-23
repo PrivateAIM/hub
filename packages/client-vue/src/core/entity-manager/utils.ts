@@ -14,7 +14,7 @@ import type {
     EntityManagerSlotProps,
 } from './type';
 
-export function buildEntityManagerSlotProps<T>(
+export function buildEntityManagerSlotProps<T extends Record<string, any>>(
     input: EntityManager<T>,
 ) : EntityManagerSlotProps<T> {
     return {
@@ -41,12 +41,12 @@ export function defineEntityManagerEvents<T>(): EntityManagerEventsType<T> {
     };
 }
 
-export function defineEntityManagerProps<T>() {
+export function defineEntityManagerProps<T extends Record<string, any>>() {
     return {
         entity: { type: Object as PropType<T> },
         entityId: { type: String },
-        queryFilters: { type: Object as PropType<FiltersBuildInput<T>> },
-        queryFields: { type: Object as PropType<FieldsBuildInput<T>> },
-        query: { type: Object as PropType<QueryBuildInput<T>> },
+        queryFilters: { type: Object as PropType<FiltersBuildInput<T, 3>> },
+        queryFields: { type: Object as PropType<FieldsBuildInput<T, 3>> },
+        query: { type: Object as PropType<QueryBuildInput<T, 3>> },
     };
 }

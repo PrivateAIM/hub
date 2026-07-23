@@ -379,7 +379,7 @@ export function createEntityManager<
 
         entity.value = null;
 
-        let query : (QueryBuildInput<RECORD>) | undefined;
+        let query : (QueryBuildInput<RECORD, 3>) | undefined;
         if (resolveCtx.query) {
             query = resolveCtx.query;
         }

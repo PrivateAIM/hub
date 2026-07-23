@@ -77,7 +77,7 @@ export default defineComponent({
          * runs in addition to the base ones.
          */
         class NodeFormValidator extends NodeValidator {
-            protected initialize() {
+            protected override initialize() {
                 super.initialize();
 
                 this.mount(
