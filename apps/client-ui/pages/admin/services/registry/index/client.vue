@@ -11,7 +11,6 @@ import { h, ref } from 'vue';
 import { ServiceID } from '@privateaim/core-kit';
 import { useToast } from '#imports';
 import { createError, defineNuxtComponent, navigateTo } from '#app';
-import { updateObjectProperties } from '../../../../../utils';
 
 export default defineNuxtComponent({
     async setup() {
@@ -38,7 +37,7 @@ export default defineNuxtComponent({
 
         const handleUpdated = (item: Client) => {
             if (entity.value) {
-                updateObjectProperties(entity.value, item);
+                entity.value = { ...entity.value, ...item };
             }
 
             toast.show({ variant: 'success', body: 'The client was successfully updated.' });
@@ -47,7 +46,7 @@ export default defineNuxtComponent({
         return () => h(AClientForm, {
             name: ServiceID.REGISTRY,
             realmId: entity.value?.realmId,
-            entity: entity.value,
+            entity: entity.value ?? undefined,
             onUpdated: (item) => {
                 handleUpdated(item);
             },

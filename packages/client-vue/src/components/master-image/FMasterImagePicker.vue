@@ -82,7 +82,7 @@ export default defineComponent({
 
                 resolved.value = true;
 
-                setup.emit('resolved', entity);
+                setup.emit('resolved', entity ?? undefined);
             },
         });
 

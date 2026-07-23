@@ -99,7 +99,7 @@ export default defineComponent({
 
         watch(updatedAt, (val, oldVal) => {
             if (val && val !== oldVal) {
-                manager.data.value = props.entity;
+                manager.data.value = props.entity ?? null;
 
                 initFromProperties();
             }

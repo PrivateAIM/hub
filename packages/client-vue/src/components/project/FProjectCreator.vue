@@ -29,14 +29,15 @@ export default defineComponent({
     <div>
         <template v-if="entity.user_id">
             <AUser :query-filters="{ id: entity.user_id }">
-                <template #default="{ data }">
+                <template #default="scope">
                     <slot
+                        v-if="scope && scope.data"
                         name="default"
-                        :data="data"
+                        :data="scope.data"
                     >
                         <FDisplayName
-                            :name="data.name"
-                            :display-name="data.displayName"
+                            :name="scope.data.name"
+                            :display-name="scope.data.displayName"
                         />
                     </slot>
                 </template>
@@ -52,14 +53,15 @@ export default defineComponent({
         </template>
         <template v-else-if="entity.robot_id">
             <AClient :query-filters="{ id: entity.robot_id }">
-                <template #default="{ data }">
+                <template #default="scope">
                     <slot
+                        v-if="scope && scope.data"
                         name="default"
-                        :data="data"
+                        :data="scope.data"
                     >
                         <FDisplayName
-                            :name="data.name"
-                            :display-name="data.displayName"
+                            :name="scope.data.name"
+                            :display-name="scope.data.displayName"
                         />
                     </slot>
                 </template>

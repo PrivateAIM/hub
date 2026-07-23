@@ -124,7 +124,7 @@ export default defineComponent({
         const updatedAt = useUpdatedAt(props.entity);
 
         const initForm = () => {
-            initFormAttributesFromSource(form, manager.data.value);
+            initFormAttributesFromSource(form, manager.data.value ?? undefined);
 
             if (!form.realm_id && props.realmId) {
                 form.realm_id = props.realmId;

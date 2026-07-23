@@ -89,7 +89,7 @@ export default defineNuxtComponent({
                 :direction="'in'"
                 :target="'project'"
                 :realm-id="realmId"
-                :source-id="nodeId"
+                :source-id="nodeId ?? undefined"
                 :include-project="true"
                 :include-node="true"
             >

@@ -76,7 +76,7 @@ const FProjectInForm = defineComponent({
         const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
         function initForm() {
-            initFormAttributesFromSource(form, manager.data.value);
+            initFormAttributesFromSource(form, manager.data.value ?? undefined);
         }
 
         watch(updatedAt, (val, oldVal) => {

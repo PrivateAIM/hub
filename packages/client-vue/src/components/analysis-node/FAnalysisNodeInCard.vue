@@ -111,6 +111,7 @@ export default defineComponent({
                         <FAnalysisBucket :query="bucketQuery">
                             <template #default="{ data: bucket }">
                                 <FAnalysisBucketDownload
+                                    v-if="bucket"
                                     :entity="bucket"
                                     :with-icon="true"
                                     :with-text="false"
