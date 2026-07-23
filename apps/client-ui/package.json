@@ -12,7 +12,9 @@
     "description": "This package contains the frontend application of the HUB Ecosystem.",
     "scripts": {
         "dev": "nuxi dev",
-        "build": "nuxi build",
+        "build": "npm run build:js && npm run build:types",
+        "build:js": "nuxi build",
+        "build:types": "nuxi typecheck",
         "start": "nuxi start",
         "generate": "nuxi generate",
         "prepare": "nuxi prepare",
