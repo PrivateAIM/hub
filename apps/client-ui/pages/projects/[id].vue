@@ -49,7 +49,7 @@ export default defineComponent({
 
         const canEdit = usePermissionCheck({ name: PermissionName.PROJECT_UPDATE });
 
-        const manager = createEntityManager<`${DomainType.PROJECT}`>({
+        const manager = createEntityManager<`${DomainType.PROJECT}`, Project>({
             type: `${DomainType.PROJECT}`,
             props: { entityId: useRoute().params.id as string },
             onUpdated() {

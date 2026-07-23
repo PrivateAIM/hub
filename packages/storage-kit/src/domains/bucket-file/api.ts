@@ -54,6 +54,10 @@ export class BucketFileAPI extends BaseAPI {
             responseType: 'stream',
         });
 
+        if (typeof response.data === 'undefined') {
+            throw new Error('The stream response did not return a body.');
+        }
+
         return response.data;
     }
 }

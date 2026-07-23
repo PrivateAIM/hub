@@ -23,13 +23,18 @@ export function parseProxyConnectionString(connectionStr: string) : ProxyConnect
         return undefined;
     }
 
+    const [, protocol, username, password, host, port] = match;
+    if (!protocol || !host || !port || !username || !password) {
+        return undefined;
+    }
+
     return {
-        protocol: match[1] as 'http' | 'https',
-        host: match[4],
-        port: Number.parseInt(match[5], 10),
+        protocol: protocol as 'http' | 'https',
+        host,
+        port: Number.parseInt(port, 10),
         auth: {
-            username: match[2],
-            password: match[3],
+            username,
+            password,
         },
     };
 }
