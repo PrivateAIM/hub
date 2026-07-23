@@ -8,7 +8,12 @@
 import { inject } from 'vitest';
 import type { TestProject } from 'vitest/node';
 import { startAuthupContainer, startPostgresContainer } from './containers.ts';
-import { applyDatabaseConnectionEnv, hasAuthupEnv, hasDatabaseEnv } from './env.ts';
+import {
+    applyDatabaseConnectionEnv,
+    hasAuthupEnv,
+    hasDatabaseEnv,
+    resolveAuthupDatabaseEnv,
+} from './env.ts';
 import type { DatabaseConnection } from './types.ts';
 
 declare module 'vitest' {
@@ -37,16 +42,17 @@ export async function provideDatabase(project: TestProject): Promise<void> {
 
 /**
  * Global-setup helper: use an externally provided Authup instance when
- * `AUTHUP_URL` is set, otherwise start an Authup container (with the hub
- * provisioning file mounted). The resolved URL is published to the test workers.
+ * `AUTHUP_URL` is set, otherwise start an Authup container provisioned with the
+ * given permission names (the set the calling service actually checks). The
+ * resolved URL is published to the test workers.
  */
-export async function provideAuthup(project: TestProject): Promise<void> {
+export async function provideAuthup(project: TestProject, permissionNames: string[]): Promise<void> {
     if (hasAuthupEnv()) {
         project.provide('AUTHUP_URL', process.env.AUTHUP_URL as string);
         return;
     }
 
-    const url = await startAuthupContainer();
+    const url = await startAuthupContainer(permissionNames, resolveAuthupDatabaseEnv());
     process.env.AUTHUP_URL = url;
     project.provide('AUTHUP_URL', url);
 }

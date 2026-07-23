@@ -8,6 +8,7 @@ import 'reflect-metadata';
 
 import type { TestProject } from 'vitest/node';
 import { GenericContainer } from 'testcontainers';
+import { PermissionName } from '@privateaim/kit';
 import { provideAuthup, provideDatabase, stopTestContainers } from '@privateaim/server-test-kit';
 import { TestDatabase } from './utils/index.ts';
 
@@ -17,6 +18,13 @@ declare module 'vitest' {
         MINIO_CONTAINER_PORT: number
     }
 }
+
+// The permissions server-storage's authorization middleware checks.
+const PERMISSIONS: PermissionName[] = [
+    PermissionName.BUCKET_CREATE,
+    PermissionName.BUCKET_UPDATE,
+    PermissionName.BUCKET_DELETE,
+];
 
 async function setup(project: TestProject) {
     const containerConfig = new GenericContainer('lazybit/minio')
@@ -36,7 +44,7 @@ async function setup(project: TestProject) {
     // Provide a database + Authup instance: an externally configured service
     // (CI) is used as-is, otherwise a testcontainer is started.
     await provideDatabase(project);
-    await provideAuthup(project);
+    await provideAuthup(project, PERMISSIONS);
 
     const database = new TestDatabase();
     await database.setup();

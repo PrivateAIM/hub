@@ -10,5 +10,5 @@ export default defineConfig({
     // as devDependencies (not peers, so consumers that only use the fakes — e.g.
     // server-messenger — are not forced to provide them) and resolved from the
     // monorepo at runtime, so they must not be bundled into dist.
-    external: [/^testcontainers/, /^vitest/, /^@privateaim\/kit/],
+    external: [/^testcontainers/, /^vitest/],
 });

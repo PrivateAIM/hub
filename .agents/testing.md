@@ -105,19 +105,26 @@ dependency is provided one of two ways, decided by env:
 | Authup     | `AUTHUP_URL` set                  | `authup/authup` container          |
 
 The shared helpers live in `@privateaim/server-test-kit`
-(`src/testcontainers/`, `src/authup-token.ts`):
+(`src/testcontainers/`, `src/authup-token.ts`, `src/setup.ts`):
 
-- `provideDatabase(project)` / `provideAuthup(project)` — global-setup helpers that
-  start a container when the service isn't provided externally and publish the
-  connection details to the workers via vitest `provide`.
-- `hydrateTestEnv()` — worker-side (`test/setup-worker.ts`, wired as `setupFiles`);
+- `provideDatabase(project)` — start a PostgreSQL container when no `DB_TYPE` is set,
+  else use the configured database. Publishes the connection to the workers via
+  vitest `provide`.
+- `provideAuthup(project, permissionNames)` — start an Authup container (unless
+  `AUTHUP_URL` is set), provisioned with exactly the permission names the calling
+  service checks. Each service passes its own set (`server-storage` 3, `server-telemetry`
+  6, `server-core` 19), listed in its `test/setup.ts`. The built-in `admin` role's
+  `globalPermissions: ['*']` picks those up at provisioning time, so the `admin`/`master`
+  token resolves them via introspection. The generated `.mjs` is mounted at
+  `/usr/src/app/writable/provisioning/hub.mjs`.
+- Authup runs on the **same database engine as hub** in each environment
+  (`resolveAuthupDatabaseEnv`): a dedicated `authup` database on the same
+  MySQL/PostgreSQL server (reached via `host.docker.internal`), or its own in-memory
+  SQLite on the sqlite leg. This keeps the whole stack on one engine per run.
+- `hydrateTestEnv()` — worker-side; the side-effecting `@privateaim/server-test-kit/setup`
+  module (wired into each `vitest.config` `setupFiles` alongside `reflect-metadata`)
   copies the provided values into `process.env` before the test app is built.
 - `stopTestContainers()` — teardown.
-- `buildAuthupProvisioning()` — generates the Authup provisioning payload from
-  `@privateaim/kit`'s `PermissionName`; mounted into the Authup container at
-  `/usr/src/app/writable/provisioning/hub.mjs`. The built-in `admin` role's
-  `globalPermissions: ['*']` picks up every hub permission at provisioning time, so
-  the `admin`/`master` token carries them all (verified via introspection).
 - `createAdminAccessToken()` / `createAdminAuthorizationHeader()` — mint a real
   `admin`/`master` token for tests that issue raw `fetch` requests (uploads,
   streaming) instead of the authenticated API client.

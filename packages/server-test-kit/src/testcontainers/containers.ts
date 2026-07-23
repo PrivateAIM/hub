@@ -27,27 +27,38 @@ const STARTUP_TIMEOUT = 180_000;
 const containers: StartedTestContainer[] = [];
 
 /**
- * Start an Authup instance with the hub provisioning file mounted. The container
- * ships with an in-memory SQLite database, the `system` client, and the default
- * `admin`/`start123` master-realm user — matching the credentials the test HTTP
- * clients authenticate with.
+ * Start an Authup instance provisioned with the given permission names, running
+ * on the given database environment (see {@link resolveAuthupDatabaseEnv} — the
+ * same engine hub uses, on a dedicated `authup` database, or self-contained
+ * SQLite). It ships with the `system` client and the default `admin`/`start123`
+ * master-realm user — matching the credentials the test HTTP clients authenticate
+ * with.
+ *
+ * `host.docker.internal` is mapped to the host gateway so the container can reach
+ * a database published on the host (a testcontainer port locally, a workflow
+ * service port in CI).
  */
-export async function startAuthupContainer(): Promise<string> {
+export async function startAuthupContainer(
+    permissionNames: string[],
+    databaseEnv: Record<string, string>,
+): Promise<string> {
     const container = await new GenericContainer(AUTHUP_IMAGE)
         .withExposedPorts(AUTHUP_PORT)
+        .withExtraHosts([
+            { host: 'host.docker.internal', ipAddress: 'host-gateway' },
+        ])
         .withEnvironment({
             NODE_ENV: 'development',
-            DB_TYPE: 'better-sqlite3',
-            DB_DATABASE: ':memory:',
             CLIENT_SYSTEM_ENABLED: 'true',
             CLIENT_SYSTEM_SECRET: 'start123',
             CLIENT_SYSTEM_SECRET_RESET: 'true',
             USER_ADMIN_PASSWORD: 'start123',
             USER_ADMIN_PASSWORD_RESET: 'true',
+            ...databaseEnv,
         })
         .withCopyContentToContainer([
             {
-                content: buildAuthupProvisioningModule(),
+                content: buildAuthupProvisioningModule(permissionNames),
                 target: AUTHUP_PROVISIONING_TARGET,
             },
         ])

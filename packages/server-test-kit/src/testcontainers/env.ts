@@ -35,3 +35,35 @@ export function applyDatabaseConnectionEnv(connection: DatabaseConnection): void
     process.env.DB_PASSWORD = connection.password;
     process.env.DB_DATABASE = connection.database;
 }
+
+/**
+ * Derive the database environment for the Authup container from hub's resolved
+ * database, so Authup runs on the same engine as the service under test in every
+ * environment (local + each CI matrix leg).
+ *
+ * - SQLite (or no configured engine) keeps Authup self-contained on its own
+ *   in-memory store — an in-memory SQLite cannot be shared across processes.
+ * - MySQL / PostgreSQL reuse the same server on a dedicated `authup` database
+ *   (Authup creates it on boot). The Authup container reaches the server — a
+ *   host-published testcontainer port locally, a workflow-service port in CI —
+ *   via `host.docker.internal` (mapped to the host gateway on Linux).
+ */
+export function resolveAuthupDatabaseEnv(): Record<string, string> {
+    const type = process.env.DB_TYPE;
+
+    if (!type || type === 'better-sqlite3' || type === 'sqlite') {
+        return {
+            DB_TYPE: 'better-sqlite3',
+            DB_DATABASE: ':memory:',
+        };
+    }
+
+    return {
+        DB_TYPE: type,
+        DB_HOST: 'host.docker.internal',
+        DB_PORT: process.env.DB_PORT ?? (type === 'mysql' ? '3306' : '5432'),
+        DB_USERNAME: process.env.DB_USERNAME ?? '',
+        DB_PASSWORD: process.env.DB_PASSWORD ?? '',
+        DB_DATABASE: 'authup',
+    };
+}

@@ -5,29 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionName } from '@privateaim/kit';
 import type { AuthupProvisioning } from './types.ts';
 
 /**
- * Build the Authup provisioning payload for the test suites from the canonical
- * {@link PermissionName} taxonomy.
+ * Build the Authup provisioning payload for a service's test suite from the set of
+ * permission names that service actually checks.
  *
- * Every hub permission is declared as a top-level (global) permission so that
- * Authup's built-in `admin` role — bound to `globalPermissions: ['*']` — resolves
- * them at provisioning time. A token minted for `admin`/`master` therefore carries
- * the full permission set, which is what the (now enforcing) authorization
+ * Every name is declared as a top-level (global) permission so that Authup's
+ * built-in `admin` role — bound to `globalPermissions: ['*']` — resolves them at
+ * provisioning time. A token minted for `admin`/`master` therefore carries the
+ * service's permission set, which is what the (now enforcing) authorization
  * middleware evaluates via introspection.
  */
-export function buildAuthupProvisioning(): AuthupProvisioning {
-    const names = Object.values(PermissionName);
-
-    return { permissions: names.map((name) => ({ attributes: { name } })) };
+export function buildAuthupProvisioning(permissionNames: string[]): AuthupProvisioning {
+    return { permissions: permissionNames.map((name) => ({ attributes: { name } })) };
 }
 
 /**
  * Serialize the provisioning payload as an ES module with a `default` export,
  * the form Authup's `FileProvisioningSource` expects for `.mjs` files.
  */
-export function buildAuthupProvisioningModule(): string {
-    return `export default ${JSON.stringify(buildAuthupProvisioning(), null, 4)};\n`;
+export function buildAuthupProvisioningModule(permissionNames: string[]): string {
+    return `export default ${JSON.stringify(buildAuthupProvisioning(permissionNames), null, 4)};\n`;
 }

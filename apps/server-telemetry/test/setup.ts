@@ -8,6 +8,7 @@ import 'reflect-metadata';
 
 import type { TestProject } from 'vitest/node';
 import { GenericContainer, Wait } from 'testcontainers';
+import { PermissionName } from '@privateaim/kit';
 import { LoggerModule } from '@privateaim/server-kit';
 import { provideAuthup, provideDatabase, stopTestContainers } from '@privateaim/server-test-kit';
 import { Application } from 'orkos';
@@ -20,6 +21,16 @@ declare module 'vitest' {
         VL_CONTAINER_PORT: number
     }
 }
+
+// The permissions server-telemetry's authorization middleware checks.
+const PERMISSIONS: PermissionName[] = [
+    PermissionName.EVENT_CREATE,
+    PermissionName.EVENT_READ,
+    PermissionName.EVENT_DELETE,
+    PermissionName.LOG_CREATE,
+    PermissionName.LOG_READ,
+    PermissionName.LOG_DELETE,
+];
 
 async function setup(project: TestProject) {
     const containerConfig = new GenericContainer('docker.io/victoriametrics/victoria-logs:v1.43.1')
@@ -36,7 +47,7 @@ async function setup(project: TestProject) {
     // Provide a database + Authup instance: an externally configured service
     // (CI) is used as-is, otherwise a testcontainer is started.
     await provideDatabase(project);
-    await provideAuthup(project);
+    await provideAuthup(project, PERMISSIONS);
 
     const app = new Application({
         modules: [
