@@ -36,7 +36,7 @@
         "@ilingo/validup-vue": "^1.0.1",
         "@ilingo/vue": "^6.0.0",
         "@nuxtjs/google-fonts": "^3.2.0",
-        "@pinia/nuxt": "^0.11.3",
+        "@pinia/nuxt": "^1.0.1",
         "@privateaim/client-vue": "^0.12.3",
         "@privateaim/client-vue-theme": "^0.12.3",
         "@privateaim/core-kit": "^0.12.3",
