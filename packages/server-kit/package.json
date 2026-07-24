@@ -33,7 +33,7 @@
         "@isaacs/ttlcache": "^2.1.5",
         "@privateaim/kit": "^0.12.3",
         "@socket.io/redis-emitter": "^5.1.0",
-        "eldin": "^1.1.0",
+        "eldin": "^1.2.0",
         "envix": "^1.5.0",
         "hapic": "^3.0.1",
         "orkos": "^1.1.1",
@@ -49,7 +49,7 @@
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.0.0-beta.1",
-        "vitest": "^4.1.9"
+        "vitest": "^4.1.10"
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.56",
