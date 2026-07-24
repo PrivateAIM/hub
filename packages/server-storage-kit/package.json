@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-storage-kit",
     "type": "module",
-    "version": "0.12.2",
+    "version": "0.12.3",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "files": [
@@ -22,14 +22,14 @@
     "license": "Apache-2.0",
     "description": "This package contains server side db helpers & utilities.",
     "devDependencies": {
-        "@privateaim/kit": "^0.12.3",
-        "@privateaim/server-kit": "^0.12.3",
-        "@privateaim/storage-kit": "^0.12.3"
+        "@privateaim/kit": "^0.12.4",
+        "@privateaim/server-kit": "^0.12.4",
+        "@privateaim/storage-kit": "^0.12.4"
     },
     "peerDependencies": {
-        "@privateaim/kit": "^0.12.3",
-        "@privateaim/server-kit": "^0.12.3",
-        "@privateaim/storage-kit": "^0.12.3"
+        "@privateaim/kit": "^0.12.4",
+        "@privateaim/server-kit": "^0.12.4",
+        "@privateaim/storage-kit": "^0.12.4"
     },
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",
