@@ -42,9 +42,9 @@
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
-        "@authup/access": "^1.0.0-beta.54",
-        "@authup/core-http-kit": "^1.0.0-beta.54",
-        "@authup/core-kit": "^1.0.0-beta.54",
+        "@authup/access": "^1.0.0-beta.55",
+        "@authup/core-http-kit": "^1.0.0-beta.55",
+        "@authup/core-kit": "^1.0.0-beta.55",
         "@rapiq/core": "^2.0.0-beta.8",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
@@ -52,9 +52,9 @@
         "vitest": "^4.1.9"
     },
     "peerDependencies": {
-        "@authup/access": "^1.0.0-beta.54",
-        "@authup/core-http-kit": "^1.0.0-beta.54",
-        "@authup/core-kit": "^1.0.0-beta.54",
+        "@authup/access": "^1.0.0-beta.55",
+        "@authup/core-http-kit": "^1.0.0-beta.55",
+        "@authup/core-kit": "^1.0.0-beta.55",
         "@rapiq/core": "^2.0.0-beta.8",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",

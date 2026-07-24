@@ -27,14 +27,14 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.54",
+        "@authup/core-kit": "^1.0.0-beta.55",
         "@privateaim/kit": "^0.12.3",
         "@rapiq/codec-url": "^2.0.0-beta.8",
         "@rapiq/core": "^2.0.0-beta.8",
         "hapic": "^3.0.1"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.54",
+        "@authup/core-kit": "^1.0.0-beta.55",
         "@privateaim/kit": "^0.12.3",
         "@rapiq/codec-url": "^2.0.0-beta.8",
         "@rapiq/core": "^2.0.0-beta.8",
