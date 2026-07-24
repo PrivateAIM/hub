@@ -42,6 +42,7 @@ describe('core/query analysis include=master_image', () => {
         const mi = await miRepo.save(miRepo.create({
             ...createTestMasterImage(),
             command: 'python main.py',
+            command_arguments: [{ position: 'before', value: '--verbose' }],
         }));
 
         const anRepo = dataSource.getRepository(AnalysisEntity);
@@ -49,6 +50,7 @@ describe('core/query analysis include=master_image', () => {
             master_image_id: mi.id,
             realm_id: 'realm-1',
             project_id: 'project-1',
+            image_command_arguments: [{ position: 'after', value: '--fast' }],
         })));
     });
 
@@ -56,7 +58,7 @@ describe('core/query analysis include=master_image', () => {
         await dataSource.destroy();
     });
 
-    it('hydrates the master_image relation when included', async () => {
+    it('hydrates the master_image relation (incl. its json command_arguments) when included', async () => {
         const query = decodeQuery({ include: 'master_image' }, { schema: analysisSchema });
         const repository = new AnalysisRepositoryAdapter(dataSource);
 
@@ -67,5 +69,18 @@ describe('core/query analysis include=master_image', () => {
         expect(data[0].master_image, 'master_image relation should hydrate').toBeDefined();
         expect(data[0].master_image.name).toEqual('base');
         expect(data[0].master_image.command).toEqual('python main.py');
+        // json column on the included relation — hydrated as a full subtree (rapiq beta.8)
+        expect(data[0].master_image.command_arguments).toEqual([{ position: 'before', value: '--verbose' }]);
+    });
+
+    it('projects the analysis json column image_command_arguments', async () => {
+        const query = decodeQuery({}, { schema: analysisSchema });
+        const repository = new AnalysisRepositoryAdapter(dataSource);
+
+        const { data } = await repository.findMany(query);
+
+        expect(data.length).toBe(1);
+        // json column on the root entity — now listable in fields (rapiq beta.8)
+        expect(data[0].image_command_arguments).toEqual([{ position: 'after', value: '--fast' }]);
     });
 });

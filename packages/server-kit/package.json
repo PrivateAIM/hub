@@ -45,7 +45,7 @@
         "@authup/access": "^1.0.0-beta.54",
         "@authup/core-http-kit": "^1.0.0-beta.54",
         "@authup/core-kit": "^1.0.0-beta.54",
-        "@rapiq/core": "^2.0.0-beta.7",
+        "@rapiq/core": "^2.0.0-beta.8",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.0.0-beta.1",
@@ -55,7 +55,7 @@
         "@authup/access": "^1.0.0-beta.54",
         "@authup/core-http-kit": "^1.0.0-beta.54",
         "@authup/core-kit": "^1.0.0-beta.54",
-        "@rapiq/core": "^2.0.0-beta.7",
+        "@rapiq/core": "^2.0.0-beta.8",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.0.0-beta.1"

@@ -12,11 +12,10 @@ import { DomainType } from '@privateaim/core-kit';
 export const masterImageSchema = defineSchema<MasterImage>({
     name: DomainType.MASTER_IMAGE,
     strict: true,
-    // Explicit root projection: without it the relation is joined but no columns
-    // are selected, so `include=master_image` (analysis/project) never hydrates it.
-    // `command_arguments` is a json/array column and cannot be listed here
-    // (rapiq SimpleKeys excludes array keys, tada5hi/rapiq#824) — it stays available
-    // via the master-image getOne endpoint (raw findOneById, no projection).
+    // Explicit root projection governing the master-image list/detail response
+    // shape. `include=master_image` (analysis/project) hydrates the relation as a
+    // full subtree regardless (rapiq beta.8). `command_arguments` is a json column,
+    // projectable since rapiq beta.8 (tada5hi/rapiq#824).
     fields: {
         default: [
             'id',
@@ -25,6 +24,7 @@ export const masterImageSchema = defineSchema<MasterImage>({
             'virtual_path',
             'group_virtual_path',
             'command',
+            'command_arguments',
             'build_status',
             'build_progress',
             'build_hash',
