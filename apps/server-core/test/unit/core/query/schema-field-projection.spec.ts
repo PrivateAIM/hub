@@ -15,6 +15,8 @@ import {
 import type { EntityTarget, ObjectLiteral } from 'typeorm';
 import { DataSource } from 'typeorm';
 import type { Schema } from '@rapiq/core';
+import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import { DataSourceOptionsBuilder } from '../../../../src/app/modules/database/index.ts';
 import { applyQuery } from '../../../../src/app/modules/database/repositories/query.ts';
 import { decodeQuery } from '../../../../src/core/query/index.ts';
@@ -73,6 +75,8 @@ describe('core/query default field projection', () => {
             analysis_realm_id: 'ar-1',
             node_id: 'n-1',
             node_realm_id: 'nr-1',
+            approval_status: AnalysisNodeApprovalStatus.APPROVED,
+            execution_status: ProcessStatus.EXECUTING,
             comment: 'note',
             execution_progress: 42,
             artifact_tag: 'tag',
