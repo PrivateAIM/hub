@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.12.4](https://github.com/PrivateAIM/hub/compare/v0.12.3...v0.12.4) (2026-07-24)
+
+
+### Bug Fixes
+
+* **server-core:** field projections + bump rapiq beta.9 / authup beta.56 (restore json columns) ([#1780](https://github.com/PrivateAIM/hub/issues/1780)) ([0765653](https://github.com/PrivateAIM/hub/commit/07656537a16d55a9b1e9158f378cde40e97cde99))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.12.3 to ^0.12.4
+    * @privateaim/telemetry-kit bumped from ^0.12.3 to ^0.12.4
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.12.3 to ^0.12.4
+    * @privateaim/telemetry-kit bumped from ^0.12.3 to ^0.12.4
+
 ## [0.12.3](https://github.com/PrivateAIM/hub/compare/v0.12.2...v0.12.3) (2026-07-23)
 
 
