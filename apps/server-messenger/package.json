@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-messenger",
     "type": "module",
-    "version": "0.12.3",
+    "version": "0.12.4",
     "private": true,
     "module": "./dist/index.mjs",
     "types": "dist/index.d.ts",
@@ -23,14 +23,14 @@
         "@authup/core-kit": "^1.0.0-beta.56",
         "@authup/kit": "^1.0.0-beta.56",
         "@privateaim/errors": "^0.8.42",
-        "@privateaim/kit": "^0.12.3",
-        "@privateaim/messenger-kit": "^0.12.2",
-        "@privateaim/server-db-kit": "^0.12.2",
-        "@privateaim/server-http-kit": "^0.12.3",
-        "@privateaim/server-kit": "^0.12.3",
-        "@privateaim/server-realtime-kit": "^0.12.3",
-        "@privateaim/server-telemetry-kit": "^0.12.2",
-        "@privateaim/telemetry-kit": "^0.12.3",
+        "@privateaim/kit": "^0.12.4",
+        "@privateaim/messenger-kit": "^0.12.3",
+        "@privateaim/server-db-kit": "^0.12.3",
+        "@privateaim/server-http-kit": "^0.12.4",
+        "@privateaim/server-kit": "^0.12.4",
+        "@privateaim/server-realtime-kit": "^0.12.4",
+        "@privateaim/server-telemetry-kit": "^0.12.3",
+        "@privateaim/telemetry-kit": "^0.12.4",
         "@routup/basic": "^3.0.0",
         "@routup/decorators": "^5.0.0",
         "@validup/zod": "^0.3.3",
@@ -60,8 +60,8 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "devDependencies": {
-        "@privateaim/messenger-http-kit": "^0.12.3",
-        "@privateaim/server-test-kit": "^0.12.3",
+        "@privateaim/messenger-http-kit": "^0.12.4",
+        "@privateaim/server-test-kit": "^0.12.4",
         "better-sqlite3": "^12.11.1",
         "vitest": "^4.1.10"
     }

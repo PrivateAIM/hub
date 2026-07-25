@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-test-kit",
     "type": "module",
-    "version": "0.12.3",
+    "version": "0.12.4",
     "license": "Apache-2.0",
     "description": "Shared test fakes and helpers for PrivateAIM server packages.",
     "exports": {
@@ -29,7 +29,7 @@
         "@authup/access": "^1.0.0-beta.56",
         "@authup/core-kit": "^1.0.0-beta.56",
         "@privateaim/errors": "^0.8.42",
-        "@privateaim/server-kit": "^0.12.3",
+        "@privateaim/server-kit": "^0.12.4",
         "testcontainers": "^12.0.4",
         "vitest": "^4.1.10"
     },
@@ -37,7 +37,7 @@
         "@authup/access": "^1.0.0-beta.56",
         "@authup/core-kit": "^1.0.0-beta.56",
         "@privateaim/errors": "^0.8.42",
-        "@privateaim/server-kit": "^0.12.3"
+        "@privateaim/server-kit": "^0.12.4"
     },
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",
