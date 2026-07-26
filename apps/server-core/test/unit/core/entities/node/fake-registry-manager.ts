@@ -20,6 +20,10 @@ export class FakeRegistryManager implements IRegistryManager {
 
     private relinkCalls: RegistryProject[] = [];
 
+    private removeCalls: RegistryProject[] = [];
+
+    private removeObserver?: (project: RegistryProject) => void;
+
     setDefaultRegistryId(id: string | null): void {
         this.defaultRegistryId = id;
     }
@@ -52,6 +56,8 @@ export class FakeRegistryManager implements IRegistryManager {
     }
 
     async removeProject(project: RegistryProject): Promise<void> {
+        this.removeCalls.push(project);
+        this.removeObserver?.(project);
         this.projects = this.projects.filter((p) => p.id !== project.id);
     }
 
@@ -79,6 +85,20 @@ export class FakeRegistryManager implements IRegistryManager {
 
     getRelinkCalls(): RegistryProject[] {
         return [...this.relinkCalls];
+    }
+
+    getRemoveCalls(): RegistryProject[] {
+        return [...this.removeCalls];
+    }
+
+    /**
+     * Observe the exact moment a project is torn down. `nodes.registry_project_id`
+     * carries an `ON DELETE CASCADE` FK in the real schema, so removing a project
+     * a node still references deletes that node too — tests use this to assert the
+     * node was already detached and persisted before the removal happens.
+     */
+    observeRemoveProject(fn: (project: RegistryProject) => void): void {
+        this.removeObserver = fn;
     }
 
     getProjects(): RegistryProject[] {
