@@ -187,6 +187,15 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         const tags : string[] = [];
         for (const node of nodes) {
+            // A node's registry project is optional and can be detached
+            // (SET NULL) when the project is deleted, so the relation may be
+            // absent even though the node is otherwise runnable.
+            if (!node.registry_project) {
+                throw BuilderError.registryProjectNotFound(
+                    `The node ${node.name} has no registry project.`,
+                );
+            }
+
             const nodeImageURL = buildDockerImageURL({
                 hostname: registry.host,
                 projectName: node.registry_project.external_name,

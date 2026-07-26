@@ -119,7 +119,7 @@ export interface Analysis {
 
     // ------------------------------------------------------------------
 
-    registry: Registry;
+    registry: Registry | null;
 
     registry_id: Registry['id'] | null;
 

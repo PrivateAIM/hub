@@ -125,6 +125,19 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             throw BuilderError.registryNotFound();
         }
 
+        // A node's registry project is optional and can be detached (SET NULL)
+        // when the project is deleted, so the relation may be absent even though
+        // the node is otherwise runnable. Validated up front rather than inside
+        // the loop below, whose catch translates docker outcomes into a check
+        // verdict — a precondition failure must not be routed through that.
+        for (const node of nodes) {
+            if (!node.registry_project) {
+                throw BuilderError.registryProjectNotFound(
+                    `The node ${node.name} has no registry project.`,
+                );
+            }
+        }
+
         const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
         const authConfig = buildDockerAuthConfigFromRegistry(registry);
