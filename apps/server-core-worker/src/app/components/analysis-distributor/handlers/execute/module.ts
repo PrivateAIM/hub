@@ -82,6 +82,15 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         );
 
         const analysis = await this.coreClient.analysis.getOne(value.id);
+
+        // `analysis.registry_id` is nullable — it is unset until the distributor
+        // assigns one, and the registry FK detaches (SET NULL) if the registry is
+        // deleted while the analysis is in flight. Fail with a domain error rather
+        // than requesting `/registries/null`.
+        if (!analysis.registry_id) {
+            throw BuilderError.registryNotFound();
+        }
+
         const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
         const analysisNodes = await getManyAll((page) => this.coreClient.analysisNode.getMany({

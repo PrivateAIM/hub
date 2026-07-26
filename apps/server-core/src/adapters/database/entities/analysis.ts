@@ -30,7 +30,7 @@ import { MasterImageEntity } from './master-image.ts';
 import { ProjectEntity } from './project.ts';
 import { RegistryEntity } from './registry.ts';
 
-@Entity({ name: 'analysis' })
+@Entity({ name: 'analyses' })
 export class AnalysisEntity implements Analysis {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -200,10 +200,15 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
+    // Detach on delete rather than cascade. A null `registry_id` is the normal
+    // pre-distribution state — `AnalysisDistributor.assignRegistry()` fills it
+    // in lazily — so losing the registry returns the analysis to a state the
+    // domain already handles. Cascading instead destroyed the analysis together
+    // with its buckets, bucket files, nodes and node events.
     @Column({ nullable: true })
     registry_id: Registry['id'] | null;
 
-    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
+    @ManyToOne(() => RegistryEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'registry_id' })
     registry: RegistryEntity | null;
 

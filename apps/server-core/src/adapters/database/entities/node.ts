@@ -63,19 +63,24 @@ export class NodeEntity implements Node {
 
     // ------------------------------------------------------------------
 
+    // Both registry references detach on delete rather than cascade. A node is
+    // an independent, long-lived resource (it owns its realm, crypto keys and
+    // client credentials) that merely *points at* registry-side rows — deleting
+    // a registry or a registry project must never take the node down with it.
+    // The node is simply left unassigned and can be reconnected.
     @Column({ nullable: true })
     registry_id: Registry['id'] | null;
 
-    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
+    @ManyToOne(() => RegistryEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'registry_id' })
     registry: Registry | null;
 
     @Column({ nullable: true })
-    registry_project_id: RegistryProject['id'];
+    registry_project_id: RegistryProject['id'] | null;
 
-    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
+    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'registry_project_id' })
-    registry_project: RegistryProject;
+    registry_project: RegistryProject | null;
 
     @Column({ type: 'uuid', nullable: true })
     client_id: Client['id'] | null;

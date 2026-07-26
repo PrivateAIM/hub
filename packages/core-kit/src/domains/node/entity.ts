@@ -27,7 +27,7 @@ export interface Node {
 
     // ------------------------------------------------------------------
 
-    registry_id: Registry['id'];
+    registry_id: Registry['id'] | null;
 
     registry: Registry;
 
