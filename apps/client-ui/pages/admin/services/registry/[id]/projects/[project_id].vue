@@ -36,7 +36,9 @@ export default defineNuxtComponent({
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY_PROJECT}`,
             props: {
-                entityId: route.params.id as string,
+                // `id` is the parent `[id]` segment (the registry); the project is
+                // the `[project_id]` segment of this route.
+                entityId: route.params.project_id as string,
                 queryFields: [
                     '+account_id',
                     '+account_name',
@@ -60,14 +62,14 @@ export default defineNuxtComponent({
                     toast.show({ variant: 'success', body: 'The project was successfully deleted.' });
                 }
 
-                return navigateTo(`/admin/registries/${props.entity.id}/projects`);
+                return navigateTo(`/admin/services/registry/${props.entity.id}/projects`);
             },
         });
 
         await manager.resolve();
 
         if (!manager.data.value) {
-            await navigateTo({ path: `/admin/registries/${route.params.id}/projects` });
+            await navigateTo({ path: `/admin/services/registry/${route.params.id}/projects` });
             throw createError({});
         }
 
