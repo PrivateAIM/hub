@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.12.5](https://github.com/PrivateAIM/hub/compare/v0.12.4...v0.12.5) (2026-07-26)
+
+
+### Bug Fixes
+
+* stop registry deletion from destroying nodes and analyses; fix registry projects sidebar ([#1786](https://github.com/PrivateAIM/hub/issues/1786)) ([1ad6338](https://github.com/PrivateAIM/hub/commit/1ad63387cc6f1f9cf59c0e33cc661f2980d1cc0d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.12.4 to ^0.12.5
+    * @privateaim/core-kit bumped from ^0.12.4 to ^0.12.5
+    * @privateaim/core-realtime-kit bumped from ^0.10.14 to ^0.10.15
+    * @privateaim/kit bumped from ^0.12.4 to ^0.12.5
+    * @privateaim/storage-kit bumped from ^0.12.4 to ^0.12.5
+    * @privateaim/telemetry-kit bumped from ^0.12.4 to ^0.12.5
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.12.4 to ^0.12.5
+    * @privateaim/core-kit bumped from ^0.12.4 to ^0.12.5
+    * @privateaim/kit bumped from ^0.12.4 to ^0.12.5
+    * @privateaim/storage-kit bumped from ^0.12.4 to ^0.12.5
+    * @privateaim/telemetry-kit bumped from ^0.12.4 to ^0.12.5
+
 ## [0.12.4](https://github.com/PrivateAIM/hub/compare/v0.12.3...v0.12.4) (2026-07-24)
 
 
