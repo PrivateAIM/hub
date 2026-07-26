@@ -17,6 +17,27 @@ Nodes are registered in the Hub with:
 3. **Assign to projects** — nodes are added to projects via `ProjectNode` associations
 4. **Execute analyses** — the worker distributes analysis containers to assigned nodes
 
+## Registry Connection
+
+A node pushes and pulls analysis images through its own **registry project** — a
+dedicated project in the docker registry with its own robot account. This is
+managed on the node's **Registry** tab (`/admin/nodes/:id/registry`):
+
+- **Connect** — pick a registry and connect. Hub provisions a registry project
+  and robot account for the node and links them in the registry.
+- **Disconnect** — clears the node's registry assignment and removes its
+  registry project together with the robot account. The node itself is kept;
+  reconnecting provisions a **new** project, so the node has to pull fresh
+  credentials.
+
+The tab also shows the node's current registry credentials (host, project,
+account name and secret) and a secondary link/unlink action that repairs the
+registry-side state of an already-provisioned project without changing the
+node's assignment.
+
+Deleting a registry or a registry project never deletes the nodes referencing
+it — those nodes are simply left unassigned and can be reconnected.
+
 ## API Endpoints
 
 | Method | Endpoint | Description |

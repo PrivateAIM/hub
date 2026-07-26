@@ -5,17 +5,34 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AnalysisBuilderErrorCode } from '@privateaim/server-core-worker-kit';
+import { AnalysisBuilderErrorCode, ErrorCode } from '@privateaim/server-core-worker-kit';
 import type { ComponentErrorOptions } from '@privateaim/server-kit';
 import { BaseError } from '../error';
 
 export class BuilderError extends BaseError {
+    // Constructed directly rather than delegating to `super`: the base factories
+    // return a `BaseError`, so delegating produced an object that was not a
+    // `BuilderError` despite the annotation — and `registryNotFound` delegated to
+    // `super.notFound`, emitting the `notFound` code instead of its own.
     static notFound(options?: ComponentErrorOptions): BuilderError {
-        return super.notFound(options);
+        return new BuilderError({
+            code: ErrorCode.NOT_FOUND,
+            ...options,
+        });
     }
 
     static registryNotFound(options?: ComponentErrorOptions): BuilderError {
-        return super.notFound(options);
+        return new BuilderError({
+            code: ErrorCode.REGISTRY_NOT_FOUND,
+            ...options,
+        });
+    }
+
+    static registryProjectNotFound(message?: string) {
+        return new BuilderError({
+            code: ErrorCode.REGISTRY_PROJECT_NOT_FOUND,
+            message,
+        });
     }
 
     static entrypointNotFound(message?: string) {

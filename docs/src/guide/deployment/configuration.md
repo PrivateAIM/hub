@@ -28,6 +28,21 @@ Used by `server-core`, `server-storage`, and `server-telemetry`:
 
 *Not required for SQLite.
 
+### SQLite has no upgrade path
+
+Migrations only run for `mysql` and `postgres`. On SQLite the schema is built from
+the entity classes by `synchronize()`, and only when no schema exists yet — so an
+**existing** SQLite database is never migrated or altered on upgrade.
+
+Schema changes therefore break a persistent SQLite deployment. The rename of the
+`analysis` table to `analyses` is one such change: a SQLite database created before
+it keeps the old table, and queries against the new name fail.
+
+Use SQLite only for tests and throwaway/in-memory (`:memory:`) instances. For any
+database you intend to keep, use MySQL or PostgreSQL. To carry an existing SQLite
+database across a schema change, export its data and re-import it into a freshly
+created database.
+
 ## Storage Variables (server-storage)
 
 | Variable | Required | Description |

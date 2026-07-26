@@ -82,6 +82,15 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         );
 
         const analysis = await this.coreClient.analysis.getOne(value.id);
+
+        // `analysis.registry_id` is nullable — it is unset until the distributor
+        // assigns one, and the registry FK detaches (SET NULL) if the registry is
+        // deleted while the analysis is in flight. Fail with a domain error rather
+        // than requesting `/registries/null`.
+        if (!analysis.registry_id) {
+            throw BuilderError.registryNotFound();
+        }
+
         const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
         const analysisNodes = await getManyAll((page) => this.coreClient.analysisNode.getMany({
@@ -178,6 +187,15 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         const tags : string[] = [];
         for (const node of nodes) {
+            // A node's registry project is optional and can be detached
+            // (SET NULL) when the project is deleted, so the relation may be
+            // absent even though the node is otherwise runnable.
+            if (!node.registry_project) {
+                throw BuilderError.registryProjectNotFound(
+                    `The node ${node.name} has no registry project.`,
+                );
+            }
+
             const nodeImageURL = buildDockerImageURL({
                 hostname: registry.host,
                 projectName: node.registry_project.external_name,

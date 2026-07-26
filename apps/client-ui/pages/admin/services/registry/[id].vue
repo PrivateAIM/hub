@@ -52,20 +52,19 @@ export default defineComponent({
                     toast.show({ variant: 'success', body: 'The registry was successfully deleted.' });
                 }
 
-                return navigateTo('/admin/registries');
+                return navigateTo('/admin/services/registry');
             },
         });
 
         await manager.resolve({ query: { fields: ['+account_secret'] } });
 
         if (!manager.data.value) {
-            await navigateTo({ path: '/admin/services/registries' });
+            await navigateTo({ path: '/admin/services/registry' });
             throw createError({});
         }
 
         const tabs = computed<NavigationItem[]>(() => {
             const base = `/admin/services/registry/${manager.data.value?.id}`;
-            const projectsBase = `${base}/projects`;
 
             return [
                 {
@@ -94,21 +93,22 @@ export default defineComponent({
                         ] : []
                 ),
                 {
+                    // Leaf on purpose: this strip is a horizontal `variant="pills"`
+                    // segmented control, whose submenus render as an inline
+                    // `Collapsible` (`orientation` is unset ⇒ collapse mode). A
+                    // `children` array here would expand a vertical sub-list INSIDE
+                    // the pill strip and turn the segment into a non-navigable
+                    // `<button>` trigger. The overview/add sub-navigation lives in
+                    // `[id]/projects.vue` as its own vertical sidebar instead —
+                    // the same shape as `projects/[id]/analyses.vue`.
                     name: 'Projects',
                     icon: 'fa6-solid:diagram-project',
-                    url: projectsBase,
-                    children: [
-                        {
-                            name: 'overview',
-                            icon: 'fa6-solid:bars',
-                            url: projectsBase,
-                        },
-                        {
-                            name: 'add',
-                            icon: 'fa6-solid:plus',
-                            url: `${projectsBase}/add`,
-                        },
-                    ],
+                    url: `${base}/projects`,
+                    // Without this, `/projects/add` and `/projects/:id` only
+                    // score a prefix match — the same score the back arrow and
+                    // "General" get from their own prefixes — and the first
+                    // item wins the tie, lighting up the back arrow instead.
+                    activeMatch: `${base}/projects`,
                 },
             ];
         });

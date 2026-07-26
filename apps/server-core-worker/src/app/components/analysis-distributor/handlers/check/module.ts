@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Node, RegistryProject } from '@privateaim/core-kit';
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
 } from '@privateaim/core-kit';
@@ -28,6 +29,7 @@ import {
     isDockerDistributionImageMissingError,
 } from '../../../../../adapters/docker/index.ts';
 import { isAnalysisProcessStale } from '../../../helpers.ts';
+import { BuilderError } from '../../../analysis-builder/error';
 
 export class AnalysisDistributorCheckHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK> {
     protected coreClient: CoreClient;
@@ -116,6 +118,32 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         // -----------------------------------------------------------------------------------
 
+        // `analysis.registry_id` is nullable — it is unset until the distributor
+        // assigns one, and the registry FK detaches (SET NULL) if the registry is
+        // deleted while the analysis is in flight. Fail with a domain error rather
+        // than requesting `/registries/null`.
+        if (!analysis.registry_id) {
+            throw BuilderError.registryNotFound();
+        }
+
+        // A node's registry project is optional and can be detached (SET NULL)
+        // when the project is deleted, so the relation may be absent even though
+        // the node is otherwise runnable. Validated up front rather than inside
+        // the loop below, whose catch translates docker outcomes into a check
+        // verdict — a precondition failure must not be routed through that. The
+        // narrowed relation is collected alongside each node so the docker loop
+        // never re-dereferences the nullable relation.
+        const checks: { node: Node; registryProject: RegistryProject }[] = [];
+        for (const node of nodes) {
+            if (!node.registry_project) {
+                throw BuilderError.registryProjectNotFound(
+                    `The node ${node.name} has no registry project.`,
+                );
+            }
+
+            checks.push({ node, registryProject: node.registry_project });
+        }
+
         const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
         const authConfig = buildDockerAuthConfigFromRegistry(registry);
@@ -123,7 +151,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         let status: `${ProcessStatus}`;
 
         try {
-            for (const node of nodes) {
+            for (const { node, registryProject } of checks) {
                 this.logger?.info({
                     message: `Checking analysis image of node ${node.name}`,
                     command: AnalysisDistributorCommand.CHECK,
@@ -133,7 +161,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
                 const nodeImageURL = buildDockerImageURL({
                     hostname: registry.host,
-                    projectName: node.registry_project.external_name,
+                    projectName: registryProject.external_name,
                     repositoryName: analysis.id,
                     tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
                 });

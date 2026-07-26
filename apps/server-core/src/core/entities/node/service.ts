@@ -114,9 +114,23 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         const merged = this.repository.merge(entity, validated);
 
-        await this.syncRegistryProject(merged);
+        // Only an explicit `registry_id: null` disconnects the node. An update
+        // that merely omits the field (a rename, a visibility toggle, …) must
+        // never tear down the node's registry project as a side effect.
+        const registryCleared = typeof validated.registry_id !== 'undefined' &&
+            !validated.registry_id;
 
-        return this.repository.save(merged, { data: actor.metadata });
+        // Detach + persist before tearing the old project down: the node must
+        // never be left referencing a row that is about to disappear.
+        const orphaned = await this.syncRegistryProject(merged, registryCleared);
+
+        const saved = await this.repository.save(merged, { data: actor.metadata });
+
+        if (orphaned) {
+            await this.registryManager?.removeProject(orphaned);
+        }
+
+        return saved;
     }
 
     async delete(id: string, actor: ActorContext): Promise<Node> {
@@ -156,6 +170,12 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         if (!registryId) return;
 
+        // Record the assignment, including when it came from the default
+        // registry. Leaving `registry_id` null while a project exists is an
+        // inconsistent state: the node reads as "not connected" everywhere the
+        // column is the source of truth, yet owns a provisioned project.
+        entity.registry_id = registryId;
+
         const externalName = entity.external_name || createNanoID();
         entity.external_name = externalName;
 
@@ -173,24 +193,58 @@ export class NodeService extends AbstractEntityService implements INodeService {
         await this.registryManager.linkProject(registryProject.id);
     }
 
-    private async syncRegistryProject(entity: Node): Promise<void> {
-        if (!this.registryManager || !entity.registry_id) return;
+    /**
+     * Reconcile the node's registry project with its (possibly just changed)
+     * `registry_id`.
+     *
+     * Returns the registry project the node no longer references, if any. The
+     * caller must persist the node BEFORE removing it — see the note in
+     * {@see update}.
+     *
+     * @param cleared whether this update explicitly disconnected the node.
+     */
+    private async syncRegistryProject(
+        entity: Node,
+        cleared: boolean,
+    ): Promise<RegistryProject | undefined> {
+        if (!this.registryManager) return undefined;
 
-        const externalName = entity.external_name || createNanoID();
+        if (!entity.registry_id) {
+            if (!cleared) return undefined;
+
+            // Disconnected — detach the node from its project and hand the
+            // project back for teardown. Without this the node keeps a dangling
+            // `registry_project_id` and still resolves credentials from a
+            // registry it is no longer assigned to.
+            const current = entity.registry_project_id ?
+                await this.registryManager.findProject(entity.registry_project_id) :
+                null;
+
+            entity.registry_project_id = null;
+
+            if (!current) return undefined;
+
+            await this.registryManager.unlinkProject(current);
+
+            return current;
+        }
 
         let registryProject: RegistryProject | undefined;
         if (entity.registry_project_id) {
             registryProject = await this.registryManager.findProject(entity.registry_project_id) ?? undefined;
         }
 
+        const externalName = entity.external_name || createNanoID();
+
         // A registry project lives inside a single registry, so when the node is
         // re-assigned to a different registry the existing project can no longer
         // serve it. Tear it down and provision a fresh one on the new registry —
         // otherwise the node keeps resolving its credentials (and host) from the
         // old registry.
+        let orphaned: RegistryProject | undefined;
         if (registryProject && registryProject.registry_id !== entity.registry_id) {
             await this.registryManager.unlinkProject(registryProject);
-            await this.registryManager.removeProject(registryProject);
+            orphaned = registryProject;
             registryProject = undefined;
         }
 
@@ -217,6 +271,8 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         entity.registry_project_id = registryProject.id;
         entity.external_name = externalName;
+
+        return orphaned;
     }
 
     private async unlinkRegistryProject(entity: Node): Promise<void> {

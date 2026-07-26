@@ -156,6 +156,20 @@ describe('NodeService', () => {
             expect(registryManager.getProjects()).toHaveLength(1);
         });
 
+        it('should record the registry assignment when it falls back to the default registry', async () => {
+            registryManager.setDefaultRegistryId('registry-1');
+
+            const result = await service.create(
+                { name: 'new-node' },
+                createMasterRealmActor(),
+            );
+
+            // A node owning a project but with a null `registry_id` reads as
+            // "not connected" everywhere the column is the source of truth.
+            expect(result.registry_id).toBe('registry-1');
+            expect(result.registry_project_id).toBe(registryManager.getProjects()[0].id);
+        });
+
         it('should convert non-hex public_key to hex', async () => {
             const result = await service.create(
                 { name: 'new-node', public_key: 'hello' },
@@ -270,6 +284,132 @@ describe('NodeService', () => {
             expect(registryManager.getUnlinkCalls()).toHaveLength(0);
             expect(registryManager.getProjects()).toHaveLength(1);
             expect(result.registry_project_id).toBe(registryProject.id);
+        });
+
+        it('should tear down the registry project when the registry is cleared', async () => {
+            const registryId = randomUUID();
+
+            const registryProject = createTestRegistryProject({
+                registry_id: registryId,
+                external_name: 'extname',
+            });
+            registryManager.seedProject(registryProject);
+
+            const node = createTestNode({
+                realm_id: 'realm-1',
+                registry_id: registryId,
+                registry_project_id: registryProject.id,
+                external_name: 'extname',
+            });
+            repository.seed(node);
+
+            const result = await service.update(
+                node.id,
+                { registry_id: null },
+                createMasterRealmActor(),
+            );
+
+            expect(registryManager.getUnlinkCalls()).toHaveLength(1);
+            expect(registryManager.getUnlinkCalls()[0].id).toBe(registryProject.id);
+            expect(registryManager.getProjects()).toHaveLength(0);
+
+            // No dangling reference: the node must not keep resolving credentials
+            // from a registry it is no longer assigned to.
+            expect(result.registry_id).toBeNull();
+            expect(result.registry_project_id).toBeNull();
+        });
+
+        it('should keep the registry project when an unrelated field is updated on a node with no registry_id', async () => {
+            // Nodes provisioned against the *default* registry before that
+            // assignment was recorded still carry `registry_id = null` while
+            // owning a project. A rename must not be read as a disconnect.
+            const registryProject = createTestRegistryProject({ external_name: 'extname' });
+            registryManager.seedProject(registryProject);
+
+            const node = createTestNode({
+                realm_id: 'realm-1',
+                registry_id: null,
+                registry_project_id: registryProject.id,
+                external_name: 'extname',
+            });
+            repository.seed(node);
+
+            const result = await service.update(
+                node.id,
+                { name: 'renamed-node' },
+                createMasterRealmActor(),
+            );
+
+            expect(registryManager.getUnlinkCalls()).toHaveLength(0);
+            expect(registryManager.getRemoveCalls()).toHaveLength(0);
+            expect(registryManager.getProjects()).toHaveLength(1);
+            expect(result.registry_project_id).toBe(registryProject.id);
+        });
+
+        it('should detach and persist the node before removing its registry project', async () => {
+            const registryId = randomUUID();
+
+            const registryProject = createTestRegistryProject({
+                registry_id: registryId,
+                external_name: 'extname',
+            });
+            registryManager.seedProject(registryProject);
+
+            const node = createTestNode({
+                realm_id: 'realm-1',
+                registry_id: registryId,
+                registry_project_id: registryProject.id,
+                external_name: 'extname',
+            });
+            repository.seed(node);
+
+            // `nodes.registry_project_id` is an `ON DELETE CASCADE` FK, so removing
+            // the project while the stored node still points at it would delete the
+            // node row. Capture what the repository holds at removal time.
+            let persistedAtRemoval: Node | null = null;
+            registryManager.observeRemoveProject(() => {
+                persistedAtRemoval = repository.getAll()
+                    .find((item) => item.id === node.id) ?? null;
+            });
+
+            await service.update(node.id, { registry_id: null }, createMasterRealmActor());
+
+            expect(registryManager.getRemoveCalls()).toHaveLength(1);
+            expect(persistedAtRemoval).not.toBeNull();
+            expect(persistedAtRemoval!.registry_project_id).toBeNull();
+        });
+
+        it('should detach and persist the node before removing the stale project on re-assignment', async () => {
+            const registryId = randomUUID();
+            const nextRegistryId = randomUUID();
+
+            const registryProject = createTestRegistryProject({
+                registry_id: registryId,
+                external_name: 'extname',
+            });
+            registryManager.seedProject(registryProject);
+
+            const node = createTestNode({
+                realm_id: 'realm-1',
+                registry_id: registryId,
+                registry_project_id: registryProject.id,
+                external_name: 'extname',
+            });
+            repository.seed(node);
+
+            let referencedAtRemoval: string | null | undefined;
+            registryManager.observeRemoveProject(() => {
+                referencedAtRemoval = repository.getAll()
+                    .find((item) => item.id === node.id)?.registry_project_id;
+            });
+
+            await service.update(node.id, { registry_id: nextRegistryId }, createMasterRealmActor());
+
+            // The node already points at the freshly provisioned project — never at
+            // the one being removed.
+            expect(registryManager.getRemoveCalls()).toHaveLength(1);
+            expect(registryManager.getRemoveCalls()[0].id).toBe(registryProject.id);
+            expect(referencedAtRemoval).not.toBe(registryProject.id);
         });
     });
 

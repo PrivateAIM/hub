@@ -12,14 +12,13 @@ import { useValidup } from '@validup/vue';
 import type { Severity } from '@validup/vue';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
-import type { Node, Registry } from '@privateaim/core-kit';
+import type { Node } from '@privateaim/core-kit';
 import {
     DomainType,
     NodeType,
     NodeValidator,
 } from '@privateaim/core-kit';
 import { ValidatorGroup } from '@privateaim/kit';
-import { VCButton } from '@vuecs/button';
 import { extend } from '@vuecs/core';
 import {
     VCFormCheckbox,
@@ -37,11 +36,10 @@ import {
     h,
     reactive,
     ref,
-    resolveComponent,
     watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
-import type { ListBodySlotProps, ListItemSlotProps } from '../../core';
+import type { ListBodySlotProps } from '../../core';
 import {
     EntityListSlotName,
     buildFormSubmit,
@@ -50,7 +48,6 @@ import {
     initFormAttributesFromSource,
     wrapFnWithBusyState,
 } from '../../core';
-import RegistryList from '../registry/FRegistries';
 
 export default defineComponent({
     props: {
@@ -89,11 +86,15 @@ export default defineComponent({
         }
 
         const busy = ref(false);
+        // No `registry_id` here on purpose: the node ↔ registry assignment is
+        // owned by `FNodeRegistryConnection` on the node's Registry tab, where
+        // connect/disconnect is an explicit, immediate action (it provisions or
+        // tears down a registry project server-side) rather than a side effect
+        // of saving this general form.
         const form = reactive({
             name: '',
             external_name: '',
             realm_id: '',
-            registry_id: '',
             hidden: false,
             type: NodeType.DEFAULT,
         });
@@ -152,17 +153,7 @@ export default defineComponent({
             await manager.createOrUpdate(form as Partial<Node>);
         });
 
-        const toggleFormData = <T extends keyof typeof form>(key: T, id: any) => {
-            if (form[key] === id) {
-                form[key] = null as any;
-            } else {
-                form[key] = id;
-            }
-        };
-
-
         return () => {
-            const VCIcon = resolveComponent('VCIcon');
             let realm : VNodeArrayChildren = [];
             if (!isRealmLocked.value) {
                 realm = [
@@ -275,32 +266,6 @@ export default defineComponent({
                 },
             );
 
-            const registry : VNodeArrayChildren = [
-                h(
-                    VCFormGroup,
-                    {
-                        label: true,
-                        labelContent: 'Registry',
-                    },
-                    {
-                        default: () => h(RegistryList, {}, {
-                            [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h(VCButton, {
-                                disabled: props.busy,
-                                size: 'xs',
-                                color: form.registry_id === props.data.id ? 'warning' : 'neutral',
-                                onClick($event: any) {
-                                    $event.preventDefault();
-
-                                    toggleFormData('registry_id', props.data.id);
-                                },
-                            }, () => [
-                                h(VCIcon, { name: form.registry_id === props.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
-                            ]),
-                        }),
-                    },
-                ),
-            ];
-
             const submitNode = buildFormSubmit({
                 submit,
                 busy: busy.value,
@@ -315,9 +280,6 @@ export default defineComponent({
                         name,
                         h('hr'),
                         externalName,
-                        h('hr'),
-                        registry,
-
                     ]),
                     h('div', { class: 'flex-1 basis-0 px-2' }, [
                         type,

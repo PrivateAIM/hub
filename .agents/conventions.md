@@ -94,6 +94,50 @@ export const analysisSchema = z.object({
 });
 ```
 
+## Database Migrations
+
+Migrations live in `apps/<service>/src/adapters/database/migrations/{mysql,postgres}/`.
+SQLite never runs them — the options builder wires `migrations: []` for
+`better-sqlite3`, so boot (and the test suite) falls back to `dataSource.synchronize()`
+from the entity classes.
+
+Adopted from authup — see [authup-conventions.md](references/authup-conventions.md#database-migrations).
+
+- **One named migration per feature.** Each feature/PR adds its migration in
+  **both** dialects, with a descriptive class/file name and a doc-comment header
+  explaining *why* the change is being made.
+- **Nothing a migration does may be invisible from its name.** Bundling several
+  changes into one file is allowed, but then the file name and the doc comment
+  must name *every* one of them (e.g.
+  `1784000000000-RegistryFkSetNullAndRenameAnalysis.ts`). The failure mode this
+  prevents is real: `AddDisplayName1780300000000` silently renamed
+  `analysis_entity` → `analysis`, and that hidden rename has since misled every
+  later migration that referenced the table by its old name. A rename in
+  particular must never hide behind an unrelated migration name.
+- **Consolidation happens at release time, not merge time.** A release window's
+  migrations may be squashed into one file per dialect as a deliberate last step
+  before the release PR merges (keeping the earliest timestamp so ordering against
+  the released chain holds). Shipping several named migrations in one release is fine.
+- **Released migrations are immutable.** Amend freely while the migration lives only
+  on its own unmerged branch; once it ships in a release, never touch it.
+- **Always verify with the round-trip** — `migration run` → `revert` × N → `run`,
+  against both MySQL and PostgreSQL. See [testing.md](testing.md#migration-tests).
+  Note that MySQL DDL is not transactional: a migration that fails halfway leaves
+  the schema partially altered, so a broken `up()` must be fixed against a fresh
+  database.
+- **FK delete rules**: cascade only when the child genuinely cannot exist without
+  the parent (`registry_projects.registry_id`). When the child is an independent
+  resource that merely *points at* the parent, use `ON DELETE SET NULL` so deleting
+  the parent detaches instead of destroying — `nodes.registry_id`,
+  `nodes.registry_project_id` and `analyses.registry_id` all had to be corrected
+  from cascade to set-null for this reason.
+
+### Table Naming
+
+Table names are **plural** and snake_case: `nodes`, `projects`, `registries`,
+`registry_projects`, `master_images`, `analyses`, `analysis_nodes`, `analysis_buckets`.
+Set them explicitly with `@Entity({ name: 'analyses' })` — there is no naming strategy.
+
 ## Logging
 
 Logs flow through Winston → `LoggerTransport` (`packages/server-telemetry-kit/src/services/logger/transport.ts`) → telemetry/VictoriaLogs, where every string/number/boolean key of the metadata object becomes a **queryable label**. UI views (e.g. the analysis log panel) filter by these labels — see `AnalysisLogController`, which queries `ref_type=analysis` + `ref_id=<id>`.

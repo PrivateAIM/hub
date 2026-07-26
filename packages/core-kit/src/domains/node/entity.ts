@@ -27,13 +27,13 @@ export interface Node {
 
     // ------------------------------------------------------------------
 
-    registry_id: Registry['id'];
+    registry_id: Registry['id'] | null;
 
-    registry: Registry;
+    registry: Registry | null;
 
     registry_project_id: RegistryProject['id'] | null;
 
-    registry_project: RegistryProject;
+    registry_project: RegistryProject | null;
 
     // ------------------------------------------------------------------
 

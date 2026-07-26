@@ -33,6 +33,45 @@ This documents the conventions Hub should adopt as part of modernization (see Pl
 2. Barrel `index.ts` files re-export from `types.ts` and implementation modules
 3. No explanatory comments unless explicitly requested
 
+## Database Migrations
+
+Source: [`.agents/conventions.md` § Database Migrations](https://github.com/authup/authup/blob/master/.agents/conventions.md) (authup), verified 2026-07-26.
+
+**Authup pattern:**
+- **One named migration per feature.** Each feature/PR adds its own migration in both
+  dialects with a descriptive class/file name (`1784289540000-CamelCaseAttributes.ts`,
+  `1784460916000-RemoveRobots.ts`) and a doc-comment header explaining the change.
+- **Consolidation happens at release time, not merge time.** A release window's
+  migrations *may* be squashed into one file per dialect as a deliberate last step
+  before the release PR merges (keeping the earliest timestamp). Shipping several
+  named migrations in one release is fine.
+- **Released migrations are immutable.** A migration may be amended while it lives
+  only on its own unmerged branch; once released, never touch it.
+- After adding or amending a migration, run the round-trip: `migration run` →
+  `revert` × N → `run`.
+
+**Hub mapping:** same layout — `apps/<service>/src/adapters/database/migrations/{mysql,postgres}/`,
+same sqlite carve-out (`migrations: []`, boot falls back to `synchronize()`), and the
+same round-trip check is already documented in [testing.md](../testing.md#migration-tests)
+and run by the `tests-migrations` CI job. See
+[conventions.md § Database Migrations](../conventions.md#database-migrations).
+
+**Hub divergence:** hub allows several changes to share one migration file, where
+authup keeps them strictly one-per-feature until release-time squashing. Hub's
+constraint is instead that the file name and doc comment must name every change the
+migration performs, so nothing a migration does is invisible from its name.
+
+## Table Naming
+
+**Authup pattern:** every table is plural and prefixed — `auth_users`, `auth_roles`,
+`auth_scopes`, `auth_sessions`, `auth_role_permissions`, `auth_identity_provider_accounts`.
+No singular exceptions across ~20 tables.
+
+**Hub mapping:** Hub is unprefixed but otherwise matches — `nodes`, `projects`,
+`registries`, `registry_projects`, `master_images`, `analysis_nodes`, `analysis_buckets`.
+The analysis table was the sole singular outlier (`analysis_entity` → `analysis` →
+`analyses`, the last step by `RegistryFkSetNullAndRenameAnalysis1784000000000`).
+
 ## Configuration Naming
 
 | Pattern | Example |

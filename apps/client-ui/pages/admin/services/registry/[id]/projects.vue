@@ -6,9 +6,11 @@
   -->
 
 <script lang="ts">
+import type { Registry } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import type { NavigationItem } from '@vuecs/navigation';
+import { computed, toRef } from 'vue';
 import type { PropType } from 'vue';
-import type { Realm } from '@authup/core-kit';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
@@ -16,11 +18,11 @@ import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
 export default defineNuxtComponent({
     props: {
         entity: {
-            type: Object as PropType<Realm>,
+            type: Object as PropType<Registry>,
             required: true,
         },
     },
-    setup() {
+    setup(props) {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -28,9 +30,41 @@ export default defineNuxtComponent({
                 PermissionName.REGISTRY_MANAGE,
             ],
         });
+
+        const entity = toRef(props, 'entity');
+
+        const tabs = computed<NavigationItem[]>(() => {
+            const base = `/admin/services/registry/${entity.value.id}/projects`;
+
+            return [
+                {
+                    name: 'overview',
+                    icon: 'fa6-solid:bars',
+                    url: base,
+                },
+                {
+                    name: 'add',
+                    icon: 'fa6-solid:plus',
+                    url: `${base}/add`,
+                },
+            ];
+        });
+
+        return { tabs };
     },
 });
 </script>
 <template>
-    <NuxtPage :entity="entity" />
+    <div class="content-wrapper">
+        <div class="content-sidebar flex-col">
+            <VCNavItems
+                :data="tabs"
+                variant="pills"
+                orientation="vertical"
+            />
+        </div>
+        <div class="content-container">
+            <NuxtPage :entity="entity" />
+        </div>
+    </div>
 </template>

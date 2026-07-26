@@ -11,3 +11,4 @@ export { default as FNodes } from './FNodes';
 export { default as FNodeRegistryProject } from './FNodeRegistryProject';
 export { default as FNodeClientCredentials } from './FNodeClientCredentials.vue';
 export { default as FNodeRegistryCredentials } from './FNodeRegistryCredentials.vue';
+export { default as FNodeRegistryConnection } from './FNodeRegistryConnection.vue';
