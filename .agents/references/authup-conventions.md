@@ -70,7 +70,7 @@ No singular exceptions across ~20 tables.
 **Hub mapping:** Hub is unprefixed but otherwise matches — `nodes`, `projects`,
 `registries`, `registry_projects`, `master_images`, `analysis_nodes`, `analysis_buckets`.
 The analysis table was the sole singular outlier (`analysis_entity` → `analysis` →
-`analyses`, the last step by `RenameAnalysisTable1785000000000`).
+`analyses`, the last step by `RegistryFkSetNullAndRenameAnalysis1784000000000`).
 
 ## Configuration Naming
 

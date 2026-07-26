@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { faker } from '@faker-js/faker';
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import type {
@@ -72,5 +73,55 @@ describe('src/controllers/core/node', () => {
         const { client } = suite;
 
         await client.node.delete(details.id);
+    });
+
+    it('should survive registry deletion with detached references', async () => {
+        const { client } = suite;
+
+        const registry = await client.registry.create({
+            name: faker.string.alpha({ length: 16, casing: 'lower' }),
+            host: faker.internet.domainName(),
+        });
+
+        const node = await client.node.create(createTestNode({ registry_id: registry.id }));
+        expect(node.registry_id).toEqual(registry.id);
+        // connecting provisions a registry project
+        expect(node.registry_project_id).toBeDefined();
+
+        await client.registry.delete(registry.id);
+
+        // The registry FKs detach (SET NULL) instead of cascading: the node must
+        // survive the registry deletion with its references nulled.
+        const found = await client.node.getOne(node.id);
+        expect(found.id).toEqual(node.id);
+        expect(found.registry_id).toBeNull();
+        expect(found.registry_project_id).toBeNull();
+    });
+
+    it('should tear down the registry project on disconnect', async () => {
+        const { client } = suite;
+
+        const registry = await client.registry.create({
+            name: faker.string.alpha({ length: 16, casing: 'lower' }),
+            host: faker.internet.domainName(),
+        });
+
+        const node = await client.node.create(createTestNode({ registry_id: registry.id }));
+        expect(node.registry_project_id).toBeDefined();
+
+        // An explicit `registry_id: null` disconnects — the null must survive the
+        // whole HTTP path (JSON body, validator) and detach the node.
+        const updated = await client.node.update(node.id, { registry_id: null });
+        expect(updated.registry_id).toBeNull();
+        expect(updated.registry_project_id).toBeNull();
+
+        // ... and the provisioned registry project is removed, not orphaned.
+        const { data: projects } = await client.registryProject.getMany({ filters: { registry_id: registry.id } });
+        expect(projects).toHaveLength(0);
+
+        // Clean up: a registry left behind would make the default-registry
+        // fallback auto-connect the bare nodes of suites that run later in
+        // this worker's database.
+        await client.registry.delete(registry.id);
     });
 });

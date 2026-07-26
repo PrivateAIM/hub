@@ -40,7 +40,26 @@ export function createTestDatabaseModule(): IModule {
 
         async setup(container: IContainer): Promise<void> {
             const optionsBuilder = new DataSourceOptionsBuilder();
-            const options = optionsBuilder.buildWithEnv();
+            let options = optionsBuilder.buildWithEnv();
+
+            // One database PER vitest worker. Spec files run in parallel across
+            // workers but sequentially within one, so this is what isolates the
+            // suites from each other: with a single shared database, any suite
+            // mutating global state races every other — e.g. a spec creating a
+            // registry makes `NodeService.create`'s default-registry fallback
+            // auto-connect the bare nodes of concurrently running suites, and
+            // deleting it again mid-flight fails their inserts on the
+            // nodes -> registries FK. sqlite needs no suffix (`:memory:` is
+            // already per data source).
+            if (options.type === 'mysql' || options.type === 'postgres') {
+                const workerId = process.env.VITEST_POOL_ID ?? process.env.VITEST_WORKER_ID;
+                if (workerId) {
+                    options = {
+                        ...options,
+                        database: `${options.database}_${workerId}`,
+                    };
+                }
+            }
 
             await createDatabase({
                 options,
