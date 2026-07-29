@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.12.7](https://github.com/PrivateAIM/hub/compare/v0.12.6...v0.12.7) (2026-07-29)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/messenger-kit bumped from ^0.12.5 to ^0.12.6
+    * @privateaim/server-db-kit bumped from ^0.12.5 to ^0.12.6
+    * @privateaim/server-http-kit bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/server-kit bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/server-realtime-kit bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/server-telemetry-kit bumped from ^0.12.5 to ^0.12.6
+    * @privateaim/telemetry-kit bumped from ^0.12.6 to ^0.12.7
+  * devDependencies
+    * @privateaim/messenger-http-kit bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/server-test-kit bumped from ^0.12.6 to ^0.12.7
+
 ## [0.12.6](https://github.com/PrivateAIM/hub/compare/v0.12.5...v0.12.6) (2026-07-26)
 
 

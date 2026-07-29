@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.12.7](https://github.com/PrivateAIM/hub/compare/v0.12.6...v0.12.7) (2026-07-29)
+
+
+### Bug Fixes
+
+* **client-ui:** resolve node client permission check before first await ([5b8894f](https://github.com/PrivateAIM/hub/commit/5b8894f56e94aedaecdca7d7be3f0198b1e78b72))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/client-vue-theme bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/core-kit bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/kit bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/storage-kit bumped from ^0.12.6 to ^0.12.7
+    * @privateaim/telemetry-kit bumped from ^0.12.6 to ^0.12.7
+
 ## [0.12.6](https://github.com/PrivateAIM/hub/compare/v0.12.5...v0.12.6) (2026-07-26)
 
 
