@@ -2,6 +2,7 @@
     "extends": "./tsconfig.build.json",
     "compilerOptions": {
         "baseUrl": ".",
-        "noEmit": true
+        "noEmit": true,
+        "ignoreDeprecations": "6.0"
     }
 }

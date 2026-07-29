@@ -21,6 +21,7 @@ hub/
 │   ├── storage-kit/       # Storage domain types
 │   ├── telemetry-kit/     # Telemetry/logging types
 │   ├── messenger-kit/     # Messenger domain types
+│   ├── messenger-http-kit/# HTTP client for the messenger broker surface
 │   ├── client-vue/        # Reusable Vue 3 component library
 │   ├── server-kit/        # Logging, auth, AMQP, Redis helpers
 │   ├── server-db-kit/     # TypeORM utilities and setup
@@ -28,20 +29,24 @@ hub/
 │   ├── server-realtime-kit/   # Socket.io server helpers
 │   ├── server-telemetry-kit/  # Telemetry utilities
 │   ├── server-core-worker-kit/# Worker task definitions
-│   └── server-storage-kit/    # Storage service contracts
+│   ├── server-storage-kit/    # Storage service contracts
+│   ├── server-test-kit/       # Shared test fakes and testcontainer helpers
+│   ├── client-vue-theme/      # Tailwind v4 theme
+│   └── errors/                # Shared error types
 └── docs/                  # Documentation (VitePress)
 ```
 
 ## Dependency Layers
 
 ```
-Layer 0 (leaf):   kit, core-kit, storage-kit, telemetry-kit, messenger-kit
+Layer 0 (leaf):   kit, core-kit, storage-kit, telemetry-kit, messenger-kit,
+                  client-vue-theme, errors
                      │
-Layer 1:          core-http-kit, core-realtime-kit, server-kit
+Layer 1:          core-http-kit, core-realtime-kit, messenger-http-kit, server-kit
                      │
 Layer 2:          server-db-kit, server-http-kit, server-realtime-kit
                   server-storage-kit, server-telemetry-kit, server-core-worker-kit
-                  client-vue
+                  server-test-kit, client-vue
                      │
 Layer 3 (apps):   server-core, server-core-worker, server-storage,
                   server-telemetry, server-messenger, client-ui

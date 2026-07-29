@@ -11,8 +11,9 @@ import { buildQueryString } from '../../utils';
 import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { IMasterImageAPI } from './types';
 
-export class MasterImageAPI extends BaseAPI {
+export class MasterImageAPI extends BaseAPI implements IMasterImageAPI {
     async getMany(data?: EntityQueryInput<MasterImage>): Promise<EntityCollectionResponse<MasterImage>> {
         const response = await this.client.get(`master-images${buildQueryString(data)}`);
         return response.data;

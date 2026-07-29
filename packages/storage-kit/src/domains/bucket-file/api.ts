@@ -10,9 +10,10 @@ import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import type { BucketFile } from './entity';
+import type { IBucketFileAPI } from './types';
 import { BaseAPI } from '../base';
 
-export class BucketFileAPI extends BaseAPI {
+export class BucketFileAPI extends BaseAPI implements IBucketFileAPI {
     async getMany(record?: EntityQueryInput<BucketFile>): Promise<EntityCollectionResponse<BucketFile>> {
         const response = await this.client.get(`bucket-files${buildQueryString(record)}`);
         return response.data;

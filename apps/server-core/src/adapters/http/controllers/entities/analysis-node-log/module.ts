@@ -10,7 +10,7 @@ import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { AnalysisNodeLogValidator, DomainType  } from '@privateaim/core-kit';
 import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
-import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
+import type { Log, LogLevel, ITelemetryClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
 import {

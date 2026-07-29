@@ -33,6 +33,28 @@ Part of the **[FLAME Hub](https://github.com/PrivateAIM/hub)** monorepo — cent
 npm install @privateaim/core-http-kit
 ```
 
+## Testing
+
+The `Client` class implements `ICoreClient`, so consumers can depend on the
+contract rather than the class. `@privateaim/core-http-kit/testing` ships a
+`FakeClient` — a real `Client` on an in-memory transport, so the request pipeline
+(header merge, decode, hooks, retry) runs unchanged and no network is touched:
+
+```typescript
+import { createFakeClient } from '@privateaim/core-http-kit/testing';
+
+const client = createFakeClient({
+    handlers: {
+        'GET /projects/:id': (req) => ({ data: { id: req.params.id }, meta: {} }),
+    },
+});
+
+const { data: project } = await client.project.getOne('abc');
+
+// Every dispatched request is recorded, normalized.
+console.log(client.requests);
+```
+
 ## License
 
 Made with 💚

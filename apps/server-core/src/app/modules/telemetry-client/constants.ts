@@ -6,6 +6,6 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { APIClient } from '@privateaim/telemetry-kit';
+import type { ITelemetryClient } from '@privateaim/telemetry-kit';
 
-export const TelemetryClientInjectionKey = new TypedToken<APIClient>('TelemetryClient');
+export const TelemetryClientInjectionKey = new TypedToken<ITelemetryClient>('TelemetryClient');

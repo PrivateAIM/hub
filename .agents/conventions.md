@@ -48,19 +48,61 @@ Output: ESM only (`dist/index.mjs`) with TypeScript declarations (`dist/index.d.
 
 **Special case:** `client-vue` uses `@vitejs/plugin-vue` + `@tsdown/css` for Vue SFC compilation, with `vue-tsc` for type declarations (`dts: false` in tsdown, separate `build:types` script).
 
+#### Subpath exports
+
+A kit ships an extra subpath by adding a second tsdown entry and a matching
+`exports` key. The four HTTP clients use this for `./testing`:
+
+```ts
+// tsdown.config.ts
+entry: ['src/index.ts', 'src/testing/index.ts']
+```
+
+```jsonc
+// package.json — add ONLY this key; module/types/files/scripts stay unchanged
+"./testing": { "types": "./dist/testing/index.d.mts", "import": "./dist/testing/index.mjs" }
+```
+
+- tsdown names array entries by their path **relative to the entries' lowest
+  common ancestor**, not by basename. The LCA of the two entries above is `src`,
+  so they emit `dist/index.mjs` and `dist/testing/index.mjs` — there is no
+  basename collision.
+- Use `.d.mts`. Hub kits emit declarations from tsdown `dts: true`; authup emits
+  `.d.ts` from a separate `tsc`, so copying authup's `exports` block verbatim
+  ships a broken `types` path.
+- A second entry moves the declaration bodies into a shared hashed
+  `dist/index-<hash>.d.mts` chunk and makes `dist/index.d.mts` a re-export shim.
+  `files: ["dist"]` already covers it, but any check that greps for a
+  declaration *body* in `index.d.mts` will now silently fail — grep the export
+  list instead.
+- **Nothing in CI verifies an `exports` map** (`build:types` is `--noEmit`, no
+  test imports from `dist`). Verify by hand after changing one:
+  `node --input-type=module -e "await import('@privateaim/<kit>/testing')"`.
+
 ### Services
 
-Built with **tsdown** (JS) + **tsc** (type declarations):
+Built with **tsdown** (JS) + **tsc** (typecheck gate):
 
 ```bash
 npm run build:js      # tsdown (bundle: false, preserves directory structure)
-npm run build:types   # tsc --emitDeclarationOnly -p tsconfig.build.json
+npm run build:types   # tsc --noEmit -p tsconfig.build.json  (TYPECHECK ONLY)
 npm run build         # rimraf dist/ + both above
 ```
 
 Config: `tsdown.config.ts` per service — `entry: ['src/**/*.ts']`, `format: 'esm'`, `bundle: false`, `dts: false`, `sourcemap: true`.
 
-Output: ESM files (`dist/**/*.mjs`) preserving source directory structure, plus TypeScript declarations (`dist/**/*.d.ts`). CLI entry points at `dist/cli/index.mjs`.
+Output: ESM files (`dist/**/*.mjs`) preserving source directory structure. CLI entry points at `dist/cli/index.mjs`.
+
+> **`build:types` does not emit anything.** Every workspace runs `tsc --noEmit`
+> — it is a typecheck gate, not a declaration step. Kit declarations come from
+> tsdown `dts: true`. The one exception is `packages/client-vue`, which really
+> does emit, via `vue-tsc --declaration --emitDeclarationOnly` (and therefore
+> ships `.d.ts`, not `.d.mts`).
+>
+> Consequence: **test files are type-checked by nothing** in CI — every
+> `tsconfig.build.json` has `include: ['src/**/*.ts']`. Run
+> `tsc --noEmit -p <pkg>/tsconfig.json` (the paths-mapped config) before pushing
+> test-only changes.
 
 ### Nx Orchestration
 
@@ -80,6 +122,26 @@ npm run test          # npx nx run-many -t test
 - All packages use `"type": "module"` (ESM-only, no CJS exports)
 - **Naming**: Interfaces always have an `I` prefix (e.g. `IEntityRepository`, `IAnalysisStorageManager`). Types do not (e.g. `ActorContext`, `EntityPersistContext`).
 - **Types/interfaces** always live in `types.ts` in the same directory, never inline in module files
+- **Contract-first**: declare the port/contract interface explicitly and have the class carry `implements`. Never derive a public contract from a class (`typeof Client`, mapped-over-class tricks) — that inverts the dependency and leaks private/protected shape. The four HTTP clients follow this: `ICoreClient` / `IStorageClient` / `ITelemetryClient` / `IMessengerClient`, plus one `I<X>API` per sub-API. Hub does **not** adopt authup's companion rule that `interface` is reserved for class-implemented contracts — hub's core-kit domain entities are bare `interface`s by design.
+- **`tsconfig.json` vs `tsconfig.build.json`**: `tsconfig.build.json` is what CI runs; it declares neither `baseUrl` nor `paths`, so it resolves through `node_modules`/`dist`. The paths-mapped `tsconfig.json` resolves kits to `src` and needs `"ignoreDeprecations": "6.0"` under TypeScript 6.0.3, because every `paths` value is repo-root-relative and therefore depends on the deprecated `baseUrl`. **Follow-up**: TypeScript 7.0 removes `baseUrl` outright — drop it and rewrite each `paths` value relative to its own tsconfig before then.
+- When a kit ships a subpath (e.g. `./testing`), map it in the consuming `tsconfig.json` **alongside** the bare specifier (`"@privateaim/core-http-kit/testing": ["./packages/core-http-kit/src/testing"]`). Without it the subpath falls through to `dist` and the package enters the program twice; because `BaseAPI` carries `protected client`, any signature typed with a concrete API class then fails cross-copy with TS2322.
+
+## Dependency Classification
+
+Hub's practice is **bimodal**, and deliberately differs from authup's. Record
+the actual shape before moving anything:
+
+| Package group | Runtime deps declared as |
+|---|---|
+| Client/domain kits (`core-http-kit`, `messenger-http-kit`) | `peerDependencies` + an identical `devDependencies` mirror. **No `dependencies` block at all** — including for internal `@privateaim/*` / `@authup/*`. |
+| Client/domain kits with a validator stack (`storage-kit`, `telemetry-kit`) | The same peer+dev mirror, **plus** a plain `dependencies` block for `{"@validup/zod","validup","zod"}`. |
+| Server kits and apps | Plain `dependencies`. |
+| Test-only deps | `devDependencies`, plus a tsdown `external` entry if they could otherwise be bundled (see `packages/server-test-kit/tsdown.config.ts`: `external: [/^testcontainers/, /^vitest/]`). |
+
+authup's convention forbids internal packages in `peerDependencies`. **Hub does
+not follow that rule.** Applying it here would rewrite ~7 manifests and disturb
+release-please's `node-workspace` plugin (`updatePeerDependencies: true` in
+`release-please-config.json`).
 
 ## Validation
 

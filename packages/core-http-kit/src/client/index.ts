@@ -7,3 +7,5 @@
 
 export * from './helpers';
 export * from './module';
+export * from './registry';
+export * from './types';

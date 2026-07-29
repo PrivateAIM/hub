@@ -13,9 +13,9 @@ npm install @privateaim/telemetry-kit
 ### HTTP Client
 
 ```typescript
-import { HTTPClient } from '@privateaim/telemetry-kit';
+import { APIClient } from '@privateaim/telemetry-kit';
 
-const client = new HTTPClient({
+const client = new APIClient({
     baseURL: 'http://localhost:4002',
 });
 
@@ -67,8 +67,52 @@ import { Event, Log } from '@privateaim/telemetry-kit';
 
 | Module | Description |
 |--------|-------------|
-| `http` | `HTTPClient` with event and log API methods |
+| `http` | `APIClient` with event and log API methods |
 | `domains` | `Event`, `Log` types and Zod validators |
+
+## Contract
+
+`APIClient` implements `ITelemetryClient`, and each sub-API implements its own
+`I<X>API` interface:
+
+```typescript
+import type { ITelemetryClient } from '@privateaim/telemetry-kit';
+
+// Depend on the CONTRACT, not the class — that is what lets a test hand you a
+// fake, and what keeps the type structural.
+function doWork(client: ITelemetryClient) { /* … */ }
+```
+
+| Sub-API | Contract |
+|---|---|
+| `event` | `IEventAPI` |
+| `log` | `ILogAPI` (append-and-query only: no `getOne`/`update`, and a query-keyed `deleteMany`) |
+
+## Testing
+
+`@privateaim/telemetry-kit/testing` ships a `FakeClient`: a real `APIClient` wired to hapic's
+`MemoryTransport`. Only the transport is replaced, so header merging, body
+transformation, decoding, retries and the client's own `RESPONSE_ERROR` hook all
+still run.
+
+```typescript
+import { createFakeClient, fakeResponse } from '@privateaim/telemetry-kit/testing';
+
+const client = createFakeClient({
+    handlers: {
+        'GET /logs': () => ({ data: [{ message: 'hello' }], meta: { total: 1 } }),
+    },
+});
+
+const { data: logs } = await client.log.getMany();
+```
+
+- Handler keys are `'<METHOD> /<path>'`; a `:name` segment captures into `req.params`.
+- The query string is ignored and `'*'` is a catch-all that always loses to a specific pattern.
+- A handler returns the response **body**; return `fakeResponse(status, body)` for a non-2xx.
+- Unmatched requests fall back to `{ data: [], meta: { total: 0 } }`.
+- Keep the default path-free `baseURL` — a `baseURL` carrying a path shifts every
+  pathname, and patterns silently stop matching.
 
 ## Dependencies
 

@@ -9,9 +9,10 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { Event } from './entity';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { IEventAPI } from './types';
 import { BaseAPI } from '../base';
 
-export class EventAPI extends BaseAPI {
+export class EventAPI extends BaseAPI implements IEventAPI {
     async getMany(options?: EntityQueryInput<Event>): Promise<EntityCollectionResponse<Event>> {
         const { data: response } = await this.client.get(`events${buildQueryString(options)}`);
         return response;

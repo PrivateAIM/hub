@@ -6,6 +6,7 @@
  */
 
 export * from './actor.ts';
+export * from './fake-authup-client.ts';
 export * from './authup-token.ts';
 export * from './fake-entity-repository.ts';
 export * from './fake-permission-checker.ts';

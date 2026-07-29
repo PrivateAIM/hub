@@ -33,6 +33,28 @@ Part of the **[FLAME Hub](https://github.com/PrivateAIM/hub)** monorepo — cent
 npm install @privateaim/telemetry-kit
 ```
 
+## Testing
+
+The `APIClient` class implements `ITelemetryClient`, so consumers can depend on the
+contract rather than the class. `@privateaim/telemetry-kit/testing` ships a
+`FakeClient` — a real `APIClient` on an in-memory transport, so the request pipeline
+(header merge, decode, hooks, retry) runs unchanged and no network is touched:
+
+```typescript
+import { createFakeClient } from '@privateaim/telemetry-kit/testing';
+
+const client = createFakeClient({
+    handlers: {
+        'GET /logs': () => ({ data: [{ message: 'hello' }], meta: { total: 1 } }),
+    },
+});
+
+const { data: logs } = await client.log.getMany();
+
+// Every dispatched request is recorded, normalized.
+console.log(client.requests);
+```
+
 ## License
 
 Made with 💚

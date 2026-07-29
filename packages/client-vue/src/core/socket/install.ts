@@ -18,7 +18,13 @@ import { provideSocketManager } from './singleton';
 import type { SocketManagerInstallOptions } from './types';
 
 export function installSocketManager(app: App, options: SocketManagerInstallOptions) {
-    const store = injectStore();
+    // Both injects MUST be passed the app explicitly. Vue's `app.use(plugin)`
+    // calls `plugin.install(app, ...)` bare, setting neither `currentInstance`
+    // nor `currentApp`, so `hasInjectionContext()` is false and an ambient
+    // inject resolves to undefined -> 'The store factory has not been injected
+    // in the app context.' It only appeared to work under Nuxt because plugins
+    // there run inside `vueApp.runWithContext()`.
+    const store = injectStore(options.pinia, app);
     const { accessToken } = storeToRefs(store);
 
     const manager = new ClientManager<
@@ -29,7 +35,7 @@ export function installSocketManager(app: App, options: SocketManagerInstallOpti
         token: () => accessToken.value,
     });
 
-    const storeDispatcher = injectStoreDispatcher();
+    const storeDispatcher = injectStoreDispatcher(app);
     storeDispatcher.on(
         StoreDispatcherEventName.ACCESS_TOKEN_UPDATED,
         () => {

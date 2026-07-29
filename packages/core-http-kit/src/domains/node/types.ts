@@ -7,6 +7,7 @@
 
 import type { Client } from '@authup/core-kit';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
+import type { EntityRecordResponse, IEntityAPI } from '../types-base';
 
 export type NodeCreatePayload =    & Pick<Node, 'name'> &
     Partial<Pick<Node, 'type' | 'hidden' | 'public_key' | 'external_name' | 'registry_id' | 'client_id' | 'realm_id'>>;
@@ -28,3 +29,11 @@ export type NodeClientCredentialsUpdate = Partial<{
 
 export type NodeRegistryCredentials =    & Pick<Registry, 'host' | 'account_name' | 'account_secret'> &
     Pick<RegistryProject, 'external_name'>;
+
+export interface INodeAPI extends IEntityAPI<Node, NodeCreatePayload, NodeUpdatePayload> {
+    runCommand(id: Node['id'], task: string, data: Record<string, any>) : Promise<EntityRecordResponse<Node>>;
+
+    getClientCredentials(id: Node['id']) : Promise<NodeClientCredentials>;
+    setClientCredentials(id: Node['id'], data?: NodeClientCredentialsUpdate) : Promise<NodeClientCredentials>;
+    getRegistryCredentials(id: Node['id']) : Promise<NodeRegistryCredentials>;
+}

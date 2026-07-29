@@ -14,6 +14,10 @@
         ".": {
             "types": "./dist/index.d.mts",
             "import": "./dist/index.mjs"
+        },
+        "./testing": {
+            "types": "./dist/testing/index.d.mts",
+            "import": "./dist/testing/index.mjs"
         }
     },
     "author": {
@@ -25,11 +29,13 @@
         "build:js": "rimraf ./dist && tsdown",
         "build:types": "tsc --noEmit -p tsconfig.build.json",
         "build": "npm run build:js && npm run build:types",
-        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
+        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch",
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "devDependencies": {
         "@privateaim/messenger-kit": "^0.12.6",
-        "hapic": "^3.0.1"
+        "hapic": "^3.0.1",
+        "vitest": "^4.1.10"
     },
     "peerDependencies": {
         "@privateaim/messenger-kit": "^0.12.6",

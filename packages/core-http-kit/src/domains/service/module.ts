@@ -9,8 +9,9 @@ import type { Registry, RegistryAPICommand, RegistryProject } from '@privateaim/
 import { ServiceID } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import { nullifyEmptyObjectProperties } from '../../utils';
+import type { IServiceAPI } from './types';
 
-export class ServiceAPI extends BaseAPI {
+export class ServiceAPI extends BaseAPI implements IServiceAPI {
     /**
      * Service commands are a protocol surface, not an entity record: the
      * endpoint acknowledges with 202 and an empty body, so there is nothing

@@ -11,9 +11,9 @@ import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { AnalysisCreatePayload, AnalysisUpdatePayload } from './types';
+import type { AnalysisCreatePayload, AnalysisUpdatePayload, IAnalysisAPI  } from './types';
 
-export class AnalysisAPI extends BaseAPI {
+export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
     // todo: we properly don't need this anymore
     getResultDownloadPath(id: Analysis['id']) {
         return `analyses/${id}/result/download`;
@@ -87,13 +87,13 @@ export class AnalysisAPI extends BaseAPI {
         return response;
     }
 
-    async streamFiles(id: Analysis['id']) {
+    async streamFiles(id: Analysis['id']) : Promise<ReadableStream<any>> {
         const response = await this.client.get(this.getFilesDownloadPath(id), { responseType: 'stream' });
 
         return response.data;
     }
 
-    async downloadResult(id: Analysis['id']) {
+    async downloadResult(id: Analysis['id']) : Promise<ReadableStream<any>> {
         const response = await this.client.get(this.getResultDownloadPath(id), { responseType: 'stream' });
 
         return response.data;

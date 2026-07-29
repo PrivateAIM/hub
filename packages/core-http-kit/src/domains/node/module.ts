@@ -11,6 +11,7 @@ import type { Node } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import type {
+    INodeAPI,
     NodeClientCredentials,
     NodeClientCredentialsUpdate,
     NodeCreatePayload,
@@ -18,7 +19,7 @@ import type {
     NodeUpdatePayload,
 } from './types';
 
-export class NodeAPI extends BaseAPI {
+export class NodeAPI extends BaseAPI implements INodeAPI {
     async getMany(options?: EntityQueryInput<Node>): Promise<EntityCollectionResponse<Node>> {
         const response = await this.client.get(`nodes${buildQueryString(options)}`);
 

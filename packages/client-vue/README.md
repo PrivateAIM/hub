@@ -33,6 +33,30 @@ Part of the **[FLAME Hub](https://github.com/PrivateAIM/hub)** monorepo — cent
 npm install @privateaim/client-vue
 ```
 
+## Setup
+
+`install` is **not** self-sufficient: `@authup/client-web-kit`'s auth hook and
+store must already be provided on the same app.
+
+```typescript
+import { install } from '@privateaim/client-vue';
+
+app.use(install, {
+    coreURL, storageURL, telemetryURL,
+
+    // Opt-in: the realtime socket manager needs a live authup store and opens a
+    // websocket, so it stays off unless requested.
+    realtime: true,
+});
+```
+
+Each of `coreHTTPClient` / `storageHTTPClient` / `telemetryHTTPClient` accepts a
+pre-built client, used instead of constructing one from the matching URL. That
+is the seam component tests use to inject a `FakeClient` from
+`@privateaim/<kit>/testing`. Prefer it over pre-providing a client: the
+installers early-return when one is already provided, so an ordering mistake
+fails silently.
+
 ## License
 
 Made with 💚

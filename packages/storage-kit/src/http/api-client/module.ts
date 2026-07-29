@@ -5,19 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RequestBaseOptions } from 'hapic';
 import { Client, HookName, isClientError } from 'hapic';
 import {
     BucketAPI,
     BucketFileAPI,
 } from '../../domains';
+import type { ClientOptions, IStorageClient } from './types';
 
-export class APIClient extends Client {
+export class APIClient extends Client implements IStorageClient {
     public readonly bucket : BucketAPI;
 
     public readonly bucketFile : BucketFileAPI;
 
-    constructor(config: RequestBaseOptions) {
+    constructor(config: ClientOptions = {}) {
         super(config);
 
         this.bucket = new BucketAPI({ client: this });

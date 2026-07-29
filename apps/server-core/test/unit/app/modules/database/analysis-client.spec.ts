@@ -8,93 +8,15 @@
 import { randomUUID } from 'node:crypto';
 import { ClientAuthMethod } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import type { AuthupClient } from '@privateaim/server-kit';
+import { createFakeAuthupClient, fakeAuthupResponse } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { AnalysisClientService } from '../../../../../src/app/modules/database/analysis-client.ts';
 
-type ClientPermissionRecord = { id: string; permission: { name: string } };
-
-/**
- * In-memory fake of the parts of AuthupClient the AnalysisClientService touches.
- * Records calls so assertions can verify create/reuse/dismiss and the additive
- * (never-delete) permission behaviour.
- */
-class FakeAuthupClient {
-    public createdClients: Record<string, any>[] = [];
-
-    public deletedClientIds: string[] = [];
-
-    public createdClientPermissions: Record<string, any>[] = [];
-
-    public deletedClientPermissionIds: string[] = [];
-
-    private existingClients = new Map<string, { id: string }>();
-
-    private existingClientPermissions: ClientPermissionRecord[] = [];
-
-    private knownPermissions = new Set<string>();
-
-    private clientSeq = 0;
-
-    constructor(opts: {
-        permissions?: string[];
-        existingClient?: { id: string };
-        existingClientPermissions?: ClientPermissionRecord[];
-    } = {}) {
-        for (const name of opts.permissions || []) {
-            this.knownPermissions.add(name);
-        }
-        if (opts.existingClient) {
-            this.existingClients.set(opts.existingClient.id, opts.existingClient);
-        }
-        if (opts.existingClientPermissions) {
-            this.existingClientPermissions = opts.existingClientPermissions;
-        }
-    }
-
-    client = {
-        create: async (data: Record<string, any>) => {
-            this.clientSeq += 1;
-            const client = { id: `client-${this.clientSeq}` };
-            this.createdClients.push(data);
-            this.existingClients.set(client.id, client);
-            return { data: client, meta: {} };
-        },
-        getOne: async (id: string) => {
-            const client = this.existingClients.get(id);
-            if (!client) {
-                throw new Error(`client ${id} not found`);
-            }
-            return { data: client, meta: {} };
-        },
-        delete: async (id: string) => {
-            this.deletedClientIds.push(id);
-            this.existingClients.delete(id);
-            return { data: { id }, meta: {} };
-        },
-    };
-
-    clientPermission = {
-        getMany: async () => ({ data: this.existingClientPermissions }),
-        create: async (data: Record<string, any>) => {
-            this.createdClientPermissions.push(data);
-            return { data: { id: `cp-${this.createdClientPermissions.length}`, ...data }, meta: {} };
-        },
-        delete: async (id: string) => {
-            this.deletedClientPermissionIds.push(id);
-            return { data: { id }, meta: {} };
-        },
-    };
-
-    permission = {
-        getOne: async (name: string) => {
-            if (!this.knownPermissions.has(name)) {
-                throw new Error(`permission ${name} not found`);
-            }
-            return { data: { id: `perm-${name}`, name }, meta: {} };
-        },
-    };
-}
+// Driven through a REAL `AuthupClient` on an in-memory transport. That matters
+// here specifically: this service branches on
+// `isClientErrorWithStatusCode(e, 404)`, which needs a genuine hapic
+// `ClientError` — a hand-written double throwing `new Error()` can never
+// produce one, so those branches used to be unreachable in tests.
 
 function createAnalysisEntity(overrides: Record<string, any> = {}) {
     return {
@@ -105,17 +27,24 @@ function createAnalysisEntity(overrides: Record<string, any> = {}) {
     } as any;
 }
 
+function bodiesOf(authup: ReturnType<typeof createFakeAuthupClient>, method: string, pathFragment: string) {
+    return authup.requests
+        .filter((request) => request.method === method && request.url.includes(pathFragment))
+        .map((request) => request.body as Record<string, any>);
+}
+
 describe('AnalysisClientService', () => {
     describe('assign', () => {
         it('should create a confidential client and store its id when none exists', async () => {
-            const authup = new FakeAuthupClient();
-            const service = new AnalysisClientService(authup as unknown as AuthupClient);
+            const authup = createFakeAuthupClient({ handlers: { 'POST /clients': () => ({ data: { id: 'client-1' }, meta: {} }) } });
+            const service = new AnalysisClientService(authup);
 
             const entity = createAnalysisEntity();
             const client = await service.assign(entity);
 
-            expect(authup.createdClients).toHaveLength(1);
-            expect(authup.createdClients[0]).toMatchObject({
+            const created = bodiesOf(authup, 'POST', '/clients');
+            expect(created).toHaveLength(1);
+            expect(created[0]).toMatchObject({
                 name: entity.id,
                 realmId: entity.realm_id,
                 authMethod: ClientAuthMethod.SECRET,
@@ -125,76 +54,176 @@ describe('AnalysisClientService', () => {
         });
 
         it('should reuse an existing client without creating a new one', async () => {
-            const authup = new FakeAuthupClient({ existingClient: { id: 'client-existing' } });
-            const service = new AnalysisClientService(authup as unknown as AuthupClient);
+            const authup = createFakeAuthupClient({ handlers: { 'GET /clients/:id': (req) => ({ data: { id: req.params.id }, meta: {} }) } });
+            const service = new AnalysisClientService(authup);
 
             const entity = createAnalysisEntity({ client_id: 'client-existing' });
             const client = await service.assign(entity);
 
-            expect(authup.createdClients).toHaveLength(0);
+            expect(bodiesOf(authup, 'POST', '/clients')).toHaveLength(0);
             expect(client.id).toBe('client-existing');
             expect(entity.client_id).toBe('client-existing');
+        });
+
+        it('should re-create the client when the stored id 404s', async () => {
+            // Previously unreachable: needs a REAL 404 client error.
+            const authup = createFakeAuthupClient({
+                handlers: {
+                    'GET /clients/:id': () => fakeAuthupResponse(404, { message: 'not found' }),
+                    'POST /clients': () => ({ data: { id: 'client-new' }, meta: {} }),
+                },
+            });
+            const service = new AnalysisClientService(authup);
+
+            const entity = createAnalysisEntity({ client_id: 'client-gone' });
+            const client = await service.assign(entity);
+
+            expect(client.id).toBe('client-new');
+            expect(entity.client_id).toBe('client-new');
+        });
+
+        it('should propagate a non-404 failure when reading the stored client', async () => {
+            const authup = createFakeAuthupClient({ handlers: { 'GET /clients/:id': () => fakeAuthupResponse(500, { message: 'boom' }) } });
+            const service = new AnalysisClientService(authup);
+
+            await expect(service.assign(createAnalysisEntity({ client_id: 'client-x' })))
+                .rejects.toThrow();
+            expect(bodiesOf(authup, 'POST', '/clients')).toHaveLength(0);
         });
     });
 
     describe('dismiss', () => {
         it('should delete the client and clear the id', async () => {
-            const authup = new FakeAuthupClient({ existingClient: { id: 'client-x' } });
-            const service = new AnalysisClientService(authup as unknown as AuthupClient);
+            const authup = createFakeAuthupClient({ handlers: { 'DELETE /clients/:id': (req) => ({ data: { id: req.params.id }, meta: {} }) } });
+            const service = new AnalysisClientService(authup);
 
             const entity = createAnalysisEntity({ client_id: 'client-x' });
             await service.dismiss(entity);
 
-            expect(authup.deletedClientIds).toEqual(['client-x']);
+            expect(authup.requests.map((request) => request.method)).toEqual(['DELETE']);
+            expect(authup.requests[0].params.id).toBe('client-x');
             expect(entity.client_id).toBeNull();
         });
 
         it('should be a no-op when there is no client_id', async () => {
-            const authup = new FakeAuthupClient();
-            const service = new AnalysisClientService(authup as unknown as AuthupClient);
+            const authup = createFakeAuthupClient();
+            const service = new AnalysisClientService(authup);
 
-            const entity = createAnalysisEntity({ client_id: null });
+            await service.dismiss(createAnalysisEntity({ client_id: null }));
+
+            expect(authup.requests).toHaveLength(0);
+        });
+
+        it('should treat an already-deleted client as success', async () => {
+            // Previously unreachable: needs a REAL 404 client error.
+            const authup = createFakeAuthupClient({ handlers: { 'DELETE /clients/:id': () => fakeAuthupResponse(404, { message: 'not found' }) } });
+            const service = new AnalysisClientService(authup);
+
+            const entity = createAnalysisEntity({ client_id: 'client-gone' });
             await service.dismiss(entity);
 
-            expect(authup.deletedClientIds).toHaveLength(0);
+            expect(entity.client_id).toBeNull();
+        });
+
+        it('should propagate a non-404 delete failure and keep the id', async () => {
+            const authup = createFakeAuthupClient({ handlers: { 'DELETE /clients/:id': () => fakeAuthupResponse(500, { message: 'boom' }) } });
+            const service = new AnalysisClientService(authup);
+
+            const entity = createAnalysisEntity({ client_id: 'client-x' });
+            await expect(service.dismiss(entity)).rejects.toThrow();
+            expect(entity.client_id).toBe('client-x');
         });
     });
 
     describe('assignDefaultPermissions', () => {
         it('should grant both self-capabilities to a client with none', async () => {
-            const authup = new FakeAuthupClient({
-                permissions: [
-                    PermissionName.ANALYSIS_SELF_STORAGE_USE,
-                    PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE,
-                ],
+            const authup = createFakeAuthupClient({
+                handlers: {
+                    'GET /client-permissions': () => ({ data: [], meta: { total: 0 } }),
+                    'GET /permissions/:name': (req) => ({
+                        data: { id: `perm-${req.params.name}`, name: req.params.name },
+                        meta: {},
+                    }),
+                    'POST /client-permissions': (req) => ({ data: { id: 'cp-1', ...(req.body as object) }, meta: {} }),
+                },
             });
-            const service = new AnalysisClientService(authup as unknown as AuthupClient);
+            const service = new AnalysisClientService(authup);
 
             await service.assignDefaultPermissions({ id: 'client-1' } as any);
 
-            const created = authup.createdClientPermissions.map((cp) => cp.permissionId);
+            const created = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.permissionId);
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_SELF_STORAGE_USE}`);
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
-            expect(authup.createdClientPermissions).toHaveLength(2);
+            expect(created).toHaveLength(2);
         });
 
         it('should additively add only the missing permission and never delete', async () => {
-            const authup = new FakeAuthupClient({
-                permissions: [
-                    PermissionName.ANALYSIS_SELF_STORAGE_USE,
-                    PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE,
-                ],
-                existingClientPermissions: [
-                    { id: 'cp-existing', permission: { name: PermissionName.ANALYSIS_SELF_STORAGE_USE } },
-                ],
+            const authup = createFakeAuthupClient({
+                handlers: {
+                    'GET /client-permissions': () => ({
+                        data: [
+                            { id: 'cp-existing', permission: { name: PermissionName.ANALYSIS_SELF_STORAGE_USE } },
+                        ],
+                        meta: { total: 1 },
+                    }),
+                    'GET /permissions/:name': (req) => ({
+                        data: { id: `perm-${req.params.name}`, name: req.params.name },
+                        meta: {},
+                    }),
+                    'POST /client-permissions': (req) => ({ data: { id: 'cp-1', ...(req.body as object) }, meta: {} }),
+                },
             });
-            const service = new AnalysisClientService(authup as unknown as AuthupClient);
+            const service = new AnalysisClientService(authup);
 
             await service.assignDefaultPermissions({ id: 'client-1' } as any);
 
-            expect(authup.createdClientPermissions).toHaveLength(1);
-            expect(authup.createdClientPermissions[0].permissionId).toBe(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
-            expect(authup.deletedClientPermissionIds).toHaveLength(0);
+            const created = bodiesOf(authup, 'POST', '/client-permissions');
+            expect(created).toHaveLength(1);
+            expect(created[0].permissionId).toBe(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
+            expect(authup.requests.some((request) => request.method === 'DELETE')).toBe(false);
+        });
+
+        it('should skip a permission that does not exist rather than failing', async () => {
+            // Previously unreachable: the warn-and-continue branch is guarded by
+            // `isClientErrorWithStatusCode(e, 404)`.
+            const authup = createFakeAuthupClient({
+                handlers: {
+                    'GET /client-permissions': () => ({ data: [], meta: { total: 0 } }),
+                    [`GET /permissions/${PermissionName.ANALYSIS_SELF_STORAGE_USE}`]: () => fakeAuthupResponse(404, { message: 'not found' }),
+                    'GET /permissions/:name': (req) => ({
+                        data: { id: `perm-${req.params.name}`, name: req.params.name },
+                        meta: {},
+                    }),
+                    'POST /client-permissions': (req) => ({ data: { id: 'cp-1', ...(req.body as object) }, meta: {} }),
+                },
+            });
+            const service = new AnalysisClientService(authup);
+
+            await service.assignDefaultPermissions({ id: 'client-1' } as any);
+
+            const created = bodiesOf(authup, 'POST', '/client-permissions');
+            expect(created).toHaveLength(1);
+            expect(created[0].permissionId).toBe(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
+        });
+
+        it('should filter the existing permissions by the client id', async () => {
+            const authup = createFakeAuthupClient({
+                handlers: {
+                    'GET /client-permissions': () => ({ data: [], meta: { total: 0 } }),
+                    'GET /permissions/:name': (req) => ({
+                        data: { id: `perm-${req.params.name}`, name: req.params.name },
+                        meta: {},
+                    }),
+                    'POST /client-permissions': (req) => ({ data: { id: 'cp-1', ...(req.body as object) }, meta: {} }),
+                },
+            });
+            const service = new AnalysisClientService(authup);
+
+            await service.assignDefaultPermissions({ id: 'client-42' } as any);
+
+            const query = decodeURIComponent(authup.requests[0].url);
+            expect(query).toContain('client-42');
+            expect(query).toContain('permission');
         });
     });
 });

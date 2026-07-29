@@ -6,7 +6,10 @@
  */
 
 import type { ProjectNode } from '@privateaim/core-kit';
+import type { IEntityAPI } from '../types-base';
 
 export type ProjectNodeCreatePayload = Pick<ProjectNode, 'project_id' | 'node_id'>;
 
 export type ProjectNodeUpdatePayload = Partial<Pick<ProjectNode, 'approval_status' | 'comment'>>;
+
+export interface IProjectNodeAPI extends IEntityAPI<ProjectNode, ProjectNodeCreatePayload, ProjectNodeUpdatePayload> {}

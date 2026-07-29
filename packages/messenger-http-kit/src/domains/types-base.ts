@@ -5,8 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client, RequestBaseOptions } from 'hapic';
+import type { IClient as IBaseClient, RequestBaseOptions } from 'hapic';
 
 export type BaseAPIContext = {
-    client?: Client | RequestBaseOptions
+    /**
+     * hapic client INTERFACE, not its concrete class — see the identical note
+     * in @privateaim/core-http-kit.
+     */
+    client?: IBaseClient | RequestBaseOptions
 };

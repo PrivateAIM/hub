@@ -10,9 +10,9 @@ import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Project } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { ProjectCreatePayload, ProjectUpdatePayload } from './types';
+import type { IProjectAPI, ProjectCreatePayload, ProjectUpdatePayload  } from './types';
 
-export class ProjectAPI extends BaseAPI {
+export class ProjectAPI extends BaseAPI implements IProjectAPI {
     async getMany(record?: EntityQueryInput<Project>): Promise<EntityCollectionResponse<Project>> {
         const response = await this.client.get(`projects${buildQueryString(record)}`);
         return response.data;

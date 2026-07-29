@@ -13,9 +13,9 @@ npm install @privateaim/core-http-kit
 ### Creating a Client
 
 ```typescript
-import { HTTPClient } from '@privateaim/core-http-kit';
+import { Client } from '@privateaim/core-http-kit';
 
-const client = new HTTPClient({
+const client = new Client({
     baseURL: 'http://localhost:4000',
 });
 ```
@@ -120,7 +120,7 @@ const analysisNodes = await getManyAll((page) => client.analysisNode.getMany({
 ### With Authentication
 
 ```typescript
-const client = new HTTPClient({
+const client = new Client({
     baseURL: 'http://localhost:4000',
     token: 'Bearer <your-token>',
 });
@@ -132,11 +132,15 @@ const client = new HTTPClient({
 
 | Module | Description |
 |--------|-------------|
-| `client` | `HTTPClient` class with typed domain API methods |
+| `client` | `Client` class with typed domain API methods |
 | `domains` | Domain-specific request/response types |
 | `EntityRecordResponse` / `EntityRecordMeta` | The `{ data, meta }` record envelope and its meta type |
 | `EntityCollectionResponse` | The `{ data, meta }` collection envelope |
-| `IEntityAPI` / `IEntityAPISlim` | Port interfaces every entity sub-API implements |
+| `IEntityAPI` / `IEntityAPISlim` | Generic port interfaces the entity sub-APIs build on |
+| `ICoreClient` / `ClientOptions` | The client contract and its construction options |
+| `I<X>API` | One contract per sub-API (`IAnalysisAPI`, `INodeAPI`, …) |
+| `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
+| `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute` |
 | `getManyAll` | Helper that fetches a resource collection exhaustively across all pages |
 
 ### Client Methods
@@ -183,6 +187,67 @@ Two changes are needed per upgrade:
 ```
 
 `getMany` call sites need **no** change — collections were already enveloped.
+
+## Contract
+
+`Client` implements `ICoreClient`, and each sub-API implements its own
+`I<X>API` interface:
+
+```typescript
+import type { ICoreClient } from '@privateaim/core-http-kit';
+
+// Depend on the CONTRACT, not the class — that is what lets a test hand you a
+// fake, and what keeps the type structural.
+function doWork(client: ICoreClient) { /* … */ }
+```
+
+| Sub-API | Contract |
+|---|---|
+| `analysis` | `IAnalysisAPI` |
+| `analysisBucket` | `IAnalysisBucketAPI` |
+| `analysisBucketFile` | `IAnalysisBucketFileAPI` |
+| `analysisLog` | `IAnalysisLogAPI` (standalone — query-keyed `delete`, returns telemetry `Log`) |
+| `analysisNode` | `IAnalysisNodeAPI` |
+| `analysisNodeEvent` | `IAnalysisNodeEventAPI` (read-only) |
+| `analysisNodeLog` | `IAnalysisNodeLogAPI` (standalone) |
+| `masterImage` | `IMasterImageAPI` (no `create`) |
+| `masterImageGroup` | `IMasterImageGroupAPI` (no `create`) |
+| `node` | `INodeAPI` |
+| `project` | `IProjectAPI` |
+| `projectNode` | `IProjectNodeAPI` |
+| `registry` | `IRegistryAPI` |
+| `registryProject` | `IRegistryProjectAPI` |
+| `service` | `IServiceAPI` (protocol surface, no entity shape) |
+
+## Testing
+
+`@privateaim/core-http-kit/testing` ships a `FakeClient`: a real `Client` wired to hapic's
+`MemoryTransport`. Only the transport is replaced, so header merging, body
+transformation, decoding, retries and the client's own `RESPONSE_ERROR` hook all
+still run.
+
+```typescript
+import { createFakeClient, fakeResponse } from '@privateaim/core-http-kit/testing';
+
+const client = createFakeClient({
+    handlers: {
+        'GET /projects/:id': (req) => ({ data: { id: req.params.id }, meta: {} }),
+        'DELETE /projects/:id': () => fakeResponse(403, { message: 'forbidden' }),
+    },
+});
+
+const { data: project } = await client.project.getOne('abc');
+
+// Every dispatched request is recorded, normalized.
+expect(client.requests[0]).toMatchObject({ method: 'GET', params: { id: 'abc' } });
+```
+
+- Handler keys are `'<METHOD> /<path>'`; a `:name` segment captures into `req.params`.
+- The query string is ignored and `'*'` is a catch-all that always loses to a specific pattern.
+- A handler returns the response **body**; return `fakeResponse(status, body)` for a non-2xx.
+- Unmatched requests fall back to `{ data: [], meta: { total: 0 } }`.
+- Keep the default path-free `baseURL` — a `baseURL` carrying a path shifts every
+  pathname, and patterns silently stop matching.
 
 ## Dependencies
 

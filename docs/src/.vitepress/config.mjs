@@ -131,6 +131,7 @@ export default defineConfig({
                     items: [
                         { text: 'Service', link: '/reference/messenger/' },
                         { text: 'messenger-kit', link: '/reference/messenger/messenger-kit' },
+                        { text: 'messenger-http-kit', link: '/reference/messenger/messenger-http-kit' },
                         { text: 'server-realtime-kit', link: '/reference/messenger/server-realtime-kit' },
                     ],
                 },

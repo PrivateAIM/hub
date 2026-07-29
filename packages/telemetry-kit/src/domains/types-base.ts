@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SchemaDescription } from '@rapiq/core';
-import type { Client, RequestBaseOptions } from 'hapic';
+import type { ObjectLiteral, SchemaDescription } from '@rapiq/core';
+import type { IClient as IBaseClient, RequestBaseOptions } from 'hapic';
+import type { EntityQueryInput } from '../utils';
 
 /**
  * Response-scoped extras of an entity-record response. `schema` is the
@@ -44,6 +45,37 @@ export type EntityCollectionResponse<R> = {
     }
 };
 
+
+/**
+ * Generic entity-API contracts, mirroring `@privateaim/core-http-kit`'s
+ * `types-base.ts`. Kept as a per-kit copy rather than a shared import: this kit
+ * sits BELOW core-http-kit in the dependency graph, so importing from it would
+ * invert the layering.
+ */
+export type DomainEntityWithID = {
+    [key: string]: any,
+    id: any
+};
+
+export type DomainEntityID<T> = T extends DomainEntityWithID ?
+    T['id'] :
+    never;
+
+export interface IEntityAPISlim<T extends ObjectLiteral, TCreate = Partial<T>> {
+    getMany(record?: EntityQueryInput<T>) : Promise<EntityCollectionResponse<T>>;
+    getOne(id: DomainEntityID<T>, record?: EntityQueryInput<T>) : Promise<EntityRecordResponse<T>>;
+    delete(id: DomainEntityID<T>) : Promise<EntityRecordResponse<T>>;
+    create(data: TCreate) : Promise<EntityRecordResponse<T>>;
+}
+
+export interface IEntityAPI<T extends ObjectLiteral, TCreate = Partial<T>, TUpdate = Partial<T>> extends IEntityAPISlim<T, TCreate> {
+    update(id: DomainEntityID<T>, data: TUpdate) : Promise<EntityRecordResponse<T>>;
+}
+
 export type BaseAPIContext = {
-    client?: Client | RequestBaseOptions
+    /**
+     * hapic client INTERFACE, not its concrete class — see the identical note
+     * in @privateaim/core-http-kit.
+     */
+    client?: IBaseClient | RequestBaseOptions
 };

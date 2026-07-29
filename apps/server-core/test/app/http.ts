@@ -6,6 +6,7 @@
  */
 
 import { Client } from '@privateaim/core-http-kit';
+import type { ICoreClient } from '@privateaim/core-http-kit';
 import {
     ConfigInjectionKey,
     createAuthupClientAuthenticationHook,
@@ -16,9 +17,9 @@ import { HTTPInjectionKey } from '../../src/app/modules/http/index.ts';
 import { TestApplication } from './module.ts';
 
 export class TestHTTPApplication extends TestApplication {
-    protected _client: Client | undefined;
+    protected _client: ICoreClient | undefined;
 
-    get client(): Client {
+    get client(): ICoreClient {
         if (typeof this._client === 'undefined') {
             this._client = this.createClient();
         }
@@ -26,7 +27,7 @@ export class TestHTTPApplication extends TestApplication {
         return this._client;
     }
 
-    protected createClient(): Client {
+    protected createClient(): ICoreClient {
         const server = this.container.resolve<HTTPServer>(HTTPInjectionKey.Server);
 
         const baseURL = server.url;

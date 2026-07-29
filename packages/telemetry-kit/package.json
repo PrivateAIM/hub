@@ -14,6 +14,10 @@
         ".": {
             "types": "./dist/index.d.mts",
             "import": "./dist/index.mjs"
+        },
+        "./testing": {
+            "types": "./dist/testing/index.d.mts",
+            "import": "./dist/testing/index.mjs"
         }
     },
     "author": {
@@ -32,7 +36,8 @@
         "@privateaim/kit": "^0.12.7",
         "@rapiq/codec-url": "^2.0.0-beta.13",
         "@rapiq/core": "^2.0.0-beta.13",
-        "hapic": "^3.0.1"
+        "hapic": "^3.0.1",
+        "vitest": "^4.1.10"
     },
     "peerDependencies": {
         "@authup/core-kit": "^1.0.0-beta.57",
@@ -46,7 +51,8 @@
         "build:js": "rimraf ./dist && tsdown",
         "build:types": "tsc --noEmit -p tsconfig.build.json",
         "build": "npm run build:js && npm run build:types",
-        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
+        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch",
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "gitHead": "5d3b6f4ce1edf2383bdfbf66e913a08c8a3a2e40",
     "publishConfig": {

@@ -5,31 +5,31 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AuthupClient } from '@privateaim/server-kit';
+import { createFakeAuthupClient } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { AuthupClientCredentialStore } from '../../../../../src/app/modules/database/authup-client-credential-store.ts';
 
+// Driven through a REAL `AuthupClient` on an in-memory transport, so the
+// request actually travels the hapic pipeline (query serialization, body
+// transform, decode) instead of stopping at a hand-written object literal.
+
 describe('AuthupClientCredentialStore', () => {
     it('should fetch the client with the +secret field and map id/name/display_name/secret', async () => {
-        const calls: { id: string; options?: any }[] = [];
-        const authup = {
-            client: {
-                getOne: async (id: string, options?: any) => {
-                    calls.push({ id, options });
-                    return {
-                        data: {
-                            id,
-                            name: 'node-1',
-                            displayName: 'Node 1',
-                            secret: 'sek',
-                        },
-                        meta: {},
-                    };
-                },
+        const authup = createFakeAuthupClient({
+            handlers: {
+                'GET /clients/:id': (req) => ({
+                    data: {
+                        id: req.params.id,
+                        name: 'node-1',
+                        displayName: 'Node 1',
+                        secret: 'sek',
+                    },
+                    meta: {},
+                }),
             },
-        };
+        });
 
-        const reader = new AuthupClientCredentialStore(authup as unknown as AuthupClient);
+        const reader = new AuthupClientCredentialStore(authup);
         const result = await reader.readByClientId('client-1');
 
         expect(result).toEqual({
@@ -38,27 +38,24 @@ describe('AuthupClientCredentialStore', () => {
             display_name: 'Node 1',
             secret: 'sek',
         });
-        expect(calls[0]).toEqual({ id: 'client-1', options: { fields: ['+secret'] } });
+
+        // `secret` is select:false server-side, so the opt-in must reach the wire.
+        expect(decodeURIComponent(authup.requests[0].url)).toContain('+secret');
     });
 
     it('should null a missing secret and display_name', async () => {
-        const authup = {
-            client: {
-                getOne: async (id: string) => ({
-                    data: {
-                        id,
-                        name: 'node-2',
-                        secret: undefined,
-                    },
+        const authup = createFakeAuthupClient({
+            handlers: {
+                'GET /clients/:id': (req) => ({
+                    data: { id: req.params.id, name: 'node-2' },
                     meta: {},
-                }), 
-            }, 
-        };
+                }),
+            },
+        });
 
-        const reader = new AuthupClientCredentialStore(authup as unknown as AuthupClient);
-        const result = await reader.readByClientId('client-2');
+        const reader = new AuthupClientCredentialStore(authup);
 
-        expect(result).toEqual({
+        expect(await reader.readByClientId('client-2')).toEqual({
             id: 'client-2',
             name: 'node-2',
             display_name: null,
@@ -67,29 +64,26 @@ describe('AuthupClientCredentialStore', () => {
     });
 
     it('should set a provided secret via client update and return the plaintext', async () => {
-        const calls: { id: string; data?: any }[] = [];
-        const authup = {
-            client: {
-                update: async (id: string, data?: any) => {
-                    calls.push({ id, data });
-                    return {
-                        data: {
-                            id,
-                            name: 'node-1',
-                            display_name: null,
-                            secret: 'stored-hash',
-                        },
-                        meta: {},
-                    };
-                },
+        const authup = createFakeAuthupClient({
+            handlers: {
+                'POST /clients/:id': (req) => ({
+                    data: {
+                        id: req.params.id,
+                        name: 'node-1',
+                        display_name: null,
+                        // The stored value may be hashed — the store must NOT
+                        // echo it back.
+                        secret: 'stored-hash',
+                    },
+                    meta: {},
+                }),
             },
-        };
+        });
 
-        const store = new AuthupClientCredentialStore(authup as unknown as AuthupClient);
+        const store = new AuthupClientCredentialStore(authup);
         const result = await store.writeByClientId('client-1', { secret: 'my-secret' });
 
-        expect(calls[0]).toEqual({ id: 'client-1', data: { secret: 'my-secret' } });
-        // Returns what we wrote, not the (possibly hashed) stored value.
+        expect(authup.requests[0].body).toMatchObject({ secret: 'my-secret' });
         expect(result).toEqual({
             id: 'client-1',
             name: 'node-1',
@@ -99,28 +93,24 @@ describe('AuthupClientCredentialStore', () => {
     });
 
     it('should generate a secret when none is provided and write+return it', async () => {
-        const calls: { id: string; data?: any }[] = [];
-        const authup = {
-            client: {
-                update: async (id: string, data?: any) => {
-                    calls.push({ id, data });
-                    return {
-                        data: {
-                            id,
-                            name: 'node-2',
-                            display_name: null,
-                            secret: 'stored-hash',
-                        },
-                        meta: {},
-                    };
-                },
+        const authup = createFakeAuthupClient({
+            handlers: {
+                'POST /clients/:id': (req) => ({
+                    data: {
+                        id: req.params.id,
+                        name: 'node-2',
+                        display_name: null,
+                        secret: 'stored-hash',
+                    },
+                    meta: {},
+                }),
             },
-        };
+        });
 
-        const store = new AuthupClientCredentialStore(authup as unknown as AuthupClient);
+        const store = new AuthupClientCredentialStore(authup);
         const result = await store.writeByClientId('client-2');
 
-        const written = calls[0].data.secret;
+        const written = (authup.requests[0].body as Record<string, any>).secret;
         expect(typeof written).toBe('string');
         expect(written.length).toBeGreaterThan(0);
         expect(result).toEqual({
@@ -132,31 +122,31 @@ describe('AuthupClientCredentialStore', () => {
     });
 
     it('should pass name and display_name through to the client update', async () => {
-        const calls: { id: string; data?: any }[] = [];
-        const authup = {
-            client: {
-                update: async (id: string, data?: any) => {
-                    calls.push({ id, data });
+        const authup = createFakeAuthupClient({
+            handlers: {
+                'POST /clients/:id': (req) => {
+                    const body = req.body as Record<string, any>;
                     return {
                         data: {
-                            id,
-                            name: data.name,
-                            displayName: data.displayName ?? null,
-                            secret: data.secret,
+                            id: req.params.id,
+                            name: body.name,
+                            displayName: body.displayName ?? null,
+                            secret: body.secret,
                         },
                         meta: {},
                     };
                 },
             },
-        };
+        });
 
-        const store = new AuthupClientCredentialStore(authup as unknown as AuthupClient);
+        const store = new AuthupClientCredentialStore(authup);
         await store.writeByClientId('client-3', { name: 'renamed', display_name: 'Renamed' });
 
+        const body = authup.requests[0].body as Record<string, any>;
         // An omitted secret still rotates; the labels ride along on the update.
-        expect(calls[0].data.name).toBe('renamed');
-        expect(calls[0].data.displayName).toBe('Renamed');
-        expect(typeof calls[0].data.secret).toBe('string');
-        expect(calls[0].data.secret.length).toBeGreaterThan(0);
+        expect(body.name).toBe('renamed');
+        expect(body.displayName).toBe('Renamed');
+        expect(typeof body.secret).toBe('string');
+        expect(body.secret.length).toBeGreaterThan(0);
     });
 });

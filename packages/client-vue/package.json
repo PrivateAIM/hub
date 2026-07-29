@@ -22,7 +22,8 @@
         "build:js": "tsdown",
         "build:types": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
         "build": "rimraf ./dist && npm run build:js && npm run build:types",
-        "build:watch": "npm run build -- --watch"
+        "build:watch": "npm run build -- --watch",
+        "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "keywords": [],
     "author": {
@@ -60,6 +61,7 @@
         "@validup/vue": "^0.3.3",
         "@validup/zod": "^0.3.3",
         "@vitejs/plugin-vue": "^6.0.8",
+        "@vue/test-utils": "^2.4.11",
         "@vuecs/button": "^1.4.0",
         "@vuecs/core": "^3.5.0",
         "@vuecs/countdown": "^2.1.0",
@@ -76,10 +78,13 @@
         "@vuecs/timeago": "^2.2.0",
         "@vueuse/core": "^14.4.0",
         "hapic": "^3.0.1",
+        "happy-dom": "^20.11.1",
         "ilingo": "^6.0.0",
+        "pinia": "^4.0.2",
         "smob": "^1.6.2",
         "socket.io-client": "^4.8.3",
         "validup": "^0.5.1",
+        "vitest": "^4.1.10",
         "vue": "^3.5.40",
         "vue-tsc": "^3.3.8",
         "zod": "^4.4.3"

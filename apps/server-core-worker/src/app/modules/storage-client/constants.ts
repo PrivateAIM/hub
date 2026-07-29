@@ -6,6 +6,6 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { APIClient } from '@privateaim/storage-kit';
+import type { IStorageClient } from '@privateaim/storage-kit';
 
-export const StorageClientInjectionKey = new TypedToken<APIClient>('StorageClient');
+export const StorageClientInjectionKey = new TypedToken<IStorageClient>('StorageClient');

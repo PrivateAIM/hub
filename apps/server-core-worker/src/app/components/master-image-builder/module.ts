@@ -13,7 +13,7 @@ import {
     BaseComponent,
 } from '@privateaim/server-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 
 import { MasterImageBuilderExecuteHandler } from './handlers';

@@ -10,9 +10,9 @@ import { buildQueryString } from '../../utils';
 import type { AnalysisNode } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { AnalysisNodeCreatePayload, AnalysisNodeUpdatePayload } from './types';
+import type { AnalysisNodeCreatePayload, AnalysisNodeUpdatePayload, IAnalysisNodeAPI  } from './types';
 
-export class AnalysisNodeAPI extends BaseAPI {
+export class AnalysisNodeAPI extends BaseAPI implements IAnalysisNodeAPI {
     async getMany(options?: EntityQueryInput<AnalysisNode>): Promise<EntityCollectionResponse<AnalysisNode>> {
         const { data: response } = await this.client.get(`analysis-nodes${buildQueryString(options)}`);
         return response;

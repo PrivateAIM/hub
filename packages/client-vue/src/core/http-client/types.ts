@@ -5,6 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type BaseHTTPClientInstallOptions = {
-    baseURL?: string
+export type BaseHTTPClientInstallOptions<C = unknown> = {
+    baseURL?: string,
+    /**
+     * A pre-built client. When given it is used as-is instead of constructing
+     * one from `baseURL` — the seam a test uses to inject a `FakeClient`.
+     */
+    client?: C
 };

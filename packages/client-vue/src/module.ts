@@ -17,13 +17,17 @@ import {
 import type { Options } from './type';
 
 export function install(app: App, options: Options): void {
-    installCoreHTTPClient(app, { baseURL: options.coreURL });
+    installCoreHTTPClient(app, { baseURL: options.coreURL, client: options.coreHTTPClient });
 
-    installStorageHTTPClient(app, { baseURL: options.storageURL });
+    installStorageHTTPClient(app, { baseURL: options.storageURL, client: options.storageHTTPClient });
 
-    installTelemetryHTTPClient(app, { baseURL: options.telemetryURL });
+    installTelemetryHTTPClient(app, { baseURL: options.telemetryURL, client: options.telemetryHTTPClient });
 
-    installSocketManager(app, { baseURL: options.coreURL });
+    // Opt-in: the socket manager needs a live authup store and opens a
+    // websocket. `apps/client-ui` passes `realtime: true` to keep it on.
+    if (options.realtime) {
+        installSocketManager(app, { baseURL: options.coreURL, pinia: options.pinia });
+    }
 
     installTranslator(app, { locale: options.translatorLocale });
 

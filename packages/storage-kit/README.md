@@ -33,6 +33,28 @@ Part of the **[FLAME Hub](https://github.com/PrivateAIM/hub)** monorepo — cent
 npm install @privateaim/storage-kit
 ```
 
+## Testing
+
+The `APIClient` class implements `IStorageClient`, so consumers can depend on the
+contract rather than the class. `@privateaim/storage-kit/testing` ships a
+`FakeClient` — a real `APIClient` on an in-memory transport, so the request pipeline
+(header merge, decode, hooks, retry) runs unchanged and no network is touched:
+
+```typescript
+import { createFakeClient } from '@privateaim/storage-kit/testing';
+
+const client = createFakeClient({
+    handlers: {
+        'GET /buckets/:id': (req) => ({ data: { id: req.params.id }, meta: {} }),
+    },
+});
+
+const { data: bucket } = await client.bucket.getOne('abc');
+
+// Every dispatched request is recorded, normalized.
+console.log(client.requests);
+```
+
 ## License
 
 Made with 💚
