@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.7](https://github.com/PrivateAIM/hub/compare/v0.12.6...v0.12.7) (2026-07-29)
+
+
+### Bug Fixes
+
+* **client-ui:** resolve node client permission check before first await ([5b8894f](https://github.com/PrivateAIM/hub/commit/5b8894f56e94aedaecdca7d7be3f0198b1e78b72))
+
 ## [0.12.6](https://github.com/PrivateAIM/hub/compare/v0.12.5...v0.12.6) (2026-07-26)
 
 ## [0.12.5](https://github.com/PrivateAIM/hub/compare/v0.12.4...v0.12.5) (2026-07-26)
