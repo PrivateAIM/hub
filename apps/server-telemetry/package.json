@@ -30,7 +30,7 @@
         "@privateaim/server-kit": "^0.12.7",
         "@privateaim/server-telemetry-kit": "^0.12.6",
         "@privateaim/telemetry-kit": "^0.12.7",
-        "@rapiq/codec-url": "^2.0.0-beta.9",
+        "@rapiq/codec-url": "^2.0.0-beta.13",
         "@rapiq/core": "^2.0.0-beta.9",
         "@rapiq/sql": "^2.0.0-beta.9",
         "@rapiq/typeorm": "^2.0.0-beta.9",
