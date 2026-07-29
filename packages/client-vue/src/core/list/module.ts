@@ -6,7 +6,7 @@
  */
 
 import { hasOwnProperty } from '@privateaim/kit';
-import type { IEntityAPI } from '@authup/core-http-kit';
+import type { IEntityAPISlim } from '@privateaim/core-http-kit';
 import type { DomainTypeMap } from '@privateaim/core-kit';
 import {
     VCList,
@@ -86,7 +86,7 @@ export function createListRaw<
 
     const client = injectCoreHTTPClient();
 
-    let domainAPI : IEntityAPI<Entity<RECORD>> | undefined;
+    let domainAPI : IEntityAPISlim<Entity<RECORD>> | undefined;
     if (hasOwnProperty(client, context.type)) {
         domainAPI = client[context.type] as any;
     }

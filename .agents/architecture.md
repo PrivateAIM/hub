@@ -142,34 +142,64 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
 ## Thin Controller Pattern
 
-Controllers only: extract request → build actor → delegate → send response. No validation, no business logic.
+Controllers only: extract request → build actor → delegate → shape the response. No validation, no business logic.
+
+**The controller owns the wire shape; services keep returning bare domain entities.** Every entity **record** response is the `{ data, meta }` envelope (`EntityRecordResponse<T>` from the matching HTTP kit) and every collection response is `EntityCollectionResponse<T>`. Hub uses no `send()`/`sendCreated()` helpers — the decorated method returns a value that routup serializes, and the status is set imperatively via `event.response.status`.
 
 ```typescript
 // adapters/http/controllers/entities/node/module.ts
+import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
+import { nodeSchema } from '../../../../../core/index.ts';
+
 @DController('/nodes')
 export class NodeController {
     constructor(ctx: { service: INodeService }) { ... }
 
+    @DGet('', [ForceLoggedInMiddleware])
+    async getMany(@DContext() event: IAppEvent): Promise<EntityCollectionResponse<Node>> {
+        const query = useRequestQuery(event);
+        const { data, meta } = await this.service.getMany(query);
+        return { data, meta: { ...meta, schema: describeQuerySchema(nodeSchema) } };
+    }
+
     @DPost('', [ForceLoggedInMiddleware])
-    async add(@DBody() data: any, @DRequest() req: any, @DResponse() res: any) {
-        const actor = buildActorContext(req);
+    async add(@DBody() data: NodeCreatePayload, @DContext() event: IAppEvent): Promise<EntityRecordResponse<Node>> {
+        const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
-        return sendCreated(res, entity);
+        event.response.status = 201;
+        return { data: entity, meta: {} };
     }
 }
 ```
 
-GET endpoints also pass `ActorContext` when the entity has permission-gated fields (e.g. `account_secret`):
+GET endpoints also pass `ActorContext` when the entity has permission-gated fields (e.g. `account_secret`), and a record read advertises only the `fields` + `relations` subset:
 
 ```typescript
 @DGet('/:id', [ForceLoggedInMiddleware])
-async getOne(@DPath('id') id: string, @DRequest() req: any, @DResponse() res: any) {
-    const actor = buildActorContext(req);
-    const query = useRequestQuery(req);
+async getOne(@DPath('id') id: string, @DContext() event: IAppEvent): Promise<EntityRecordResponse<Registry>> {
+    const actor = buildActorContext(event);
+    const query = useRequestQuery(event);
     const entity = await this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
-    return send(res, entity);
+
+    return { data: entity, meta: { schema: describeQuerySchema(registrySchema, RECORD_QUERY_PARAMETERS) } };
 }
 ```
+
+## Response Envelope & Query Capability Discovery
+
+Contract, uniform across server-core, server-storage and server-telemetry:
+
+- **Record responses** — `{ data: <entity>, meta: {…} }`. Mutations (`POST`, `DELETE`, command routes) carry `meta: {}` — never omitted, never `undefined`.
+- **Collection responses** — `{ data: <entity>[], meta: { total, limit?, offset?, schema? } }`. Unchanged by the envelope work apart from `schema`.
+- **`meta.schema`** — every query-capable `GET` publishes its rapiq vocabulary via `describeQuerySchema()` (`@privateaim/server-kit`, `src/core/query/describe.ts`). Collections get the full description; record reads get `describeQuerySchema(x, RECORD_QUERY_PARAMETERS)` (fields + relations). It is the **static** allow-list upper bound — actor-dependent gates (the `account_secret` field gate, realm scoping) are deliberately not reflected. Relation vocabulary is **referenced, not expanded**: `relations.schemas` names each relation's target schema.
+- Descriptions are memoized **and deep-frozen**. Always spread — `meta: { ...meta, schema: … }`; `meta.schema = …` throws.
+- Controllers import the schema **object** from the `core` barrel — every entity barrel re-exports its `schema.ts` (server-core: `core/entities/<x>/index.ts` ×14; server-storage and server-telemetry: the single `core/entities/index.ts`). Never deep-import a `schema.ts` from a controller.
+- Return-type annotations are load-bearing: trapi derives the OpenAPI response schema from the method signature, so every method — including `getMany` — must be annotated.
+
+**Endpoints that deliberately stay flat** (protocol, credential, stream and bespoke shapes): `GET /` on all three services; `POST /services/:id/hook` and `POST /services/:id/command`; the node/analysis client-credential and node registry-credential routes; `DELETE /analysis-logs`, `DELETE /analysis-node-logs`, `DELETE /logs`; `GET /buckets/:id/stream` and `GET /bucket-files/:id/stream`; the entire `server-messenger` message surface. `POST /buckets/:id/upload` stays a **collection** (it uploads many files), not a record envelope.
+
+**Collections without `schema`:** `GET /logs` (telemetry) — decoded with `decodeQueryOpen()`, its filters are dynamic VictoriaLogs labels, so there is nothing to describe; `GET /analyses/:id/client/permissions` — proxies Authup records with no Hub-side schema; `POST /buckets/:id/upload`.
 
 ## Wiring Pattern
 

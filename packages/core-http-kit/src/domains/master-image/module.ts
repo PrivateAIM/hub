@@ -10,10 +10,10 @@ import { buildQueryString } from '../../utils';
 
 import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 
 export class MasterImageAPI extends BaseAPI {
-    async getMany(data?: EntityQueryInput<MasterImage>): Promise<CollectionResourceResponse<MasterImage>> {
+    async getMany(data?: EntityQueryInput<MasterImage>): Promise<EntityCollectionResponse<MasterImage>> {
         const response = await this.client.get(`master-images${buildQueryString(data)}`);
         return response.data;
     }
@@ -21,20 +21,24 @@ export class MasterImageAPI extends BaseAPI {
     async getOne(
         id: MasterImage['id'],
         data?: EntityQueryInput<MasterImage>,
-    ): Promise<SingleResourceResponse<MasterImage>> {
+    ): Promise<EntityRecordResponse<MasterImage>> {
         const response = await this.client.get(`master-images/${id}${buildQueryString(data)}`);
         return response.data;
     }
 
-    async delete(id: MasterImage['id']): Promise<SingleResourceResponse<MasterImage>> {
+    async delete(id: MasterImage['id']): Promise<EntityRecordResponse<MasterImage>> {
         const response = await this.client.delete(`master-images/${id}`);
         return response.data;
     }
 
+    /**
+     * The `BUILD` command echoes the affected master image back, the `SYNC`
+     * command has no single record to return — hence the `null` branch.
+     */
     async runCommand(
         command: `${MasterImageCommand}`,
         data: Record<string, any> = {},
-    ): Promise<SingleResourceResponse<Record<string, any>>> {
+    ): Promise<EntityRecordResponse<MasterImage | null>> {
         const actionData = {
             command,
             ...data,

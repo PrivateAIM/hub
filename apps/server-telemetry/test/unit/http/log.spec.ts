@@ -65,13 +65,14 @@ describe('log HTTP endpoints', () => {
             });
 
             const body = await response.json();
-            expect(body.time).toBeDefined();
-            expect(body.message).toBe(logPayload.message);
-            expect(body.level).toBe(logPayload.level);
-            expect(body.channel).toBe(logPayload.channel);
-            expect(body.labels).toBeDefined();
-            expect(body.labels.foo).toBe('bar');
-            expect(body.labels.ref_type).toBe('analysis');
+            expect(body.meta).toEqual({});
+            expect(body.data.time).toBeDefined();
+            expect(body.data.message).toBe(logPayload.message);
+            expect(body.data.level).toBe(logPayload.level);
+            expect(body.data.channel).toBe(logPayload.channel);
+            expect(body.data.labels).toBeDefined();
+            expect(body.data.labels.foo).toBe('bar');
+            expect(body.data.labels.ref_type).toBe('analysis');
         });
     });
 
@@ -95,6 +96,8 @@ describe('log HTTP endpoints', () => {
             expect(body.meta.total).toBeDefined();
             expect(body.meta.limit).toBeDefined();
             expect(body.meta.offset).toBeDefined();
+            // decodeQueryOpen() — deliberately schemaless, no capability discovery
+            expect(body.meta.schema).toBeUndefined();
         });
 
         it('should return 400 when no filter labels provided', async () => {

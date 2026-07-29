@@ -6,7 +6,12 @@
  */
 
 import type { Registry } from '@privateaim/core-kit';
-import type { RegistryCreatePayload, RegistryUpdatePayload } from '@privateaim/core-http-kit';
+import type {
+    EntityCollectionResponse,
+    EntityRecordResponse,
+    RegistryCreatePayload,
+    RegistryUpdatePayload,
+} from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -20,7 +25,9 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IRegistryService } from '../../../../../core/index.ts';
+import { registrySchema } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
 
 type RegistryControllerContext = {
@@ -39,32 +46,34 @@ export class RegistryController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<Registry>> {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query, actor);
-        return { data, meta };
+        return { data, meta: { ...meta, schema: describeQuerySchema(registrySchema) } };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<Registry> {
+    ): Promise<EntityRecordResponse<Registry>> {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
-        return this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
+
+        return { data: entity, meta: { schema: describeQuerySchema(registrySchema, RECORD_QUERY_PARAMETERS) } };
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: RegistryCreatePayload,
         @DContext() event: IAppEvent,
-    ): Promise<Registry> {
+    ): Promise<EntityRecordResponse<Registry>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
@@ -72,21 +81,21 @@ export class RegistryController {
         @DPath('id') id: string,
         @DBody() data: RegistryUpdatePayload,
         @DContext() event: IAppEvent,
-    ): Promise<Registry> {
+    ): Promise<EntityRecordResponse<Registry>> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<Registry> {
+    ): Promise<EntityRecordResponse<Registry>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 }

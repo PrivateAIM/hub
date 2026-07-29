@@ -117,7 +117,7 @@ const FProjectNodeApprovalCommand = defineComponent({
             }
 
             try {
-                const item = await apiClient.projectNode.update(props.entityId, { approval_status: status });
+                const { data: item } = await apiClient.projectNode.update(props.entityId, { approval_status: status });
 
                 emit('updated', item);
             } catch (e) {

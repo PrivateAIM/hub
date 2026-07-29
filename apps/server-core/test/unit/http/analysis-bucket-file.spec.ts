@@ -41,20 +41,20 @@ describe('controllers/analysis-bucket-file', () => {
     it('should create resource', async () => {
         const { client } = suite;
 
-        const project = await client.project.create(createTestProject());
+        const { data: project } = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const analysis = await client.analysis.create({ project_id: project.id });
+        const { data: analysis } = await client.analysis.create({ project_id: project.id });
         expect(analysis.id).toBeDefined();
 
-        const analysisBucket = await client.analysisBucket.create({
+        const { data: analysisBucket } = await client.analysisBucket.create({
             bucket_id: randomUUID(),
             analysis_id: analysis.id,
             type: AnalysisBucketType.CODE,
         });
         expect(analysisBucket.id).toBeDefined();
 
-        const analysisBucketFile = await client.analysisBucketFile.create({
+        const { data: analysisBucketFile } = await client.analysisBucketFile.create({
             analysis_bucket_id: analysisBucket.id,
             bucket_id: analysisBucket.bucket_id,
             bucket_file_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
@@ -68,13 +68,13 @@ describe('controllers/analysis-bucket-file', () => {
     it('should read resource', async () => {
         const { client } = suite;
 
-        const data = await client.analysisBucketFile.getOne(details.id);
+        const { data } = await client.analysisBucketFile.getOne(details.id);
         expectProperties(details, data);
     });
 
     it('should update resource', async () => {
         const { client } = suite;
-        const data = await client.analysisBucketFile.update(details.id, { root: true });
+        const { data } = await client.analysisBucketFile.update(details.id, { root: true });
 
         expect(data.root).toBeTruthy();
     });

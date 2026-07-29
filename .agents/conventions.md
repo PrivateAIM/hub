@@ -195,16 +195,44 @@ src/
 
 ### Controller Conventions
 
-Controllers are truly thin — only: extract request → build `ActorContext` → delegate to service → send response. **Zero validation, zero business logic.**
+Controllers are truly thin — only: extract request → build `ActorContext` → delegate to service → shape the response. **Zero validation, zero business logic.**
+
+The controller owns the **wire shape**; services keep returning bare domain entities. Every entity record response is the `{ data, meta }` envelope, every collection response is `{ data, meta: { total, limit?, offset?, schema? } }`.
 
 ```typescript
+@DGet('', [ForceLoggedInMiddleware])
+async getMany(@DContext() event: IAppEvent): Promise<EntityCollectionResponse<Node>> {
+    const query = useRequestQuery(event);
+    const { data, meta } = await this.service.getMany(query);
+    return { data, meta: { ...meta, schema: describeQuerySchema(nodeSchema) } };
+}
+
+@DGet('/:id', [ForceLoggedInMiddleware])
+async getOne(@DPath('id') id: string, @DContext() event: IAppEvent): Promise<EntityRecordResponse<Node>> {
+    const query = useRequestQuery(event);
+    const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+
+    return { data: entity, meta: { schema: describeQuerySchema(nodeSchema, RECORD_QUERY_PARAMETERS) } };
+}
+
 @DPost('', [ForceLoggedInMiddleware])
-async add(@DBody() data: any, @DRequest() req: any, @DResponse() res: any) {
-    const actor = buildActorContext(req);
+async add(@DBody() data: NodeCreatePayload, @DContext() event: IAppEvent): Promise<EntityRecordResponse<Node>> {
+    const actor = buildActorContext(event);
     const entity = await this.service.create(data, actor);
-    return sendCreated(res, entity);
+    event.response.status = 201;
+    return { data: entity, meta: {} };
 }
 ```
+
+Rules:
+
+- **Annotate every return type**, including `getMany` — `@trapi/swagger` derives the OpenAPI response schema from the method signature; an unannotated method emits an anonymous inline schema. Types come from `@privateaim/core-http-kit` / `storage-kit` / `telemetry-kit` (`EntityRecordResponse`, `EntityCollectionResponse`).
+- **Mutations carry `meta: {}`** — never omitted, never `undefined`. When a command can legitimately produce no entity, coalesce explicitly (`{ data: entity ?? null, meta: {} }`, annotated `EntityRecordResponse<X | null>`); `data: undefined` serializes to a malformed envelope with the key dropped.
+- **Query-capable `GET`s attach `meta.schema`** via `describeQuerySchema()` from `@privateaim/server-kit`: the full description on collections, `describeQuerySchema(x, RECORD_QUERY_PARAMETERS)` (fields + relations) on record reads. The schema object comes from the entity barrel, which re-exports `schema.ts`.
+- **Never mutate the description** — it is memoized and deep-frozen, shared by reference. Always spread: `meta: { ...meta, schema: … }`. `meta.schema = …` throws a `TypeError`.
+- `meta.schema` is the **static** allow-list upper bound. Actor-dependent gates (the `account_secret` field gate, realm scoping) are deliberately not reflected there — the runtime gate in the service is what enforces access.
+- **Protocol, credential, stream and bespoke shapes stay flat** — no envelope. See [architecture.md](architecture.md#response-envelope--query-capability-discovery) for the explicit endpoint list.
+- Hub uses **no** `send()`/`sendCreated()` helpers (only `sendStream` in storage): return the value and set the status via `event.response.status`.
 
 ### Repository Field Selection Conventions
 

@@ -33,16 +33,16 @@ describe('src/controllers/core/project-node', () => {
     it('should create resource', async () => {
         const { client } = suite;
 
-        const project = await client.project.create(createTestProject());
+        const { data: project } = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const node = await client.node.create(createTestNode());
+        const { data: node } = await client.node.create(createTestNode());
         expect(node.id).toBeDefined();
 
-        details = await client.projectNode.create({
+        details = (await client.projectNode.create({
             node_id: node.id,
             project_id: project.id,
-        });
+        })).data;
     });
 
     it('should read collection', async () => {
@@ -55,7 +55,7 @@ describe('src/controllers/core/project-node', () => {
     it('should read resource', async () => {
         const { client } = suite;
 
-        const data = await client.projectNode.getOne(details.id);
+        const { data } = await client.projectNode.getOne(details.id);
         expectProperties(details, data);
     });
 

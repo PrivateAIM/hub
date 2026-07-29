@@ -41,13 +41,13 @@ describe('controllers/analysis-file', () => {
     it('should create resource', async () => {
         const { client } = suite;
 
-        const project = await client.project.create(createTestProject());
+        const { data: project } = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const analysis = await client.analysis.create({ project_id: project.id });
+        const { data: analysis } = await client.analysis.create({ project_id: project.id });
         expect(analysis.id).toBeDefined();
 
-        const analysisBucket = await client.analysisBucket.create({
+        const { data: analysisBucket } = await client.analysisBucket.create({
             analysis_id: analysis.id,
             bucket_id: randomUUID(),
             type: AnalysisBucketType.CODE,
@@ -66,7 +66,7 @@ describe('controllers/analysis-file', () => {
     it('should read resource', async () => {
         const { client } = suite;
 
-        const data = await client.analysisBucket.getOne(details.id);
+        const { data } = await client.analysisBucket.getOne(details.id);
         expectProperties(details, data);
     });
 

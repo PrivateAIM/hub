@@ -8,9 +8,14 @@
 import { Readable } from 'node:stream';
 import { createGzip } from 'node:zlib';
 import { EntityNotFoundError } from '@privateaim/errors';
-import type { BucketFile } from '@privateaim/storage-kit';
+import type {
+    BucketFile,
+    EntityCollectionResponse,
+    EntityRecordResponse,
+} from '@privateaim/storage-kit';
 import { DomainType } from '@privateaim/storage-kit';
 import type { Logger } from '@privateaim/server-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import {
     DContext,
@@ -31,6 +36,7 @@ import {
 } from 'routup';
 import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileRepository, IBucketFileService } from '../../../../core/entities/index.ts';
+import { bucketFileSchema } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import { buildActorContext } from '../../request/index.ts';
 
@@ -62,10 +68,11 @@ export class BucketFileController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<BucketFile>> {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
-        return { data, meta };
+
+        return { data, meta: { ...meta, schema: describeQuerySchema(bucketFileSchema) } };
     }
 
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
@@ -117,19 +124,24 @@ export class BucketFileController {
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<BucketFile> {
+    ): Promise<EntityRecordResponse<BucketFile>> {
         const query = useRequestQuery(event);
-        return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+
+        return {
+            data: entity,
+            meta: { schema: describeQuerySchema(bucketFileSchema, RECORD_QUERY_PARAMETERS) },
+        };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<BucketFile> {
+    ): Promise<EntityRecordResponse<BucketFile>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 }

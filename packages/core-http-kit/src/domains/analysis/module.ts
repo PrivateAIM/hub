@@ -10,7 +10,7 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import type { AnalysisCreatePayload, AnalysisUpdatePayload } from './types';
 
 export class AnalysisAPI extends BaseAPI {
@@ -39,7 +39,7 @@ export class AnalysisAPI extends BaseAPI {
 
     async getMany(
         options?: EntityQueryInput<Analysis>,
-    ): Promise<CollectionResourceResponse<Analysis>> {
+    ): Promise<EntityCollectionResponse<Analysis>> {
         const { data: response } = await this.client.get(`analyses${buildQueryString(options)}`);
         return response;
     }
@@ -48,26 +48,26 @@ export class AnalysisAPI extends BaseAPI {
         id: Analysis['id'],
         options?: EntityQueryInput<Analysis>,
         requestConfig?: RequestBaseOptions,
-    ): Promise<SingleResourceResponse<Analysis>> {
+    ): Promise<EntityRecordResponse<Analysis>> {
         const { data: response } = await this.client
             .get(`analyses/${id}${buildQueryString(options)}`, requestConfig);
 
         return response;
     }
 
-    async delete(id: Analysis['id']): Promise<SingleResourceResponse<Analysis>> {
+    async delete(id: Analysis['id']): Promise<EntityRecordResponse<Analysis>> {
         const { data: response } = await this.client.delete(`analyses/${id}`);
 
         return response;
     }
 
-    async update(id: Analysis['id'], data: AnalysisUpdatePayload): Promise<SingleResourceResponse<Analysis>> {
+    async update(id: Analysis['id'], data: AnalysisUpdatePayload): Promise<EntityRecordResponse<Analysis>> {
         const { data: response } = await this.client.post(`analyses/${id}`, nullifyEmptyObjectProperties(data));
 
         return response;
     }
 
-    async create(data: AnalysisCreatePayload): Promise<SingleResourceResponse<Analysis>> {
+    async create(data: AnalysisCreatePayload): Promise<EntityRecordResponse<Analysis>> {
         const { data: response } = await this.client.post('analyses', nullifyEmptyObjectProperties(data));
 
         return response;
@@ -77,7 +77,7 @@ export class AnalysisAPI extends BaseAPI {
         id: Analysis['id'],
         command: `${AnalysisCommand}`,
         data: Record<string, any> = {},
-    ): Promise<SingleResourceResponse<Analysis>> {
+    ): Promise<EntityRecordResponse<Analysis>> {
         const { data: response } = await this.client
             .post(`analyses/${id}/command`, {
                 command,

@@ -9,7 +9,7 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Node } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import type {
     NodeClientCredentials,
     NodeClientCredentialsUpdate,
@@ -19,37 +19,37 @@ import type {
 } from './types';
 
 export class NodeAPI extends BaseAPI {
-    async getMany(options?: EntityQueryInput<Node>): Promise<CollectionResourceResponse<Node>> {
+    async getMany(options?: EntityQueryInput<Node>): Promise<EntityCollectionResponse<Node>> {
         const response = await this.client.get(`nodes${buildQueryString(options)}`);
 
         return response.data;
     }
 
-    async getOne(id: Node['id'], options?: EntityQueryInput<Node>): Promise<SingleResourceResponse<Node>> {
+    async getOne(id: Node['id'], options?: EntityQueryInput<Node>): Promise<EntityRecordResponse<Node>> {
         const response = await this.client.get(`nodes/${id}${buildQueryString(options)}`);
 
         return response.data;
     }
 
-    async create(data: NodeCreatePayload): Promise<SingleResourceResponse<Node>> {
+    async create(data: NodeCreatePayload): Promise<EntityRecordResponse<Node>> {
         const response = await this.client.post('nodes', nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async update(id: Node['id'], data: NodeUpdatePayload): Promise<SingleResourceResponse<Node>> {
+    async update(id: Node['id'], data: NodeUpdatePayload): Promise<EntityRecordResponse<Node>> {
         const response = await this.client.post(`nodes/${id}`, nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async delete(id: Node['id']): Promise<SingleResourceResponse<Node>> {
+    async delete(id: Node['id']): Promise<EntityRecordResponse<Node>> {
         const response = await this.client.delete(`nodes/${id}`);
 
         return response.data;
     }
 
-    async runCommand(id: Node['id'], task: string, data: Record<string, any>): Promise<SingleResourceResponse<Node>> {
+    async runCommand(id: Node['id'], task: string, data: Record<string, any>): Promise<EntityRecordResponse<Node>> {
         const response = await this.client.post(`nodes/${id}/task`, { task, ...data });
 
         return response.data;

@@ -7,7 +7,12 @@
 
 import { BadRequestError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
-import type { Log, LogInput } from '@privateaim/telemetry-kit';
+import type {
+    EntityCollectionResponse,
+    EntityRecordResponse,
+    Log,
+    LogInput,
+} from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import {
     DBody,
@@ -37,7 +42,7 @@ export class LogController {
     async create(
         @DBody() body: LogInput,
         @DContext() event: IAppEvent,
-    ): Promise<Log> {
+    ): Promise<EntityRecordResponse<Log>> {
         const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheck({ name: PermissionName.LOG_CREATE });
 
@@ -47,13 +52,20 @@ export class LogController {
         const entity = await this.logStore.write(data);
 
         event.response.status = 201;
-        return entity;
+
+        return { data: entity, meta: {} };
     }
 
+    /**
+     * The log collection is decoded with `decodeQueryOpen()` — its filters are
+     * dynamic VictoriaLogs labels rather than a declared rapiq vocabulary, so
+     * there is nothing to describe. This is the one collection endpoint that
+     * deliberately carries no `meta.schema`.
+     */
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<Log>> {
         const permissionChecker = useRequestPermissionChecker(event);
         await permissionChecker.preCheckOneOf({
             name: [

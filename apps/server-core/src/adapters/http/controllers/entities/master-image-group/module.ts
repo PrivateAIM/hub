@@ -6,6 +6,7 @@
  */
 
 import type { MasterImageGroup } from '@privateaim/core-kit';
+import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
 import {
     DContext,
     DController,
@@ -17,7 +18,9 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IMasterImageGroupService } from '../../../../../core/index.ts';
+import { masterImageGroupSchema } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
 
 type MasterImageGroupControllerContext = {
@@ -36,27 +39,32 @@ export class MasterImageGroupController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<MasterImageGroup>> {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
-        return { data, meta };
+        return { data, meta: { ...meta, schema: describeQuerySchema(masterImageGroupSchema) } };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<MasterImageGroup> {
-        return this.service.getOne(id);
+    ): Promise<EntityRecordResponse<MasterImageGroup>> {
+        const entity = await this.service.getOne(id);
+
+        return {
+            data: entity,
+            meta: { schema: describeQuerySchema(masterImageGroupSchema, RECORD_QUERY_PARAMETERS) },
+        };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<MasterImageGroup> {
+    ): Promise<EntityRecordResponse<MasterImageGroup>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 }

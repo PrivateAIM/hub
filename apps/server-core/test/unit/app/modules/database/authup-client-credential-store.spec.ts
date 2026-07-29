@@ -17,10 +17,13 @@ describe('AuthupClientCredentialStore', () => {
                 getOne: async (id: string, options?: any) => {
                     calls.push({ id, options });
                     return {
-                        id,
-                        name: 'node-1',
-                        displayName: 'Node 1',
-                        secret: 'sek',
+                        data: {
+                            id,
+                            name: 'node-1',
+                            displayName: 'Node 1',
+                            secret: 'sek',
+                        },
+                        meta: {},
                     };
                 },
             },
@@ -42,9 +45,12 @@ describe('AuthupClientCredentialStore', () => {
         const authup = {
             client: {
                 getOne: async (id: string) => ({
-                    id, 
-                    name: 'node-2', 
-                    secret: undefined, 
+                    data: {
+                        id,
+                        name: 'node-2',
+                        secret: undefined,
+                    },
+                    meta: {},
                 }), 
             }, 
         };
@@ -67,10 +73,13 @@ describe('AuthupClientCredentialStore', () => {
                 update: async (id: string, data?: any) => {
                     calls.push({ id, data });
                     return {
-                        id, 
-                        name: 'node-1', 
-                        display_name: null, 
-                        secret: 'stored-hash', 
+                        data: {
+                            id,
+                            name: 'node-1',
+                            display_name: null,
+                            secret: 'stored-hash',
+                        },
+                        meta: {},
                     };
                 },
             },
@@ -96,10 +105,13 @@ describe('AuthupClientCredentialStore', () => {
                 update: async (id: string, data?: any) => {
                     calls.push({ id, data });
                     return {
-                        id, 
-                        name: 'node-2', 
-                        display_name: null, 
-                        secret: 'stored-hash', 
+                        data: {
+                            id,
+                            name: 'node-2',
+                            display_name: null,
+                            secret: 'stored-hash',
+                        },
+                        meta: {},
                     };
                 },
             },
@@ -126,10 +138,13 @@ describe('AuthupClientCredentialStore', () => {
                 update: async (id: string, data?: any) => {
                     calls.push({ id, data });
                     return {
-                        id,
-                        name: data.name,
-                        displayName: data.displayName ?? null,
-                        secret: data.secret,
+                        data: {
+                            id,
+                            name: data.name,
+                            displayName: data.displayName ?? null,
+                            secret: data.secret,
+                        },
+                        meta: {},
                     };
                 },
             },

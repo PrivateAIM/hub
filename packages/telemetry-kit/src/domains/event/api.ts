@@ -8,34 +8,34 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { Event } from './entity';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import { BaseAPI } from '../base';
 
 export class EventAPI extends BaseAPI {
-    async getMany(options?: EntityQueryInput<Event>): Promise<CollectionResourceResponse<Event>> {
+    async getMany(options?: EntityQueryInput<Event>): Promise<EntityCollectionResponse<Event>> {
         const { data: response } = await this.client.get(`events${buildQueryString(options)}`);
         return response;
     }
 
-    async getOne(id: Event['id']): Promise<SingleResourceResponse<Event>> {
+    async getOne(id: Event['id']): Promise<EntityRecordResponse<Event>> {
         const { data: response } = await this.client.get(`events/${id}`);
 
         return response;
     }
 
-    async delete(id: Event['id']): Promise<SingleResourceResponse<Event>> {
+    async delete(id: Event['id']): Promise<EntityRecordResponse<Event>> {
         const { data: response } = await this.client.delete(`events/${id}`);
 
         return response;
     }
 
-    async update(id: Event['id'], data: Partial<Event>): Promise<SingleResourceResponse<Event>> {
+    async update(id: Event['id'], data: Partial<Event>): Promise<EntityRecordResponse<Event>> {
         const { data: response } = await this.client.post(`events/${id}`, data);
 
         return response;
     }
 
-    async create(data: Partial<Event>): Promise<SingleResourceResponse<Event>> {
+    async create(data: Partial<Event>): Promise<EntityRecordResponse<Event>> {
         const { data: response } = await this.client.post('events', data);
 
         return response;

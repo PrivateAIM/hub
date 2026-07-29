@@ -39,7 +39,7 @@ describe('src/controllers/core/node', () => {
     it('should create node', async () => {
         const { client } = suite;
 
-        const node = await client.node.create(createTestNode());
+        const { data: node } = await client.node.create(createTestNode());
         expect(node.id).toBeDefined();
 
         details = removeDateProperties(node);
@@ -55,7 +55,7 @@ describe('src/controllers/core/node', () => {
     it('should read resource', async () => {
         const { client } = suite;
 
-        const data = await client.node.getOne(details.id);
+        const { data } = await client.node.getOne(details.id);
         expectProperties(details, data, { keysExcluded: ['robot_id'] });
     });
 
@@ -64,7 +64,7 @@ describe('src/controllers/core/node', () => {
 
         details.name = 'TestA';
 
-        const data = await client.node.update(details.id, details);
+        const { data } = await client.node.update(details.id, details);
 
         expectProperties(details, data);
     });
@@ -78,12 +78,12 @@ describe('src/controllers/core/node', () => {
     it('should survive registry deletion with detached references', async () => {
         const { client } = suite;
 
-        const registry = await client.registry.create({
+        const { data: registry } = await client.registry.create({
             name: faker.string.alpha({ length: 16, casing: 'lower' }),
             host: faker.internet.domainName(),
         });
 
-        const node = await client.node.create(createTestNode({ registry_id: registry.id }));
+        const { data: node } = await client.node.create(createTestNode({ registry_id: registry.id }));
         expect(node.registry_id).toEqual(registry.id);
         // connecting provisions a registry project
         expect(node.registry_project_id).toBeDefined();
@@ -92,7 +92,7 @@ describe('src/controllers/core/node', () => {
 
         // The registry FKs detach (SET NULL) instead of cascading: the node must
         // survive the registry deletion with its references nulled.
-        const found = await client.node.getOne(node.id);
+        const { data: found } = await client.node.getOne(node.id);
         expect(found.id).toEqual(node.id);
         expect(found.registry_id).toBeNull();
         expect(found.registry_project_id).toBeNull();
@@ -101,17 +101,17 @@ describe('src/controllers/core/node', () => {
     it('should tear down the registry project on disconnect', async () => {
         const { client } = suite;
 
-        const registry = await client.registry.create({
+        const { data: registry } = await client.registry.create({
             name: faker.string.alpha({ length: 16, casing: 'lower' }),
             host: faker.internet.domainName(),
         });
 
-        const node = await client.node.create(createTestNode({ registry_id: registry.id }));
+        const { data: node } = await client.node.create(createTestNode({ registry_id: registry.id }));
         expect(node.registry_project_id).toBeDefined();
 
         // An explicit `registry_id: null` disconnects — the null must survive the
         // whole HTTP path (JSON body, validator) and detach the node.
-        const updated = await client.node.update(node.id, { registry_id: null });
+        const { data: updated } = await client.node.update(node.id, { registry_id: null });
         expect(updated.registry_id).toBeNull();
         expect(updated.registry_project_id).toBeNull();
 

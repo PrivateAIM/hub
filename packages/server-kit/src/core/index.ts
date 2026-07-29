@@ -6,5 +6,6 @@
  */
 
 export * from './actor/index.ts';
+export * from './query/index.ts';
 export * from './service.ts';
 export * from './types.ts';

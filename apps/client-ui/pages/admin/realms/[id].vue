@@ -45,9 +45,11 @@ export default defineComponent({
         const entity: Ref<Realm> = ref(null) as any;
 
         try {
-            entity.value = await injectHTTPClient()
+            const { data } = await injectHTTPClient()
                 .realm
                 .getOne(route.params.id as string);
+
+            entity.value = data;
         } catch {
             await navigateTo({ path: '/admin/realms' });
             throw createError({});

@@ -49,7 +49,8 @@ export async function generateDockerFileContent(
 
     let entryPoint : BucketFile;
     try {
-        entryPoint = await ctx.storageClient.bucketFile.getOne(analysisBucketFile.bucket_file_id);
+        const { data } = await ctx.storageClient.bucketFile.getOne(analysisBucketFile.bucket_file_id);
+        entryPoint = data;
     } catch {
         throw BuilderError.entrypointNotFound();
     }
@@ -57,7 +58,8 @@ export async function generateDockerFileContent(
     let masterImage : MasterImage;
 
     try {
-        masterImage = await ctx.coreClient.masterImage.getOne(entity.master_image_id);
+        const { data } = await ctx.coreClient.masterImage.getOne(entity.master_image_id);
+        masterImage = data;
     } catch {
         throw BuilderError.masterImageNotFound();
     }

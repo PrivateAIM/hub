@@ -55,15 +55,19 @@ export default defineComponent({
             try {
                 let entity: Analysis;
                 if (lockIt.value) {
-                    entity = await apiClient
+                    const { data } = await apiClient
                         .analysis.runCommand(props.entity.id, AnalysisCommand.CONFIGURATION_LOCK);
+
+                    entity = data;
 
                     emit('updated', entity);
                 }
 
                 if (buildIt.value) {
-                    entity = await apiClient
+                    const { data } = await apiClient
                         .analysis.runCommand(props.entity.id, AnalysisCommand.BUILD_START);
+
+                    entity = data;
 
                     emit('updated', entity);
                 }

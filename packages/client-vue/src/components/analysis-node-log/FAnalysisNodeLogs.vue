@@ -51,9 +51,14 @@ export default defineComponent({
             // Page forward while records remain beyond the current window
             // (total > offset + limit), advancing the offset by one page. The
             // `limit > 0` guard prevents an unbounded loop if the window never
-            // advances.
-            const nextOffset = response.meta.offset + response.meta.limit;
-            if (response.meta.limit > 0 && response.meta.total > nextOffset) {
+            // advances — and also stops paging when the server reported no
+            // pagination window at all (`limit`/`offset` are optional on the
+            // wire: an adapter only reports back the pagination it applied).
+            const appliedLimit = response.meta.limit ?? 0;
+            const appliedOffset = response.meta.offset ?? 0;
+
+            const nextOffset = appliedOffset + appliedLimit;
+            if (appliedLimit > 0 && response.meta.total > nextOffset) {
                 return collect(target, nextOffset);
             }
 

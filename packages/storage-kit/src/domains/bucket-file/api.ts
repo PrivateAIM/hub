@@ -8,34 +8,34 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import type { BucketFile } from './entity';
 import { BaseAPI } from '../base';
 
 export class BucketFileAPI extends BaseAPI {
-    async getMany(record?: EntityQueryInput<BucketFile>): Promise<CollectionResourceResponse<BucketFile>> {
+    async getMany(record?: EntityQueryInput<BucketFile>): Promise<EntityCollectionResponse<BucketFile>> {
         const response = await this.client.get(`bucket-files${buildQueryString(record)}`);
         return response.data;
     }
 
-    async getOne(id: BucketFile['id'], requestRecord?: EntityQueryInput<BucketFile>): Promise<SingleResourceResponse<BucketFile>> {
+    async getOne(id: BucketFile['id'], requestRecord?: EntityQueryInput<BucketFile>): Promise<EntityRecordResponse<BucketFile>> {
         const response = await this.client.get(`bucket-files/${id}${buildQueryString(requestRecord)}`);
 
         return response.data;
     }
 
-    async create(data: Record<string, any>): Promise<SingleResourceResponse<BucketFile>> {
+    async create(data: Record<string, any>): Promise<EntityRecordResponse<BucketFile>> {
         const response = await this.client.post('bucket-files', nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async delete(id: BucketFile['id']): Promise<SingleResourceResponse<BucketFile>> {
+    async delete(id: BucketFile['id']): Promise<EntityRecordResponse<BucketFile>> {
         const response = await this.client.delete(`bucket-files/${id}`);
         return response.data;
     }
 
-    async update(id: BucketFile['id'], data: Record<string, any>): Promise<SingleResourceResponse<BucketFile>> {
+    async update(id: BucketFile['id'], data: Record<string, any>): Promise<EntityRecordResponse<BucketFile>> {
         const response = await this.client.post(`bucket-files/${id}`, nullifyEmptyObjectProperties(data));
         return response.data;
     }

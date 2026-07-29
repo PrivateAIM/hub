@@ -51,6 +51,28 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `DELETE` | `/logs` | Delete logs |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
 
+## Response Shapes
+
+Event and log endpoints answer with a `{ data, meta }` envelope — the record (or the record array)
+under `data`. `GET /events` and `GET /events/:id` advertise the endpoint's queryable vocabulary at
+`meta.schema`; `POST /events`, `DELETE /events/:id` and `POST /logs` carry `meta: {}`.
+
+Two surfaces stay outside that contract:
+
+| Endpoint | Shape |
+|----------|-------|
+| `GET /` | `{ version, timestamp }` — service metadata, flat |
+| `DELETE /logs` | `null` (202), flat |
+
+::: warning `GET /logs` is deliberately schemaless
+The log collection is decoded as an **open** query: its filters are dynamic VictoriaLogs labels
+rather than a declared rapiq vocabulary, so there is nothing to describe. It is the one query
+endpoint in Hub that carries **no** `meta.schema` — `meta` holds only `total`, `limit` and `offset`.
+:::
+
+See [API Reference](/guide/development/api#response-shapes) for the full contract and the
+`meta.schema` reading rules.
+
 ## Architecture
 
 - **LogStore port** (`core/services/log-store/types.ts`) — defines `query`, `write`, `delete` operations

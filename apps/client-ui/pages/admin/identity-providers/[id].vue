@@ -44,9 +44,11 @@ export default defineComponent({
         const entity: Ref<IdentityProvider> = ref(null) as any;
 
         try {
-            entity.value = await injectHTTPClient()
+            const { data } = await injectHTTPClient()
                 .identityProvider
                 .getOne(route.params.id as string);
+
+            entity.value = data;
         } catch {
             await navigateTo({ path: '/admin/identity-providers' });
             throw createError({});

@@ -82,7 +82,7 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                const response = await httpClient.node.update(props.entity.id, { public_key: publicKey.value });
+                const { data: response } = await httpClient.node.update(props.entity.id, { public_key: publicKey.value });
 
                 emit('updated', response);
             } catch (e) {

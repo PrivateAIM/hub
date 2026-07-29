@@ -11,7 +11,10 @@ import type { Server as SocketServer } from 'socket.io';
 
 export type HTTPServer = ReturnType<typeof serve>;
 
-export const HTTPInjectionKey = {
+export const HTTPInjectionKey : {
+    Server: TypedToken<HTTPServer>,
+    SocketServer: TypedToken<SocketServer>,
+} = {
     Server: new TypedToken<HTTPServer>('Server'),
     SocketServer: new TypedToken<SocketServer>('SocketServer'),
 };

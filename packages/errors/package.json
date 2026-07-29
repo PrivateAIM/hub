@@ -27,7 +27,7 @@
         "url": "https://github.com/tada5hi"
     },
     "dependencies": {
-        "@ebec/core": "^1.1.0",
+        "@ebec/core": "^1.2.0",
         "validup": "^0.5.1"
     },
     "publishConfig": {

@@ -8,6 +8,7 @@
 import { pickRecord } from '@authup/kit';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { AnalysisNodeLogValidator, DomainType  } from '@privateaim/core-kit';
+import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
 import { isRealmResourceWritable } from '@privateaim/kit';
 import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
@@ -26,13 +27,13 @@ import type { FiltersBuildInput } from '@rapiq/core';
 import type { IAppEvent } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ForceLoggedInMiddleware, useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { describeQuerySchema } from '@privateaim/server-kit';
 import { ValidupError, buildErrorMessageForAttribute, defineIssueItem } from 'validup';
 import {
     AnalysisEntity,
     NodeEntity,
 } from '../../../../database/index.ts';
-import { analysisNodeLogSchema } from '../../../../../core/entities/analysis-node-log/schema.ts';
-import { collectRootFilterValues, decodeQuery } from '../../../../../core/query/index.ts';
+import { analysisNodeLogSchema, collectRootFilterValues, decodeQuery } from '../../../../../core/index.ts';
 
 type AnalysisNodeLogControllerContext = {
     telemetryClient?: TelemetryClient;
@@ -50,7 +51,7 @@ export class AnalysisNodeLogController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<Log>> {
         const query = decodeQuery(useRequestQuery(event), { schema: analysisNodeLogSchema });
 
         const filtersNormalized = collectRootFilterValues(query);
@@ -72,23 +73,24 @@ export class AnalysisNodeLogController {
         }
 
         if (this.telemetryClient) {
-            return this.telemetryClient.log.getMany({
+            const { data, meta } = await this.telemetryClient.log.getMany({
                 filters,
                 pagination: {
                     limit: query.pagination.limit,
                     offset: query.pagination.offset,
                 },
             });
+
+            return { data, meta: { ...meta, schema: describeQuerySchema(analysisNodeLogSchema) } };
         }
 
         return {
             data: [],
             meta: {
                 total: 0,
-                pagination: {
-                    limit: 50,
-                    offset: 0,
-                },
+                limit: 50,
+                offset: 0,
+                schema: describeQuerySchema(analysisNodeLogSchema),
             },
         };
     }
@@ -97,7 +99,7 @@ export class AnalysisNodeLogController {
     async add(
         @DBody() body: Partial<AnalysisNodeLog>,
         @DContext() event: IAppEvent,
-    ): Promise<Log> {
+    ): Promise<EntityRecordResponse<Log>> {
         const validator = new AnalysisNodeLogValidator();
         const data = await validator.run(body, { group: 'create' });
 
@@ -166,7 +168,7 @@ export class AnalysisNodeLogController {
         }
 
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DDelete('', [ForceLoggedInMiddleware])

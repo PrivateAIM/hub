@@ -7,7 +7,7 @@
 
 import type { IQuery } from '@rapiq/core';
 import { Query } from '@rapiq/core';
-import { TypeormAdapter } from '@rapiq/typeorm';
+import { TypeormAdapter } from '@rapiq/adapter-typeorm';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { EntityRepositoryPaginationMeta } from '@privateaim/server-kit';
 

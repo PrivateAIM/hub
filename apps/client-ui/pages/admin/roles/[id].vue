@@ -46,9 +46,11 @@ export default defineComponent({
         const entity : Ref<Role> = ref(null) as any;
 
         try {
-            entity.value = await injectHTTPClient()
+            const { data } = await injectHTTPClient()
                 .role
                 .getOne(route.params.id as string);
+
+            entity.value = data;
         } catch {
             await navigateTo({ path: '/admin/roles' });
             throw createError({});

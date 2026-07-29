@@ -7,3 +7,4 @@
 
 export * from './event/types.ts';
 export * from './event/service.ts';
+export * from './event/schema.ts';

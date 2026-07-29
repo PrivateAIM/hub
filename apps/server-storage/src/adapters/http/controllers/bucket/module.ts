@@ -5,9 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Bucket, BucketCreatePayload } from '@privateaim/storage-kit';
+import type {
+    Bucket,
+    BucketCreatePayload,
+    EntityCollectionResponse,
+    EntityRecordResponse,
+} from '@privateaim/storage-kit';
 import { DomainType } from '@privateaim/storage-kit';
 import type { Logger } from '@privateaim/server-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import {
@@ -30,6 +36,7 @@ import {
 } from 'routup';
 import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileRepository, IBucketService } from '../../../../core/entities/index.ts';
+import { bucketSchema } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import { buildActorContext } from '../../request/index.ts';
@@ -72,10 +79,11 @@ export class BucketController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<Bucket>> {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
-        return { data, meta };
+
+        return { data, meta: { ...meta, schema: describeQuerySchema(bucketSchema) } };
     }
 
     @DGet('/:id/stream', [ForceLoggedInMiddleware])
@@ -122,9 +130,14 @@ export class BucketController {
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<Bucket> {
+    ): Promise<EntityRecordResponse<Bucket>> {
         const query = useRequestQuery(event);
-        return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+
+        return {
+            data: entity,
+            meta: { schema: describeQuerySchema(bucketSchema, RECORD_QUERY_PARAMETERS) },
+        };
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
@@ -132,32 +145,32 @@ export class BucketController {
         @DPath('id') id: string,
         @DBody() data: Partial<BucketCreatePayload>,
         @DContext() event: IAppEvent,
-    ): Promise<Bucket> {
+    ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: BucketCreatePayload,
         @DContext() event: IAppEvent,
-    ): Promise<Bucket> {
+    ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<Bucket> {
+    ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 }

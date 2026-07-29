@@ -58,11 +58,11 @@ class FakeAuthupClient {
             const record = { id: `cp-${this.seq}`, ...data };
             this.createdClientPermissions.push(data);
             this.clientPermissions.push(record as ClientPermissionRecord);
-            return record;
+            return { data: record, meta: {} };
         },
         delete: async (id: string) => {
             this.deletedClientPermissionIds.push(id);
-            return { id };
+            return { data: { id }, meta: {} };
         },
     };
 
@@ -72,7 +72,7 @@ class FakeAuthupClient {
             if (!permission) {
                 throw new Error(`permission ${id} not found`);
             }
-            return permission;
+            return { data: permission, meta: {} };
         },
     };
 }

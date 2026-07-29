@@ -12,6 +12,10 @@ export default [
             '**/.nx/**',
             '**/writable/**',
             '**/.output/**',
+            // VitePress dev-server dependency cache — generated, gitignored,
+            // and only present once the docs dev server has run locally. Without
+            // this, `npm run lint` is red locally but green on a fresh CI checkout.
+            '**/.vitepress/cache/**',
         ],
     },
     {

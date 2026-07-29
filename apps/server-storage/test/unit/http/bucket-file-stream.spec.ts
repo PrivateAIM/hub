@@ -39,7 +39,7 @@ describe('bucket-file stream endpoint', () => {
     it('should create bucket and upload file', async () => {
         const client = suite.client();
 
-        const bucket = await client.bucket.create(createTestBucket());
+        const { data: bucket } = await client.bucket.create(createTestBucket());
         bucketId = bucket.id;
 
         const content = Buffer.from(JSON.stringify({ hello: 'world' }));

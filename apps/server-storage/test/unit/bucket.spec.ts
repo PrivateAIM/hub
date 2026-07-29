@@ -36,7 +36,7 @@ describe('controllers/bucket', () => {
     it('should create resource', async () => {
         const client = suite.client();
         const input = createTestBucket({ region: 'eu-west' });
-        const data = await client.bucket.create(input);
+        const { data } = await client.bucket.create(input);
 
         expect(data.name).toEqual(input.name);
         expect(data.region).toEqual('eu-west');
@@ -52,7 +52,7 @@ describe('controllers/bucket', () => {
 
     it('should read resource', async () => {
         const client = suite.client();
-        const data = await client.bucket.getOne(details.id);
+        const { data } = await client.bucket.getOne(details.id);
 
         expectPropertiesEqualToSrc(details, data);
     });

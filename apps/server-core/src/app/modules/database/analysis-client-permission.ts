@@ -106,15 +106,17 @@ export class AnalysisClientPermissionService {
         const analysis = await this.resolveAnalysis(analysisId);
         await this.assertWritable(analysis, actor);
 
-        const permission = await this.authup.permission.getOne(data.permission_id);
+        const { data: permission } = await this.authup.permission.getOne(data.permission_id);
         if (!ANALYSIS_SELF_PERMISSION_NAMES.includes(permission.name)) {
             throw new PermissionDeniedError('Only analysis self-capabilities can be assigned to an analysis client.');
         }
 
-        return this.authup.clientPermission.create({
+        const { data: clientPermission } = await this.authup.clientPermission.create({
             clientId: analysis.client_id,
             permissionId: permission.id,
         });
+
+        return clientPermission;
     }
 
     async delete(analysisId: string, permissionId: string, actor: ActorContext): Promise<ClientPermission> {

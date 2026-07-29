@@ -6,7 +6,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type { CollectionResourcePage, CollectionResourceResponse } from '../../src/domains/types-base';
+import type { CollectionResourcePage, EntityCollectionResponse } from '../../src/domains/types-base';
 import { getManyAll } from '../../src/domains/helpers';
 
 type Item = { id: number };
@@ -23,7 +23,7 @@ class FakeCollectionAPI {
         this.maxLimit = maxLimit;
     }
 
-    async getMany(page: CollectionResourcePage): Promise<CollectionResourceResponse<Item>> {
+    async getMany(page: CollectionResourcePage): Promise<EntityCollectionResponse<Item>> {
         this.pages.push(page);
 
         const limit = Math.min(page.limit, this.maxLimit);

@@ -41,11 +41,32 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `GET` | `/buckets` | List buckets |
 | `POST` | `/buckets` | Create bucket |
 | `GET` | `/buckets/:id` | Get bucket |
+| `POST` | `/buckets/:id` | Update bucket |
 | `DELETE` | `/buckets/:id` | Delete bucket |
+| `POST` | `/buckets/:id/upload` | Upload files into a bucket |
+| `GET` | `/buckets/:id/stream` | Stream the bucket contents as a tar |
 | `GET` | `/bucket-files` | List files |
-| `POST` | `/bucket-files` | Upload file |
+| `GET` | `/bucket-files/:id` | Get file |
+| `DELETE` | `/bucket-files/:id` | Delete file |
 | `GET` | `/bucket-files/:id/stream` | Stream file contents |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
+
+## Response Shapes
+
+Every bucket and bucket-file endpoint answers with a `{ data, meta }` envelope — the record (or the
+record array) under `data`. Query-capable `GET`s advertise the endpoint's queryable vocabulary at
+`meta.schema`; mutations carry `meta: {}`.
+
+Three surfaces stay outside the record envelope:
+
+| Endpoint | Shape |
+|----------|-------|
+| `GET /` | `{ version, timestamp }` — service metadata, flat |
+| `GET /buckets/:id/stream`, `GET /bucket-files/:id/stream` | flat binary streams with attachment headers |
+| `POST /buckets/:id/upload` | a **collection** (`{ data: files, meta: { total } }`), because it uploads many files — no `schema` |
+
+See [API Reference](/guide/development/api#response-shapes) for the full contract and the
+`meta.schema` reading rules.
 
 ## Architecture
 

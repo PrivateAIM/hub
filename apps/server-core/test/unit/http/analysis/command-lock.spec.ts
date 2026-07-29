@@ -33,15 +33,20 @@ describe('analysis/command-lock', () => {
 
         const { client } = suite;
 
-        const project = await client.project.create(createTestProject());
+        const { data: project } = await client.project.create(createTestProject());
 
-        nodeDefault = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
-        nodeAggregator = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+        const { data: defaultNode } = await client.node.create(createTestNode({ type: NodeType.DEFAULT }));
+        const { data: aggregatorNode } = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+
+        nodeDefault = defaultNode;
+        nodeAggregator = aggregatorNode;
 
         // Create the analysis before the project nodes so this suite can drive the
         // node-validation gates one analysis-node at a time. Approved project nodes are
         // auto-assigned at analysis creation; creating the analysis first keeps that a no-op.
-        analysis = await client.analysis.create({ project_id: project.id });
+        const { data: analysisRecord } = await client.analysis.create({ project_id: project.id });
+
+        analysis = analysisRecord;
 
         await client.projectNode.create({
             node_id: nodeDefault.id,

@@ -47,7 +47,7 @@ describe('bucket-file HTTP endpoints', () => {
     it('should setup bucket and upload file', async () => {
         const client = suite.client();
 
-        const bucket = await client.bucket.create(createTestBucket());
+        const { data: bucket } = await client.bucket.create(createTestBucket());
         bucketId = bucket.id;
 
         const filePath = path.join(import.meta.dirname, '../../data/file.json');
@@ -83,11 +83,13 @@ describe('bucket-file HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
-            expect(body.id).toBe(fileId);
-            expect(body.bucket_id).toBe(bucketId);
-            expect(body.name).toBe('test-file.json');
-            expect(body.created_at).toBeDefined();
-            expect(body.updated_at).toBeDefined();
+            expect(body.data.id).toBe(fileId);
+            expect(body.data.bucket_id).toBe(bucketId);
+            expect(body.data.name).toBe('test-file.json');
+            expect(body.data.created_at).toBeDefined();
+            expect(body.data.updated_at).toBeDefined();
+            expect(body.meta.schema).toBeDefined();
+            expect(body.meta.schema.name).toBe('bucketFile');
         });
 
         it('should return 404 for non-existent bucket file', async () => {
@@ -121,7 +123,8 @@ describe('bucket-file HTTP endpoints', () => {
             expect(response.status).toBe(202);
 
             const body = await response.json();
-            expect(body.id).toBe(deleteFileId);
+            expect(body.data.id).toBe(deleteFileId);
+            expect(body.meta).toEqual({});
         });
     });
 

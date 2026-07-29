@@ -43,7 +43,8 @@ export class NodeClientService {
 
         if (entity.client_id) {
             try {
-                client = await this.authup.client.getOne(entity.client_id);
+                const { data } = await this.authup.client.getOne(entity.client_id);
+                client = data;
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
                     throw e;
@@ -52,12 +53,13 @@ export class NodeClientService {
         }
 
         if (!client) {
-            client = await this.authup.client.create({
+            const { data } = await this.authup.client.create({
                 name: entity.id,
                 realmId: entity.realm_id,
                 authMethod: ClientAuthMethod.SECRET,
             });
 
+            client = data;
             entity.client_id = client.id;
         }
 
@@ -102,7 +104,8 @@ export class NodeClientService {
             let permission: Permission;
 
             try {
-                permission = await this.authup.permission.getOne(permissionName);
+                const { data } = await this.authup.permission.getOne(permissionName);
+                permission = data;
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
                     throw e;

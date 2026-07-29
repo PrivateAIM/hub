@@ -72,7 +72,7 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
             value,
         );
 
-        const analysis = await this.coreClient.analysis.getOne(value.id);
+        const { data: analysis } = await this.coreClient.analysis.getOne(value.id);
 
         const image = this.docker.getImage(`${value.id}:${REGISTRY_ARTIFACT_TAG_LATEST}`);
 
