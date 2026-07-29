@@ -46,12 +46,12 @@
     },
     "devDependencies": {
         "redis-extension": "^2.0.4",
-        "routup": "^6.0.0",
+        "routup": "^6.1.0",
         "typeorm-extension": "^4.0.0-beta.1"
     },
     "peerDependencies": {
         "redis-extension": "^2.0.4",
-        "routup": "^6.0.0",
+        "routup": "^6.1.0",
         "typeorm-extension": "^4.0.0-beta.1"
     },
     "scripts": {
