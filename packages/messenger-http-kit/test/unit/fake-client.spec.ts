@@ -8,6 +8,14 @@
 import { isClientError } from 'hapic';
 import { describe, expect, it } from 'vitest';
 import { createFakeClient, fakeResponse, matchRoute } from '../../src/testing';
+import type { FakeRequest } from '../../src/testing';
+
+const EMPTY_REQUEST : FakeRequest = {
+    method: 'GET',
+    url: '/',
+    params: {},
+    headers: {},
+};
 
 describe('matchRoute', () => {
     it('should ignore the query string', () => {
@@ -22,7 +30,7 @@ describe('matchRoute', () => {
             'POST /messages/ack': () => 'specific',
         });
 
-        expect(match.handler({} as any)).toBe('specific');
+        expect(match.handler(EMPTY_REQUEST)).toBe('specific');
     });
 });
 
@@ -40,7 +48,7 @@ describe('FakeClient', () => {
     it('should send messages and return the persisted ids', async () => {
         const client = createFakeClient({ handlers: { 'POST /messages': () => ({ data: ['m1', 'm2'] }) } });
 
-        const ids = await client.message.send({ recipients: ['r1'], payload: {} } as any);
+        const ids = await client.message.send({ recipients: ['r1'], data: { body: 'hi' } });
 
         expect(ids).toEqual(['m1', 'm2']);
         expect(client.requests[0].body).toMatchObject({ recipients: ['r1'] });
@@ -49,7 +57,7 @@ describe('FakeClient', () => {
     it('should acknowledge messages by id', async () => {
         const client = createFakeClient({ handlers: { 'POST /messages/ack': () => undefined } });
 
-        await client.message.ack({ ids: ['m1'] } as any);
+        await client.message.ack({ ids: ['m1'] });
 
         expect(client.requests[0]).toMatchObject({ method: 'POST', body: { ids: ['m1'] } });
     });
@@ -57,7 +65,7 @@ describe('FakeClient', () => {
     it('should drive a non-2xx through the real error pipeline, hook included', async () => {
         const client = createFakeClient({ handlers: { 'POST /messages': () => fakeResponse(403, { message: 'rewritten by server' }) } });
 
-        await expect(client.message.send({ recipients: [], payload: {} } as any)).rejects.toSatisfy(
+        await expect(client.message.send({ recipients: [] })).rejects.toSatisfy(
             (error: unknown) => isClientError(error) &&
                 error.response?.status === 403 &&
                 error.message === 'rewritten by server',

@@ -69,9 +69,10 @@ export class FakeClient extends APIClient {
      * lower-cased headers, parsed body). The RAW post-pipeline record lives on
      * the transport itself as `MemoryTransport.requests` (plus `reset()`).
      *
-     * Deliberately declared WITHOUT an initializer: under `target: ES2022` and
-     * `useDefineForClassFields`, a `= []` here would be `[[Define]]`d right
-     * after `super()` and overwrite the array the transport closes over.
+     * Assigned in the constructor rather than initialized here: the array has to
+     * exist BEFORE `super()` so the transport can close over it. A field
+     * initializer (`= []`) would run after `super()` and then simply be
+     * overwritten by that assignment — harmless, but misleading.
      */
     public readonly requests : FakeRequest[];
 

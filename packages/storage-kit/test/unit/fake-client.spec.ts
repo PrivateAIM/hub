@@ -8,6 +8,14 @@
 import { isClientError } from 'hapic';
 import { describe, expect, it } from 'vitest';
 import { createFakeClient, fakeResponse, matchRoute } from '../../src/testing';
+import type { FakeRequest } from '../../src/testing';
+
+const EMPTY_REQUEST : FakeRequest = {
+    method: 'GET',
+    url: '/',
+    params: {},
+    headers: {},
+};
 
 describe('matchRoute', () => {
     it('should capture :param segments and ignore the query string', () => {
@@ -22,7 +30,7 @@ describe('matchRoute', () => {
             'GET /buckets': () => 'specific',
         });
 
-        expect(match.handler({} as any)).toBe('specific');
+        expect(match.handler(EMPTY_REQUEST)).toBe('specific');
     });
 });
 

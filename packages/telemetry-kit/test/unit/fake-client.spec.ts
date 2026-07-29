@@ -8,6 +8,14 @@
 import { isClientError } from 'hapic';
 import { describe, expect, it } from 'vitest';
 import { createFakeClient, fakeResponse, matchRoute } from '../../src/testing';
+import type { FakeRequest } from '../../src/testing';
+
+const EMPTY_REQUEST : FakeRequest = {
+    method: 'GET',
+    url: '/',
+    params: {},
+    headers: {},
+};
 
 describe('matchRoute', () => {
     it('should capture :param segments and ignore the query string', () => {
@@ -22,7 +30,7 @@ describe('matchRoute', () => {
             'GET /logs': () => 'specific',
         });
 
-        expect(match.handler({} as any)).toBe('specific');
+        expect(match.handler(EMPTY_REQUEST)).toBe('specific');
     });
 });
 
@@ -39,7 +47,12 @@ describe('FakeClient', () => {
     it('should parse a JSON request body back into an object', async () => {
         const client = createFakeClient({ handlers: { 'POST /logs': () => ({ data: { id: 'new' }, meta: {} }) } });
 
-        await client.log.create({ message: 'hello' } as any);
+        await client.log.create({
+            message: 'hello', 
+            level: 'info', 
+            service: 'test', 
+            channel: 'audit',
+        });
 
         expect(client.requests[0].body).toMatchObject({ message: 'hello' });
     });

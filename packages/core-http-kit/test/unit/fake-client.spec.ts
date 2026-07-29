@@ -8,6 +8,14 @@
 import { isClientError } from 'hapic';
 import { describe, expect, it } from 'vitest';
 import { createFakeClient, fakeResponse, matchRoute } from '../../src/testing';
+import type { FakeRequest } from '../../src/testing';
+
+const EMPTY_REQUEST : FakeRequest = {
+    method: 'GET',
+    url: '/',
+    params: {},
+    headers: {},
+};
 
 describe('matchRoute', () => {
     it('should match an exact path', () => {
@@ -47,13 +55,13 @@ describe('matchRoute', () => {
             'GET /projects': () => 'specific',
         });
 
-        expect(match.handler({} as any)).toBe('specific');
+        expect(match.handler(EMPTY_REQUEST)).toBe('specific');
     });
 
     it('should fall back to the catch-all when nothing specific matches', () => {
         const match = matchRoute('GET', '/unknown', { '*': () => 'catch-all' });
 
-        expect(match.handler({} as any)).toBe('catch-all');
+        expect(match.handler(EMPTY_REQUEST)).toBe('catch-all');
     });
 
     it('should skip a key without a space separator', () => {

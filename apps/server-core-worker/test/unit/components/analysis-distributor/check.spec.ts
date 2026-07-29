@@ -6,7 +6,10 @@
  */
 
 import { ProcessStatus } from '@privateaim/kit';
+import type { ICoreClient } from '@privateaim/core-http-kit';
 import { createFakeClient } from '@privateaim/core-http-kit/testing';
+import type { Client as DockerClient } from 'docken';
+import type { AnalysisDistributorCheckPayload } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import { describe, expect, it } from 'vitest';
 import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/app/components/constants';
@@ -69,17 +72,33 @@ function createCoreClient(overrides: Overrides = {}) {
     });
 }
 
-function createHandler(coreClient: any, docker: FakeDockerClient) {
-    return new AnalysisDistributorCheckHandler({ coreClient, docker: docker as any });
+const PAYLOAD: AnalysisDistributorCheckPayload = { id: ANALYSIS_ID };
+
+/**
+ * `docken`'s `Client` is a concrete class, not a port, so the fake cannot
+ * structurally satisfy it — this cast is the one the architecture forces.
+ * Isolated here so no individual test carries it.
+ */
+function createHandler(coreClient: ICoreClient, docker: FakeDockerClient) {
+    return new AnalysisDistributorCheckHandler({
+        coreClient,
+        docker: docker as unknown as DockerClient,
+    });
+}
+
+function run(coreClient: ICoreClient, docker: FakeDockerClient) {
+    const context = new FakeComponentHandlerContext();
+
+    return createHandler(coreClient, docker)
+        .handle(PAYLOAD, context)
+        .then(() => context);
 }
 
 describe('AnalysisDistributorCheckHandler', () => {
     it('should report EXECUTED when every node image resolves', async () => {
         const coreClient = createCoreClient();
         const docker = new FakeDockerClient();
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.lastEvent()).toMatchObject({
             event: AnalysisDistributorEvent.CHECK_FINISHED,
@@ -95,9 +114,7 @@ describe('AnalysisDistributorCheckHandler', () => {
     it('should request the registry secret explicitly and pass it to docker', async () => {
         const coreClient = createCoreClient();
         const docker = new FakeDockerClient();
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        await run(coreClient, docker);
 
         // `account_secret` is `select: false` server-side, so the worker has to
         // opt in via `fields=+account_secret`.
@@ -110,9 +127,7 @@ describe('AnalysisDistributorCheckHandler', () => {
     it('should finish early when the analysis has no nodes', async () => {
         const coreClient = createCoreClient({ analysisNodes: [] });
         const docker = new FakeDockerClient();
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.lastEvent().event).toBe(AnalysisDistributorEvent.CHECK_FINISHED);
         expect(context.lastEvent().payload.status).toBeUndefined();
@@ -122,9 +137,7 @@ describe('AnalysisDistributorCheckHandler', () => {
     it('should finish early when no node records resolve', async () => {
         const coreClient = createCoreClient({ nodes: [] });
         const docker = new FakeDockerClient();
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.lastEvent().event).toBe(AnalysisDistributorEvent.CHECK_FINISHED);
         expect(docker.calls).toHaveLength(0);
@@ -134,9 +147,7 @@ describe('AnalysisDistributorCheckHandler', () => {
         // `analysis.registry_id` is nullable and the FK detaches on SET NULL.
         const coreClient = createCoreClient({ analysis: { registry_id: null } });
         const docker = new FakeDockerClient();
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.lastEvent().event).toBe(AnalysisDistributorEvent.CHECK_FAILED);
         expect(coreClient.requests.some((request) => request.url.includes('/registries/null'))).toBe(false);
@@ -151,9 +162,7 @@ describe('AnalysisDistributorCheckHandler', () => {
             }], 
         });
         const docker = new FakeDockerClient();
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.lastEvent().event).toBe(AnalysisDistributorEvent.CHECK_FAILED);
     });
@@ -161,9 +170,7 @@ describe('AnalysisDistributorCheckHandler', () => {
     it('should report FAILED when the image is missing and no distribution is in flight', async () => {
         const coreClient = createCoreClient();
         const docker = new FakeDockerClient({ distributionError: new FakeDockerError(404) });
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.lastEvent()).toMatchObject({
             event: AnalysisDistributorEvent.CHECK_FINISHED,
@@ -179,9 +186,7 @@ describe('AnalysisDistributorCheckHandler', () => {
             },
         });
         const docker = new FakeDockerClient({ distributionError: new FakeDockerError(404) });
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.lastEvent().payload.status).toBe(ProcessStatus.STARTED);
     });
@@ -194,9 +199,7 @@ describe('AnalysisDistributorCheckHandler', () => {
             },
         });
         const docker = new FakeDockerClient({ distributionError: new FakeDockerError(404) });
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.lastEvent().payload.status).toBe(ProcessStatus.FAILED);
     });
@@ -207,9 +210,7 @@ describe('AnalysisDistributorCheckHandler', () => {
         // silently downgraded to FAILED.
         const coreClient = createCoreClient();
         const docker = new FakeDockerClient({ distributionError: new FakeDockerError(500, 'daemon down') });
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.lastEvent().event).toBe(AnalysisDistributorEvent.CHECK_FAILED);
         expect(context.eventsOf(AnalysisDistributorEvent.CHECK_FINISHED)).toHaveLength(0);
@@ -218,9 +219,7 @@ describe('AnalysisDistributorCheckHandler', () => {
     it('should emit CHECK_STARTED before doing any work', async () => {
         const coreClient = createCoreClient();
         const docker = new FakeDockerClient();
-        const context = new FakeComponentHandlerContext();
-
-        await createHandler(coreClient, docker).handle({ id: ANALYSIS_ID } as any, context as any);
+        const context = await run(coreClient, docker);
 
         expect(context.emitted[0].event).toBe(AnalysisDistributorEvent.CHECK_STARTED);
     });

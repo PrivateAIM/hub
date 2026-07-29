@@ -10,6 +10,7 @@ import { LogFlag } from '@privateaim/telemetry-kit';
 import {
     afterAll,
     beforeAll,
+    beforeEach,
     describe,
     expect,
     it,
@@ -47,6 +48,12 @@ describe('src/controllers/core/analysis-log', () => {
         await suite.setup();
     });
 
+    // Reset per test: asserting on `telemetryRequests[length - 1]` would
+    // otherwise couple each case to the execution order of the ones before it.
+    beforeEach(() => {
+        telemetryRequests.length = 0;
+    });
+
     afterAll(async () => {
         await suite.teardown();
     });
@@ -62,7 +69,8 @@ describe('src/controllers/core/analysis-log', () => {
 
         // The controller must translate `analysis_id` into the telemetry
         // LABELS the log store actually indexes.
-        const query = decodeURIComponent(telemetryRequests[telemetryRequests.length - 1].url);
+        expect(telemetryRequests).toHaveLength(1);
+        const query = decodeURIComponent(telemetryRequests[0].url);
         expect(query).toContain(LogFlag.REF_TYPE);
         expect(query).toContain(DomainType.ANALYSIS);
         expect(query).toContain(ANALYSIS_ID);
@@ -87,7 +95,8 @@ describe('src/controllers/core/analysis-log', () => {
 
         await client.analysisLog.delete({ filters: { analysis_id: ANALYSIS_ID } });
 
-        const query = decodeURIComponent(telemetryRequests[telemetryRequests.length - 1].url);
+        expect(telemetryRequests).toHaveLength(1);
+        const query = decodeURIComponent(telemetryRequests[0].url);
         expect(query).toContain(ANALYSIS_ID);
     });
 

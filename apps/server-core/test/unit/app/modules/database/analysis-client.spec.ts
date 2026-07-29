@@ -6,10 +6,12 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import type { Client } from '@authup/core-kit';
 import { ClientAuthMethod } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { createFakeAuthupClient, fakeAuthupResponse } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
+import type { AnalysisEntity } from '../../../../../src/adapters/database/entities/index.ts';
 import { AnalysisClientService } from '../../../../../src/app/modules/database/analysis-client.ts';
 
 // Driven through a REAL `AuthupClient` on an in-memory transport. That matters
@@ -18,13 +20,15 @@ import { AnalysisClientService } from '../../../../../src/app/modules/database/a
 // `ClientError` — a hand-written double throwing `new Error()` can never
 // produce one, so those branches used to be unreachable in tests.
 
-function createAnalysisEntity(overrides: Record<string, any> = {}) {
+// The single narrowing cast lives in this factory: an AnalysisEntity has far
+// more columns than the service reads.
+function createAnalysisEntity(overrides: Partial<AnalysisEntity> = {}) : AnalysisEntity {
     return {
         id: randomUUID(),
         client_id: null,
         realm_id: randomUUID(),
         ...overrides,
-    } as any;
+    } as AnalysisEntity;
 }
 
 function bodiesOf(authup: ReturnType<typeof createFakeAuthupClient>, method: string, pathFragment: string) {
@@ -149,7 +153,7 @@ describe('AnalysisClientService', () => {
             });
             const service = new AnalysisClientService(authup);
 
-            await service.assignDefaultPermissions({ id: 'client-1' } as any);
+            await service.assignDefaultPermissions({ id: 'client-1' } as Client);
 
             const created = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.permissionId);
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_SELF_STORAGE_USE}`);
@@ -175,7 +179,7 @@ describe('AnalysisClientService', () => {
             });
             const service = new AnalysisClientService(authup);
 
-            await service.assignDefaultPermissions({ id: 'client-1' } as any);
+            await service.assignDefaultPermissions({ id: 'client-1' } as Client);
 
             const created = bodiesOf(authup, 'POST', '/client-permissions');
             expect(created).toHaveLength(1);
@@ -199,7 +203,7 @@ describe('AnalysisClientService', () => {
             });
             const service = new AnalysisClientService(authup);
 
-            await service.assignDefaultPermissions({ id: 'client-1' } as any);
+            await service.assignDefaultPermissions({ id: 'client-1' } as Client);
 
             const created = bodiesOf(authup, 'POST', '/client-permissions');
             expect(created).toHaveLength(1);
@@ -219,7 +223,7 @@ describe('AnalysisClientService', () => {
             });
             const service = new AnalysisClientService(authup);
 
-            await service.assignDefaultPermissions({ id: 'client-42' } as any);
+            await service.assignDefaultPermissions({ id: 'client-42' } as Client);
 
             const query = decodeURIComponent(authup.requests[0].url);
             expect(query).toContain('client-42');

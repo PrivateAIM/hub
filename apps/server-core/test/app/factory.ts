@@ -47,6 +47,10 @@ function createTestComponentsModule(): IModule {
  * service. `HTTPModule` picks it up via `tryResolve`, and the real
  * `TelemetryClientModule` is not in the test module list at all — so there is
  * nothing to clobber and no guard needed.
+ *
+ * Ordering is guaranteed by the module NAME, not by the position in the array:
+ * `HTTPModule` declares `{ name: 'telemetryClient', optional: true }`, so orkos
+ * topologically sorts this module ahead of it.
  */
 function createTestTelemetryClientModule(handlers: FakeHandlerMap): IModule {
     return {
@@ -83,8 +87,6 @@ export function createTestApplication(options: TestApplicationOptions = {}): Tes
     ];
 
     if (options.telemetryHandlers) {
-        // Must be registered BEFORE HTTPModule, which resolves the token while
-        // constructing the log controllers.
         modules.push(createTestTelemetryClientModule(options.telemetryHandlers));
     }
 

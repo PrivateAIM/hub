@@ -9,7 +9,12 @@ import { randomUUID } from 'node:crypto';
 import type { Analysis } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import { createAllowAllActor, createDenyAllActor, createFakeAuthupClient } from '@privateaim/server-test-kit';
+import {
+    createAllowAllActor, 
+    createDenyAllActor, 
+    createFakeAuthupClient, 
+    fakeAuthupResponse,
+} from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { AnalysisClientPermissionService } from '../../../../../src/app/modules/database/analysis-client-permission.ts';
 import type { IAnalysisRepository } from '../../../../../src/core/index.ts';
@@ -40,7 +45,9 @@ function permissionHandler(...permissions: { id: string, name: string }[]) {
     return (req: { params: Record<string, string> }) => {
         const permission = permissions.find((entry) => entry.id === req.params.id);
         if (!permission) {
-            throw new Error(`permission ${req.params.id} not found`);
+            // A real 404, not a bare throw: a throwing handler becomes an
+            // unhandled rejection on a fire-and-forget path.
+            return fakeAuthupResponse(404, { message: 'permission not found' });
         }
 
         return { data: permission, meta: {} };
