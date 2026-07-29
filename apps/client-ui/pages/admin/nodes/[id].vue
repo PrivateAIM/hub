@@ -30,6 +30,21 @@ export default defineComponent({
 
         const route = useRoute();
 
+        // Must run before the first await — the injection context is only
+        // available synchronously in setup().
+        // The node's client is a plain authup client, so admins who may manage
+        // clients are sent to the full client view. Everyone else — a node admin
+        // holding NODE_UPDATE but no CLIENT_* permission — keeps the node-local
+        // credential view, which goes through the node API instead.
+        // One-of semantics: the checker evaluates the names as a disjunction.
+        const canManageClient = usePermissionCheck({
+            name: [
+                PermissionName.CLIENT_READ,
+                PermissionName.CLIENT_UPDATE,
+                PermissionName.CLIENT_DELETE,
+            ],
+        });
+
         const manager = createEntityManager({
             type: `${DomainType.NODE}`,
             props: { entityId: route.params.id as string },
@@ -62,19 +77,6 @@ export default defineComponent({
 
         const entity = manager.data.value as Node;
         const base = `/admin/nodes/${entity.id}`;
-
-        // The node's client is a plain authup client, so admins who may manage
-        // clients are sent to the full client view. Everyone else — a node admin
-        // holding NODE_UPDATE but no CLIENT_* permission — keeps the node-local
-        // credential view, which goes through the node API instead.
-        // One-of semantics: the checker evaluates the names as a disjunction.
-        const canManageClient = usePermissionCheck({
-            name: [
-                PermissionName.CLIENT_READ,
-                PermissionName.CLIENT_UPDATE,
-                PermissionName.CLIENT_DELETE,
-            ],
-        });
 
         const tabs = computed<NavigationItem[]>(() => [
             {
