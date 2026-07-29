@@ -23,7 +23,9 @@ export default defineComponent({
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionName.CLIENT_READ,
                 PermissionName.CLIENT_UPDATE,
+                PermissionName.CLIENT_DELETE,
             ],
         });
 

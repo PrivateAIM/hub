@@ -5,6 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
+import { PermissionName } from '@authup/core-kit';
 import { createEntityManager } from '@privateaim/client-vue';
 import type {
     Node,
@@ -14,7 +16,7 @@ import {
 } from '@privateaim/core-kit';
 import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import {
     useRoute,
     useToast,
@@ -58,8 +60,23 @@ export default defineComponent({
             throw createError({});
         }
 
-        const base = `/admin/nodes/${manager.data.value.id}`;
-        const tabs: NavigationItem[] = [
+        const entity = manager.data.value as Node;
+        const base = `/admin/nodes/${entity.id}`;
+
+        // The node's client is a plain authup client, so admins who may manage
+        // clients are sent to the full client view. Everyone else — a node admin
+        // holding NODE_UPDATE but no CLIENT_* permission — keeps the node-local
+        // credential view, which goes through the node API instead.
+        // One-of semantics: the checker evaluates the names as a disjunction.
+        const canManageClient = usePermissionCheck({
+            name: [
+                PermissionName.CLIENT_READ,
+                PermissionName.CLIENT_UPDATE,
+                PermissionName.CLIENT_DELETE,
+            ],
+        });
+
+        const tabs = computed<NavigationItem[]>(() => [
             {
                 name: '',
                 icon: 'fa6-solid:arrow-left',
@@ -78,18 +95,20 @@ export default defineComponent({
             {
                 name: 'Client',
                 icon: 'fa6-solid:ghost',
-                url: `${base}/client`,
+                url: entity.client_id && canManageClient.value ?
+                    `/admin/clients/${entity.client_id}` :
+                    `${base}/client`,
             },
             {
                 name: 'Registry',
                 icon: 'fa6-brands:docker',
                 url: `${base}/registry`,
             },
-        ];
+        ]);
 
         return {
             tabs,
-            entity: manager.data.value as Node,
+            entity,
             handleUpdated: manager.updated,
             handleFailed: manager.failed,
         };
