@@ -55,7 +55,9 @@ export default defineComponent({
                 }
 
                 if (props.entityId) {
-                    data.value = await storage.bucketFile.getOne(props.entityId);
+                    const { data: entity } = await storage.bucketFile.getOne(props.entityId);
+
+                    data.value = entity;
                 }
             } catch (e) {
                 emit('failed', e);

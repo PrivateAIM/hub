@@ -10,10 +10,10 @@ import { buildQueryString } from '../../utils';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import type { Log } from '@privateaim/telemetry-kit';
 import { BaseAPI } from '../base';
-import type { CollectionResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 
 export class AnalysisNodeLogAPI extends BaseAPI {
-    async getMany(options: EntityQueryInput<AnalysisNodeLog> = {}): Promise<CollectionResourceResponse<Log>> {
+    async getMany(options: EntityQueryInput<AnalysisNodeLog> = {}): Promise<EntityCollectionResponse<Log>> {
         const { data: response } = await this.client.get(`analysis-node-logs${buildQueryString(options)}`);
         return response;
     }
@@ -22,7 +22,7 @@ export class AnalysisNodeLogAPI extends BaseAPI {
         await this.client.delete(`analysis-node-logs${buildQueryString(options)}`);
     }
 
-    async create(data: Partial<AnalysisNodeLog>): Promise<Log> {
+    async create(data: Partial<AnalysisNodeLog>): Promise<EntityRecordResponse<Log>> {
         const { data: response } = await this.client.post('analysis-node-logs', data);
         return response;
     }

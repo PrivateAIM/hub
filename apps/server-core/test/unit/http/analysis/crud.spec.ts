@@ -40,8 +40,8 @@ describe('src/controllers/core/analysis', () => {
     it('should create resource', async () => {
         const { client } = suite;
 
-        const project = await client.project.create(createTestProject());
-        const analysis = await client.analysis.create(createTestAnalysis({ project_id: project.id }));
+        const { data: project } = await client.project.create(createTestProject());
+        const { data: analysis } = await client.analysis.create(createTestAnalysis({ project_id: project.id }));
 
         expect(analysis.project_id).toEqual(project.id);
 
@@ -57,7 +57,7 @@ describe('src/controllers/core/analysis', () => {
 
     it('should read resource', async () => {
         const { client } = suite;
-        const data = await client.analysis.getOne(details.id);
+        const { data } = await client.analysis.getOne(details.id);
 
         expectProperties(details, data);
     });
@@ -66,14 +66,14 @@ describe('src/controllers/core/analysis', () => {
         const { client } = suite;
         details.name = 'test-a';
 
-        const data = await client.analysis.update(details.id, details);
+        const { data } = await client.analysis.update(details.id, details);
 
         expectProperties(details, data);
     });
 
     it('should delete resource', async () => {
         const { client } = suite;
-        const response = await client.analysis.delete(details.id);
+        const { data: response } = await client.analysis.delete(details.id);
         expect(response).toBeDefined();
     });
 
@@ -102,7 +102,7 @@ describe('src/controllers/core/analysis', () => {
 
         const { client } = suite;
 
-        const project = await client.project.create({ name: createNanoID() });
+        const { data: project } = await client.project.create({ name: createNanoID() });
 
         try {
             await client.analysis.create({

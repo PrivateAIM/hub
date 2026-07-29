@@ -25,7 +25,8 @@ export default defineComponent({
 
         const httpClient = injectTelemetryHTTPClient();
         try {
-            entity.value = await httpClient.event.getOne(route.params.id as string);
+            const { data } = await httpClient.event.getOne(route.params.id as string);
+            entity.value = data;
         } catch {
             await navigateTo({ path: '/admin/events' });
             throw createError({});

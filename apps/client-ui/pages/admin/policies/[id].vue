@@ -30,9 +30,11 @@ export default defineComponent({
         const entity : Ref<Policy> = ref(null) as any;
 
         try {
-            entity.value = await injectHTTPClient()
+            const { data } = await injectHTTPClient()
                 .policy
                 .getOne(route.params.id as string);
+
+            entity.value = data;
         } catch {
             await navigateTo({ path: '/admin/policies' });
             throw createError({});

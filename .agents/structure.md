@@ -47,7 +47,7 @@ Shared libraries, located in `packages/`.
 
 | Package                  | Purpose                                    |
 |--------------------------|--------------------------------------------|
-| `server-kit`             | Logging (Winston), auth helpers, AMQP messaging, Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup) |
+| `server-kit`             | Logging (Winston), auth helpers, AMQP messaging, Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup), `describeQuerySchema()` + `RECORD_QUERY_PARAMETERS` for the response `meta.schema` |
 | `server-test-kit`        | Shared test fakes (FakeEntityRepository, FakePermissionChecker, actor factories) |
 | `server-db-kit`          | TypeORM utilities, database setup, migrations |
 | `server-http-kit`        | HTTP route/controller decorators for Routup |
@@ -62,10 +62,10 @@ Shared libraries, located in `packages/`.
 |---------------------|----------------------------------------|
 | `kit`               | Core utilities: crypto, domain events, permissions, realms |
 | `core-kit`          | Domain models & types for the core service |
-| `core-http-kit`     | HTTP client (Hapic) for the core API   |
+| `core-http-kit`     | HTTP client (Hapic) for the core API. Entity **record** responses are the `{ data, meta }` envelope (`EntityRecordResponse`), collections are `EntityCollectionResponse`, and query-capable GETs carry the endpoint's queryable vocabulary under `meta.schema` (rapiq `SchemaDescription`). Sub-API port interfaces are `IEntityAPI` / `IEntityAPISlim` — the pre-envelope names `SingleResourceResponse` / `CollectionResourceResponse` / `DomainAPI` / `DomainAPISlim` were removed with **no** deprecated aliases. |
 | `core-realtime-kit` | WebSocket event types                  |
-| `storage-kit`       | Storage domain types                   |
-| `telemetry-kit`     | Telemetry/logging types                |
+| `storage-kit`       | Storage domain types + HTTP client (same `EntityRecordResponse` / `EntityCollectionResponse` envelope types as core-http-kit) |
+| `telemetry-kit`     | Telemetry/logging types + HTTP client (same envelope types; `GET /logs` is the one schemaless collection) |
 | `messenger-kit`     | Messenger domain types                 |
 
 ## Dependency Layers

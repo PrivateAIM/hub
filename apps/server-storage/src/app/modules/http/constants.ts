@@ -10,7 +10,10 @@ import type { App, serve } from 'routup';
 
 export type HTTPServer = ReturnType<typeof serve>;
 
-export const HTTPInjectionKey = {
+export const HTTPInjectionKey : {
+    App: TypedToken<App>,
+    Server: TypedToken<HTTPServer>,
+} = {
     App: new TypedToken<App>('App'),
     Server: new TypedToken<HTTPServer>('Server'),
 };

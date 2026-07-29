@@ -78,7 +78,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
             payload,
         );
 
-        const masterImage = await this.coreClient.masterImage.getOne(payload.id);
+        const { data: masterImage } = await this.coreClient.masterImage.getOne(payload.id);
 
         try {
             await this.buildImage(masterImage, {

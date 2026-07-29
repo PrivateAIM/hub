@@ -54,7 +54,7 @@ export default defineComponent({
 
         const execute = wrapFnWithBusyState(isBusy, async () => {
             try {
-                const response = await apiClient
+                const { data: response } = await apiClient
                     .masterImage.runCommand(props.command, { ...(props.entity ? { id: props.entity.id } : {}) });
 
                 emit('executed', props.command);

@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ClientPermission } from '@authup/core-kit';
+import type { EntityRecordResponse } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -48,11 +50,11 @@ export class AnalysisClientPermissionController {
         @DPath('id') id: string,
         @DBody() data: { permission_id: string },
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityRecordResponse<ClientPermission>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(id, data, actor);
         event.response.status = 201;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DDelete('/:id/client/permissions/:permissionId', [ForceLoggedInMiddleware])
@@ -60,10 +62,10 @@ export class AnalysisClientPermissionController {
         @DPath('id') id: string,
         @DPath('permissionId') permissionId: string,
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityRecordResponse<ClientPermission>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, permissionId, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 }

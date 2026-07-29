@@ -6,6 +6,7 @@
  */
 
 import { DomainType } from '@privateaim/core-kit';
+import type { EntityCollectionResponse } from '@privateaim/core-http-kit';
 import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { BadRequestError } from '@privateaim/errors';
@@ -20,8 +21,8 @@ import { useRequestQuery } from '@routup/basic/query';
 import type { FiltersBuildInput } from '@rapiq/core';
 import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import { analysisLogSchema } from '../../../../../core/entities/analysis-log/schema.ts';
-import { collectRootFilterValues, decodeQuery } from '../../../../../core/query/index.ts';
+import { describeQuerySchema } from '@privateaim/server-kit';
+import { analysisLogSchema, collectRootFilterValues, decodeQuery } from '../../../../../core/index.ts';
 
 type AnalysisLogControllerContext = {
     telemetryClient?: TelemetryClient;
@@ -39,7 +40,7 @@ export class AnalysisLogController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<Log>> {
         const query = decodeQuery(useRequestQuery(event), { schema: analysisLogSchema });
 
         const filtersNormalized = collectRootFilterValues(query);
@@ -60,23 +61,24 @@ export class AnalysisLogController {
         }
 
         if (this.telemetryClient) {
-            return this.telemetryClient.log.getMany({
+            const { data, meta } = await this.telemetryClient.log.getMany({
                 filters,
                 pagination: {
                     limit: query.pagination.limit,
                     offset: query.pagination.offset,
                 },
             });
+
+            return { data, meta: { ...meta, schema: describeQuerySchema(analysisLogSchema) } };
         }
 
         return {
             data: [],
             meta: {
                 total: 0,
-                pagination: {
-                    limit: 50,
-                    offset: 0,
-                },
+                limit: 50,
+                offset: 0,
+                schema: describeQuerySchema(analysisLogSchema),
             },
         };
     }

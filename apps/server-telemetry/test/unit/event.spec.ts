@@ -58,7 +58,7 @@ describe('controllers/event', () => {
             expires_at: '2025-08-08T10:14:05.475Z',
         };
 
-        const data = await client.event.create(input);
+        const { data } = await client.event.create(input);
         expect(data.id).toBeDefined();
 
         expectPropertiesEqualToSrc(
@@ -78,7 +78,7 @@ describe('controllers/event', () => {
 
     it('should read resource', async () => {
         const client = suite.client();
-        const data = await client.event.getOne(details.id);
+        const { data } = await client.event.getOne(details.id);
 
         expectPropertiesEqualToSrc(
             details,

@@ -6,6 +6,7 @@
  */
 
 import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
+import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -19,7 +20,9 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IMasterImageService } from '../../../../../core/index.ts';
+import { masterImageSchema } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
 
 type MasterImageControllerContext = {
@@ -38,17 +41,19 @@ export class MasterImageController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<MasterImage>> {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
-        return { data, meta };
+        return { data, meta: { ...meta, schema: describeQuerySchema(masterImageSchema) } };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<MasterImage> {
-        return this.service.getOne(id);
+    ): Promise<EntityRecordResponse<MasterImage>> {
+        const entity = await this.service.getOne(id);
+
+        return { data: entity, meta: { schema: describeQuerySchema(masterImageSchema, RECORD_QUERY_PARAMETERS) } };
     }
 
     @DPost('/command', [ForceLoggedInMiddleware])
@@ -58,21 +63,24 @@ export class MasterImageController {
             id?: string;
         },
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityRecordResponse<MasterImage | null>> {
         const actor = buildActorContext(event);
         const entity = await this.service.executeCommand(data.command, data, actor);
         event.response.status = 202;
-        return entity;
+
+        // The SYNC branch resolves without an entity — coalesce so the
+        // envelope always carries an explicit `data` key on the wire.
+        return { data: entity ?? null, meta: {} };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<MasterImage> {
+    ): Promise<EntityRecordResponse<MasterImage>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 }

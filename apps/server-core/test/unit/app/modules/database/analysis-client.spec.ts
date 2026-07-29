@@ -58,19 +58,19 @@ class FakeAuthupClient {
             const client = { id: `client-${this.clientSeq}` };
             this.createdClients.push(data);
             this.existingClients.set(client.id, client);
-            return client;
+            return { data: client, meta: {} };
         },
         getOne: async (id: string) => {
             const client = this.existingClients.get(id);
             if (!client) {
                 throw new Error(`client ${id} not found`);
             }
-            return client;
+            return { data: client, meta: {} };
         },
         delete: async (id: string) => {
             this.deletedClientIds.push(id);
             this.existingClients.delete(id);
-            return { id };
+            return { data: { id }, meta: {} };
         },
     };
 
@@ -78,11 +78,11 @@ class FakeAuthupClient {
         getMany: async () => ({ data: this.existingClientPermissions }),
         create: async (data: Record<string, any>) => {
             this.createdClientPermissions.push(data);
-            return { id: `cp-${this.createdClientPermissions.length}`, ...data };
+            return { data: { id: `cp-${this.createdClientPermissions.length}`, ...data }, meta: {} };
         },
         delete: async (id: string) => {
             this.deletedClientPermissionIds.push(id);
-            return { id };
+            return { data: { id }, meta: {} };
         },
     };
 
@@ -91,7 +91,7 @@ class FakeAuthupClient {
             if (!this.knownPermissions.has(name)) {
                 throw new Error(`permission ${name} not found`);
             }
-            return { id: `perm-${name}`, name };
+            return { data: { id: `perm-${name}`, name }, meta: {} };
         },
     };
 }

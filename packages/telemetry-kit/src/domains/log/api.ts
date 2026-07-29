@@ -8,11 +8,11 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { Log, LogInput } from './entity';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import { BaseAPI } from '../base';
 
 export class LogAPI extends BaseAPI {
-    async getMany(options?: EntityQueryInput<Log>): Promise<CollectionResourceResponse<Log>> {
+    async getMany(options?: EntityQueryInput<Log>): Promise<EntityCollectionResponse<Log>> {
         const { data: response } = await this.client.get(`logs${buildQueryString(options)}`);
         return response;
     }
@@ -21,7 +21,7 @@ export class LogAPI extends BaseAPI {
         await this.client.delete(`logs${buildQueryString(options)}`);
     }
 
-    async create(data: LogInput): Promise<SingleResourceResponse<Log>> {
+    async create(data: LogInput): Promise<EntityRecordResponse<Log>> {
         const { data: response } = await this.client.post('logs', data);
 
         return response;

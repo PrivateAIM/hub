@@ -102,6 +102,26 @@ const coreClient = injectCoreHTTPClient();
 const storageClient = injectStorageHTTPClient();
 ```
 
+### Working with Response Envelopes
+
+Every single-record call on the injected clients resolves to the `{ data, meta }` record envelope
+(see [API Reference](/guide/development/api#response-shapes)). Destructure `data` at the call site —
+handing the envelope onward is the failure mode, because a component `emit` or a `Ref<Record>`
+accepts it without complaint and the consuming panel then renders blank:
+
+```typescript
+// Correct
+const { data: node } = await coreClient.node.getOne(nodeId);
+
+// Wrong — `node` is { data, meta }, not the record
+const node = await coreClient.node.getOne(nodeId);
+```
+
+Entity managers unwrap for you: `createEntityManager(...)` exposes the **bare** record on
+`manager.data`, and the `created` / `updated` / `deleted` callbacks (and the matching component
+emits) receive the bare record too. Collections are unchanged — `getMany` was always enveloped, and
+list handlers keep receiving `{ data, meta }`.
+
 ## Technology
 
 - `vue` — Vue 3 framework (composition API)

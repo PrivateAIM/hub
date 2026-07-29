@@ -9,35 +9,35 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Registry } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import type { RegistryCreatePayload, RegistryUpdatePayload } from './types';
 
 export class RegistryAPI extends BaseAPI {
-    async getMany(options?: EntityQueryInput<Registry>): Promise<CollectionResourceResponse<Registry>> {
+    async getMany(options?: EntityQueryInput<Registry>): Promise<EntityCollectionResponse<Registry>> {
         const response = await this.client.get(`registries${buildQueryString(options)}`);
 
         return response.data;
     }
 
-    async getOne(id: Registry['id'], options?: EntityQueryInput<Registry>): Promise<SingleResourceResponse<Registry>> {
+    async getOne(id: Registry['id'], options?: EntityQueryInput<Registry>): Promise<EntityRecordResponse<Registry>> {
         const response = await this.client.get(`registries/${id}${buildQueryString(options)}`);
 
         return response.data;
     }
 
-    async create(data: RegistryCreatePayload): Promise<SingleResourceResponse<Registry>> {
+    async create(data: RegistryCreatePayload): Promise<EntityRecordResponse<Registry>> {
         const response = await this.client.post('registries', nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async update(id: Registry['id'], data: RegistryUpdatePayload): Promise<SingleResourceResponse<Registry>> {
+    async update(id: Registry['id'], data: RegistryUpdatePayload): Promise<EntityRecordResponse<Registry>> {
         const response = await this.client.post(`registries/${id}`, nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async delete(id: Registry['id']): Promise<SingleResourceResponse<Registry>> {
+    async delete(id: Registry['id']): Promise<EntityRecordResponse<Registry>> {
         const response = await this.client.delete(`registries/${id}`);
 
         return response.data;

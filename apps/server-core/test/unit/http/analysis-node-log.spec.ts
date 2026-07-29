@@ -41,22 +41,26 @@ describe('controllers > analysis-node-log', () => {
     it('should create resource', async () => {
         const { client } = suite;
 
-        const project = await client.project.create(createTestProject());
-        node = await client.node.create(createTestNode());
+        const { data: project } = await client.project.create(createTestProject());
+        const { data: nodeRecord } = await client.node.create(createTestNode());
+
+        node = nodeRecord;
 
         await client.projectNode.create({
             node_id: node.id,
             project_id: project.id,
         });
 
-        analysis = await client.analysis.create({ project_id: project.id });
+        const { data: analysisRecord } = await client.analysis.create({ project_id: project.id });
+
+        analysis = analysisRecord;
 
         await client.analysisNode.create({
             analysis_id: analysis.id,
             node_id: node.id,
         });
 
-        const entity = await client.analysisNodeLog.create({
+        const { data: entity } = await client.analysisNodeLog.create({
             analysis_id: analysis!.id,
             node_id: node!.id,
             status: ProcessStatus.FAILED,

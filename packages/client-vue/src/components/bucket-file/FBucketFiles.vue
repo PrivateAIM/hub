@@ -88,7 +88,7 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                const entity = await httpClient.bucketFile.delete(id);
+                const { data: entity } = await httpClient.bucketFile.delete(id);
                 handleDeleted(entity);
             } catch (e) {
                 emit('failed', e);

@@ -9,3 +9,4 @@ export * from './bucket';
 export * from './bucket-file';
 
 export * from './constants';
+export * from './types-base';

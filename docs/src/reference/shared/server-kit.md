@@ -37,6 +37,30 @@ import { RedisModule } from '@privateaim/server-kit';
 import { AuthupModule } from '@privateaim/server-kit';
 ```
 
+### Query Schema Description
+
+`describeQuerySchema()` serializes a rapiq entity schema into the `SchemaDescription` that
+controllers publish under `meta.schema` — the static upper bound of an endpoint's queryable
+vocabulary. Pass `RECORD_QUERY_PARAMETERS` on single-record reads to advertise only the
+`fields` + `relations` subset a record read processes.
+
+```typescript
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
+
+// Collection GET — full vocabulary
+return { data, meta: { ...meta, schema: describeQuerySchema(nodeSchema) } };
+
+// Record GET — fields + relations only
+return { data: entity, meta: { schema: describeQuerySchema(nodeSchema, RECORD_QUERY_PARAMETERS) } };
+```
+
+Descriptions are memoized per `(schema, parameters)` and **deep-frozen**: the returned object is
+shared by reference, so never mutate it. Always spread when merging — `meta: { ...meta, schema }`,
+never `meta.schema = ...` (that throws under ESM strict mode).
+
+See [API Reference](/guide/development/api#query-capability-discovery) for the consumer-side
+reading rules.
+
 ### Application Builder
 
 ```typescript
@@ -60,6 +84,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 | `authup` | Authup authentication middleware module |
 | `cache` | Cache module (Redis-backed) |
 | `config` | Configuration reading via `envix` |
+| `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema` |
 | `entity-event` | Entity event pub/sub system |
 | `task-manager` | Task lifecycle management |
 | `aggregator` | AMQP event aggregator base classes |
@@ -82,6 +107,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 - `winston` — Logging
 - `@ebec/http` — HTTP error types
 - `@hapic/oauth2` — OAuth2 client
+- `@rapiq/core` — Query schema definition and description (`describeQuerySchema`)
 - `orkos` — Module system (`IModule`)
 - `eldin` — DI container (`TypedToken`)
 - `envix` — Environment variable reading

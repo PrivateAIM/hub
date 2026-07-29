@@ -73,11 +73,12 @@ describe('event HTTP endpoints', () => {
             });
 
             const body = await response.json();
-            expect(body.id).toBeDefined();
-            expect(body.created_at).toBeDefined();
-            expect(body.updated_at).toBeDefined();
+            expect(body.meta).toEqual({});
+            expect(body.data.id).toBeDefined();
+            expect(body.data.created_at).toBeDefined();
+            expect(body.data.updated_at).toBeDefined();
 
-            createdId = body.id;
+            createdId = body.data.id;
         });
 
         it('should persist all provided fields', async () => {
@@ -91,21 +92,21 @@ describe('event HTTP endpoints', () => {
             });
 
             const body = await response.json();
-            expect(body.scope).toBe(eventPayload.scope);
-            expect(body.name).toBe(eventPayload.name);
-            expect(body.ref_type).toBe(eventPayload.ref_type);
-            expect(body.ref_id).toBe(eventPayload.ref_id);
-            expect(body.data).toEqual(eventPayload.data);
-            expect(body.expiring).toBe(eventPayload.expiring);
-            expect(body.request_path).toBe(eventPayload.request_path);
-            expect(body.request_method).toBe(eventPayload.request_method);
-            expect(body.request_ip_address).toBe(eventPayload.request_ip_address);
-            expect(body.request_user_agent).toBe(eventPayload.request_user_agent);
-            expect(body.actor_type).toBe(eventPayload.actor_type);
-            expect(body.actor_id).toBe(eventPayload.actor_id);
-            expect(body.actor_name).toBe(eventPayload.actor_name);
+            expect(body.data.scope).toBe(eventPayload.scope);
+            expect(body.data.name).toBe(eventPayload.name);
+            expect(body.data.ref_type).toBe(eventPayload.ref_type);
+            expect(body.data.ref_id).toBe(eventPayload.ref_id);
+            expect(body.data.data).toEqual(eventPayload.data);
+            expect(body.data.expiring).toBe(eventPayload.expiring);
+            expect(body.data.request_path).toBe(eventPayload.request_path);
+            expect(body.data.request_method).toBe(eventPayload.request_method);
+            expect(body.data.request_ip_address).toBe(eventPayload.request_ip_address);
+            expect(body.data.request_user_agent).toBe(eventPayload.request_user_agent);
+            expect(body.data.actor_type).toBe(eventPayload.actor_type);
+            expect(body.data.actor_id).toBe(eventPayload.actor_id);
+            expect(body.data.actor_name).toBe(eventPayload.actor_name);
 
-            createdId = body.id;
+            createdId = body.data.id;
         });
     });
 
@@ -148,11 +149,13 @@ describe('event HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
-            expect(body.id).toBe(createdId);
-            expect(body.scope).toBe(eventPayload.scope);
-            expect(body.name).toBe(eventPayload.name);
-            expect(body.ref_type).toBe(eventPayload.ref_type);
-            expect(body.ref_id).toBe(eventPayload.ref_id);
+            expect(body.data.id).toBe(createdId);
+            expect(body.data.scope).toBe(eventPayload.scope);
+            expect(body.data.name).toBe(eventPayload.name);
+            expect(body.data.ref_type).toBe(eventPayload.ref_type);
+            expect(body.data.ref_id).toBe(eventPayload.ref_id);
+            expect(body.meta.schema).toBeDefined();
+            expect(body.meta.schema.name).toBe('event');
         });
 
         it('should return 404 for non-existent event', async () => {
@@ -178,7 +181,7 @@ describe('event HTTP endpoints', () => {
             });
             const created = await createResponse.json();
 
-            const response = await fetch(`${baseURL}/events/${created.id}`, {
+            const response = await fetch(`${baseURL}/events/${created.data.id}`, {
                 method: 'DELETE',
                 headers: { Authorization: authorization },
             });
@@ -198,14 +201,15 @@ describe('event HTTP endpoints', () => {
             });
             const created = await createResponse.json();
 
-            const response = await fetch(`${baseURL}/events/${created.id}`, {
+            const response = await fetch(`${baseURL}/events/${created.data.id}`, {
                 method: 'DELETE',
                 headers: { Authorization: authorization },
             });
 
             const body = await response.json();
-            expect(body.id).toBe(created.id);
-            expect(body.scope).toBe(eventPayload.scope);
+            expect(body.data.id).toBe(created.data.id);
+            expect(body.data.scope).toBe(eventPayload.scope);
+            expect(body.meta).toEqual({});
         });
 
         it('should return 404 for non-existent event', async () => {

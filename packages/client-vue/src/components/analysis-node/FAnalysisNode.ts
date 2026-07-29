@@ -132,11 +132,15 @@ export default defineComponent({
             !manager.data.value[props.target]
         ) {
             if (props.target === Target.ANALYSIS) {
-                manager.data.value[props.target] = await apiClient
+                const { data: analysis } = await apiClient
                     .analysis.getOne(manager.data.value.analysis_id);
+
+                manager.data.value[props.target] = analysis;
             } else {
-                manager.data.value[props.target] = await apiClient
+                const { data: node } = await apiClient
                     .node.getOne(manager.data.value.node_id);
+
+                manager.data.value[props.target] = node;
             }
         }
 

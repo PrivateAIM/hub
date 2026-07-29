@@ -26,7 +26,7 @@ export class AuthupClientCredentialStore implements IClientCredentialStore {
     }
 
     async readByClientId(clientId: string): Promise<ClientCredentials> {
-        const client = await this.authup.client.getOne(clientId, { fields: ['+secret'] });
+        const { data: client } = await this.authup.client.getOne(clientId, { fields: ['+secret'] });
 
         return {
             id: client.id,
@@ -42,7 +42,7 @@ export class AuthupClientCredentialStore implements IClientCredentialStore {
         // unchanged.
         const next = data?.secret ?? randomBytes(32).toString('hex');
 
-        const client = await this.authup.client.update(clientId, {
+        const { data: client } = await this.authup.client.update(clientId, {
             name: data?.name,
             displayName: data?.display_name,
             secret: next,

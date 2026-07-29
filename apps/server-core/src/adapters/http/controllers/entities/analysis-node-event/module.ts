@@ -6,6 +6,7 @@
  */
 
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
+import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
 import {
     DContext,
     DController,
@@ -16,7 +17,9 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IAnalysisNodeEventService } from '../../../../../core/index.ts';
+import { analysisNodeEventSchema } from '../../../../../core/index.ts';
 
 type AnalysisNodeEventControllerContext = {
     service: IAnalysisNodeEventService;
@@ -34,16 +37,21 @@ export class AnalysisNodeEventController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<AnalysisNodeEvent>> {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
-        return { data, meta };
+        return { data, meta: { ...meta, schema: describeQuerySchema(analysisNodeEventSchema) } };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<AnalysisNodeEvent> {
-        return this.service.getOne(id);
+    ): Promise<EntityRecordResponse<AnalysisNodeEvent>> {
+        const entity = await this.service.getOne(id);
+
+        return {
+            data: entity,
+            meta: { schema: describeQuerySchema(analysisNodeEventSchema, RECORD_QUERY_PARAMETERS) },
+        };
     }
 }

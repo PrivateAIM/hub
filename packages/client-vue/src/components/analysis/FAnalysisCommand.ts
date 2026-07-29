@@ -61,7 +61,7 @@ const FAnalysisCommand = defineComponent({
 
         const execute = wrapFnWithBusyState(isBusy, async () => {
             try {
-                const response = await apiClient
+                const { data: response } = await apiClient
                     .analysis.runCommand(entity.value.id, props.command);
 
                 emit('executed', props.command);

@@ -37,7 +37,7 @@ describe('src/controllers/core/project', () => {
     it('should create resource', async () => {
         const { client } = suite;
 
-        const project = await client.project.create(createTestProject());
+        const { data: project } = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
         details = removeDateProperties(project);
@@ -53,7 +53,7 @@ describe('src/controllers/core/project', () => {
     it('should read resource', async () => {
         const { client } = suite;
 
-        const data = await client.project.getOne(details.id);
+        const { data } = await client.project.getOne(details.id);
         expectProperties(details, data);
     });
 
@@ -62,7 +62,7 @@ describe('src/controllers/core/project', () => {
 
         details.name = 'test-a';
 
-        const data = await client.project.update(details.id, details);
+        const { data } = await client.project.update(details.id, details);
         expectProperties(details, data);
     });
 

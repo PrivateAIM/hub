@@ -30,7 +30,7 @@ import {
     ref,
     resolveDynamicComponent,
 } from 'vue';
-import type { DomainAPISlim } from '@privateaim/core-http-kit';
+import type { IEntityAPISlim } from '@privateaim/core-http-kit';
 import { injectCoreHTTPClient, injectStorageHTTPClient, injectTelemetryHTTPClient } from '../core';
 import { ElementType } from './constants';
 
@@ -117,18 +117,18 @@ export default defineComponent({
         const submit = async () => {
             if (busy.value) return;
 
-            let domainAPI : DomainAPISlim<any> | undefined;
+            let domainAPI : IEntityAPISlim<any> | undefined;
             switch (props.service) {
                 case 'core': {
-                    domainAPI = (coreClient as Record<string, any>)[props.entityType] as DomainAPISlim<any> | undefined;
+                    domainAPI = (coreClient as Record<string, any>)[props.entityType] as IEntityAPISlim<any> | undefined;
                     break;
                 }
                 case 'storage': {
-                    domainAPI = (storageClient as Record<string, any>)[props.entityType] as DomainAPISlim<any> | undefined;
+                    domainAPI = (storageClient as Record<string, any>)[props.entityType] as IEntityAPISlim<any> | undefined;
                     break;
                 }
                 case 'telemetry': {
-                    domainAPI = (telemetryClient as Record<string, any>)[props.entityType] as DomainAPISlim<any> | undefined;
+                    domainAPI = (telemetryClient as Record<string, any>)[props.entityType] as IEntityAPISlim<any> | undefined;
                     break;
                 }
             }
@@ -145,8 +145,7 @@ export default defineComponent({
 
             try {
                 const response = await domainAPI.delete(props.entityId);
-                response.id = props.entityId;
-                ctx.emit('deleted', response);
+                ctx.emit('deleted', { ...response.data, id: props.entityId });
             } catch (e) {
                 ctx.emit('failed', e);
             }

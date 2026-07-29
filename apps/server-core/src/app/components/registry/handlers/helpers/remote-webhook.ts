@@ -27,7 +27,7 @@ export async function saveRemoteRegistryProjectWebhook(
 ) : Promise<{ id: number } | undefined> {
     const { authupClient } = context;
 
-    const client = await authupClient.client.getOne(ServiceID.REGISTRY, { fields: ['+secret'] });
+    const { data: client } = await authupClient.client.getOne(ServiceID.REGISTRY, { fields: ['+secret'] });
 
     // todo: check if client.secret is not hashed or encrypted
 

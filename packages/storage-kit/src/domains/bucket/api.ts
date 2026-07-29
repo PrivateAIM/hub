@@ -8,41 +8,41 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import { BaseAPI } from '../base';
 import type { BucketFile } from '../bucket-file';
 import type { Bucket } from './entity';
 import type { BucketCreatePayload } from './types';
 
 export class BucketAPI extends BaseAPI {
-    async getMany(record?: EntityQueryInput<Bucket>): Promise<CollectionResourceResponse<Bucket>> {
+    async getMany(record?: EntityQueryInput<Bucket>): Promise<EntityCollectionResponse<Bucket>> {
         const response = await this.client.get(`buckets${buildQueryString(record)}`);
         return response.data;
     }
 
-    async getOne(id: Bucket['id'], requestRecord?: EntityQueryInput<Bucket>): Promise<SingleResourceResponse<Bucket>> {
+    async getOne(id: Bucket['id'], requestRecord?: EntityQueryInput<Bucket>): Promise<EntityRecordResponse<Bucket>> {
         const response = await this.client.get(`buckets/${id}${buildQueryString(requestRecord)}`);
 
         return response.data;
     }
 
-    async create(data: BucketCreatePayload): Promise<SingleResourceResponse<Bucket>> {
+    async create(data: BucketCreatePayload): Promise<EntityRecordResponse<Bucket>> {
         const response = await this.client.post('buckets', nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async delete(id: Bucket['id']): Promise<SingleResourceResponse<Bucket>> {
+    async delete(id: Bucket['id']): Promise<EntityRecordResponse<Bucket>> {
         const response = await this.client.delete(`buckets/${id}`);
         return response.data;
     }
 
-    async update(id: Bucket['id'], data: Partial<BucketCreatePayload>): Promise<SingleResourceResponse<Bucket>> {
+    async update(id: Bucket['id'], data: Partial<BucketCreatePayload>): Promise<EntityRecordResponse<Bucket>> {
         const response = await this.client.post(`buckets/${id}`, nullifyEmptyObjectProperties(data));
         return response.data;
     }
 
-    async upload(id: Bucket['id'], formData: FormData): Promise<CollectionResourceResponse<BucketFile>> {
+    async upload(id: Bucket['id'], formData: FormData): Promise<EntityCollectionResponse<BucketFile>> {
         const response = await this.client.post(`buckets/${id}/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 
         return response.data;

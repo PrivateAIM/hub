@@ -10,10 +10,10 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { AnalysisLog } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { CollectionResourceResponse } from '../types-base';
+import type { EntityCollectionResponse } from '../types-base';
 
 export class AnalysisLogAPI extends BaseAPI {
-    async getMany(options?: EntityQueryInput<AnalysisLog>): Promise<CollectionResourceResponse<Log>> {
+    async getMany(options?: EntityQueryInput<AnalysisLog>): Promise<EntityCollectionResponse<Log>> {
         const { data: response } = await this.client.get(`analysis-logs${buildQueryString(options)}`);
         return response;
     }

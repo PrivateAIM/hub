@@ -6,7 +6,11 @@
  */
 
 import type { AnalysisBucket } from '@privateaim/core-kit';
-import type { AnalysisBucketCreatePayload } from '@privateaim/core-http-kit';
+import type {
+    AnalysisBucketCreatePayload,
+    EntityCollectionResponse,
+    EntityRecordResponse,
+} from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -20,7 +24,9 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IAnalysisBucketService } from '../../../../../core/index.ts';
+import { analysisBucketSchema } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
 
 type AnalysisBucketControllerContext = {
@@ -39,28 +45,30 @@ export class AnalysisBucketController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<AnalysisBucket>> {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
-        return { data, meta };
+        return { data, meta: { ...meta, schema: describeQuerySchema(analysisBucketSchema) } };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
-    ): Promise<AnalysisBucket> {
-        return this.service.getOne(id);
+    ): Promise<EntityRecordResponse<AnalysisBucket>> {
+        const entity = await this.service.getOne(id);
+
+        return { data: entity, meta: { schema: describeQuerySchema(analysisBucketSchema, RECORD_QUERY_PARAMETERS) } };
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: AnalysisBucketCreatePayload,
         @DContext() event: IAppEvent,
-    ): Promise<AnalysisBucket> {
+    ): Promise<EntityRecordResponse<AnalysisBucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
@@ -68,21 +76,21 @@ export class AnalysisBucketController {
         @DPath('id') id: string,
         @DBody() data: Partial<AnalysisBucketCreatePayload>,
         @DContext() event: IAppEvent,
-    ): Promise<AnalysisBucket> {
+    ): Promise<EntityRecordResponse<AnalysisBucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<AnalysisBucket> {
+    ): Promise<EntityRecordResponse<AnalysisBucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 }

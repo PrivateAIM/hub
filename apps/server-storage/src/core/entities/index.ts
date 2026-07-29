@@ -7,5 +7,7 @@
 
 export * from './bucket/types.ts';
 export * from './bucket/service.ts';
+export * from './bucket/schema.ts';
 export * from './bucket-file/types.ts';
 export * from './bucket-file/service.ts';
+export * from './bucket-file/schema.ts';

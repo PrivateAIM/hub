@@ -9,35 +9,35 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { ProjectNode } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
 import type { ProjectNodeCreatePayload, ProjectNodeUpdatePayload } from './types';
 
 export class ProjectNodeAPI extends BaseAPI {
-    async getMany(data?: EntityQueryInput<ProjectNode>): Promise<CollectionResourceResponse<ProjectNode>> {
+    async getMany(data?: EntityQueryInput<ProjectNode>): Promise<EntityCollectionResponse<ProjectNode>> {
         const response = await this.client.get(`project-nodes${buildQueryString(data)}`);
 
         return response.data;
     }
 
-    async getOne(id: ProjectNode['id'], data?: EntityQueryInput<ProjectNode>): Promise<SingleResourceResponse<ProjectNode>> {
+    async getOne(id: ProjectNode['id'], data?: EntityQueryInput<ProjectNode>): Promise<EntityRecordResponse<ProjectNode>> {
         const response = await this.client.get(`project-nodes/${id}${buildQueryString(data)}`);
 
         return response.data;
     }
 
-    async create(data: ProjectNodeCreatePayload): Promise<SingleResourceResponse<ProjectNode>> {
+    async create(data: ProjectNodeCreatePayload): Promise<EntityRecordResponse<ProjectNode>> {
         const response = await this.client.post('project-nodes', data);
 
         return response.data;
     }
 
-    async update(id: ProjectNode['id'], data: ProjectNodeUpdatePayload): Promise<SingleResourceResponse<ProjectNode>> {
+    async update(id: ProjectNode['id'], data: ProjectNodeUpdatePayload): Promise<EntityRecordResponse<ProjectNode>> {
         const response = await this.client.post(`project-nodes/${id}`, nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async delete(id: ProjectNode['id']): Promise<SingleResourceResponse<ProjectNode>> {
+    async delete(id: ProjectNode['id']): Promise<EntityRecordResponse<ProjectNode>> {
         const response = await this.client.delete(`project-nodes/${id}`);
 
         return response.data;

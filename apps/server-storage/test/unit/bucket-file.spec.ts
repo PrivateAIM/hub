@@ -41,7 +41,7 @@ describe('controllers/bucket-file', () => {
     it('should create resource', async () => {
         const client = suite.client();
 
-        const bucket = await client.bucket.create(createTestBucket({ region: 'eu-west' }));
+        const { data: bucket } = await client.bucket.create(createTestBucket({ region: 'eu-west' }));
 
         const filePath = path.join(import.meta.dirname, '..', 'data', 'file.json');
         const file = await fs.promises.readFile(filePath);
@@ -65,7 +65,7 @@ describe('controllers/bucket-file', () => {
     it('should read resource', async () => {
         const client = suite.client();
 
-        const data = await client.bucketFile.getOne(details.id);
+        const { data } = await client.bucketFile.getOne(details.id);
 
         expectPropertiesEqualToSrc(details, data);
     });

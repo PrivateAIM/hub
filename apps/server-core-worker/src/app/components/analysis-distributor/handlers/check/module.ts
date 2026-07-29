@@ -83,7 +83,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             value,
         );
 
-        const analysis = await this.coreClient.analysis.getOne(value.id);
+        const { data: analysis } = await this.coreClient.analysis.getOne(value.id);
 
         // -----------------------------------------------------------------------------------
 
@@ -144,7 +144,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             checks.push({ node, registryProject: node.registry_project });
         }
 
-        const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
+        const { data: registry } = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
         const authConfig = buildDockerAuthConfigFromRegistry(registry);
 

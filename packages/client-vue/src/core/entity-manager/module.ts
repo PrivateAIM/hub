@@ -6,7 +6,7 @@
  */
 
 import { hasOwnProperty } from '@privateaim/kit';
-import type { IEntityAPI } from '@authup/core-http-kit';
+import type { IEntityAPI } from '@privateaim/core-http-kit';
 import type {
     DomainEntityID, 
     DomainTypeMap,
@@ -155,7 +155,7 @@ export function createEntityManager<
 
             entity.value = {
                 ...data,
-                ...response,
+                ...response.data,
             };
 
             updated(entity.value as RECORD);
@@ -184,7 +184,7 @@ export function createEntityManager<
 
             entity.value = null;
 
-            deleted(response);
+            deleted(response.data);
         } catch (e) {
             if (e instanceof Error) {
                 failed(e);
@@ -207,9 +207,9 @@ export function createEntityManager<
         try {
             const response = await domainAPI.create(data);
 
-            entity.value = response;
+            entity.value = response.data;
 
-            created(response);
+            created(response.data);
         } catch (e) {
             if (e instanceof Error) {
                 failed(e);
@@ -275,7 +275,9 @@ export function createEntityManager<
 
         if (resolveCtx.id) {
             try {
-                entity.value = await domainAPI.getOne(resolveCtx.id, resolveCtx.query as QueryBuildInput<any>);
+                const { data } = await domainAPI.getOne(resolveCtx.id, resolveCtx.query as QueryBuildInput<any>);
+
+                entity.value = data;
 
                 if (socket) {
                     socket.subscribe();

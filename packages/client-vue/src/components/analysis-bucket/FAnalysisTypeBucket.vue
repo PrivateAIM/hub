@@ -46,7 +46,7 @@ export default defineComponent({
 
         const execute = wrapFnWithBusyState(isBusy, async () => {
             try {
-                const response = await httpClient
+                const { data: response } = await httpClient
                     .analysis.runCommand(props.entityId, AnalysisCommand.STORAGE_CHECK);
 
                 emit('executed', AnalysisCommand.STORAGE_CHECK);

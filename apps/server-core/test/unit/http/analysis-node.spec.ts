@@ -36,10 +36,10 @@ describe('src/controllers/core/analysis-node', () => {
     it('should create resource', async () => {
         const { client } = suite;
 
-        const project = await client.project.create(createTestProject());
+        const { data: project } = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const node = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+        const { data: node } = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
         expect(node.id).toBeDefined();
 
         await client.projectNode.create({
@@ -47,11 +47,11 @@ describe('src/controllers/core/analysis-node', () => {
             project_id: project.id,
         });
 
-        const analysis = await client.analysis.create({ project_id: project.id });
+        const { data: analysis } = await client.analysis.create({ project_id: project.id });
 
         expect(analysis.id).toBeDefined();
 
-        const analysisNode = await client.analysisNode.create({
+        const { data: analysisNode } = await client.analysisNode.create({
             analysis_id: analysis.id,
             node_id: node.id,
             execution_status: ProcessStatus.STARTING,
@@ -66,7 +66,7 @@ describe('src/controllers/core/analysis-node', () => {
     it('should update record', async () => {
         const { client } = suite;
 
-        const data = await client.analysisNode.update(details.id, {
+        const { data } = await client.analysisNode.update(details.id, {
             ...details,
             execution_status: ProcessStatus.STARTED,
             execution_progress: 10,
@@ -87,7 +87,7 @@ describe('src/controllers/core/analysis-node', () => {
     it('should read resource', async () => {
         const { client } = suite;
 
-        const data = await client.analysisNode.getOne(details.id);
+        const { data } = await client.analysisNode.getOne(details.id);
         expectProperties(details, data);
     });
 

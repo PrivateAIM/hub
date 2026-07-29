@@ -94,7 +94,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             value,
         );
 
-        const analysis = await this.coreClient.analysis.getOne(value.id);
+        const { data: analysis } = await this.coreClient.analysis.getOne(value.id);
 
         // -----------------------------------------------------------------------------------
 

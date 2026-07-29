@@ -59,11 +59,12 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(201);
 
             const body = await response.json();
-            expect(body.id).toBeDefined();
-            expect(body.name).toBe(input.name);
-            expect(body.region).toBe('eu-west');
+            expect(body.meta).toEqual({});
+            expect(body.data.id).toBeDefined();
+            expect(body.data.name).toBe(input.name);
+            expect(body.data.region).toBe('eu-west');
 
-            bucketId = body.id;
+            bucketId = body.data.id;
         });
 
         it('should return bucket entity with id, name, region', async () => {
@@ -79,12 +80,12 @@ describe('bucket HTTP endpoints', () => {
             });
 
             const body = await response.json();
-            expect(body.id).toBeDefined();
-            expect(typeof body.id).toBe('string');
-            expect(body.name).toBe(input.name);
-            expect(body.region).toBe('us-east');
-            expect(body.created_at).toBeDefined();
-            expect(body.updated_at).toBeDefined();
+            expect(body.data.id).toBeDefined();
+            expect(typeof body.data.id).toBe('string');
+            expect(body.data.name).toBe(input.name);
+            expect(body.data.region).toBe('us-east');
+            expect(body.data.created_at).toBeDefined();
+            expect(body.data.updated_at).toBeDefined();
         });
     });
 
@@ -121,9 +122,11 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
-            expect(body.id).toBe(bucketId);
-            expect(body.name).toBeDefined();
-            expect(body.region).toBe('eu-west');
+            expect(body.data.id).toBe(bucketId);
+            expect(body.data.name).toBeDefined();
+            expect(body.data.region).toBe('eu-west');
+            expect(body.meta.schema).toBeDefined();
+            expect(body.meta.schema.name).toBe('bucket');
         });
 
         it('should return 404 for non-existent bucket', async () => {
@@ -148,7 +151,7 @@ describe('bucket HTTP endpoints', () => {
                 body: JSON.stringify(input),
             });
             const bucket = await createResponse.json();
-            streamBucketId = bucket.id;
+            streamBucketId = bucket.data.id;
 
             const filePath = path.join(import.meta.dirname, '../../data/file.json');
             const fileContent = await fs.promises.readFile(filePath);
@@ -244,7 +247,8 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(202);
 
             const body = await response.json();
-            expect(body.id).toBe(bucketId);
+            expect(body.data.id).toBe(bucketId);
+            expect(body.meta).toEqual({});
         });
     });
 
@@ -258,7 +262,8 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(202);
 
             const body = await response.json();
-            expect(body.id).toBe(bucketId);
+            expect(body.data.id).toBe(bucketId);
+            expect(body.meta).toEqual({});
         });
 
         it('should return 404 for non-existent bucket', async () => {

@@ -16,10 +16,16 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import type { Event } from '@privateaim/telemetry-kit';
+import type {
+    EntityCollectionResponse,
+    EntityRecordResponse,
+    Event,
+} from '@privateaim/telemetry-kit';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IAppEvent } from 'routup';
 import type { IEventService } from '../../../../core/entities/index.ts';
+import { eventSchema } from '../../../../core/entities/index.ts';
 import { buildActorContext } from '../../request/index.ts';
 
 type EventControllerContext = {
@@ -39,40 +45,48 @@ export class EventController {
     async create(
         @DBody() data: Partial<Event>,
         @DContext() event: IAppEvent,
-    ): Promise<Event> {
+    ): Promise<EntityRecordResponse<Event>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
-        return entity;
+
+        return { data: entity, meta: {} };
     }
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<Event>> {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query, actor);
-        return { data, meta };
+
+        return { data, meta: { ...meta, schema: describeQuerySchema(eventSchema) } };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<Event> {
+    ): Promise<EntityRecordResponse<Event>> {
         const actor = buildActorContext(event);
-        return this.service.getOne(id, actor);
+        const entity = await this.service.getOne(id, actor);
+
+        return {
+            data: entity,
+            meta: { schema: describeQuerySchema(eventSchema, RECORD_QUERY_PARAMETERS) },
+        };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<Event> {
+    ): Promise<EntityRecordResponse<Event>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;
-        return entity;
+
+        return { data: entity, meta: {} };
     }
 }

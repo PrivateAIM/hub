@@ -6,7 +6,12 @@
  */
 
 import type { Project } from '@privateaim/core-kit';
-import type { ProjectCreatePayload, ProjectUpdatePayload } from '@privateaim/core-http-kit';
+import type {
+    EntityCollectionResponse,
+    EntityRecordResponse,
+    ProjectCreatePayload,
+    ProjectUpdatePayload,
+} from '@privateaim/core-http-kit';
 import {
     DBody,
     DContext,
@@ -20,7 +25,9 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IProjectService } from '../../../../../core/index.ts';
+import { projectSchema } from '../../../../../core/index.ts';
 import { buildActorContext } from '../../../request/index.ts';
 
 type ProjectControllerContext = {
@@ -39,30 +46,32 @@ export class ProjectController {
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<EntityCollectionResponse<Project>> {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query);
-        return { data, meta };
+        return { data, meta: { ...meta, schema: describeQuerySchema(projectSchema) } };
     }
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
         @DBody() data: ProjectCreatePayload,
         @DContext() event: IAppEvent,
-    ): Promise<Project> {
+    ): Promise<EntityRecordResponse<Project>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
         event.response.status = 201;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<Project> {
+    ): Promise<EntityRecordResponse<Project>> {
         const query = useRequestQuery(event);
-        return this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+
+        return { data: entity, meta: { schema: describeQuerySchema(projectSchema, RECORD_QUERY_PARAMETERS) } };
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
@@ -70,21 +79,21 @@ export class ProjectController {
         @DPath('id') id: string,
         @DBody() data: ProjectUpdatePayload,
         @DContext() event: IAppEvent,
-    ): Promise<Project> {
+    ): Promise<EntityRecordResponse<Project>> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ): Promise<Project> {
+    ): Promise<EntityRecordResponse<Project>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
         event.response.status = 202;
-        return entity;
+        return { data: entity, meta: {} };
     }
 }

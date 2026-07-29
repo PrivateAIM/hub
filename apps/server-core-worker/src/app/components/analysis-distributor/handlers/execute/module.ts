@@ -81,7 +81,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             value,
         );
 
-        const analysis = await this.coreClient.analysis.getOne(value.id);
+        const { data: analysis } = await this.coreClient.analysis.getOne(value.id);
 
         // `analysis.registry_id` is nullable — it is unset until the distributor
         // assigns one, and the registry FK detaches (SET NULL) if the registry is
@@ -91,7 +91,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             throw BuilderError.registryNotFound();
         }
 
-        const registry = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
+        const { data: registry } = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
 
         const analysisNodes = await getManyAll((page) => this.coreClient.analysisNode.getMany({
             filters: { analysis_id: analysis.id },

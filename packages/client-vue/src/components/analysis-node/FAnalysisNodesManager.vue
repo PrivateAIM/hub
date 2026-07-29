@@ -114,7 +114,7 @@ export default defineComponent({
 
         const drop = wrapFnWithBusyState(busy, async (item: AnalysisNode) => {
             try {
-                const tmp = await coreClient.analysisNode.delete(item.id);
+                const { data: tmp } = await coreClient.analysisNode.delete(item.id);
                 handleDeleted(tmp);
             } catch (e) {
                 if (isClientErrorWithStatusCode(e, 404)) {
