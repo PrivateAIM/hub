@@ -43,14 +43,14 @@ export class RegistrySetupHandler implements ComponentHandler<
         // incoming
         let incomingEntity = await projectRepository.findOneBy({
             name: REGISTRY_INCOMING_PROJECT_NAME,
-            registry_id: entity.id,
+            registryId: entity.id,
         });
         if (!incomingEntity) {
             incomingEntity = projectRepository.create({
                 name: REGISTRY_INCOMING_PROJECT_NAME,
-                external_name: generateRegistryProjectId(),
+                externalName: generateRegistryProjectId(),
                 type: RegistryProjectType.INCOMING,
-                registry_id: entity.id,
+                registryId: entity.id,
                 public: false,
             });
         } else {
@@ -63,14 +63,14 @@ export class RegistrySetupHandler implements ComponentHandler<
         // outgoing
         let outgoingEntity = await projectRepository.findOneBy({
             name: REGISTRY_OUTGOING_PROJECT_NAME,
-            registry_id: entity.id,
+            registryId: entity.id,
         });
         if (!outgoingEntity) {
             outgoingEntity = projectRepository.create({
                 name: REGISTRY_OUTGOING_PROJECT_NAME,
-                external_name: generateRegistryProjectId(),
+                externalName: generateRegistryProjectId(),
                 type: RegistryProjectType.OUTGOING,
-                registry_id: entity.id,
+                registryId: entity.id,
                 public: false,
             });
         } else {
@@ -82,15 +82,15 @@ export class RegistrySetupHandler implements ComponentHandler<
 
         // master ( images )
         let masterImagesEntity = await projectRepository.findOneBy({
-            external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-            registry_id: entity.id,
+            externalName: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+            registryId: entity.id,
         });
         if (!masterImagesEntity) {
             masterImagesEntity = projectRepository.create({
                 name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-                external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME, // todo: can this be generated?
+                externalName: REGISTRY_MASTER_IMAGE_PROJECT_NAME, // todo: can this be generated?
                 type: RegistryProjectType.MASTER_IMAGES,
-                registry_id: entity.id,
+                registryId: entity.id,
                 public: true,
             });
         } else {
@@ -102,7 +102,7 @@ export class RegistrySetupHandler implements ComponentHandler<
         // -----------------------------------------------
 
         const entities = await projectRepository.find({
-            where: { registry_id: entity.id },
+            where: { registryId: entity.id },
             select: { id: true },
         });
 

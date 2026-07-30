@@ -89,7 +89,7 @@ export default defineComponent({
         );
 
         // Stage files, deduping by relative path. The server enforces a unique
-        // (bucket_id, path), so re-adding the same path would only produce a
+        // (bucketId, path), so re-adding the same path would only produce a
         // duplicate row and a 409 on upload — drop it here instead.
         const addStaged = (staged: StagedFile[]) => {
             const existing = new Set(tempFiles.value.map((item) => item.path));

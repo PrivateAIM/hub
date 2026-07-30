@@ -23,7 +23,7 @@ Each realm is an isolated organizational unit. Resources created within a realm 
 
 ## Realm Scoping
 
-All realm-scoped entities carry a `realm_id` column. Access is enforced by the `isRealmResourceWritable()` helper in every entity service:
+All realm-scoped entities carry a `realmId` property (the `realm_id` column). Access is enforced by the `isRealmResourceWritable()` helper in every entity service:
 
 ```
 Master realm member  →  can read/write all resources

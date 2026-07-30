@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type { Message, MessageParty } from '@privateaim/messenger-kit';
 import type { IMessageRepository, MessagePersistInput } from '../../../../../src/core/entities/message/types.ts';
 
-type StoredMessage = Message & { expires_at: string };
+type StoredMessage = Message & { expiresAt: string };
 
 export class FakeMessageRepository implements IMessageRepository {
     public messages: StoredMessage[] = [];
@@ -23,7 +23,7 @@ export class FakeMessageRepository implements IMessageRepository {
                 ...item,
                 id: randomUUID(),
                 // monotonic ISO timestamp so ordering is deterministic in tests
-                created_at: new Date(Date.now() + this.counter).toISOString(),
+                createdAt: new Date(Date.now() + this.counter).toISOString(),
             };
             this.messages.push(message);
             return message;
@@ -32,8 +32,8 @@ export class FakeMessageRepository implements IMessageRepository {
 
     async findManyForRecipient(recipient: MessageParty, limit: number): Promise<Message[]> {
         return this.messages
-            .filter((message) => message.recipient_type === recipient.type && message.recipient_id === recipient.id)
-            .sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id))
+            .filter((message) => message.recipientType === recipient.type && message.recipientId === recipient.id)
+            .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id))
             .slice(0, limit);
     }
 
@@ -41,8 +41,8 @@ export class FakeMessageRepository implements IMessageRepository {
         const set = new Set(ids);
         this.messages = this.messages.filter(
             (message) => !(
-                message.recipient_type === recipient.type &&
-                message.recipient_id === recipient.id &&
+                message.recipientType === recipient.type &&
+                message.recipientId === recipient.id &&
                 set.has(message.id)
             ),
         );
@@ -51,7 +51,7 @@ export class FakeMessageRepository implements IMessageRepository {
     async deleteExpired(now: Date): Promise<number> {
         const before = this.messages.length;
         const cutoff = now.getTime();
-        this.messages = this.messages.filter((message) => new Date(message.expires_at).getTime() >= cutoff);
+        this.messages = this.messages.filter((message) => new Date(message.expiresAt).getTime() >= cutoff);
         return before - this.messages.length;
     }
 }

@@ -68,10 +68,10 @@ export function createEntityManager<
 
             if (!realmId && entity.value) {
                 if (
-                    hasOwnProperty(entity.value, 'realm_id') &&
-                    typeof entity.value.realm_id === 'string'
+                    hasOwnProperty(entity.value, 'realmId') &&
+                    typeof entity.value.realmId === 'string'
                 ) {
-                    return entity.value.realm_id;
+                    return entity.value.realmId;
                 }
             }
 

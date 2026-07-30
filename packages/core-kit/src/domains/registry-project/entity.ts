@@ -21,37 +21,37 @@ export interface RegistryProject {
     // ------------------------------------------------------------------
 
     // a-z0-9-_ {0,255}
-    external_name: string;
+    externalName: string;
 
-    external_id: string | null;
-
-    // ------------------------------------------------------------------
-
-    account_id: string | null;
-
-    account_name: string | null;
-
-    account_secret: string | null;
+    externalId: string | null;
 
     // ------------------------------------------------------------------
 
-    webhook_name: string | null;
+    accountId: string | null;
 
-    webhook_exists: boolean | null;
+    accountName: string | null;
+
+    accountSecret: string | null;
 
     // ------------------------------------------------------------------
 
-    registry_id: Registry['id'];
+    webhookName: string | null;
+
+    webhookExists: boolean | null;
+
+    // ------------------------------------------------------------------
+
+    registryId: Registry['id'];
 
     registry: Registry;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'] | null;
+    realmId: Realm['id'] | null;
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 }

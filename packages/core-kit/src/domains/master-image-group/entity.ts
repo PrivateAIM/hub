@@ -12,11 +12,11 @@ export interface MasterImageGroup {
 
     path: string;
 
-    virtual_path: string;
+    virtualPath: string;
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 }

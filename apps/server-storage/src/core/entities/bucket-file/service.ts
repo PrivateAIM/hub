@@ -60,7 +60,7 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
         ) {
             await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_UPDATE });
 
-            if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
                 throw new PermissionDeniedError();
             }
         }
@@ -78,13 +78,13 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
 
     private isOwnedByActor(entity: BucketFile, actor: ActorContext): boolean {
         if (!actor.identity) return false;
-        return entity.actor_type === actor.identity.type &&
-            entity.actor_id === actor.identity.id;
+        return entity.actorType === actor.identity.type &&
+            entity.actorId === actor.identity.id;
     }
 
     private isBucketOwnedByActor(entity: BucketFile, actor: ActorContext): boolean {
         if (!actor.identity || !entity.bucket) return false;
-        return entity.bucket.actor_type === actor.identity.type &&
-            entity.bucket.actor_id === actor.identity.id;
+        return entity.bucket.actorType === actor.identity.type &&
+            entity.bucket.actorId === actor.identity.id;
     }
 }

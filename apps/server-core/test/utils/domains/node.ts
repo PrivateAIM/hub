@@ -11,7 +11,7 @@ import type { Node } from '@privateaim/core-kit';
 export function createTestNode(entity: Partial<Node> = {}) : Partial<Node> {
     return {
         name: faker.string.alpha({ length: 16, casing: 'lower' }),
-        external_name: faker.string.alpha({ length: 16, casing: 'lower' }),
+        externalName: faker.string.alpha({ length: 16, casing: 'lower' }),
         ...entity,
     };
 }

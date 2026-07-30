@@ -33,7 +33,7 @@ describe('VictoriaLogsLogStore', () => {
     describe('isValidLabelKey', () => {
         it('should accept alphanumeric keys', () => {
             expect(store.testIsValidLabelKey('channel')).toBe(true);
-            expect(store.testIsValidLabelKey('node_id')).toBe(true);
+            expect(store.testIsValidLabelKey('nodeId')).toBe(true);
             expect(store.testIsValidLabelKey('Key123')).toBe(true);
             expect(store.testIsValidLabelKey('_private')).toBe(true);
         });

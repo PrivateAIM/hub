@@ -71,36 +71,36 @@ describe('core/query default field projection', () => {
 
     it('analysis-node projects all default fields', async () => {
         await expectRoundTrip(AnalysisNodeEntity, analysisNodeSchema, {
-            analysis_id: 'a-1',
-            analysis_realm_id: 'ar-1',
-            node_id: 'n-1',
-            node_realm_id: 'nr-1',
-            approval_status: AnalysisNodeApprovalStatus.APPROVED,
-            execution_status: ProcessStatus.EXECUTING,
+            analysisId: 'a-1',
+            analysisRealmId: 'ar-1',
+            nodeId: 'n-1',
+            nodeRealmId: 'nr-1',
+            approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            executionStatus: ProcessStatus.EXECUTING,
             comment: 'note',
-            execution_progress: 42,
-            artifact_tag: 'tag',
-            artifact_digest: 'sha256:abc',
+            executionProgress: 42,
+            artifactTag: 'tag',
+            artifactDigest: 'sha256:abc',
         });
     });
 
     it('project-node projects all default fields', async () => {
         await expectRoundTrip(ProjectNodeEntity, projectNodeSchema, {
-            project_id: 'p-1',
-            project_realm_id: 'pr-1',
-            node_id: 'n-2',
-            node_realm_id: 'nr-2',
+            projectId: 'p-1',
+            projectRealmId: 'pr-1',
+            nodeId: 'n-2',
+            nodeRealmId: 'nr-2',
             comment: 'note',
         });
     });
 
     it('analysis-node-event projects all default fields', async () => {
         await expectRoundTrip(AnalysisNodeEventEntity, analysisNodeEventSchema, {
-            analysis_id: 'a-2',
-            analysis_realm_id: 'ar-2',
-            node_id: 'n-3',
-            node_realm_id: 'nr-3',
-            event_id: 'e-1',
+            analysisId: 'a-2',
+            analysisRealmId: 'ar-2',
+            nodeId: 'n-3',
+            nodeRealmId: 'nr-3',
+            eventId: 'e-1',
         });
     });
 
@@ -108,7 +108,7 @@ describe('core/query default field projection', () => {
         await expectRoundTrip(MasterImageGroupEntity, masterImageGroupSchema, {
             name: 'group',
             path: 'data/group',
-            virtual_path: 'python/group',
+            virtualPath: 'python/group',
         });
     });
 });

@@ -24,26 +24,28 @@ import type { Client, Realm } from '@authup/core-kit';
 import { RegistryProjectEntity } from './registry-project.ts';
 import { RegistryEntity } from './registry.ts';
 
-@Unique(['external_name', 'registry_id'])
-@Unique(['name', 'realm_id'])
+@Unique(['externalName', 'registryId'])
+@Unique(['name', 'realmId'])
 @Entity({ name: 'nodes' })
 export class NodeEntity implements Node {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({
+        name: 'external_name',
         type: 'varchar', 
         length: 64, 
         nullable: true, 
     })
-    external_name: string;
+    externalName: string;
 
     @Column({
+        name: 'public_key',
         type: 'varchar',
         length: 4096,
         nullable: true,
     })
-    public_key: string;
+    publicKey: string;
 
     @Column({ type: 'varchar', length: 128 })
     name: string;
@@ -68,34 +70,42 @@ export class NodeEntity implements Node {
     // client credentials) that merely *points at* registry-side rows — deleting
     // a registry or a registry project must never take the node down with it.
     // The node is simply left unassigned and can be reconnected.
-    @Column({ nullable: true })
-    registry_id: Registry['id'] | null;
+    @Column({ name: 'registry_id', nullable: true })
+    registryId: Registry['id'] | null;
 
     @ManyToOne(() => RegistryEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'registry_id' })
     registry: Registry | null;
 
-    @Column({ nullable: true })
-    registry_project_id: RegistryProject['id'] | null;
+    @Column({ name: 'registry_project_id', nullable: true })
+    registryProjectId: RegistryProject['id'] | null;
 
     @ManyToOne(() => RegistryProjectEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'registry_project_id' })
-    registry_project: RegistryProject | null;
+    registryProject: RegistryProject | null;
 
-    @Column({ type: 'uuid', nullable: true })
-    client_id: Client['id'] | null;
+    @Column({
+        name: 'client_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    clientId: Client['id'] | null;
 
-    @Column({ type: 'uuid', nullable: true })
-    robot_id: Client['id'] | null;
+    @Column({
+        name: 'robot_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    robotId: Client['id'] | null;
 
-    @Column({ type: 'uuid' })
-    realm_id: Realm['id'];
+    @Column({ name: 'realm_id', type: 'uuid' })
+    realmId: Realm['id'];
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 }

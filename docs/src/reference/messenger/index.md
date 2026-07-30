@@ -76,7 +76,7 @@ The payload is never sent over any wakeup channel — it carries only the recipi
 
 Hexagonal, like the other Hub services:
 
-- **`adapters/database/`** — single `message` TypeORM entity (uuid pk, `created_at` ordering, bigint-epoch `expires_at`), PostgreSQL + MySQL migrations
+- **`adapters/database/`** — single `message` TypeORM entity (uuid pk, `createdAt` ordering, bigint-epoch `expiresAt`), PostgreSQL + MySQL migrations
 - **`adapters/http/`** — thin REST controllers (`/messages` send/pull/ack) + the SSE wakeup stream (`/messages/stream`, via `routup.createEventStream`)
 - **`adapters/socket/`** — connection room-join (keyed by identity) + the legacy `messagePending` socket emit; the legacy relay/presence handlers (and this socket wakeup) retire at decommission
 - **`core/`** — `MessageService` (send/pull/ack + long-poll), `IMessageRepository` port, `IMessageWakeup` port (in-memory + redis implementations)

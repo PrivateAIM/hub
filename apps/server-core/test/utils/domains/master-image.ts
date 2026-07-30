@@ -12,9 +12,9 @@ export function createTestMasterImage() : Partial<MasterImage> {
     const name = faker.string.alpha({ length: 16, casing: 'lower' });
 
     return {
-        group_virtual_path: name,
+        groupVirtualPath: name,
         name: 'base',
         path: `data\\${name}\\base`,
-        virtual_path: `python/${name}`,
+        virtualPath: `python/${name}`,
     };
 }

@@ -43,13 +43,13 @@ export class RegistryValidator extends Container<Registry> {
         );
 
         this.mount(
-            'account_name',
+            'accountName',
             { optional: true },
             createValidator(z.string().min(3).max(256).nullable()),
         );
 
         this.mount(
-            'account_secret',
+            'accountSecret',
             { optional: true },
             createValidator(z.string().min(3).max(256).nullable()),
         );

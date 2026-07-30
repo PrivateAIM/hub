@@ -17,22 +17,22 @@ export class AnalysisDistributorCommandChecker {
      */
     static canStart(entity: Analysis) {
         if (
-            !entity.build_status ||
-            entity.build_status !== ProcessStatus.EXECUTED
+            !entity.buildStatus ||
+            entity.buildStatus !== ProcessStatus.EXECUTED
         ) {
             throw new AnalysisError('The analysis is not built yet.');
         }
 
         // we haven't started distribution yet.
-        if (!entity.distribution_status) {
+        if (!entity.distributionStatus) {
             return;
         }
 
         if (
-            entity.distribution_status !== ProcessStatus.FAILED &&
-            entity.distribution_status !== ProcessStatus.STOPPED
+            entity.distributionStatus !== ProcessStatus.FAILED &&
+            entity.distributionStatus !== ProcessStatus.STOPPED
         ) {
-            throw new AnalysisError(`The analysis can not be distributed in state ${  entity.distribution_status}`);
+            throw new AnalysisError(`The analysis can not be distributed in state ${  entity.distributionStatus}`);
         }
     }
 
@@ -42,15 +42,15 @@ export class AnalysisDistributorCommandChecker {
      * @param entity
      */
     static canCheck(entity: Analysis) {
-        if (!entity.build_status) {
+        if (!entity.buildStatus) {
             throw new AnalysisError('The analysis build process has not been initialized.');
         }
 
-        if (entity.build_status !== ProcessStatus.EXECUTED) {
+        if (entity.buildStatus !== ProcessStatus.EXECUTED) {
             throw new AnalysisError('The analysis build process has not been finished.');
         }
 
-        if (!entity.distribution_status) {
+        if (!entity.distributionStatus) {
             throw new AnalysisError('The analysis distribution process has not been initialized.');
         }
 

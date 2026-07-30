@@ -46,10 +46,10 @@ export default defineComponent({
         const clipboard = useClipboard();
 
         const init = () => {
-            if (props.entity.public_key) {
-                publicKey.value = isHex(props.entity.public_key) ?
-                    hexToUTF8(props.entity.public_key) :
-                    props.entity.public_key;
+            if (props.entity.publicKey) {
+                publicKey.value = isHex(props.entity.publicKey) ?
+                    hexToUTF8(props.entity.publicKey) :
+                    props.entity.publicKey;
             }
         };
 
@@ -82,7 +82,7 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                const { data: response } = await httpClient.node.update(props.entity.id, { public_key: publicKey.value });
+                const { data: response } = await httpClient.node.update(props.entity.id, { publicKey: publicKey.value });
 
                 emit('updated', response);
             } catch (e) {

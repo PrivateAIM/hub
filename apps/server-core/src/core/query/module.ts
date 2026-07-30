@@ -46,15 +46,26 @@ import type { DecodeQueryOptions } from './types.ts';
  * The registry deliberately lives in core (persistence-agnostic): the
  * schemas are security policy over the domain types, and services consume
  * them to decode wire queries into the rapiq IR. The database module only
- * executes the decoded IR and validates the schemas against the TypeORM
- * metadata at boot; the allow-lists themselves stay explicit and are never
- * auto-derived from entity metadata.
+ * executes the decoded IR; the allow-lists themselves stay explicit and are
+ * never auto-derived from entity metadata.
+ *
+ * Because an allow-list entry is a bare string, the compiler checks it against
+ * the domain type but never against the TypeORM column metadata. That gap is
+ * closed by `test/unit/core/query/schema-entity-parity.spec.ts`, which runs
+ * rapiq's `assertSchemaMatchesEntity` over every schema in this registry that
+ * has a backing entity.
  */
 export const schemaRegistry = new SchemaRegistry();
 
-// Schema is invariant in its record type, so a heterogeneous registry of
-// Schema<Node> | Schema<Analysis> | ... can only be typed as Schema<any>[].
-const schemas: Schema<any>[] = [
+/**
+ * Every entity schema the registry knows about. Exported so
+ * `test/unit/core/query/schema-entity-parity.spec.ts` can assert it covers ALL
+ * of them — otherwise a schema added later would silently go unguarded.
+ *
+ * Schema is invariant in its record type, so a heterogeneous registry of
+ * Schema<Node> | Schema<Analysis> | ... can only be typed as Schema<any>[].
+ */
+export const entitySchemas: Schema<any>[] = [
     analysisSchema,
     analysisBucketSchema,
     analysisBucketFileSchema,
@@ -69,7 +80,7 @@ const schemas: Schema<any>[] = [
     registryProjectSchema,
 ];
 
-for (const schema of schemas) {
+for (const schema of entitySchemas) {
     schemaRegistry.add(schema);
 }
 
@@ -132,7 +143,7 @@ export function appendQueryConditions(query: IQuery, ...conditions: ICondition[]
  * Flatten the equality leaf filters of a decoded query into a
  * `field -> string value` map. Used by the telemetry-backed log controllers,
  * which forward a small set of allow-listed scalar filters (e.g.
- * `analysis_id`, `node_id`, `level`) to the telemetry client as label
+ * `analysisId`, `nodeId`, `level`) to the telemetry client as label
  * equalities.
  *
  * Only positive equality (`eq`) leaves combined with `and` are meaningful

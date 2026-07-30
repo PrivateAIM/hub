@@ -41,7 +41,7 @@ export class EventComponentCreateHandler implements ComponentHandler<
             this.logger?.error({
                 message: e,
                 command: EventCommand.CREATE,
-                event_id: value.id,
+                eventId: value.id,
                 [LogFlag.REF_ID]: value.id,
                 [LogFlag.REF_TYPE]: DomainType.EVENT,
             });

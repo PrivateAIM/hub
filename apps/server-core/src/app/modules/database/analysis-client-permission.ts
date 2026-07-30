@@ -66,15 +66,15 @@ export class AnalysisClientPermissionService {
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
         });
 
-        if (!isRealmResourceWritable(actor.realm, analysis.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, analysis.realmId)) {
             throw new PermissionDeniedError();
         }
 
-        if (analysis.configuration_locked) {
+        if (analysis.configurationLocked) {
             throw new BadRequestError('The capabilities cannot be changed while the analysis configuration is locked.');
         }
 
-        if (!analysis.client_id) {
+        if (!analysis.clientId) {
             throw new BadRequestError('The analysis has no client provisioned yet.');
         }
     }
@@ -86,33 +86,33 @@ export class AnalysisClientPermissionService {
         // configuration, so it requires the same permission as changing it.
         await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
-        if (!analysis.client_id) {
+        if (!analysis.clientId) {
             return { data: [], meta: { total: 0 } };
         }
 
         const { data, meta } = await this.authup.clientPermission.getMany({
-            filters: { clientId: analysis.client_id },
+            filters: { clientId: analysis.clientId },
             relations: { permission: true },
         });
 
         return { data, meta };
     }
 
-    async create(analysisId: string, data: { permission_id?: string }, actor: ActorContext): Promise<ClientPermission> {
-        if (!data.permission_id) {
-            throw new BadRequestError('A permission_id is required.');
+    async create(analysisId: string, data: { permissionId?: string }, actor: ActorContext): Promise<ClientPermission> {
+        if (!data.permissionId) {
+            throw new BadRequestError('A permissionId is required.');
         }
 
         const analysis = await this.resolveAnalysis(analysisId);
         await this.assertWritable(analysis, actor);
 
-        const { data: permission } = await this.authup.permission.getOne(data.permission_id);
+        const { data: permission } = await this.authup.permission.getOne(data.permissionId);
         if (!ANALYSIS_SELF_PERMISSION_NAMES.includes(permission.name)) {
             throw new PermissionDeniedError('Only analysis self-capabilities can be assigned to an analysis client.');
         }
 
         const { data: clientPermission } = await this.authup.clientPermission.create({
-            clientId: analysis.client_id,
+            clientId: analysis.clientId,
             permissionId: permission.id,
         });
 
@@ -123,7 +123,7 @@ export class AnalysisClientPermissionService {
         const analysis = await this.resolveAnalysis(analysisId);
         await this.assertWritable(analysis, actor);
 
-        const { data } = await this.authup.clientPermission.getMany({ filters: { clientId: analysis.client_id, permissionId } });
+        const { data } = await this.authup.clientPermission.getMany({ filters: { clientId: analysis.clientId, permissionId } });
 
         const [clientPermission] = data;
         if (!clientPermission) {

@@ -28,7 +28,7 @@ export class FakeClientCredentialStore implements IClientCredentialStore {
         return {
             id: clientId,
             name: this.name,
-            display_name: null,
+            displayName: null,
             secret: this.secret,
         };
     }
@@ -38,7 +38,7 @@ export class FakeClientCredentialStore implements IClientCredentialStore {
         return {
             id: clientId,
             name: data?.name ?? this.name,
-            display_name: data?.display_name ?? null,
+            displayName: data?.displayName ?? null,
             secret: data?.secret ?? 'generated-secret',
         };
     }

@@ -16,11 +16,11 @@ import type {
 import type { ActorContext } from '@privateaim/server-kit';
 
 /**
- * The writable fields of a message — `id` and `created_at` are generated.
- * `expires_at` is an absolute expiry timestamp (ISO-8601), set from the TTL at send time.
+ * The writable fields of a message — `id` and `createdAt` are generated.
+ * `expiresAt` is an absolute expiry timestamp (ISO-8601), set from the TTL at send time.
  */
-export type MessagePersistInput = Omit<Message, 'id' | 'created_at'> & {
-    expires_at: string;
+export type MessagePersistInput = Omit<Message, 'id' | 'createdAt'> & {
+    expiresAt: string;
 };
 
 export interface IMessageRepository {
@@ -33,7 +33,7 @@ export interface IMessageRepository {
     /** Delete the named messages for `recipient` (type + id) — delete-on-ack. */
     ackByIds(recipient: MessageParty, ids: string[]): Promise<void>;
 
-    /** Delete messages whose absolute expiry (`expires_at`) is before `now` (TTL sweep); returns the count removed. */
+    /** Delete messages whose absolute expiry (`expiresAt`) is before `now` (TTL sweep); returns the count removed. */
     deleteExpired(now: Date): Promise<number>;
 }
 

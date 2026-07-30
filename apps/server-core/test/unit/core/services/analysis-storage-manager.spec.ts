@@ -24,12 +24,12 @@ function createTestBucket(overrides?: Partial<AnalysisBucket>): AnalysisBucket {
     return {
         id: 'bucket-1',
         type: AnalysisBucketType.CODE,
-        bucket_id: 'external-bucket-1',
-        analysis_id: 'analysis-1',
+        bucketId: 'external-bucket-1',
+        analysisId: 'analysis-1',
         analysis: {} as Analysis,
-        realm_id: 'realm-1',
-        created_at: new Date(),
-        updated_at: new Date(),
+        realmId: 'realm-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     };
 }
@@ -66,7 +66,7 @@ describe('AnalysisStorageManager', () => {
             expect(caller.getCallsFor('callCreate')).toHaveLength(bucketTypes.length);
         });
 
-        it('should create bucket with correct name and realm_id', async () => {
+        it('should create bucket with correct name and realmId', async () => {
             const analysis = createFullAnalysis();
             repository.seed(analysis);
 
@@ -76,7 +76,7 @@ describe('AnalysisStorageManager', () => {
             expect(createCalls).toHaveLength(1);
             expect(createCalls[0].data).toEqual({
                 name: buildAnalysisBucketName(AnalysisBucketType.CODE, 'analysis-1'),
-                realm_id: 'realm-1',
+                realmId: 'realm-1',
             });
         });
 
@@ -109,7 +109,7 @@ describe('AnalysisStorageManager', () => {
             const analysis = createFullAnalysis();
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
-                analysis_id: 'analysis-1',
+                analysisId: 'analysis-1',
                 type: AnalysisBucketType.CODE,
             }));
 
@@ -123,7 +123,7 @@ describe('AnalysisStorageManager', () => {
             const analysis = createFullAnalysis();
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
-                analysis_id: 'analysis-1',
+                analysisId: 'analysis-1',
                 type: AnalysisBucketType.CODE,
             }));
 
@@ -154,9 +154,9 @@ describe('AnalysisStorageManager', () => {
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
                 id: 'bucket-code',
-                analysis_id: 'analysis-1',
+                analysisId: 'analysis-1',
                 type: AnalysisBucketType.CODE,
-                bucket_id: 'ext-code',
+                bucketId: 'ext-code',
             }));
 
             await storageManager.remove(analysis, { type: AnalysisBucketType.CODE });
@@ -171,9 +171,9 @@ describe('AnalysisStorageManager', () => {
             const analysis = createFullAnalysis();
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
-                analysis_id: 'analysis-1',
+                analysisId: 'analysis-1',
                 type: AnalysisBucketType.CODE,
-                bucket_id: 'ext-code',
+                bucketId: 'ext-code',
             }));
 
             await storageManager.remove(analysis, { type: AnalysisBucketType.CODE });
@@ -199,21 +199,21 @@ describe('AnalysisStorageManager', () => {
             bucketRepository.seed([
                 createTestBucket({
                     id: 'bucket-code',
-                    analysis_id: 'analysis-1',
+                    analysisId: 'analysis-1',
                     type: AnalysisBucketType.CODE,
-                    bucket_id: 'ext-code',
+                    bucketId: 'ext-code',
                 }),
                 createTestBucket({
                     id: 'bucket-result',
-                    analysis_id: 'analysis-1',
+                    analysisId: 'analysis-1',
                     type: AnalysisBucketType.RESULT,
-                    bucket_id: 'ext-result',
+                    bucketId: 'ext-result',
                 }),
                 createTestBucket({
                     id: 'bucket-temp',
-                    analysis_id: 'analysis-1',
+                    analysisId: 'analysis-1',
                     type: AnalysisBucketType.TEMP,
-                    bucket_id: 'ext-temp',
+                    bucketId: 'ext-temp',
                 }),
             ]);
 

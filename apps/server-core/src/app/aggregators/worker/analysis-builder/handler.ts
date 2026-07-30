@@ -35,17 +35,17 @@ export async function handleAnalysisBuilderEvent(
 
     switch (context.key) {
         case AnalysisBuilderEvent.EXECUTION_STARTED: {
-            entity.build_status = ProcessStatus.STARTED;
-            entity.build_progress = 0;
+            entity.buildStatus = ProcessStatus.STARTED;
+            entity.buildProgress = 0;
             break;
         }
         case AnalysisBuilderEvent.EXECUTION_PROGRESS: {
             const temp = value as AnalysisBuilderExecutionProgressPayload;
             if (
-                !entity.build_progress ||
-                temp.progress.percent >= entity.build_progress
+                !entity.buildProgress ||
+                temp.progress.percent >= entity.buildProgress
             ) {
-                entity.build_progress = Math.min(temp.progress.percent, 100);
+                entity.buildProgress = Math.min(temp.progress.percent, 100);
             }
             break;
         }
@@ -54,17 +54,17 @@ export async function handleAnalysisBuilderEvent(
             return;
         }
         case AnalysisBuilderEvent.EXECUTION_FAILED: {
-            entity.build_status = ProcessStatus.FAILED;
+            entity.buildStatus = ProcessStatus.FAILED;
             break;
         }
         case AnalysisBuilderEvent.EXECUTION_FINISHED: {
             const temp = value as AnalysisBuilderExecutionFinishedPayload;
 
-            entity.build_hash = temp.hash ?? null;
-            entity.build_os = temp.os ?? null;
-            entity.build_size = temp.size ?? null;
-            entity.build_status = ProcessStatus.EXECUTED;
-            entity.build_progress = 100;
+            entity.buildHash = temp.hash ?? null;
+            entity.buildOs = temp.os ?? null;
+            entity.buildSize = temp.size ?? null;
+            entity.buildStatus = ProcessStatus.EXECUTED;
+            entity.buildProgress = 100;
             break;
         }
         case AnalysisBuilderEvent.CHECK_FINISHED: {
@@ -73,20 +73,20 @@ export async function handleAnalysisBuilderEvent(
                 return;
             }
 
-            entity.build_status = temp.status;
+            entity.buildStatus = temp.status;
 
             if (temp.status === ProcessStatus.EXECUTED) {
-                entity.build_progress = 100;
-                entity.build_hash = temp.hash ?? entity.build_hash;
-                entity.build_os = temp.os ?? entity.build_os;
-                entity.build_size = temp.size ?? entity.build_size;
+                entity.buildProgress = 100;
+                entity.buildHash = temp.hash ?? entity.buildHash;
+                entity.buildOs = temp.os ?? entity.buildOs;
+                entity.buildSize = temp.size ?? entity.buildSize;
             } else if (temp.status === ProcessStatus.FAILED) {
                 // the image is verifiably gone (e.g. docker daemon data loss) —
                 // reset the build artifacts so the build can be retriggered.
-                entity.build_progress = 0;
-                entity.build_hash = temp.hash ?? null;
-                entity.build_os = temp.os ?? null;
-                entity.build_size = temp.size ?? null;
+                entity.buildProgress = 0;
+                entity.buildHash = temp.hash ?? null;
+                entity.buildOs = temp.os ?? null;
+                entity.buildSize = temp.size ?? null;
             }
         }
     }

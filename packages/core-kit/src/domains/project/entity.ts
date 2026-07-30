@@ -24,7 +24,7 @@ export interface Project {
     /**
      * Human-readable label shown in the UI. Falls back to `name` when not set.
      */
-    display_name: string | null;
+    displayName: string | null;
 
     description: string | null;
 
@@ -36,21 +36,21 @@ export interface Project {
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'];
+    realmId: Realm['id'];
 
-    client_id: Client['id'] | null;
+    clientId: Client['id'] | null;
 
-    robot_id: Client['id'] | null;
+    robotId: Client['id'] | null;
 
-    user_id: User['id'] | null;
+    userId: User['id'] | null;
 
-    master_image_id: MasterImage['id'] | null;
+    masterImageId: MasterImage['id'] | null;
 
-    master_image: MasterImage | null;
+    masterImage: MasterImage | null;
 }

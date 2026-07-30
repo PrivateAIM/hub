@@ -58,7 +58,7 @@ export default defineNuxtComponent({
     <FNodeCrypto
         v-if="entity"
         :entity="entity"
-        :realm-id="entity.realm_id"
+        :realm-id="entity.realmId"
         @key-copied="handleKeyCopied"
         @key-pair-generated="handleKeyPairGenerated"
         @failed="handleFailed"

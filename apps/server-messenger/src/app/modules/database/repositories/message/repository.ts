@@ -24,21 +24,21 @@ export class MessageRepositoryAdapter implements IMessageRepository {
     }
 
     async findManyForRecipient(recipient: MessageParty, limit: number): Promise<Message[]> {
-        // select only the public Message fields — `expires_at` is internal (TTL)
+        // select only the public Message fields — `expiresAt` is internal (TTL)
         return this.repository.createQueryBuilder('message')
             .select([
                 'message.id',
-                'message.sender_type',
-                'message.sender_id',
-                'message.recipient_type',
-                'message.recipient_id',
+                'message.senderType',
+                'message.senderId',
+                'message.recipientType',
+                'message.recipientId',
                 'message.data',
                 'message.metadata',
-                'message.created_at',
+                'message.createdAt',
             ])
-            .where('message.recipient_type = :recipientType', { recipientType: recipient.type })
-            .andWhere('message.recipient_id = :recipientId', { recipientId: recipient.id })
-            .orderBy('message.created_at', 'ASC')
+            .where('message.recipientType = :recipientType', { recipientType: recipient.type })
+            .andWhere('message.recipientId = :recipientId', { recipientId: recipient.id })
+            .orderBy('message.createdAt', 'ASC')
             .addOrderBy('message.id', 'ASC')
             .limit(limit)
             .getMany();
@@ -52,8 +52,8 @@ export class MessageRepositoryAdapter implements IMessageRepository {
         await this.repository.createQueryBuilder()
             .delete()
             .from(MessageEntity)
-            .where('recipient_type = :recipientType', { recipientType: recipient.type })
-            .andWhere('recipient_id = :recipientId', { recipientId: recipient.id })
+            .where('recipientType = :recipientType', { recipientType: recipient.type })
+            .andWhere('recipientId = :recipientId', { recipientId: recipient.id })
             .andWhere('id IN (:...ids)', { ids })
             .execute();
     }
@@ -62,7 +62,7 @@ export class MessageRepositoryAdapter implements IMessageRepository {
         const result = await this.repository.createQueryBuilder()
             .delete()
             .from(MessageEntity)
-            .where('expires_at < :now', { now })
+            .where('expiresAt < :now', { now })
             .execute();
 
         return result.affected ?? 0;

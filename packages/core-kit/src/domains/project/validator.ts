@@ -40,7 +40,7 @@ export class ProjectValidator extends Container<Project> {
 
         // Human-readable label shown in the UI. Free-form, optional.
         this.mount(
-            'display_name',
+            'displayName',
             { optional: true },
             createValidator(z.string().min(3).max(256).nullable()),
         );
@@ -52,7 +52,7 @@ export class ProjectValidator extends Container<Project> {
         );
 
         this.mount(
-            'master_image_id',
+            'masterImageId',
             { optional: true },
             createValidator(z.uuid().nullable()),
         );

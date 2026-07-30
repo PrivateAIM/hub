@@ -42,9 +42,9 @@ describe('core/entities/message/service', () => {
         }, actorFor(sender, 'user'));
 
         expect(messages).toHaveLength(2);
-        expect(messages[0].sender_type).toBe('user');
-        expect(messages[0].sender_id).toBe(sender);
-        expect(messages.map((m) => m.recipient_id).sort()).toEqual([recipientA, recipientB].sort());
+        expect(messages[0].senderType).toBe('user');
+        expect(messages[0].senderId).toBe(sender);
+        expect(messages.map((m) => m.recipientId).sort()).toEqual([recipientA, recipientB].sort());
         expect(messages[0].metadata).toEqual({ analysisId: 'analysis-1' });
     });
 

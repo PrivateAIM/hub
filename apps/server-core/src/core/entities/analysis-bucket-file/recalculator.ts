@@ -37,7 +37,7 @@ export class AnalysisFileMetadataRecalculator implements IAnalysisFileMetadataRe
         const cloned = { ...entity };
 
         const rootFile = await this.bucketFileRepository.findRootCodeFile(entity.id);
-        entity.configuration_entrypoint_valid = !!rootFile;
+        entity.configurationEntrypointValid = !!rootFile;
 
         if (hasAnalysisChanged(cloned, entity)) {
             await this.analysisRepository.save(entity);

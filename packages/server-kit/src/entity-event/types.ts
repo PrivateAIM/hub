@@ -19,19 +19,19 @@ export type EntityEventDestinationsFn<
 > = (data: T) => EntityEventDestination[];
 
 export type EntityEventMetadata = {
-    ref_type: string,
-    ref_id?: string,
+    refType: string,
+    refId?: string,
 
     event: string,
 
-    request_path?: string | null,
-    request_method?: string | null;
-    request_ip_address?: string | null;
-    request_user_agent?: string | null;
+    requestPath?: string | null,
+    requestMethod?: string | null;
+    requestIpAddress?: string | null;
+    requestUserAgent?: string | null;
 
-    actor_type?: string | null;
-    actor_id?: string | null;
-    actor_name?: string | null;
+    actorType?: string | null;
+    actorId?: string | null;
+    actorName?: string | null;
 };
 
 export type EntityEventPublishOptions<

@@ -29,13 +29,13 @@ function createTestProject(overrides?: Partial<Project>): Project {
         description: null,
         nodes: 0,
         analyses: 0,
-        created_at: new Date(),
-        updated_at: new Date(),
-        realm_id: 'realm-1',
-        client_id: null,
-        robot_id: null,
-        user_id: 'user-1',
-        master_image_id: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        realmId: 'realm-1',
+        clientId: null,
+        robotId: null,
+        userId: 'user-1',
+        masterImageId: null,
         ...overrides,
     } as Project;
 }
@@ -90,14 +90,14 @@ describe('ProjectService', () => {
             expect(result.name).toMatch(/^[a-z0-9-_.]+$/);
         });
 
-        it('should keep a provided name and display_name', async () => {
+        it('should keep a provided name and displayName', async () => {
             const result = await service.create(
-                { name: 'my-project', display_name: 'My Project' },
+                { name: 'my-project', displayName: 'My Project' },
                 createAllowAllActor(),
             );
 
             expect(result.name).toBe('my-project');
-            expect(result.display_name).toBe('My Project');
+            expect(result.displayName).toBe('My Project');
         });
 
         it('should reject a name that is not url-friendly', async () => {
@@ -142,7 +142,7 @@ describe('ProjectService', () => {
         });
 
         it('should enforce realm writability for non-master realm', async () => {
-            repository.seed(createTestProject({ realm_id: 'other-realm' }));
+            repository.seed(createTestProject({ realmId: 'other-realm' }));
 
             const actor = createNonMasterRealmActor('realm-1');
             await expect(
@@ -151,7 +151,7 @@ describe('ProjectService', () => {
         });
 
         it('should allow master realm to delete any project', async () => {
-            repository.seed(createTestProject({ realm_id: 'other-realm' }));
+            repository.seed(createTestProject({ realmId: 'other-realm' }));
 
             const result = await service.delete('project-1', createMasterRealmActor());
             expect(result.id).toBe('project-1');

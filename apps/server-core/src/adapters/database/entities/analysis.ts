@@ -44,12 +44,13 @@ export class AnalysisEntity implements Analysis {
     name: string;
 
     @Column({
+        name: 'display_name',
         type: 'varchar',
         length: 256,
         nullable: true,
         default: null,
     })
-    display_name: string | null;
+    displayName: string | null;
 
     @Column({ type: 'text', nullable: true })
     description: string | null;
@@ -62,121 +63,160 @@ export class AnalysisEntity implements Analysis {
     nodes: number;
 
     @Column({
+        name: 'nodes_approved',
         type: 'int', 
         unsigned: true, 
         default: 0, 
     })
-    nodes_approved: number;
+    nodesApproved: number;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'boolean', default: false })
-    configuration_locked: boolean;
+    @Column({
+        name: 'configuration_locked', 
+        type: 'boolean', 
+        default: false, 
+    })
+    configurationLocked: boolean;
 
-    @Column({ type: 'boolean', default: false })
-    configuration_entrypoint_valid: boolean;
+    @Column({
+        name: 'configuration_entrypoint_valid', 
+        type: 'boolean', 
+        default: false, 
+    })
+    configurationEntrypointValid: boolean;
 
-    @Column({ type: 'boolean', default: false })
-    configuration_image_valid: boolean;
+    @Column({
+        name: 'configuration_image_valid', 
+        type: 'boolean', 
+        default: false, 
+    })
+    configurationImageValid: boolean;
 
-    @Column({ type: 'boolean', default: false })
-    configuration_node_aggregator_valid: boolean;
+    @Column({
+        name: 'configuration_node_aggregator_valid', 
+        type: 'boolean', 
+        default: false, 
+    })
+    configurationNodeAggregatorValid: boolean;
 
-    @Column({ type: 'boolean', default: false })
-    configuration_node_default_valid: boolean;
+    @Column({
+        name: 'configuration_node_default_valid', 
+        type: 'boolean', 
+        default: false, 
+    })
+    configurationNodeDefaultValid: boolean;
 
-    @Column({ type: 'boolean', default: false })
-    configuration_nodes_valid: boolean;
+    @Column({
+        name: 'configuration_nodes_valid', 
+        type: 'boolean', 
+        default: false, 
+    })
+    configurationNodesValid: boolean;
 
     // ------------------------------------------------------------------
 
     @Index()
     @Column({
+        name: 'distribution_status',
         type: 'varchar', 
         length: 64, 
         nullable: true, 
         default: null,
     })
-    distribution_status: `${ProcessStatus}` | null;
+    distributionStatus: `${ProcessStatus}` | null;
 
     @Column({
+        name: 'distribution_progress',
         type: 'int', 
         unsigned: true, 
         nullable: true, 
         default: null,
     })
-    distribution_progress: number | null;
+    distributionProgress: number | null;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'boolean', default: false })
-    build_nodes_valid: boolean;
+    @Column({
+        name: 'build_nodes_valid', 
+        type: 'boolean', 
+        default: false, 
+    })
+    buildNodesValid: boolean;
 
     @Index()
     @Column({
+        name: 'build_status',
         type: 'varchar', 
         length: 64, 
         nullable: true, 
         default: null,
     })
-    build_status: `${ProcessStatus}` | null;
+    buildStatus: `${ProcessStatus}` | null;
 
     @Column({
+        name: 'build_progress',
         type: 'int', 
         unsigned: true, 
         nullable: true, 
         default: null,
     })
-    build_progress: number | null;
+    buildProgress: number | null;
 
     // sha512:<128 hex> = 135
     @Column({
+        name: 'build_hash',
         type: 'varchar',
         length: 135,
         nullable: true,
         default: null,
     })
-    build_hash: string | null;
+    buildHash: string | null;
 
     @Column({
+        name: 'build_os',
         type: 'varchar',
         length: 10,
         nullable: true,
         default: null,
     })
-    build_os: string | null;
+    buildOs: string | null;
 
     @Column({
+        name: 'build_size',
         type: 'bigint',
         unsigned: true,
         nullable: true,
         default: null,
         transformer: bigintNumberTransformer,
     })
-    build_size: number | null;
+    buildSize: number | null;
 
     // ------------------------------------------------------------------
 
     @Index()
     @Column({
+        name: 'execution_status',
         type: 'varchar', 
         length: 64, 
         nullable: true, 
         default: null,
     })
-    execution_status: `${ProcessStatus}` | null;
+    executionStatus: `${ProcessStatus}` | null;
 
     @Column({
+        name: 'execution_progress',
         type: 'int', 
         unsigned: true, 
         nullable: true, 
         default: null,
     })
-    execution_progress: number | null;
+    executionProgress: number | null;
 
     // ------------------------------------------------------------------
 
     @Column({
+        name: 'image_command_arguments',
         type: 'text',
         nullable: true,
         transformer: {
@@ -188,25 +228,25 @@ export class AnalysisEntity implements Analysis {
             },
         },
     })
-    image_command_arguments: MasterImageCommandArgument[] | null;
+    imageCommandArguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    // Detach on delete rather than cascade. A null `registry_id` is the normal
+    // Detach on delete rather than cascade. A null `registryId` is the normal
     // pre-distribution state — `AnalysisDistributor.assignRegistry()` fills it
     // in lazily — so losing the registry returns the analysis to a state the
     // domain already handles. Cascading instead destroyed the analysis together
     // with its buckets, bucket files, nodes and node events.
-    @Column({ nullable: true })
-    registry_id: Registry['id'] | null;
+    @Column({ name: 'registry_id', nullable: true })
+    registryId: Registry['id'] | null;
 
     @ManyToOne(() => RegistryEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'registry_id' })
@@ -214,22 +254,30 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid', nullable: true })
-    client_id: Client['id'] | null;
+    @Column({
+        name: 'client_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    clientId: Client['id'] | null;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid' })
-    realm_id: Realm['id'];
+    @Column({ name: 'realm_id', type: 'uuid' })
+    realmId: Realm['id'];
 
     // ------------------------------------------------------------------
 
-    @Column({ nullable: true, type: 'uuid' })
-    user_id: User['id'];
+    @Column({
+        name: 'user_id', 
+        nullable: true, 
+        type: 'uuid', 
+    })
+    userId: User['id'];
 
     // ------------------------------------------------------------------
-    @Column({ type: 'uuid' })
-    project_id: Project['id'];
+    @Column({ name: 'project_id', type: 'uuid' })
+    projectId: Project['id'];
 
     @ManyToOne(() => ProjectEntity, (proposal) => proposal.analyses, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'project_id' })
@@ -237,10 +285,14 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
-    @Column({ nullable: true, type: 'uuid' })
-    master_image_id: MasterImage['id'] | null;
+    @Column({
+        name: 'master_image_id', 
+        nullable: true, 
+        type: 'uuid', 
+    })
+    masterImageId: MasterImage['id'] | null;
 
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })
-    master_image: MasterImageEntity;
+    masterImage: MasterImageEntity;
 }

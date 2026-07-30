@@ -73,9 +73,9 @@ export class RegistryManagerAdapter implements IRegistryManager {
             RegistryCommand.PROJECT_RELINK,
             {
                 id: project.id,
-                registryId: project.registry_id,
-                externalName: project.external_name,
-                accountId: project.account_id,
+                registryId: project.registryId,
+                externalName: project.externalName,
+                accountId: project.accountId,
             },
             {},
         );
@@ -90,9 +90,9 @@ export class RegistryManagerAdapter implements IRegistryManager {
             RegistryCommand.PROJECT_UNLINK,
             {
                 id: project.id,
-                registryId: project.registry_id,
-                externalName: project.external_name,
-                accountId: project.account_id,
+                registryId: project.registryId,
+                externalName: project.externalName,
+                accountId: project.accountId,
             },
             {},
         );

@@ -43,7 +43,7 @@ export class BucketDeleteHandler implements ComponentHandler<
             this.logger?.error({
                 message: e,
                 command: BucketCommand.DELETE,
-                analysis_id: value.id,
+                analysisId: value.id,
                 [LogFlag.REF_ID]: value.id,
                 [LogFlag.REF_TYPE]: DomainType.BUCKET,
             });

@@ -36,8 +36,8 @@ export default defineComponent({
             setup,
             socket: {
                 processEvent(event) {
-                    return event.data.analysis_id === props.analysisId &&
-                        event.data.node_id === props.nodeId;
+                    return event.data.analysisId === props.analysisId &&
+                        event.data.nodeId === props.nodeId;
                 },
             },
         });
@@ -45,8 +45,8 @@ export default defineComponent({
         await manager.resolve({
             query: {
                 filters: {
-                    analysis_id: props.analysisId,
-                    node_id: props.nodeId,
+                    analysisId: props.analysisId,
+                    nodeId: props.nodeId,
                 },
             },
         });
@@ -60,8 +60,8 @@ export default defineComponent({
             onChanged: (value: boolean) => {
                 if (value) {
                     return manager.create({
-                        analysis_id: props.analysisId,
-                        node_id: props.nodeId,
+                        analysisId: props.analysisId,
+                        nodeId: props.nodeId,
                     });
                 }
 

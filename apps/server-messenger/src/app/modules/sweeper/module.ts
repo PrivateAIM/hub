@@ -15,7 +15,7 @@ const SWEEP_INTERVAL_MS = 60_000;
 
 /**
  * Periodically deletes expired messages from the durable mailbox — rows whose
- * absolute `expires_at` (stamped at send time) has passed.
+ * absolute `expiresAt` (stamped at send time) has passed.
  */
 export class SweeperModule implements IModule {
     readonly name = 'sweeper';

@@ -20,7 +20,7 @@ import {
 } from 'typeorm';
 import { BucketEntity } from './bucket.ts';
 
-@Unique(['bucket_id', 'path'])
+@Unique(['bucketId', 'path'])
 @Entity({ name: 'bucket_files' })
 export class BucketFileEntity implements BucketFile {
     @PrimaryGeneratedColumn('uuid')
@@ -48,29 +48,37 @@ export class BucketFileEntity implements BucketFile {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
-
-    // ------------------------------------------------------------------
-
-    @Column({ type: 'varchar', length: 64 })
-    actor_type: string;
-
-    @Column({ type: 'uuid' })
-    actor_id: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid', nullable: true })
-    realm_id: Realm['id'] | null;
+    @Column({
+        name: 'actor_type', 
+        type: 'varchar', 
+        length: 64, 
+    })
+    actorType: string;
+
+    @Column({ name: 'actor_id', type: 'uuid' })
+    actorId: string;
 
     // ------------------------------------------------------------------
 
-    @Column()
-    bucket_id: BucketEntity['id'];
+    @Column({
+        name: 'realm_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    realmId: Realm['id'] | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({ name: 'bucket_id' })
+    bucketId: BucketEntity['id'];
 
     @ManyToOne(() => BucketEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'bucket_id' })

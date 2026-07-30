@@ -16,21 +16,21 @@ export interface AnalysisBucket {
 
     // ------------------------------------------------------------------
 
-    bucket_id: string;
+    bucketId: string;
 
     // ------------------------------------------------------------------
 
-    analysis_id: Analysis['id'];
+    analysisId: Analysis['id'];
 
     analysis: Analysis;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'];
+    realmId: Realm['id'];
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 }

@@ -10,8 +10,8 @@ import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
 import type { EntityQueryInput } from '../../utils';
 import type { EntityRecordResponse, IEntityAPI } from '../types-base';
 
-export type AnalysisCreatePayload =    & Pick<Analysis, 'project_id'> &
-    Partial<Pick<Analysis, 'name' | 'display_name' | 'description' | 'master_image_id' | 'registry_id' | 'image_command_arguments'>>;
+export type AnalysisCreatePayload =    & Pick<Analysis, 'projectId'> &
+    Partial<Pick<Analysis, 'name' | 'displayName' | 'description' | 'masterImageId' | 'registryId' | 'imageCommandArguments'>>;
 
 export type AnalysisUpdatePayload = Partial<AnalysisCreatePayload>;
 

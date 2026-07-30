@@ -57,7 +57,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             this.logger?.error({
                 message: e,
                 command: AnalysisDistributorCommand.EXECUTE,
-                analysis_id: value.id,
+                analysisId: value.id,
                 [LogFlag.REF_ID]: value.id,
                 event: AnalysisDistributorEvent.EXECUTION_FAILED,
             });
@@ -83,18 +83,18 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         const { data: analysis } = await this.coreClient.analysis.getOne(value.id);
 
-        // `analysis.registry_id` is nullable — it is unset until the distributor
+        // `analysis.registryId` is nullable — it is unset until the distributor
         // assigns one, and the registry FK detaches (SET NULL) if the registry is
         // deleted while the analysis is in flight. Fail with a domain error rather
         // than requesting `/registries/null`.
-        if (!analysis.registry_id) {
+        if (!analysis.registryId) {
             throw BuilderError.registryNotFound();
         }
 
-        const { data: registry } = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
+        const { data: registry } = await this.coreClient.registry.getOne(analysis.registryId, { fields: ['+accountSecret'] });
 
         const analysisNodes = await getManyAll((page) => this.coreClient.analysisNode.getMany({
-            filters: { analysis_id: analysis.id },
+            filters: { analysisId: analysis.id },
             pagination: page,
         }));
 
@@ -104,8 +104,8 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         }
 
         const nodes = await getManyAll((page) => this.coreClient.node.getMany({
-            filters: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
-            relations: { registry_project: true },
+            filters: { id: analysisNodes.map((analysisNode) => analysisNode.nodeId) },
+            relations: { registryProject: true },
             pagination: page,
         }));
 
@@ -123,7 +123,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             this.logger?.error({
                 message: 'Tagging images failed',
                 command: AnalysisDistributorCommand.EXECUTE,
-                analysis_id: analysis.id,
+                analysisId: analysis.id,
                 [LogFlag.REF_ID]: analysis.id,
             });
 
@@ -155,7 +155,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             this.logger?.error({
                 message: 'Pushing images failed',
                 command: AnalysisDistributorCommand.EXECUTE,
-                analysis_id: analysis.id,
+                analysisId: analysis.id,
                 [LogFlag.REF_ID]: analysis.id,
             });
 
@@ -176,7 +176,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         this.logger?.info({
             message: 'Tagging images',
             command: AnalysisDistributorCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
 
@@ -190,7 +190,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             // A node's registry project is optional and can be detached
             // (SET NULL) when the project is deleted, so the relation may be
             // absent even though the node is otherwise runnable.
-            if (!node.registry_project) {
+            if (!node.registryProject) {
                 throw BuilderError.registryProjectNotFound(
                     `The node ${node.name} has no registry project.`,
                 );
@@ -198,7 +198,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
             const nodeImageURL = buildDockerImageURL({
                 hostname: registry.host,
-                projectName: node.registry_project.external_name,
+                projectName: node.registryProject.externalName,
                 repositoryName: analysis.id,
                 tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
             });
@@ -224,7 +224,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         this.logger?.info({
             message: 'Tagged images',
             command: AnalysisDistributorCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
 
@@ -239,7 +239,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         this.logger?.info({
             message: 'Pushing images',
             command: AnalysisDistributorCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
 
@@ -277,7 +277,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         this.logger?.info({
             message: 'Pushed images',
             command: AnalysisDistributorCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
     }

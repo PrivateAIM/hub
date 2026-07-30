@@ -42,7 +42,7 @@ export default defineNuxtComponent({
     },
     setup(props) {
         const projectNodeQuery : QueryBuildInput<ProjectNode, 3> = {
-            filters: { project_id: props.entity.id },
+            filters: { projectId: props.entity.id },
             sort: 'node.name',
         };
 
@@ -72,7 +72,7 @@ export default defineNuxtComponent({
                     </div>
                 </div>
 
-                <template v-if="entity.master_image_id">
+                <template v-if="entity.masterImageId">
                     <div class="card-grey card grow">
                         <div class="card-header">
                             <span class="title">MasterImage</span>
@@ -85,18 +85,18 @@ export default defineNuxtComponent({
                                 />
                             </div>
                             <div class="h6">
-                                <template v-if="entity.master_image">
-                                    {{ entity.master_image.name }}
+                                <template v-if="entity.masterImage">
+                                    {{ entity.masterImage.name }}
                                 </template>
                                 <template v-else>
-                                    <FMasterImage :entity-id="entity.master_image_id">
+                                    <FMasterImage :entity-id="entity.masterImageId">
                                         <template #default="{ data }">
                                             <template v-if="data">
                                                 {{ data.name }}
                                             </template>
                                         </template>
                                         <template #error>
-                                            {{ entity.master_image_id }}
+                                            {{ entity.masterImageId }}
                                         </template>
                                     </FMasterImage>
                                 </template>
@@ -117,7 +117,7 @@ export default defineNuxtComponent({
                             />
                         </div>
                         <div class="h6">
-                            <ARealm :entity-id="entity.realm_id">
+                            <ARealm :entity-id="entity.realmId">
                                 <template #default="scope">
                                     <template v-if="scope?.data">
                                         <FDisplayName
@@ -127,7 +127,7 @@ export default defineNuxtComponent({
                                     </template>
                                 </template>
                                 <template #error>
-                                    {{ entity.realm_id }}
+                                    {{ entity.realmId }}
                                 </template>
                             </ARealm>
                         </div>
@@ -168,10 +168,10 @@ export default defineNuxtComponent({
                             </div>
                             <div class="card-body">
                                 <div>
-                                    <strong>Status</strong> <FProjectNodeApprovalStatus :status="item.approval_status ?? undefined" />
+                                    <strong>Status</strong> <FProjectNodeApprovalStatus :status="item.approvalStatus ?? undefined" />
                                 </div>
                                 <div>
-                                    <strong>Updated</strong> <VCTimeago :datetime="item.updated_at" />
+                                    <strong>Updated</strong> <VCTimeago :datetime="item.updatedAt" />
                                 </div>
                                 <template v-if="item.node">
                                     <div>

@@ -50,7 +50,7 @@ export default defineNuxtComponent({
     >
         <!--
             The node ↔ registry assignment. Owns connect/disconnect: an update of
-            `registry_id` provisions or tears down the node's registry project
+            `registryId` provisions or tears down the node's registry project
             server-side. Previously this lived in the general node form.
         -->
         <FNodeRegistryConnection
@@ -59,7 +59,7 @@ export default defineNuxtComponent({
             @failed="handleFailed"
         />
 
-        <template v-if="entity.registry_project_id">
+        <template v-if="entity.registryProjectId">
             <hr class="my-0">
 
             <FNodeRegistryCredentials
@@ -76,7 +76,7 @@ export default defineNuxtComponent({
             -->
             <FNodeRegistryProject
                 :entity="entity"
-                :realm-id="entity.realm_id"
+                :realm-id="entity.realmId"
                 @updated="handleUpdated"
                 @failed="handleFailed"
             />

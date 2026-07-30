@@ -93,7 +93,7 @@ export class BucketController {
     ) {
         const entity = await this.service.getOne(id);
 
-        const files = await this.bucketFileRepository.findManyBy({ bucket_id: entity.id });
+        const files = await this.bucketFileRepository.findManyBy({ bucketId: entity.id });
 
         const bucketName = toBucketName(entity.id);
 

@@ -43,7 +43,7 @@ function deepFreeze<T>(input: T) : T {
  * vocabulary. Relation capabilities are not expanded inline:
  * `relations.schemas` names each relation's target schema, whose own
  * endpoints carry its description. Actor-dependent gates (the
- * `account_secret` field gate, realm scoping) are deliberately not
+ * `accountSecret` field gate, realm scoping) are deliberately not
  * reflected. Descriptions are immutable per (schema, parameters), so
  * they are memoized — callers MUST NOT mutate the returned object.
  */

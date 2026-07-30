@@ -53,7 +53,7 @@ describe('typeorm subscriber: push after initialize', () => {
         const entity = repo.create({
             name: 'test-group',
             path: '/test',
-            virtual_path: '/test',
+            virtualPath: '/test',
         });
         await repo.save(entity);
 

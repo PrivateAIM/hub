@@ -57,8 +57,8 @@ function buildService(opts: { node?: Partial<Node>; secret?: string | null }) {
 function baseNode(overrides: Partial<Node> = {}): Partial<Node> {
     return {
         id: NODE_ID,
-        realm_id: 'realm-b',
-        client_id: 'node-client-1',
+        realmId: 'realm-b',
+        clientId: 'node-client-1',
         ...overrides,
     };
 }
@@ -72,14 +72,14 @@ describe('NodeClientCredentialService', () => {
         expect(credentials).toEqual({
             id: 'node-client-1',
             name: 'the-name',
-            display_name: null,
+            displayName: null,
             secret: 'the-secret',
         });
         expect(reader.calls).toEqual(['node-client-1']);
     });
 
     it('should return credentials for a same-realm manager', async () => {
-        const { service } = buildService({ node: baseNode({ realm_id: 'realm-b' }) });
+        const { service } = buildService({ node: baseNode({ realmId: 'realm-b' }) });
 
         const credentials = await service.getCredentials(NODE_ID, realmManagerActor('realm-b'));
         expect(credentials.secret).toBe('the-secret');
@@ -104,7 +104,7 @@ describe('NodeClientCredentialService', () => {
     });
 
     it('should deny a manager from a different realm', async () => {
-        const { service, reader } = buildService({ node: baseNode({ realm_id: 'realm-b' }) });
+        const { service, reader } = buildService({ node: baseNode({ realmId: 'realm-b' }) });
 
         await expect(
             service.getCredentials(NODE_ID, realmManagerActor('realm-a')),
@@ -121,7 +121,7 @@ describe('NodeClientCredentialService', () => {
     });
 
     it('should reject when the node has no client provisioned', async () => {
-        const { service } = buildService({ node: baseNode({ client_id: null }) });
+        const { service } = buildService({ node: baseNode({ clientId: null }) });
 
         await expect(
             service.getCredentials(NODE_ID, createAllowAllActor()),
@@ -139,7 +139,7 @@ describe('NodeClientCredentialService', () => {
     it('should authorize before exposing provisioning state', async () => {
         // A denied actor on an unprovisioned node must be rejected by the auth
         // gate, never leak provisioning state via BadRequestError.
-        const { service, reader } = buildService({ node: baseNode({ client_id: null }) });
+        const { service, reader } = buildService({ node: baseNode({ clientId: null }) });
 
         await expect(
             service.getCredentials(NODE_ID, createDenyAllActor()),
@@ -170,13 +170,13 @@ describe('NodeClientCredentialService', () => {
 
             await service.setCredentials(
                 NODE_ID,
-                { name: 'new-name', display_name: 'New Name' },
+                { name: 'new-name', displayName: 'New Name' },
                 createAllowAllActor(),
             );
 
             expect(reader.writes).toEqual([{
                 clientId: 'node-client-1',
-                data: { name: 'new-name', display_name: 'New Name' },
+                data: { name: 'new-name', displayName: 'New Name' },
             }]);
         });
 
@@ -208,7 +208,7 @@ describe('NodeClientCredentialService', () => {
         });
 
         it('should deny a manager from a different realm', async () => {
-            const { service, reader } = buildService({ node: baseNode({ realm_id: 'realm-b' }) });
+            const { service, reader } = buildService({ node: baseNode({ realmId: 'realm-b' }) });
 
             await expect(
                 service.setCredentials(NODE_ID, {}, realmManagerActor('realm-a')),
@@ -217,7 +217,7 @@ describe('NodeClientCredentialService', () => {
         });
 
         it('should reject when the node has no client provisioned', async () => {
-            const { service } = buildService({ node: baseNode({ client_id: null }) });
+            const { service } = buildService({ node: baseNode({ clientId: null }) });
 
             await expect(
                 service.setCredentials(NODE_ID, {}, createAllowAllActor()),

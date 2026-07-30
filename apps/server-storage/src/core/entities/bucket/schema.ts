@@ -12,8 +12,8 @@ import { DomainType } from '@privateaim/storage-kit';
 export const bucketSchema = defineSchema<Bucket>({
     name: DomainType.BUCKET,
     strict: true,
-    fields: { default: ['id', 'name', 'region', 'created_at', 'updated_at', 'realm_id', 'actor_id', 'actor_type'] },
-    filters: { allowed: ['id', 'name', 'realm_id', 'actor_type', 'actor_id'] },
-    sort: { allowed: ['id', 'updated_at', 'created_at'] },
+    fields: { default: ['id', 'name', 'region', 'createdAt', 'updatedAt', 'realmId', 'actorId', 'actorType'] },
+    filters: { allowed: ['id', 'name', 'realmId', 'actorType', 'actorId'] },
+    sort: { allowed: ['id', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
 });

@@ -33,10 +33,10 @@ function createTestRegistry(overrides?: Partial<Registry>): Registry {
         id: 'registry-1',
         name: 'test-registry',
         host: 'registry.example.com',
-        account_name: 'admin',
-        account_secret: 'secret',
-        created_at: new Date(),
-        updated_at: new Date(),
+        accountName: 'admin',
+        accountSecret: 'secret',
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     } as Registry;
 }
@@ -72,10 +72,10 @@ describe('AnalysisDistributor', () => {
 
     function seedBuiltAnalysis(overrides?: Partial<Analysis>): Analysis {
         const analysis = createFullAnalysis({
-            configuration_locked: true,
-            build_status: ProcessStatus.EXECUTED,
-            build_progress: 100,
-            build_hash: 'abc123',
+            configurationLocked: true,
+            buildStatus: ProcessStatus.EXECUTED,
+            buildProgress: 100,
+            buildHash: 'abc123',
             ...overrides,
         });
         repository.seed(analysis);
@@ -83,14 +83,14 @@ describe('AnalysisDistributor', () => {
     }
 
     describe('start', () => {
-        it('should set distribution_status to STARTING and dispatch execute', async () => {
+        it('should set distributionStatus to STARTING and dispatch execute', async () => {
             const analysis = seedBuiltAnalysis();
             registryRepository.seed(createTestRegistry());
-            analysisNodeRepository.seed(createTestAnalysisNode({ analysis_id: 'analysis-1' }));
+            analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
             const result = await distributor.start(analysis);
 
-            expect(result.distribution_status).toBe(ProcessStatus.STARTING);
+            expect(result.distributionStatus).toBe(ProcessStatus.STARTING);
             expect(caller.getCallsFor('callExecute')).toHaveLength(1);
             expect(caller.getCallsFor('callExecute')[0].data.id).toBe('analysis-1');
         });
@@ -98,7 +98,7 @@ describe('AnalysisDistributor', () => {
         it('should call recalculators before starting', async () => {
             const analysis = seedBuiltAnalysis();
             registryRepository.seed(createTestRegistry());
-            analysisNodeRepository.seed(createTestAnalysisNode({ analysis_id: 'analysis-1' }));
+            analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
             await distributor.start(analysis);
 
@@ -110,58 +110,58 @@ describe('AnalysisDistributor', () => {
         it('should resolve entity by string ID', async () => {
             seedBuiltAnalysis();
             registryRepository.seed(createTestRegistry());
-            analysisNodeRepository.seed(createTestAnalysisNode({ analysis_id: 'analysis-1' }));
+            analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
             const result = await distributor.start('analysis-1');
-            expect(result.distribution_status).toBe(ProcessStatus.STARTING);
+            expect(result.distributionStatus).toBe(ProcessStatus.STARTING);
         });
 
-        it('should auto-assign first registry when registry_id is null', async () => {
-            const analysis = seedBuiltAnalysis({ registry_id: null as unknown as string });
+        it('should auto-assign first registry when registryId is null', async () => {
+            const analysis = seedBuiltAnalysis({ registryId: null as unknown as string });
             registryRepository.seed(createTestRegistry({ id: 'auto-registry' }));
-            analysisNodeRepository.seed(createTestAnalysisNode({ analysis_id: 'analysis-1' }));
+            analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
             const result = await distributor.start(analysis);
-            expect(result.registry_id).toBe('auto-registry');
+            expect(result.registryId).toBe('auto-registry');
         });
 
-        it('should throw when no registries exist and registry_id is null', async () => {
-            const analysis = seedBuiltAnalysis({ registry_id: null as unknown as string });
+        it('should throw when no registries exist and registryId is null', async () => {
+            const analysis = seedBuiltAnalysis({ registryId: null as unknown as string });
 
             await expect(distributor.start(analysis)).rejects.toThrow(BadRequestError);
         });
 
         it('should throw when build not EXECUTED', async () => {
-            const analysis = seedBuiltAnalysis({ build_status: ProcessStatus.STARTED });
+            const analysis = seedBuiltAnalysis({ buildStatus: ProcessStatus.STARTED });
 
             await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when distribution already in progress', async () => {
-            const analysis = seedBuiltAnalysis({ distribution_status: ProcessStatus.STARTING });
+            const analysis = seedBuiltAnalysis({ distributionStatus: ProcessStatus.STARTING });
 
             await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should allow retry when distribution FAILED', async () => {
-            const analysis = seedBuiltAnalysis({ distribution_status: ProcessStatus.FAILED });
+            const analysis = seedBuiltAnalysis({ distributionStatus: ProcessStatus.FAILED });
             registryRepository.seed(createTestRegistry());
-            analysisNodeRepository.seed(createTestAnalysisNode({ analysis_id: 'analysis-1' }));
+            analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
             const result = await distributor.start(analysis);
-            expect(result.distribution_status).toBe(ProcessStatus.STARTING);
+            expect(result.distributionStatus).toBe(ProcessStatus.STARTING);
         });
 
         it('should throw when a node has no registry assigned', async () => {
             const analysis = seedBuiltAnalysis();
             registryRepository.seed(createTestRegistry());
             analysisNodeRepository.seed(createTestAnalysisNode({
-                analysis_id: 'analysis-1',
+                analysisId: 'analysis-1',
                 node: {
                     id: 'bad-node',
                     name: 'bad-node',
                     type: NodeType.DEFAULT,
-                    registry_id: null,
+                    registryId: null,
                 } as unknown as Node,
             }));
 
@@ -171,7 +171,7 @@ describe('AnalysisDistributor', () => {
 
     describe('check', () => {
         it('should dispatch check call', async () => {
-            const analysis = seedBuiltAnalysis({ distribution_status: ProcessStatus.STARTED });
+            const analysis = seedBuiltAnalysis({ distributionStatus: ProcessStatus.STARTED });
 
             const result = await distributor.check(analysis);
 
@@ -180,7 +180,7 @@ describe('AnalysisDistributor', () => {
         });
 
         it('should resolve entity by string ID', async () => {
-            seedBuiltAnalysis({ distribution_status: ProcessStatus.STARTED });
+            seedBuiltAnalysis({ distributionStatus: ProcessStatus.STARTED });
 
             const result = await distributor.check('analysis-1');
             expect(result.id).toBe('analysis-1');
@@ -191,13 +191,13 @@ describe('AnalysisDistributor', () => {
         });
 
         it('should throw when build not initialized', async () => {
-            const analysis = seedBuiltAnalysis({ build_status: null });
+            const analysis = seedBuiltAnalysis({ buildStatus: null });
 
             await expect(distributor.check(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when build not EXECUTED', async () => {
-            const analysis = seedBuiltAnalysis({ build_status: ProcessStatus.FAILED });
+            const analysis = seedBuiltAnalysis({ buildStatus: ProcessStatus.FAILED });
 
             await expect(distributor.check(analysis)).rejects.toThrow(AnalysisError);
         });
@@ -209,7 +209,7 @@ describe('AnalysisDistributor', () => {
         });
 
         it('should dispatch check call for EXECUTED distribution (reconciliation after data loss)', async () => {
-            const analysis = seedBuiltAnalysis({ distribution_status: ProcessStatus.EXECUTED });
+            const analysis = seedBuiltAnalysis({ distributionStatus: ProcessStatus.EXECUTED });
 
             const result = await distributor.check(analysis);
 

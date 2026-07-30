@@ -40,16 +40,16 @@ const FAnalysisBucketFiles = defineComponent({
         );
 
         const canHandleEventData = (item: AnalysisBucketFile) => {
-            if (filters.value.analysis_bucket_id) {
-                return item.analysis_bucket_id === filters.value.analysis_bucket_id;
+            if (filters.value.analysisBucketId) {
+                return item.analysisBucketId === filters.value.analysisBucketId;
             }
 
-            if (filters.value.analysis_id) {
-                return item.analysis_id === filters.value.analysis_id;
+            if (filters.value.analysisId) {
+                return item.analysisId === filters.value.analysisId;
             }
 
-            if (filters.value.realm_id) {
-                return item.realm_id === filters.value.realm_id;
+            if (filters.value.realmId) {
+                return item.realmId === filters.value.realmId;
             }
 
             return true;

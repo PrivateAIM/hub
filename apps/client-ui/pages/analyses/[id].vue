@@ -62,7 +62,7 @@ export default defineComponent({
                 {
                     name: '',
                     icon: 'fa6-solid:arrow-left',
-                    url: `/projects/${manager.data.value?.project_id}/analyses`,
+                    url: `/projects/${manager.data.value?.projectId}/analyses`,
                 },
                 {
                     name: 'Overview',
@@ -119,7 +119,7 @@ export default defineComponent({
                 <template v-if="entity">
                     <FDisplayName
                         :name="entity.name"
-                        :display-name="entity.display_name"
+                        :display-name="entity.displayName"
                     />
                 </template>
                 <template v-else>

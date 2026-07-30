@@ -127,7 +127,7 @@ export default defineNuxtComponent({
                                     <span>
                                         <FDisplayName
                                             :name="user.name"
-                                            :display-name="user.display_name"
+                                            :display-name="user.displayName"
                                         />
                                     </span>
                                 </nuxt-link>

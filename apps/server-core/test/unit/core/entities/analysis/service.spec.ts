@@ -60,13 +60,13 @@ function createTestProject(overrides?: Partial<Project>): Project {
         description: null,
         nodes: 0,
         analyses: 1,
-        created_at: new Date(),
-        updated_at: new Date(),
-        realm_id: 'realm-1',
-        client_id: null,
-        robot_id: null,
-        user_id: 'user-1',
-        master_image_id: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        realmId: 'realm-1',
+        clientId: null,
+        robotId: null,
+        userId: 'user-1',
+        masterImageId: null,
         ...overrides,
     } as Project;
 }
@@ -184,7 +184,7 @@ describe('AnalysisService', () => {
             };
 
             const result = await service.create(
-                { name: 'test-analysis', project_id: project.id },
+                { name: 'test-analysis', projectId: project.id },
                 createAllowAllActor(),
             );
 
@@ -193,7 +193,7 @@ describe('AnalysisService', () => {
         });
 
         it('should call recalcDebounced after save', async () => {
-            const project = createTestProject({ master_image_id: randomUUID() });
+            const project = createTestProject({ masterImageId: randomUUID() });
             projectRepository.seed(project);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
@@ -203,7 +203,7 @@ describe('AnalysisService', () => {
             };
 
             const result = await service.create(
-                { name: 'test-analysis', project_id: project.id },
+                { name: 'test-analysis', projectId: project.id },
                 createAllowAllActor(),
             );
 
@@ -225,7 +225,7 @@ describe('AnalysisService', () => {
             };
 
             const result = await service.create(
-                { name: 'test-analysis', project_id: project.id },
+                { name: 'test-analysis', projectId: project.id },
                 createAllowAllActor(),
             );
 
@@ -245,7 +245,7 @@ describe('AnalysisService', () => {
             };
 
             const result = await service.create(
-                { project_id: project.id },
+                { projectId: project.id },
                 createAllowAllActor(),
             );
 
@@ -266,7 +266,7 @@ describe('AnalysisService', () => {
 
             // An empty name must not be rejected before the generator runs.
             const result = await service.create(
-                { project_id: project.id, name: '' },
+                { projectId: project.id, name: '' },
                 createAllowAllActor(),
             );
 
@@ -275,7 +275,7 @@ describe('AnalysisService', () => {
             expect(result.name).toMatch(/^[a-z0-9-_.]+$/);
         });
 
-        it('should keep a provided name and display_name', async () => {
+        it('should keep a provided name and displayName', async () => {
             const project = createTestProject();
             projectRepository.seed(project);
 
@@ -287,28 +287,28 @@ describe('AnalysisService', () => {
 
             const result = await service.create(
                 {
-                    project_id: project.id, 
+                    projectId: project.id, 
                     name: 'my-analysis', 
-                    display_name: 'My Analysis', 
+                    displayName: 'My Analysis', 
                 },
                 createAllowAllActor(),
             );
 
             expect(result.name).toBe('my-analysis');
-            expect(result.display_name).toBe('My Analysis');
+            expect(result.displayName).toBe('My Analysis');
         });
 
         it('should reject a name that is not url-friendly', async () => {
             await expect(
                 service.create(
-                    { project_id: randomUUID(), name: 'Not A Slug!' },
+                    { projectId: randomUUID(), name: 'Not A Slug!' },
                     createAllowAllActor(),
                 ),
             ).rejects.toThrow(/name is invalid/i);
         });
 
         it('should assign every approved project node to the created analysis', async () => {
-            const project = createTestProject({ realm_id: 'analysis-realm' });
+            const project = createTestProject({ realmId: 'analysis-realm' });
             projectRepository.seed(project);
 
             const aggregatorNodeId = randomUUID();
@@ -316,26 +316,26 @@ describe('AnalysisService', () => {
             projectNodeRepository.seed([
                 {
                     id: randomUUID(),
-                    project_id: project.id,
-                    node_id: aggregatorNodeId,
-                    node_realm_id: 'node-realm-1',
-                    approval_status: ProjectNodeApprovalStatus.APPROVED,
+                    projectId: project.id,
+                    nodeId: aggregatorNodeId,
+                    nodeRealmId: 'node-realm-1',
+                    approvalStatus: ProjectNodeApprovalStatus.APPROVED,
                     node: {
                         id: aggregatorNodeId, 
                         type: NodeType.AGGREGATOR, 
-                        realm_id: 'node-realm-1', 
+                        realmId: 'node-realm-1', 
                     } as Node,
                 } as ProjectNode,
                 {
                     id: randomUUID(),
-                    project_id: project.id,
-                    node_id: defaultNodeId,
-                    node_realm_id: 'node-realm-2',
-                    approval_status: ProjectNodeApprovalStatus.APPROVED,
+                    projectId: project.id,
+                    nodeId: defaultNodeId,
+                    nodeRealmId: 'node-realm-2',
+                    approvalStatus: ProjectNodeApprovalStatus.APPROVED,
                     node: {
                         id: defaultNodeId, 
                         type: NodeType.DEFAULT, 
-                        realm_id: 'node-realm-2', 
+                        realmId: 'node-realm-2', 
                     } as Node,
                 } as ProjectNode,
             ]);
@@ -347,22 +347,22 @@ describe('AnalysisService', () => {
             };
 
             const result = await service.create(
-                { name: 'test-analysis', project_id: project.id },
+                { name: 'test-analysis', projectId: project.id },
                 createAllowAllActor(),
             );
 
             const analysisNodes = analysisNodeRepository.getAll();
             expect(analysisNodes).toHaveLength(2);
-            expect(analysisNodes.every((node) => node.analysis_id === result.id)).toBe(true);
-            expect(analysisNodes.every((node) => node.analysis_realm_id === 'analysis-realm')).toBe(true);
-            expect(analysisNodes.map((node) => node.node_id).sort())
+            expect(analysisNodes.every((node) => node.analysisId === result.id)).toBe(true);
+            expect(analysisNodes.every((node) => node.analysisRealmId === 'analysis-realm')).toBe(true);
+            expect(analysisNodes.map((node) => node.nodeId).sort())
                 .toEqual([aggregatorNodeId, defaultNodeId].sort());
 
             // aggregator nodes are auto-approved, default nodes stay pending (approval not skipped)
-            const aggregatorNode = analysisNodes.find((node) => node.node_id === aggregatorNodeId);
-            const defaultNode = analysisNodes.find((node) => node.node_id === defaultNodeId);
-            expect(aggregatorNode?.approval_status).toBe(AnalysisNodeApprovalStatus.APPROVED);
-            expect(defaultNode?.approval_status).toBeUndefined();
+            const aggregatorNode = analysisNodes.find((node) => node.nodeId === aggregatorNodeId);
+            const defaultNode = analysisNodes.find((node) => node.nodeId === defaultNodeId);
+            expect(aggregatorNode?.approvalStatus).toBe(AnalysisNodeApprovalStatus.APPROVED);
+            expect(defaultNode?.approvalStatus).toBeUndefined();
 
             // node-derived analysis metadata is recalculated exactly once
             expect(nodeRecalculator.getCallCount()).toBe(1);
@@ -378,26 +378,26 @@ describe('AnalysisService', () => {
             projectNodeRepository.seed([
                 {
                     id: randomUUID(),
-                    project_id: project.id,
-                    node_id: approvedNodeId,
-                    node_realm_id: 'node-realm-1',
-                    approval_status: ProjectNodeApprovalStatus.APPROVED,
+                    projectId: project.id,
+                    nodeId: approvedNodeId,
+                    nodeRealmId: 'node-realm-1',
+                    approvalStatus: ProjectNodeApprovalStatus.APPROVED,
                     node: {
                         id: approvedNodeId, 
                         type: NodeType.DEFAULT, 
-                        realm_id: 'node-realm-1', 
+                        realmId: 'node-realm-1', 
                     } as Node,
                 } as ProjectNode,
                 {
                     id: randomUUID(),
-                    project_id: project.id,
-                    node_id: pendingNodeId,
-                    node_realm_id: 'node-realm-2',
-                    approval_status: null,
+                    projectId: project.id,
+                    nodeId: pendingNodeId,
+                    nodeRealmId: 'node-realm-2',
+                    approvalStatus: null,
                     node: {
                         id: pendingNodeId, 
                         type: NodeType.DEFAULT, 
-                        realm_id: 'node-realm-2', 
+                        realmId: 'node-realm-2', 
                     } as Node,
                 } as ProjectNode,
             ]);
@@ -409,13 +409,13 @@ describe('AnalysisService', () => {
             };
 
             await service.create(
-                { name: 'test-analysis', project_id: project.id },
+                { name: 'test-analysis', projectId: project.id },
                 createAllowAllActor(),
             );
 
             const analysisNodes = analysisNodeRepository.getAll();
             expect(analysisNodes).toHaveLength(1);
-            expect(analysisNodes[0].node_id).toBe(approvedNodeId);
+            expect(analysisNodes[0].nodeId).toBe(approvedNodeId);
         });
 
         it('should not create analysis nodes when the project has no nodes', async () => {
@@ -429,7 +429,7 @@ describe('AnalysisService', () => {
             };
 
             await service.create(
-                { name: 'test-analysis', project_id: project.id },
+                { name: 'test-analysis', projectId: project.id },
                 createAllowAllActor(),
             );
 
@@ -462,7 +462,7 @@ describe('AnalysisService', () => {
             const project = createTestProject();
             project.analyses = 1;
             projectRepository.seed(project);
-            analysisRepository.seed(createFullAnalysis({ project, project_id: project.id }));
+            analysisRepository.seed(createFullAnalysis({ project, projectId: project.id }));
 
             await service.delete('analysis-1', createAllowAllActor());
 
@@ -479,12 +479,12 @@ describe('AnalysisService', () => {
             analysisRepository.seed(createFullAnalysis({
                 id: 'analysis-1', 
                 project, 
-                project_id: project.id, 
+                projectId: project.id, 
             }));
             analysisRepository.seed(createFullAnalysis({
                 id: 'analysis-2', 
                 project, 
-                project_id: project.id, 
+                projectId: project.id, 
             }));
 
             const result = await service.delete('analysis-1', createAllowAllActor());
@@ -499,7 +499,7 @@ describe('AnalysisService', () => {
             // Counter already drifted to 0 (or below) while a row still exists.
             project.analyses = 0;
             projectRepository.seed(project);
-            analysisRepository.seed(createFullAnalysis({ project, project_id: project.id }));
+            analysisRepository.seed(createFullAnalysis({ project, projectId: project.id }));
 
             const result = await service.delete('analysis-1', createAllowAllActor());
 
@@ -522,7 +522,7 @@ describe('AnalysisService', () => {
         });
 
         it('should enforce realm writability', async () => {
-            analysisRepository.seed(createFullAnalysis({ realm_id: 'other-realm' }));
+            analysisRepository.seed(createFullAnalysis({ realmId: 'other-realm' }));
 
             const actor = createNonMasterRealmActor('realm-1');
             await expect(
@@ -534,7 +534,7 @@ describe('AnalysisService', () => {
             const project = createTestProject({ analyses: 1 });
             projectRepository.seed(project);
             analysisRepository.seed(createFullAnalysis({
-                realm_id: 'other-realm',
+                realmId: 'other-realm',
                 project,
             }));
 
@@ -559,7 +559,7 @@ describe('AnalysisService', () => {
         });
 
         it('should enforce realm writability', async () => {
-            analysisRepository.seed(createFullAnalysis({ realm_id: 'other-realm' }));
+            analysisRepository.seed(createFullAnalysis({ realmId: 'other-realm' }));
 
             const actor = createNonMasterRealmActor('realm-1');
             await expect(
@@ -576,11 +576,11 @@ describe('AnalysisService', () => {
                 createAllowAllActor(),
             );
 
-            expect(result.configuration_locked).toBe(true);
+            expect(result.configurationLocked).toBe(true);
         });
 
         it('should dispatch CONFIGURATION_UNLOCK to configurator', async () => {
-            analysisRepository.seed(createFullAnalysis({ configuration_locked: true }));
+            analysisRepository.seed(createFullAnalysis({ configurationLocked: true }));
 
             const result = await service.executeCommand(
                 'analysis-1',
@@ -588,11 +588,11 @@ describe('AnalysisService', () => {
                 createAllowAllActor(),
             );
 
-            expect(result.configuration_locked).toBe(false);
+            expect(result.configurationLocked).toBe(false);
         });
 
         it('should dispatch BUILD_START to builder', async () => {
-            analysisRepository.seed(createFullAnalysis({ configuration_locked: true }));
+            analysisRepository.seed(createFullAnalysis({ configurationLocked: true }));
 
             const result = await service.executeCommand(
                 'analysis-1',
@@ -600,14 +600,14 @@ describe('AnalysisService', () => {
                 createAllowAllActor(),
             );
 
-            expect(result.build_status).toBe(ProcessStatus.STARTING);
+            expect(result.buildStatus).toBe(ProcessStatus.STARTING);
             expect(builderCaller.getCallsFor('callExecute')).toHaveLength(1);
         });
 
         it('should dispatch BUILD_CHECK to builder', async () => {
             analysisRepository.seed(createFullAnalysis({
-                configuration_locked: true,
-                build_status: ProcessStatus.STARTED,
+                configurationLocked: true,
+                buildStatus: ProcessStatus.STARTED,
             }));
 
             await service.executeCommand(
@@ -621,8 +621,8 @@ describe('AnalysisService', () => {
 
         it('should dispatch DISTRIBUTION_START to distributor', async () => {
             analysisRepository.seed(createFullAnalysis({
-                configuration_locked: true,
-                build_status: ProcessStatus.EXECUTED,
+                configurationLocked: true,
+                buildStatus: ProcessStatus.EXECUTED,
             }));
 
             const result = await service.executeCommand(
@@ -631,15 +631,15 @@ describe('AnalysisService', () => {
                 createAllowAllActor(),
             );
 
-            expect(result.distribution_status).toBe(ProcessStatus.STARTING);
+            expect(result.distributionStatus).toBe(ProcessStatus.STARTING);
             expect(distributorCaller.getCallsFor('callExecute')).toHaveLength(1);
         });
 
         it('should dispatch DISTRIBUTION_CHECK to distributor', async () => {
             analysisRepository.seed(createFullAnalysis({
-                configuration_locked: true,
-                build_status: ProcessStatus.EXECUTED,
-                distribution_status: ProcessStatus.STARTED,
+                configurationLocked: true,
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
             }));
 
             await service.executeCommand(

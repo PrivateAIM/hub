@@ -33,17 +33,17 @@ export async function handleAnalysisDistributorEvent(
 
     switch (context.key) {
         case AnalysisDistributorEvent.EXECUTION_STARTED: {
-            entity.distribution_status = ProcessStatus.STARTED;
-            entity.distribution_progress = 0;
+            entity.distributionStatus = ProcessStatus.STARTED;
+            entity.distributionProgress = 0;
             break;
         }
         case AnalysisDistributorEvent.EXECUTION_PROGRESS: {
             const temp = value as AnalysisDistributorExecutionProgressPayload;
             if (
-                !entity.distribution_progress ||
-                temp.progress.percent >= entity.distribution_progress
+                !entity.distributionProgress ||
+                temp.progress.percent >= entity.distributionProgress
             ) {
-                entity.distribution_progress = Math.min(temp.progress.percent, 100);
+                entity.distributionProgress = Math.min(temp.progress.percent, 100);
             }
             break;
         }
@@ -52,12 +52,12 @@ export async function handleAnalysisDistributorEvent(
             return;
         }
         case AnalysisDistributorEvent.EXECUTION_FAILED: {
-            entity.distribution_status = ProcessStatus.FAILED;
+            entity.distributionStatus = ProcessStatus.FAILED;
             break;
         }
         case AnalysisDistributorEvent.EXECUTION_FINISHED: {
-            entity.distribution_status = ProcessStatus.EXECUTED;
-            entity.distribution_progress = 100;
+            entity.distributionStatus = ProcessStatus.EXECUTED;
+            entity.distributionProgress = 100;
             break;
         }
         case AnalysisDistributorEvent.CHECK_FINISHED: {
@@ -66,12 +66,12 @@ export async function handleAnalysisDistributorEvent(
                 return;
             }
 
-            entity.distribution_status = temp.status;
+            entity.distributionStatus = temp.status;
 
             if (temp.status === ProcessStatus.EXECUTED) {
-                entity.distribution_progress = 100;
+                entity.distributionProgress = 100;
             } else if (temp.status === ProcessStatus.FAILED) {
-                entity.distribution_progress = 0;
+                entity.distributionProgress = 0;
             }
         }
     }

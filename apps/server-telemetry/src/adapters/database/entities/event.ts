@@ -22,7 +22,7 @@ import type {
 } from '@privateaim/telemetry-kit';
 
 @Index(['name', 'scope'])
-@Index(['ref_type', 'ref_id'])
+@Index(['refType', 'refId'])
 @Entity({ name: 'events' })
 export class EventEntity implements Event {
     @PrimaryGeneratedColumn('uuid')
@@ -37,16 +37,21 @@ export class EventEntity implements Event {
     name: string;
 
     @Index()
-    @Column({ type: 'varchar', length: 64 })
-    ref_type: string;
+    @Column({
+        name: 'ref_type', 
+        type: 'varchar', 
+        length: 64, 
+    })
+    refType: string;
 
     @Index()
     @Column({
+        name: 'ref_id',
         type: 'varchar',
         length: 64,
         nullable: true,
     })
-    ref_id: string | null;
+    refId: string | null;
 
     @Column({
         type: 'text',
@@ -72,75 +77,90 @@ export class EventEntity implements Event {
 
     @Index()
     @Column({
+        name: 'request_path',
         type: 'varchar',
         length: 256,
         nullable: true,
     })
-    request_path: string | null;
+    requestPath: string | null;
 
     @Index()
     @Column({
+        name: 'request_method',
         type: 'varchar',
         length: 10,
         nullable: true,
     })
-    request_method: string | null;
+    requestMethod: string | null;
 
     @Index()
     @Column({
+        name: 'request_ip_address',
         type: 'varchar',
         length: 15,
         nullable: true,
     })
-    request_ip_address: string | null;
+    requestIpAddress: string | null;
 
     @Index()
     @Column({
+        name: 'request_user_agent',
         type: 'varchar',
         length: 512,
         nullable: true,
     })
-    request_user_agent: string | null;
+    requestUserAgent: string | null;
 
     // ------------------------------------------------------------------
 
     @Index()
     @Column({
+        name: 'actor_type',
         type: 'varchar',
         length: 64,
         nullable: true,
     })
-    actor_type: string | null;
-
-    @Index()
-    @Column({ type: 'uuid', nullable: true })
-    actor_id: string | null;
+    actorType: string | null;
 
     @Index()
     @Column({
+        name: 'actor_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    actorId: string | null;
+
+    @Index()
+    @Column({
+        name: 'actor_name',
         type: 'varchar',
         length: 64,
         nullable: true,
     })
-    actor_name: string | null;
-
-    // ------------------------------------------------------------------
-
-    @Column({ type: 'uuid', nullable: true })
-    realm_id: Realm['id'] | null;
+    actorName: string | null;
 
     // ------------------------------------------------------------------
 
     @Column({
+        name: 'realm_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    realmId: Realm['id'] | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({
+        name: 'expires_at',
         type: 'varchar',
         length: 28,
         nullable: true,
     })
-    expires_at: string | null;
+    expiresAt: string | null;
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 }

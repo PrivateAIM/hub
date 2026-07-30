@@ -16,27 +16,27 @@ export class AnalysisConfiguratorCommandChecker {
      * @param entity
      */
     static canLock(entity: Analysis) : void {
-        if (entity.configuration_locked) {
+        if (entity.configurationLocked) {
             throw AnalysisError.configurationLocked();
         }
 
-        if (entity.build_status) {
+        if (entity.buildStatus) {
             throw AnalysisError.buildInitialized();
         }
 
-        if (!entity.configuration_node_default_valid) {
+        if (!entity.configurationNodeDefaultValid) {
             throw AnalysisError.defaultNodeRequired();
         }
 
-        if (!entity.configuration_node_aggregator_valid) {
+        if (!entity.configurationNodeAggregatorValid) {
             throw AnalysisError.aggregatorNodeRequired();
         }
 
-        if (!entity.configuration_entrypoint_valid) {
+        if (!entity.configurationEntrypointValid) {
             throw AnalysisError.entrypointRequired();
         }
 
-        if (!entity.configuration_image_valid) {
+        if (!entity.configurationImageValid) {
             throw AnalysisError.imageAssignmentRequired();
         }
     }
@@ -47,18 +47,18 @@ export class AnalysisConfiguratorCommandChecker {
      * @param entity
      */
     static canUnlock(entity: Analysis): void {
-        if (!entity.configuration_locked) {
+        if (!entity.configurationLocked) {
             throw new AnalysisError('The analysis configuration is already unlocked.');
         }
 
-        if (!entity.build_status) {
+        if (!entity.buildStatus) {
             return;
         }
 
         if (
-            entity.build_status === ProcessStatus.FAILED ||
-            entity.build_status === ProcessStatus.STOPPED ||
-            entity.build_status === ProcessStatus.STOPPING
+            entity.buildStatus === ProcessStatus.FAILED ||
+            entity.buildStatus === ProcessStatus.STOPPED ||
+            entity.buildStatus === ProcessStatus.STOPPING
         ) {
             return;
         }

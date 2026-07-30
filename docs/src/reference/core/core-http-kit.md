@@ -76,18 +76,18 @@ console.log(meta.schema);
 //     name: 'node',
 //     strict: true,
 //     fields:     { default: ['id', 'name', /* ... */], allowed: ['id', 'name', /* ... */] },
-//     filters:    { allowed: ['id', 'name', 'online', 'hidden', 'client_id', 'realm_id', 'robot_id'] },
+//     filters:    { allowed: ['id', 'name', 'online', 'hidden', 'clientId', 'realmId', 'robotId'] },
 //     pagination: { maxLimit: 50 },
-//     relations:  { allowed: ['registry_project', 'registry'],
-//                   schemas: { registry_project: 'registryProject', registry: 'registry' } },
-//     sort:       { allowed: ['name', 'updated_at', 'created_at'], default: null },
+//     relations:  { allowed: ['registryProject', 'registry'],
+//                   schemas: { registryProject: 'registryProject', registry: 'registry' } },
+//     sort:       { allowed: ['name', 'updatedAt', 'createdAt'], default: null },
 // }
 ```
 
 Reading rules:
 
 - the description is the **static upper bound** — the allow-list the schema declares, not an
-  actor-aware view. Actor-dependent authorization gates (e.g. the `account_secret` field gate on
+  actor-aware view. Actor-dependent authorization gates (e.g. the `accountSecret` field gate on
   registries) and realm scoping are deliberately **not** reflected and may still strip individual
   keys per request.
 - the shape is **normalized** — every described parameter carries every constraint key: a **`null`**
@@ -112,7 +112,7 @@ Use `getManyAll` to follow the pagination until every record is retrieved:
 import { getManyAll } from '@privateaim/core-http-kit';
 
 const analysisNodes = await getManyAll((page) => client.analysisNode.getMany({
-    filter: { analysis_id: analysisId },
+    filter: { analysisId: analysisId },
     page,
 }));
 ```

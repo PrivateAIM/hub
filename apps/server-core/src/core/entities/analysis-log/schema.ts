@@ -6,12 +6,13 @@
  */
 
 import { defineSchema } from '@rapiq/core';
+import type { AnalysisLog } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 
-export const analysisLogSchema = defineSchema({
+export const analysisLogSchema = defineSchema<AnalysisLog>({
     name: DomainType.ANALYSIS_LOG,
     strict: true,
-    filters: { allowed: ['level', 'analysis_id'] },
+    filters: { allowed: ['level', 'analysisId'] },
     sort: { allowed: ['time'] },
     pagination: { maxLimit: 50 },
 });

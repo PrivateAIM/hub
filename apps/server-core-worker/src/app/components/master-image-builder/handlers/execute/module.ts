@@ -96,7 +96,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
             this.logger?.info({
                 message: 'Building image failed',
                 command: MasterImageBuilderCommand.EXECUTE,
-                master_image_id: masterImage.id,
+                masterImageId: masterImage.id,
                 [LogFlag.REF_ID]: masterImage.id,
             });
         }
@@ -114,13 +114,13 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
         this.logger?.info({
             message: 'Building image',
             command: MasterImageBuilderCommand.EXECUTE,
-            master_image_id: masterImage.id,
+            masterImageId: masterImage.id,
             [LogFlag.REF_ID]: masterImage.id,
         });
 
         const imageTag = buildDockerImageURL({
             projectName: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-            repositoryName: masterImage.virtual_path,
+            repositoryName: masterImage.virtualPath,
             tagOrDigest: 'latest',
         });
 
@@ -138,7 +138,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
                 this.logger?.info({
                     message: 'Built image',
                     command: MasterImageBuilderCommand.EXECUTE,
-                    master_image_id: masterImage.id,
+                    masterImageId: masterImage.id,
                     [LogFlag.REF_ID]: masterImage.id,
                 });
             },

@@ -37,15 +37,15 @@ export default defineNuxtComponent({
             type: `${DomainType.REGISTRY_PROJECT}`,
             props: {
                 // `id` is the parent `[id]` segment (the registry); the project is
-                // the `[project_id]` segment of this route.
-                entityId: route.params.project_id as string,
+                // the `[projectId]` segment of this route.
+                entityId: route.params.projectId as string,
                 queryFields: [
-                    '+account_id',
-                    '+account_name',
-                    '+account_secret',
-                    '+webhook_exists',
-                    '+external_name',
-                ] as FieldsBuildInput<RegistryProject, 3>,
+                    '+accountId',
+                    '+accountName',
+                    '+accountSecret',
+                    '+webhookExists',
+                    '+externalName',
+                ] satisfies FieldsBuildInput<RegistryProject, 3>,
             },
             onFailed(e) {
                 if (toast) {

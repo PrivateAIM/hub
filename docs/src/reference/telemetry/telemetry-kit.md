@@ -21,7 +21,7 @@ const client = new APIClient({
 
 // Query logs — filters map onto VictoriaLogs labels
 const { data: logs, meta } = await client.log.getMany({
-    filter: { ref_type: 'analysis', ref_id: analysisId },
+    filter: { refType: 'analysis', refId: analysisId },
 });
 
 // Create an event — { data: Event, meta: {} }

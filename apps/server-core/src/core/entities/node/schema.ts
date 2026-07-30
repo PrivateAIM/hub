@@ -10,7 +10,7 @@ import type { Node } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 
 const schemaMapping = {
-    registry_project: DomainType.REGISTRY_PROJECT,
+    registryProject: DomainType.REGISTRY_PROJECT,
     registry: DomainType.REGISTRY,
 };
 
@@ -18,12 +18,12 @@ export const nodeSchema = defineSchema<Node>({
     name: DomainType.NODE,
     strict: true,
     fields: {
-        default: ['id', 'name', 'client_id', 'external_name', 'hidden', 'type', 'online', 'public_key', 'robot_id', 'realm_id', 'registry_id', 'registry_project_id', 'created_at', 'updated_at'],
-        allowed: ['id', 'name', 'client_id', 'external_name', 'hidden', 'type', 'online', 'public_key', 'robot_id', 'realm_id', 'registry_id', 'registry_project_id', 'created_at', 'updated_at'],
+        default: ['id', 'name', 'clientId', 'externalName', 'hidden', 'type', 'online', 'publicKey', 'robotId', 'realmId', 'registryId', 'registryProjectId', 'createdAt', 'updatedAt'],
+        allowed: ['id', 'name', 'clientId', 'externalName', 'hidden', 'type', 'online', 'publicKey', 'robotId', 'realmId', 'registryId', 'registryProjectId', 'createdAt', 'updatedAt'],
     },
-    filters: { allowed: ['id', 'name', 'online', 'hidden', 'client_id', 'realm_id', 'robot_id'] },
-    relations: { allowed: ['registry_project', 'registry'] },
-    sort: { allowed: ['name', 'updated_at', 'created_at'] },
+    filters: { allowed: ['id', 'name', 'online', 'hidden', 'clientId', 'realmId', 'robotId'] },
+    relations: { allowed: ['registryProject', 'registry'] },
+    sort: { allowed: ['name', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

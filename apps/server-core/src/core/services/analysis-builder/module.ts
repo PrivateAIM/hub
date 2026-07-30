@@ -51,8 +51,8 @@ export class AnalysisBuilder {
 
         AnalysisBuilderCommandChecker.canStart(entity);
 
-        entity.build_status = ProcessStatus.STARTING;
-        entity.build_progress = null;
+        entity.buildStatus = ProcessStatus.STARTING;
+        entity.buildProgress = null;
 
         await this.repository.save(entity, persistCtx);
         await this.caller.callExecute({ id: entity.id });

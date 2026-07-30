@@ -30,10 +30,10 @@ function createTestRegistry(overrides?: Partial<Registry>): Registry {
         id: randomUUID(),
         name: 'test-registry',
         host: 'registry.example.com',
-        account_name: 'admin',
-        account_secret: null,
-        created_at: new Date(),
-        updated_at: new Date(),
+        accountName: 'admin',
+        accountSecret: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     } as Registry;
 }
@@ -71,7 +71,7 @@ describe('RegistryService', () => {
 
             const actor = createAllowAllActor();
             await service.getMany(
-                { fields: '+account_secret' },
+                { fields: '+accountSecret' },
                 actor,
             );
 
@@ -83,7 +83,7 @@ describe('RegistryService', () => {
 
             await expect(
                 service.getMany(
-                    { fields: '+account_secret' },
+                    { fields: '+accountSecret' },
                     createDenyAllActor(),
                 ),
             ).rejects.toThrow(PermissionDeniedError);
@@ -119,7 +119,7 @@ describe('RegistryService', () => {
             repository.seed(registry);
 
             const actor = createAllowAllActor();
-            await service.getOne('r-1', actor, { fields: '+account_secret' });
+            await service.getOne('r-1', actor, { fields: '+accountSecret' });
 
             expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
         });
@@ -268,9 +268,9 @@ describe('RegistryService', () => {
             it('should call registryCaller for PROJECT_LINK', async () => {
                 const project = {
                     id: 'rp-1',
-                    registry_id: 'r-1',
-                    external_name: 'ext',
-                    account_id: 'acc-1',
+                    registryId: 'r-1',
+                    externalName: 'ext',
+                    accountId: 'acc-1',
                 } as RegistryProject;
                 registryProjectRepository.seed(project);
 
@@ -287,9 +287,9 @@ describe('RegistryService', () => {
             it('should call registryCaller for PROJECT_UNLINK', async () => {
                 const project = {
                     id: 'rp-1',
-                    registry_id: 'r-1',
-                    external_name: 'ext',
-                    account_id: 'acc-1',
+                    registryId: 'r-1',
+                    externalName: 'ext',
+                    accountId: 'acc-1',
                 } as RegistryProject;
                 registryProjectRepository.seed(project);
 

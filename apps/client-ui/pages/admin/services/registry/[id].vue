@@ -56,7 +56,7 @@ export default defineComponent({
             },
         });
 
-        await manager.resolve({ query: { fields: ['+account_secret'] } });
+        await manager.resolve({ query: { fields: ['+accountSecret'] } });
 
         if (!manager.data.value) {
             await navigateTo({ path: '/admin/services/registry' });

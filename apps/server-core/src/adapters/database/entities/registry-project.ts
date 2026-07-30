@@ -23,9 +23,9 @@ import {
 import type { Realm } from '@authup/core-kit';
 import { RegistryEntity } from './registry.ts';
 
-@Unique(['name', 'registry_id'])
-@Unique(['external_name', 'registry_id'])
-@Unique(['external_id', 'registry_id'])
+@Unique(['name', 'registryId'])
+@Unique(['externalName', 'registryId'])
+@Unique(['externalId', 'registryId'])
 @Entity({ name: 'registry_projects' })
 export class RegistryProjectEntity implements RegistryProject {
     @PrimaryGeneratedColumn('uuid')
@@ -48,60 +48,70 @@ export class RegistryProjectEntity implements RegistryProject {
     // ------------------------------------------------------------------
 
     @Column({
+        name: 'external_name',
         type: 'varchar',
         length: 64,
     })
-    external_name: string;
+    externalName: string;
 
     @Column({
+        name: 'external_id',
         type: 'varchar',
         length: 64,
         nullable: true,
         default: null,
     })
-    external_id: string | null;
+    externalId: string | null;
 
     // ------------------------------------------------------------------
 
     @Column({
+        name: 'account_id',
         type: 'varchar', 
         length: 64, 
         nullable: true,
     })
-    account_id: string | null;
+    accountId: string | null;
 
     @Column({
+        name: 'account_name',
         type: 'varchar', 
         length: 256, 
         nullable: true,
     })
-    account_name: string | null;
+    accountName: string | null;
 
     @Column({
+        name: 'account_secret',
         type: 'varchar', 
         length: 256, 
         nullable: true, 
         select: false,
     })
-    account_secret: string | null;
+    accountSecret: string | null;
 
     // ------------------------------------------------------------------
 
     @Column({
+        name: 'webhook_name',
         type: 'varchar', 
         length: 128, 
         default: null, 
         nullable: true,
     })
-    webhook_name: string | null;
+    webhookName: string | null;
 
-    @Column({ type: 'boolean', default: false })
-    webhook_exists: boolean;
+    @Column({
+        name: 'webhook_exists', 
+        type: 'boolean', 
+        default: false, 
+    })
+    webhookExists: boolean;
 
     // ------------------------------------------------------------------
 
-    @Column()
-    registry_id: Registry['id'];
+    @Column({ name: 'registry_id' })
+    registryId: Registry['id'];
 
     @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'registry_id' })
@@ -109,14 +119,18 @@ export class RegistryProjectEntity implements RegistryProject {
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid', nullable: true })
-    realm_id: Realm['id'];
+    @Column({
+        name: 'realm_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    realmId: Realm['id'];
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 }

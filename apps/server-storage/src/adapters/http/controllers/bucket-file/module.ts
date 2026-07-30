@@ -86,12 +86,12 @@ export class BucketFileController {
             throw new EntityNotFoundError({ entity: 'bucket-file' });
         }
 
-        const bucketName = toBucketName(entity.bucket_id);
+        const bucketName = toBucketName(entity.bucketId);
 
         this.logger?.debug(`Streaming file ${entity.path}`, {
             [LogFlag.REF_TYPE]: DomainType.BUCKET_FILE,
             [LogFlag.REF_ID]: id,
-            bucket_id: entity.bucket_id,
+            bucketId: entity.bucketId,
         });
 
         const nodeStream = await this.storage.getObject(bucketName, entity.hash);
@@ -99,7 +99,7 @@ export class BucketFileController {
             this.logger?.debug(`Streamed file ${entity.path}`, {
                 [LogFlag.REF_TYPE]: DomainType.BUCKET_FILE,
                 [LogFlag.REF_ID]: id,
-                bucket_id: entity.bucket_id,
+                bucketId: entity.bucketId,
             });
         });
         nodeStream.on('error', (err) => {

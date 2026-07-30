@@ -43,8 +43,8 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
     create(data: Partial<T>): T {
         return {
             id: randomUUID(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
             ...data,
         } as Partial<T> as T;
     }
@@ -53,7 +53,7 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
         return {
             ...entity,
             ...data,
-            updated_at: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         };
     }
 

@@ -48,7 +48,7 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
             this.logger?.error({
                 message: e,
                 command: AnalysisBuilderCommand.CHECK,
-                analysis_id: value.id,
+                analysisId: value.id,
                 [LogFlag.REF_ID]: value.id,
                 event: AnalysisBuilderEvent.CHECK_FAILED,
             });
@@ -106,25 +106,25 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
         let status: `${ProcessStatus}`;
 
         if (
-            analysis.build_status === ProcessStatus.STARTED ||
-            analysis.build_status === ProcessStatus.STARTING
+            analysis.buildStatus === ProcessStatus.STARTED ||
+            analysis.buildStatus === ProcessStatus.STARTING
         ) {
             // an in-progress build refreshes the entity via progress events;
             // a long-untouched one is orphaned (e.g. worker died) and recoverable as FAILED.
-            status = isAnalysisProcessStale(analysis.updated_at) ?
+            status = isAnalysisProcessStale(analysis.updatedAt) ?
                 ProcessStatus.FAILED :
-                analysis.build_status;
-        } else if (analysis.build_status === ProcessStatus.EXECUTED) {
+                analysis.buildStatus;
+        } else if (analysis.buildStatus === ProcessStatus.EXECUTED) {
             // fail-safe: the local image must only exist while no distribution
             // explains its absence (the distributor removes it during/after a run).
             if (
-                !analysis.distribution_status ||
-                analysis.distribution_status === ProcessStatus.FAILED ||
-                analysis.distribution_status === ProcessStatus.STOPPED
+                !analysis.distributionStatus ||
+                analysis.distributionStatus === ProcessStatus.FAILED ||
+                analysis.distributionStatus === ProcessStatus.STOPPED
             ) {
                 status = ProcessStatus.FAILED;
             } else {
-                status = analysis.build_status;
+                status = analysis.buildStatus;
             }
         } else {
             status = ProcessStatus.FAILED;

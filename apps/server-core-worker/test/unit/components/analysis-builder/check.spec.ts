@@ -31,9 +31,9 @@ function createCoreClient(analysis: Record<string, any> = {}) {
             [`GET /analyses/${ANALYSIS_ID}`]: () => ({
                 data: {
                     id: ANALYSIS_ID,
-                    build_status: null,
-                    distribution_status: null,
-                    updated_at: new Date().toISOString(),
+                    buildStatus: null,
+                    distributionStatus: null,
+                    updatedAt: new Date().toISOString(),
                     ...analysis,
                 },
                 meta: {},
@@ -83,7 +83,7 @@ describe('AnalysisBuilderCheckHandler', () => {
     it('should report FAILED when the image is absent and no build ever ran', async () => {
         const docker = new FakeDockerClient({ inspectError: IMAGE_MISSING });
 
-        const context = await run(createCoreClient({ build_status: null }), docker);
+        const context = await run(createCoreClient({ buildStatus: null }), docker);
 
         expect(context.lastEvent()).toMatchObject({
             event: AnalysisBuilderEvent.CHECK_FINISHED,
@@ -95,7 +95,7 @@ describe('AnalysisBuilderCheckHandler', () => {
         const docker = new FakeDockerClient({ inspectError: IMAGE_MISSING });
 
         const context = await run(
-            createCoreClient({ build_status: ProcessStatus.STARTED, updated_at: new Date().toISOString() }),
+            createCoreClient({ buildStatus: ProcessStatus.STARTED, updatedAt: new Date().toISOString() }),
             docker,
         );
 
@@ -107,8 +107,8 @@ describe('AnalysisBuilderCheckHandler', () => {
 
         const context = await run(
             createCoreClient({
-                build_status: ProcessStatus.STARTING,
-                updated_at: new Date(Date.now() - ANALYSIS_PROCESS_STALE_THRESHOLD_MS - 1000).toISOString(),
+                buildStatus: ProcessStatus.STARTING,
+                updatedAt: new Date(Date.now() - ANALYSIS_PROCESS_STALE_THRESHOLD_MS - 1000).toISOString(),
             }),
             docker,
         );
@@ -122,7 +122,7 @@ describe('AnalysisBuilderCheckHandler', () => {
         const docker = new FakeDockerClient({ inspectError: IMAGE_MISSING });
 
         const context = await run(
-            createCoreClient({ build_status: ProcessStatus.EXECUTED, distribution_status: null }),
+            createCoreClient({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: null }),
             docker,
         );
 
@@ -136,7 +136,7 @@ describe('AnalysisBuilderCheckHandler', () => {
         const docker = new FakeDockerClient({ inspectError: IMAGE_MISSING });
 
         const context = await run(
-            createCoreClient({ build_status: ProcessStatus.EXECUTED, distribution_status: distributionStatus }),
+            createCoreClient({ buildStatus: ProcessStatus.EXECUTED, distributionStatus }),
             docker,
         );
 
@@ -148,8 +148,8 @@ describe('AnalysisBuilderCheckHandler', () => {
 
         const context = await run(
             createCoreClient({
-                build_status: ProcessStatus.EXECUTED,
-                distribution_status: ProcessStatus.STARTED,
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
             }),
             docker,
         );

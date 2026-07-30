@@ -6,6 +6,7 @@
  */
 
 import { defineSchema } from '@rapiq/core';
+import type { AnalysisNode } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 
 const schemaMapping = {
@@ -13,29 +14,29 @@ const schemaMapping = {
     analysis: DomainType.ANALYSIS,
 };
 
-export const analysisNodeSchema = defineSchema({
+export const analysisNodeSchema = defineSchema<AnalysisNode>({
     name: DomainType.ANALYSIS_NODE,
     strict: true,
     fields: {
         default: [
             'id',
-            'approval_status',
-            'execution_status',
-            'execution_progress',
+            'approvalStatus',
+            'executionStatus',
+            'executionProgress',
             'comment',
-            'artifact_tag',
-            'artifact_digest',
-            'created_at',
-            'updated_at',
-            'analysis_id',
-            'analysis_realm_id',
-            'node_id',
-            'node_realm_id',
+            'artifactTag',
+            'artifactDigest',
+            'createdAt',
+            'updatedAt',
+            'analysisId',
+            'analysisRealmId',
+            'nodeId',
+            'nodeRealmId',
         ],
     },
-    filters: { allowed: ['execution_status', 'approval_status', 'analysis_id', 'analysis_realm_id', 'node_id', 'node_realm_id'] },
+    filters: { allowed: ['executionStatus', 'approvalStatus', 'analysisId', 'analysisRealmId', 'nodeId', 'nodeRealmId'] },
     relations: { allowed: ['node', 'analysis'] },
-    sort: { allowed: ['created_at', 'updated_at'] },
+    sort: { allowed: ['createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

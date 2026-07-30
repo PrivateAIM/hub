@@ -37,8 +37,8 @@ describe('controllers/event', () => {
         const input : Partial<Event> = {
             scope: 'model',
             name: 'updated',
-            ref_type: 'project',
-            ref_id: '4b324d99-1984-4081-a47d-10e809092075',
+            refType: 'project',
+            refId: '4b324d99-1984-4081-a47d-10e809092075',
             data: {
                 diff: {
                     name: {
@@ -48,14 +48,14 @@ describe('controllers/event', () => {
                 },
             },
             expiring: true,
-            request_path: '/projects/4b324d99-1984-4081-a47d-10e809092075',
-            request_method: 'POST',
-            request_ip_address: '172.40.1.1',
-            request_user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
-            actor_type: 'user',
-            actor_id: '9b921a45-3846-40ed-a392-deb26a4cc757',
-            actor_name: 'admin',
-            expires_at: '2025-08-08T10:14:05.475Z',
+            requestPath: '/projects/4b324d99-1984-4081-a47d-10e809092075',
+            requestMethod: 'POST',
+            requestIpAddress: '172.40.1.1',
+            requestUserAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
+            actorType: 'user',
+            actorId: '9b921a45-3846-40ed-a392-deb26a4cc757',
+            actorName: 'admin',
+            expiresAt: '2025-08-08T10:14:05.475Z',
         };
 
         const { data } = await client.event.create(input);
@@ -64,7 +64,7 @@ describe('controllers/event', () => {
         expectPropertiesEqualToSrc(
             input,
             data,
-            ['created_at', 'updated_at'],
+            ['createdAt', 'updatedAt'],
         );
 
         details = data;

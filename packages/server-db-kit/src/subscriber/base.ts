@@ -75,8 +75,8 @@ export class BaseSubscriber<
             data: payload.data,
             dataPrevious: payload.dataPrevious,
             metadata: {
-                ref_type: this.refType,
-                ref_id: payload.data.id,
+                refType: this.refType,
+                refId: payload.data.id,
 
                 event: payload.type,
                 ...(payload.metadata ? payload.metadata : {}),

@@ -17,31 +17,31 @@ export class AnalysisNodeValidator extends Container<AnalysisNode> {
         super.initialize();
 
         this.mount(
-            'node_id',
+            'nodeId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );
 
         this.mount(
-            'analysis_id',
+            'analysisId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );
 
         this.mount(
-            'execution_status',
+            'executionStatus',
             { optional: true },
             createValidator(z.enum(ProcessStatus).nullable()),
         );
 
         this.mount(
-            'execution_progress',
+            'executionProgress',
             { optional: true },
             createValidator(z.number().int().min(0).max(100).nullable()),
         );
 
         this.mount(
-            'approval_status',
+            'approvalStatus',
             { optional: true },
             createValidator(z.enum(AnalysisNodeApprovalStatus).nullable()),
         );

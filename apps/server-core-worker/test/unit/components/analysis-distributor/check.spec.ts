@@ -35,21 +35,21 @@ type Overrides = {
 function createCoreClient(overrides: Overrides = {}) {
     const analysis = {
         id: ANALYSIS_ID,
-        registry_id: REGISTRY_ID,
-        distribution_status: null,
-        updated_at: new Date().toISOString(),
+        registryId: REGISTRY_ID,
+        distributionStatus: null,
+        updatedAt: new Date().toISOString(),
         ...overrides.analysis,
     };
 
     const analysisNodes = overrides.analysisNodes ?? [{
         id: 'an-1', 
-        analysis_id: ANALYSIS_ID, 
-        node_id: NODE_ID, 
+        analysisId: ANALYSIS_ID, 
+        nodeId: NODE_ID, 
     }];
     const nodes = overrides.nodes ?? [{
         id: NODE_ID,
         name: 'node-a',
-        registry_project: { id: 'rp-1', external_name: 'project-a' },
+        registryProject: { id: 'rp-1', externalName: 'project-a' },
     }];
 
     return createFakeClient({
@@ -63,8 +63,8 @@ function createCoreClient(overrides: Overrides = {}) {
                 data: {
                     id: REGISTRY_ID,
                     host: 'registry.fake.test',
-                    account_name: 'robot',
-                    account_secret: 'secret',
+                    accountName: 'robot',
+                    accountSecret: 'secret',
                 },
                 meta: {},
             }),
@@ -116,10 +116,10 @@ describe('AnalysisDistributorCheckHandler', () => {
         const docker = new FakeDockerClient();
         await run(coreClient, docker);
 
-        // `account_secret` is `select: false` server-side, so the worker has to
-        // opt in via `fields=+account_secret`.
+        // `accountSecret` is `select: false` server-side, so the worker has to
+        // opt in via `fields=+accountSecret`.
         const registryRequest = coreClient.requests.find((request) => request.url.includes('/registries/'));
-        expect(decodeURIComponent(registryRequest.url)).toContain('account_secret');
+        expect(decodeURIComponent(registryRequest.url)).toContain('accountSecret');
 
         expect(docker.calls[0].authconfig).toMatchObject({ username: 'robot', password: 'secret' });
     });
@@ -144,8 +144,8 @@ describe('AnalysisDistributorCheckHandler', () => {
     });
 
     it('should fail the check when the analysis has no registry assigned', async () => {
-        // `analysis.registry_id` is nullable and the FK detaches on SET NULL.
-        const coreClient = createCoreClient({ analysis: { registry_id: null } });
+        // `analysis.registryId` is nullable and the FK detaches on SET NULL.
+        const coreClient = createCoreClient({ analysis: { registryId: null } });
         const docker = new FakeDockerClient();
         const context = await run(coreClient, docker);
 
@@ -158,7 +158,7 @@ describe('AnalysisDistributorCheckHandler', () => {
             nodes: [{
                 id: NODE_ID, 
                 name: 'node-a', 
-                registry_project: null, 
+                registryProject: null, 
             }], 
         });
         const docker = new FakeDockerClient();
@@ -181,8 +181,8 @@ describe('AnalysisDistributorCheckHandler', () => {
     it('should keep an in-flight distribution status when the image is missing but fresh', async () => {
         const coreClient = createCoreClient({
             analysis: {
-                distribution_status: ProcessStatus.STARTED,
-                updated_at: new Date().toISOString(),
+                distributionStatus: ProcessStatus.STARTED,
+                updatedAt: new Date().toISOString(),
             },
         });
         const docker = new FakeDockerClient({ distributionError: new FakeDockerError(404) });
@@ -194,8 +194,8 @@ describe('AnalysisDistributorCheckHandler', () => {
     it('should recover a stale in-flight distribution as FAILED', async () => {
         const coreClient = createCoreClient({
             analysis: {
-                distribution_status: ProcessStatus.STARTED,
-                updated_at: new Date(Date.now() - ANALYSIS_PROCESS_STALE_THRESHOLD_MS - 1000).toISOString(),
+                distributionStatus: ProcessStatus.STARTED,
+                updatedAt: new Date(Date.now() - ANALYSIS_PROCESS_STALE_THRESHOLD_MS - 1000).toISOString(),
             },
         });
         const docker = new FakeDockerClient({ distributionError: new FakeDockerError(404) });

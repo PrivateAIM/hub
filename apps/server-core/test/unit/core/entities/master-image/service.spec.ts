@@ -30,16 +30,16 @@ function createTestMasterImage(overrides?: Partial<MasterImage>): MasterImage {
         id: randomUUID(),
         name: 'test-image',
         path: '/path/to/image',
-        virtual_path: 'image/path',
-        group_virtual_path: 'group/path',
+        virtualPath: 'image/path',
+        groupVirtualPath: 'group/path',
         command: null,
-        command_arguments: null,
-        build_status: null,
-        build_progress: null,
-        build_hash: null,
-        build_size: null,
-        created_at: new Date(),
-        updated_at: new Date(),
+        commandArguments: null,
+        buildStatus: null,
+        buildProgress: null,
+        buildHash: null,
+        buildSize: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     } as MasterImage;
 }
@@ -130,7 +130,7 @@ describe('MasterImageService', () => {
         });
 
         describe('BUILD', () => {
-            it('should call builderCaller and set build_status to STARTING', async () => {
+            it('should call builderCaller and set buildStatus to STARTING', async () => {
                 const image = createTestMasterImage({ id: 'mi-1' });
                 repository.seed(image);
 
@@ -141,7 +141,7 @@ describe('MasterImageService', () => {
                 );
 
                 expect(result).toBeDefined();
-                expect(result!.build_status).toBe(ProcessStatus.STARTING);
+                expect(result!.buildStatus).toBe(ProcessStatus.STARTING);
                 expect(builderCaller.getCallCount()).toBe(1);
                 expect(builderCaller.getCalls()[0]).toEqual({ id: 'mi-1' });
             });

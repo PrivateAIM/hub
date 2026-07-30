@@ -17,7 +17,7 @@ export class RegistryProjectValidator extends Container<RegistryProject> {
         super.initialize();
 
         this.mount(
-            'registry_id',
+            'registryId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );
@@ -40,13 +40,13 @@ export class RegistryProjectValidator extends Container<RegistryProject> {
         // mirrors the pre-migration form rule.
         const externalNameValidator = createValidator(z.string().min(3).max(64).regex(/^[a-z0-9-_]*$/));
         this.mount(
-            'external_name',
+            'externalName',
             { group: ValidatorGroup.CREATE },
             externalNameValidator,
         );
 
         this.mount(
-            'external_name',
+            'externalName',
             { group: ValidatorGroup.UPDATE, optional: true },
             externalNameValidator,
         );

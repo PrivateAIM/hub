@@ -14,7 +14,7 @@ import { AuthupClientCredentialStore } from '../../../../../src/app/modules/data
 // transform, decode) instead of stopping at a hand-written object literal.
 
 describe('AuthupClientCredentialStore', () => {
-    it('should fetch the client with the +secret field and map id/name/display_name/secret', async () => {
+    it('should fetch the client with the +secret field and map id/name/displayName/secret', async () => {
         const authup = createFakeAuthupClient({
             handlers: {
                 'GET /clients/:id': (req) => ({
@@ -35,7 +35,7 @@ describe('AuthupClientCredentialStore', () => {
         expect(result).toEqual({
             id: 'client-1',
             name: 'node-1',
-            display_name: 'Node 1',
+            displayName: 'Node 1',
             secret: 'sek',
         });
 
@@ -43,7 +43,7 @@ describe('AuthupClientCredentialStore', () => {
         expect(decodeURIComponent(authup.requests[0].url)).toContain('+secret');
     });
 
-    it('should null a missing secret and display_name', async () => {
+    it('should null a missing secret and displayName', async () => {
         const authup = createFakeAuthupClient({
             handlers: {
                 'GET /clients/:id': (req) => ({
@@ -58,7 +58,7 @@ describe('AuthupClientCredentialStore', () => {
         expect(await reader.readByClientId('client-2')).toEqual({
             id: 'client-2',
             name: 'node-2',
-            display_name: null,
+            displayName: null,
             secret: null,
         });
     });
@@ -70,7 +70,7 @@ describe('AuthupClientCredentialStore', () => {
                     data: {
                         id: req.params.id,
                         name: 'node-1',
-                        display_name: null,
+                        displayName: null,
                         // The stored value may be hashed — the store must NOT
                         // echo it back.
                         secret: 'stored-hash',
@@ -87,7 +87,7 @@ describe('AuthupClientCredentialStore', () => {
         expect(result).toEqual({
             id: 'client-1',
             name: 'node-1',
-            display_name: null,
+            displayName: null,
             secret: 'my-secret',
         });
     });
@@ -99,7 +99,7 @@ describe('AuthupClientCredentialStore', () => {
                     data: {
                         id: req.params.id,
                         name: 'node-2',
-                        display_name: null,
+                        displayName: null,
                         secret: 'stored-hash',
                     },
                     meta: {},
@@ -116,12 +116,12 @@ describe('AuthupClientCredentialStore', () => {
         expect(result).toEqual({
             id: 'client-2',
             name: 'node-2',
-            display_name: null,
+            displayName: null,
             secret: written,
         });
     });
 
-    it('should pass name and display_name through to the client update', async () => {
+    it('should pass name and displayName through to the client update', async () => {
         const authup = createFakeAuthupClient({
             handlers: {
                 'POST /clients/:id': (req) => {
@@ -140,7 +140,7 @@ describe('AuthupClientCredentialStore', () => {
         });
 
         const store = new AuthupClientCredentialStore(authup);
-        await store.writeByClientId('client-3', { name: 'renamed', display_name: 'Renamed' });
+        await store.writeByClientId('client-3', { name: 'renamed', displayName: 'Renamed' });
 
         const body = authup.requests[0].body as Record<string, any>;
         // An omitted secret still rotates; the labels ride along on the update.

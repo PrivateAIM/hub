@@ -12,26 +12,30 @@ import {
     useRequestIdentityRealm,
     useRequestPermissionChecker,
 } from '@privateaim/server-http-kit';
-import type { ActorContext } from '@privateaim/server-kit';
+import type { ActorContext, EntityEventMetadata } from '@privateaim/server-kit';
 
 export function buildActorContext(event: IAppEvent): ActorContext {
     const identity = useRequestIdentity(event);
     const realm = useRequestIdentityRealm(event);
     const permissionChecker = useRequestPermissionChecker(event);
 
-    const metadata: Record<string, any> = {
-        request_path: event.path,
-        request_method: event.method || 'GET',
-        request_user_agent: flattenString(
+    // Typed against EntityEventMetadata rather than Record<string, any>: these
+    // keys are read back BY NAME in @privateaim/server-telemetry-kit's
+    // EntityEventHandler and land on the telemetry `events` row, so a one-sided
+    // rename would silently drop every audit field.
+    const metadata: Partial<EntityEventMetadata> = {
+        requestPath: event.path,
+        requestMethod: event.method || 'GET',
+        requestUserAgent: flattenString(
             getRequestHeader(event, 'user-agent'),
         ),
-        request_ip_address: getRequestIP(event, { trustProxy: true }),
+        requestIpAddress: getRequestIP(event, { trustProxy: true }),
     };
 
     if (identity) {
-        metadata.actor_id = identity.id;
-        metadata.actor_type = identity.type;
-        metadata.actor_name = identity.attributes?.name;
+        metadata.actorId = identity.id;
+        metadata.actorType = identity.type;
+        metadata.actorName = identity.attributes?.name;
     }
 
     return {

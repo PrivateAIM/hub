@@ -56,15 +56,15 @@ export class AnalysisNodeLogController {
 
         const filtersNormalized = collectRootFilterValues(query);
 
-        if (!filtersNormalized.analysis_id || !filtersNormalized.node_id) {
-            throw new BadRequestError('The filters node_id and analysis_id must be defined.');
+        if (!filtersNormalized.analysisId || !filtersNormalized.nodeId) {
+            throw new BadRequestError('The filters nodeId and analysisId must be defined.');
         }
 
         const filters : FiltersBuildInput<Log> = {
             labels: {
                 [LogFlag.REF_TYPE]: DomainType.ANALYSIS_NODE,
-                analysis_id: filtersNormalized.analysis_id,
-                node_id: filtersNormalized.node_id,
+                analysisId: filtersNormalized.analysisId,
+                nodeId: filtersNormalized.nodeId,
             },
         };
 
@@ -105,32 +105,32 @@ export class AnalysisNodeLogController {
 
         const dataSource = await useDataSource();
         const nodeRepository = dataSource.getRepository(NodeEntity);
-        const node = await nodeRepository.findOneBy({ id: data.node_id });
+        const node = await nodeRepository.findOneBy({ id: data.nodeId });
         if (!node) {
             throw new ValidupError([
                 defineIssueItem({
-                    path: ['node_id'],
-                    message: buildErrorMessageForAttribute('node_id'),
+                    path: ['nodeId'],
+                    message: buildErrorMessageForAttribute('nodeId'),
                 }),
             ]);
         }
 
-        data.node_realm_id = node.realm_id;
+        data.nodeRealmId = node.realmId;
 
         const analysisRepository = dataSource.getRepository(AnalysisEntity);
-        const analysis = await analysisRepository.findOneBy({ id: data.analysis_id });
+        const analysis = await analysisRepository.findOneBy({ id: data.analysisId });
         if (!analysis) {
             throw new ValidupError([
                 defineIssueItem({
-                    path: ['analysis_id'],
-                    message: buildErrorMessageForAttribute('analysis_id'),
+                    path: ['analysisId'],
+                    message: buildErrorMessageForAttribute('analysisId'),
                 }),
             ]);
         }
 
-        data.analysis_realm_id = analysis.realm_id;
+        data.analysisRealmId = analysis.realmId;
 
-        const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(event), data.node_realm_id);
+        const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(event), data.nodeRealmId);
         if (!isAuthorityOfNode) {
             throw new PermissionDeniedError('You are not an actor of the node realm.');
         }
@@ -140,8 +140,8 @@ export class AnalysisNodeLogController {
             ...(data.labels || {}),
             [LogFlag.REF_TYPE]: DomainType.ANALYSIS_NODE,
             ...pickRecord(data, [
-                'analysis_id',
-                'node_id',
+                'analysisId',
+                'nodeId',
                 'code',
                 'status',
             ]),
@@ -182,15 +182,15 @@ export class AnalysisNodeLogController {
 
         const filtersNormalized = collectRootFilterValues(query);
 
-        if (!filtersNormalized.analysis_id || !filtersNormalized.node_id) {
-            throw new BadRequestError('The filters node_id and analysis_id must be defined.');
+        if (!filtersNormalized.analysisId || !filtersNormalized.nodeId) {
+            throw new BadRequestError('The filters nodeId and analysisId must be defined.');
         }
 
         const filters : FiltersBuildInput<Log> = {
             labels: {
                 [LogFlag.REF_TYPE]: DomainType.ANALYSIS_NODE,
-                analysis_id: filtersNormalized.analysis_id,
-                node_id: filtersNormalized.node_id,
+                analysisId: filtersNormalized.analysisId,
+                nodeId: filtersNormalized.nodeId,
             },
             time: `${((BigInt(Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10))) * 1_000_000n).toString()}`,
         };

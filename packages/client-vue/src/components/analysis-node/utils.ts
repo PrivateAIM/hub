@@ -9,15 +9,15 @@ import type { AnalysisNode } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 
 export function getAnalysisNodeExecutionProgress(item: AnalysisNode): number {
-    if (item.execution_status === ProcessStatus.EXECUTED) {
+    if (item.executionStatus === ProcessStatus.EXECUTED) {
         return 100;
     }
 
-    return item.execution_progress || 0;
+    return item.executionProgress || 0;
 }
 
 export function getAnalysisNodeExecutionProgressColor(item: AnalysisNode): string {
-    switch (item.execution_status) {
+    switch (item.executionStatus) {
         case ProcessStatus.EXECUTED:
             return 'bg-success-600';
         case ProcessStatus.FAILED:

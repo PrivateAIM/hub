@@ -69,10 +69,10 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
 
         await this.repository.validateJoinColumns(validated);
 
-        validated.project_realm_id = validated.project.realm_id;
-        validated.node_realm_id = validated.node.realm_id;
+        validated.projectRealmId = validated.project.realmId;
+        validated.nodeRealmId = validated.node.realmId;
 
-        if (!isRealmResourceWritable(actor.realm, validated.project.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, validated.project.realmId)) {
             throw new PermissionDeniedError('The referenced project realm is not permitted.');
         }
 
@@ -82,7 +82,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
             this.skipProjectApproval ||
             (validated.node.type === NodeType.AGGREGATOR)
         ) {
-            entity.approval_status = ProjectNodeApprovalStatus.APPROVED;
+            entity.approvalStatus = ProjectNodeApprovalStatus.APPROVED;
         }
 
         await this.repository.save(entity, { data: actor.metadata });
@@ -103,7 +103,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
             throw new EntityNotFoundError({ entity: 'project-node' });
         }
 
-        const isAuthorityOfNode = isRealmResourceWritable(actor.realm, entity.node_realm_id);
+        const isAuthorityOfNode = isRealmResourceWritable(actor.realm, entity.nodeRealmId);
         if (!isAuthorityOfNode) {
             throw new PermissionDeniedError('You are not permitted to update this object.');
         }
@@ -127,8 +127,8 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
         }
 
         if (
-            !isRealmResourceWritable(actor.realm, entity.node_realm_id) &&
-            !isRealmResourceWritable(actor.realm, entity.project_realm_id)
+            !isRealmResourceWritable(actor.realm, entity.nodeRealmId) &&
+            !isRealmResourceWritable(actor.realm, entity.projectRealmId)
         ) {
             throw new PermissionDeniedError('You are not authorized to drop this relation object.');
         }
@@ -139,7 +139,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
 
         entity.id = entityId;
 
-        const project = await this.projectRepository.findOneBy({ id: entity.project_id });
+        const project = await this.projectRepository.findOneBy({ id: entity.projectId });
         if (project) {
             project.nodes -= 1;
             await this.projectRepository.save(project, { data: actor.metadata });

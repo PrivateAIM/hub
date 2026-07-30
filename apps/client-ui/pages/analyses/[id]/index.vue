@@ -63,7 +63,7 @@ export default defineNuxtComponent({
                 />
             </div>
 
-            <div v-if="entity.configuration_locked">
+            <div v-if="entity.configurationLocked">
                 <div class="card-grey card">
                     <div class="card-header">
                         <div class="title">

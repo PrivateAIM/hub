@@ -43,19 +43,19 @@ export class RequestRepositoryAdapter<T extends Repository<any>> {
 
     private extendOptionsData<F extends { data?: any, [key: string]: any }>(options: F) : F {
         const metadata : Partial<EntityEventMetadata> = {
-            request_path: this.event.path,
-            request_method: this.event.method || 'GET',
-            request_user_agent: this.flattenString(
+            requestPath: this.event.path,
+            requestMethod: this.event.method || 'GET',
+            requestUserAgent: this.flattenString(
                 getRequestHeader(this.event, 'user-agent'),
             ),
-            request_ip_address: getRequestIP(this.event, { trustProxy: true }),
+            requestIpAddress: getRequestIP(this.event, { trustProxy: true }),
         };
 
         const identity = useRequestIdentity(this.event);
         if (identity) {
-            metadata.actor_id = identity.id;
-            metadata.actor_type = identity.type;
-            metadata.actor_name = identity.attributes?.name;
+            metadata.actorId = identity.id;
+            metadata.actorType = identity.type;
+            metadata.actorName = identity.attributes?.name;
         }
 
         options.data = {

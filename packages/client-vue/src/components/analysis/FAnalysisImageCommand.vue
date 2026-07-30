@@ -61,20 +61,20 @@ export default defineComponent({
             },
             onResolved: (entity) => {
                 if (entity) {
-                    if (entity.master_image) {
-                        masterImageManager.data.value = entity.master_image;
-                    } else if (entity.master_image_id) {
-                        masterImageManager.resolve({ id: entity.master_image_id });
+                    if (entity.masterImage) {
+                        masterImageManager.data.value = entity.masterImage;
+                    } else if (entity.masterImageId) {
+                        masterImageManager.resolve({ id: entity.masterImageId });
                     }
 
                     analysisBucketFileManager.resolve({
                         query: {
                             filters: {
-                                analysis_id: entity.id,
-                                analysis_bucket: { type: AnalysisBucketType.CODE },
+                                analysisId: entity.id,
+                                analysisBucket: { type: AnalysisBucketType.CODE },
                                 root: true,
                             },
-                            relations: { analysis_bucket: true },
+                            relations: { analysisBucket: true },
                         },
                     });
                 } else {
@@ -118,14 +118,14 @@ export default defineComponent({
             }
 
             const entity = props.entity as Analysis;
-            if (entity.master_image_id) {
-                if (entity.master_image) {
-                    masterImageManager.data.value = entity.master_image;
+            if (entity.masterImageId) {
+                if (entity.masterImage) {
+                    masterImageManager.data.value = entity.masterImage;
                 } else if (
                     !masterImageManager.data.value ||
-                        masterImageManager.data.value.id !== entity.master_image_id
+                        masterImageManager.data.value.id !== entity.masterImageId
                 ) {
-                    masterImageManager.resolve({ id: entity.master_image_id, reset: true });
+                    masterImageManager.resolve({ id: entity.masterImageId, reset: true });
                 }
             } else {
                 masterImageManager.data.value = null;
@@ -140,8 +140,8 @@ export default defineComponent({
             return null;
         });
 
-        const commandArguments = computed(() => analysisManager.data.value?.image_command_arguments ??
-                masterImageManager.data.value?.command_arguments);
+        const commandArguments = computed(() => analysisManager.data.value?.imageCommandArguments ??
+                masterImageManager.data.value?.commandArguments);
 
         const file = computed(() => {
             if (analysisBucketFileManager.data.value) {

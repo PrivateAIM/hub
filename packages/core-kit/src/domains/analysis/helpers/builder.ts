@@ -16,21 +16,21 @@ export class AnalysisBuilderCommandChecker {
      * @param entity
      */
     static canStart(entity: Analysis) {
-        if (!entity.configuration_locked) {
+        if (!entity.configurationLocked) {
             throw AnalysisError.configurationNotLocked();
         }
 
-        if (!entity.build_nodes_valid) {
+        if (!entity.buildNodesValid) {
             throw AnalysisError.nodesApprovalRequired();
         }
 
-        if (!entity.build_status) {
+        if (!entity.buildStatus) {
             return;
         }
 
         if (
-            entity.build_status === ProcessStatus.FAILED ||
-            entity.build_status === ProcessStatus.STOPPED
+            entity.buildStatus === ProcessStatus.FAILED ||
+            entity.buildStatus === ProcessStatus.STOPPED
         ) {
             return;
         }
@@ -44,11 +44,11 @@ export class AnalysisBuilderCommandChecker {
      * @param entity
      */
     static canCheck(entity: Analysis) {
-        if (!entity.configuration_locked) {
+        if (!entity.configurationLocked) {
             throw new AnalysisError('The analysis configuration must be locked before checking the build status.');
         }
 
-        if (!entity.build_status) {
+        if (!entity.buildStatus) {
             throw new AnalysisError('The analysis build process has not been initialized.');
         }
 

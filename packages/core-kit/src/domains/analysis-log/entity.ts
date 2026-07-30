@@ -17,9 +17,9 @@ export interface AnalysisLog {
 
     labels: Record<string, string>,
 
-    time: string | bigint | null,
+    time: string | null,
 
-    analysis_id: Analysis['id'];
+    analysisId: Analysis['id'];
 
-    realm_id: Realm['id'];
+    realmId: Realm['id'];
 }

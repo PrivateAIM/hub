@@ -26,13 +26,13 @@ import { VCFormGroup, VCFormInput, useSubmitButton } from '@vuecs/forms';
 class LoginCredentialsValidator extends Container<{
     name: string;
     password: string;
-    realm_id: string;
+    realmId: string;
 }> {
     protected override initialize() {
         super.initialize();
         this.mount('name', createValidator(z.string().min(3).max(255)));
         this.mount('password', createValidator(z.string().min(3).max(255)));
-        this.mount('realm_id', { optional: true }, createValidator(z.string()));
+        this.mount('realmId', { optional: true }, createValidator(z.string()));
     }
 }
 
@@ -53,15 +53,15 @@ export default defineComponent({
         const form = reactive({
             name: '',
             password: '',
-            realm_id: '',
+            realmId: '',
         });
 
         if (realmId.value) {
-            form.realm_id = realmId.value;
+            form.realmId = realmId.value;
         }
 
         watch(realmId, (val) => {
-            form.realm_id = val ?? '';
+            form.realmId = val ?? '';
         });
 
         const v = useValidup(new LoginCredentialsValidator(), form);
@@ -78,7 +78,7 @@ export default defineComponent({
                 await store.login({
                     name: form.name,
                     password: form.password,
-                    realmId: form.realm_id,
+                    realmId: form.realmId,
                 });
 
                 emit('done');

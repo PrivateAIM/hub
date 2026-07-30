@@ -21,7 +21,7 @@ export function buildDockerAuthConfig(config: DockerConnectionOptions): DockerAu
 export function buildDockerAuthConfigFromRegistry(registry: Registry) : AuthConfig {
     return buildDockerAuthConfig({
         host: registry.host,
-        user: registry.account_name,
-        password: registry.account_secret,
+        user: registry.accountName,
+        password: registry.accountSecret,
     });
 }

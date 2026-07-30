@@ -33,14 +33,14 @@ export class BucketSubscriber extends BaseSubscriber<
                     },
                 ];
 
-                if (data.realm_id) {
+                if (data.realmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: DomainType.BUCKET,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: [DomainType.BUCKET, data.id],
                     });
                 }

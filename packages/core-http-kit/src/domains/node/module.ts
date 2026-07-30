@@ -64,7 +64,7 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
 
     /**
      * Update the node client's credentials. An omitted `secret` rotates to a
-     * fresh one; an omitted `name` / `display_name` leaves that field unchanged.
+     * fresh one; an omitted `name` / `displayName` leaves that field unchanged.
      * Returns the new credentials once.
      */
     async setClientCredentials(id: Node['id'], data?: NodeClientCredentialsUpdate): Promise<NodeClientCredentials> {

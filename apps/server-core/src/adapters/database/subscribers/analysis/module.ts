@@ -40,14 +40,14 @@ export class AnalysisSubscriber extends BaseSubscriber<
                     },
                 ];
 
-                if (data.realm_id) {
+                if (data.realmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: DomainType.ANALYSIS,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: [DomainType.ANALYSIS, data.id],
                     });
                 }
@@ -97,7 +97,7 @@ export class AnalysisSubscriber extends BaseSubscriber<
     ): Promise<void> {
         if (!this.analysisClientService) return;
 
-        const prevId = entity.client_id;
+        const prevId = entity.clientId;
 
         const client = await this.analysisClientService.assign(entity);
         if (client.id !== prevId) {

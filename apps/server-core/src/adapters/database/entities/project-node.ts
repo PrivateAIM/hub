@@ -26,49 +26,50 @@ import type { Realm } from '@authup/core-kit';
 import { ProjectEntity } from './project.ts';
 import { NodeEntity } from './node.ts';
 
-@Unique(['project_id', 'node_id'])
+@Unique(['projectId', 'nodeId'])
 @Entity({ name: 'project_nodes' })
 export class ProjectNodeEntity implements ProjectNode {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({
+        name: 'approval_status',
         type: 'varchar', 
         length: 32, 
         default: null, 
     })
-    approval_status: ProjectNodeApprovalStatus | null;
+    approvalStatus: ProjectNodeApprovalStatus | null;
 
     @Column({ type: 'text', nullable: true })
     comment: string;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    @Column()
-    project_id: Project['id'];
+    @Column({ name: 'project_id' })
+    projectId: Project['id'];
 
     @ManyToOne(() => ProjectEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'project_id' })
     project: ProjectEntity;
 
-    @Column({ type: 'uuid' })
-    project_realm_id: Realm['id'];
+    @Column({ name: 'project_realm_id', type: 'uuid' })
+    projectRealmId: Realm['id'];
 
-    @Column()
-    node_id: Node['id'];
+    @Column({ name: 'node_id' })
+    nodeId: Node['id'];
 
     @ManyToOne(() => NodeEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
-    @Column({ type: 'uuid' })
-    node_realm_id: string;
+    @Column({ name: 'node_realm_id', type: 'uuid' })
+    nodeRealmId: string;
 }

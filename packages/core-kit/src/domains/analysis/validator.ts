@@ -19,7 +19,7 @@ export class AnalysisValidator extends Container<Analysis> {
         super.initialize();
 
         this.mount(
-            'project_id',
+            'projectId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );
@@ -47,7 +47,7 @@ export class AnalysisValidator extends Container<Analysis> {
 
         // Human-readable label shown in the UI. Free-form, optional.
         this.mount(
-            'display_name',
+            'displayName',
             { optional: true },
             createValidator(z.string().min(3).max(256).nullable()),
         );
@@ -59,26 +59,26 @@ export class AnalysisValidator extends Container<Analysis> {
         );
 
         this.mount(
-            'master_image_id',
+            'masterImageId',
             { optional: true },
             createValidator(z.uuid().nullable()),
         );
 
         this.mount(
-            'registry_id',
+            'registryId',
             { optional: true },
             createValidator(z.uuid().nullable()),
         );
 
         const commandArgumentValidator = new ImageAttributeCommandArgumentsValidator();
         // image_command_executable
-        this.mount('image_command_arguments', { optional: true }, (ctx) => {
+        this.mount('imageCommandArguments', { optional: true }, (ctx) => {
             if (ctx.value == null) {
                 return ctx.value;
             }
 
             if (!Array.isArray(ctx.value)) {
-                throw new BadRequestError('image_command_arguments must be an array.');
+                throw new BadRequestError('imageCommandArguments must be an array.');
             }
 
             const promises = ctx.value.map((child) => commandArgumentValidator.run(child, {

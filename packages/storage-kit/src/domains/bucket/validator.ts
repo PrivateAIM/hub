@@ -37,7 +37,7 @@ export class BucketValidator extends Container<Partial<Bucket>> {
         );
 
         this.mount(
-            'realm_id',
+            'realmId',
             { group: ValidatorGroup.CREATE, optional: true },
             createValidator(
                 zod.string()

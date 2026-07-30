@@ -83,9 +83,9 @@ function buildService(opts: {
 function baseNode(overrides: Partial<Node> = {}): Partial<Node> {
     return {
         id: NODE_ID,
-        realm_id: 'realm-b',
-        client_id: 'node-client-1',
-        registry_project_id: REGISTRY_PROJECT_ID,
+        realmId: 'realm-b',
+        clientId: 'node-client-1',
+        registryProjectId: REGISTRY_PROJECT_ID,
         ...overrides,
     };
 }
@@ -101,10 +101,10 @@ function baseRegistry(overrides: Partial<Registry> = {}): Partial<Registry> {
 function baseRegistryProject(overrides: Partial<RegistryProject> = {}): Partial<RegistryProject> {
     return {
         id: REGISTRY_PROJECT_ID,
-        registry_id: REGISTRY_ID,
-        external_name: 'node-project',
-        account_name: 'robot$node-project',
-        account_secret: 'the-secret',
+        registryId: REGISTRY_ID,
+        externalName: 'node-project',
+        accountName: 'robot$node-project',
+        accountSecret: 'the-secret',
         ...overrides,
     };
 }
@@ -125,9 +125,9 @@ describe('NodeRegistryCredentialService', () => {
 
         expect(credentials).toEqual({
             host: 'registry.example.com',
-            external_name: 'node-project',
-            account_name: 'robot$node-project',
-            account_secret: 'the-secret',
+            externalName: 'node-project',
+            accountName: 'robot$node-project',
+            accountSecret: 'the-secret',
         });
     });
 
@@ -146,7 +146,7 @@ describe('NodeRegistryCredentialService', () => {
 
         const credentials = await service.getCredentials(NODE_ID, nodeClientActor('node-client-1'));
 
-        expect(credentials.account_secret).toBe('the-secret');
+        expect(credentials.accountSecret).toBe('the-secret');
         expect(credentials.host).toBe('registry.example.com');
     });
 
@@ -167,8 +167,8 @@ describe('NodeRegistryCredentialService', () => {
     });
 
     it('should deny the node\'s own client when the node has no client provisioned', async () => {
-        // A null client_id must never match a (also nullish) actor id.
-        const service = fullSetup(baseNode({ client_id: null }));
+        // A null clientId must never match a (also nullish) actor id.
+        const service = fullSetup(baseNode({ clientId: null }));
 
         await expect(
             service.getCredentials(NODE_ID, nodeClientActor('node-client-1')),
@@ -185,7 +185,7 @@ describe('NodeRegistryCredentialService', () => {
 
     it('should reject when the node has no registry project provisioned', async () => {
         const service = buildService({
-            node: baseNode({ registry_project_id: null }),
+            node: baseNode({ registryProjectId: null }),
             registry: baseRegistry(),
             registryProject: baseRegistryProject(),
         });
@@ -222,7 +222,7 @@ describe('NodeRegistryCredentialService', () => {
     it('should authorize before exposing provisioning state', async () => {
         // An unauthorized actor on an unprovisioned node must be denied, never
         // leak provisioning state via BadRequestError.
-        const service = fullSetup(baseNode({ registry_project_id: null }));
+        const service = fullSetup(baseNode({ registryProjectId: null }));
 
         await expect(
             service.getCredentials(NODE_ID, userActor()),

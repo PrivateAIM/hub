@@ -45,7 +45,7 @@ export default defineComponent({
                     <div>
                         <span class="title">Code</span>
                     </div>
-                    <template v-if="!entity.configuration_locked">
+                    <template v-if="!entity.configurationLocked">
                         <div class="ms-auto">
                             <VCButton
                                 style="width: 120px"
@@ -81,8 +81,8 @@ export default defineComponent({
                     <template #default="props">
                         <FBucketFilesManager
                             ref="bucketFiles"
-                            :entity-id="props.data.bucket_id"
-                            :readonly="entity.configuration_locked"
+                            :entity-id="props.data.bucketId"
+                            :readonly="entity.configurationLocked"
                         />
                     </template>
                 </FAnalysisTypeBucket>

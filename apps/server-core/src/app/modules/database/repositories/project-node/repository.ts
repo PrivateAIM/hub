@@ -58,7 +58,7 @@ export class ProjectNodeRepositoryAdapter implements IProjectNodeRepository {
 
     async findManyWithNodeByProject(projectId: string): Promise<ProjectNode[]> {
         return this.repository.find({
-            where: { project_id: projectId },
+            where: { projectId },
             relations: { node: true },
             cache: false,
         });

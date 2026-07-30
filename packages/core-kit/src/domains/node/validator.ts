@@ -41,31 +41,31 @@ export class NodeValidator extends Container<Node> {
         );
 
         this.mount(
-            'public_key',
+            'publicKey',
             { optional: true },
             createValidator(z.string().min(5).max(4096).nullable()),
         );
 
         this.mount(
-            'external_name',
+            'externalName',
             { optional: true },
             createValidator(z.string().min(1).max(64).regex(/^[a-z0-9-_]*$/).nullable()),
         );
 
         this.mount(
-            'registry_id',
+            'registryId',
             { optional: true },
             createValidator(z.uuid().nullable()),
         );
 
         this.mount(
-            'client_id',
+            'clientId',
             { optional: true },
             createValidator(z.uuid().nullable()),
         );
 
         this.mount(
-            'realm_id',
+            'realmId',
             { group: ValidatorGroup.CREATE, optional: true },
             createValidator(z.uuid().nullable()),
         );

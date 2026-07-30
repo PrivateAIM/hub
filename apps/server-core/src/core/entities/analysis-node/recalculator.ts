@@ -60,12 +60,12 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
 
         for (const analysisNode of analysisNodes) {
             nodes++;
-            if (analysisNode.approval_status === AnalysisNodeApprovalStatus.APPROVED) {
+            if (analysisNode.approvalStatus === AnalysisNodeApprovalStatus.APPROVED) {
                 nodesApproved += 1;
             }
 
-            executionProgress += analysisNode.execution_progress || 0;
-            executionStatuses.push(analysisNode.execution_status);
+            executionProgress += analysisNode.executionProgress || 0;
+            executionStatuses.push(analysisNode.executionStatus);
 
             if (analysisNode.node.type === NodeType.AGGREGATOR) {
                 hasAggregator = true;
@@ -78,22 +78,22 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
         }
 
         entity.nodes = nodes;
-        entity.nodes_approved = nodesApproved;
+        entity.nodesApproved = nodesApproved;
 
         const ignoreApproval = this.config.skipAnalysisApproval ||
             this.config.env === EnvironmentName.TEST;
 
-        entity.build_nodes_valid = entity.nodes > 0 &&
-            (ignoreApproval || entity.nodes === entity.nodes_approved);
+        entity.buildNodesValid = entity.nodes > 0 &&
+            (ignoreApproval || entity.nodes === entity.nodesApproved);
 
-        entity.execution_status = getMinProcessStatus(executionStatuses);
-        entity.execution_progress = executionProgress > 0 && nodes > 0 ?
+        entity.executionStatus = getMinProcessStatus(executionStatuses);
+        entity.executionProgress = executionProgress > 0 && nodes > 0 ?
             Math.floor(executionProgress / nodes) :
             0;
 
-        entity.configuration_node_aggregator_valid = hasAggregator;
-        entity.configuration_node_default_valid = hasDefault;
-        entity.configuration_nodes_valid = hasAggregator && hasDefault;
+        entity.configurationNodeAggregatorValid = hasAggregator;
+        entity.configurationNodeDefaultValid = hasDefault;
+        entity.configurationNodesValid = hasAggregator && hasDefault;
 
         if (hasAnalysisChanged(cloned, entity)) {
             await this.analysisRepository.save(entity);

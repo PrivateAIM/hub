@@ -59,8 +59,8 @@ export default {
         const refs = toRefs(props);
 
         const query : QueryBuildInput<RegistryProject, 3> = {
-            filters: { registry_id: refs.entity.value.id },
-            fields: ['+account_id', '+account_name', '+account_secret'],
+            filters: { registryId: refs.entity.value.id },
+            fields: ['+accountId', '+accountName', '+accountSecret'],
         };
 
         const columns: TableColumn<RegistryProject>[] = [
@@ -83,13 +83,13 @@ export default {
                 cellClass: 'text-left',
             },
             {
-                key: 'created_at',
+                key: 'createdAt',
                 label: 'Created At',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
             },
             {
-                key: 'updated_at',
+                key: 'updatedAt',
                 label: 'Updated At',
                 headerClass: 'text-left',
                 cellClass: 'text-left',
@@ -203,11 +203,11 @@ export default {
                             />
                         </div>
                     </template>
-                    <template #cell-created_at="{ row }">
-                        <timeago :datetime="row.created_at" />
+                    <template #cell-createdAt="{ row }">
+                        <timeago :datetime="row.createdAt" />
                     </template>
-                    <template #cell-updated_at="{ row }">
-                        <timeago :datetime="row.updated_at" />
+                    <template #cell-updatedAt="{ row }">
+                        <timeago :datetime="row.updatedAt" />
                     </template>
                     <VCTableLoading />
                     <VCTableEmpty />
@@ -228,7 +228,7 @@ export default {
                         v-if="item"
                         :key="item.id"
                         :entity-id="item.id"
-                        :realm-id="item.realm_id"
+                        :realm-id="item.realmId"
                     />
                 </div>
             </VCModalContent>

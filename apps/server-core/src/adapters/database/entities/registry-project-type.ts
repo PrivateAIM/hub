@@ -6,7 +6,7 @@
  */
 
 export type RegistryProjectVaultPayload = {
-    account_name: string,
-    account_id: string,
-    account_secret: string
+    accountName: string,
+    accountId: string,
+    accountSecret: string
 };

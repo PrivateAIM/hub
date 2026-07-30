@@ -18,7 +18,7 @@ export class StorageBucketFileCreationFinishedHandler extends BaseAggregatorHand
 > {
     async handle(data: BucketFile): Promise<void> {
         const analysisBucketRepository = this.dataSource.getRepository(AnalysisBucketEntity);
-        const analysisBucket = await analysisBucketRepository.findOneBy({ bucket_id: data.bucket_id });
+        const analysisBucket = await analysisBucketRepository.findOneBy({ bucketId: data.bucketId });
 
         if (!analysisBucket) {
             this.logger?.debug(`Can not associate ${data.path} to an analysis bucket`);
@@ -30,20 +30,20 @@ export class StorageBucketFileCreationFinishedHandler extends BaseAggregatorHand
         const analysisBucketFileRepository = this.dataSource.getRepository(AnalysisBucketFileEntity);
         const analysisBucketFile = analysisBucketFileRepository.create({
             path: data.path,
-            analysis_bucket_id: analysisBucket.id,
-            analysis_id: analysisBucket.analysis_id,
-            realm_id: analysisBucket.realm_id,
-            bucket_file_id: data.id,
-            bucket_id: data.bucket_id,
+            analysisBucketId: analysisBucket.id,
+            analysisId: analysisBucket.analysisId,
+            realmId: analysisBucket.realmId,
+            bucketFileId: data.id,
+            bucketId: data.bucketId,
         });
 
-        switch (data.actor_type) {
+        switch (data.actorType) {
             case 'user': {
-                analysisBucketFile.user_id = data.actor_id;
+                analysisBucketFile.userId = data.actorId;
                 break;
             }
             case 'robot': {
-                analysisBucketFile.robot_id = data.actor_id;
+                analysisBucketFile.robotId = data.actorId;
                 break;
             }
         }

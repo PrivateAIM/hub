@@ -48,8 +48,8 @@ export class AnalysisRecalcQueue {
 
 export function hasAnalysisChanged(a: Analysis, b: Analysis): boolean {
     const excludeKeys: (keyof Analysis)[] = [
-        'updated_at',
-        'created_at',
+        'updatedAt',
+        'createdAt',
     ];
 
     const keys = Object.keys(a);

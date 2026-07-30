@@ -33,14 +33,14 @@ export class BucketFileSubscriber extends BaseSubscriber<
                     },
                 ];
 
-                if (data.realm_id) {
+                if (data.realmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: DomainType.BUCKET_FILE,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: [DomainType.BUCKET_FILE, data.id],
                     });
                 }

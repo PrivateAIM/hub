@@ -25,8 +25,8 @@ import { AnalysisClientService } from '../../../../../src/app/modules/database/a
 function createAnalysisEntity(overrides: Partial<AnalysisEntity> = {}) : AnalysisEntity {
     return {
         id: randomUUID(),
-        client_id: null,
-        realm_id: randomUUID(),
+        clientId: null,
+        realmId: randomUUID(),
         ...overrides,
     } as AnalysisEntity;
 }
@@ -50,23 +50,23 @@ describe('AnalysisClientService', () => {
             expect(created).toHaveLength(1);
             expect(created[0]).toMatchObject({
                 name: entity.id,
-                realmId: entity.realm_id,
+                realmId: entity.realmId,
                 authMethod: ClientAuthMethod.SECRET,
             });
             expect(client.id).toBe('client-1');
-            expect(entity.client_id).toBe('client-1');
+            expect(entity.clientId).toBe('client-1');
         });
 
         it('should reuse an existing client without creating a new one', async () => {
             const authup = createFakeAuthupClient({ handlers: { 'GET /clients/:id': (req) => ({ data: { id: req.params.id }, meta: {} }) } });
             const service = new AnalysisClientService(authup);
 
-            const entity = createAnalysisEntity({ client_id: 'client-existing' });
+            const entity = createAnalysisEntity({ clientId: 'client-existing' });
             const client = await service.assign(entity);
 
             expect(bodiesOf(authup, 'POST', '/clients')).toHaveLength(0);
             expect(client.id).toBe('client-existing');
-            expect(entity.client_id).toBe('client-existing');
+            expect(entity.clientId).toBe('client-existing');
         });
 
         it('should re-create the client when the stored id 404s', async () => {
@@ -79,18 +79,18 @@ describe('AnalysisClientService', () => {
             });
             const service = new AnalysisClientService(authup);
 
-            const entity = createAnalysisEntity({ client_id: 'client-gone' });
+            const entity = createAnalysisEntity({ clientId: 'client-gone' });
             const client = await service.assign(entity);
 
             expect(client.id).toBe('client-new');
-            expect(entity.client_id).toBe('client-new');
+            expect(entity.clientId).toBe('client-new');
         });
 
         it('should propagate a non-404 failure when reading the stored client', async () => {
             const authup = createFakeAuthupClient({ handlers: { 'GET /clients/:id': () => fakeAuthupResponse(500, { message: 'boom' }) } });
             const service = new AnalysisClientService(authup);
 
-            await expect(service.assign(createAnalysisEntity({ client_id: 'client-x' })))
+            await expect(service.assign(createAnalysisEntity({ clientId: 'client-x' })))
                 .rejects.toThrow();
             expect(bodiesOf(authup, 'POST', '/clients')).toHaveLength(0);
         });
@@ -101,19 +101,19 @@ describe('AnalysisClientService', () => {
             const authup = createFakeAuthupClient({ handlers: { 'DELETE /clients/:id': (req) => ({ data: { id: req.params.id }, meta: {} }) } });
             const service = new AnalysisClientService(authup);
 
-            const entity = createAnalysisEntity({ client_id: 'client-x' });
+            const entity = createAnalysisEntity({ clientId: 'client-x' });
             await service.dismiss(entity);
 
             expect(authup.requests.map((request) => request.method)).toEqual(['DELETE']);
             expect(authup.requests[0].params.id).toBe('client-x');
-            expect(entity.client_id).toBeNull();
+            expect(entity.clientId).toBeNull();
         });
 
-        it('should be a no-op when there is no client_id', async () => {
+        it('should be a no-op when there is no clientId', async () => {
             const authup = createFakeAuthupClient();
             const service = new AnalysisClientService(authup);
 
-            await service.dismiss(createAnalysisEntity({ client_id: null }));
+            await service.dismiss(createAnalysisEntity({ clientId: null }));
 
             expect(authup.requests).toHaveLength(0);
         });
@@ -123,19 +123,19 @@ describe('AnalysisClientService', () => {
             const authup = createFakeAuthupClient({ handlers: { 'DELETE /clients/:id': () => fakeAuthupResponse(404, { message: 'not found' }) } });
             const service = new AnalysisClientService(authup);
 
-            const entity = createAnalysisEntity({ client_id: 'client-gone' });
+            const entity = createAnalysisEntity({ clientId: 'client-gone' });
             await service.dismiss(entity);
 
-            expect(entity.client_id).toBeNull();
+            expect(entity.clientId).toBeNull();
         });
 
         it('should propagate a non-404 delete failure and keep the id', async () => {
             const authup = createFakeAuthupClient({ handlers: { 'DELETE /clients/:id': () => fakeAuthupResponse(500, { message: 'boom' }) } });
             const service = new AnalysisClientService(authup);
 
-            const entity = createAnalysisEntity({ client_id: 'client-x' });
+            const entity = createAnalysisEntity({ clientId: 'client-x' });
             await expect(service.dismiss(entity)).rejects.toThrow();
-            expect(entity.client_id).toBe('client-x');
+            expect(entity.clientId).toBe('client-x');
         });
     });
 

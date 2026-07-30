@@ -53,25 +53,25 @@ export class NodeRegistryCredentialService extends AbstractEntityService impleme
             throw new PermissionDeniedError('You are not permitted to read the registry credentials of this node.');
         }
 
-        if (!node.registry_project_id) {
+        if (!node.registryProjectId) {
             throw new BadRequestError('The node has no registry project provisioned yet.');
         }
 
-        const registryProject = await this.registryProjectRepository.findOneWithSecret(node.registry_project_id);
+        const registryProject = await this.registryProjectRepository.findOneWithSecret(node.registryProjectId);
         if (!registryProject) {
             throw new BadRequestError('The registry project of the node could not be found.');
         }
 
-        const registry = await this.registryRepository.findOneById(registryProject.registry_id);
+        const registry = await this.registryRepository.findOneById(registryProject.registryId);
         if (!registry) {
             throw new BadRequestError('The registry of the node could not be found.');
         }
 
         return {
             host: registry.host,
-            external_name: registryProject.external_name,
-            account_name: registryProject.account_name,
-            account_secret: registryProject.account_secret,
+            externalName: registryProject.externalName,
+            accountName: registryProject.accountName,
+            accountSecret: registryProject.accountSecret,
         };
     }
 
@@ -86,8 +86,8 @@ export class NodeRegistryCredentialService extends AbstractEntityService impleme
         if (
             actor.identity &&
             actor.identity.type === 'client' &&
-            !!node.client_id &&
-            node.client_id === actor.identity.id
+            !!node.clientId &&
+            node.clientId === actor.identity.id
         ) {
             return true;
         }

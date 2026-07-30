@@ -15,7 +15,7 @@ export class StorageBucketFileDeletionFinishedHandler extends BaseAggregatorHand
 > {
     async handle(data: BucketFile): Promise<void> {
         const analysisBucketFileRepository = this.dataSource.getRepository(AnalysisBucketFileEntity);
-        const analysisBucketFile = await analysisBucketFileRepository.findOneBy({ bucket_file_id: data.id });
+        const analysisBucketFile = await analysisBucketFileRepository.findOneBy({ bucketFileId: data.id });
 
         if (!analysisBucketFile) {
             return;

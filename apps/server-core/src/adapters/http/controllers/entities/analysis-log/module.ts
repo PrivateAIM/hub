@@ -45,14 +45,14 @@ export class AnalysisLogController {
 
         const filtersNormalized = collectRootFilterValues(query);
 
-        if (!filtersNormalized.analysis_id) {
-            throw new BadRequestError('The filter analysis_id must be defined.');
+        if (!filtersNormalized.analysisId) {
+            throw new BadRequestError('The filter analysisId must be defined.');
         }
 
         const filters : FiltersBuildInput<Log> = {
             labels: {
                 [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
-                [LogFlag.REF_ID]: filtersNormalized.analysis_id,
+                [LogFlag.REF_ID]: filtersNormalized.analysisId,
             },
         };
 
@@ -94,14 +94,14 @@ export class AnalysisLogController {
 
         const filtersNormalized = collectRootFilterValues(query);
 
-        if (!filtersNormalized.analysis_id) {
-            throw new BadRequestError('The filter analysis_id must be defined.');
+        if (!filtersNormalized.analysisId) {
+            throw new BadRequestError('The filter analysisId must be defined.');
         }
 
         const filters : FiltersBuildInput<Log> = {
             labels: {
                 [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
-                [LogFlag.REF_ID]: filtersNormalized.analysis_id,
+                [LogFlag.REF_ID]: filtersNormalized.analysisId,
             },
             time: `${((BigInt(Math.floor(Date.now() / 1000) - (60 * 60 * 24 * 31 * 12 * 10))) * 1_000_000n).toString()}`,
         };

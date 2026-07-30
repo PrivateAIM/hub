@@ -40,14 +40,14 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
                     },
                 ];
 
-                if (data.realm_id) {
+                if (data.realmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: DomainType.NODE,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: [DomainType.NODE, data.id],
                     });
                 }
@@ -86,7 +86,7 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
     protected async assignClient(entity: NodeEntity, manager: EntityManager): Promise<void> {
         if (!this.nodeClientService) return;
 
-        const prevId = entity.client_id;
+        const prevId = entity.clientId;
 
         const client = await this.nodeClientService.assign(entity);
         if (client.id !== prevId) {

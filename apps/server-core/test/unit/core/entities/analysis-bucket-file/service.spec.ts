@@ -27,10 +27,10 @@ function createFakeBucketFileRepository(analysisId: string) {
     repo.validateJoinColumns = async (data: Partial<AnalysisBucketFile>) => {
         await originalValidateJoinColumns(data);
 
-        if (!data.analysis_bucket) {
-            data.analysis_bucket = {
-                id: data.analysis_bucket_id,
-                analysis_id: analysisId,
+        if (!data.analysisBucket) {
+            data.analysisBucket = {
+                id: data.analysisBucketId,
+                analysisId,
             } as AnalysisBucket;
         }
     };
@@ -43,17 +43,17 @@ function createTestBucketFile(analysisId: string, overrides?: Partial<AnalysisBu
         id: randomUUID(),
         path: 'main.py',
         root: false,
-        analysis_id: analysisId,
-        analysis_bucket_id: randomUUID(),
-        analysis_bucket: { id: randomUUID(), analysis_id: analysisId } as AnalysisBucket,
-        bucket_id: randomUUID(),
-        bucket_file_id: randomUUID(),
-        realm_id: 'realm-1',
-        user_id: null,
-        robot_id: null,
-        client_id: null,
-        created_at: new Date(),
-        updated_at: new Date(),
+        analysisId,
+        analysisBucketId: randomUUID(),
+        analysisBucket: { id: randomUUID(), analysisId } as AnalysisBucket,
+        bucketId: randomUUID(),
+        bucketFileId: randomUUID(),
+        realmId: 'realm-1',
+        userId: null,
+        robotId: null,
+        clientId: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     } as AnalysisBucketFile;
 }
@@ -71,7 +71,7 @@ describe('AnalysisBucketFileService', () => {
         const analysisRepository = new FakeEntityRepository<Analysis>();
         recalculator = new FakeAnalysisFileMetadataRecalculator(analysisRepository);
 
-        analysisRepository.seed({ id: analysisId, realm_id: 'realm-1' } as Analysis);
+        analysisRepository.seed({ id: analysisId, realmId: 'realm-1' } as Analysis);
 
         service = new AnalysisBucketFileService({
             repository,
@@ -83,10 +83,10 @@ describe('AnalysisBucketFileService', () => {
         it('should call recalc for root file', async () => {
             await service.create(
                 {
-                    analysis_bucket_id: randomUUID(),
+                    analysisBucketId: randomUUID(),
                     path: 'main.py',
-                    bucket_id: randomUUID(),
-                    bucket_file_id: randomUUID(),
+                    bucketId: randomUUID(),
+                    bucketFileId: randomUUID(),
                     root: true,
                 },
                 createAllowAllActor(),
@@ -99,10 +99,10 @@ describe('AnalysisBucketFileService', () => {
         it('should not call recalc for non-root file', async () => {
             await service.create(
                 {
-                    analysis_bucket_id: randomUUID(),
+                    analysisBucketId: randomUUID(),
                     path: 'helper.py',
-                    bucket_id: randomUUID(),
-                    bucket_file_id: randomUUID(),
+                    bucketId: randomUUID(),
+                    bucketFileId: randomUUID(),
                     root: false,
                 },
                 createAllowAllActor(),

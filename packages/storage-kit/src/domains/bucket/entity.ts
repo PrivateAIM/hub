@@ -16,18 +16,18 @@ export interface Bucket {
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
-
-    // ------------------------------------------------------------------
-
-    actor_id: string | null;
-
-    actor_type: string | null;
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'] | null;
+    actorId: string | null;
+
+    actorType: string | null;
+
+    // ------------------------------------------------------------------
+
+    realmId: Realm['id'] | null;
 
 }

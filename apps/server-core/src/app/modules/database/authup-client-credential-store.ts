@@ -31,20 +31,20 @@ export class AuthupClientCredentialStore implements IClientCredentialStore {
         return {
             id: client.id,
             name: client.name,
-            display_name: client.displayName ?? null,
+            displayName: client.displayName ?? null,
             secret: client.secret ?? null,
         };
     }
 
     async writeByClientId(clientId: string, data?: ClientCredentialsUpdate): Promise<ClientCredentials> {
         // Rotate by default (generate a fresh secret); otherwise set the caller's.
-        // Undefined name/display_name keys are dropped on the wire, leaving them
+        // Undefined name/displayName keys are dropped on the wire, leaving them
         // unchanged.
         const next = data?.secret ?? randomBytes(32).toString('hex');
 
         const { data: client } = await this.authup.client.update(clientId, {
             name: data?.name,
-            displayName: data?.display_name,
+            displayName: data?.displayName,
             secret: next,
         });
 
@@ -52,7 +52,7 @@ export class AuthupClientCredentialStore implements IClientCredentialStore {
         return {
             id: client.id,
             name: client.name,
-            display_name: client.displayName ?? null,
+            displayName: client.displayName ?? null,
             secret: next,
         };
     }

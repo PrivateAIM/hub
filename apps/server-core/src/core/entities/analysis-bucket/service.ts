@@ -49,7 +49,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
 
         await this.repository.validateJoinColumns(validated);
 
-        validated.realm_id = validated.analysis.realm_id;
+        validated.realmId = validated.analysis.realmId;
 
         const entity = this.repository.create(validated);
 
@@ -62,7 +62,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 
@@ -79,7 +79,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 

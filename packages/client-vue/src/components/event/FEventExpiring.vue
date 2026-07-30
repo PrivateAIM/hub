@@ -40,7 +40,7 @@ export default defineComponent({
             <template v-if="entity.expiring">
                 <div>
                     <small>
-                        (<VCTimeago :datetime="entity.expires_at ?? undefined" />)
+                        (<VCTimeago :datetime="entity.expiresAt ?? undefined" />)
                     </small>
                 </div>
             </template>

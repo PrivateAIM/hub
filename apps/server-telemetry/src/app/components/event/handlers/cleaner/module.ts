@@ -45,7 +45,7 @@ export class EventComponentCleanerHandler implements ComponentHandler<
             const entities = await repository.find({
                 where: {
                     expiring: true,
-                    expires_at: LessThan(isoDate),
+                    expiresAt: LessThan(isoDate),
                 },
                 take: limit,
             });

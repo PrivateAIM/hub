@@ -31,7 +31,7 @@ export default defineComponent({
         const entity = toRef(props, 'entity');
 
         const configurationProgress = computed(() => {
-            if (entity.value.configuration_locked) {
+            if (entity.value.configurationLocked) {
                 return 100;
             }
 
@@ -39,43 +39,43 @@ export default defineComponent({
         });
 
         const buildProgress = computed(() => {
-            if (entity.value.build_status === ProcessStatus.EXECUTED) {
+            if (entity.value.buildStatus === ProcessStatus.EXECUTED) {
                 return 100;
             }
 
-            if (entity.value.build_status === ProcessStatus.STARTED) {
+            if (entity.value.buildStatus === ProcessStatus.STARTED) {
                 return 10;
             }
 
-            if (entity.value.build_status === ProcessStatus.STARTING) {
+            if (entity.value.buildStatus === ProcessStatus.STARTING) {
                 return 5;
             }
 
-            if (!entity.value.build_status) {
+            if (!entity.value.buildStatus) {
                 return 0;
             }
 
-            return Math.max(10, entity.value.build_progress ?? 0);
+            return Math.max(10, entity.value.buildProgress ?? 0);
         });
 
         const runProgress = computed(() => {
-            if (entity.value.execution_status === ProcessStatus.EXECUTED) {
+            if (entity.value.executionStatus === ProcessStatus.EXECUTED) {
                 return 100;
             }
 
-            if (entity.value.execution_status === ProcessStatus.STARTED) {
+            if (entity.value.executionStatus === ProcessStatus.STARTED) {
                 return 10;
             }
 
-            if (entity.value.execution_status === ProcessStatus.STARTING) {
+            if (entity.value.executionStatus === ProcessStatus.STARTING) {
                 return 5;
             }
 
-            if (!entity.value.execution_status) {
+            if (!entity.value.executionStatus) {
                 return 0;
             }
 
-            return Math.max(10, entity.value.execution_progress ?? 0);
+            return Math.max(10, entity.value.executionProgress ?? 0);
         });
 
         const progress = computed(() => {
@@ -91,7 +91,7 @@ export default defineComponent({
         });
 
         const bgClazz = computed(() => {
-            if (entity.value.execution_status === ProcessStatus.EXECUTED) {
+            if (entity.value.executionStatus === ProcessStatus.EXECUTED) {
                 return 'bg-success-600';
             }
 

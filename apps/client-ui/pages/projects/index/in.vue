@@ -48,7 +48,7 @@ export default defineNuxtComponent({
         const nodeId : Ref<string | null> = ref(null);
 
         try {
-            const response = await api.node.getMany({ filters: { realm_id: realmId.value } });
+            const response = await api.node.getMany({ filters: { realmId: realmId.value } });
 
             const node = response.data.pop();
             if (node) {

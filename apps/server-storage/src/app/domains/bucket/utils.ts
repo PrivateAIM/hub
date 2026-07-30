@@ -11,6 +11,6 @@ import type { Bucket } from '@privateaim/storage-kit';
 export { toBucketName } from '../../../core/utils/bucket-name.ts';
 
 export function isBucketOwnedByIdentity(entity: Bucket, actor: RequestIdentity) {
-    return entity.actor_type === actor.type &&
-        entity.actor_id === actor.id;
+    return entity.actorType === actor.type &&
+        entity.actorId === actor.id;
 }

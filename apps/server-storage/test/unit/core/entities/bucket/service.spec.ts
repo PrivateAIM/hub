@@ -30,11 +30,11 @@ function createTestBucket(overrides?: Partial<Bucket>): Bucket {
         id: randomUUID(),
         name: 'test-bucket',
         region: null,
-        actor_id: null,
-        actor_type: null,
-        realm_id: 'realm-1',
-        created_at: new Date(),
-        updated_at: new Date(),
+        actorId: null,
+        actorType: null,
+        realmId: 'realm-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     } as Bucket;
 }
@@ -103,8 +103,8 @@ describe('BucketService', () => {
             expect(result).toBeDefined();
             expect(caller.getCreateCalls()).toHaveLength(1);
             expect(caller.getCreateCalls()[0].name).toBe('new-bucket');
-            expect(caller.getCreateCalls()[0].actor_id).toBe(actor.identity!.id);
-            expect(caller.getCreateCalls()[0].actor_type).toBe('user');
+            expect(caller.getCreateCalls()[0].actorId).toBe(actor.identity!.id);
+            expect(caller.getCreateCalls()[0].actorType).toBe('user');
         });
 
         it('should throw PermissionDeniedError when actor lacks permission', async () => {
@@ -122,22 +122,22 @@ describe('BucketService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should set realm_id from actor when not provided', async () => {
+        it('should set realmId from actor when not provided', async () => {
             const actor = createMasterRealmActor('my-realm');
 
             await service.create({ name: 'new-bucket' }, actor);
 
             const call = caller.getCreateCalls()[0];
-            expect(call.realm_id).toBe('my-realm');
+            expect(call.realmId).toBe('my-realm');
         });
 
-        it('should throw PermissionDeniedError when non-master realm sets different realm_id', async () => {
+        it('should throw PermissionDeniedError when non-master realm sets different realmId', async () => {
             const actor = createNonMasterRealmActor('realm-1');
             const otherRealmId = randomUUID();
 
             await expect(
                 service.create(
-                    { name: 'new-bucket', realm_id: otherRealmId },
+                    { name: 'new-bucket', realmId: otherRealmId },
                     actor,
                 ),
             ).rejects.toThrow(PermissionDeniedError);
@@ -162,9 +162,9 @@ describe('BucketService', () => {
         it('should skip permission check when actor owns the bucket', async () => {
             const actorId = randomUUID();
             const bucket = createTestBucket({
-                actor_id: actorId,
-                actor_type: 'user',
-                realm_id: 'other-realm',
+                actorId,
+                actorType: 'user',
+                realmId: 'other-realm',
             });
             repository.seed(bucket);
 
@@ -176,7 +176,7 @@ describe('BucketService', () => {
         });
 
         it('should enforce realm writability for non-owner', async () => {
-            const bucket = createTestBucket({ realm_id: 'other-realm' });
+            const bucket = createTestBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
@@ -231,8 +231,8 @@ describe('BucketService', () => {
         it('should skip permission check when actor owns the bucket', async () => {
             const actorId = randomUUID();
             const bucket = createTestBucket({
-                actor_id: actorId,
-                actor_type: 'user',
+                actorId,
+                actorType: 'user',
             });
             repository.seed(bucket);
 
@@ -244,7 +244,7 @@ describe('BucketService', () => {
         });
 
         it('should enforce realm writability for non-owner', async () => {
-            const bucket = createTestBucket({ realm_id: 'other-realm' });
+            const bucket = createTestBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(

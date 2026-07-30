@@ -38,8 +38,8 @@ export default defineComponent({
             h('strong', `${entity.value.name} (${entity.value.scope})`),
         );
 
-        if (entity.value.ref_id) {
-            message.push(h('span', { class: 'ms-1' }, [`(${entity.value.ref_id})`]));
+        if (entity.value.refId) {
+            message.push(h('span', { class: 'ms-1' }, [`(${entity.value.refId})`]));
         }
 
         message.push(' triggered.');
@@ -57,7 +57,7 @@ export default defineComponent({
                             message,
                         ]),
                         h('div', { class: 'ms-auto' }, [
-                            h(VCTimeago, { datetime: entity.value.created_at }),
+                            h(VCTimeago, { datetime: entity.value.createdAt }),
                         ]),
                     ]),
                 ]),

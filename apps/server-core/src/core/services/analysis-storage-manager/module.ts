@@ -51,7 +51,7 @@ export class AnalysisStorageManager {
 
         for (const bucketType of bucketTypes) {
             const analysisBucket = await this.bucketRepository.findOneBy({
-                analysis_id: entity.id,
+                analysisId: entity.id,
                 type: bucketType,
             });
             if (analysisBucket) {
@@ -65,7 +65,7 @@ export class AnalysisStorageManager {
 
             await this.caller.callCreate({
                 name: buildAnalysisBucketName(bucketType, entity.id),
-                realm_id: entity.realm_id,
+                realmId: entity.realmId,
             }, { correlationId });
         }
         return entity;
@@ -83,7 +83,7 @@ export class AnalysisStorageManager {
 
         for (const bucketType of bucketTypes) {
             const analysisBucket = await this.bucketRepository.findOneBy({
-                analysis_id: entity.id,
+                analysisId: entity.id,
                 type: bucketType,
             });
             if (!analysisBucket) {
@@ -92,10 +92,10 @@ export class AnalysisStorageManager {
 
             const correlationId = await this.taskManager.create(
                 'analysisBucketDelete',
-                { analysisId: analysisBucket.analysis_id },
+                { analysisId: analysisBucket.analysisId },
             );
 
-            await this.caller.callDelete({ id: analysisBucket.bucket_id }, { correlationId });
+            await this.caller.callDelete({ id: analysisBucket.bucketId }, { correlationId });
         }
 
         return entity;

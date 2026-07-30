@@ -25,38 +25,42 @@ export class MasterImageEntity implements MasterImage {
 
     @Index()
     @Column({
+        name: 'build_status',
         type: 'varchar', 
         length: 64, 
         nullable: true, 
         default: null,
     })
-    build_status: `${ProcessStatus}` | null;
+    buildStatus: `${ProcessStatus}` | null;
 
     @Column({
+        name: 'build_progress',
         type: 'int', 
         unsigned: true, 
         nullable: true, 
         default: null,
     })
-    build_progress: number | null;
+    buildProgress: number | null;
 
     // sha512:<128 hex> = 135
     @Column({
+        name: 'build_hash',
         type: 'varchar',
         length: 135,
         nullable: true,
         default: null,
     })
-    build_hash: string | null;
+    buildHash: string | null;
 
     @Column({
+        name: 'build_size',
         type: 'bigint',
         unsigned: true,
         nullable: true,
         default: null,
         transformer: bigintNumberTransformer,
     })
-    build_size: number | null;
+    buildSize: number | null;
 
     @Column({
         type: 'varchar', 
@@ -66,12 +70,20 @@ export class MasterImageEntity implements MasterImage {
     path: string | null;
 
     @Index()
-    @Column({ type: 'varchar', length: 512 })
-    virtual_path: string;
+    @Column({
+        name: 'virtual_path', 
+        type: 'varchar', 
+        length: 512, 
+    })
+    virtualPath: string;
 
     @Index()
-    @Column({ type: 'varchar', length: 512 })
-    group_virtual_path: string;
+    @Column({
+        name: 'group_virtual_path', 
+        type: 'varchar', 
+        length: 512, 
+    })
+    groupVirtualPath: string;
 
     @Column({ type: 'varchar' })
     name: string;
@@ -80,6 +92,7 @@ export class MasterImageEntity implements MasterImage {
     command: string | null;
 
     @Column({
+        name: 'command_arguments',
         type: 'text',
         nullable: true,
         transformer: {
@@ -91,13 +104,13 @@ export class MasterImageEntity implements MasterImage {
             },
         },
     })
-    command_arguments: MasterImageCommandArgument[] | null;
+    commandArguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 }

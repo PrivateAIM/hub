@@ -34,27 +34,27 @@ export class AnalysisClientService {
     }
 
     async dismiss(entity: AnalysisEntity): Promise<void> {
-        if (!entity.client_id) {
+        if (!entity.clientId) {
             return;
         }
 
         try {
-            await this.authup.client.delete(entity.client_id);
+            await this.authup.client.delete(entity.clientId);
         } catch (e) {
             if (!isClientErrorWithStatusCode(e, 404)) {
                 throw e;
             }
         }
 
-        entity.client_id = null;
+        entity.clientId = null;
     }
 
     async assign(entity: AnalysisEntity): Promise<Client> {
         let client: Client | undefined;
 
-        if (entity.client_id) {
+        if (entity.clientId) {
             try {
-                const { data } = await this.authup.client.getOne(entity.client_id);
+                const { data } = await this.authup.client.getOne(entity.clientId);
                 client = data;
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
@@ -66,12 +66,12 @@ export class AnalysisClientService {
         if (!client) {
             const { data } = await this.authup.client.create({
                 name: entity.id,
-                realmId: entity.realm_id,
+                realmId: entity.realmId,
                 authMethod: ClientAuthMethod.SECRET,
             });
 
             client = data;
-            entity.client_id = client.id;
+            entity.clientId = client.id;
         }
 
         return client;

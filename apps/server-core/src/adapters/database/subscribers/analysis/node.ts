@@ -33,26 +33,26 @@ export class AnalysisNodeSubscriber extends BaseSubscriber<
                     },
                 ];
 
-                if (data.analysis_realm_id) {
+                if (data.analysisRealmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.analysis_realm_id],
+                        namespace: [DomainEventNamespace, data.analysisRealmId],
                         channel: DomainType.ANALYSIS_NODE,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.analysis_realm_id],
+                        namespace: [DomainEventNamespace, data.analysisRealmId],
                         channel: [DomainType.ANALYSIS_NODE, data.id],
                     });
                 }
 
-                if (data.node_realm_id) {
+                if (data.nodeRealmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        namespace: [DomainEventNamespace, data.nodeRealmId],
                         channel: DomainType.ANALYSIS_NODE,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        namespace: [DomainEventNamespace, data.nodeRealmId],
                         channel: [DomainType.ANALYSIS_NODE, data.id],
                     });
                 }

@@ -57,7 +57,7 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
     }
 
     async countByProject(projectId: string): Promise<number> {
-        return this.repository.countBy({ project_id: projectId });
+        return this.repository.countBy({ projectId });
     }
 
     async findOneBy(where: Record<string, any>): Promise<Analysis | null> {

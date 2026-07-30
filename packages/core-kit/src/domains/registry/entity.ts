@@ -14,13 +14,13 @@ export interface Registry {
 
     // ------------------------------------------------------------------
 
-    account_name: string | null;
+    accountName: string | null;
 
-    account_secret: string | null;
+    accountSecret: string | null;
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 }

@@ -9,7 +9,7 @@ import type { Registry } from '@privateaim/core-kit';
 import type { IEntityAPI } from '../types-base';
 
 export type RegistryCreatePayload =    & Pick<Registry, 'name' | 'host'> &
-    Partial<Pick<Registry, 'account_name' | 'account_secret'>>;
+    Partial<Pick<Registry, 'accountName' | 'accountSecret'>>;
 
 export type RegistryUpdatePayload = Partial<RegistryCreatePayload>;
 

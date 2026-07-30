@@ -44,20 +44,20 @@ describe('controllers/analysis-bucket-file', () => {
         const { data: project } = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const { data: analysis } = await client.analysis.create({ project_id: project.id });
+        const { data: analysis } = await client.analysis.create({ projectId: project.id });
         expect(analysis.id).toBeDefined();
 
         const { data: analysisBucket } = await client.analysisBucket.create({
-            bucket_id: randomUUID(),
-            analysis_id: analysis.id,
+            bucketId: randomUUID(),
+            analysisId: analysis.id,
             type: AnalysisBucketType.CODE,
         });
         expect(analysisBucket.id).toBeDefined();
 
         const { data: analysisBucketFile } = await client.analysisBucketFile.create({
-            analysis_bucket_id: analysisBucket.id,
-            bucket_id: analysisBucket.bucket_id,
-            bucket_file_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+            analysisBucketId: analysisBucket.id,
+            bucketId: analysisBucket.bucketId,
+            bucketFileId: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
             path: 'foo.bar',
             root: false,
         });

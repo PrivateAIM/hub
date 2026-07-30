@@ -57,28 +57,28 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         await this.repository.validateJoinColumns(validated);
 
-        validated.realm_id = this.getActorRealmId(actor);
+        validated.realmId = this.getActorRealmId(actor);
 
-        if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
             throw new PermissionDeniedError();
         }
 
-        // Set analysis_id from the related analysis_bucket
-        if (validated.analysis_bucket?.analysis_id) {
-            validated.analysis_id = validated.analysis_bucket.analysis_id;
+        // Set analysisId from the related analysisBucket
+        if (validated.analysisBucket?.analysisId) {
+            validated.analysisId = validated.analysisBucket.analysisId;
         }
 
         switch (actor.identity.type) {
             case 'user': {
-                validated.user_id = actor.identity.id;
+                validated.userId = actor.identity.id;
                 break;
             }
             case 'robot': {
-                validated.robot_id = actor.identity.id;
+                validated.robotId = actor.identity.id;
                 break;
             }
             case 'client': {
-                validated.client_id = actor.identity.id;
+                validated.clientId = actor.identity.id;
                 break;
             }
             default: {
@@ -91,7 +91,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         const saved = await this.repository.save(entity, { data: actor.metadata });
 
         if (saved.root) {
-            await this.recalculator.recalc(saved.analysis_id);
+            await this.recalculator.recalc(saved.analysisId);
         }
 
         return saved;
@@ -105,7 +105,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 
@@ -113,7 +113,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         const saved = await this.repository.save(merged, { data: actor.metadata });
 
-        await this.recalculator.recalcDebounced(saved.analysis_id);
+        await this.recalculator.recalcDebounced(saved.analysisId);
 
         return saved;
     }
@@ -124,7 +124,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 
@@ -135,7 +135,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         entity.id = entityId;
 
         if (entity.root) {
-            await this.recalculator.recalc(entity.analysis_id);
+            await this.recalculator.recalc(entity.analysisId);
         }
 
         return entity;

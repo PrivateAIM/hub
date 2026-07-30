@@ -47,20 +47,20 @@ describe('AnalysisBuilder', () => {
     });
 
     describe('start', () => {
-        it('should set build_status to STARTING and dispatch execute', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true });
+        it('should set buildStatus to STARTING and dispatch execute', async () => {
+            const analysis = createFullAnalysis({ configurationLocked: true });
             repository.seed(analysis);
 
             const result = await builder.start(analysis);
 
-            expect(result.build_status).toBe(ProcessStatus.STARTING);
-            expect(result.build_progress).toBeNull();
+            expect(result.buildStatus).toBe(ProcessStatus.STARTING);
+            expect(result.buildProgress).toBeNull();
             expect(caller.getCallsFor('callExecute')).toHaveLength(1);
             expect(caller.getCallsFor('callExecute')[0].data.id).toBe('analysis-1');
         });
 
         it('should call all recalculators before checking', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true });
+            const analysis = createFullAnalysis({ configurationLocked: true });
             repository.seed(analysis);
 
             await builder.start(analysis);
@@ -71,50 +71,50 @@ describe('AnalysisBuilder', () => {
         });
 
         it('should resolve entity by string ID', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true });
+            const analysis = createFullAnalysis({ configurationLocked: true });
             repository.seed(analysis);
 
             const result = await builder.start('analysis-1');
 
-            expect(result.build_status).toBe(ProcessStatus.STARTING);
+            expect(result.buildStatus).toBe(ProcessStatus.STARTING);
             expect(caller.getCallCount()).toBe(1);
         });
 
         it('should save entity to repository', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true });
+            const analysis = createFullAnalysis({ configurationLocked: true });
             repository.seed(analysis);
 
             await builder.start(analysis);
 
             const saved = await repository.findOneById('analysis-1');
             expect(saved).toBeDefined();
-            expect(saved!.build_status).toBe(ProcessStatus.STARTING);
+            expect(saved!.buildStatus).toBe(ProcessStatus.STARTING);
         });
 
         it('should throw when config not locked', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: false });
+            const analysis = createFullAnalysis({ configurationLocked: false });
             repository.seed(analysis);
 
             await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when build nodes not valid', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true, build_nodes_valid: false });
+            const analysis = createFullAnalysis({ configurationLocked: true, buildNodesValid: false });
             repository.seed(analysis);
 
             await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should allow retry when build FAILED', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true, build_status: ProcessStatus.FAILED });
+            const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.FAILED });
             repository.seed(analysis);
 
             const result = await builder.start(analysis);
-            expect(result.build_status).toBe(ProcessStatus.STARTING);
+            expect(result.buildStatus).toBe(ProcessStatus.STARTING);
         });
 
         it('should throw when build already in progress', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTING });
+            const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTING });
             repository.seed(analysis);
 
             await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
@@ -123,7 +123,7 @@ describe('AnalysisBuilder', () => {
 
     describe('check', () => {
         it('should dispatch check call for in-progress build', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTED });
+            const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTED });
             repository.seed(analysis);
 
             const result = await builder.check(analysis);
@@ -134,7 +134,7 @@ describe('AnalysisBuilder', () => {
         });
 
         it('should resolve entity by string ID', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTED });
+            const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTED });
             repository.seed(analysis);
 
             const result = await builder.check('analysis-1');
@@ -146,21 +146,21 @@ describe('AnalysisBuilder', () => {
         });
 
         it('should throw when config not locked', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: false, build_status: ProcessStatus.STARTED });
+            const analysis = createFullAnalysis({ configurationLocked: false, buildStatus: ProcessStatus.STARTED });
             repository.seed(analysis);
 
             await expect(builder.check(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should throw when no build started', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true, build_status: null });
+            const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: null });
             repository.seed(analysis);
 
             await expect(builder.check(analysis)).rejects.toThrow(AnalysisError);
         });
 
         it('should dispatch check call for EXECUTED build (reconciliation after data loss)', async () => {
-            const analysis = createFullAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTED });
+            const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.EXECUTED });
             repository.seed(analysis);
 
             const result = await builder.check(analysis);

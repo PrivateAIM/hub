@@ -32,11 +32,11 @@ export default defineComponent({
             }"
         >
             <div>
-                <strong>{{ entity.ref_type }}</strong>
+                <strong>{{ entity.refType }}</strong>
             </div>
             <div>
-                <template v-if="entity.ref_id">
-                    {{ entity.ref_id }}
+                <template v-if="entity.refId">
+                    {{ entity.refId }}
                 </template>
             </div>
         </div>

@@ -6,6 +6,7 @@
  */
 
 import { defineSchema } from '@rapiq/core';
+import type { ProjectNode } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 
 const schemaMapping = {
@@ -13,25 +14,25 @@ const schemaMapping = {
     project: DomainType.PROJECT,
 };
 
-export const projectNodeSchema = defineSchema({
+export const projectNodeSchema = defineSchema<ProjectNode>({
     name: DomainType.PROJECT_NODE,
     strict: true,
     fields: {
         default: [
             'id',
-            'approval_status',
+            'approvalStatus',
             'comment',
-            'created_at',
-            'updated_at',
-            'project_id',
-            'project_realm_id',
-            'node_id',
-            'node_realm_id',
+            'createdAt',
+            'updatedAt',
+            'projectId',
+            'projectRealmId',
+            'nodeId',
+            'nodeRealmId',
         ],
     },
-    filters: { allowed: ['project_realm_id', 'project_id', 'node_realm_id', 'node_id'] },
+    filters: { allowed: ['projectRealmId', 'projectId', 'nodeRealmId', 'nodeId'] },
     relations: { allowed: ['node', 'project'] },
-    sort: { allowed: ['created_at', 'updated_at'] },
+    sort: { allowed: ['createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

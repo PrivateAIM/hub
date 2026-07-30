@@ -36,7 +36,7 @@ function createFakeRegistryProjectRepository() {
 
         if (!data.registry) {
             data.registry = {
-                id: data.registry_id,
+                id: data.registryId,
                 name: 'test-registry',
             } as Registry;
         }
@@ -51,17 +51,17 @@ function createTestRegistryProject(overrides?: Partial<RegistryProject>): Regist
         name: 'test-project',
         type: RegistryProjectType.DEFAULT,
         public: false,
-        external_name: 'ext-name',
-        external_id: null,
-        account_id: null,
-        account_name: null,
-        account_secret: null,
-        webhook_name: null,
-        webhook_exists: null,
-        registry_id: randomUUID(),
-        realm_id: 'realm-1',
-        created_at: new Date(),
-        updated_at: new Date(),
+        externalName: 'ext-name',
+        externalId: null,
+        accountId: null,
+        accountName: null,
+        accountSecret: null,
+        webhookName: null,
+        webhookExists: null,
+        registryId: randomUUID(),
+        realmId: 'realm-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     } as RegistryProject;
 }
@@ -94,9 +94,9 @@ describe('RegistryProjectService', () => {
             expect(result.data).toHaveLength(2);
         });
 
-        it('should check secret field access when entities have account_secret', async () => {
+        it('should check secret field access when entities have accountSecret', async () => {
             repository.seed([
-                createTestRegistryProject({ id: 'rp-1', account_secret: 'secret123' }),
+                createTestRegistryProject({ id: 'rp-1', accountSecret: 'secret123' }),
             ]);
 
             const actor = createAllowAllActor();
@@ -121,8 +121,8 @@ describe('RegistryProjectService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should check secret access when entity has account_secret', async () => {
-            const project = createTestRegistryProject({ id: 'rp-1', account_secret: 'secret' });
+        it('should check secret access when entity has accountSecret', async () => {
+            const project = createTestRegistryProject({ id: 'rp-1', accountSecret: 'secret' });
             repository.seed(project);
 
             const actor = createAllowAllActor();
@@ -137,14 +137,14 @@ describe('RegistryProjectService', () => {
 
             const project = createTestRegistryProject({
                 id: registryProjectId,
-                account_secret: 'secret',
+                accountSecret: 'secret',
             });
             repository.seed(project);
 
             nodeRepository.seed({
                 id: randomUUID(),
-                client_id: clientId,
-                registry_project_id: registryProjectId,
+                clientId,
+                registryProjectId,
             } as Node);
 
             const actor = createDenyAllActor();
@@ -163,8 +163,8 @@ describe('RegistryProjectService', () => {
                 {
                     name: 'new-project',
                     type: RegistryProjectType.DEFAULT,
-                    external_name: 'ext',
-                    registry_id: registryId,
+                    externalName: 'ext',
+                    registryId,
                 },
                 createAllowAllActor(),
             );
@@ -178,8 +178,8 @@ describe('RegistryProjectService', () => {
                 {
                     name: 'new-project',
                     type: RegistryProjectType.DEFAULT,
-                    external_name: 'ext',
-                    registry_id: randomUUID(),
+                    externalName: 'ext',
+                    registryId: randomUUID(),
                 },
                 createAllowAllActor(),
             );
@@ -193,8 +193,8 @@ describe('RegistryProjectService', () => {
                     {
                         name: 'new-project',
                         type: RegistryProjectType.DEFAULT,
-                        external_name: 'ext',
-                        registry_id: randomUUID(),
+                        externalName: 'ext',
+                        registryId: randomUUID(),
                     },
                     createDenyAllActor(),
                 ),
@@ -232,7 +232,7 @@ describe('RegistryProjectService', () => {
         });
 
         it('should enforce realm writability for non-master realm', async () => {
-            const project = createTestRegistryProject({ realm_id: 'other-realm' });
+            const project = createTestRegistryProject({ realmId: 'other-realm' });
             repository.seed(project);
 
             await expect(
@@ -240,13 +240,13 @@ describe('RegistryProjectService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should unlink and relink when external_name changes', async () => {
-            const project = createTestRegistryProject({ external_name: 'old-name' });
+        it('should unlink and relink when externalName changes', async () => {
+            const project = createTestRegistryProject({ externalName: 'old-name' });
             repository.seed(project);
 
             await service.update(
                 project.id,
-                { external_name: 'new-name' },
+                { externalName: 'new-name' },
                 createMasterRealmActor(),
             );
 
@@ -254,8 +254,8 @@ describe('RegistryProjectService', () => {
             expect(registryManager.getLinkCalls()).toHaveLength(1);
         });
 
-        it('should only link (not unlink) when external_name does not change', async () => {
-            const project = createTestRegistryProject({ external_name: 'same-name' });
+        it('should only link (not unlink) when externalName does not change', async () => {
+            const project = createTestRegistryProject({ externalName: 'same-name' });
             repository.seed(project);
 
             await service.update(
@@ -295,7 +295,7 @@ describe('RegistryProjectService', () => {
         });
 
         it('should enforce realm writability for non-master realm', async () => {
-            const project = createTestRegistryProject({ realm_id: 'other-realm' });
+            const project = createTestRegistryProject({ realmId: 'other-realm' });
             repository.seed(project);
 
             await expect(

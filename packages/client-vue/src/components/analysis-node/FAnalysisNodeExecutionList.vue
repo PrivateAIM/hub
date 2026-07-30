@@ -33,7 +33,7 @@ export default defineComponent({
     },
     setup(props) {
         const query : QueryBuildInput<AnalysisNode, 3> = {
-            filters: { analysis_id: props.entity.id },
+            filters: { analysisId: props.entity.id },
             sort: 'node.name',
         };
 
@@ -50,7 +50,7 @@ export default defineComponent({
     <FAnalysisNodes
         :header="false"
         :query="query"
-        :realm-id="entity.realm_id"
+        :realm-id="entity.realmId"
         :source-id="entity.id"
     >
         <template #body="props">
@@ -63,16 +63,16 @@ export default defineComponent({
                         <div class="flex flex-row items-center gap-1 min-w-0">
                             <span
                                 class="node-execution-name flex-1 min-w-0 truncate text-sm"
-                                :title="item.node ? item.node.name : item.node_id"
+                                :title="item.node ? item.node.name : item.nodeId"
                             >
-                                {{ item.node ? item.node.name : item.node_id }}
+                                {{ item.node ? item.node.name : item.nodeId }}
                                 <small
                                     v-if="item.node"
                                     class="text-fg-muted"
                                 >({{ item.node.type }})</small>
                             </span>
                             <FAnalysisNodeExecutionStatus
-                                :status="item.execution_status"
+                                :status="item.executionStatus"
                                 tag="span"
                             >
                                 <template #default="data">

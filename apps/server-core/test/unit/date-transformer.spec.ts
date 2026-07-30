@@ -21,18 +21,18 @@ describe('date-to-iso-string transformer', () => {
         await app.teardown();
     });
 
-    it('hydrates created_at and updated_at as ISO strings on a fresh read', async () => {
+    it('hydrates createdAt and updatedAt as ISO strings on a fresh read', async () => {
         const repo = app.dataSource.getRepository(MasterImageGroupEntity);
         const saved = await repo.save(repo.create({
             name: 'g', 
             path: '/p', 
-            virtual_path: '/vp', 
+            virtualPath: '/vp', 
         }));
         const read = await repo.findOneByOrFail({ id: saved.id });
 
-        expect(typeof read.created_at).toBe('string');
-        expect(typeof read.updated_at).toBe('string');
-        expect(Number.isNaN(new Date(read.created_at).getTime())).toBe(false);
-        expect(Number.isNaN(new Date(read.updated_at).getTime())).toBe(false);
+        expect(typeof read.createdAt).toBe('string');
+        expect(typeof read.updatedAt).toBe('string');
+        expect(Number.isNaN(new Date(read.createdAt).getTime())).toBe(false);
+        expect(Number.isNaN(new Date(read.updatedAt).getTime())).toBe(false);
     });
 });

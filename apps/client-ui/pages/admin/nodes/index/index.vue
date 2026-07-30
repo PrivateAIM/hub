@@ -51,13 +51,13 @@ export default defineNuxtComponent({
                 cellClass: 'text-left',
             },
             {
-                key: 'created_at',
+                key: 'createdAt',
                 label: 'Created At',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
             },
             {
-                key: 'updated_at',
+                key: 'updatedAt',
                 label: 'Updated At',
                 headerClass: 'text-left',
                 cellClass: 'text-left',
@@ -77,8 +77,8 @@ export default defineNuxtComponent({
         const canView = computed(() => canEdit.value || canDrop.value);
 
         const query = computed<QueryBuildInput<Node, 3>>(() => ({
-            filters: { realm_id: realmManagementId.value },
-            sort: { updated_at: 'DESC' },
+            filters: { realmId: realmManagementId.value },
+            sort: { updatedAt: 'DESC' },
         }));
 
         const handleDeleted = async (item: Node) => {
@@ -147,11 +147,11 @@ export default defineNuxtComponent({
                         />
                     </div>
                 </template>
-                <template #cell-created_at="{ row }">
-                    <VCTimeago :datetime="row.created_at" />
+                <template #cell-createdAt="{ row }">
+                    <VCTimeago :datetime="row.createdAt" />
                 </template>
-                <template #cell-updated_at="{ row }">
-                    <VCTimeago :datetime="row.updated_at" />
+                <template #cell-updatedAt="{ row }">
+                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <VCTableLoading />
                 <VCTableEmpty />

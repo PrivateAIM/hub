@@ -18,28 +18,36 @@ import {
 
 /**
  * The durable mailbox. Append-only: one row per recipient, delivered delete-on-ack.
- * Pulls are ordered by `created_at` (relative ordering is timezone-independent) and
- * scoped to `recipient_id`; `data` is opaque to the hub (base64 E2E ciphertext for
- * analysis messaging). `expires_at` is an absolute datetime used by the TTL sweep.
+ * Pulls are ordered by `createdAt` (relative ordering is timezone-independent) and
+ * scoped to `recipientId`; `data` is opaque to the hub (base64 E2E ciphertext for
+ * analysis messaging). `expiresAt` is an absolute datetime used by the TTL sweep.
  */
-@Index(['recipient_id', 'created_at', 'id'])
-@Index(['expires_at'])
+@Index(['recipientId', 'createdAt', 'id'])
+@Index(['expiresAt'])
 @Entity({ name: 'messages' })
 export class MessageEntity implements Message {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
 
-    @Column({ type: 'varchar', length: 64 })
-    sender_type!: Message['sender_type'];
+    @Column({
+        name: 'sender_type', 
+        type: 'varchar', 
+        length: 64, 
+    })
+    senderType!: Message['senderType'];
 
-    @Column({ type: 'uuid' })
-    sender_id!: string;
+    @Column({ name: 'sender_id', type: 'uuid' })
+    senderId!: string;
 
-    @Column({ type: 'varchar', length: 64 })
-    recipient_type!: Message['recipient_type'];
+    @Column({
+        name: 'recipient_type', 
+        type: 'varchar', 
+        length: 64, 
+    })
+    recipientType!: Message['recipientType'];
 
-    @Column({ type: 'uuid' })
-    recipient_id!: string;
+    @Column({ name: 'recipient_id', type: 'uuid' })
+    recipientId!: string;
 
     @Column({
         type: 'text',
@@ -61,10 +69,14 @@ export class MessageEntity implements Message {
     })
     metadata!: MessageMetadata | null;
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at!: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt!: string;
 
     /** absolute expiry timestamp; the TTL sweep deletes rows past it */
-    @Column({ type: Date, transformer: dateToISOStringTransformer })
-    expires_at!: string;
+    @Column({
+        name: 'expires_at', 
+        type: Date, 
+        transformer: dateToISOStringTransformer, 
+    })
+    expiresAt!: string;
 }

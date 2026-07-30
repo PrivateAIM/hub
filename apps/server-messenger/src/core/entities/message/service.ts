@@ -56,13 +56,13 @@ export class MessageService implements IMessageService {
         const expiresAt = new Date(Date.now() + this.ttlMs).toISOString();
 
         const input: MessagePersistInput[] = recipients.map((recipient) => ({
-            sender_type: sender.type,
-            sender_id: sender.id,
-            recipient_type: recipient.type,
-            recipient_id: recipient.id,
+            senderType: sender.type,
+            senderId: sender.id,
+            recipientType: recipient.type,
+            recipientId: recipient.id,
             data: data.data ?? null,
             metadata: data.metadata ?? null,
-            expires_at: expiresAt,
+            expiresAt,
         }));
 
         const messages = await this.repository.createMany(input);

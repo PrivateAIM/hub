@@ -54,7 +54,7 @@ export class RegistryRepositoryAdapter implements IRegistryRepository {
 
     async findOneWithSecret(id: string): Promise<Registry | null> {
         const qb = this.repository.createQueryBuilder('registry')
-            .addSelect(['registry.account_secret'])
+            .addSelect(['registry.accountSecret'])
             .where('registry.id = :id', { id });
 
         return qb.getOne();

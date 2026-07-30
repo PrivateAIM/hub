@@ -31,7 +31,7 @@ describe('AnalysisService', () => {
 
     it('should create with valid data', async () => {
         const actor = createAllowAllActor();
-        const result = await service.create({ name: 'test', project_id: '...' }, actor);
+        const result = await service.create({ name: 'test', projectId: '...' }, actor);
         expect(result.name).toBe('test');
     });
 });

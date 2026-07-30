@@ -65,7 +65,7 @@ export default defineComponent({
         :direction="'out'"
         :query="{
             filters: {
-                project_id: projectId
+                projectId: projectId
             },
             sort: 'node.name'
         }"
@@ -90,8 +90,8 @@ export default defineComponent({
                 </div>
                 <div class="ms-auto">
                     <FAnalysisNodeAssignAction
-                        :key="props.data.node_id"
-                        :node-id="props.data.node_id"
+                        :key="props.data.nodeId"
+                        :node-id="props.data.nodeId"
                         :analysis-id="analysisId"
                         :realm-id="realmId"
                         @created="created"

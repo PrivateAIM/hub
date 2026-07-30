@@ -11,7 +11,7 @@ import { FakeEntityRepository } from '@privateaim/server-test-kit';
 
 export class FakeAnalysisBucketFileRepository extends FakeEntityRepository<AnalysisBucketFile> implements IAnalysisBucketFileRepository {
     async findRootCodeFile(analysisId: string): Promise<AnalysisBucketFile | null> {
-        const all = await this.findManyBy({ analysis_id: analysisId });
+        const all = await this.findManyBy({ analysisId });
         return all.find((f) => f.root) ?? null;
     }
 }

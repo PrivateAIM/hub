@@ -27,8 +27,8 @@ export default defineComponent({
 </script>
 <template>
     <div>
-        <template v-if="entity.user_id">
-            <AUser :query-filters="{ id: entity.user_id }">
+        <template v-if="entity.userId">
+            <AUser :query-filters="{ id: entity.userId }">
                 <template #default="scope">
                     <slot
                         v-if="scope && scope.data"
@@ -46,13 +46,13 @@ export default defineComponent({
                         name="error"
                         :data="error"
                     >
-                        {{ entity.user_id }}
+                        {{ entity.userId }}
                     </slot>
                 </template>
             </AUser>
         </template>
-        <template v-else-if="entity.robot_id">
-            <AClient :query-filters="{ id: entity.robot_id }">
+        <template v-else-if="entity.robotId">
+            <AClient :query-filters="{ id: entity.robotId }">
                 <template #default="scope">
                     <slot
                         v-if="scope && scope.data"
@@ -70,7 +70,7 @@ export default defineComponent({
                         name="error"
                         :data="error"
                     >
-                        {{ entity.robot_id }}
+                        {{ entity.robotId }}
                     </slot>
                 </template>
             </AClient>

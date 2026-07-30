@@ -25,9 +25,9 @@ function createTestMasterImageGroup(overrides?: Partial<MasterImageGroup>): Mast
         id: 'mig-1',
         name: 'test-group',
         path: '/path/to/group',
-        virtual_path: 'group/path',
-        created_at: new Date(),
-        updated_at: new Date(),
+        virtualPath: 'group/path',
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     };
 }

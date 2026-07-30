@@ -84,7 +84,7 @@ export default defineComponent({
     <FAnalysisBucket
         ref="analysisBucket"
         :query-filters="{
-            analysis_id: entityId,
+            analysisId: entityId,
             type,
         }"
         v-on="forward"

@@ -64,11 +64,11 @@ export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileR
     async findRootCodeFile(analysisId: string): Promise<AnalysisBucketFile | null> {
         return this.repository.findOne({
             where: {
-                analysis_id: analysisId,
+                analysisId,
                 root: true,
-                analysis_bucket: { type: AnalysisBucketType.CODE },
+                analysisBucket: { type: AnalysisBucketType.CODE },
             },
-            relations: { analysis_bucket: true },
+            relations: { analysisBucket: true },
         });
     }
 

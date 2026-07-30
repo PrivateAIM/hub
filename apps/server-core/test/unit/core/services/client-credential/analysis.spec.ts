@@ -28,7 +28,7 @@ function createAnalysisRepository(analyses: Partial<Analysis>[]): IAnalysisRepos
 function createNodeRepository(nodes: Partial<Node>[]): INodeRepository {
     return {
         findOneBy: async (where: Record<string, any>) => nodes.find(
-            (n) => n.client_id === where.client_id,
+            (n) => n.clientId === where.clientId,
         ) ?? null,
     } as unknown as INodeRepository;
 }
@@ -36,7 +36,7 @@ function createNodeRepository(nodes: Partial<Node>[]): INodeRepository {
 function createAnalysisNodeRepository(analysisNodes: Partial<AnalysisNode>[]): IAnalysisNodeRepository {
     return {
         findOneBy: async (where: Record<string, any>) => analysisNodes.find(
-            (an) => an.analysis_id === where.analysis_id && an.node_id === where.node_id,
+            (an) => an.analysisId === where.analysisId && an.nodeId === where.nodeId,
         ) ?? null,
     } as unknown as IAnalysisNodeRepository;
 }
@@ -93,8 +93,8 @@ function buildService(opts: {
 function baseAnalysis(overrides: Partial<Analysis> = {}): Partial<Analysis> {
     return {
         id: ANALYSIS_ID,
-        realm_id: randomUUID(),
-        client_id: 'analysis-client-1',
+        realmId: randomUUID(),
+        clientId: 'analysis-client-1',
         ...overrides,
     };
 }
@@ -108,7 +108,7 @@ describe('AnalysisClientCredentialService', () => {
         expect(credentials).toEqual({
             id: 'analysis-client-1',
             name: 'the-name',
-            display_name: null,
+            displayName: null,
             secret: 'the-secret',
         });
         expect(reader.calls).toEqual(['analysis-client-1']);
@@ -128,11 +128,11 @@ describe('AnalysisClientCredentialService', () => {
     it('should return credentials for the client of an approved, assigned node', async () => {
         const { service } = buildService({
             analysis: baseAnalysis(),
-            nodes: [{ id: NODE_ID, client_id: 'node-client-1' }],
+            nodes: [{ id: NODE_ID, clientId: 'node-client-1' }],
             analysisNodes: [{
-                analysis_id: ANALYSIS_ID,
-                node_id: NODE_ID,
-                approval_status: AnalysisNodeApprovalStatus.APPROVED,
+                analysisId: ANALYSIS_ID,
+                nodeId: NODE_ID,
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
             }],
         });
 
@@ -143,11 +143,11 @@ describe('AnalysisClientCredentialService', () => {
     it('should deny a node that is assigned but not approved', async () => {
         const { service } = buildService({
             analysis: baseAnalysis(),
-            nodes: [{ id: NODE_ID, client_id: 'node-client-1' }],
+            nodes: [{ id: NODE_ID, clientId: 'node-client-1' }],
             analysisNodes: [{
-                analysis_id: ANALYSIS_ID,
-                node_id: NODE_ID,
-                approval_status: null,
+                analysisId: ANALYSIS_ID,
+                nodeId: NODE_ID,
+                approvalStatus: null,
             }],
         });
 
@@ -173,7 +173,7 @@ describe('AnalysisClientCredentialService', () => {
     });
 
     it('should reject when the analysis has no client provisioned', async () => {
-        const { service } = buildService({ analysis: baseAnalysis({ client_id: null }) });
+        const { service } = buildService({ analysis: baseAnalysis({ clientId: null }) });
 
         await expect(
             service.getCredentials(ANALYSIS_ID, createAllowAllActor()),
@@ -191,7 +191,7 @@ describe('AnalysisClientCredentialService', () => {
     it('should authorize before exposing provisioning state', async () => {
         // An unauthorized actor on an unprovisioned analysis must be denied,
         // never leak provisioning state via BadRequestError.
-        const { service } = buildService({ analysis: baseAnalysis({ client_id: null }) });
+        const { service } = buildService({ analysis: baseAnalysis({ clientId: null }) });
 
         await expect(
             service.getCredentials(ANALYSIS_ID, userActor()),
@@ -212,11 +212,11 @@ describe('AnalysisClientCredentialService', () => {
             // The read path allows an approved assigned node; writing must not.
             const { service, reader } = buildService({
                 analysis: baseAnalysis(),
-                nodes: [{ id: NODE_ID, client_id: 'node-client-1' }],
+                nodes: [{ id: NODE_ID, clientId: 'node-client-1' }],
                 analysisNodes: [{
-                    analysis_id: ANALYSIS_ID,
-                    node_id: NODE_ID,
-                    approval_status: AnalysisNodeApprovalStatus.APPROVED,
+                    analysisId: ANALYSIS_ID,
+                    nodeId: NODE_ID,
+                    approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
                 }],
             });
 

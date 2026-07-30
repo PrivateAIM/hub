@@ -15,12 +15,12 @@ export const registryProjectSchema = defineSchema<RegistryProject>({
     name: DomainType.REGISTRY_PROJECT,
     strict: true,
     fields: {
-        default: ['id', 'name', 'type', 'public', 'external_name', 'external_id', 'account_id', 'account_name', 'webhook_name', 'webhook_exists', 'registry_id', 'realm_id', 'created_at', 'updated_at'],
-        allowed: ['id', 'name', 'type', 'public', 'external_name', 'external_id', 'account_id', 'account_name', 'webhook_name', 'webhook_exists', 'registry_id', 'realm_id', 'created_at', 'updated_at', 'account_secret'],
+        default: ['id', 'name', 'type', 'public', 'externalName', 'externalId', 'accountId', 'accountName', 'webhookName', 'webhookExists', 'registryId', 'realmId', 'createdAt', 'updatedAt'],
+        allowed: ['id', 'name', 'type', 'public', 'externalName', 'externalId', 'accountId', 'accountName', 'webhookName', 'webhookExists', 'registryId', 'realmId', 'createdAt', 'updatedAt', 'accountSecret'],
     },
-    filters: { allowed: ['id', 'name', 'registry_id', 'external_name', 'type'] },
+    filters: { allowed: ['id', 'name', 'registryId', 'externalName', 'type'] },
     relations: { allowed: ['registry'] },
-    sort: { allowed: ['id', 'updated_at', 'created_at'] },
+    sort: { allowed: ['id', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

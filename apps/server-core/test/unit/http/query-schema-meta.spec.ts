@@ -50,8 +50,8 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
         expect(meta.schema.pagination.maxLimit).toEqual(50);
         // deep-equal pins the referenced-not-expanded relation contract
         expect(meta.schema.relations).toEqual({
-            allowed: ['registry_project', 'registry'],
-            schemas: { registry_project: 'registryProject', registry: 'registry' },
+            allowed: ['registryProject', 'registry'],
+            schemas: { registryProject: 'registryProject', registry: 'registry' },
         });
     });
 

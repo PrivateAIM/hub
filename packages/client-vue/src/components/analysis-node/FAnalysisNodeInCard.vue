@@ -44,7 +44,7 @@ export default defineComponent({
         const bucketQuery = computed<QueryBuildInput<AnalysisBucket, 3>>(() => ({
             filters: {
                 type: AnalysisBucketType.CODE,
-                analysis_id: props.entity.analysis_id,
+                analysisId: props.entity.analysisId,
             },
         } satisfies QueryBuildInput<AnalysisBucket, 3>));
 
@@ -90,7 +90,7 @@ export default defineComponent({
 
                         <FDisplayName
                             :name="entity.analysis.name"
-                            :display-name="entity.analysis.display_name"
+                            :display-name="entity.analysis.displayName"
                         />
                     </slot>
                 </div>
@@ -120,7 +120,7 @@ export default defineComponent({
                         </FAnalysisBucket>
                         <FAnalysisNodeApprovalCommand
                             :entity-id="entity.id"
-                            :approval-status="entity.approval_status"
+                            :approval-status="entity.approvalStatus"
                             :with-icon="true"
                             :element-type="'button'"
                             :command="'approve'"
@@ -129,7 +129,7 @@ export default defineComponent({
                         />
                         <FAnalysisNodeApprovalCommand
                             :entity-id="entity.id"
-                            :approval-status="entity.approval_status"
+                            :approval-status="entity.approvalStatus"
                             :with-icon="true"
                             :element-type="'button'"
                             :command="'reject'"
@@ -159,7 +159,7 @@ export default defineComponent({
                     </div>
                     <div>
                         <FAnalysisNodeApprovalStatus
-                            :status="entity.approval_status"
+                            :status="entity.approvalStatus"
                         >
                             <template #default="slotProps">
                                 <span
@@ -176,8 +176,8 @@ export default defineComponent({
                         <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
                     </div>
                     <div>
-                        <template v-if="entity.analysis.user_id">
-                            {{ entity.analysis.user_id }}
+                        <template v-if="entity.analysis.userId">
+                            {{ entity.analysis.userId }}
                         </template>
                     </div>
                 </div>
@@ -188,7 +188,7 @@ export default defineComponent({
                         <strong><i class="fa fa-user" /> Creator</strong>
                     </div>
                     <div>
-                        <AUser :entity-id="entity.user_id">
+                        <AUser :entity-id="entity.userId">
                             <template #default="{ data }">
                                 {{ data.name }}
                             </template>
@@ -208,7 +208,7 @@ export default defineComponent({
                         <span class="text-fg-muted">
                             created
                         </span>
-                        <VCTimeago :datetime="entity.created_at" />
+                        <VCTimeago :datetime="entity.createdAt" />
                     </small>
                 </div>
                 <div class="ms-auto">
@@ -216,7 +216,7 @@ export default defineComponent({
                         <span class="text-fg-muted">
                             updated
                         </span>
-                        <VCTimeago :datetime="entity.updated_at" />
+                        <VCTimeago :datetime="entity.updatedAt" />
                     </small>
                 </div>
             </div>
