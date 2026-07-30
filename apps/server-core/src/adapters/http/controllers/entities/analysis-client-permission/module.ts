@@ -48,7 +48,7 @@ export class AnalysisClientPermissionController {
     @DPost('/:id/client/permissions', [ForceLoggedInMiddleware])
     async add(
         @DPath('id') id: string,
-        @DBody() data: { permission_id: string },
+        @DBody() data: { permissionId: string },
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<ClientPermission>> {
         const actor = buildActorContext(event);

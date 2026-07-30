@@ -98,15 +98,15 @@ export class AnalysisClientPermissionService {
         return { data, meta };
     }
 
-    async create(analysisId: string, data: { permission_id?: string }, actor: ActorContext): Promise<ClientPermission> {
-        if (!data.permission_id) {
-            throw new BadRequestError('A permission_id is required.');
+    async create(analysisId: string, data: { permissionId?: string }, actor: ActorContext): Promise<ClientPermission> {
+        if (!data.permissionId) {
+            throw new BadRequestError('A permissionId is required.');
         }
 
         const analysis = await this.resolveAnalysis(analysisId);
         await this.assertWritable(analysis, actor);
 
-        const { data: permission } = await this.authup.permission.getOne(data.permission_id);
+        const { data: permission } = await this.authup.permission.getOne(data.permissionId);
         if (!ANALYSIS_SELF_PERMISSION_NAMES.includes(permission.name)) {
             throw new PermissionDeniedError('Only analysis self-capabilities can be assigned to an analysis client.');
         }

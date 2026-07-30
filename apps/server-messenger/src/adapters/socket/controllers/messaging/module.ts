@@ -57,8 +57,8 @@ export function mountMessagingController(socket: Socket, options?: { logger?: Lo
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
                 actorType: from.type,
                 actorId: from.id,
-                target_type: to.type,
-                target_id: to.id,
+                targetType: to.type,
+                targetId: to.id,
             });
 
             socket.in(buildConnectionRoomForIdentity(to))

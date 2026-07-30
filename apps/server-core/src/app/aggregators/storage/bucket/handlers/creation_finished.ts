@@ -34,7 +34,7 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
                 this.logger?.info(`${task.data.bucketType} bucket already exists for analysis`, {
                     [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                     [LogFlag.REF_ID]: task.data.analysisId,
-                    bucket_type: task.data.bucketType,
+                    bucketType: task.data.bucketType,
                 });
                 return;
             }
@@ -46,7 +46,7 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
                 this.logger?.info(`Analysis does not exist; ${task.data.bucketType} bucket cannot be created`, {
                     [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                     [LogFlag.REF_ID]: task.data.analysisId,
-                    bucket_type: task.data.bucketType,
+                    bucketType: task.data.bucketType,
                 });
                 return;
             }

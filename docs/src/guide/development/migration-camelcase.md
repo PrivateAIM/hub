@@ -23,7 +23,10 @@ uniformly to:
   `include`. Relation names move too (`include=master_image` →
   `include=masterImage`).
 - **`meta.schema`** — the published allow-lists now list camelCase keys.
-- **Telemetry log labels** — `ref_type` / `ref_id` are now `refType` / `refId`.
+- **Telemetry log labels** — `ref_type` / `ref_id` → `refType` / `refId`
+  (`LogFlag`), and alongside them `actor_type` / `actor_id` → `actorType` /
+  `actorId`, `target_type` / `target_id` → `targetType` / `targetId`, and
+  `bucket_type` → `bucketType`.
 - **The npm packages** — `@privateaim/core-kit`, `core-http-kit`, `storage-kit`,
   `telemetry-kit`, `messenger-kit`, `messenger-http-kit`, `client-vue`.
 
@@ -105,9 +108,18 @@ updates:
 
 - `POST /analysis-node-logs` — body keys `analysis_id`, `node_id`,
   `node_realm_id`, `analysis_realm_id` → camelCase.
-- `GET /nodes/:id/client/credentials` — `display_name` → `displayName`.
+- `GET` / `POST /nodes/:id/client/credentials` — `display_name` →
+  `displayName`, in the response **and** in the `POST` request body. The body has
+  no validator, so a legacy `display_name` key is silently dropped: the secret
+  still rotates and the response is `200`, while the display name stays
+  unchanged.
+- `GET` / `POST /analyses/:id/client/credentials` — response `display_name` →
+  `displayName`. The `POST` body (`{ secret }`) is unchanged. Node-callable: a
+  client whose node holds an approved `analysisNode` row may read these.
 - `GET /nodes/:id/registry/credentials` — `account_name`, `account_secret`,
   `external_name` → camelCase.
+- `POST /analyses/:id/client/permissions` — body key `permission_id` →
+  `permissionId`.
 - The messenger broker surface (`POST /messages`, pull, ack) — `sender_type`,
   `sender_id`, `recipient_type`, `recipient_id`, `created_at` → camelCase.
 

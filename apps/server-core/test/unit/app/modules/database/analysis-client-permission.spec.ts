@@ -117,7 +117,7 @@ describe('AnalysisClientPermissionService', () => {
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
-            await service.create(analysis.id!, { permission_id: STORAGE_PERMISSION.id }, createAllowAllActor());
+            await service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createAllowAllActor());
 
             const created = authup.requests.filter((request) => request.method === 'POST');
             expect(created).toHaveLength(1);
@@ -136,7 +136,7 @@ describe('AnalysisClientPermissionService', () => {
             });
 
             await expect(
-                service.create(analysis.id!, { permission_id: APPROVE_PERMISSION.id }, createAllowAllActor()),
+                service.create(analysis.id!, { permissionId: APPROVE_PERMISSION.id }, createAllowAllActor()),
             ).rejects.toThrow(PermissionDeniedError);
             expect(authup.requests.filter((request) => request.method === 'POST')).toHaveLength(0);
         });
@@ -150,7 +150,7 @@ describe('AnalysisClientPermissionService', () => {
             });
 
             await expect(
-                service.create(analysis.id!, { permission_id: STORAGE_PERMISSION.id }, createAllowAllActor()),
+                service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createAllowAllActor()),
             ).rejects.toThrow(BadRequestError);
         });
 
@@ -163,11 +163,11 @@ describe('AnalysisClientPermissionService', () => {
             });
 
             await expect(
-                service.create(analysis.id!, { permission_id: STORAGE_PERMISSION.id }, createAllowAllActor()),
+                service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createAllowAllActor()),
             ).rejects.toThrow(BadRequestError);
         });
 
-        it('should reject without a permission_id', async () => {
+        it('should reject without a permissionId', async () => {
             const analysis = createAnalysis();
             const authup = createFakeAuthupClient();
             const service = new AnalysisClientPermissionService({
@@ -189,7 +189,7 @@ describe('AnalysisClientPermissionService', () => {
             });
 
             await expect(
-                service.create(analysis.id!, { permission_id: STORAGE_PERMISSION.id }, createDenyAllActor()),
+                service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createDenyAllActor()),
             ).rejects.toThrow();
             expect(authup.requests.filter((request) => request.method === 'POST')).toHaveLength(0);
         });
@@ -202,7 +202,7 @@ describe('AnalysisClientPermissionService', () => {
             });
 
             await expect(
-                service.create(randomUUID(), { permission_id: STORAGE_PERMISSION.id }, createAllowAllActor()),
+                service.create(randomUUID(), { permissionId: STORAGE_PERMISSION.id }, createAllowAllActor()),
             ).rejects.toThrow(EntityNotFoundError);
         });
     });
