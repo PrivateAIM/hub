@@ -6,7 +6,7 @@
  */
 
 import { assertSchemaMatchesEntity } from '@rapiq/adapter-typeorm';
-import { toMetadataOnlyDataSourceOptions } from '@privateaim/server-test-kit';
+import { collectUncoveredColumns, toMetadataOnlyDataSourceOptions } from '@privateaim/server-test-kit';
 import type { EntityTarget } from 'typeorm';
 import { DataSource } from 'typeorm';
 import {
@@ -57,6 +57,13 @@ describe('core/query (schema ↔ entity parity)', () => {
         }
     });
 
+    // The other direction, which `assertSchemaMatchesEntity` does not check: a
+    // column in neither `fields.default` nor `fields.allowed` is silently absent
+    // from every response, because rapiq derives the root projection from
+    // `fields`. No error is raised — the property just never appears.
+    it.each(SCHEMA_ENTITY_TARGETS)('should expose every %s column through fields', (_name, schema, target) => {
+        expect(collectUncoveredColumns(schema, dataSource.getMetadata(target))).toEqual([]);
+    });
     it.each(SCHEMA_ENTITY_TARGETS)('should resolve every %s schema key against the entity', (_name, schema, target) => {
         expect(() => assertSchemaMatchesEntity(schema, target, dataSource)).not.toThrow();
     });

@@ -33,6 +33,57 @@ export function toMetadataOnlyDataSourceOptions(options: DataSourceOptions): Dat
 }
 
 /**
+ * Selectable columns of `metadata` that appear in neither `fields.default` nor
+ * `fields.allowed` of `schema`.
+ *
+ * rapiq's own `assertSchemaMatchesEntity` only checks one direction — that every
+ * schema key resolves against the entity. The reverse is just as damaging and
+ * completely silent: rapiq derives the root projection from `fields`, so a column
+ * missing from both lists simply never appears in a response. No error, no log,
+ * just an absent property. authup lost `role.builtIn` exactly this way.
+ *
+ * Relation-owned columns are excluded — they are projected through the relation,
+ * not the root `fields` list.
+ *
+ * A schema that declares NO `fields` block at all is exempt: rapiq then decodes to
+ * an empty projection (`fields: { value: [] }`, verified against `eventSchema`),
+ * which applies no explicit select and lets TypeORM return every column. Nothing
+ * can be missing, so there is nothing to assert. Note the two consequences that
+ * shape does carry — a `select: false` column can never be opted into, and an
+ * `include=` child is dropped (rapiq#821 / authup#3313) — neither of which this
+ * helper is about.
+ */
+export function collectUncoveredColumns(
+    schema: { fields?: { default?: readonly string[], allowed?: readonly string[] } },
+    metadata: {
+        columns: readonly {
+            propertyName: string, 
+            isSelect: boolean, 
+            relationMetadata?: unknown 
+        }[] 
+    },
+    exclusions: readonly string[] = [],
+): string[] {
+    const names = [
+        ...(schema.fields?.default ?? []),
+        ...(schema.fields?.allowed ?? []),
+    ];
+
+    // `defineSchema` normalizes, so `fields` is present even when the author
+    // declared none — an EMPTY name set is what "no fields block" looks like.
+    if (names.length === 0) {
+        return [];
+    }
+
+    const declared = new Set<string>([...names, ...exclusions]);
+
+    return metadata.columns
+        .filter((column) => column.isSelect && !column.relationMetadata)
+        .map((column) => column.propertyName)
+        .filter((propertyName) => !declared.has(propertyName));
+}
+
+/**
  * Plan 017: database columns stay snake_case, pinned per column by an explicit
  * `@Column({ name })` / `@JoinColumn({ name })`. There is no naming strategy, so
  * a forgotten explicit name silently falls back to TypeORM's
