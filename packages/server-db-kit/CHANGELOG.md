@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.13.0](https://github.com/PrivateAIM/hub/compare/v0.12.6...v0.13.0) (2026-07-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* entity record endpoints return { data, meta } instead of the bare record, so consumers must unwrap data; old clients against a new server break. The kit response types are renamed with no deprecated aliases: SingleResourceResponse -> EntityRecordResponse, CollectionResourceResponse -> EntityCollectionResponse, DomainAPI -> IEntityAPI, DomainAPISlim -> IEntityAPISlim.
+
+### Features
+
+* record data/meta envelope, meta.schema discovery and dependency bump ([#1801](https://github.com/PrivateAIM/hub/issues/1801)) ([a509e93](https://github.com/PrivateAIM/hub/commit/a509e932c7f650b58ce237a13993026cb102121c)), closes [#1793](https://github.com/PrivateAIM/hub/issues/1793) [#1794](https://github.com/PrivateAIM/hub/issues/1794)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.12.7 to ^0.13.0
+    * @privateaim/server-kit bumped from ^0.12.7 to ^0.13.0
+
 ## [0.12.6](https://github.com/PrivateAIM/hub/compare/v0.12.5...v0.12.6) (2026-07-29)
 
 
