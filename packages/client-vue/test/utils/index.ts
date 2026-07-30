@@ -52,10 +52,19 @@ export type MountHandlers = {
  * `provide()` is first-wins, so an ordering mistake fails SILENTLY with the
  * real `new Client({ baseURL })` winning.
  */
+export type MountOptions = {
+    /**
+     * Install the realtime socket manager. Off by default, mirroring
+     * client-vue's own `realtime` install option.
+     */
+    realtime?: boolean
+};
+
 export function mountClientVueComponent(
     component: Component,
     props: Record<string, any> = {},
     handlers: MountHandlers = {},
+    options: MountOptions = {},
 ) {
     const pinia = createPinia();
 
@@ -104,7 +113,8 @@ export function mountClientVueComponent(
                     storageHTTPClient: storageClient,
                     telemetryHTTPClient: telemetryClient,
                     pinia,
-                    // `realtime` omitted -> installSocketManager is skipped.
+                    // Off unless a spec opts in -> installSocketManager skipped.
+                    realtime: options.realtime,
                 }],
             ],
         },

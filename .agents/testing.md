@@ -354,7 +354,10 @@ Things the harness handles, and why they matter:
   teardown. VTU's `stubs` matches by component name, so it also intercepts the
   `VCIcon` that `@vuecs/button` imports directly (a global `components`
   registration does not).
-- **`realtime` is omitted**, so `installSocketManager` is skipped.
+- **`realtime` is omitted** by default, so `installSocketManager` is skipped.
+  Pass `{ realtime: true }` as the harness's fourth argument to opt in —
+  `test/unit/core/realtime-gate.spec.ts` pins both sides of that gate,
+  because a consumer that forgets the option loses realtime SILENTLY.
 
 Cross-package test imports resolve through `dist`, so the kits must be built
 first. `nx.json`'s `test: { dependsOn: ["^build"] }` handles that for

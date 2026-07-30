@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { hasOwnProperty } from '@privateaim/kit';
 import type { ObjectLiteral } from '@rapiq/core';
 import type { DomainTypeMap, IEntityAPI } from '../../domains';
 import type { IStorageClient } from './types';
@@ -19,6 +20,16 @@ export type ClientEntityAPIRegistry = {
 };
 
 /**
+ * RUNTIME allow-list. `Record<ClientEntityAPIKey, true>` keeps it exhaustive in
+ * both directions, so it cannot drift from the type. See core-http-kit for why
+ * a `hasOwnProperty` check against the client is not sufficient.
+ */
+const ENTITY_API_KEYS : Record<ClientEntityAPIKey, true> = {
+    bucket: true,
+    bucketFile: true,
+};
+
+/**
  * Resolve a storage sub-API by its `DomainType` string. Mirrors
  * `pickEntityAPI` in `@privateaim/core-http-kit`, including the cast-free
  * `ClientEntityAPIRegistry` assignment that proves record-type alignment at
@@ -30,7 +41,7 @@ export function pickEntityAPI<TYPE extends ObjectLiteral>(
 ) : EntityAPIDispatch<TYPE> | undefined {
     const registry : ClientEntityAPIRegistry = client;
 
-    if (!Object.prototype.hasOwnProperty.call(registry, type)) {
+    if (!hasOwnProperty(ENTITY_API_KEYS, type)) {
         return undefined;
     }
 

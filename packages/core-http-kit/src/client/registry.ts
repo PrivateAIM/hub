@@ -6,6 +6,7 @@
  */
 
 import type { ObjectLiteral } from '@rapiq/core';
+import { hasOwnProperty } from '@privateaim/kit';
 import type { DomainTypeMap } from '@privateaim/core-kit';
 import type { IEntityAPI } from '../domains';
 import type { ICoreClient } from './types';
@@ -36,6 +37,32 @@ export type ClientEntityAPIRegistry = {
 };
 
 /**
+ * RUNTIME allow-list of the registry keys.
+ *
+ * A `hasOwnProperty` check against the client is NOT enough: the client really
+ * does carry `analysisLog` / `analysisNodeLog` as own properties, so excluding
+ * them from `ClientEntityAPIKey` only hides them from the compiler while
+ * `pickEntityAPI` would still hand them out. Typing this as
+ * `Record<ClientEntityAPIKey, true>` makes the object literal exhaustive in both
+ * directions — a key added to the type but not here (or vice versa) fails the
+ * build — so the runtime list cannot drift from the type.
+ */
+const ENTITY_API_KEYS : Record<ClientEntityAPIKey, true> = {
+    masterImage: true,
+    masterImageGroup: true,
+    project: true,
+    projectNode: true,
+    registry: true,
+    registryProject: true,
+    node: true,
+    analysis: true,
+    analysisBucket: true,
+    analysisBucketFile: true,
+    analysisNode: true,
+    analysisNodeEvent: true,
+};
+
+/**
  * Resolve a sub-API by its `DomainType` string, or `undefined` when the client
  * carries no such entity API.
  *
@@ -60,7 +87,7 @@ export function pickEntityAPI<TYPE extends ObjectLiteral>(
 ) : EntityAPIDispatch<TYPE> | undefined {
     const registry : ClientEntityAPIRegistry = client;
 
-    if (!Object.prototype.hasOwnProperty.call(registry, type)) {
+    if (!hasOwnProperty(ENTITY_API_KEYS, type)) {
         return undefined;
     }
 

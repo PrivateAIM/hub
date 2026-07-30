@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { hasOwnProperty } from '@privateaim/kit';
 import type { ObjectLiteral } from '@rapiq/core';
 import type { DomainTypeMap, IEntityAPI } from '../../domains';
 import type { ITelemetryClient } from './types';
@@ -25,6 +26,14 @@ export type ClientEntityAPIRegistry = {
 };
 
 /**
+ * RUNTIME allow-list. Load-bearing here: the client really does carry `log` as
+ * an own property, so excluding it from `ClientEntityAPIKey` alone would hide
+ * it from the compiler while `pickEntityAPI` still handed it out.
+ * `Record<ClientEntityAPIKey, true>` keeps this exhaustive in both directions.
+ */
+const ENTITY_API_KEYS : Record<ClientEntityAPIKey, true> = { event: true };
+
+/**
  * Resolve a telemetry sub-API by its `DomainType` string. Mirrors
  * `pickEntityAPI` in `@privateaim/core-http-kit`, including the cast-free
  * `ClientEntityAPIRegistry` assignment that proves record-type alignment at
@@ -36,7 +45,7 @@ export function pickEntityAPI<TYPE extends ObjectLiteral>(
 ) : EntityAPIDispatch<TYPE> | undefined {
     const registry : ClientEntityAPIRegistry = client;
 
-    if (!Object.prototype.hasOwnProperty.call(registry, type)) {
+    if (!hasOwnProperty(ENTITY_API_KEYS, type)) {
         return undefined;
     }
 
