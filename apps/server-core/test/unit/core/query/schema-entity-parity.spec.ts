@@ -1,0 +1,98 @@
+/*
+ * Copyright (c) 2026.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import { assertSchemaMatchesEntity } from '@rapiq/adapter-typeorm';
+import { toMetadataOnlyDataSourceOptions } from '@privateaim/server-test-kit';
+import type { EntityTarget } from 'typeorm';
+import { DataSource } from 'typeorm';
+import {
+    afterAll, 
+    beforeAll, 
+    describe, 
+    expect, 
+    it,
+} from 'vitest';
+import {
+    AnalysisBucketEntity,
+    AnalysisBucketFileEntity,
+    AnalysisEntity,
+    AnalysisNodeEntity,
+    AnalysisNodeEventEntity,
+    MasterImageEntity,
+    MasterImageGroupEntity,
+    NodeEntity,
+    ProjectEntity,
+    ProjectNodeEntity,
+    RegistryEntity,
+    RegistryProjectEntity,
+} from '../../../../src/adapters/database/index.ts';
+import {
+    analysisBucketFileSchema,
+    analysisBucketSchema,
+    analysisNodeEventSchema,
+    analysisNodeSchema,
+    analysisSchema,
+    masterImageGroupSchema,
+    masterImageSchema,
+    nodeSchema,
+    projectNodeSchema,
+    projectSchema,
+    registryProjectSchema,
+    registrySchema,
+} from '../../../../src/core/index.ts';
+import { DataSourceOptionsBuilder } from '../../../../src/app/modules/database/index.ts';
+
+/**
+ * Plan 017 guard for the OTHER half of the rename: a rapiq schema is a set of
+ * string allow-lists (`fields`, `filters`, `sort`, `relations`) that the compiler
+ * only checks against the domain TYPE, never against the entity metadata. A key
+ * that resolves against neither does not error — a stale `filters.allowed` entry
+ * surfaces as a runtime "key is not permitted", and a field missing from
+ * `fields` silently vanishes from every collection response.
+ *
+ * `analysisLogSchema` / `analysisNodeLogSchema` are deliberately absent: they are
+ * backed by VictoriaLogs, not by a TypeORM entity.
+ */
+const SCHEMA_ENTITY_TARGETS: [string, any, EntityTarget<any>][] = [
+    ['analysis', analysisSchema, AnalysisEntity],
+    ['analysisBucket', analysisBucketSchema, AnalysisBucketEntity],
+    ['analysisBucketFile', analysisBucketFileSchema, AnalysisBucketFileEntity],
+    ['analysisNode', analysisNodeSchema, AnalysisNodeEntity],
+    ['analysisNodeEvent', analysisNodeEventSchema, AnalysisNodeEventEntity],
+    ['masterImage', masterImageSchema, MasterImageEntity],
+    ['masterImageGroup', masterImageGroupSchema, MasterImageGroupEntity],
+    ['node', nodeSchema, NodeEntity],
+    ['project', projectSchema, ProjectEntity],
+    ['projectNode', projectNodeSchema, ProjectNodeEntity],
+    ['registry', registrySchema, RegistryEntity],
+    ['registryProject', registryProjectSchema, RegistryProjectEntity],
+];
+
+describe('core/query (schema ↔ entity parity)', () => {
+    let dataSource: DataSource;
+
+    beforeAll(async () => {
+        dataSource = new DataSource(
+            toMetadataOnlyDataSourceOptions(new DataSourceOptionsBuilder().buildWith({
+                type: 'better-sqlite3',
+                database: ':memory:',
+            })),
+        );
+
+        await dataSource.initialize();
+    });
+
+    afterAll(async () => {
+        if (dataSource?.isInitialized) {
+            await dataSource.destroy();
+        }
+    });
+
+    it.each(SCHEMA_ENTITY_TARGETS)('should resolve every %s schema key against the entity', (_name, schema, target) => {
+        expect(() => assertSchemaMatchesEntity(schema, target, dataSource)).not.toThrow();
+    });
+});

@@ -33,6 +33,7 @@
         "@privateaim/server-kit": "^0.12.7",
         "hapic": "^3.0.1",
         "testcontainers": "^12.0.4",
+        "typeorm": "^1.1.0",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
@@ -41,7 +42,8 @@
         "@privateaim/core-http-kit": "^0.12.7",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.12.7",
-        "hapic": "^3.0.1"
+        "hapic": "^3.0.1",
+        "typeorm": "^1.1.0"
     },
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",
