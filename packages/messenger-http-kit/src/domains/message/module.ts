@@ -11,6 +11,7 @@ import type {
     MessagePullResponse,
     SendMessageRequest,
 } from '@privateaim/messenger-kit';
+import type { IMessageAPI } from './types';
 import { BaseAPI } from '../base';
 
 function buildPullQuery(query?: MessagePullQuery): string {
@@ -30,7 +31,7 @@ function buildPullQuery(query?: MessagePullQuery): string {
     return serialized.length > 0 ? `?${serialized}` : '';
 }
 
-export class MessageAPI extends BaseAPI {
+export class MessageAPI extends BaseAPI implements IMessageAPI {
     /**
      * Send a message to one or more recipients. The sender is the authenticated
      * identity; the hub persists one durable row per recipient. The analysis

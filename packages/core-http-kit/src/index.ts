@@ -7,3 +7,6 @@
 
 export * from './client';
 export * from './domains';
+// `EntityQueryInput` appears in every `I*API` signature, so it has to be
+// publicly nameable; `buildQueryString` and friends come along with it.
+export * from './utils';

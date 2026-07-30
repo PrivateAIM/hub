@@ -19,7 +19,7 @@ import {
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
-import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import path from 'node:path';
 import tar from 'tar-fs';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';

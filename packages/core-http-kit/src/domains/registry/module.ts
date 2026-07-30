@@ -10,9 +10,9 @@ import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { Registry } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { RegistryCreatePayload, RegistryUpdatePayload } from './types';
+import type { IRegistryAPI, RegistryCreatePayload, RegistryUpdatePayload  } from './types';
 
-export class RegistryAPI extends BaseAPI {
+export class RegistryAPI extends BaseAPI implements IRegistryAPI {
     async getMany(options?: EntityQueryInput<Registry>): Promise<EntityCollectionResponse<Registry>> {
         const response = await this.client.get(`registries${buildQueryString(options)}`);
 

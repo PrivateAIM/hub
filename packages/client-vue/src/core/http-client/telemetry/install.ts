@@ -6,17 +6,18 @@
  */
 
 import { APIClient as Client } from '@privateaim/telemetry-kit';
+import type { ITelemetryClient } from '@privateaim/telemetry-kit';
 import type { App } from 'vue';
 import { setupBaseHTTPClient } from '../setup';
 import type { BaseHTTPClientInstallOptions } from '../types';
 import { isTelemetryHTTPClientUsable, provideTelemetryHTTPClient } from './singleton';
 
-export function installTelemetryHTTPClient(app: App, options: BaseHTTPClientInstallOptions) {
+export function installTelemetryHTTPClient(app: App, options: BaseHTTPClientInstallOptions<ITelemetryClient>) {
     if (isTelemetryHTTPClientUsable(app)) {
         return;
     }
 
-    const client = new Client({ baseURL: options.baseURL });
+    const client = options.client ?? new Client({ baseURL: options.baseURL });
 
     setupBaseHTTPClient(app, client);
 

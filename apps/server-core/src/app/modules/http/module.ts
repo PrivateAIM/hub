@@ -6,7 +6,7 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IModule } from 'orkos';
+import type { IModule, ModuleDependency } from 'orkos';
 import type { Server } from 'node:http';
 import { App, serve } from 'routup';
 import {
@@ -36,7 +36,20 @@ import type { HTTPModuleOptions } from './types.ts';
 export class HTTPModule implements IModule {
     readonly name = 'http';
 
-    readonly dependencies: string[] = ['config', 'database', 'analysis'];
+    /**
+     * `telemetryClient` is OPTIONAL but declared: this module `tryResolve`s
+     * that token while constructing the log controllers, so it must be set up
+     * first WHEN PRESENT. Without declaring it, the ordering held only by
+     * accident of graph depth (`telemetryClient` depends on `config` alone,
+     * while `http` waits on `analysis`) — which would break silently if either
+     * module's dependencies changed.
+     */
+    readonly dependencies: (string | ModuleDependency)[] = [
+        'config',
+        'database',
+        'analysis',
+        { name: 'telemetryClient', optional: true },
+    ];
 
     private options: HTTPModuleOptions;
 

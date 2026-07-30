@@ -11,8 +11,9 @@ import type { MasterImageGroup } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { IMasterImageGroupAPI } from './types';
 
-export class MasterImageGroupAPI extends BaseAPI {
+export class MasterImageGroupAPI extends BaseAPI implements IMasterImageGroupAPI {
     async getMany(data?: EntityQueryInput<MasterImageGroup>): Promise<EntityCollectionResponse<MasterImageGroup>> {
         const response = await this.client.get(`master-image-groups${buildQueryString(data)}`);
         return response.data;

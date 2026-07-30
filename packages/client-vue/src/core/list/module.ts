@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@privateaim/kit';
-import type { IEntityAPISlim } from '@privateaim/core-http-kit';
+import { pickEntityAPI } from '@privateaim/core-http-kit';
 import type { DomainTypeMap } from '@privateaim/core-kit';
 import {
     VCList,
@@ -86,15 +85,15 @@ export function createListRaw<
 
     const client = injectCoreHTTPClient();
 
-    let domainAPI : IEntityAPISlim<Entity<RECORD>> | undefined;
-    if (hasOwnProperty(client, context.type)) {
-        domainAPI = client[context.type] as any;
-    }
+    // `context.type` spans every DomainTypeMap key, including the ones the core
+    // client has no entity API for (the two log types and the four sub-types),
+    // so this resolves to undefined for those and the list stays inert.
+    const domainAPI = pickEntityAPI<Entity<RECORD>>(client, context.type);
 
     let query : QueryBuildInput<Entity<RECORD>> | undefined;
 
     async function load(input: ListMeta<RECORD> = {}) {
-        if (!domainAPI || busy.value) return;
+        if (typeof domainAPI?.getMany !== 'function' || busy.value) return;
 
         busy.value = true;
         meta.value.busy = true;

@@ -13,7 +13,7 @@ import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker
 import {
     AnalysisDistributorCommand,
 } from '@privateaim/server-core-worker-kit';
-import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 import { AnalysisDistributorCheckHandler, AnalysisDistributorExecuteHandler } from './handlers';
 

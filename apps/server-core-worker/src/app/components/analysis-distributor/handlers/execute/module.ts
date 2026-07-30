@@ -17,7 +17,7 @@ import {
 import type { Analysis, Node, Registry } from '@privateaim/core-kit';
 import { REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
-import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import { getManyAll } from '@privateaim/core-http-kit';
 import type { Client as DockerClient, ModemStreamWaitOptions  } from 'docken';
 import type { ImagePushOptions } from 'dockerode';

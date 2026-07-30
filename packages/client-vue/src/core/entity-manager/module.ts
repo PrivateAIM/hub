@@ -6,7 +6,7 @@
  */
 
 import { hasOwnProperty } from '@privateaim/kit';
-import type { IEntityAPI } from '@privateaim/core-http-kit';
+import { pickEntityAPI } from '@privateaim/core-http-kit';
 import type {
     DomainEntityID, 
     DomainTypeMap,
@@ -41,10 +41,12 @@ export function createEntityManager<
     ctx: EntityManagerContext<TYPE, RECORD>,
 ) : EntityManager<RECORD> {
     const client = injectCoreHTTPClient();
-    let domainAPI : IEntityAPI<RECORD> | undefined;
-    if (hasOwnProperty(client, ctx.type)) {
-        domainAPI = client[ctx.type] as any;
-    }
+    // `ctx.type` spans every DomainTypeMap key, including the ones the core
+    // client has no entity API for (the two log types and the four sub-types).
+    // The resolved verbs are individually optional — `masterImage` has no
+    // `create`, `analysisNodeEvent` is read-only — so each operation below
+    // guards the verb it needs instead of assuming the full entity surface.
+    const domainAPI = pickEntityAPI<RECORD>(client, ctx.type);
 
     const entity : Ref<RECORD | null> = ref(null);
     const entityId = computed<DomainEntityID<RECORD> | undefined>(
@@ -140,7 +142,7 @@ export function createEntityManager<
     const busy = ref(false);
 
     const update = async (data: Partial<RECORD>) => {
-        if (!domainAPI || busy.value || !entityId.value) {
+        if (typeof domainAPI?.update !== 'function' || busy.value || !entityId.value) {
             return;
         }
 
@@ -170,7 +172,7 @@ export function createEntityManager<
     };
 
     const remove = async () : Promise<void> => {
-        if (!domainAPI || busy.value || !entityId.value) {
+        if (typeof domainAPI?.delete !== 'function' || busy.value || !entityId.value) {
             return;
         }
 
@@ -196,7 +198,7 @@ export function createEntityManager<
     };
 
     const create = async (data: Partial<RECORD>) : Promise<void> => {
-        if (!domainAPI || busy.value) {
+        if (typeof domainAPI?.create !== 'function' || busy.value) {
             return;
         }
 
@@ -273,7 +275,7 @@ export function createEntityManager<
             return null;
         }
 
-        if (resolveCtx.id) {
+        if (resolveCtx.id && typeof domainAPI.getOne === 'function') {
             try {
                 const { data } = await domainAPI.getOne(resolveCtx.id, resolveCtx.query as QueryBuildInput<any>);
 
@@ -293,7 +295,7 @@ export function createEntityManager<
             }
         }
 
-        if (resolveCtx.query) {
+        if (resolveCtx.query && typeof domainAPI.getMany === 'function') {
             try {
                 const response = await domainAPI.getMany({
                     ...resolveCtx.query as QueryBuildInput<any>,

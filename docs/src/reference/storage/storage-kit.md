@@ -13,9 +13,9 @@ npm install @privateaim/storage-kit
 ### HTTP Client
 
 ```typescript
-import { HTTPClient } from '@privateaim/storage-kit';
+import { APIClient } from '@privateaim/storage-kit';
 
-const client = new HTTPClient({
+const client = new APIClient({
     baseURL: 'http://localhost:4001',
 });
 
@@ -68,8 +68,55 @@ import { Bucket, BucketFile } from '@privateaim/storage-kit';
 
 | Module | Description |
 |--------|-------------|
-| `http` | `HTTPClient` with bucket and bucket-file API methods |
+| `http` | `APIClient` with bucket and bucket-file API methods |
+| `IStorageClient` / `ClientOptions` | The client contract and its construction options |
+| `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
+| `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute` |
 | `domains` | `Bucket`, `BucketFile` types and validators |
+
+## Contract
+
+`APIClient` implements `IStorageClient`, and each sub-API implements its own
+`I<X>API` interface:
+
+```typescript
+import type { IStorageClient } from '@privateaim/storage-kit';
+
+// Depend on the CONTRACT, not the class — that is what lets a test hand you a
+// fake, and what keeps the type structural.
+function doWork(client: IStorageClient) { /* … */ }
+```
+
+| Sub-API | Contract |
+|---|---|
+| `bucket` | `IBucketAPI` (entity verbs plus `upload`/`stream`) |
+| `bucketFile` | `IBucketFileAPI` (entity verbs plus `stream`) |
+
+## Testing
+
+`@privateaim/storage-kit/testing` ships a `FakeClient`: a real `APIClient` wired to hapic's
+`MemoryTransport`. Only the transport is replaced, so header merging, body
+transformation, decoding, retries and the client's own `RESPONSE_ERROR` hook all
+still run.
+
+```typescript
+import { createFakeClient, fakeResponse } from '@privateaim/storage-kit/testing';
+
+const client = createFakeClient({
+    handlers: {
+        'GET /buckets/:id': (req) => ({ data: { id: req.params.id }, meta: {} }),
+    },
+});
+
+const { data: bucket } = await client.bucket.getOne('abc');
+```
+
+- Handler keys are `'<METHOD> /<path>'`; a `:name` segment captures into `req.params`.
+- The query string is ignored and `'*'` is a catch-all that always loses to a specific pattern.
+- A handler returns the response **body**; return `fakeResponse(status, body)` for a non-2xx.
+- Unmatched requests fall back to `{ data: [], meta: { total: 0 } }`.
+- Keep the default path-free `baseURL` — a `baseURL` carrying a path shifts every
+  pathname, and patterns silently stop matching.
 
 ## Dependencies
 

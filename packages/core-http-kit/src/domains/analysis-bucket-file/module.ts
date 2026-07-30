@@ -10,9 +10,9 @@ import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { AnalysisBucketFileCreatePayload, AnalysisBucketFileUpdatePayload } from './types';
+import type { AnalysisBucketFileCreatePayload, AnalysisBucketFileUpdatePayload, IAnalysisBucketFileAPI  } from './types';
 
-export class AnalysisBucketFileAPI extends BaseAPI {
+export class AnalysisBucketFileAPI extends BaseAPI implements IAnalysisBucketFileAPI {
     async getMany(
         options?: EntityQueryInput<AnalysisBucketFile>,
     ): Promise<EntityCollectionResponse<AnalysisBucketFile>> {

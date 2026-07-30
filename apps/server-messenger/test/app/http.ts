@@ -6,12 +6,13 @@
  */
 
 import { Client } from '@privateaim/messenger-http-kit';
+import type { IMessengerClient } from '@privateaim/messenger-http-kit';
 import type { HTTPServer } from '../../src/app/modules/http/constants.ts';
 import { HTTPInjectionKey } from '../../src/app/modules/http/index.ts';
 import { TestApplication } from './module.ts';
 
 export class TestHTTPApplication extends TestApplication {
-    protected _client: Client | undefined;
+    protected _client: IMessengerClient | undefined;
 
     get baseURL(): string {
         const server = this.container.resolve<HTTPServer>(HTTPInjectionKey.Server);
@@ -19,7 +20,7 @@ export class TestHTTPApplication extends TestApplication {
         return (server.url ?? '').replace('0.0.0.0', '127.0.0.1');
     }
 
-    get client(): Client {
+    get client(): IMessengerClient {
         if (typeof this._client === 'undefined') {
             this._client = new Client({ baseURL: this.baseURL });
         }

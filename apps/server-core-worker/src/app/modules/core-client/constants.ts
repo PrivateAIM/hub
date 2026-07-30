@@ -6,6 +6,6 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { Client } from '@privateaim/core-http-kit';
+import type { ICoreClient } from '@privateaim/core-http-kit';
 
-export const CoreClientInjectionKey = new TypedToken<Client>('CoreClient');
+export const CoreClientInjectionKey = new TypedToken<ICoreClient>('CoreClient');

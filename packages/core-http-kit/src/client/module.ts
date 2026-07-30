@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RequestBaseOptions } from 'hapic';
 import { Client as BaseClient, HookName, isClientError } from 'hapic';
 import {
     AnalysisAPI,
@@ -24,8 +23,9 @@ import {
     RegistryProjectAPI,
     ServiceAPI,
 } from '../domains';
+import type { ClientOptions, ICoreClient } from './types';
 
-export class Client extends BaseClient {
+export class Client extends BaseClient implements ICoreClient {
     public readonly masterImage : MasterImageAPI;
 
     public readonly masterImageGroup : MasterImageGroupAPI;
@@ -56,7 +56,7 @@ export class Client extends BaseClient {
 
     public readonly service : ServiceAPI;
 
-    constructor(config: RequestBaseOptions) {
+    constructor(config: ClientOptions = {}) {
         super(config);
 
         this.masterImage = new MasterImageAPI({ client: this });

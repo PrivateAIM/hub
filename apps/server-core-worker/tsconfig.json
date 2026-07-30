@@ -5,10 +5,13 @@
             "@privateaim/core-kit": ["./packages/core-kit/src"],
             "@privateaim/kit": ["./packages/kit/src"],
             "@privateaim/core-http-kit": ["./packages/core-http-kit/src"],
+            "@privateaim/core-http-kit/testing": ["./packages/core-http-kit/src/testing"],
             "@privateaim/telemetry-kit": ["./packages/telemetry-kit/src"],
+            "@privateaim/telemetry-kit/testing": ["./packages/telemetry-kit/src/testing"],
             "@privateaim/server-kit": ["./packages/server-kit/src"],
             "@privateaim/server-telemetry-kit": ["./packages/server-telemetry-kit/src"],
             "@privateaim/storage-kit": ["./packages/storage-kit/src"],
+            "@privateaim/storage-kit/testing": ["./packages/storage-kit/src/testing"],
             "@privateaim/server-core-worker-kit": ["./packages/server-core-worker-kit/src"]
         }
     }

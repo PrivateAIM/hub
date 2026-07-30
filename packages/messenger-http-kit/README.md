@@ -35,6 +35,28 @@ Built on [Hapic](https://github.com/tada5hi/hapic), this client wraps the broker
 npm install @privateaim/messenger-http-kit
 ```
 
+## Testing
+
+The `Client` class implements `IMessengerClient`, so consumers can depend on the
+contract rather than the class. `@privateaim/messenger-http-kit/testing` ships a
+`FakeClient` — a real `Client` on an in-memory transport, so the request pipeline
+(header merge, decode, hooks, retry) runs unchanged and no network is touched:
+
+```typescript
+import { createFakeClient } from '@privateaim/messenger-http-kit/testing';
+
+const client = createFakeClient({
+    handlers: {
+        'GET /messages': () => ({ messages: [{ id: 'm1' }] }),
+    },
+});
+
+const { messages } = await client.message.pull();
+
+// Every dispatched request is recorded, normalized.
+console.log(client.requests);
+```
+
 ## License
 
 Made with 💚

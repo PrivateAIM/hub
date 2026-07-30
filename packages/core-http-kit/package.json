@@ -14,6 +14,10 @@
         ".": {
             "types": "./dist/index.d.mts",
             "import": "./dist/index.mjs"
+        },
+        "./testing": {
+            "types": "./dist/testing/index.d.mts",
+            "import": "./dist/testing/index.mjs"
         }
     },
     "author": {
@@ -32,6 +36,7 @@
         "@authup/core-kit": "^1.0.0-beta.57",
         "@authup/kit": "^1.0.0-beta.57",
         "@privateaim/core-kit": "^0.12.7",
+        "@privateaim/kit": "^0.12.7",
         "@privateaim/telemetry-kit": "^0.12.7",
         "@rapiq/codec-url": "^2.0.0-beta.13",
         "@rapiq/core": "^2.0.0-beta.13",
@@ -42,6 +47,7 @@
         "@authup/core-kit": "^1.0.0-beta.57",
         "@authup/kit": "^1.0.0-beta.57",
         "@privateaim/core-kit": "^0.12.7",
+        "@privateaim/kit": "^0.12.7",
         "@privateaim/telemetry-kit": "^0.12.7",
         "@rapiq/codec-url": "^2.0.0-beta.13",
         "@rapiq/core": "^2.0.0-beta.13",

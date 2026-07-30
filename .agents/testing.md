@@ -137,6 +137,66 @@ Enabling the Authup client does **not** activate `NodeClientService` /
 `AnalysisClientService`: the test database module builds serviceless subscribers
 that short-circuit, keeping enforcement and client-provisioning decoupled.
 
+## The Three Testing Layers
+
+Hub fakes at three different depths. They are complementary — pick by what the
+code under test actually talks to, and do not migrate one layer into another.
+
+| Layer | Seam | Used for | Needs Docker |
+|---|---|---|---|
+| **Port fakes** | The domain port interface (`IEntityRepository`, `IPermissionChecker`, …) | Entity/business services in `core/` | no |
+| **Transport-level FakeClient** | hapic's `MemoryTransport`, under a real client | Anything that CONSUMES an HTTP client: client-vue components, worker components | no |
+| **Testcontainers** | The real process | HTTP integration suites for server-core / storage / telemetry, with real Authup enforcement | **yes** |
+
+### Transport-level FakeClient
+
+`@privateaim/<kit>/testing` ships a `FakeClient` that subclasses the kit's real
+client and only replaces the transport. Everything above the transport still
+runs — header merge, body transform, decode, retry, the constructor's
+`RESPONSE_ERROR` hook and any attached `ClientAuthenticationHook` — so a test
+exercises the client rather than bypassing it.
+
+```typescript
+import { createFakeClient, fakeResponse } from '@privateaim/core-http-kit/testing';
+
+const client = createFakeClient({
+    handlers: {
+        'GET /projects/:id': (req) => ({ data: { id: req.params.id }, meta: {} }),
+        'DELETE /projects/:id': () => fakeResponse(403, { message: 'forbidden' }),
+    },
+});
+
+await client.project.getOne('abc');
+expect(client.requests[0]).toMatchObject({ method: 'GET', params: { id: 'abc' } });
+```
+
+Handler-map semantics (pinned by each kit's `test/unit/fake-client.spec.ts`):
+
+- Keys are `'<METHOD> /<path>'`; a `:name` segment captures into `req.params`.
+- Method compare is case-insensitive; the segment count must match exactly.
+- The query string is ignored — the url is reduced to its **pathname**.
+- `'*'` is a catch-all that always loses to a specific pattern, whatever the key
+  order. Among specific patterns, first insertion order wins, so declare
+  `'GET /users/@me'` before `'GET /users/:id'`.
+- No match and no `'*'` falls back to `{ data: [], meta: { total: 0 } }`.
+- A handler returns the response **body**; return `fakeResponse(status, body)`
+  for a non-2xx. Prefer that over throwing — a throw on a fire-and-forget path
+  becomes an unhandled rejection and fails the run.
+
+Gotchas worth knowing before you debug one:
+
+- **A path-bearing `baseURL` shifts every pathname.** `createFakeClient({ baseURL: 'http://fake.test/api' })`
+  makes a `'GET /projects'` pattern silently fall through to the fallback. Keep
+  the default (`http://fake.test`, path-free).
+- **`getManyAll` needs consistent `meta.total`.** It pages until `offset >= total`,
+  so a handler returning a full page with an inflated or recomputed `total`
+  never terminates.
+- **`responseType: 'stream'` dispatches with `method === undefined`** and is
+  normalized to `GET` — that is what makes `AnalysisAPI.streamFiles`,
+  `BucketAPI.stream` and `BucketFileAPI.stream` match a `GET` pattern.
+- The raw, un-normalized record is still on the transport itself
+  (`MemoryTransport.requests`, plus `reset()`) if you need it.
+
 ## Database Testing
 
 Tests run against real databases (not mocks). The CI matrix tests three backends:
@@ -246,6 +306,63 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
 - HTTP-facing suites (core/storage/telemetry) need Docker: they start Authup (always)
   and, unless `DB_TYPE` is set, a PostgreSQL container. Set `DB_TYPE`/`DB_HOST`
   (or use `test:mysql`/`test:psql`) to target an already-running database instead.
+- HTTP-client consumers (client-vue components, worker components) use the
+  transport-level `FakeClient` and need **no** Docker.
+- `apps/server-core-worker` components are constructor-injected, so specs
+  construct them DIRECTLY (`new AnalysisBuilderCheckHandler({ coreClient, docker })`)
+  — no container, no message bus. Shared doubles live in
+  `test/unit/components/fakes/`.
+- `createTestApplication({ telemetryHandlers })` (server-core) opts in to a faked
+  telemetry client, which is the only way to exercise `AnalysisLogController` /
+  `AnalysisNodeLogController` without a live telemetry service.
+
+## Component Tests (client-vue)
+
+`packages/client-vue` is hub's only non-node vitest environment:
+`test/vitest.config.ts` uses `environment: 'happy-dom'` and `plugins: [vue()]`,
+where every other suite is `plugins: [swc.vite()]` on node.
+
+Mount through the shared harness, `packages/client-vue/test/utils/index.ts`:
+
+```typescript
+const { wrapper, coreClient } = mountClientVueComponent(
+    FEntityDelete,
+    { entityId: 'abc', entityType: 'project', withPrompt: false },
+    { core: { 'DELETE /projects/:id': () => ({ data: {}, meta: {} }) } },
+);
+
+await wrapper.trigger('click');
+expect(coreClient.requests[0]).toMatchObject({ method: 'DELETE', params: { id: 'abc' } });
+```
+
+Things the harness handles, and why they matter:
+
+- **client-vue's `install` is not self-sufficient.** `@authup/client-web-kit`
+  must be installed on the same app FIRST — `setupBaseHTTPClient` calls
+  `injectHTTPClientAuthenticationHook(app)` and the `usePermissionCheck` sites
+  call `injectStore()`. Installing only client-vue throws.
+- **Pass the client via the `client` install option, never by pre-providing it.**
+  Every `install*()` early-returns on `isXHTTPClientUsable(app)` and authup's
+  `provide()` is first-wins, so an ordering mistake fails SILENTLY with the real
+  `new Client({ baseURL })` winning.
+- **`isServer: true`** on the authup install maps to the auth hook's
+  `timer: !isServer`; without it a real refresh timer is armed in happy-dom and
+  leaks across specs. The cookie noops avoid `useCookies`.
+- **`stubs: { VCIcon: true }`.** `@vuecs/icon` resolves icon names through
+  `@iconify/vue`, which FETCHES unknown icons from the iconify API — leaving it
+  live makes every icon-rendering spec hit the network and happy-dom abort it at
+  teardown. VTU's `stubs` matches by component name, so it also intercepts the
+  `VCIcon` that `@vuecs/button` imports directly (a global `components`
+  registration does not).
+- **`realtime` is omitted** by default, so `installSocketManager` is skipped.
+  Pass `{ realtime: true }` as the harness's fourth argument to opt in —
+  `test/unit/core/realtime-gate.spec.ts` pins both sides of that gate,
+  because a consumer that forgets the option loses realtime SILENTLY.
+
+Cross-package test imports resolve through `dist`, so the kits must be built
+first. `nx.json`'s `test: { dependsOn: ["^build"] }` handles that for
+`npx nx run-many -t test`; a bare `npm run test -w packages/client-vue` on a
+cold tree does not.
 
 ## Fakes Over Mocks
 
@@ -269,6 +386,18 @@ Existing fakes to reuse:
 - `FakePermissionChecker` — `IPermissionChecker` with `getCalls()`, `wasMethodCalled()`
 - `createAllowAllActor()` / `createDenyAllActor()` — `ActorContext` fakes for permission testing
 - `createMasterRealmActor()` / `createNonMasterRealmActor()` — realm-scoped actor fakes
+- `createFakeAuthupClient({ handlers, fallback, baseURL })` / `FakeAuthupClient` — a REAL `AuthupClient` on a `MemoryTransport`, with `requests` and `fakeAuthupResponse(status, body)`. Use this for anything talking to authup. Deliberately **not** `@authup/core-http-kit/testing`'s `createFakeClient`: that one overrides `request()` and hard-codes a 200, so it can never drive the `isClientErrorWithStatusCode(e, 404)` branches that `AnalysisClientService` and `NodeClientService` depend on.
+
+**HTTP clients (`@privateaim/<kit>/testing`)** — see [Transport-level FakeClient](#transport-level-fakeclient):
+- `createFakeClient({ handlers, fallback, ...clientOptions })` / `FakeClient` — a REAL client on a `MemoryTransport`, exposing `requests`: the normalized record of everything dispatched
+- `fakeResponse(status, body)` — return it from a handler to drive a non-2xx through the real error pipeline
+- `matchRoute(method, url, handlers)` — the route matcher, exported for direct testing
+
+Available from all four HTTP kits: `@privateaim/core-http-kit/testing`,
+`@privateaim/storage-kit/testing`, `@privateaim/telemetry-kit/testing` and
+`@privateaim/messenger-http-kit/testing`. Authup's equivalent
+(`@authup/core-http-kit/testing`) is installed too, so alias on import when a
+file needs more than one: `import { createFakeClient as createFakeCoreClient } from …`.
 
 **Domain-specific (colocated in `test/unit/core/entities/<entity>/`):**
 - `FakeAnalysisRepository` — `IAnalysisRepository` with `findOneWithProject()`

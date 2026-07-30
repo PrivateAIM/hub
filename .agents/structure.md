@@ -32,7 +32,7 @@ Runnable services and the frontend, located in `apps/`.
 
 See [Conventions — Documentation Site](.agents/conventions.md#documentation-site) for docs structure and update guidelines.
 
-## Packages & Libraries (17)
+## Packages & Libraries (19)
 
 Shared libraries, located in `packages/`.
 
@@ -55,6 +55,7 @@ Shared libraries, located in `packages/`.
 | `server-telemetry-kit`   | Telemetry/logging utilities                |
 | `server-core-worker-kit` | Worker task type definitions               |
 | `server-storage-kit`     | Storage service contracts                  |
+| `errors`                 | Shared error types                         |
 
 ### Domain Kits (shared types and HTTP clients)
 
@@ -62,19 +63,20 @@ Shared libraries, located in `packages/`.
 |---------------------|----------------------------------------|
 | `kit`               | Core utilities: crypto, domain events, permissions, realms |
 | `core-kit`          | Domain models & types for the core service |
-| `core-http-kit`     | HTTP client (Hapic) for the core API. Entity **record** responses are the `{ data, meta }` envelope (`EntityRecordResponse`), collections are `EntityCollectionResponse`, and query-capable GETs carry the endpoint's queryable vocabulary under `meta.schema` (rapiq `SchemaDescription`). Sub-API port interfaces are `IEntityAPI` / `IEntityAPISlim` — the pre-envelope names `SingleResourceResponse` / `CollectionResourceResponse` / `DomainAPI` / `DomainAPISlim` were removed with **no** deprecated aliases. |
+| `core-http-kit`     | HTTP client (Hapic) for the core API. Entity **record** responses are the `{ data, meta }` envelope (`EntityRecordResponse`), collections are `EntityCollectionResponse`, and query-capable GETs carry the endpoint's queryable vocabulary under `meta.schema` (rapiq `SchemaDescription`). The client implements `ICoreClient` and each sub-API its own `I<X>API`; `./testing` ships a `MemoryTransport`-backed `FakeClient`. Generic sub-API port interfaces are `IEntityAPI` / `IEntityAPISlim` — the pre-envelope names `SingleResourceResponse` / `CollectionResourceResponse` / `DomainAPI` / `DomainAPISlim` were removed with **no** deprecated aliases. |
 | `core-realtime-kit` | WebSocket event types                  |
-| `storage-kit`       | Storage domain types + HTTP client (same `EntityRecordResponse` / `EntityCollectionResponse` envelope types as core-http-kit) |
-| `telemetry-kit`     | Telemetry/logging types + HTTP client (same envelope types; `GET /logs` is the one schemaless collection) |
+| `storage-kit`       | Storage domain types + HTTP client (same `EntityRecordResponse` / `EntityCollectionResponse` envelope types as core-http-kit). Implements `IStorageClient`; ships `./testing`. |
+| `telemetry-kit`     | Telemetry/logging types + HTTP client (same envelope types; `GET /logs` is the one schemaless collection). Implements `ITelemetryClient`; ships `./testing`. |
 | `messenger-kit`     | Messenger domain types                 |
+| `messenger-http-kit` | HTTP client for the messenger broker surface (send/pull/ack). NOT an entity API — no `{ data, meta }` envelope. |
 
 ## Dependency Layers
 
 ```
 Layer 0 (leaf):   kit, core-kit, storage-kit, telemetry-kit, messenger-kit,
-                  client-vue-theme
+                  client-vue-theme, errors
                      |
-Layer 1:          core-http-kit, core-realtime-kit, server-kit
+Layer 1:          core-http-kit, core-realtime-kit, messenger-http-kit, server-kit
                      |
 Layer 2:          server-db-kit, server-http-kit, server-realtime-kit
                   server-storage-kit, server-telemetry-kit, server-core-worker-kit

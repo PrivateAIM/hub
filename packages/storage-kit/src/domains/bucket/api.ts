@@ -9,12 +9,12 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { BucketCreatePayload, IBucketAPI  } from './types';
 import { BaseAPI } from '../base';
 import type { BucketFile } from '../bucket-file';
 import type { Bucket } from './entity';
-import type { BucketCreatePayload } from './types';
 
-export class BucketAPI extends BaseAPI {
+export class BucketAPI extends BaseAPI implements IBucketAPI {
     async getMany(record?: EntityQueryInput<Bucket>): Promise<EntityCollectionResponse<Bucket>> {
         const response = await this.client.get(`buckets${buildQueryString(record)}`);
         return response.data;

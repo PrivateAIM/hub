@@ -97,3 +97,56 @@ After making changes, always:
 - Use domain interfaces (from `core-kit`) in ports, TypeORM entity classes only in adapters
 - Before adding new code, study surrounding patterns and naming
 - No `useX()` singleton accessors — use DI constructor injection
+
+## Contract-First HTTP Clients & the `./testing` Subpath
+
+Adopted from authup (`packages/core-http-kit/src/{client,testing}`,
+`packages/client-web-kit/test/utils/index.ts`), with two deliberate divergences.
+
+**Authup pattern:** each HTTP client declares an explicit contract interface that
+the class `implements`, and the package ships a `./testing` subpath exporting a
+`FakeClient` / `createFakeClient` / `matchRoute` so downstream component tests
+run against a real client object without a network.
+
+**Hub mapping:**
+
+| Authup | Hub |
+|---|---|
+| `packages/core-http-kit/src/client/type.ts` (`type.ts`, singular) | `packages/core-http-kit/src/client/types.ts` (plural — hub's `types.ts` convention wins) |
+| `IClient` (per-package) | `ICoreClient` / `IStorageClient` / `ITelemetryClient` / `IMessengerClient` (service-prefixed) |
+| `packages/core-http-kit/src/testing/{matcher,module,types}.ts` | same layout, in all four hub HTTP kits |
+| `dist/testing/index.{d.ts,mjs}` | `dist/testing/index.{d.mts,mjs}` |
+| `packages/client-web-kit/test/utils/index.ts` (unpublished harness) | `packages/client-vue/test/utils/index.ts` (unpublished harness) |
+
+**Hub divergence 1 — service-prefixed contract names.** hapic itself exports
+`IClient`, and hub imports it unaliased in every `domains/base.ts`. A hub-local
+`IClient` in the same package would be same-name-different-shape shadowing, made
+easy to miss by the root `strict: false`. Service prefixes also remove the
+aliasing consumers already do (`import type { APIClient as StorageClient }`),
+and client-vue imports all three clients in one file, where distinct names are
+mandatory anyway. The hapic import is aliased to `IBaseClient` throughout.
+
+**Hub divergence 2 — `MemoryTransport` instead of overriding `request()`.**
+authup's `FakeClient extends Client` overrides `request()`. Hub instead injects
+hapic 3's `MemoryTransport` through the (widened) `ClientOptionsInput`
+constructor and leaves the request pipeline intact. Three concrete wins:
+
+1. All four hub clients install a `HookName.RESPONSE_ERROR` message-rewrite hook
+   **in their constructor**, and server-side DI additionally calls
+   `hook.attach(client)` with authup's `ClientAuthenticationHook`. Overriding
+   `request()` bypasses both; injecting a transport does not. Each kit's
+   `fake-client.spec.ts` pins this by asserting the rewritten `error.message`.
+2. authup's fake hard-codes `new Response(null, { status: 200 })` and cannot
+   produce a non-2xx. `MemoryTransport` accepts a `MemoryResponseInit` or a real
+   `Response`, so `fakeResponse(400, …)` becomes a genuine hapic `ClientError`.
+3. Client-level defaults set via `setAuthorizationHeader()` are visible in the
+   recorded request — authup documents their absence as a limitation of its fake.
+
+Both repos keep the fake a **real subclass**, which matters for the
+`client[entityType]` own-property dispatch sites and for hapic's
+`Symbol.for('hapic/Client')` marker that `isClient()` checks.
+
+**Do NOT port:** authup's rule that `interface` is reserved for class-implemented
+contracts (hub's core-kit domain entities are bare `interface`s), nor its
+dependency-classification rule forbidding internal packages in
+`peerDependencies` (see [conventions.md](../conventions.md#dependency-classification)).

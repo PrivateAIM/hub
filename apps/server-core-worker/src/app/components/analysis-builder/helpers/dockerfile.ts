@@ -14,8 +14,8 @@ import {
     AnalysisBucketType,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
 } from '@privateaim/core-kit';
-import type { BucketFile, APIClient as StorageClient  } from '@privateaim/storage-kit';
-import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { BucketFile, IStorageClient as StorageClient  } from '@privateaim/storage-kit';
+import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import path from 'node:path';
 import { AnalysisContainerPath } from '../constants';
 import { BuilderError } from '../error';

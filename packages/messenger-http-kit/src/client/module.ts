@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RequestBaseOptions } from 'hapic';
 import { Client as BaseClient, HookName, isClientError } from 'hapic';
 import { MessageAPI } from '../domains';
+import type { ClientOptions, IMessengerClient } from './types';
 
-export class Client extends BaseClient {
+export class Client extends BaseClient implements IMessengerClient {
     public readonly message : MessageAPI;
 
-    constructor(config: RequestBaseOptions) {
+    constructor(config: ClientOptions = {}) {
         super(config);
 
         this.message = new MessageAPI({ client: this });

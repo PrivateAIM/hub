@@ -6,17 +6,18 @@
  */
 
 import { Client } from '@privateaim/core-http-kit';
+import type { ICoreClient } from '@privateaim/core-http-kit';
 import type { App } from 'vue';
 import { setupBaseHTTPClient } from '../setup';
 import type { BaseHTTPClientInstallOptions } from '../types';
 import { isCoreHTTPClientUsable, provideCoreHTTPClient } from './singleton';
 
-export function installCoreHTTPClient(app: App, options: BaseHTTPClientInstallOptions) {
+export function installCoreHTTPClient(app: App, options: BaseHTTPClientInstallOptions<ICoreClient>) {
     if (isCoreHTTPClientUsable(app)) {
         return;
     }
 
-    const client = new Client({ baseURL: options.baseURL });
+    const client = options.client ?? new Client({ baseURL: options.baseURL });
 
     setupBaseHTTPClient(app, client);
 

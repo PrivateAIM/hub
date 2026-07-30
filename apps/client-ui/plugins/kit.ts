@@ -36,5 +36,8 @@ export default defineNuxtPlugin((ctx) => {
         coreURL,
         storageURL,
         telemetryURL,
+        // `installSocketManager` is opt-in as of the contract-first client work;
+        // without this, realtime silently stops working.
+        realtime: true,
     });
 });

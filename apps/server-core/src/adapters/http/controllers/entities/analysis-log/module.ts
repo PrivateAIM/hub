@@ -7,7 +7,7 @@
 
 import { DomainType } from '@privateaim/core-kit';
 import type { EntityCollectionResponse } from '@privateaim/core-http-kit';
-import type { Log, LogLevel, APIClient as TelemetryClient } from '@privateaim/telemetry-kit';
+import type { Log, LogLevel, ITelemetryClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { BadRequestError } from '@privateaim/errors';
 import {

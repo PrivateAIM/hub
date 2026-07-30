@@ -97,9 +97,63 @@ import {
     useTranslator,
 } from '@privateaim/client-vue';
 
-// Inside a setup function
-const coreClient = injectCoreHTTPClient();
-const storageClient = injectStorageHTTPClient();
+// Inside a setup function. The injected values are typed as the CONTRACTS —
+// ICoreClient / IStorageClient / ITelemetryClient — not the concrete classes,
+// so a test can supply a fake without any cast.
+const coreClient = injectCoreHTTPClient();       // ICoreClient
+const storageClient = injectStorageHTTPClient(); // IStorageClient
+```
+
+### Install Options
+
+```typescript
+import { install } from '@privateaim/client-vue';
+
+app.use(install, {
+    coreURL: 'http://localhost:4000',
+    storageURL: 'http://localhost:4001',
+    telemetryURL: 'http://localhost:4002',
+
+    // Opt-in: installs the realtime socket manager. It needs a live authup
+    // store and opens a websocket, so it stays OFF unless requested.
+    realtime: true,
+});
+```
+
+| Option | Purpose |
+|--------|---------|
+| `coreURL` / `storageURL` / `telemetryURL` | Base URLs used to construct the clients |
+| `coreHTTPClient` / `storageHTTPClient` / `telemetryHTTPClient` | Pre-built clients used INSTEAD of constructing from the URLs |
+| `pinia` | Pinia instance backing authup's store; required outside Nuxt, and forwarded to the socket manager |
+| `realtime` | Install the socket manager (default off) |
+| `components` | Register components globally (`true`, or a name allow-list) |
+| `translatorLocale` | Initial locale |
+
+::: warning The install is not self-sufficient
+`@authup/client-web-kit`'s auth hook and store must already be provided on the
+same app — `setupBaseHTTPClient` calls `injectHTTPClientAuthenticationHook(app)`
+and the permission-check composables call `injectStore()`. Installing only
+client-vue throws.
+:::
+
+### Testing with a fake client
+
+Pass a `FakeClient` through the `*HTTPClient` options rather than pre-providing
+it: each installer early-returns on `isXHTTPClientUsable(app)` and authup's
+`provide()` is first-wins, so an ordering mistake fails *silently*, with the
+real client winning.
+
+```typescript
+import { createFakeClient } from '@privateaim/core-http-kit/testing';
+
+const coreHTTPClient = createFakeClient({
+    handlers: { 'DELETE /projects/:id': () => ({ data: {}, meta: {} }) },
+});
+
+app.use(install, { coreURL, storageURL, telemetryURL, coreHTTPClient });
+
+// …then assert against what the component actually dispatched
+expect(coreHTTPClient.requests[0]).toMatchObject({ method: 'DELETE', params: { id: 'abc' } });
 ```
 
 ### Working with Response Envelopes

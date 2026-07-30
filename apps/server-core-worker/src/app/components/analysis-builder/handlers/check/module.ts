@@ -14,7 +14,7 @@ import type {
 } from '@privateaim/server-core-worker-kit';
 import { AnalysisBuilderCommand, AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
-import type { Client as CoreClient } from '@privateaim/core-http-kit';
+import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 import type { ImageInspectInfo } from 'dockerode';
 import { isDockerNotFoundError } from '../../../../../adapters/docker/index.ts';

@@ -6,6 +6,7 @@
  */
 
 import { APIClient } from '@privateaim/storage-kit';
+import type { IStorageClient } from '@privateaim/storage-kit';
 import {
     ConfigInjectionKey,
     createAuthupClientAuthenticationHook,
@@ -16,9 +17,9 @@ import { HTTPInjectionKey } from '../../src/app/modules/http/index.ts';
 import { TestApplication } from './module.ts';
 
 export class TestHTTPApplication extends TestApplication {
-    protected _client: APIClient | undefined;
+    protected _client: IStorageClient | undefined;
 
-    get client(): APIClient {
+    get client(): IStorageClient {
         if (typeof this._client === 'undefined') {
             this._client = this.createClient();
         }
@@ -26,7 +27,7 @@ export class TestHTTPApplication extends TestApplication {
         return this._client;
     }
 
-    protected createClient(): APIClient {
+    protected createClient(): IStorageClient {
         const server = this.container.resolve<HTTPServer>(HTTPInjectionKey.Server);
 
         const baseURL = server.url;
