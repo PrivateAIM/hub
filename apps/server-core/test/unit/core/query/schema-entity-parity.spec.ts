@@ -36,6 +36,7 @@ import {
     analysisNodeEventSchema,
     analysisNodeSchema,
     analysisSchema,
+    entitySchemas,
     masterImageGroupSchema,
     masterImageSchema,
     nodeSchema,
@@ -90,6 +91,13 @@ describe('core/query (schema ↔ entity parity)', () => {
         if (dataSource?.isInitialized) {
             await dataSource.destroy();
         }
+    });
+
+    // SCHEMA_ENTITY_TARGETS is hand-maintained, so without this a schema added
+    // later would silently go unguarded rather than fail.
+    it('should cover every schema in the registry', () => {
+        expect(SCHEMA_ENTITY_TARGETS.map(([, schema]) => schema.name).sort())
+            .toEqual(entitySchemas.map((schema) => schema.name).sort());
     });
 
     it.each(SCHEMA_ENTITY_TARGETS)('should resolve every %s schema key against the entity', (_name, schema, target) => {

@@ -57,9 +57,15 @@ import type { DecodeQueryOptions } from './types.ts';
  */
 export const schemaRegistry = new SchemaRegistry();
 
-// Schema is invariant in its record type, so a heterogeneous registry of
-// Schema<Node> | Schema<Analysis> | ... can only be typed as Schema<any>[].
-const schemas: Schema<any>[] = [
+/**
+ * Every entity schema the registry knows about. Exported so
+ * `test/unit/core/query/schema-entity-parity.spec.ts` can assert it covers ALL
+ * of them — otherwise a schema added later would silently go unguarded.
+ *
+ * Schema is invariant in its record type, so a heterogeneous registry of
+ * Schema<Node> | Schema<Analysis> | ... can only be typed as Schema<any>[].
+ */
+export const entitySchemas: Schema<any>[] = [
     analysisSchema,
     analysisBucketSchema,
     analysisBucketFileSchema,
@@ -74,7 +80,7 @@ const schemas: Schema<any>[] = [
     registryProjectSchema,
 ];
 
-for (const schema of schemas) {
+for (const schema of entitySchemas) {
     schemaRegistry.add(schema);
 }
 

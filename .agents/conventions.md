@@ -244,13 +244,27 @@ Two guards enforce this, and both are in CI via the ordinary spec globs:
 
 | Guard | Catches |
 |---|---|
-| `apps/<service>/test/unit/adapters/database/column-naming.spec.ts` | a forgotten `@Column({ name })` — asserts no column name has an uppercase letter and that each equals `snakeCase(property)`, skipping relation-owned columns |
-| `apps/<service>/test/unit/core/query/schema-entity-parity.spec.ts` | a rapiq allow-list key that resolves against no entity column, via rapiq's `assertSchemaMatchesEntity` |
+| `apps/<service>/test/unit/adapters/database/column-naming.spec.ts` | a forgotten `@Column({ name })` — asserts no column name has an uppercase letter and that each equals `snakeCase(property)` |
+| `apps/<service>/test/unit/core/query/schema-entity-parity.spec.ts` | a rapiq allow-list key that resolves against no entity column, via rapiq's `assertSchemaMatchesEntity`, plus a coverage assertion against `entitySchemas` so a schema added later cannot go unguarded |
 
 Both build a `DataSource` from the **production** `DataSourceOptionsBuilder` with
 an in-memory sqlite driver (`toMetadataOnlyDataSourceOptions` in
-`@privateaim/server-test-kit`), so the entity list cannot drift from production
-and no external database is needed.
+`@privateaim/server-test-kit`), so the entity list cannot drift from production.
+The `DataSource` itself needs no external database — the enclosing service suite
+still provisions one through its `globalSetup`.
+
+The column guard skips a relation-owned column **only** when its `propertyName`
+IS the relation — a `@JoinColumn` with no paired scalar FK. Skipping on
+`relationMetadata` alone would exempt every FK column, so a consistently applied
+typo (`@Column({ name: 'registryid' })` plus a matching `@JoinColumn`) would pass
+both the guard and the `synchronize()`-based suites.
+
+**Still unguarded:** validup `mount()` keys. `mount`'s signature is
+`Path<T> | (string & {})`, so any string compiles, and a stale key silently stops
+validating that field — the value is then dropped from the write. All 156 mount
+keys were verified by hand against their `Container<T>` at plan 017; only the
+Harbor webhook validator legitimately keeps snake_case. There is no automated net
+for this yet.
 
 ### Naming exceptions
 
