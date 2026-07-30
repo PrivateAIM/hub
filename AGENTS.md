@@ -24,7 +24,7 @@ npm run dev --workspace=apps/server-core-worker # Worker service
 npm run dev --workspace=docs                    # Documentation site
 ```
 
-- **Node.js**: 22
+- **Node.js**: 24
 - **Package manager**: npm (workspaces)
 - **Build orchestration**: Nx 22
 

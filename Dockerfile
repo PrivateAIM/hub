@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:24-alpine
 
 RUN mkdir -p /usr/src/project
 
@@ -6,9 +6,16 @@ WORKDIR /usr/src/project/
 
 COPY . .
 
+# `better-sqlite3` (a devDependency of the four database services, needed for the
+# sqlite test leg) ships no prebuilt binary for musl, so `npm ci` falls back to
+# `node-gyp rebuild` — which needs a Python + C++ toolchain that the alpine image
+# does not carry. Installed as a virtual package and removed inside the same
+# layer, so the toolchain never reaches the published image.
 RUN rm -rf ./node-modules && \
+    apk add --no-cache --virtual .build-deps python3 make g++ && \
     npm ci && \
     npm run build && \
+    apk del .build-deps && \
     touch apps/server-core/.env && \
     touch apps/server-core-worker/.env && \
     touch apps/server-messenger/.env && \
