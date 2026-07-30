@@ -98,16 +98,16 @@ Collection reads advertise the full vocabulary:
     "name": "node",
     "strict": true,
     "fields": {
-        "default": ["id", "name", "client_id", "external_name", "hidden", "type", "online", "public_key", "robot_id", "realm_id", "registry_id", "registry_project_id", "created_at", "updated_at"],
-        "allowed": ["id", "name", "client_id", "external_name", "hidden", "type", "online", "public_key", "robot_id", "realm_id", "registry_id", "registry_project_id", "created_at", "updated_at"]
+        "default": ["id", "name", "clientId", "externalName", "hidden", "type", "online", "publicKey", "robotId", "realmId", "registryId", "registryProjectId", "createdAt", "updatedAt"],
+        "allowed": ["id", "name", "clientId", "externalName", "hidden", "type", "online", "publicKey", "robotId", "realmId", "registryId", "registryProjectId", "createdAt", "updatedAt"]
     },
-    "filters": { "allowed": ["id", "name", "online", "hidden", "client_id", "realm_id", "robot_id"] },
+    "filters": { "allowed": ["id", "name", "online", "hidden", "clientId", "realmId", "robotId"] },
     "pagination": { "maxLimit": 50 },
     "relations": {
-        "allowed": ["registry_project", "registry"],
-        "schemas": { "registry_project": "registryProject", "registry": "registry" }
+        "allowed": ["registryProject", "registry"],
+        "schemas": { "registryProject": "registryProject", "registry": "registry" }
     },
-    "sort": { "allowed": ["name", "updated_at", "created_at"], "default": null }
+    "sort": { "allowed": ["name", "updatedAt", "createdAt"], "default": null }
 }
 ```
 
@@ -121,8 +121,8 @@ The `filters`, `sort` and `pagination` keys are **absent** (not `null`):
     "strict": true,
     "fields": { "default": ["id", "name", /* ... */], "allowed": ["id", "name", /* ... */] },
     "relations": {
-        "allowed": ["registry_project", "registry"],
-        "schemas": { "registry_project": "registryProject", "registry": "registry" }
+        "allowed": ["registryProject", "registry"],
+        "schemas": { "registryProject": "registryProject", "registry": "registry" }
     }
 }
 ```
@@ -132,7 +132,7 @@ Mutations (`POST`, `DELETE`) describe nothing — their `meta` is exactly `{}`.
 ### Reading rules
 
 - The description is the **static upper bound** — the allow-list declared by the schema, *not* an
-  actor-aware view. Actor-dependent gates (the `account_secret` field gate on registries, realm
+  actor-aware view. Actor-dependent gates (the `accountSecret` field gate on registries, realm
   scoping) are deliberately **not** reflected and may still strip individual keys per request.
   A name appearing in `fields.allowed` means the query parser accepts it, not that you will get it.
 - The shape is **normalized** — every described parameter carries every constraint key. **`null`

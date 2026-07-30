@@ -69,6 +69,7 @@ export default defineConfig({
                         { text: 'Local Setup', link: '/guide/development/setup' },
                         { text: 'Repository Structure', link: '/guide/development/repository-structure' },
                         { text: 'API Reference', link: '/guide/development/api' },
+                        { text: 'Migration — camelCase fields', link: '/guide/development/migration-camelcase' },
                     ],
                 },
             ],

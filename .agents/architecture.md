@@ -173,7 +173,7 @@ export class NodeController {
 }
 ```
 
-GET endpoints also pass `ActorContext` when the entity has permission-gated fields (e.g. `account_secret`), and a record read advertises only the `fields` + `relations` subset:
+GET endpoints also pass `ActorContext` when the entity has permission-gated fields (e.g. `accountSecret`), and a record read advertises only the `fields` + `relations` subset:
 
 ```typescript
 @DGet('/:id', [ForceLoggedInMiddleware])
@@ -192,7 +192,7 @@ Contract, uniform across server-core, server-storage and server-telemetry:
 
 - **Record responses** — `{ data: <entity>, meta: {…} }`. Mutations (`POST`, `DELETE`, command routes) carry `meta: {}` — never omitted, never `undefined`.
 - **Collection responses** — `{ data: <entity>[], meta: { total, limit?, offset?, schema? } }`. Unchanged by the envelope work apart from `schema`.
-- **`meta.schema`** — every query-capable `GET` publishes its rapiq vocabulary via `describeQuerySchema()` (`@privateaim/server-kit`, `src/core/query/describe.ts`). Collections get the full description; record reads get `describeQuerySchema(x, RECORD_QUERY_PARAMETERS)` (fields + relations). It is the **static** allow-list upper bound — actor-dependent gates (the `account_secret` field gate, realm scoping) are deliberately not reflected. Relation vocabulary is **referenced, not expanded**: `relations.schemas` names each relation's target schema.
+- **`meta.schema`** — every query-capable `GET` publishes its rapiq vocabulary via `describeQuerySchema()` (`@privateaim/server-kit`, `src/core/query/describe.ts`). Collections get the full description; record reads get `describeQuerySchema(x, RECORD_QUERY_PARAMETERS)` (fields + relations). It is the **static** allow-list upper bound — actor-dependent gates (the `accountSecret` field gate, realm scoping) are deliberately not reflected. Relation vocabulary is **referenced, not expanded**: `relations.schemas` names each relation's target schema.
 - Descriptions are memoized **and deep-frozen**. Always spread — `meta: { ...meta, schema: … }`; `meta.schema = …` throws.
 - Controllers import the schema **object** from the `core` barrel — every entity barrel re-exports its `schema.ts` (server-core: `core/entities/<x>/index.ts` ×14; server-storage and server-telemetry: the single `core/entities/index.ts`). Never deep-import a `schema.ts` from a controller.
 - Return-type annotations are load-bearing: trapi derives the OpenAPI response schema from the method signature, so every method — including `getMany` — must be annotated.
@@ -225,7 +225,7 @@ export function buildActorContext(req: Request): ActorContext {
         permissionChecker: useRequestPermissionChecker(req),
         realm: useRequestIdentityRealm(req),
         identity: ...,
-        metadata: { request_path, request_method, actor_id, ... },
+        metadata: { requestPath, requestMethod, actorId, ... },
     };
 }
 ```
@@ -249,7 +249,7 @@ All services integrate with **Authup** (OAuth2 identity provider):
 
 ## Realm Scoping
 
-Entities are scoped to realms via `realm_id`. The `isRealmResourceWritable()` helper enforces:
+Entities are scoped to realms via `realmId`. The `isRealmResourceWritable()` helper enforces:
 - Master realm members can access all resources
 - Other users can only access resources in their own realm
 

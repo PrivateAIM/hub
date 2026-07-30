@@ -20,7 +20,7 @@ A project defines:
 Like analyses, projects have two name fields:
 
 - **`name`** — a unique, URL-friendly identifier (lowercase letters, digits and the characters `-`, `_`, `.`; no whitespace). It is **required** and must be unique. If you do not provide one when creating a project, a readable name is **generated automatically** (e.g. `brave-otter-1a2b3c`); the create form also pre-fills an editable suggestion.
-- **`display_name`** — an optional, free-form human-readable label. When set, it is shown in the UI in place of the `name`.
+- **`displayName`** — an optional, free-form human-readable label. When set, it is shown in the UI in place of the `name`.
 
 Once created, a project enters a pending state and requires [administrator approval](/guide/user/approval) before analyses can be added (unless approval is disabled in development).
 

@@ -111,7 +111,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         // 2. Validate input (Zod via validup)
         const validated = await this.validator.run(data, { group: 'create' });
         // 3. Realm defaulting
-        validated.realm_id = validated.realm_id ?? this.getActorRealmId(actor);
+        validated.realmId = validated.realmId ?? this.getActorRealmId(actor);
         // 4. Validate join columns
         await this.repository.validateJoinColumns(validated);
         // 5. Full permission evaluation — the PolicyData bag is passed as `data`
@@ -179,10 +179,10 @@ export function buildActorContext(req: Request): ActorContext {
 
 ## Realm Scoping
 
-| Category | `realm_id: null` allowed | Hub Entities |
+| Category | `realmId: null` allowed | Hub Entities |
 |----------|--------------------------|--------------|
 | Global | Yes | (TBD per entity) |
 | Realm-bound | No | Most Hub entities |
 | Junction | Inherited | project-node, analysis-node |
 
-Services default `realm_id` to actor's realm. Explicit `null` required for global entities. Access control is policy-driven, no master realm bypass.
+Services default `realmId` to actor's realm. Explicit `null` required for global entities. Access control is policy-driven, no master realm bypass.

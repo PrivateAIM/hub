@@ -200,14 +200,80 @@ Table names are **plural** and snake_case: `nodes`, `projects`, `registries`,
 `registry_projects`, `master_images`, `analyses`, `analysis_nodes`, `analysis_buckets`.
 Set them explicitly with `@Entity({ name: 'analyses' })` — there is no naming strategy.
 
+### Column Naming
+
+**snake_case survives in exactly two places: physical column names, and
+migration files.** Everything else — entity properties, domain types, validator
+mounts, rapiq allow-lists, request/response fields — is camelCase (plan 017).
+
+Every camelCase property therefore carries an explicit column name:
+
+```typescript
+@Column({ name: 'display_name', type: 'varchar', length: 256, nullable: true })
+displayName: string | null;
+
+@CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+createdAt: string;
+
+// A scalar FK and its relation name the SAME physical column.
+@Column({ name: 'registry_id', nullable: true })
+registryId: Registry['id'] | null;
+
+@ManyToOne(() => RegistryEntity, { onDelete: 'SET NULL', nullable: true })
+@JoinColumn({ name: 'registry_id' })
+registry: RegistryEntity | null;
+```
+
+- Single-word properties (`name`, `nodes`, `description`) need no `name:` — the
+  derived name already equals the property.
+- **No `SnakeNamingStrategy`.** A global strategy is one point of failure, and a
+  `snakeCase()` edge case would mismap a future column *invisibly*: the
+  `synchronize()`-based suites build their schema from the same metadata they
+  read through, so write and read stay self-consistent and only production
+  diverges from the frozen migration column.
+- `@Unique([...])` / `@Index([...])` take **property** names, so they are
+  camelCase. This needs no DDL migration: TypeORM derives auto-generated
+  constraint and index names from the table plus `column.databaseName`, not from
+  property names. An *explicitly* named constraint keeps its frozen snake_case
+  name string forever — never "fix" it to match.
+- Query-builder strings that are **alias-qualified** are property paths and
+  follow the property (`'registry.accountSecret'`); TypeORM resolves them through
+  entity metadata.
+
+Two guards enforce this, and both are in CI via the ordinary spec globs:
+
+| Guard | Catches |
+|---|---|
+| `apps/<service>/test/unit/adapters/database/column-naming.spec.ts` | a forgotten `@Column({ name })` — asserts no column name has an uppercase letter and that each equals `snakeCase(property)`, skipping relation-owned columns |
+| `apps/<service>/test/unit/core/query/schema-entity-parity.spec.ts` | a rapiq allow-list key that resolves against no entity column, via rapiq's `assertSchemaMatchesEntity` |
+
+Both build a `DataSource` from the **production** `DataSourceOptionsBuilder` with
+an in-memory sqlite driver (`toMetadataOnlyDataSourceOptions` in
+`@privateaim/server-test-kit`), so the entity list cannot drift from production
+and no external database is needed.
+
+### Naming exceptions
+
+These stay snake_case and must not be swept into a rename:
+
+- `PermissionName` values (`analysis_create`, …) — persisted in Authup's
+  database; authup keeps its own values snake_case too.
+- OAuth2 / OIDC parameters — `client_id`, `client_secret`, `grant_type`,
+  `redirect_uri`, `code_verifier`, and authup's `AuthorizationRequest`.
+- Token introspection payloads — `OAuth2TokenPermission` / `TokenVerificationData`
+  (`realm_id`, `sub_kind`, …) are the wire shape hub consumes, not owns.
+- Third-party payloads — `@hapic/harbor`'s `project_id`, dockerode, MinIO,
+  VictoriaLogs query syntax.
+- Environment variables.
+
 ## Logging
 
-Logs flow through Winston → `LoggerTransport` (`packages/server-telemetry-kit/src/services/logger/transport.ts`) → telemetry/VictoriaLogs, where every string/number/boolean key of the metadata object becomes a **queryable label**. UI views (e.g. the analysis log panel) filter by these labels — see `AnalysisLogController`, which queries `ref_type=analysis` + `ref_id=<id>`.
+Logs flow through Winston → `LoggerTransport` (`packages/server-telemetry-kit/src/services/logger/transport.ts`) → telemetry/VictoriaLogs, where every string/number/boolean key of the metadata object becomes a **queryable label**. UI views (e.g. the analysis log panel) filter by these labels — see `AnalysisLogController`, which queries `refType=analysis` + `refId=<id>`.
 
 **Rule: keep human-readable tokens in the message; move opaque UUIDs to labels.**
 
 - **Human-readable tokens stay inline** — filenames, paths, entity names, enum-like types (`CODE`/`RESULT`, `user`/`robot`), counts. They give the line meaning; stripping them collapses distinct lines into identical text (`Packing file` × N).
-- **Opaque UUIDs move to labels** — never interpolate an entity id into the message string. Attach it via `LogFlag.REF_TYPE` + `LogFlag.REF_ID` (`packages/telemetry-kit/src/domains/log/constants.ts`) for the primary referenced entity, plus named labels (`bucket_id`, `target_id`, …) for secondary ids. `LogFlag.REF_TYPE` takes the referenced entity's `DomainType` — import it from **that entity's own kit** (`@privateaim/core-kit` for analysis, `@privateaim/storage-kit` for bucket/bucket-file), **not** telemetry-kit's `DomainType` (which only covers `event`/`log`).
+- **Opaque UUIDs move to labels** — never interpolate an entity id into the message string. Attach it via `LogFlag.REF_TYPE` + `LogFlag.REF_ID` (`packages/telemetry-kit/src/domains/log/constants.ts`) for the primary referenced entity, plus named labels (`bucketId`, `targetId`, …) for secondary ids. `LogFlag.REF_TYPE` takes the referenced entity's `DomainType` — import it from **that entity's own kit** (`@privateaim/core-kit` for analysis, `@privateaim/storage-kit` for bucket/bucket-file), **not** telemetry-kit's `DomainType` (which only covers `event`/`log`).
 
 ```typescript
 import { DomainType } from '@privateaim/core-kit';
@@ -292,7 +358,7 @@ Rules:
 - **Mutations carry `meta: {}`** — never omitted, never `undefined`. When a command can legitimately produce no entity, coalesce explicitly (`{ data: entity ?? null, meta: {} }`, annotated `EntityRecordResponse<X | null>`); `data: undefined` serializes to a malformed envelope with the key dropped.
 - **Query-capable `GET`s attach `meta.schema`** via `describeQuerySchema()` from `@privateaim/server-kit`: the full description on collections, `describeQuerySchema(x, RECORD_QUERY_PARAMETERS)` (fields + relations) on record reads. The schema object comes from the entity barrel, which re-exports `schema.ts`.
 - **Never mutate the description** — it is memoized and deep-frozen, shared by reference. Always spread: `meta: { ...meta, schema: … }`. `meta.schema = …` throws a `TypeError`.
-- `meta.schema` is the **static** allow-list upper bound. Actor-dependent gates (the `account_secret` field gate, realm scoping) are deliberately not reflected there — the runtime gate in the service is what enforces access.
+- `meta.schema` is the **static** allow-list upper bound. Actor-dependent gates (the `accountSecret` field gate, realm scoping) are deliberately not reflected there — the runtime gate in the service is what enforces access.
 - **Protocol, credential, stream and bespoke shapes stay flat** — no envelope. See [architecture.md](architecture.md#response-envelope--query-capability-discovery) for the explicit endpoint list.
 - Hub uses **no** `send()`/`sendCreated()` helpers (only `sendStream` in storage): return the value and set the status via `event.response.status`.
 
@@ -303,12 +369,12 @@ Repository adapters define `DEFAULT_FIELDS` (returned by default) and optionally
 ```typescript
 // app/modules/database/repositories/registry/repository.ts
 const DEFAULT_FIELDS: ParseAllowedOption<RegistryEntity> = [
-    'id', 'name', 'host', 'account_name', 'created_at', 'updated_at',
+    'id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt',
 ];
 
 const ALLOWED_FIELDS: ParseAllowedOption<RegistryEntity> = [
     ...DEFAULT_FIELDS,
-    'account_secret',  // select: false on entity — only returned when explicitly requested
+    'accountSecret',  // select: false on entity — only returned when explicitly requested
 ];
 
 // In findMany():

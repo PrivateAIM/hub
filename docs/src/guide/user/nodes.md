@@ -50,10 +50,10 @@ it — those nodes are simply left unassigned and can be reconnected.
 
 ## Credential Management
 
-Each node has an `account_secret` field that is not returned by default in API responses. To retrieve it, the requesting user must have the appropriate permission and explicitly request the field:
+Each node has an `accountSecret` field that is not returned by default in API responses. To retrieve it, the requesting user must have the appropriate permission and explicitly request the field:
 
 ```
-GET /nodes/:id?fields=+account_secret
+GET /nodes/:id?fields=+accountSecret
 ```
 
 This field-level access control is enforced by the Node service's permission checker.
