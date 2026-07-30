@@ -69,6 +69,9 @@ import { Bucket, BucketFile } from '@privateaim/storage-kit';
 | Module | Description |
 |--------|-------------|
 | `http` | `APIClient` with bucket and bucket-file API methods |
+| `IStorageClient` / `ClientOptions` | The client contract and its construction options |
+| `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
+| `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute` |
 | `domains` | `Bucket`, `BucketFile` types and validators |
 
 ## Contract

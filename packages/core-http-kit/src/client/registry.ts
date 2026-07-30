@@ -36,22 +36,36 @@ export type ClientEntityAPIRegistry = {
 };
 
 /**
- * Resolve a sub-API by its `DomainType` string.
+ * Resolve a sub-API by its `DomainType` string, or `undefined` when the client
+ * carries no such entity API.
  *
- * The value of this function is the cast-free assignment inside it: it is a
- * compile-time proof that every conforming sub-API's record type still lines
- * up with `DomainTypeMap`, and it fails the build on drift.
+ * Two things happen here that a caller cannot do for itself:
  *
- * It does NOT remove the narrow casts at the client-vue dispatch sites —
- * `createList` and `createEntityManager` are generic over ALL `DomainTypeMap`
- * keys, including the two excluded logs and the four sub-types.
+ * 1. `const registry : ClientEntityAPIRegistry = client;` is cast-free, which
+ *    makes this a compile-time proof that every conforming sub-API's record
+ *    type still lines up with `DomainTypeMap` — the build fails on drift.
+ * 2. The own-property check and the untyped index access are centralised, so
+ *    dispatch sites keep neither a `hasOwnProperty` guard nor an `as any`.
+ *
+ * `TYPE` is supplied by the caller because `createEntityManager` / `createList`
+ * are generic over ALL `DomainTypeMap` keys — including the two excluded logs
+ * and the four `DomainSubType` keys, none of which this registry covers. The
+ * returned verbs are therefore all OPTIONAL, and callers must guard the ones
+ * they use (`typeof api.create === 'function'`): `masterImage` has no `create`
+ * and `analysisNodeEvent` is read-only.
  */
-export function pickEntityAPI(client: ICoreClient, type: string) : EntityAPIDispatch<any> | undefined {
+export function pickEntityAPI<TYPE extends ObjectLiteral>(
+    client: ICoreClient,
+    type: string,
+) : EntityAPIDispatch<TYPE> | undefined {
     const registry : ClientEntityAPIRegistry = client;
 
     if (!Object.prototype.hasOwnProperty.call(registry, type)) {
         return undefined;
     }
 
-    return registry[type as ClientEntityAPIKey] as EntityAPIDispatch<any>;
+    // The caller asserts that `type` names TYPE. A runtime string cannot prove
+    // that to the compiler, so the one unsound step is isolated HERE instead of
+    // being repeated as an `as any` at every dispatch site.
+    return registry[type as ClientEntityAPIKey] as unknown as EntityAPIDispatch<TYPE>;
 }

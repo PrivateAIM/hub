@@ -90,11 +90,19 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
     async streamFiles(id: Analysis['id']) : Promise<ReadableStream<any>> {
         const response = await this.client.get(this.getFilesDownloadPath(id), { responseType: 'stream' });
 
+        if (typeof response.data === 'undefined') {
+            throw new Error('The stream response did not return a body.');
+        }
+
         return response.data;
     }
 
     async downloadResult(id: Analysis['id']) : Promise<ReadableStream<any>> {
         const response = await this.client.get(this.getResultDownloadPath(id), { responseType: 'stream' });
+
+        if (typeof response.data === 'undefined') {
+            throw new Error('The stream response did not return a body.');
+        }
 
         return response.data;
     }

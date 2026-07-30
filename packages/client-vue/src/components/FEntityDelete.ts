@@ -30,7 +30,10 @@ import {
     ref,
     resolveDynamicComponent,
 } from 'vue';
-import type { IEntityAPISlim } from '@privateaim/core-http-kit';
+import { pickEntityAPI as pickCoreEntityAPI } from '@privateaim/core-http-kit';
+import type { DomainEntityWithID, EntityAPIDispatch } from '@privateaim/core-http-kit';
+import { pickEntityAPI as pickStorageEntityAPI } from '@privateaim/storage-kit';
+import { pickEntityAPI as pickTelemetryEntityAPI } from '@privateaim/telemetry-kit';
 import { injectCoreHTTPClient, injectStorageHTTPClient, injectTelemetryHTTPClient } from '../core';
 import { ElementType } from './constants';
 
@@ -117,27 +120,29 @@ export default defineComponent({
         const submit = async () => {
             if (busy.value) return;
 
-            let domainAPI : IEntityAPISlim<any> | undefined;
+            // Each client resolves its own sub-API registry, so the lookup is
+            // typed and the own-property check lives in the kit rather than
+            // here. A `delete`-less or unknown entity type yields undefined.
+            // `DomainEntityWithID` rather than `Record<string, any>`: the latter has no
+            // REQUIRED `id`, so `DomainEntityID<T>` collapses to `never` and `delete`
+            // becomes uncallable.
+            let domainAPI : EntityAPIDispatch<DomainEntityWithID> | undefined;
             switch (props.service) {
                 case 'core': {
-                    domainAPI = (coreClient as Record<string, any>)[props.entityType] as IEntityAPISlim<any> | undefined;
+                    domainAPI = pickCoreEntityAPI(coreClient, props.entityType);
                     break;
                 }
                 case 'storage': {
-                    domainAPI = (storageClient as Record<string, any>)[props.entityType] as IEntityAPISlim<any> | undefined;
+                    domainAPI = pickStorageEntityAPI(storageClient, props.entityType);
                     break;
                 }
                 case 'telemetry': {
-                    domainAPI = (telemetryClient as Record<string, any>)[props.entityType] as IEntityAPISlim<any> | undefined;
+                    domainAPI = pickTelemetryEntityAPI(telemetryClient, props.entityType);
                     break;
                 }
             }
 
-            if (!domainAPI) {
-                return;
-            }
-
-            if (typeof domainAPI.delete !== 'function') {
+            if (typeof domainAPI?.delete !== 'function') {
                 return;
             }
 

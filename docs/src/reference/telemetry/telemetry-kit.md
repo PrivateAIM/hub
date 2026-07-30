@@ -68,6 +68,9 @@ import { Event, Log } from '@privateaim/telemetry-kit';
 | Module | Description |
 |--------|-------------|
 | `http` | `APIClient` with event and log API methods |
+| `ITelemetryClient` / `ClientOptions` | The client contract and its construction options |
+| `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
+| `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute` |
 | `domains` | `Event`, `Log` types and Zod validators |
 
 ## Contract

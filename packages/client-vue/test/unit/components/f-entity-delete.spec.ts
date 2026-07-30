@@ -102,16 +102,35 @@ describe('FEntityDelete', () => {
         expect(wrapper.emitted('deleted')).toBeFalsy();
     });
 
+    it('should dispatch to the telemetry client when service is telemetry', async () => {
+        const { wrapper, telemetryClient } = mountClientVueComponent(
+            FEntityDelete,
+            {
+                entityId: 'ev-1',
+                entityType: 'event',
+                service: 'telemetry',
+                withPrompt: false,
+            },
+            { telemetry: { 'DELETE /events/:id': () => ({ data: { id: 'ev-1' }, meta: {} }) } },
+        );
+
+        await wrapper.trigger('click');
+        await new Promise((resolve) => { setTimeout(resolve, 0); });
+
+        expect(telemetryClient.requests).toHaveLength(1);
+        expect(telemetryClient.requests[0]).toMatchObject({ method: 'DELETE', params: { id: 'ev-1' } });
+    });
+
     it('should no-op for an entity type the client has no sub-API for', async () => {
-        // The dispatch sites rely on own-instance property lookup
-        // (`client[entityType]`), which a real subclass preserves. An unknown
-        // key resolves to undefined and the component returns early.
+        // `pickEntityAPI` performs an own-property lookup against the client's
+        // registry, so an unknown key resolves to undefined and the component
+        // returns early rather than throwing.
         const { wrapper, coreClient } = mountClientVueComponent(
             FEntityDelete,
             {
-                entityId: 'abc', 
-                entityType: 'notAnEntity', 
-                withPrompt: false, 
+                entityId: 'abc',
+                entityType: 'notAnEntity',
+                withPrompt: false,
             },
         );
 
@@ -119,6 +138,29 @@ describe('FEntityDelete', () => {
         await new Promise((resolve) => { setTimeout(resolve, 0); });
 
         expect(coreClient.requests).toHaveLength(0);
+        expect(wrapper.emitted('deleted')).toBeFalsy();
+        expect(wrapper.emitted('failed')).toBeFalsy();
+    });
+
+    it('should no-op for an entity whose API has no id-keyed delete', async () => {
+        // `log` is excluded from the telemetry registry on purpose: `ILogAPI` is
+        // append-and-query only, with a query-keyed `deleteMany` rather than an
+        // id-keyed `delete`. Previously this reached `client.log` and threw
+        // "delete is not a function"; now it resolves to undefined.
+        const { wrapper, telemetryClient } = mountClientVueComponent(
+            FEntityDelete,
+            {
+                entityId: 'abc',
+                entityType: 'log',
+                service: 'telemetry',
+                withPrompt: false,
+            },
+        );
+
+        await wrapper.trigger('click');
+        await new Promise((resolve) => { setTimeout(resolve, 0); });
+
+        expect(telemetryClient.requests).toHaveLength(0);
         expect(wrapper.emitted('deleted')).toBeFalsy();
         expect(wrapper.emitted('failed')).toBeFalsy();
     });
