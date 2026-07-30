@@ -6,3 +6,4 @@
  */
 
 export * from './subscriber';
+export * from './types.ts';

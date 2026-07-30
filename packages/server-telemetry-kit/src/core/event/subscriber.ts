@@ -11,21 +11,30 @@ import type { Event, EventData } from '@privateaim/telemetry-kit';
 import { DomainType } from '@privateaim/telemetry-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { WEEK_IN_MS, isObject } from '@privateaim/kit';
-import type { EventComponentCaller } from '../../components';
+import type { IEventPublisher } from './types.ts';
 
 /**
  * Entity timestamp properties, excluded from an update diff so a save does not
- * register as a change on every entity view.
+ * register as a change on every entity view. Complete as of plan 017: these are
+ * the only `*At` properties across every entity in every service.
+ *
+ * An explicit set rather than an `endsWith('At')` suffix test, deliberately. The
+ * suffix form would auto-cover a future timestamp, but it would also silently
+ * drop any non-timestamp property whose name happens to end in `At` from the
+ * audit trail — a quiet gap. This way a new timestamp column shows up as diff
+ * noise until it is added here, which is visible and cheap to fix.
+ *
+ * **Adding a timestamp column? Add it here too.**
  */
 const TIMESTAMP_KEYS = new Set<string>(['createdAt', 'updatedAt', 'expiresAt']);
 
 export type EntityEventHandlerContext = {
-    eventComponentCaller?: EventComponentCaller,
+    eventComponentCaller?: IEventPublisher,
     logger?: Logger,
 };
 
 export class EntityEventHandler implements IEntityEventHandler {
-    protected eventComponentCaller?: EventComponentCaller;
+    protected eventComponentCaller?: IEventPublisher;
 
     protected logger?: Logger;
 

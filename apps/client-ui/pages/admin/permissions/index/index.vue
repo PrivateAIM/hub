@@ -64,7 +64,7 @@ export default defineNuxtComponent({
                 cellClass: 'text-left',
             },
             {
-                key: 'built_in',
+                key: 'builtIn',
                 label: 'Built in?',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
@@ -136,7 +136,7 @@ export default defineNuxtComponent({
                         :display-name="row.displayName"
                     />
                 </template>
-                <template #cell-built_in="{ row }">
+                <template #cell-builtIn="{ row }">
                     <VCIcon
                         :name="row.builtIn ? 'fa6-solid:check' : 'fa6-solid:xmark'"
                         :class="row.builtIn ? 'text-success-600' : 'text-error-600'"
