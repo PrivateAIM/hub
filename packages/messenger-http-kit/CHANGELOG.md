@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.13.0](https://github.com/PrivateAIM/hub/compare/v0.12.7...v0.13.0) (2026-07-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* `AuthupClientInjectionKey` is retyped to `IAuthupClient` consumers via the contract types; `Options.isServer` is removed from `@privateaim/client-vue` (it was declared but never read); and `installSocketManager` is now gated behind a new `realtime` install option, so consumers must pass `realtime: true` to keep the socket manager. `IEntityAPI` / `IEntityAPISlim` are now constrained to `ObjectLiteral`.
+
+### Features
+
+* contract-first HTTP clients + a ./testing FakeClient subpath ([#1804](https://github.com/PrivateAIM/hub/issues/1804)) ([a3c826d](https://github.com/PrivateAIM/hub/commit/a3c826df69bba0af1993638fea5ee62995a1a8af))
+
+
+### Bug Fixes
+
+* pickEntityAPI leaked the excluded keys at runtime ([a3c826d](https://github.com/PrivateAIM/hub/commit/a3c826df69bba0af1993638fea5ee62995a1a8af))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/messenger-kit bumped from ^0.12.6 to ^0.13.0
+  * peerDependencies
+    * @privateaim/messenger-kit bumped from ^0.12.6 to ^0.13.0
+
 ## [0.12.7](https://github.com/PrivateAIM/hub/compare/v0.12.6...v0.12.7) (2026-07-29)
 
 
