@@ -62,10 +62,18 @@ export function collectColumnNamingViolations(dataSource: DataSource): ColumnNam
                 continue;
             }
 
-            // A relation-owned FK column is named by @JoinColumn, so its property
-            // (the relation, e.g. `registry`) deliberately differs from the column
-            // (`registry_id`). The no-uppercase rule above still covers it.
-            if (column.relationMetadata) {
+            // A relation with NO paired scalar FK property is named entirely by
+            // @JoinColumn, so its `propertyName` IS the relation (`registry`) and
+            // deliberately differs from the column (`registry_id`) — only the
+            // no-uppercase rule above can apply there.
+            //
+            // Every FK in hub does have a paired scalar (`registryId`), whose
+            // `propertyName` is the scalar, not the relation. Skipping on
+            // `relationMetadata` alone would therefore exempt exactly the 17
+            // columns this rename newly stamped: a lowercase typo such as
+            // `@Column({ name: 'registryid' })` with a matching `@JoinColumn`
+            // would pass both this guard and the synchronize()-based suites.
+            if (column.relationMetadata && column.propertyName === column.relationMetadata.propertyName) {
                 continue;
             }
 

@@ -4,9 +4,9 @@ Hub's HTTP API, domain types and npm packages moved every field name from
 `snake_case` to `camelCase`. Database column names did **not** change.
 
 This is a breaking change. There are **no** `snake_case` aliases and no
-deprecation window: a request using the old names is rejected by the query
-parser or silently ignored by the validator, depending on where the name
-appears.
+deprecation window — and, importantly, **almost nothing errors**: an old name is
+silently dropped by the query parser or silently ignored by the validator,
+depending on where it appears. Do not expect a 4xx to find these for you.
 
 Tracks [#1501](https://github.com/PrivateAIM/hub/issues/1501).
 
@@ -76,12 +76,20 @@ GET /nodes?pagination[limit]=1
 
 Failure modes to expect while migrating:
 
-- An unknown **filter or sort** key is rejected — `strict` schemas answer with
-  `The key <name> is not permitted`.
+- An unknown **filter**, **sort** or **`include`** key is **silently dropped,
+  not rejected**. rapiq's `throwOnFailure` is deliberately not enabled, so a
+  stale `filter[realm_id]` does not fail — the filter is pruned and the endpoint
+  answers with a **wider, unfiltered** result set. This is the failure mode to
+  watch for: it looks like success. (`strict: true` on hub's schemas does not
+  change this — it governs parameters that declare *no* allow-list, and every
+  hub schema declares one.)
 - An unknown **request-body** key is dropped by the validator, so a write appears
   to succeed while leaving the field unset. Check the response body.
 - An unknown **`fields`** entry does not error; the field is simply absent from
   the response.
+
+Because none of these raise, diff every key you send against `meta.schema`
+rather than waiting for an error.
 
 ### Database
 
@@ -126,7 +134,8 @@ updates:
 ### Stored URLs
 
 Bookmarked or emailed links carrying `?filter[realm_id]=…`-style query strings
-stop filtering as intended (the key is rejected). Re-create them.
+stop filtering as intended: the key is silently dropped, so the link returns an
+unfiltered result set rather than an error. Re-create them.
 
 ### Audit event diffs
 
