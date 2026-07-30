@@ -58,7 +58,7 @@ describe('src/subscriber/base', () => {
 
         expect(publisher.safePublish).toHaveBeenCalledOnce();
         const ctx = (publisher.safePublish as any).mock.calls[0][0];
-        expect(ctx.metadata.ref_type).toBe('testEntity');
+        expect(ctx.metadata.refType).toBe('testEntity');
         expect(ctx.metadata.event).toBe(DomainEventName.CREATED);
     });
 

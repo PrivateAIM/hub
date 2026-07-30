@@ -20,7 +20,7 @@ export class EntityEventRedisHandler implements IEntityEventHandler {
 
     async handle(ctx: EntityEventHandleOptions) : Promise<void> {
         const payload : DomainEventRecord = {
-            type: ctx.metadata.ref_type,
+            type: ctx.metadata.refType,
             event: ctx.metadata.event,
             data: transformEntityEventData(ctx.data),
         };

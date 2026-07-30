@@ -9,18 +9,18 @@ import { defineSchema } from '@rapiq/core';
 import type { Project } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 
-const schemaMapping = { master_image: DomainType.MASTER_IMAGE };
+const schemaMapping = { masterImage: DomainType.MASTER_IMAGE };
 
 export const projectSchema = defineSchema<Project>({
     name: DomainType.PROJECT,
     strict: true,
     fields: {
-        default: ['id', 'name', 'display_name', 'description', 'nodes', 'analyses', 'created_at', 'updated_at', 'realm_id', 'client_id', 'robot_id', 'user_id', 'master_image_id'],
-        allowed: ['id', 'name', 'display_name', 'description', 'nodes', 'analyses', 'created_at', 'updated_at', 'realm_id', 'client_id', 'robot_id', 'user_id', 'master_image_id'],
+        default: ['id', 'name', 'displayName', 'description', 'nodes', 'analyses', 'createdAt', 'updatedAt', 'realmId', 'clientId', 'robotId', 'userId', 'masterImageId'],
+        allowed: ['id', 'name', 'displayName', 'description', 'nodes', 'analyses', 'createdAt', 'updatedAt', 'realmId', 'clientId', 'robotId', 'userId', 'masterImageId'],
     },
-    filters: { allowed: ['id', 'name', 'display_name', 'realm_id', 'user_id'] },
-    relations: { allowed: ['master_image'] },
-    sort: { allowed: ['id', 'name', 'display_name', 'updated_at', 'created_at'] },
+    filters: { allowed: ['id', 'name', 'displayName', 'realmId', 'userId'] },
+    relations: { allowed: ['masterImage'] },
+    sort: { allowed: ['id', 'name', 'displayName', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

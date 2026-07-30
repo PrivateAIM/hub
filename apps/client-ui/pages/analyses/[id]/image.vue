@@ -103,13 +103,13 @@ export default defineComponent({
                             variant="soft"
                             size="sm"
                             class="mb-3"
-                            :color="entity.configuration_image_valid ? 'warning' : 'error'"
+                            :color="entity.configurationImageValid ? 'warning' : 'error'"
                         >
                             Pick a Docker-based master image that provides the runtime environment for your analysis.<br>
                             Your uploaded code will be embedded into this image before distribution.
                         </VCAlert>
                         <FAnalysisMasterImagePicker
-                            :readonly="entity.configuration_locked"
+                            :readonly="entity.configurationLocked"
                             :entity-id="entity.id"
                             :entity="entity"
                             @updated="handleUpdated"
@@ -122,7 +122,7 @@ export default defineComponent({
                     </div>
                     <div class="card-body">
                         <FAnalysisImageCommandArguments
-                            :readonly="entity.configuration_locked"
+                            :readonly="entity.configurationLocked"
                             :entity="entity"
                             @updated="handleUpdated"
                         />
@@ -141,7 +141,7 @@ export default defineComponent({
                             variant="soft"
                             size="sm"
                             class="mb-3"
-                            :color="entity.configuration_entrypoint_valid ? 'warning' : 'error'"
+                            :color="entity.configurationEntrypointValid ? 'warning' : 'error'"
                         >
                             An entrypoint file must be selected.
                         </VCAlert>
@@ -152,7 +152,7 @@ export default defineComponent({
                         >
                             <template #default="{ data: bucket }">
                                 <FAnalysisBucketFiles
-                                    :query="{ filters: { analysis_bucket_id: bucket.id } }"
+                                    :query="{ filters: { analysisBucketId: bucket.id } }"
                                     @updated="handAnalysisBucketFileUpdated"
                                     @deleted="handAnalysisBucketFileDeleted"
                                 >
@@ -171,7 +171,7 @@ export default defineComponent({
                                                         </div>
 
                                                         <div class="ms-auto">
-                                                            <template v-if="!entity.configuration_locked">
+                                                            <template v-if="!entity.configurationLocked">
                                                                 <FAnalysisBucketFileRootToggler
                                                                     :entity="bucketFileProps.data"
                                                                     @updated="(value) => bucketFileProps.update(value)"
@@ -201,8 +201,8 @@ export default defineComponent({
                     <div class="card-body">
                         <FAnalysisImageCommand
                             ref="imageCommand"
-                            :master-image="entity.master_image"
-                            :master-image-id="entity.master_image_id"
+                            :master-image="entity.masterImage"
+                            :master-image-id="entity.masterImageId"
                             :entity="entity"
                             :entity-id="entity.id"
                             @analysis-bucket-file-resolved="setLastRootFile"

@@ -11,29 +11,29 @@ import type { MasterImageCommandArgument } from './types';
 export interface MasterImage {
     id: string;
 
-    build_status: `${ProcessStatus}` | null;
+    buildStatus: `${ProcessStatus}` | null;
 
-    build_progress: number | null;
+    buildProgress: number | null;
 
-    build_hash: string | null;
+    buildHash: string | null;
 
-    build_size: number | null;
+    buildSize: number | null;
 
     path: string | null;
 
-    virtual_path: string;
+    virtualPath: string;
 
-    group_virtual_path: string;
+    groupVirtualPath: string;
 
     name: string;
 
     command: string | null;
 
-    command_arguments: MasterImageCommandArgument[] | null;
+    commandArguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 }

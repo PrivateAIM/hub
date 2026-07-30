@@ -29,13 +29,13 @@ import FMasterImages from './FMasterImages';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
 
 class MasterImagePickerValidator extends Container<{
-    group_virtual_path: string;
-    master_image_id: string;
+    groupVirtualPath: string;
+    masterImageId: string;
 }> {
     protected override initialize() {
         super.initialize();
-        this.mount('group_virtual_path', createValidator(z.string().min(1)));
-        this.mount('master_image_id', createValidator(z.string().min(1)));
+        this.mount('groupVirtualPath', createValidator(z.string().min(1)));
+        this.mount('masterImageId', createValidator(z.string().min(1)));
     }
 }
 
@@ -59,11 +59,11 @@ export default defineComponent({
         const vMasterImages = useTemplateRef<typeof FMasterImages | null>('masterImages');
 
         const form = reactive({
-            group_virtual_path: '',
-            master_image_id: '',
+            groupVirtualPath: '',
+            masterImageId: '',
         });
 
-        const imageQuery = computed(() => ({ filters: { ...(form.group_virtual_path !== '' ? { group_virtual_path: form.group_virtual_path } : {}) } }));
+        const imageQuery = computed(() => ({ filters: { ...(form.groupVirtualPath !== '' ? { groupVirtualPath: form.groupVirtualPath } : {}) } }));
 
         const resolved = ref(false);
 
@@ -73,11 +73,11 @@ export default defineComponent({
             setup,
             onResolved: (entity) => {
                 if (entity) {
-                    form.group_virtual_path = entity.group_virtual_path;
-                    form.master_image_id = entity.id;
+                    form.groupVirtualPath = entity.groupVirtualPath;
+                    form.masterImageId = entity.id;
                 } else {
-                    form.group_virtual_path = '';
-                    form.master_image_id = '';
+                    form.groupVirtualPath = '';
+                    form.masterImageId = '';
                 }
 
                 resolved.value = true;
@@ -87,11 +87,11 @@ export default defineComponent({
         });
 
         if (props.entityId) {
-            form.master_image_id = props.entityId;
+            form.masterImageId = props.entityId;
         }
 
         if (props.entity) {
-            form.master_image_id = props.entity.id;
+            form.masterImageId = props.entity.id;
         }
 
         Promise.resolve()
@@ -99,8 +99,8 @@ export default defineComponent({
 
         const v = useValidup(new MasterImagePickerValidator(), form, { detached: true });
 
-        const isVirtualGroupPathDefined = computed(() => !!form.group_virtual_path &&
-            form.group_virtual_path.length > 0);
+        const isVirtualGroupPathDefined = computed(() => !!form.groupVirtualPath &&
+            form.groupVirtualPath.length > 0);
 
         watch(entityId, (val, oldValue) => {
             if (
@@ -124,13 +124,13 @@ export default defineComponent({
 
         const selectGroup = (input: string | null) => {
             if (!input) {
-                form.master_image_id = '';
-                form.group_virtual_path = '';
+                form.masterImageId = '';
+                form.groupVirtualPath = '';
                 return;
             }
-            form.group_virtual_path = input;
+            form.groupVirtualPath = input;
 
-            form.master_image_id = '';
+            form.masterImageId = '';
         };
 
         const selectImage = (id: string | null) => {
@@ -164,7 +164,7 @@ export default defineComponent({
                 <template #default=" { data }">
                     <IFieldValidation
                         v-slot="{ value }"
-                        :field="v.fields.group_virtual_path"
+                        :field="v.fields.groupVirtualPath"
                     >
                         <VCFormGroup :validation="value">
                             <template #label>
@@ -178,11 +178,11 @@ export default defineComponent({
                             </template>
                             <template #default>
                                 <VCFormSelect
-                                    v-model="v.fields.group_virtual_path.$model.value"
+                                    v-model="v.fields.groupVirtualPath.$model.value"
                                     :options="data.map((el) => {
                                         return {
-                                            value: el.virtual_path,
-                                            label: el.virtual_path
+                                            value: el.virtualPath,
+                                            label: el.virtualPath
                                         }
                                     })"
                                     :disabled="readonly || busy"
@@ -204,12 +204,12 @@ export default defineComponent({
                 <template #default="{ data }">
                     <IFieldValidation
                         v-slot="{ value }"
-                        :field="v.fields.master_image_id"
+                        :field="v.fields.masterImageId"
                     >
                         <VCFormGroup :validation="value">
                             <template #label>
                                 Image
-                                <template v-if="v.fields.master_image_id.$model.value">
+                                <template v-if="v.fields.masterImageId.$model.value">
                                     <VCIcon
                                         name="fa6-solid:check"
                                         class="text-success-600"
@@ -218,12 +218,12 @@ export default defineComponent({
                             </template>
                             <template #default>
                                 <VCFormSelect
-                                    v-model="v.fields.master_image_id.$model.value"
+                                    v-model="v.fields.masterImageId.$model.value"
                                     :options="data.map((el) => {
                                         return {
                                             value: el.id,
                                             label: el.name,
-                                            disabled: el.build_status !== 'executed',
+                                            disabled: el.buildStatus !== 'executed',
                                         }
                                     })"
                                     :disabled="readonly || busy"

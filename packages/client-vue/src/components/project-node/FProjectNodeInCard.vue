@@ -90,7 +90,7 @@ export default defineComponent({
                         >
                             <FDisplayName
                                 :name="entity.project.name"
-                                :display-name="entity.project.display_name"
+                                :display-name="entity.project.displayName"
                             />
                         </VCLink>
                     </slot>
@@ -118,7 +118,7 @@ export default defineComponent({
                         </VCButton>
                         <FProjectNodeApprovalCommand
                             :entity-id="entity.id"
-                            :approval-status="entity.approval_status"
+                            :approval-status="entity.approvalStatus"
                             :with-icon="true"
                             :element-type="'button'"
                             :command="'approve'"
@@ -127,7 +127,7 @@ export default defineComponent({
                         />
                         <FProjectNodeApprovalCommand
                             :entity-id="entity.id"
-                            :approval-status="entity.approval_status"
+                            :approval-status="entity.approvalStatus"
                             :with-icon="true"
                             :element-type="'button'"
                             :command="'reject'"
@@ -157,7 +157,7 @@ export default defineComponent({
                     </div>
                     <div>
                         <FProjectNodeApprovalStatus
-                            :status="entity.approval_status"
+                            :status="entity.approvalStatus"
                         >
                             <template #default="slotProps">
                                 <span
@@ -174,11 +174,11 @@ export default defineComponent({
                         <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
                     </div>
                     <div>
-                        <template v-if="entity.project.user_id">
-                            {{ entity.project.user_id }}
+                        <template v-if="entity.project.userId">
+                            {{ entity.project.userId }}
                         </template>
-                        <template v-else-if="entity.project.robot_id">
-                            {{ entity.project.robot_id }}
+                        <template v-else-if="entity.project.robotId">
+                            {{ entity.project.robotId }}
                         </template>
                     </div>
                 </div>
@@ -189,7 +189,7 @@ export default defineComponent({
                         <strong><i class="fa fa-user" /> Creator</strong>
                     </div>
                     <div>
-                        <AUser :entity-id="entity.user_id">
+                        <AUser :entity-id="entity.userId">
                             <template #default="{ data }">
                                 {{ data.name }}
                             </template>
@@ -209,7 +209,7 @@ export default defineComponent({
                         <span class="text-fg-muted">
                             created
                         </span>
-                        <VCTimeago :datetime="entity.created_at" />
+                        <VCTimeago :datetime="entity.createdAt" />
                     </small>
                 </div>
                 <div class="ms-auto">
@@ -217,7 +217,7 @@ export default defineComponent({
                         <span class="text-fg-muted">
                             updated
                         </span>
-                        <VCTimeago :datetime="entity.updated_at" />
+                        <VCTimeago :datetime="entity.updatedAt" />
                     </small>
                 </div>
             </div>
@@ -238,7 +238,7 @@ export default defineComponent({
                         <VCIcon name="fa6-solid:file-import" /> Project
                         <FDisplayName
                             :name="entity.project.name"
-                            :display-name="entity.project.display_name"
+                            :display-name="entity.project.displayName"
                         />
                     </VCModalTitle>
                     <VCModalClose class="btn-close" />

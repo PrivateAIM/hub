@@ -22,8 +22,8 @@ export default defineNuxtComponent({
         const { realmId } = storeToRefs(store);
 
         const route = useRoute();
-        if (typeof route.query.project_id === 'string') {
-            projectId.value = route.query.project_id;
+        if (typeof route.query.projectId === 'string') {
+            projectId.value = route.query.projectId;
         }
 
         const handleCreated = async (entity: Analysis) => {

@@ -28,7 +28,7 @@ describe('MemoryLogStore', () => {
                 level: LogLevel.INFORMATIONAL,
                 channel: LogChannel.SYSTEM,
                 service: 'test-service',
-                labels: { node_id: 'node-1' },
+                labels: { nodeId: 'node-1' },
             });
 
             expect(store.items).toHaveLength(1);
@@ -77,17 +77,17 @@ describe('MemoryLogStore', () => {
                 level: LogLevel.INFORMATIONAL, 
                 channel: LogChannel.SYSTEM, 
                 service: 'svc', 
-                labels: { node_id: 'node-1' }, 
+                labels: { nodeId: 'node-1' }, 
             });
             await store.write({
                 message: 'b', 
                 level: LogLevel.INFORMATIONAL, 
                 channel: LogChannel.SYSTEM, 
                 service: 'svc', 
-                labels: { node_id: 'node-2' }, 
+                labels: { nodeId: 'node-2' }, 
             });
 
-            const [results] = await store.query({ labels: { node_id: 'node-1' } });
+            const [results] = await store.query({ labels: { nodeId: 'node-1' } });
             expect(results).toHaveLength(1);
             expect(results[0].message).toBe('a');
         });
@@ -98,10 +98,10 @@ describe('MemoryLogStore', () => {
                 level: LogLevel.INFORMATIONAL, 
                 channel: LogChannel.SYSTEM, 
                 service: 'svc', 
-                labels: { node_id: 'node-1' }, 
+                labels: { nodeId: 'node-1' }, 
             });
 
-            const [results] = await store.query({ labels: { node_id: 'nonexistent' } });
+            const [results] = await store.query({ labels: { nodeId: 'nonexistent' } });
             expect(results).toHaveLength(0);
         });
 
@@ -114,7 +114,7 @@ describe('MemoryLogStore', () => {
             });
             delete (log as { labels?: Record<string, unknown> }).labels;
 
-            const [results] = await store.query({ labels: { node_id: 'node-1' } });
+            const [results] = await store.query({ labels: { nodeId: 'node-1' } });
             expect(results).toHaveLength(0);
         });
     });

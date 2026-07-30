@@ -23,12 +23,12 @@ export interface Event {
      *
      * eg. analysis, node, analysisNode, ....
      */
-    ref_type: string;
+    refType: string;
 
     /**
      * eg. uuid
      */
-    ref_id: string | null;
+    refId: string | null;
 
     /**
      * component, prozess,
@@ -55,31 +55,31 @@ export interface Event {
 
     // ------------------------------------------------------------------
 
-    request_path: string | null;
+    requestPath: string | null;
 
-    request_method: string | null;
+    requestMethod: string | null;
 
-    request_ip_address: string | null;
+    requestIpAddress: string | null;
 
-    request_user_agent: string | null;
-
-    // ------------------------------------------------------------------
-
-    actor_type: string | null;
-
-    actor_id: string | null;
-
-    actor_name: string | null;
+    requestUserAgent: string | null;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'] | null;
+    actorType: string | null;
+
+    actorId: string | null;
+
+    actorName: string | null;
 
     // ------------------------------------------------------------------
 
-    expires_at: string | null;
+    realmId: Realm['id'] | null;
 
-    created_at: string;
+    // ------------------------------------------------------------------
 
-    updated_at: string;
+    expiresAt: string | null;
+
+    createdAt: string;
+
+    updatedAt: string;
 }

@@ -46,7 +46,7 @@ export class BucketCreateHandler implements ComponentHandler<
             this.logger?.error({
                 message: e,
                 command: BucketCommand.CREATE,
-                analysis_id: value.id,
+                analysisId: value.id,
                 [LogFlag.REF_ID]: value.id,
                 [LogFlag.REF_TYPE]: DomainType.BUCKET,
             });

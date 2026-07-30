@@ -36,14 +36,14 @@ export class ProjectSubscriber extends BaseSubscriber<
                     },
                 ];
 
-                if (data.realm_id) {
+                if (data.realmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: DomainType.PROJECT,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: [DomainType.PROJECT, data.id],
                     });
                 }

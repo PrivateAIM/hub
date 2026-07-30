@@ -53,13 +53,13 @@ export default defineComponent({
     setup(props, setup) {
         const busy = ref(false);
         const form = reactive({
-            project_id: '',
+            projectId: '',
             name: '',
-            display_name: '',
+            displayName: '',
             description: '',
         });
 
-        const proposalQuery = computed<QueryBuildInput<Project, 3>>(() => ({ filters: { ...(props.realmId ? { realm_id: props.realmId } : {}) } }));
+        const proposalQuery = computed<QueryBuildInput<Project, 3>>(() => ({ filters: { ...(props.realmId ? { realmId: props.realmId } : {}) } }));
 
         const manager = createEntityManager({
             type: `${DomainType.ANALYSIS}`,
@@ -76,7 +76,7 @@ export default defineComponent({
         );
 
         if (props.projectId) {
-            form.project_id = props.projectId as string;
+            form.projectId = props.projectId as string;
         }
 
         const initFromProperties = () => {
@@ -142,15 +142,15 @@ export default defineComponent({
             <div class="flex-1 basis-0 px-2">
                 <IFieldValidation
                     v-slot="{ value }"
-                    :field="v.fields.display_name"
+                    :field="v.fields.displayName"
                 >
                     <VCFormGroup :validation="value">
                         <template #label>
                             Display Name
                         </template>
                         <VCFormInput
-                            :model-value="v.fields.display_name.$model.value ?? ''"
-                            @update:model-value="(next: string) => { v.fields.display_name.$model.value = next; }"
+                            :model-value="v.fields.displayName.$model.value ?? ''"
+                            @update:model-value="(next: string) => { v.fields.displayName.$model.value = next; }"
                         />
                     </VCFormGroup>
                 </IFieldValidation>
@@ -228,16 +228,16 @@ export default defineComponent({
                         <VCButton
                             :disabled="props.busy"
                             size="xs"
-                            :color="form.project_id !== props.data.id ? 'neutral' : 'warning'"
-                            @click.prevent="toggle('project_id', props.data.id)"
+                            :color="form.projectId !== props.data.id ? 'neutral' : 'warning'"
+                            @click.prevent="toggle('projectId', props.data.id)"
                         >
-                            <VCIcon :name="form.project_id !== props.data.id ? 'fa6-solid:plus' : 'fa6-solid:minus'" />
+                            <VCIcon :name="form.projectId !== props.data.id ? 'fa6-solid:plus' : 'fa6-solid:minus'" />
                         </VCButton>
                     </template>
                 </FProjects>
 
                 <VCAlert
-                    v-if="!v.fields.project_id.$model.value"
+                    v-if="!v.fields.projectId.$model.value"
                     color="warning"
                     variant="soft"
                     size="sm"

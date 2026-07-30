@@ -94,10 +94,10 @@ export class BucketFileCreateHandler implements ComponentHandler<
         } else {
             const bucketRepository = dataSource.getRepository(BucketEntity);
 
-            bucket = await bucketRepository.findOneByOrFail({ id: meta.bucket_id });
+            bucket = await bucketRepository.findOneByOrFail({ id: meta.bucketId });
         }
 
-        // Random storage key — the (bucket_id, path) DB unique constraint enforces
+        // Random storage key — the (bucketId, path) DB unique constraint enforces
         // logical de-duplication, so the object key just needs to be unique per row.
         const hash = crypto.randomBytes(32).toString('hex');
 

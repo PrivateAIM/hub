@@ -29,7 +29,7 @@ async function packFile(
     logger?.debug(`Packing file ${file.path}`, {
         [LogFlag.REF_TYPE]: DomainType.BUCKET_FILE,
         [LogFlag.REF_ID]: file.id,
-        bucket_id: file.bucket_id,
+        bucketId: file.bucketId,
     });
 
     const source = await storage.getObject(name, file.hash);

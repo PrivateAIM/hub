@@ -17,19 +17,19 @@ export class ProjectNodeValidator extends Container<ProjectNode> {
         super.initialize();
 
         this.mount(
-            'project_id',
+            'projectId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );
 
         this.mount(
-            'node_id',
+            'nodeId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );
 
         this.mount(
-            'approval_status',
+            'approvalStatus',
             { group: ValidatorGroup.UPDATE, optional: true },
             createValidator(z.enum(ProjectNodeApprovalStatus).nullable()),
         );

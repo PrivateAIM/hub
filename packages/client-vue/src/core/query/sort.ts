@@ -10,8 +10,8 @@ import type { SortsBuildInput } from '@rapiq/core';
 import { SortDirection } from '@rapiq/core';
 
 type Data = {
-    created_at?: string | Date,
-    updated_at?: string | Date,
+    createdAt?: string | Date,
+    updatedAt?: string | Date,
     [key: string]: any
 };
 export function isQuerySortedDescByDate<T extends Data>(input: SortsBuildInput<T>) : boolean {
@@ -20,10 +20,10 @@ export function isQuerySortedDescByDate<T extends Data>(input: SortsBuildInput<T
     }
 
     if (isObject(input)) {
-        return input.created_at === SortDirection.DESC ||
-            input.updated_at === SortDirection.DESC;
+        return input.createdAt === SortDirection.DESC ||
+            input.updatedAt === SortDirection.DESC;
     }
 
     return typeof input === 'string' &&
-        (input === '-created_at' || input === '-updated_at');
+        (input === '-createdAt' || input === '-updatedAt');
 }

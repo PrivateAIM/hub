@@ -22,7 +22,7 @@ export interface Analysis {
     /**
      * Human-readable label shown in the UI. Falls back to `name` when not set.
      */
-    display_name: string | null;
+    displayName: string | null;
 
     description: string | null;
 
@@ -36,92 +36,92 @@ export interface Analysis {
     /**
      * Amount of nodes which approved the analysis.
      */
-    nodes_approved: number;
+    nodesApproved: number;
 
     // ------------------------------------------------------------------
 
-    configuration_locked: boolean;
+    configurationLocked: boolean;
 
     /**
      * A root code bucket file is linked for the analysis.
      */
-    configuration_entrypoint_valid : boolean;
+    configurationEntrypointValid : boolean;
 
     /**
      * Master image is assigned.
      */
-    configuration_image_valid: boolean;
+    configurationImageValid: boolean;
 
     /**
      * One or more default nodes are assigned.
      */
-    configuration_node_default_valid: boolean;
+    configurationNodeDefaultValid: boolean;
 
     /**
      * An aggregator is assigned.
      */
-    configuration_node_aggregator_valid: boolean;
+    configurationNodeAggregatorValid: boolean;
 
     /**
      * A default node as well an aggregator node is assigned.
      */
-    configuration_nodes_valid: boolean;
+    configurationNodesValid: boolean;
 
     // ------------------------------------------------------------------
 
-    build_status: `${ProcessStatus}` | null;
+    buildStatus: `${ProcessStatus}` | null;
 
     /**
      * Define if the node constraints are satisfied for the build process.
      */
-    build_nodes_valid: boolean;
+    buildNodesValid: boolean;
 
     /**
      * Percentage for building image
      */
-    build_progress: number | null;
+    buildProgress: number | null;
 
     /**
      * Hash for build process.
      */
-    build_hash: string | null;
+    buildHash: string | null;
 
     /**
      * Operating system
      */
-    build_os: string | null;
+    buildOs: string | null;
 
     /**
      * Size in bytes
      */
-    build_size: number | null;
+    buildSize: number | null;
 
     // ------------------------------------------------------------------
 
-    distribution_status: `${ProcessStatus}` | null;
+    distributionStatus: `${ProcessStatus}` | null;
 
     /**
      * Percentage for distributing image
      */
-    distribution_progress: number | null;
+    distributionProgress: number | null;
 
     // ------------------------------------------------------------------
 
-    execution_status: `${ProcessStatus}` | null;
+    executionStatus: `${ProcessStatus}` | null;
 
-    execution_progress: number | null;
+    executionProgress: number | null;
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
     registry: Registry | null;
 
-    registry_id: Registry['id'] | null;
+    registryId: Registry['id'] | null;
 
     // ------------------------------------------------------------------
 
@@ -129,27 +129,27 @@ export interface Analysis {
      * Dedicated OAuth2/Authup client the analysis uses to act on the node side
      * under its own (restricted) identity. Provisioned on creation.
      */
-    client_id: Client['id'] | null;
+    clientId: Client['id'] | null;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'];
+    realmId: Realm['id'];
 
-    user_id: User['id'];
+    userId: User['id'];
 
     // ------------------------------------------------------------------
 
-    project_id: Project['id'];
+    projectId: Project['id'];
 
     project: Project;
 
     // ------------------------------------------------------------------
 
-    image_command_arguments: MasterImageCommandArgument[] | null;
+    imageCommandArguments: MasterImageCommandArgument[] | null;
 
     // ------------------------------------------------------------------
 
-    master_image_id: MasterImage['id'] | null;
+    masterImageId: MasterImage['id'] | null;
 
-    master_image: MasterImage;
+    masterImage: MasterImage;
 }

@@ -84,8 +84,8 @@ describe('bucket HTTP endpoints', () => {
             expect(typeof body.data.id).toBe('string');
             expect(body.data.name).toBe(input.name);
             expect(body.data.region).toBe('us-east');
-            expect(body.data.created_at).toBeDefined();
-            expect(body.data.updated_at).toBeDefined();
+            expect(body.data.createdAt).toBeDefined();
+            expect(body.data.updatedAt).toBeDefined();
         });
     });
 
@@ -227,7 +227,7 @@ describe('bucket HTTP endpoints', () => {
             expect(Array.isArray(body.data)).toBe(true);
             expect(body.data.length).toBeGreaterThanOrEqual(1);
             expect(body.data[0].id).toBeDefined();
-            expect(body.data[0].bucket_id).toBe(bucketId);
+            expect(body.data[0].bucketId).toBe(bucketId);
             expect(body.meta).toBeDefined();
             expect(body.meta.total).toBeGreaterThanOrEqual(1);
         });

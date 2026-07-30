@@ -69,16 +69,16 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         await this.repository.validateJoinColumns(validated);
 
-        validated.analysis_realm_id = validated.analysis.realm_id;
-        validated.node_realm_id = validated.node.realm_id;
+        validated.analysisRealmId = validated.analysis.realmId;
+        validated.nodeRealmId = validated.node.realmId;
 
-        if (validated.analysis.configuration_locked) {
+        if (validated.analysis.configurationLocked) {
             throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
         }
 
         const projectNode = await this.projectNodeRepository.findOneBy({
-            project_id: validated.analysis.project_id,
-            node_id: validated.node_id,
+            projectId: validated.analysis.projectId,
+            nodeId: validated.nodeId,
         });
 
         if (!projectNode) {
@@ -89,15 +89,15 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         // node is auto-assigned when the analysis is created. Treat a repeated assignment
         // as an idempotent no-op instead of a unique-constraint conflict. The existing
         // relation (and its approval decision) is left untouched: field changes such as
-        // approval_status or execution_status must go through update(), which enforces the
+        // approvalStatus or executionStatus must go through update(), which enforces the
         // node-authority permission checks. A recalc keeps the analysis metadata consistent.
         const existing = await this.repository.findOneBy({
-            analysis_id: validated.analysis_id,
-            node_id: validated.node_id,
+            analysisId: validated.analysisId,
+            nodeId: validated.nodeId,
         });
 
         if (existing) {
-            await this.recalculator.recalc(existing.analysis_id);
+            await this.recalculator.recalc(existing.analysisId);
 
             return existing;
         }
@@ -108,12 +108,12 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             this.skipAnalysisApproval ||
             entity.node.type === NodeType.AGGREGATOR
         ) {
-            entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
+            entity.approvalStatus = AnalysisNodeApprovalStatus.APPROVED;
         }
 
         const saved = await this.repository.save(entity, { data: actor.metadata });
 
-        await this.recalculator.recalc(saved.analysis_id);
+        await this.recalculator.recalc(saved.analysisId);
 
         return saved;
     }
@@ -126,8 +126,8 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             throw new EntityNotFoundError({ entity: 'analysis-node' });
         }
 
-        const isAuthorityOfNode = isRealmResourceWritable(actor.realm, entity.node_realm_id);
-        const isAuthorityOfAnalysis = isRealmResourceWritable(actor.realm, entity.analysis_realm_id);
+        const isAuthorityOfNode = isRealmResourceWritable(actor.realm, entity.nodeRealmId);
+        const isAuthorityOfAnalysis = isRealmResourceWritable(actor.realm, entity.analysisRealmId);
 
         if (!isAuthorityOfNode && !isAuthorityOfAnalysis) {
             throw new PermissionDeniedError('You are neither part of the node nor analysis realm.');
@@ -153,7 +153,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         }
 
         if (
-            isPropertySet(validated, 'approval_status') ||
+            isPropertySet(validated, 'approvalStatus') ||
             isPropertySet(validated, 'comment')
         ) {
             if (!isAuthorityOfNode || !canApprove) {
@@ -163,7 +163,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             }
         }
 
-        if (isPropertySet(validated, 'execution_status')) {
+        if (isPropertySet(validated, 'executionStatus')) {
             if (!isAuthorityOfNode || !canUpdate) {
                 throw new BadRequestError(
                     'You are either no authority of the node or you don\'t have the required permissions.',
@@ -175,7 +175,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         const saved = await this.repository.save(merged, { data: actor.metadata });
 
-        await this.recalculator.recalcDebounced(saved.analysis_id);
+        await this.recalculator.recalcDebounced(saved.analysisId);
 
         return saved;
     }
@@ -194,8 +194,8 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         }
 
         if (
-            !isRealmResourceWritable(actor.realm, entity.node_realm_id) &&
-            !isRealmResourceWritable(actor.realm, entity.analysis_realm_id)
+            !isRealmResourceWritable(actor.realm, entity.nodeRealmId) &&
+            !isRealmResourceWritable(actor.realm, entity.analysisRealmId)
         ) {
             throw new PermissionDeniedError();
         }
@@ -206,7 +206,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         entity.id = entityId;
 
-        await this.recalculator.recalc(entity.analysis_id);
+        await this.recalculator.recalc(entity.analysisId);
 
         return entity;
     }

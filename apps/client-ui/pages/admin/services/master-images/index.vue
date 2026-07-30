@@ -132,10 +132,10 @@ export default {
                 <FEvents
                     :query="{
                         filters: {
-                            ref_type: 'masterImage'
+                            refType: 'masterImage'
                         },
                         sort: {
-                            created_at: 'DESC'
+                            createdAt: 'DESC'
                         }
                     }"
                 />

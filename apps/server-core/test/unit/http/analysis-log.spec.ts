@@ -20,7 +20,7 @@ import { createTestApplication } from '../../app';
 // `AnalysisLogController` proxies the telemetry log store, so it could not be
 // exercised at all without either a live telemetry service or this opt-in
 // transport-level fake. The fake also lets the spec assert the LABEL mapping
-// the controller performs — analysis_id -> ref_type/ref_id — which is the
+// the controller performs — analysisId -> refType/refId — which is the
 // controller's entire job and was previously unverified.
 
 const ANALYSIS_ID = '11111111-1111-1111-1111-111111111111';
@@ -61,13 +61,13 @@ describe('src/controllers/core/analysis-log', () => {
     it('should proxy the analysis log collection from the telemetry store', async () => {
         const { client } = suite;
 
-        const { data, meta } = await client.analysisLog.getMany({ filters: { analysis_id: ANALYSIS_ID } });
+        const { data, meta } = await client.analysisLog.getMany({ filters: { analysisId: ANALYSIS_ID } });
 
         expect(data).toHaveLength(1);
         expect(data[0].message).toBe('hello from the analysis');
         expect(meta.total).toBe(1);
 
-        // The controller must translate `analysis_id` into the telemetry
+        // The controller must translate `analysisId` into the telemetry
         // LABELS the log store actually indexes.
         expect(telemetryRequests).toHaveLength(1);
         const query = decodeURIComponent(telemetryRequests[0].url);
@@ -76,7 +76,7 @@ describe('src/controllers/core/analysis-log', () => {
         expect(query).toContain(ANALYSIS_ID);
     });
 
-    it('should reject a collection read without an analysis_id filter', async () => {
+    it('should reject a collection read without an analysisId filter', async () => {
         const { client } = suite;
 
         await expect(client.analysisLog.getMany()).rejects.toThrow();
@@ -85,7 +85,7 @@ describe('src/controllers/core/analysis-log', () => {
     it('should attach the queryable vocabulary at meta.schema', async () => {
         const { client } = suite;
 
-        const { meta } = await client.analysisLog.getMany({ filters: { analysis_id: ANALYSIS_ID } });
+        const { meta } = await client.analysisLog.getMany({ filters: { analysisId: ANALYSIS_ID } });
 
         expect(meta.schema).toBeDefined();
     });
@@ -93,14 +93,14 @@ describe('src/controllers/core/analysis-log', () => {
     it('should delete through the telemetry store', async () => {
         const { client } = suite;
 
-        await client.analysisLog.delete({ filters: { analysis_id: ANALYSIS_ID } });
+        await client.analysisLog.delete({ filters: { analysisId: ANALYSIS_ID } });
 
         expect(telemetryRequests).toHaveLength(1);
         const query = decodeURIComponent(telemetryRequests[0].url);
         expect(query).toContain(ANALYSIS_ID);
     });
 
-    it('should reject a delete without an analysis_id filter', async () => {
+    it('should reject a delete without an analysisId filter', async () => {
         const { client } = suite;
 
         await expect(client.analysisLog.delete({})).rejects.toThrow();

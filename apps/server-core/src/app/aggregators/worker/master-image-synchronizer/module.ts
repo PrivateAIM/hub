@@ -46,10 +46,10 @@ export class MasterImageSynchronizerAggregator extends BaseComponent<MasterImage
                 await ctx.eventComponentCaller.callCreate({
                     name: context.key,
                     data: {},
-                    ref_type: DomainType.MASTER_IMAGE,
+                    refType: DomainType.MASTER_IMAGE,
                     scope: 'synchronizer',
                     expiring: true,
-                    expires_at: new Date(
+                    expiresAt: new Date(
                         Date.now() + (1000 * 60 * 60 * 24),
                     ).toISOString(),
                 });

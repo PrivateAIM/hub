@@ -39,24 +39,24 @@ export default defineComponent({
             <template v-if="data">
                 <FMasterImagePicker
                     :readonly="readonly || busy"
-                    :entity-id="data.master_image_id ?? undefined"
-                    :entity="data.master_image"
+                    :entity-id="data.masterImageId ?? undefined"
+                    :entity="data.masterImage"
                     @resolved="(value) => {
                         if(
-                            (value && value.id !== data.master_image_id) ||
-                            !value && data.master_image_id ||
-                            value && !data.master_image_id
+                            (value && value.id !== data.masterImageId) ||
+                            !value && data.masterImageId ||
+                            value && !data.masterImageId
                         ) {
                             update({
-                                master_image_id: value ? value.id : null,
-                                master_image: value,
-                                image_command_arguments: null
+                                masterImageId: value ? value.id : null,
+                                masterImage: value,
+                                imageCommandArguments: null
                             })
                         } else {
                             updated({
                                 ...data,
-                                master_image_id: value ? value.id : null,
-                                master_image: value ?? data.master_image
+                                masterImageId: value ? value.id : null,
+                                masterImage: value ?? data.masterImage
                             })
                         }
                     }"

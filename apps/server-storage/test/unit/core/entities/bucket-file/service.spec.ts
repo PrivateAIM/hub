@@ -32,13 +32,13 @@ function createTestBucketFile(overrides?: Partial<BucketFile>): BucketFile {
         hash: 'abc123',
         directory: '/data',
         size: 1024,
-        actor_id: 'user-1',
-        actor_type: 'user',
-        realm_id: 'realm-1',
-        bucket_id: randomUUID(),
+        actorId: 'user-1',
+        actorType: 'user',
+        realmId: 'realm-1',
+        bucketId: randomUUID(),
         bucket: null,
-        created_at: new Date(),
-        updated_at: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     } as BucketFile;
 }
@@ -102,9 +102,9 @@ describe('BucketFileService', () => {
         it('should skip permission check when actor owns the file', async () => {
             const actorId = randomUUID();
             const file = createTestBucketFile({
-                actor_id: actorId,
-                actor_type: 'user',
-                realm_id: 'other-realm',
+                actorId,
+                actorType: 'user',
+                realmId: 'other-realm',
             });
             repository.seed(file);
 
@@ -118,12 +118,12 @@ describe('BucketFileService', () => {
         it('should skip permission check when actor owns the bucket', async () => {
             const actorId = randomUUID();
             const file = createTestBucketFile({
-                actor_id: 'other-user',
-                actor_type: 'user',
-                realm_id: 'other-realm',
+                actorId: 'other-user',
+                actorType: 'user',
+                realmId: 'other-realm',
                 bucket: {
-                    actor_id: actorId,
-                    actor_type: 'user',
+                    actorId,
+                    actorType: 'user',
                 } as Bucket,
             });
             repository.seed(file);
@@ -137,9 +137,9 @@ describe('BucketFileService', () => {
 
         it('should enforce realm writability for non-owner', async () => {
             const file = createTestBucketFile({
-                actor_id: 'other-user',
-                actor_type: 'user',
-                realm_id: 'other-realm',
+                actorId: 'other-user',
+                actorType: 'user',
+                realmId: 'other-realm',
                 bucket: null,
             });
             repository.seed(file);
@@ -151,9 +151,9 @@ describe('BucketFileService', () => {
 
         it('should throw PermissionDeniedError when actor lacks permission and is not owner', async () => {
             const file = createTestBucketFile({
-                actor_id: 'other-user',
-                actor_type: 'user',
-                realm_id: 'realm-1',
+                actorId: 'other-user',
+                actorType: 'user',
+                realmId: 'realm-1',
                 bucket: null,
             });
             repository.seed(file);

@@ -32,8 +32,8 @@ function createFakeAnalysisBucketRepository() {
 
         if (!data.analysis) {
             data.analysis = {
-                id: data.analysis_id,
-                realm_id: 'realm-1',
+                id: data.analysisId,
+                realmId: 'realm-1',
             } as Analysis;
         }
     };
@@ -45,11 +45,11 @@ function createTestAnalysisBucket(overrides?: Partial<AnalysisBucket>): Analysis
     return {
         id: randomUUID(),
         type: AnalysisBucketType.CODE,
-        bucket_id: randomUUID(),
-        analysis_id: randomUUID(),
-        realm_id: 'realm-1',
-        created_at: new Date(),
-        updated_at: new Date(),
+        bucketId: randomUUID(),
+        analysisId: randomUUID(),
+        realmId: 'realm-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     } as AnalysisBucket;
 }
@@ -97,30 +97,30 @@ describe('AnalysisBucketService', () => {
 
             const result = await service.create(
                 {
-                    analysis_id: analysisId,
-                    bucket_id: bucketId,
+                    analysisId,
+                    bucketId,
                     type: AnalysisBucketType.CODE,
                 },
                 createAllowAllActor(),
             );
 
-            expect(result.analysis_id).toBe(analysisId);
-            expect(result.bucket_id).toBe(bucketId);
-            expect(result.realm_id).toBe('realm-1');
+            expect(result.analysisId).toBe(analysisId);
+            expect(result.bucketId).toBe(bucketId);
+            expect(result.realmId).toBe('realm-1');
             expect(repository.getAll()).toHaveLength(1);
         });
 
-        it('should set realm_id from analysis', async () => {
+        it('should set realmId from analysis', async () => {
             const result = await service.create(
                 {
-                    analysis_id: randomUUID(),
-                    bucket_id: randomUUID(),
+                    analysisId: randomUUID(),
+                    bucketId: randomUUID(),
                     type: AnalysisBucketType.RESULT,
                 },
                 createAllowAllActor(),
             );
 
-            expect(result.realm_id).toBe('realm-1');
+            expect(result.realmId).toBe('realm-1');
         });
     });
 
@@ -140,7 +140,7 @@ describe('AnalysisBucketService', () => {
         });
 
         it('should enforce realm writability for non-master realm', async () => {
-            const bucket = createTestAnalysisBucket({ realm_id: 'other-realm' });
+            const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
@@ -149,7 +149,7 @@ describe('AnalysisBucketService', () => {
         });
 
         it('should allow master realm to update any entity', async () => {
-            const bucket = createTestAnalysisBucket({ realm_id: 'other-realm' });
+            const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             const result = await service.update(bucket.id, {}, createMasterRealmActor());
@@ -174,7 +174,7 @@ describe('AnalysisBucketService', () => {
         });
 
         it('should enforce realm writability for non-master realm', async () => {
-            const bucket = createTestAnalysisBucket({ realm_id: 'other-realm' });
+            const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
@@ -183,7 +183,7 @@ describe('AnalysisBucketService', () => {
         });
 
         it('should allow master realm to delete any entity', async () => {
-            const bucket = createTestAnalysisBucket({ realm_id: 'other-realm' });
+            const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             const result = await service.delete(bucket.id, createMasterRealmActor());

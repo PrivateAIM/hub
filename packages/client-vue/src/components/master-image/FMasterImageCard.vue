@@ -28,11 +28,11 @@ export default defineComponent({
     },
     setup(props) {
         const progress = computed(() => {
-            if (props.entity.build_status === ProcessStatus.EXECUTED) {
+            if (props.entity.buildStatus === ProcessStatus.EXECUTED) {
                 return 100;
             }
 
-            return props.entity.build_progress || 0;
+            return props.entity.buildProgress || 0;
         });
 
         return { progress, resolveTextColorClass };
@@ -44,10 +44,10 @@ export default defineComponent({
         <div class="card-header">
             <div class="title flex flex-row">
                 <div>
-                    {{ entity.virtual_path }}
+                    {{ entity.virtualPath }}
                 </div>
                 <div class="ms-auto">
-                    <FProcessStatus :value="entity.build_status">
+                    <FProcessStatus :value="entity.buildStatus">
                         <template #default=" {value, iconName, iconClass, classSuffix }">
                             <span class="me-1">{{ value }}</span> <VCIcon
                                 :name="iconName"

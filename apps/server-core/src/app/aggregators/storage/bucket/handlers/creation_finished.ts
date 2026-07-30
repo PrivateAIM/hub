@@ -26,7 +26,7 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
         if (task.type === TaskType.ANALYSIS_BUCKET_CREATE) {
             const analysisBucketRepository = this.dataSource.getRepository(AnalysisBucketEntity);
             let analysisBucket = await analysisBucketRepository.findOneBy({
-                analysis_id: task.data.analysisId,
+                analysisId: task.data.analysisId,
                 type: task.data.bucketType,
             });
 
@@ -53,9 +53,9 @@ export class StorageBucketCreationFinishedHandler extends BaseAggregatorHandler<
 
             analysisBucket = analysisBucketRepository.create({
                 type: task.data.bucketType,
-                bucket_id: bucket.id,
-                analysis_id: analysis.id,
-                realm_id: analysis.realm_id,
+                bucketId: bucket.id,
+                analysisId: analysis.id,
+                realmId: analysis.realmId,
             });
 
             await analysisBucketRepository.save(analysisBucket);

@@ -44,7 +44,7 @@ const FProjects = defineComponent({
                         slotContent.icon,
                         h(FDisplayName, {
                             name: item.name,
-                            displayName: item.display_name,
+                            displayName: item.displayName,
                         }),
                         slotContent.actions,
                     ];

@@ -120,11 +120,11 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         await this.repository.validateJoinColumns(validated);
 
-        if (!validated.master_image_id) {
-            validated.master_image_id = validated.project.master_image_id;
+        if (!validated.masterImageId) {
+            validated.masterImageId = validated.project.masterImageId;
         }
 
-        validated.realm_id = validated.project.realm_id;
+        validated.realmId = validated.project.realmId;
 
         if (!actor.identity || actor.identity.type !== 'user') {
             throw new PermissionDeniedError('Only user accounts are permitted to create an analysis.');
@@ -132,7 +132,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const entity = this.repository.create({ ...validated });
 
-        entity.user_id = actor.identity.id;
+        entity.userId = actor.identity.id;
 
         await actor.permissionChecker.check({
             name: PermissionName.ANALYSIS_CREATE,
@@ -146,7 +146,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         // throws, or on concurrent creates) and can end up negative on delete.
         // This runs before the steps that may throw so the count stays accurate
         // even if the build/storage check fails after the analysis is persisted.
-        entity.project.analyses = await this.repository.countByProject(entity.project_id);
+        entity.project.analyses = await this.repository.countByProject(entity.projectId);
         await this.projectRepository.save(entity.project, { data: actor.metadata });
 
         await this.assignProjectNodes(entity, actor);
@@ -169,9 +169,9 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
      * recalculated once at the end instead of per node.
      */
     protected async assignProjectNodes(analysis: Analysis, actor: ActorContext): Promise<void> {
-        const projectNodes = await this.projectNodeRepository.findManyWithNodeByProject(analysis.project_id);
+        const projectNodes = await this.projectNodeRepository.findManyWithNodeByProject(analysis.projectId);
         const approvedProjectNodes = projectNodes.filter(
-            (projectNode) => projectNode.approval_status === ProjectNodeApprovalStatus.APPROVED,
+            (projectNode) => projectNode.approvalStatus === ProjectNodeApprovalStatus.APPROVED,
         );
         if (approvedProjectNodes.length === 0) {
             return;
@@ -179,17 +179,17 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         for (const projectNode of approvedProjectNodes) {
             const entity = this.analysisNodeRepository.create({
-                analysis_id: analysis.id,
-                analysis_realm_id: analysis.realm_id,
-                node_id: projectNode.node_id,
-                node_realm_id: projectNode.node_realm_id,
+                analysisId: analysis.id,
+                analysisRealmId: analysis.realmId,
+                nodeId: projectNode.nodeId,
+                nodeRealmId: projectNode.nodeRealmId,
             });
 
             if (
                 this.skipAnalysisApproval ||
                 projectNode.node.type === NodeType.AGGREGATOR
             ) {
-                entity.approval_status = AnalysisNodeApprovalStatus.APPROVED;
+                entity.approvalStatus = AnalysisNodeApprovalStatus.APPROVED;
             }
 
             await this.analysisNodeRepository.save(entity, { data: actor.metadata });
@@ -215,21 +215,21 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
         });
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 
         if (
-            entity.registry_id &&
-            validated.registry_id &&
-            entity.registry_id !== validated.registry_id
+            entity.registryId &&
+            validated.registryId &&
+            entity.registryId !== validated.registryId
         ) {
             throw new BadRequestError('The registry can not be changed after it is specified.');
         }
 
-        if (isPropertySet(validated, 'master_image_id')) {
-            if (validated.master_image_id !== entity.master_image_id) {
-                validated.image_command_arguments = null;
+        if (isPropertySet(validated, 'masterImageId')) {
+            if (validated.masterImageId !== entity.masterImageId) {
+                validated.imageCommandArguments = null;
             }
         }
 
@@ -255,7 +255,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
         });
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 
@@ -285,7 +285,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         let entity = await this.getOne(id);
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 

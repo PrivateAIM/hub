@@ -36,11 +36,11 @@ export default defineComponent({
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
         const progress = computed(() => {
-            if (props.entity.execution_status === ProcessStatus.EXECUTED) {
+            if (props.entity.executionStatus === ProcessStatus.EXECUTED) {
                 return 100;
             }
 
-            return props.entity.execution_progress || 0;
+            return props.entity.executionProgress || 0;
         });
 
         const handleExecuted = (type: string, command: string) => {
@@ -71,7 +71,7 @@ export default defineComponent({
                     4. Execution
                 </div>
                 <div class="ms-auto">
-                    <FProcessStatus :value="entity.execution_status">
+                    <FProcessStatus :value="entity.executionStatus">
                         <template #default=" { iconName, iconClass, classSuffix }">
                             <VCIcon
                                 :name="iconName"

@@ -24,7 +24,7 @@ import {
 import { createTestMasterImage } from '../../../utils/domains/master-image.ts';
 import { createTestAnalysis } from '../../../utils/domains/analysis.ts';
 
-describe('core/query analysis include=master_image', () => {
+describe('core/query analysis include=masterImage', () => {
     let dataSource: DataSource;
 
     beforeAll(async () => {
@@ -35,22 +35,22 @@ describe('core/query analysis include=master_image', () => {
         dataSource = new DataSource(options);
         await dataSource.initialize();
         await dataSource.synchronize();
-        // isolate the analysis<->master_image join under test; skip the wider FK graph
+        // isolate the analysis<->masterImage join under test; skip the wider FK graph
         await dataSource.query('PRAGMA foreign_keys = OFF');
 
         const miRepo = dataSource.getRepository(MasterImageEntity);
         const mi = await miRepo.save(miRepo.create({
             ...createTestMasterImage(),
             command: 'python main.py',
-            command_arguments: [{ position: 'before', value: '--verbose' }],
+            commandArguments: [{ position: 'before', value: '--verbose' }],
         }));
 
         const anRepo = dataSource.getRepository(AnalysisEntity);
         await anRepo.save(anRepo.create(createTestAnalysis({
-            master_image_id: mi.id,
-            realm_id: 'realm-1',
-            project_id: 'project-1',
-            image_command_arguments: [{ position: 'after', value: '--fast' }],
+            masterImageId: mi.id,
+            realmId: 'realm-1',
+            projectId: 'project-1',
+            imageCommandArguments: [{ position: 'after', value: '--fast' }],
         })));
     });
 
@@ -58,22 +58,22 @@ describe('core/query analysis include=master_image', () => {
         await dataSource.destroy();
     });
 
-    it('hydrates the master_image relation (incl. its json command_arguments) when included', async () => {
-        const query = decodeQuery({ include: 'master_image' }, { schema: analysisSchema });
+    it('hydrates the masterImage relation (incl. its json commandArguments) when included', async () => {
+        const query = decodeQuery({ include: 'masterImage' }, { schema: analysisSchema });
         const repository = new AnalysisRepositoryAdapter(dataSource);
 
         const { data } = await repository.findMany(query);
 
         expect(data.length).toBe(1);
-        expect(data[0].master_image_id).toBeDefined();
-        expect(data[0].master_image, 'master_image relation should hydrate').toBeDefined();
-        expect(data[0].master_image.name).toEqual('base');
-        expect(data[0].master_image.command).toEqual('python main.py');
+        expect(data[0].masterImageId).toBeDefined();
+        expect(data[0].masterImage, 'masterImage relation should hydrate').toBeDefined();
+        expect(data[0].masterImage.name).toEqual('base');
+        expect(data[0].masterImage.command).toEqual('python main.py');
         // json column on the included relation — hydrated as a full subtree (rapiq beta.8)
-        expect(data[0].master_image.command_arguments).toEqual([{ position: 'before', value: '--verbose' }]);
+        expect(data[0].masterImage.commandArguments).toEqual([{ position: 'before', value: '--verbose' }]);
     });
 
-    it('projects the analysis json column image_command_arguments', async () => {
+    it('projects the analysis json column imageCommandArguments', async () => {
         const query = decodeQuery({}, { schema: analysisSchema });
         const repository = new AnalysisRepositoryAdapter(dataSource);
 
@@ -81,6 +81,6 @@ describe('core/query analysis include=master_image', () => {
 
         expect(data.length).toBe(1);
         // json column on the root entity — now listable in fields (rapiq beta.8)
-        expect(data[0].image_command_arguments).toEqual([{ position: 'after', value: '--fast' }]);
+        expect(data[0].imageCommandArguments).toEqual([{ position: 'after', value: '--fast' }]);
     });
 });

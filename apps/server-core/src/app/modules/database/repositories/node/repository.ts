@@ -54,7 +54,7 @@ export class NodeRepositoryAdapter implements INodeRepository {
 
     async findOneWithExternalName(id: string): Promise<Node | null> {
         const qb = this.repository.createQueryBuilder('node')
-            .addSelect(['node.external_name'])
+            .addSelect(['node.externalName'])
             .where('node.id = :id', { id });
 
         return qb.getOne();

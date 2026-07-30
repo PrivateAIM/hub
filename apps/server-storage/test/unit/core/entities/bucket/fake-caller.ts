@@ -19,8 +19,8 @@ export class FakeBucketCaller implements IBucketCaller {
         return {
             id: randomUUID(),
             ...data,
-            created_at: new Date(),
-            updated_at: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
         } as Bucket;
     }
 

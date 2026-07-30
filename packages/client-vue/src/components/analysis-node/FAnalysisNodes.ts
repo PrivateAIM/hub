@@ -60,16 +60,16 @@ export default defineComponent({
             switch (source.value) {
                 case DomainType.NODE:
                     if (typeof props.sourceId === 'undefined') {
-                        return props.realmId === item.node_realm_id;
+                        return props.realmId === item.nodeRealmId;
                     }
 
-                    return props.sourceId === item.node_id;
+                    return props.sourceId === item.nodeId;
                 default:
                     if (typeof props.sourceId === 'undefined') {
-                        return props.realmId === item.analysis_realm_id;
+                        return props.realmId === item.analysisRealmId;
                     }
 
-                    return props.sourceId === item.analysis_id;
+                    return props.sourceId === item.analysisId;
             }
         };
 
@@ -148,9 +148,9 @@ export default defineComponent({
 
                 if (props.realmId) {
                     if (props.direction === Direction.IN) {
-                        filters.node_realm_id = props.realmId;
+                        filters.nodeRealmId = props.realmId;
                     } else {
-                        filters.analysis_realm_id = props.realmId;
+                        filters.analysisRealmId = props.realmId;
                     }
                 }
             },
@@ -208,7 +208,7 @@ export default defineComponent({
                                 text = h('div', [
                                     h(FDisplayName, {
                                         name: slotProps.data.analysis.name,
-                                        displayName: slotProps.data.analysis.display_name,
+                                        displayName: slotProps.data.analysis.displayName,
                                     }),
                                 ]);
                             } else {

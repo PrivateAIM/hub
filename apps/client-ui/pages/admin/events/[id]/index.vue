@@ -62,7 +62,7 @@ export default defineNuxtComponent({
                                     <strong>Ref Type</strong>
                                 </div>
                                 <div class="">
-                                    {{ entity.ref_type }}
+                                    {{ entity.refType }}
                                 </div>
                             </div>
                             <div class="flex flex-row gap-3">
@@ -70,7 +70,7 @@ export default defineNuxtComponent({
                                     <strong>Ref ID</strong>
                                 </div>
                                 <div class="">
-                                    {{ entity.ref_id }}
+                                    {{ entity.refId }}
                                 </div>
                             </div>
                             <div class="flex flex-row gap-3">
@@ -78,7 +78,7 @@ export default defineNuxtComponent({
                                     <strong>Created</strong>
                                 </div>
                                 <div class="">
-                                    <VCTimeago :datetime="entity.created_at" />
+                                    <VCTimeago :datetime="entity.createdAt" />
                                 </div>
                             </div>
                             <div class="flex flex-row gap-3">
@@ -110,7 +110,7 @@ export default defineNuxtComponent({
                                     <strong>Type</strong>
                                 </div>
                                 <div class="">
-                                    {{ entity.actor_type }}
+                                    {{ entity.actorType }}
                                 </div>
                             </div>
                             <div class="flex flex-row gap-3">
@@ -118,7 +118,7 @@ export default defineNuxtComponent({
                                     <strong>ID</strong>
                                 </div>
                                 <div class="">
-                                    {{ entity.actor_id }}
+                                    {{ entity.actorId }}
                                 </div>
                             </div>
                             <div class="flex flex-row gap-3">
@@ -126,7 +126,7 @@ export default defineNuxtComponent({
                                     <strong>Name</strong>
                                 </div>
                                 <div class="">
-                                    {{ entity.actor_name }}
+                                    {{ entity.actorName }}
                                 </div>
                             </div>
                         </div>
@@ -147,7 +147,7 @@ export default defineNuxtComponent({
                                     <strong>Path</strong>
                                 </div>
                                 <div class="">
-                                    {{ entity.request_path }}
+                                    {{ entity.requestPath }}
                                 </div>
                             </div>
                             <div class="flex flex-row gap-3">
@@ -155,7 +155,7 @@ export default defineNuxtComponent({
                                     <strong>Method</strong>
                                 </div>
                                 <div class="">
-                                    {{ entity.request_method }}
+                                    {{ entity.requestMethod }}
                                 </div>
                             </div>
                             <div class="flex flex-row gap-3">
@@ -163,7 +163,7 @@ export default defineNuxtComponent({
                                     <strong>IP Address</strong>
                                 </div>
                                 <div class="">
-                                    {{ entity.request_ip_address }}
+                                    {{ entity.requestIpAddress }}
                                 </div>
                             </div>
                             <div class="flex flex-row gap-3">
@@ -171,7 +171,7 @@ export default defineNuxtComponent({
                                     <strong>User Agent</strong>
                                 </div>
                                 <div class="">
-                                    {{ entity.request_user_agent }}
+                                    {{ entity.requestUserAgent }}
                                 </div>
                             </div>
                         </div>

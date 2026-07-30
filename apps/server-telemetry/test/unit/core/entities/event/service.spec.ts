@@ -27,23 +27,23 @@ import {
 function createTestEvent(overrides?: Partial<Event>): Event {
     return {
         id: randomUUID(),
-        ref_type: 'project',
-        ref_id: randomUUID(),
+        refType: 'project',
+        refId: randomUUID(),
         scope: 'model',
         name: 'updated',
         data: null,
         expiring: false,
-        request_path: null,
-        request_method: null,
-        request_ip_address: null,
-        request_user_agent: null,
-        actor_type: null,
-        actor_id: null,
-        actor_name: null,
-        realm_id: 'realm-1',
-        expires_at: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        requestPath: null,
+        requestMethod: null,
+        requestIpAddress: null,
+        requestUserAgent: null,
+        actorType: null,
+        actorId: null,
+        actorName: null,
+        realmId: 'realm-1',
+        expiresAt: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         ...overrides,
     } as Event;
 }
@@ -112,14 +112,14 @@ describe('EventService', () => {
         it('should create with valid data', async () => {
             const result = await service.create(
                 {
-                    ref_type: 'analysis',
+                    refType: 'analysis',
                     scope: 'model',
                     name: 'created',
                 },
                 createAllowAllActor(),
             );
 
-            expect(result.ref_type).toBe('analysis');
+            expect(result.refType).toBe('analysis');
             expect(result.scope).toBe('model');
             expect(result.name).toBe('created');
             expect(repository.getAll()).toHaveLength(1);
@@ -129,7 +129,7 @@ describe('EventService', () => {
             await expect(
                 service.create(
                     {
-                        ref_type: 'analysis',
+                        refType: 'analysis',
                         scope: 'model',
                         name: 'created',
                     },
@@ -138,32 +138,32 @@ describe('EventService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should set realm_id from actor when not provided', async () => {
+        it('should set realmId from actor when not provided', async () => {
             const actor = createMasterRealmActor('my-realm');
 
             const result = await service.create(
                 {
-                    ref_type: 'analysis',
+                    refType: 'analysis',
                     scope: 'model',
                     name: 'created',
                 },
                 actor,
             );
 
-            expect(result.realm_id).toBe('my-realm');
+            expect(result.realmId).toBe('my-realm');
         });
 
-        it('should throw PermissionDeniedError when non-master realm sets different realm_id', async () => {
+        it('should throw PermissionDeniedError when non-master realm sets different realmId', async () => {
             const actor = createNonMasterRealmActor('realm-1');
             const otherRealmId = randomUUID();
 
             await expect(
                 service.create(
                     {
-                        ref_type: 'analysis',
+                        refType: 'analysis',
                         scope: 'model',
                         name: 'created',
-                        realm_id: otherRealmId,
+                        realmId: otherRealmId,
                     },
                     actor,
                 ),
@@ -197,7 +197,7 @@ describe('EventService', () => {
         });
 
         it('should enforce realm writability for non-master realm', async () => {
-            const event = createTestEvent({ realm_id: 'other-realm' });
+            const event = createTestEvent({ realmId: 'other-realm' });
             repository.seed(event);
 
             await expect(
@@ -206,15 +206,15 @@ describe('EventService', () => {
         });
 
         it('should allow master realm to delete any event', async () => {
-            const event = createTestEvent({ realm_id: 'other-realm' });
+            const event = createTestEvent({ realmId: 'other-realm' });
             repository.seed(event);
 
             const result = await service.delete(event.id, createMasterRealmActor());
             expect(result.id).toBe(event.id);
         });
 
-        it('should allow delete when event has no realm_id', async () => {
-            const event = createTestEvent({ realm_id: null });
+        it('should allow delete when event has no realmId', async () => {
+            const event = createTestEvent({ realmId: null });
             repository.seed(event);
 
             const result = await service.delete(event.id, createNonMasterRealmActor('realm-1'));

@@ -68,21 +68,21 @@ describe('relation schema resolution', () => {
         });
 
         it('drops a related filter the target schema does not allow', () => {
-            // `build_hash` is a column on analysis but not in analysisSchema.filters
+            // `buildHash` is a column on analysis but not in analysisSchema.filters
             // — the related schema, not the junction, governs what is filterable.
             const query = decodeQuery(
-                { filter: { 'analysis.build_hash': 'x' }, include: 'analysis' },
+                { filter: { 'analysis.buildHash': 'x' }, include: 'analysis' },
                 { schema: analysisNodeSchema },
             );
-            expect(filterFields(query)).not.toContain('analysis.build_hash');
+            expect(filterFields(query)).not.toContain('analysis.buildHash');
         });
 
         it('still resolves the junction\'s own root filters', () => {
             const query = decodeQuery(
-                { filter: { execution_status: 'running' } },
+                { filter: { executionStatus: 'running' } },
                 { schema: analysisNodeSchema },
             );
-            expect(filterFields(query)).toContain('execution_status');
+            expect(filterFields(query)).toContain('executionStatus');
         });
     });
 
@@ -97,10 +97,10 @@ describe('relation schema resolution', () => {
 
         it('resolves a related project filter through schemaMapping', () => {
             const query = decodeQuery(
-                { filter: { 'project.display_name': 'p' }, include: 'project' },
+                { filter: { 'project.displayName': 'p' }, include: 'project' },
                 { schema: projectNodeSchema },
             );
-            expect(filterFields(query)).toContain('project.display_name');
+            expect(filterFields(query)).toContain('project.displayName');
         });
     });
 });

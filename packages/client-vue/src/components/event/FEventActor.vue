@@ -20,10 +20,10 @@ export default defineComponent({
 </script>
 <template>
     <slot v-bind="entity">
-        <template v-if="entity.actor_type">
-            <strong>{{ entity.actor_type }}</strong>
+        <template v-if="entity.actorType">
+            <strong>{{ entity.actorType }}</strong>
             <br>
-            {{ entity.actor_id }}
+            {{ entity.actorId }}
         </template>
         <template v-else>
             <slot name="fallback">

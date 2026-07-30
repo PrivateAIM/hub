@@ -68,7 +68,7 @@ export default defineComponent({
     setup(props, setup) {
         /**
          * Form-level validator. The shared {@link NodeValidator} keeps
-         * `realm_id` optional on CREATE (the server defaults it from the
+         * `realmId` optional on CREATE (the server defaults it from the
          * actor realm), but the form requires an explicit realm selection —
          * the pre-migration UI contract. `mount()` appends, so this rule
          * runs in addition to the base ones.
@@ -78,7 +78,7 @@ export default defineComponent({
                 super.initialize();
 
                 this.mount(
-                    'realm_id',
+                    'realmId',
                     { group: ValidatorGroup.CREATE },
                     createValidator(z.uuid()),
                 );
@@ -86,15 +86,15 @@ export default defineComponent({
         }
 
         const busy = ref(false);
-        // No `registry_id` here on purpose: the node ↔ registry assignment is
+        // No `registryId` here on purpose: the node ↔ registry assignment is
         // owned by `FNodeRegistryConnection` on the node's Registry tab, where
         // connect/disconnect is an explicit, immediate action (it provisions or
         // tears down a registry project server-side) rather than a side effect
         // of saving this general form.
         const form = reactive({
             name: '',
-            external_name: '',
-            realm_id: '',
+            externalName: '',
+            realmId: '',
             hidden: false,
             type: NodeType.DEFAULT,
         });
@@ -112,23 +112,23 @@ export default defineComponent({
         );
 
         const nameValidation = useFieldValidation($v.fields.name);
-        const realmValidation = useFieldValidation($v.fields.realm_id);
+        const realmValidation = useFieldValidation($v.fields.realmId);
         const typeValidation = useFieldValidation($v.fields.type);
-        const externalNameValidation = useFieldValidation($v.fields.external_name);
+        const externalNameValidation = useFieldValidation($v.fields.externalName);
         const hiddenValidation = useFieldValidation($v.fields.hidden);
 
         const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
         const isRealmLocked = computed(() => props.realmId ||
-                (manager.data.value && manager.data.value.realm_id));
+                (manager.data.value && manager.data.value.realmId));
 
         const updatedAt = useUpdatedAt(props.entity);
 
         const initForm = () => {
             initFormAttributesFromSource(form, manager.data.value ?? undefined);
 
-            if (!form.realm_id && props.realmId) {
-                form.realm_id = props.realmId;
+            if (!form.realmId && props.realmId) {
+                form.realmId = props.realmId;
             }
 
             if (
@@ -171,9 +171,9 @@ export default defineComponent({
                                 },
                                 {
                                     default: () => h(VCFormSelect, {
-                                        modelValue: form.realm_id,
+                                        modelValue: form.realmId,
                                         'onUpdate:modelValue': (input: unknown) => {
-                                            form.realm_id = input as string;
+                                            form.realmId = input as string;
                                         },
                                         options: props.data.map((item) => ({
                                             value: item.id,
@@ -238,9 +238,9 @@ export default defineComponent({
                 },
                 {
                     default: () => h(VCFormInput, {
-                        modelValue: form.external_name == null ? '' : String(form.external_name),
+                        modelValue: form.externalName == null ? '' : String(form.externalName),
                         'onUpdate:modelValue': (input: string) => {
-                            form.external_name = input;
+                            form.externalName = input;
                         },
                     }),
                 },

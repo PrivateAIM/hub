@@ -18,8 +18,8 @@ function createTestPublishContext() {
     return {
         data: { id: '1', name: 'test' },
         metadata: {
-            ref_type: 'testEntity',
-            ref_id: '1',
+            refType: 'testEntity',
+            refId: '1',
             event: 'created',
         },
         destinations: [
@@ -59,7 +59,7 @@ describe('src/entity-event/publisher', () => {
 
         const ctx = {
             data: { id: '1' },
-            metadata: { ref_type: 'test', event: 'created' },
+            metadata: { refType: 'test', event: 'created' },
             destinations: [
                 { channel: 'ch1', namespace: 'ns1' },
                 { channel: 'ch2' },
@@ -82,10 +82,10 @@ describe('src/entity-event/publisher', () => {
         publisher.register(handler);
 
         const ctx = {
-            data: { id: '1', realm_id: 'realm-abc' },
-            metadata: { ref_type: 'test', event: 'created' },
+            data: { id: '1', realmId: 'realm-abc' },
+            metadata: { refType: 'test', event: 'created' },
             destinations: (data: any) => [
-                { channel: `realm/${data.realm_id}` },
+                { channel: `realm/${data.realmId}` },
             ],
         };
 

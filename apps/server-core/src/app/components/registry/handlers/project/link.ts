@@ -43,7 +43,7 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
         const repository = dataSource.getRepository(RegistryProjectEntity);
         const entity = await repository.createQueryBuilder('registryProject')
             .addSelect([
-                'registryProject.account_secret',
+                'registryProject.accountSecret',
             ])
             .where('registryProject.id = :id', { id: value.id })
             .getOne();
@@ -60,9 +60,9 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
         const registryRepository = dataSource.getRepository(RegistryEntity);
         const registryEntity = await registryRepository.createQueryBuilder('registry')
             .addSelect([
-                'registry.account_secret',
+                'registry.accountSecret',
             ])
-            .where('registry.id = :id', { id: entity.registry_id })
+            .where('registry.id = :id', { id: entity.registryId })
             .getOne();
 
         if (!registryEntity) {
@@ -79,14 +79,15 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
 
         try {
             const project = await ensureRemoteRegistryProject(httpClient, {
-                remoteId: entity.external_id,
-                remoteName: entity.external_name,
+                remoteId: entity.externalId,
+                remoteName: entity.externalName,
                 remoteOptions: { public: entity.public },
             });
 
-            entity.external_id = `${project.project_id}`;
+            // `project_id` is Harbor's own field name — third-party wire shape.
+            entity.externalId = `${project.project_id}`;
         } catch (e) {
-            // `Project ${entity.external_name} could not be created.`
+            // `Project ${entity.externalName} could not be created.`
             this.logger?.error({
                 message: e,
                 component: 'registry',
@@ -100,22 +101,22 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
 
         try {
             const robotAccount = await ensureRemoteRegistryProjectAccount(httpClient, {
-                name: entity.external_name,
+                name: entity.externalName,
                 account: {
-                    id: Number.parseInt(entity.account_id, 10),
-                    name: entity.account_name,
-                    secret: value.secret || entity.account_secret,
+                    id: Number.parseInt(entity.accountId, 10),
+                    name: entity.accountName,
+                    secret: value.secret || entity.accountSecret,
                 },
             });
 
             if (robotAccount) {
-                entity.account_id = `${robotAccount.id}`;
-                entity.account_name = robotAccount.name;
-                entity.account_secret = robotAccount.secret;
+                entity.accountId = `${robotAccount.id}`;
+                entity.accountName = robotAccount.name;
+                entity.accountSecret = robotAccount.secret;
             } else {
-                entity.account_id = null;
-                entity.account_name = null;
-                entity.account_secret = null;
+                entity.accountId = null;
+                entity.accountName = null;
+                entity.accountSecret = null;
             }
         } catch (e) {
             // 'Robot account could not be created.'
@@ -139,15 +140,15 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
                 httpClient,
                 {
                     publicURL: this.publicURL,
-                    projectIdOrName: entity.external_name,
+                    projectIdOrName: entity.externalName,
                     isProjectName: true,
                     authupClient: this.authupClient,
                 },
             );
 
             // webhook.id is also present :)
-            entity.webhook_name = `${webhook.id}`;
-            entity.webhook_exists = true;
+            entity.webhookName = `${webhook.id}`;
+            entity.webhookExists = true;
         } catch (e) {
             // 'Webhook could not be created.'
             this.logger?.error({

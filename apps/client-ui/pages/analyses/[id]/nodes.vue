@@ -40,7 +40,7 @@ export default defineComponent({
                     <div>
                         <span class="title">Nodes</span>
                     </div>
-                    <template v-if="!entity.configuration_locked">
+                    <template v-if="!entity.configurationLocked">
                         <div class="ms-auto">
                             <VCButton
                                 style="width: 120px"

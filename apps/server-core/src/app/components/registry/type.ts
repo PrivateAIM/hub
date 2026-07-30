@@ -26,8 +26,8 @@ export type RegistryProjectLinkPayload = {
 export type RegistryProjectUnlinkPayload = {
     id?: RegistryProject['id'],
     registryId: Registry['id'],
-    externalName: RegistryProject['external_name'],
-    accountId?: RegistryProject['account_id']
+    externalName: RegistryProject['externalName'],
+    accountId?: RegistryProject['accountId']
 };
 
 export type RegistryProjectRelinkPayload = RegistryProjectUnlinkPayload & {

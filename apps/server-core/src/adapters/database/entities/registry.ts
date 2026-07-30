@@ -32,25 +32,27 @@ export class RegistryEntity implements Registry {
     // ------------------------------------------------------------------
 
     @Column({
+        name: 'account_name',
         type: 'varchar', 
         length: 256, 
         nullable: true,
     })
-    account_name: string | null;
+    accountName: string | null;
 
     @Column({
+        name: 'account_secret',
         type: 'varchar', 
         length: 256, 
         nullable: true, 
         select: false,
     })
-    account_secret: string | null;
+    accountSecret: string | null;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 }

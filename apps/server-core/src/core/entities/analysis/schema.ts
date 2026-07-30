@@ -11,19 +11,19 @@ import { DomainType } from '@privateaim/core-kit';
 
 const schemaMapping = {
     project: DomainType.PROJECT,
-    master_image: DomainType.MASTER_IMAGE,
+    masterImage: DomainType.MASTER_IMAGE,
 };
 
 export const analysisSchema = defineSchema<Analysis>({
     name: DomainType.ANALYSIS,
     strict: true,
     fields: {
-        default: ['id', 'name', 'display_name', 'description', 'nodes', 'nodes_approved', 'configuration_locked', 'configuration_entrypoint_valid', 'configuration_image_valid', 'configuration_node_aggregator_valid', 'configuration_node_default_valid', 'configuration_nodes_valid', 'distribution_status', 'distribution_progress', 'build_nodes_valid', 'build_status', 'build_progress', 'build_hash', 'build_os', 'build_size', 'execution_status', 'execution_progress', 'created_at', 'updated_at', 'registry_id', 'client_id', 'realm_id', 'user_id', 'project_id', 'master_image_id', 'image_command_arguments'],
-        allowed: ['id', 'name', 'display_name', 'description', 'nodes', 'nodes_approved', 'configuration_locked', 'configuration_entrypoint_valid', 'configuration_image_valid', 'configuration_node_aggregator_valid', 'configuration_node_default_valid', 'configuration_nodes_valid', 'distribution_status', 'distribution_progress', 'build_nodes_valid', 'build_status', 'build_progress', 'build_hash', 'build_os', 'build_size', 'execution_status', 'execution_progress', 'created_at', 'updated_at', 'registry_id', 'client_id', 'realm_id', 'user_id', 'project_id', 'master_image_id', 'image_command_arguments'],
+        default: ['id', 'name', 'displayName', 'description', 'nodes', 'nodesApproved', 'configurationLocked', 'configurationEntrypointValid', 'configurationImageValid', 'configurationNodeAggregatorValid', 'configurationNodeDefaultValid', 'configurationNodesValid', 'distributionStatus', 'distributionProgress', 'buildNodesValid', 'buildStatus', 'buildProgress', 'buildHash', 'buildOs', 'buildSize', 'executionStatus', 'executionProgress', 'createdAt', 'updatedAt', 'registryId', 'clientId', 'realmId', 'userId', 'projectId', 'masterImageId', 'imageCommandArguments'],
+        allowed: ['id', 'name', 'displayName', 'description', 'nodes', 'nodesApproved', 'configurationLocked', 'configurationEntrypointValid', 'configurationImageValid', 'configurationNodeAggregatorValid', 'configurationNodeDefaultValid', 'configurationNodesValid', 'distributionStatus', 'distributionProgress', 'buildNodesValid', 'buildStatus', 'buildProgress', 'buildHash', 'buildOs', 'buildSize', 'executionStatus', 'executionProgress', 'createdAt', 'updatedAt', 'registryId', 'clientId', 'realmId', 'userId', 'projectId', 'masterImageId', 'imageCommandArguments'],
     },
-    filters: { allowed: ['id', 'name', 'display_name', 'description', 'project_id', 'realm_id', 'build_status', 'execution_status', 'configuration_locked'] },
-    relations: { allowed: ['project', 'master_image'] },
-    sort: { allowed: ['name', 'display_name', 'created_at', 'updated_at'], default: { updated_at: 'DESC' } },
+    filters: { allowed: ['id', 'name', 'displayName', 'description', 'projectId', 'realmId', 'buildStatus', 'executionStatus', 'configurationLocked'] },
+    relations: { allowed: ['project', 'masterImage'] },
+    sort: { allowed: ['name', 'displayName', 'createdAt', 'updatedAt'], default: { updatedAt: 'DESC' } },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

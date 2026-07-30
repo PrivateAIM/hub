@@ -60,13 +60,13 @@ export default defineComponent({
                 cellClass: 'text-left',
             },
             {
-                key: 'ref_type',
+                key: 'refType',
                 label: 'Ref Type',
                 headerClass: 'text-left',
                 cellClass: 'text-left',
             },
             {
-                key: 'ref_id',
+                key: 'refId',
                 label: 'Ref ID',
                 headerClass: 'text-left',
                 cellClass: 'text-left',
@@ -84,7 +84,7 @@ export default defineComponent({
                 cellClass: 'text-center',
             },
             {
-                key: 'created_at',
+                key: 'createdAt',
                 label: 'Created At',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
@@ -103,8 +103,8 @@ export default defineComponent({
         const canDrop = usePermissionCheck({ name: PermissionName.EVENT_DELETE });
 
         const query = computed<QueryBuildInput<Event, 3>>(() => ({
-            filters: { realm_id: [realmManagementId.value, null] },
-            sort: { updated_at: 'DESC' },
+            filters: { realmId: [realmManagementId.value, null] },
+            sort: { updatedAt: 'DESC' },
             pagination: { limit: 50 },
         }));
 
@@ -193,11 +193,11 @@ export default defineComponent({
                         />
                     </div>
                 </template>
-                <template #cell-created_at="{ row }">
-                    <VCTimeago :datetime="row.created_at" />
+                <template #cell-createdAt="{ row }">
+                    <VCTimeago :datetime="row.createdAt" />
                 </template>
-                <template #cell-updated_at="{ row }">
-                    <VCTimeago :datetime="row.updated_at" />
+                <template #cell-updatedAt="{ row }">
+                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <VCTableLoading />
                 <VCTableEmpty />

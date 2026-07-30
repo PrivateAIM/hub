@@ -59,7 +59,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             this.logger?.error({
                 message: e,
                 command: AnalysisDistributorCommand.CHECK,
-                analysis_id: value.id,
+                analysisId: value.id,
                 [LogFlag.REF_ID]: value.id,
                 event: AnalysisDistributorEvent.CHECK_FAILED,
             });
@@ -88,7 +88,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         // -----------------------------------------------------------------------------------
 
         const analysisNodes = await getManyAll((page) => this.coreClient.analysisNode.getMany({
-            filters: { analysis_id: analysis.id },
+            filters: { analysisId: analysis.id },
             pagination: page,
         }));
 
@@ -102,8 +102,8 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         }
 
         const nodes = await getManyAll((page) => this.coreClient.node.getMany({
-            filters: { id: analysisNodes.map((analysisNode) => analysisNode.node_id) },
-            relations: { registry_project: true },
+            filters: { id: analysisNodes.map((analysisNode) => analysisNode.nodeId) },
+            relations: { registryProject: true },
             pagination: page,
         }));
 
@@ -118,11 +118,11 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         // -----------------------------------------------------------------------------------
 
-        // `analysis.registry_id` is nullable — it is unset until the distributor
+        // `analysis.registryId` is nullable — it is unset until the distributor
         // assigns one, and the registry FK detaches (SET NULL) if the registry is
         // deleted while the analysis is in flight. Fail with a domain error rather
         // than requesting `/registries/null`.
-        if (!analysis.registry_id) {
+        if (!analysis.registryId) {
             throw BuilderError.registryNotFound();
         }
 
@@ -135,16 +135,16 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         // never re-dereferences the nullable relation.
         const checks: { node: Node; registryProject: RegistryProject }[] = [];
         for (const node of nodes) {
-            if (!node.registry_project) {
+            if (!node.registryProject) {
                 throw BuilderError.registryProjectNotFound(
                     `The node ${node.name} has no registry project.`,
                 );
             }
 
-            checks.push({ node, registryProject: node.registry_project });
+            checks.push({ node, registryProject: node.registryProject });
         }
 
-        const { data: registry } = await this.coreClient.registry.getOne(analysis.registry_id, { fields: ['+account_secret'] });
+        const { data: registry } = await this.coreClient.registry.getOne(analysis.registryId, { fields: ['+accountSecret'] });
 
         const authConfig = buildDockerAuthConfigFromRegistry(registry);
 
@@ -155,13 +155,13 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
                 this.logger?.info({
                     message: `Checking analysis image of node ${node.name}`,
                     command: AnalysisDistributorCommand.CHECK,
-                    analysis_id: analysis.id,
+                    analysisId: analysis.id,
                     [LogFlag.REF_ID]: analysis.id,
                 });
 
                 const nodeImageURL = buildDockerImageURL({
                     hostname: registry.host,
-                    projectName: registryProject.external_name,
+                    projectName: registryProject.externalName,
                     repositoryName: analysis.id,
                     tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
                 });
@@ -180,14 +180,14 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             }
 
             if (
-                analysis.distribution_status === ProcessStatus.STARTED ||
-                analysis.distribution_status === ProcessStatus.STARTING
+                analysis.distributionStatus === ProcessStatus.STARTED ||
+                analysis.distributionStatus === ProcessStatus.STARTING
             ) {
                 // an in-progress distribution refreshes the entity via progress events;
                 // a long-untouched one is orphaned (e.g. worker died) and recoverable as FAILED.
-                status = isAnalysisProcessStale(analysis.updated_at) ?
+                status = isAnalysisProcessStale(analysis.updatedAt) ?
                     ProcessStatus.FAILED :
-                    analysis.distribution_status;
+                    analysis.distributionStatus;
             } else {
                 status = ProcessStatus.FAILED;
             }

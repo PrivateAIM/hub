@@ -56,11 +56,11 @@ export default defineComponent({
                 }
 
                 if (props.target === Target.ANALYSIS) {
-                    return entity.analysis_realm_id;
+                    return entity.analysisRealmId;
                 }
 
                 if (props.target === Target.NODE) {
-                    return entity.node_realm_id;
+                    return entity.nodeRealmId;
                 }
 
                 return undefined;
@@ -75,11 +75,11 @@ export default defineComponent({
                     }
 
                     if (props.target === Target.ANALYSIS) {
-                        return realmId === event.data.analysis_realm_id;
+                        return realmId === event.data.analysisRealmId;
                     }
 
                     if (props.target === Target.NODE) {
-                        return realmId === event.data.node_realm_id;
+                        return realmId === event.data.nodeRealmId;
                     }
 
                     return false;
@@ -133,12 +133,12 @@ export default defineComponent({
         ) {
             if (props.target === Target.ANALYSIS) {
                 const { data: analysis } = await apiClient
-                    .analysis.getOne(manager.data.value.analysis_id);
+                    .analysis.getOne(manager.data.value.analysisId);
 
                 manager.data.value[props.target] = analysis;
             } else {
                 const { data: node } = await apiClient
-                    .node.getOne(manager.data.value.node_id);
+                    .node.getOne(manager.data.value.nodeId);
 
                 manager.data.value[props.target] = node;
             }
@@ -155,7 +155,7 @@ export default defineComponent({
                         return h('div', [
                             h(FDisplayName, {
                                 name: manager.data.value?.analysis.name,
-                                displayName: manager.data.value?.analysis.display_name,
+                                displayName: manager.data.value?.analysis.displayName,
                             }),
                         ]);
                     }

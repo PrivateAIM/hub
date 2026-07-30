@@ -33,7 +33,7 @@ export default defineNuxtComponent({
     <FNodeForm
         v-if="entity"
         :entity="entity"
-        :realm-id="entity.realm_id"
+        :realm-id="entity.realmId"
         @updated="handleUpdated"
         @failed="handleFailed"
     />

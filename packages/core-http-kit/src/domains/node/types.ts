@@ -10,25 +10,25 @@ import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import type { EntityRecordResponse, IEntityAPI } from '../types-base';
 
 export type NodeCreatePayload =    & Pick<Node, 'name'> &
-    Partial<Pick<Node, 'type' | 'hidden' | 'public_key' | 'external_name' | 'registry_id' | 'client_id' | 'realm_id'>>;
+    Partial<Pick<Node, 'type' | 'hidden' | 'publicKey' | 'externalName' | 'registryId' | 'clientId' | 'realmId'>>;
 
 export type NodeUpdatePayload = Partial<NodeCreatePayload>;
 
 export type NodeClientCredentials = {
     id: Client['id'];
     name: Client['name'];
-    display_name: Client['displayName'];
+    displayName: Client['displayName'];
     secret: Client['secret'];
 };
 
 export type NodeClientCredentialsUpdate = Partial<{
     secret: Client['secret'];
     name: Client['name'];
-    display_name: Client['displayName'];
+    displayName: Client['displayName'];
 }>;
 
-export type NodeRegistryCredentials =    & Pick<Registry, 'host' | 'account_name' | 'account_secret'> &
-    Pick<RegistryProject, 'external_name'>;
+export type NodeRegistryCredentials =    & Pick<Registry, 'host' | 'accountName' | 'accountSecret'> &
+    Pick<RegistryProject, 'externalName'>;
 
 export interface INodeAPI extends IEntityAPI<Node, NodeCreatePayload, NodeUpdatePayload> {
     runCommand(id: Node['id'], task: string, data: Record<string, any>) : Promise<EntityRecordResponse<Node>>;

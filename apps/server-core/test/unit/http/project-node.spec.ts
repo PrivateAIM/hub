@@ -40,8 +40,8 @@ describe('src/controllers/core/project-node', () => {
         expect(node.id).toBeDefined();
 
         details = (await client.projectNode.create({
-            node_id: node.id,
-            project_id: project.id,
+            nodeId: node.id,
+            projectId: project.id,
         })).data;
     });
 

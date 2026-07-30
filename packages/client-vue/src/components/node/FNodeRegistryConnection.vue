@@ -40,7 +40,7 @@ export default defineComponent({
         const busy = ref(false);
 
         // The node's own entity manager — connecting/disconnecting is a plain
-        // `registry_id` update. The server reacts to it by provisioning a
+        // `registryId` update. The server reacts to it by provisioning a
         // registry project (+ Harbor robot account) or tearing the existing one
         // down, and answers with the updated node.
         const manager = createEntityManager({
@@ -52,8 +52,8 @@ export default defineComponent({
         // `manager.data` wins over the prop: after an update it holds the fresh
         // server response, while the parent's copy is only patched afterwards.
         const current = computed(() => manager.data.value ?? entity.value);
-        const connected = computed(() => !!current.value.registry_id);
-        const hasProject = computed(() => !!current.value.registry_project_id);
+        const connected = computed(() => !!current.value.registryId);
+        const hasProject = computed(() => !!current.value.registryProjectId);
 
         // Staged selection: picking a registry in the list only marks it, the
         // update is deferred to an explicit Connect click. Provisioning is not
@@ -74,18 +74,18 @@ export default defineComponent({
             const id = selectedId.value;
             if (!id) return;
 
-            await manager.update({ registry_id: id });
+            await manager.update({ registryId: id });
 
             // `update()` reports failure through the `failed` event rather than
             // throwing, so confirm it landed before dropping the selection —
             // otherwise a failed connect silently loses the user's pick.
-            if (manager.data.value?.registry_id === id) {
+            if (manager.data.value?.registryId === id) {
                 selectedId.value = null;
             }
         });
 
         const disconnect = wrapFnWithBusyState(busy, async () => {
-            await manager.update({ registry_id: null });
+            await manager.update({ registryId: null });
         });
 
         return {

@@ -6,23 +6,24 @@
  */
 
 import { defineSchema } from '@rapiq/core';
+import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 
 const schemaMapping = {
     analysis: DomainType.ANALYSIS,
-    analysis_bucket: DomainType.ANALYSIS_BUCKET,
+    analysisBucket: DomainType.ANALYSIS_BUCKET,
 };
 
-export const analysisBucketFileSchema = defineSchema({
+export const analysisBucketFileSchema = defineSchema<AnalysisBucketFile>({
     name: DomainType.ANALYSIS_BUCKET_FILE,
     strict: true,
     fields: {
-        default: ['id', 'path', 'root', 'bucket_id', 'bucket_file_id', 'client_id', 'robot_id', 'user_id', 'realm_id', 'analysis_id', 'analysis_bucket_id', 'created_at', 'updated_at'],
-        allowed: ['id', 'path', 'root', 'bucket_id', 'bucket_file_id', 'client_id', 'robot_id', 'user_id', 'realm_id', 'analysis_id', 'analysis_bucket_id', 'created_at', 'updated_at'],
+        default: ['id', 'path', 'root', 'bucketId', 'bucketFileId', 'clientId', 'robotId', 'userId', 'realmId', 'analysisId', 'analysisBucketId', 'createdAt', 'updatedAt'],
+        allowed: ['id', 'path', 'root', 'bucketId', 'bucketFileId', 'clientId', 'robotId', 'userId', 'realmId', 'analysisId', 'analysisBucketId', 'createdAt', 'updatedAt'],
     },
-    filters: { allowed: ['path', 'root', 'analysis_bucket_id', 'analysis_id'] },
-    relations: { allowed: ['analysis', 'analysis_bucket'] },
-    sort: { allowed: ['path', 'created_at', 'updated_at'] },
+    filters: { allowed: ['path', 'root', 'analysisBucketId', 'analysisId'] },
+    relations: { allowed: ['analysis', 'analysisBucket'] },
+    sort: { allowed: ['path', 'createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

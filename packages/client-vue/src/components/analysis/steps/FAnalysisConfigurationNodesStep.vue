@@ -24,8 +24,8 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const hasAggregator = computed(() => props.entity.configuration_node_aggregator_valid);
-        const hasDefault = computed(() => props.entity.configuration_node_default_valid);
+        const hasAggregator = computed(() => props.entity.configurationNodeAggregatorValid);
+        const hasDefault = computed(() => props.entity.configurationNodeDefaultValid);
         const passed = computed(() => hasAggregator.value && hasDefault.value);
 
         const message = computed(() => {

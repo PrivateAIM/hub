@@ -29,7 +29,7 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmId } = storeToRefs(store);
 
-        const isOwner = computed(() => entity.value.realm_id === realmId.value);
+        const isOwner = computed(() => entity.value.realmId === realmId.value);
 
         const tabs = computed<NavigationItem[]>(() => {
             const base = `/projects/${entity.value.id}/analyses`;

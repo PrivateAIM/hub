@@ -15,7 +15,7 @@ export class EventValidator extends Container<Event> {
         super.initialize();
 
         this.mount(
-            'ref_type',
+            'refType',
             createValidator(
                 zod
                     .string()
@@ -25,7 +25,7 @@ export class EventValidator extends Container<Event> {
         );
 
         this.mount(
-            'ref_id',
+            'refId',
             { optional: true },
             createValidator(
                 zod
@@ -83,25 +83,25 @@ export class EventValidator extends Container<Event> {
         // ----------------------------------------------
 
         this.mount(
-            'request_path',
+            'requestPath',
             { optional: true },
             createValidator(zod.string().min(3).max(256).nullable()),
         );
 
         this.mount(
-            'request_method',
+            'requestMethod',
             { optional: true },
             createValidator(zod.string().min(3).max(10).nullable()),
         );
 
         this.mount(
-            'request_ip_address',
+            'requestIpAddress',
             { optional: true },
             createValidator(zod.ipv4().nullable()),
         );
 
         this.mount(
-            'request_user_agent',
+            'requestUserAgent',
             { optional: true },
             createValidator(zod.string().min(3).max(512).nullable()),
         );
@@ -109,19 +109,19 @@ export class EventValidator extends Container<Event> {
         // ----------------------------------------------
 
         this.mount(
-            'actor_type',
+            'actorType',
             { optional: true },
             createValidator(zod.string().min(3).max(64).nullable()),
         );
 
         this.mount(
-            'actor_id',
+            'actorId',
             { optional: true },
             createValidator(zod.uuidv4().nullable()),
         );
 
         this.mount(
-            'actor_name',
+            'actorName',
             { optional: true },
             createValidator(zod.string().min(3).max(64).nullable()),
         );
@@ -129,7 +129,7 @@ export class EventValidator extends Container<Event> {
         // ----------------------------------------------
 
         this.mount(
-            'realm_id',
+            'realmId',
             { optional: true },
             createValidator(zod.uuidv4().nullable()),
         );
@@ -137,7 +137,7 @@ export class EventValidator extends Container<Event> {
         // ----------------------------------------------
 
         this.mount(
-            'expires_at',
+            'expiresAt',
             { optional: true },
             createValidator(
                 zod.iso.datetime()

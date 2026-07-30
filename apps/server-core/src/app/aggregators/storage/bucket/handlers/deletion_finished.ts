@@ -24,8 +24,8 @@ export class StorageBucketDeletionFinishedHandler extends BaseAggregatorHandler<
         if (task.type === TaskType.ANALYSIS_BUCKET_DELETE) {
             const analysisBucketRepository = this.dataSource.getRepository(AnalysisBucketEntity);
             const analysisBucket = await analysisBucketRepository.findOneBy({
-                analysis_id: task.data.analysisId,
-                bucket_id: bucket.id,
+                analysisId: task.data.analysisId,
+                bucketId: bucket.id,
             });
 
             if (!analysisBucket) {

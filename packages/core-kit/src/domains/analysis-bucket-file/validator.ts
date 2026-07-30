@@ -16,7 +16,7 @@ export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
         super.initialize();
 
         this.mount(
-            'analysis_bucket_id',
+            'analysisBucketId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );
@@ -35,13 +35,13 @@ export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
         );
 
         this.mount(
-            'bucket_id',
+            'bucketId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );
 
         this.mount(
-            'bucket_file_id',
+            'bucketFileId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );

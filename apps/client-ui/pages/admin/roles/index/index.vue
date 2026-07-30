@@ -73,13 +73,13 @@ export default defineNuxtComponent({
                 cellClass: 'text-center',
             },
             {
-                key: 'created_at',
+                key: 'createdAt',
                 label: 'Created at',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
             },
             {
-                key: 'updated_at',
+                key: 'updatedAt',
                 label: 'Updated at',
                 headerClass: 'text-left',
                 cellClass: 'text-left',
@@ -145,10 +145,10 @@ export default defineNuxtComponent({
                         :class="!row.realmId ? 'text-success-600' : 'text-error-600'"
                     />
                 </template>
-                <template #cell-created_at="{ row }">
+                <template #cell-createdAt="{ row }">
                     <VCTimeago :datetime="row.createdAt" />
                 </template>
-                <template #cell-updated_at="{ row }">
+                <template #cell-updatedAt="{ row }">
                     <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <template #cell-options="{ row }">

@@ -33,17 +33,17 @@ describe('event HTTP endpoints', () => {
     const eventPayload = {
         scope: 'model',
         name: 'updated',
-        ref_type: 'project',
-        ref_id: '4b324d99-1984-4081-a47d-10e809092075',
+        refType: 'project',
+        refId: '4b324d99-1984-4081-a47d-10e809092075',
         data: { diff: { name: { next: 'new', previous: 'old' } } },
         expiring: true,
-        request_path: '/projects/4b324d99-1984-4081-a47d-10e809092075',
-        request_method: 'POST',
-        request_ip_address: '172.40.1.1',
-        request_user_agent: 'TestAgent/1.0',
-        actor_type: 'user',
-        actor_id: '9b921a45-3846-40ed-a392-deb26a4cc757',
-        actor_name: 'admin',
+        requestPath: '/projects/4b324d99-1984-4081-a47d-10e809092075',
+        requestMethod: 'POST',
+        requestIpAddress: '172.40.1.1',
+        requestUserAgent: 'TestAgent/1.0',
+        actorType: 'user',
+        actorId: '9b921a45-3846-40ed-a392-deb26a4cc757',
+        actorName: 'admin',
     };
 
     let createdId: string;
@@ -75,8 +75,8 @@ describe('event HTTP endpoints', () => {
             const body = await response.json();
             expect(body.meta).toEqual({});
             expect(body.data.id).toBeDefined();
-            expect(body.data.created_at).toBeDefined();
-            expect(body.data.updated_at).toBeDefined();
+            expect(body.data.createdAt).toBeDefined();
+            expect(body.data.updatedAt).toBeDefined();
 
             createdId = body.data.id;
         });
@@ -94,17 +94,17 @@ describe('event HTTP endpoints', () => {
             const body = await response.json();
             expect(body.data.scope).toBe(eventPayload.scope);
             expect(body.data.name).toBe(eventPayload.name);
-            expect(body.data.ref_type).toBe(eventPayload.ref_type);
-            expect(body.data.ref_id).toBe(eventPayload.ref_id);
+            expect(body.data.refType).toBe(eventPayload.refType);
+            expect(body.data.refId).toBe(eventPayload.refId);
             expect(body.data.data).toEqual(eventPayload.data);
             expect(body.data.expiring).toBe(eventPayload.expiring);
-            expect(body.data.request_path).toBe(eventPayload.request_path);
-            expect(body.data.request_method).toBe(eventPayload.request_method);
-            expect(body.data.request_ip_address).toBe(eventPayload.request_ip_address);
-            expect(body.data.request_user_agent).toBe(eventPayload.request_user_agent);
-            expect(body.data.actor_type).toBe(eventPayload.actor_type);
-            expect(body.data.actor_id).toBe(eventPayload.actor_id);
-            expect(body.data.actor_name).toBe(eventPayload.actor_name);
+            expect(body.data.requestPath).toBe(eventPayload.requestPath);
+            expect(body.data.requestMethod).toBe(eventPayload.requestMethod);
+            expect(body.data.requestIpAddress).toBe(eventPayload.requestIpAddress);
+            expect(body.data.requestUserAgent).toBe(eventPayload.requestUserAgent);
+            expect(body.data.actorType).toBe(eventPayload.actorType);
+            expect(body.data.actorId).toBe(eventPayload.actorId);
+            expect(body.data.actorName).toBe(eventPayload.actorName);
 
             createdId = body.data.id;
         });
@@ -152,8 +152,8 @@ describe('event HTTP endpoints', () => {
             expect(body.data.id).toBe(createdId);
             expect(body.data.scope).toBe(eventPayload.scope);
             expect(body.data.name).toBe(eventPayload.name);
-            expect(body.data.ref_type).toBe(eventPayload.ref_type);
-            expect(body.data.ref_id).toBe(eventPayload.ref_id);
+            expect(body.data.refType).toBe(eventPayload.refType);
+            expect(body.data.refId).toBe(eventPayload.refId);
             expect(body.meta.schema).toBeDefined();
             expect(body.meta.schema.name).toBe('event');
         });

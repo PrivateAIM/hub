@@ -35,14 +35,14 @@ export class EventSubscriber extends BaseSubscriber<
                     },
                 ];
 
-                if (data.realm_id) {
+                if (data.realmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: DomainType.EVENT,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.realm_id],
+                        namespace: [DomainEventNamespace, data.realmId],
                         channel: [DomainType.EVENT, data.id],
                     });
                 }

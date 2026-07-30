@@ -75,7 +75,7 @@ export default defineComponent({
                     <strong>Configuration</strong>
                 </div>
                 <div>
-                    <FAnalysisConfigurationStatus :locked="entity.configuration_locked" />
+                    <FAnalysisConfigurationStatus :locked="entity.configurationLocked" />
                 </div>
             </div>
 
@@ -103,7 +103,7 @@ export default defineComponent({
                     <strong>Build</strong>
                 </div>
                 <div>
-                    <FProcessStatus :value="entity.build_status" />
+                    <FProcessStatus :value="entity.buildStatus" />
                 </div>
             </div>
 
@@ -131,7 +131,7 @@ export default defineComponent({
                     <strong>Distribution</strong>
                 </div>
                 <div>
-                    <FProcessStatus :value="entity.distribution_status" />
+                    <FProcessStatus :value="entity.distributionStatus" />
                 </div>
             </div>
 
@@ -159,7 +159,7 @@ export default defineComponent({
                     <strong>Execution</strong>
                 </div>
                 <div>
-                    <FProcessStatus :value="entity.execution_status" />
+                    <FProcessStatus :value="entity.executionStatus" />
                 </div>
             </div>
 

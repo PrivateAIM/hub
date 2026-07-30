@@ -21,13 +21,13 @@ const SENDER_ID = randomUUID();
 
 function persistInput(recipientId: string, data: string, expiresAtEpoch = Date.now() + 60_000): MessagePersistInput {
     return {
-        sender_type: 'user',
-        sender_id: SENDER_ID,
-        recipient_type: 'client',
-        recipient_id: recipientId,
+        senderType: 'user',
+        senderId: SENDER_ID,
+        recipientType: 'client',
+        recipientId,
         data,
         metadata: { analysisId: 'analysis-1' },
-        expires_at: new Date(expiresAtEpoch).toISOString(),
+        expiresAt: new Date(expiresAtEpoch).toISOString(),
     };
 }
 
@@ -48,14 +48,14 @@ describe('database/message-repository', () => {
     // no global cleanup: every test uses unique random recipient ids, so they are
     // isolated even on the shared CI matrix database.
 
-    it('should persist messages with a generated id and created_at', async () => {
+    it('should persist messages with a generated id and createdAt', async () => {
         const recipient = randomUUID();
         const created = await repository.createMany([persistInput(recipient, 'a'), persistInput(recipient, 'b')]);
 
         expect(created).toHaveLength(2);
         expect(created[0].id).toBeDefined();
-        expect(created[0].created_at).toBeDefined();
-        expect(Number.isNaN(new Date(created[0].created_at).getTime())).toBe(false);
+        expect(created[0].createdAt).toBeDefined();
+        expect(Number.isNaN(new Date(created[0].createdAt).getTime())).toBe(false);
         expect(created[0].metadata).toEqual({ analysisId: 'analysis-1' });
     });
 

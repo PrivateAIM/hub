@@ -37,7 +37,7 @@ describe('log HTTP endpoints', () => {
         level: LogLevel.INFORMATIONAL,
         service: 'test-service',
         channel: LogChannel.HTTP,
-        labels: { foo: 'bar', ref_type: 'analysis' },
+        labels: { foo: 'bar', refType: 'analysis' },
     };
 
     describe('POST /logs', () => {
@@ -72,7 +72,7 @@ describe('log HTTP endpoints', () => {
             expect(body.data.channel).toBe(logPayload.channel);
             expect(body.data.labels).toBeDefined();
             expect(body.data.labels.foo).toBe('bar');
-            expect(body.data.labels.ref_type).toBe('analysis');
+            expect(body.data.labels.refType).toBe('analysis');
         });
     });
 

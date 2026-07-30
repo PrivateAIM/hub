@@ -23,14 +23,14 @@ export async function setupHarborService(ctx: SetupHarborContext) {
 
     let entity = await ctx.registryRepository.findOneBy({ name: 'default' });
     if (entity) {
-        entity.account_name = connection.user;
-        entity.account_secret = connection.password;
+        entity.accountName = connection.user;
+        entity.accountSecret = connection.password;
     } else {
         entity = ctx.registryRepository.create({
             name: 'default',
             host,
-            account_name: connection.user,
-            account_secret: connection.password,
+            accountName: connection.user,
+            accountSecret: connection.password,
         });
     }
 

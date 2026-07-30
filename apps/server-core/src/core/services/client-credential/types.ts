@@ -15,19 +15,19 @@ import type { ActorContext } from '@privateaim/server-kit';
 export type ClientCredentials = {
     id: Client['id'];
     name: Client['name'];
-    display_name: Client['displayName'];
+    displayName: Client['displayName'];
     secret: Client['secret'];
 };
 
 /**
  * Patch applied to an OAuth2 client's credentials. An omitted `secret` rotates
- * to a fresh random one; an omitted `name` / `display_name` leaves that field
+ * to a fresh random one; an omitted `name` / `displayName` leaves that field
  * unchanged. Projected from the Authup {@link Client}.
  */
 export type ClientCredentialsUpdate = Partial<{
     secret: Client['secret'];
     name: Client['name'];
-    display_name: Client['displayName'];
+    displayName: Client['displayName'];
 }>;
 
 /**

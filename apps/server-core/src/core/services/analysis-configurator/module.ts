@@ -53,7 +53,7 @@ export class AnalysisConfigurator {
 
         AnalysisConfiguratorCommandChecker.canLock(entity);
 
-        entity.configuration_locked = true;
+        entity.configurationLocked = true;
 
         await this.repository.save(entity, options.persistCtx);
 
@@ -68,7 +68,7 @@ export class AnalysisConfigurator {
 
         AnalysisConfiguratorCommandChecker.canUnlock(entity);
 
-        const analysisNodes = await this.analysisNodeRepository.findManyBy({ analysis_id: entity.id });
+        const analysisNodes = await this.analysisNodeRepository.findManyBy({ analysisId: entity.id });
 
         for (const analysisNode of analysisNodes) {
             if (
@@ -79,14 +79,14 @@ export class AnalysisConfigurator {
             }
 
             if (!options.ignoreApproval) {
-                analysisNode.approval_status = null;
+                analysisNode.approvalStatus = null;
             }
 
             await this.analysisNodeRepository.save(analysisNode);
         }
 
-        entity.configuration_locked = false;
-        entity.build_status = null;
+        entity.configurationLocked = false;
+        entity.buildStatus = null;
 
         await this.repository.save(entity, options.persistCtx);
 

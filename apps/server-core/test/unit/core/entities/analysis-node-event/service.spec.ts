@@ -20,13 +20,13 @@ import { FakeEntityRepository } from '../../helpers/index.ts';
 function createTestAnalysisNodeEvent(overrides?: Partial<AnalysisNodeEvent>): AnalysisNodeEvent {
     return {
         id: randomUUID(),
-        event_id: randomUUID(),
-        analysis_id: randomUUID(),
-        analysis_realm_id: 'realm-1',
-        node_id: randomUUID(),
-        node_realm_id: 'realm-1',
-        created_at: new Date(),
-        updated_at: new Date(),
+        eventId: randomUUID(),
+        analysisId: randomUUID(),
+        analysisRealmId: 'realm-1',
+        nodeId: randomUUID(),
+        nodeRealmId: 'realm-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
         ...overrides,
     } as AnalysisNodeEvent;
 }
@@ -67,7 +67,7 @@ describe('AnalysisNodeEventService', () => {
 
             const result = await service.getOne('ane-1');
             expect(result.id).toBe('ane-1');
-            expect(result.analysis_id).toBe(event.analysis_id);
+            expect(result.analysisId).toBe(event.analysisId);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {

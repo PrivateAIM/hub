@@ -51,7 +51,7 @@ export class MasterImageSynchronizerService {
 
         const virtualPaths = input.map((entity) => entity.virtualPath);
         result.deleted = entities
-            .filter((image) => !virtualPaths.includes(image.virtual_path));
+            .filter((image) => !virtualPaths.includes(image.virtualPath));
 
         for (const element of input) {
             const parts = element.virtualPath.split('/');
@@ -60,17 +60,17 @@ export class MasterImageSynchronizerService {
             const data: Partial<MasterImage> = {
                 name: element.name,
                 path: element.path,
-                group_virtual_path: parts.join('/'),
-                virtual_path: element.virtualPath,
+                groupVirtualPath: parts.join('/'),
+                virtualPath: element.virtualPath,
                 command: element.command,
             };
 
             if (element.commandArguments) {
-                data.command_arguments = element.commandArguments;
+                data.commandArguments = element.commandArguments;
             }
 
             const index = entities.findIndex(
-                (entity) => entity.virtual_path === data.virtual_path,
+                (entity) => entity.virtualPath === data.virtualPath,
             );
             if (index === -1) {
                 result.created.push(this.imageRepository.create(data));
@@ -107,7 +107,7 @@ export class MasterImageSynchronizerService {
 
         const dirVirtualPaths: string[] = input.map((entity) => entity.virtualPath);
         result.deleted = entities.filter(
-            (image) => !dirVirtualPaths.includes(image.virtual_path),
+            (image) => !dirVirtualPaths.includes(image.virtualPath),
         );
 
         for (const element of input) {
@@ -116,10 +116,10 @@ export class MasterImageSynchronizerService {
                 name: element.name,
             };
 
-            const index = entities.findIndex((dbEntity) => dbEntity.virtual_path === element.virtualPath);
+            const index = entities.findIndex((dbEntity) => dbEntity.virtualPath === element.virtualPath);
             if (index === -1) {
                 result.created.push(this.groupRepository.create({
-                    virtual_path: element.virtualPath,
+                    virtualPath: element.virtualPath,
                     ...data,
                 } as Partial<MasterImageGroup>));
             } else {

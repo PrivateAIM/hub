@@ -41,7 +41,7 @@ export class EntityEventPublisher implements IEntityEventPublisher {
             await this.publish(ctx);
         } catch (e) {
             if (this.logger) {
-                this.logger.error(`Publishing event ${buildDomainEventFullName(ctx.metadata.ref_type, ctx.metadata.event)} failed`);
+                this.logger.error(`Publishing event ${buildDomainEventFullName(ctx.metadata.refType, ctx.metadata.event)} failed`);
                 this.logger.error(e);
             }
         }
@@ -53,7 +53,7 @@ export class EntityEventPublisher implements IEntityEventPublisher {
         if (this.logger) {
             this.logger
                 .debug(
-                    `Publishing event ${buildDomainEventFullName(ctx.metadata.ref_type, ctx.metadata.event)}`,
+                    `Publishing event ${buildDomainEventFullName(ctx.metadata.refType, ctx.metadata.event)}`,
                 );
         }
 

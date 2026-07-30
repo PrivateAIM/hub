@@ -47,22 +47,22 @@ describe('controllers > analysis-node-log', () => {
         node = nodeRecord;
 
         await client.projectNode.create({
-            node_id: node.id,
-            project_id: project.id,
+            nodeId: node.id,
+            projectId: project.id,
         });
 
-        const { data: analysisRecord } = await client.analysis.create({ project_id: project.id });
+        const { data: analysisRecord } = await client.analysis.create({ projectId: project.id });
 
         analysis = analysisRecord;
 
         await client.analysisNode.create({
-            analysis_id: analysis.id,
-            node_id: node.id,
+            analysisId: analysis.id,
+            nodeId: node.id,
         });
 
         const { data: entity } = await client.analysisNodeLog.create({
-            analysis_id: analysis!.id,
-            node_id: node!.id,
+            analysisId: analysis!.id,
+            nodeId: node!.id,
             status: ProcessStatus.FAILED,
             level: LogLevel.ERROR,
             message: 'Analysis has been forcefully terminated.',
@@ -80,8 +80,8 @@ describe('controllers > analysis-node-log', () => {
         const response = await client.analysisNodeLog
             .getMany({
                 filters: {
-                    analysis_id: analysis!.id,
-                    node_id: node!.id,
+                    analysisId: analysis!.id,
+                    nodeId: node!.id,
                 },
             });
 
@@ -94,8 +94,8 @@ describe('controllers > analysis-node-log', () => {
 
         await client.analysisNodeLog.delete({
             filters: {
-                analysis_id: analysis!.id,
-                node_id: node!.id,
+                analysisId: analysis!.id,
+                nodeId: node!.id,
             },
         });
     });

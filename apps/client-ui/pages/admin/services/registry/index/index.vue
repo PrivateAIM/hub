@@ -50,13 +50,13 @@ export default defineNuxtComponent({
                 cellClass: 'text-left',
             },
             {
-                key: 'created_at',
+                key: 'createdAt',
                 label: 'Created At',
                 headerClass: 'text-center',
                 cellClass: 'text-center',
             },
             {
-                key: 'updated_at',
+                key: 'updatedAt',
                 label: 'Updated At',
                 headerClass: 'text-left',
                 cellClass: 'text-left',
@@ -68,7 +68,7 @@ export default defineNuxtComponent({
             },
         ];
 
-        const query : QueryBuildInput<Registry> = { sort: { updated_at: 'DESC' } };
+        const query : QueryBuildInput<Registry> = { sort: { updatedAt: 'DESC' } };
 
         const canManage = usePermissionCheck({ name: PermissionName.REGISTRY_MANAGE });
 
@@ -144,11 +144,11 @@ export default defineNuxtComponent({
                         />
                     </div>
                 </template>
-                <template #cell-created_at="{ row }">
-                    <VCTimeago :datetime="row.created_at" />
+                <template #cell-createdAt="{ row }">
+                    <VCTimeago :datetime="row.createdAt" />
                 </template>
-                <template #cell-updated_at="{ row }">
-                    <VCTimeago :datetime="row.updated_at" />
+                <template #cell-updatedAt="{ row }">
+                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <VCTableLoading />
                 <VCTableEmpty />

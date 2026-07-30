@@ -10,12 +10,12 @@ import { hasOwnProperty } from '@privateaim/kit';
 export function removeDateProperties<
     T extends Record<string, any>,
 >(input: T) : T {
-    if (hasOwnProperty(input, 'created_at')) {
-        delete input.created_at;
+    if (hasOwnProperty(input, 'createdAt')) {
+        delete input.createdAt;
     }
 
-    if (hasOwnProperty(input, 'updated_at')) {
-        delete input.updated_at;
+    if (hasOwnProperty(input, 'updatedAt')) {
+        delete input.updatedAt;
     }
 
     // todo: remove other date values.

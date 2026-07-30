@@ -65,7 +65,7 @@ export default defineComponent({
             displayName.value = '';
             secret.value = '';
 
-            if (!props.entity.client_id) {
+            if (!props.entity.clientId) {
                 busy.value = false;
                 loaded.value = true;
                 return;
@@ -82,7 +82,7 @@ export default defineComponent({
 
                 clientId.value = credentials.id;
                 name.value = credentials.name ?? '';
-                displayName.value = credentials.display_name ?? '';
+                displayName.value = credentials.displayName ?? '';
                 secret.value = credentials.secret ?? '';
             } catch (e) {
                 if (token === loadToken) {
@@ -112,7 +112,7 @@ export default defineComponent({
         };
 
         const submit = async () => {
-            if (busy.value || !props.entity.client_id) {
+            if (busy.value || !props.entity.clientId) {
                 return;
             }
 
@@ -128,7 +128,7 @@ export default defineComponent({
             const data: NodeClientCredentialsUpdate = {
                 secret: secret.value ? secret.value : undefined,
                 name: name.value ? name.value : undefined,
-                display_name: displayName.value ? displayName.value : null,
+                displayName: displayName.value ? displayName.value : null,
             };
 
             busy.value = true;
@@ -140,7 +140,7 @@ export default defineComponent({
 
                 clientId.value = credentials.id;
                 name.value = credentials.name ?? '';
-                displayName.value = credentials.display_name ?? '';
+                displayName.value = credentials.displayName ?? '';
                 secret.value = credentials.secret ?? '';
                 // Reveal the freshly written secret so the admin can copy it.
                 revealed.value = true;
@@ -180,7 +180,7 @@ export default defineComponent({
         </p>
 
         <VCAlert
-            v-if="!entity.client_id"
+            v-if="!entity.clientId"
             color="warning"
             variant="soft"
             size="sm"

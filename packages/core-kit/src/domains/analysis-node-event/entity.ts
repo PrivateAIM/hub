@@ -15,23 +15,23 @@ export interface AnalysisNodeEvent {
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    event_id: Event['id'];
+    eventId: Event['id'];
 
-    analysis_id: Analysis['id'];
+    analysisId: Analysis['id'];
 
     analysis: Analysis;
 
-    analysis_realm_id: Realm['id'];
+    analysisRealmId: Realm['id'];
 
-    node_id: Node['id'];
+    nodeId: Node['id'];
 
     node: Node;
 
-    node_realm_id: Realm['id'];
+    nodeRealmId: Realm['id'];
 }

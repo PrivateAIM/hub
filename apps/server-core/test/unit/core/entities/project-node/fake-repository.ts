@@ -11,6 +11,6 @@ import type { IProjectNodeRepository } from '../../../../../src/core/entities/pr
 
 export class FakeProjectNodeRepository extends FakeEntityRepository<ProjectNode> implements IProjectNodeRepository {
     async findManyWithNodeByProject(projectId: string): Promise<ProjectNode[]> {
-        return this.findManyBy({ project_id: projectId });
+        return this.findManyBy({ projectId });
     }
 }

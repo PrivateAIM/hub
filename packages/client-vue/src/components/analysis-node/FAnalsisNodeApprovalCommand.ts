@@ -111,7 +111,7 @@ const FAnalysisNodeApprovalCommand = defineComponent({
             }
 
             try {
-                const { data: item } = await apiClient.analysisNode.update(props.entityId, { approval_status: status });
+                const { data: item } = await apiClient.analysisNode.update(props.entityId, { approvalStatus: status });
 
                 setup.emit('updated', item);
             } catch (e) {

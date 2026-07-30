@@ -32,16 +32,16 @@ export default defineComponent({
                     typeof filters.name === 'string' &&
                     filters.name.length > 0
                 ) {
-                    filters.virtual_path = filters.name;
+                    filters.virtualPath = filters.name;
 
                     delete filters.name;
                 }
             },
-            query: { sort: { virtual_path: 'ASC' } },
+            query: { sort: { virtualPath: 'ASC' } },
         });
 
         setDefaults({
-            item: { textPropName: 'virtual_path' },
+            item: { textPropName: 'virtualPath' },
 
             noMore: { content: 'No more master-images available...' },
         });

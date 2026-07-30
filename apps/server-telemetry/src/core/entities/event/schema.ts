@@ -12,7 +12,7 @@ import { DomainType } from '@privateaim/telemetry-kit';
 export const eventSchema = defineSchema<Event>({
     name: DomainType.EVENT,
     strict: true,
-    filters: { allowed: ['scope', 'name', 'ref_type', 'ref_id', 'realm_id', 'created_at', 'updated_at'] },
-    sort: { allowed: ['expires_at', 'created_at', 'updated_at'] },
+    filters: { allowed: ['scope', 'name', 'refType', 'refId', 'realmId', 'createdAt', 'updatedAt'] },
+    sort: { allowed: ['expiresAt', 'createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },
 });

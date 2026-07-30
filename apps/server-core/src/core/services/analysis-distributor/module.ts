@@ -62,7 +62,7 @@ export class AnalysisDistributor {
         await this.assignRegistry(entity);
         await this.checkNodes(entity);
 
-        entity.distribution_status = ProcessStatus.STARTING;
+        entity.distributionStatus = ProcessStatus.STARTING;
 
         await this.repository.save(entity, persistCtx);
         await this.caller.callExecute({ id: entity.id });
@@ -78,7 +78,7 @@ export class AnalysisDistributor {
     }
 
     protected async assignRegistry(entity: Analysis) {
-        if (!entity.registry_id) {
+        if (!entity.registryId) {
             const registries = await this.registryRepository.findManyBy({});
             const registry = registries[0];
 
@@ -86,19 +86,19 @@ export class AnalysisDistributor {
                 throw new BadRequestError('No docker registry is defined.');
             }
 
-            entity.registry_id = registry.id;
+            entity.registryId = registry.id;
         }
 
         return entity;
     }
 
     protected async checkNodes(entity: Analysis) {
-        const analysisNodes = await this.analysisNodeRepository.findManyBy({ analysis_id: entity.id });
+        const analysisNodes = await this.analysisNodeRepository.findManyBy({ analysisId: entity.id });
 
         for (const analysisNode of analysisNodes) {
             if (
                 analysisNode.node &&
-                !analysisNode.node.registry_id
+                !analysisNode.node.registryId
             ) {
                 throw new BadRequestError(`The node ${analysisNode.node.name} is not assigned to a registry yet.`);
             }

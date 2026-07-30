@@ -23,23 +23,23 @@ export interface BucketFile {
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
-
-    // ------------------------------------------------------------------
-
-    actor_id: string;
-
-    actor_type: string;
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'];
+    actorId: string;
+
+    actorType: string;
 
     // ------------------------------------------------------------------
 
-    bucket_id: Bucket['id'];
+    realmId: Realm['id'];
+
+    // ------------------------------------------------------------------
+
+    bucketId: Bucket['id'];
 
     bucket: Bucket;
 }

@@ -92,7 +92,7 @@ export class FakeRegistryManager implements IRegistryManager {
     }
 
     /**
-     * Observe the exact moment a project is torn down. `nodes.registry_project_id`
+     * Observe the exact moment a project is torn down. `nodes.registryProjectId`
      * carries an `ON DELETE CASCADE` FK in the real schema, so removing a project
      * a node still references deletes that node too — tests use this to assert the
      * node was already detached and persisted before the removal happens.

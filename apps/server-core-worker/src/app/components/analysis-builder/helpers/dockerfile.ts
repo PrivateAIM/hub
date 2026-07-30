@@ -26,7 +26,7 @@ export async function generateDockerFileContent(
 ) : Promise<string> {
     const { data: analysisBuckets } = await ctx.coreClient.analysisBucket.getMany({
         filters: {
-            analysis_id: entity.id,
+            analysisId: entity.id,
             type: AnalysisBucketType.CODE,
         },
     });
@@ -38,7 +38,7 @@ export async function generateDockerFileContent(
     const { data: analysisBucketFiles } = await ctx.coreClient.analysisBucketFile.getMany({
         filters: {
             root: true,
-            analysis_bucket_id: analysisBucket.id,
+            analysisBucketId: analysisBucket.id,
         },
     });
 
@@ -49,7 +49,7 @@ export async function generateDockerFileContent(
 
     let entryPoint : BucketFile;
     try {
-        const { data } = await ctx.storageClient.bucketFile.getOne(analysisBucketFile.bucket_file_id);
+        const { data } = await ctx.storageClient.bucketFile.getOne(analysisBucketFile.bucketFileId);
         entryPoint = data;
     } catch {
         throw BuilderError.entrypointNotFound();
@@ -58,7 +58,7 @@ export async function generateDockerFileContent(
     let masterImage : MasterImage;
 
     try {
-        const { data } = await ctx.coreClient.masterImage.getOne(entity.master_image_id);
+        const { data } = await ctx.coreClient.masterImage.getOne(entity.masterImageId);
         masterImage = data;
     } catch {
         throw BuilderError.masterImageNotFound();
@@ -70,10 +70,10 @@ export async function generateDockerFileContent(
     );
 
     let commandArguments : MasterImageCommandArgument[];
-    if (entity.image_command_arguments) {
-        commandArguments = entity.image_command_arguments;
-    } else if (masterImage.command_arguments) {
-        commandArguments = masterImage.command_arguments;
+    if (entity.imageCommandArguments) {
+        commandArguments = entity.imageCommandArguments;
+    } else if (masterImage.commandArguments) {
+        commandArguments = masterImage.commandArguments;
     } else {
         commandArguments = [];
     }
@@ -107,7 +107,7 @@ export async function generateDockerFileContent(
     }
 
     return `
-    FROM ${REGISTRY_MASTER_IMAGE_PROJECT_NAME}/${masterImage.virtual_path}
+    FROM ${REGISTRY_MASTER_IMAGE_PROJECT_NAME}/${masterImage.virtualPath}
     RUN mkdir -p ${AnalysisContainerPath.CODE}
     RUN chmod -R +x ${AnalysisContainerPath.CODE}
 

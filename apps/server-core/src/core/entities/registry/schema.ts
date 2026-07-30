@@ -13,10 +13,10 @@ export const registrySchema = defineSchema<Registry>({
     name: DomainType.REGISTRY,
     strict: true,
     fields: {
-        default: ['id', 'name', 'host', 'account_name', 'created_at', 'updated_at'],
-        allowed: ['id', 'name', 'host', 'account_name', 'created_at', 'updated_at', 'account_secret'],
+        default: ['id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt'],
+        allowed: ['id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt', 'accountSecret'],
     },
     filters: { allowed: ['id', 'name'] },
-    sort: { allowed: ['id', 'updated_at', 'created_at'] },
+    sort: { allowed: ['id', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
 });

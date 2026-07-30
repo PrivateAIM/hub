@@ -13,27 +13,27 @@ import type { ProjectNodeApprovalStatus } from './constants';
 export interface ProjectNode {
     id: string;
 
-    approval_status: ProjectNodeApprovalStatus | null;
+    approvalStatus: ProjectNodeApprovalStatus | null;
 
     comment: string | null;
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    project_id: Project['id'];
+    projectId: Project['id'];
 
     project: Project;
 
-    project_realm_id: Realm['id'];
+    projectRealmId: Realm['id'];
 
-    node_id: Node['id'];
+    nodeId: Node['id'];
 
     node: Node;
 
-    node_realm_id: Realm['id'];
+    nodeRealmId: Realm['id'];
 }

@@ -28,6 +28,14 @@ type RegistryServiceContext = {
     registryCaller?: IRegistryCaller;
 };
 
+/**
+ * The permission-gated field, as a checked literal. `checkSecretFieldAccess`
+ * compares raw `?fields=` tokens against it, and a stale string there would skip
+ * the REGISTRY_MANAGE pre-check entirely rather than fail — so `satisfies` keeps
+ * it pinned to the property name.
+ */
+const SECRET_FIELD = 'accountSecret' satisfies keyof Registry;
+
 export class RegistryService extends AbstractEntityService implements IRegistryService {
     protected repository: IRegistryRepository;
 
@@ -87,7 +95,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
 
         const requestsSecret = tokens
             .map((t) => t.trim().replace(/^[+-]/, ''))
-            .includes('account_secret');
+            .includes(SECRET_FIELD);
 
         if (requestsSecret) {
             await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
@@ -195,9 +203,9 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
                         'PROJECT_UNLINK',
                         {
                             id: entity.id,
-                            registryId: entity.registry_id,
-                            externalName: entity.external_name,
-                            accountId: entity.account_id,
+                            registryId: entity.registryId,
+                            externalName: entity.externalName,
+                            accountId: entity.accountId,
                         },
                         {},
                     );

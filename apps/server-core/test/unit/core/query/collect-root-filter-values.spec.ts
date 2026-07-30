@@ -35,28 +35,28 @@ const lt = (field: string, value: string) => new Filter(FilterFieldOperator.LESS
 
 describe('collectRootFilterValues', () => {
     it('collects positive equality leaves under AND', () => {
-        const result = collectRootFilterValues(query(and(eq('analysis_id', 'X'), eq('level', 'info'))));
-        expect(result).toEqual({ analysis_id: 'X', level: 'info' });
+        const result = collectRootFilterValues(query(and(eq('analysisId', 'X'), eq('level', 'info'))));
+        expect(result).toEqual({ analysisId: 'X', level: 'info' });
     });
 
     it('walks nested AND groups', () => {
-        const result = collectRootFilterValues(query(and(eq('analysis_id', 'X'), and(eq('node_id', 'N')))));
-        expect(result).toEqual({ analysis_id: 'X', node_id: 'N' });
+        const result = collectRootFilterValues(query(and(eq('analysisId', 'X'), and(eq('nodeId', 'N')))));
+        expect(result).toEqual({ analysisId: 'X', nodeId: 'N' });
     });
 
     it('rejects a negated (ne) leaf instead of forwarding the inverse equality', () => {
-        // `not(eq(analysis_id, X))` folds to a `ne` leaf at parse time; the old
-        // code returned { analysis_id: 'X' }, i.e. logs FOR X — the inverse.
-        expect(() => collectRootFilterValues(query(and(ne('analysis_id', 'X'))))).toThrow(BadRequestError);
+        // `not(eq(analysisId, X))` folds to a `ne` leaf at parse time; the old
+        // code returned { analysisId: 'X' }, i.e. logs FOR X — the inverse.
+        expect(() => collectRootFilterValues(query(and(ne('analysisId', 'X'))))).toThrow(BadRequestError);
     });
 
     it('rejects an OR compound instead of last-wins flattening', () => {
-        // The old code walked both branches and returned { analysis_id: 'B' }.
-        expect(() => collectRootFilterValues(query(or(eq('analysis_id', 'A'), eq('analysis_id', 'B'))))).toThrow(BadRequestError);
+        // The old code walked both branches and returned { analysisId: 'B' }.
+        expect(() => collectRootFilterValues(query(or(eq('analysisId', 'A'), eq('analysisId', 'B'))))).toThrow(BadRequestError);
     });
 
     it('rejects a comparison (lt) leaf', () => {
-        expect(() => collectRootFilterValues(query(and(lt('created_at', '5'))))).toThrow(BadRequestError);
+        expect(() => collectRootFilterValues(query(and(lt('createdAt', '5'))))).toThrow(BadRequestError);
     });
 
     it('returns an empty map for a query without a filters group', () => {

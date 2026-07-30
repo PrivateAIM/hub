@@ -69,19 +69,19 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         await this.repository.validateJoinColumns(validated);
 
-        if (validated.realm_id) {
-            if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
+        if (validated.realmId) {
+            if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
                 throw new PermissionDeniedError('You are not permitted to create this node.');
             }
         } else {
-            validated.realm_id = this.getActorRealmId(actor);
+            validated.realmId = this.getActorRealmId(actor);
         }
 
         const entity = this.repository.create(validated);
 
-        if (entity.public_key && !isHex(entity.public_key)) {
-            entity.public_key = Buffer
-                .from(entity.public_key, 'utf8')
+        if (entity.publicKey && !isHex(entity.publicKey)) {
+            entity.publicKey = Buffer
+                .from(entity.publicKey, 'utf8')
                 .toString('hex');
         }
 
@@ -97,9 +97,9 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         await this.repository.validateJoinColumns(validated);
 
-        if (validated.public_key && !isHex(validated.public_key)) {
-            validated.public_key = Buffer
-                .from(validated.public_key, 'utf8')
+        if (validated.publicKey && !isHex(validated.publicKey)) {
+            validated.publicKey = Buffer
+                .from(validated.publicKey, 'utf8')
                 .toString('hex');
         }
 
@@ -108,17 +108,17 @@ export class NodeService extends AbstractEntityService implements INodeService {
             throw new EntityNotFoundError({ entity: 'node' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError('You are not permitted to update this node.');
         }
 
         const merged = this.repository.merge(entity, validated);
 
-        // Only an explicit `registry_id: null` disconnects the node. An update
+        // Only an explicit `registryId: null` disconnects the node. An update
         // that merely omits the field (a rename, a visibility toggle, …) must
         // never tear down the node's registry project as a side effect.
-        const registryCleared = typeof validated.registry_id !== 'undefined' &&
-            !validated.registry_id;
+        const registryCleared = typeof validated.registryId !== 'undefined' &&
+            !validated.registryId;
 
         // Detach + persist before tearing the old project down: the node must
         // never be left referencing a row that is about to disappear.
@@ -141,7 +141,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
             throw new EntityNotFoundError({ entity: 'node' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError('You are not permitted to delete this node.');
         }
 
@@ -162,8 +162,8 @@ export class NodeService extends AbstractEntityService implements INodeService {
         if (!this.registryManager) return;
 
         let registryId: string | undefined;
-        if (entity.registry_id) {
-            registryId = entity.registry_id;
+        if (entity.registryId) {
+            registryId = entity.registryId;
         } else {
             registryId = await this.registryManager.findDefaultRegistryId() ?? undefined;
         }
@@ -171,31 +171,31 @@ export class NodeService extends AbstractEntityService implements INodeService {
         if (!registryId) return;
 
         // Record the assignment, including when it came from the default
-        // registry. Leaving `registry_id` null while a project exists is an
+        // registry. Leaving `registryId` null while a project exists is an
         // inconsistent state: the node reads as "not connected" everywhere the
         // column is the source of truth, yet owns a provisioned project.
-        entity.registry_id = registryId;
+        entity.registryId = registryId;
 
-        const externalName = entity.external_name || createNanoID();
-        entity.external_name = externalName;
+        const externalName = entity.externalName || createNanoID();
+        entity.externalName = externalName;
 
         const registryProject = await this.registryManager.createProject({
-            external_name: externalName,
+            externalName,
             name: entity.name,
             type: RegistryProjectType.NODE,
-            realm_id: entity.realm_id,
-            registry_id: registryId,
+            realmId: entity.realmId,
+            registryId,
             public: false,
         } as Partial<RegistryProject>);
 
-        entity.registry_project_id = registryProject.id;
+        entity.registryProjectId = registryProject.id;
 
         await this.registryManager.linkProject(registryProject.id);
     }
 
     /**
      * Reconcile the node's registry project with its (possibly just changed)
-     * `registry_id`.
+     * `registryId`.
      *
      * Returns the registry project the node no longer references, if any. The
      * caller must persist the node BEFORE removing it — see the note in
@@ -209,18 +209,18 @@ export class NodeService extends AbstractEntityService implements INodeService {
     ): Promise<RegistryProject | undefined> {
         if (!this.registryManager) return undefined;
 
-        if (!entity.registry_id) {
+        if (!entity.registryId) {
             if (!cleared) return undefined;
 
             // Disconnected — detach the node from its project and hand the
             // project back for teardown. Without this the node keeps a dangling
-            // `registry_project_id` and still resolves credentials from a
+            // `registryProjectId` and still resolves credentials from a
             // registry it is no longer assigned to.
-            const current = entity.registry_project_id ?
-                await this.registryManager.findProject(entity.registry_project_id) :
+            const current = entity.registryProjectId ?
+                await this.registryManager.findProject(entity.registryProjectId) :
                 null;
 
-            entity.registry_project_id = null;
+            entity.registryProjectId = null;
 
             if (!current) return undefined;
 
@@ -230,11 +230,11 @@ export class NodeService extends AbstractEntityService implements INodeService {
         }
 
         let registryProject: RegistryProject | undefined;
-        if (entity.registry_project_id) {
-            registryProject = await this.registryManager.findProject(entity.registry_project_id) ?? undefined;
+        if (entity.registryProjectId) {
+            registryProject = await this.registryManager.findProject(entity.registryProjectId) ?? undefined;
         }
 
-        const externalName = entity.external_name || createNanoID();
+        const externalName = entity.externalName || createNanoID();
 
         // A registry project lives inside a single registry, so when the node is
         // re-assigned to a different registry the existing project can no longer
@@ -242,43 +242,43 @@ export class NodeService extends AbstractEntityService implements INodeService {
         // otherwise the node keeps resolving its credentials (and host) from the
         // old registry.
         let orphaned: RegistryProject | undefined;
-        if (registryProject && registryProject.registry_id !== entity.registry_id) {
+        if (registryProject && registryProject.registryId !== entity.registryId) {
             await this.registryManager.unlinkProject(registryProject);
             orphaned = registryProject;
             registryProject = undefined;
         }
 
         if (registryProject) {
-            if (registryProject.external_name !== externalName) {
-                registryProject.external_name = externalName;
-                registryProject.realm_id = entity.realm_id;
+            if (registryProject.externalName !== externalName) {
+                registryProject.externalName = externalName;
+                registryProject.realmId = entity.realmId;
 
                 await this.registryManager.saveProject(registryProject);
                 await this.registryManager.relinkProject(registryProject);
             }
         } else {
             registryProject = await this.registryManager.createProject({
-                external_name: externalName,
+                externalName,
                 name: entity.name,
                 type: RegistryProjectType.NODE,
-                realm_id: entity.realm_id,
-                registry_id: entity.registry_id,
+                realmId: entity.realmId,
+                registryId: entity.registryId,
                 public: false,
             } as Partial<RegistryProject>);
 
             await this.registryManager.linkProject(registryProject.id);
         }
 
-        entity.registry_project_id = registryProject.id;
-        entity.external_name = externalName;
+        entity.registryProjectId = registryProject.id;
+        entity.externalName = externalName;
 
         return orphaned;
     }
 
     private async unlinkRegistryProject(entity: Node): Promise<void> {
-        if (!this.registryManager || !entity.registry_project_id) return;
+        if (!this.registryManager || !entity.registryProjectId) return;
 
-        const registryProject = await this.registryManager.findProject(entity.registry_project_id);
+        const registryProject = await this.registryManager.findProject(entity.registryProjectId);
         if (!registryProject) return;
 
         await this.registryManager.unlinkProject(registryProject);

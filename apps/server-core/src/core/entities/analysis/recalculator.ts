@@ -26,7 +26,7 @@ export class AnalysisMetadataRecalculator implements IAnalysisMetadataRecalculat
         }
 
         const cloned = { ...entity };
-        entity.configuration_image_valid = !!entity.master_image_id;
+        entity.configurationImageValid = !!entity.masterImageId;
 
         if (hasAnalysisChanged(cloned, entity)) {
             await this.repository.save(entity);

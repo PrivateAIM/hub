@@ -64,7 +64,7 @@ export default defineComponent({
             accountName.value = null;
             accountSecret.value = null;
 
-            if (!props.entity.registry_project_id) {
+            if (!props.entity.registryProjectId) {
                 busy.value = false;
                 loaded.value = true;
                 return;
@@ -80,9 +80,9 @@ export default defineComponent({
                 }
 
                 host.value = credentials.host;
-                externalName.value = credentials.external_name;
-                accountName.value = credentials.account_name;
-                accountSecret.value = credentials.account_secret;
+                externalName.value = credentials.externalName;
+                accountName.value = credentials.accountName;
+                accountSecret.value = credentials.accountSecret;
             } catch (e) {
                 if (token === loadToken) {
                     emit('failed', e);
@@ -134,7 +134,7 @@ export default defineComponent({
         </p>
 
         <VCAlert
-            v-if="!entity.registry_project_id"
+            v-if="!entity.registryProjectId"
             color="warning"
             variant="soft"
             size="sm"

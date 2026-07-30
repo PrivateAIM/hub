@@ -20,7 +20,7 @@ export default defineComponent({
     },
     emits: ['resolved', 'failed', 'updated'],
     setup(props, { emit }) {
-        if (!props.entity.registry_id) {
+        if (!props.entity.registryId) {
             return () => h(
                 VCAlert,
                 {
@@ -35,7 +35,7 @@ export default defineComponent({
             );
         }
 
-        if (!props.entity.registry_project_id) {
+        if (!props.entity.registryProjectId) {
             return () => h(
                 VCAlert,
                 {
@@ -55,11 +55,11 @@ export default defineComponent({
         return () => h(
             RegistryProjectDetails,
             {
-                entityId: props.entity.registry_project_id as string,
+                entityId: props.entity.registryProjectId as string,
                 onUpdated: (entity: RegistryProject) => {
                     emit('updated', {
-                        registry_project_id: entity.id,
-                        registry_project: entity,
+                        registryProjectId: entity.id,
+                        registryProject: entity,
                     });
                 },
                 onFailed: (e) => {
@@ -68,10 +68,10 @@ export default defineComponent({
                 onResolved: (entity?: RegistryProject) => {
                     if (!entity) { return; }
 
-                    if (props.entity.registry_project_id !== entity.id) {
+                    if (props.entity.registryProjectId !== entity.id) {
                         emit('updated', {
-                            registry_project_id: entity.id,
-                            registry_project: entity,
+                            registryProjectId: entity.id,
+                            registryProject: entity,
                         });
                     }
                 },

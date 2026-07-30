@@ -32,21 +32,21 @@ export type MessageMetadata = {
 /**
  * A durable message as stored by the broker and returned on pull — the domain
  * model implemented by the persistence entity (`MessageEntity implements Message`).
- * Identity is flat (`sender_type`/`sender_id`, `recipient_type`/`recipient_id`)
- * to match the storage row. Ordering uses `created_at` (the universal entity
+ * Identity is flat (`senderType`/`senderId`, `recipientType`/`recipientId`)
+ * to match the storage row. Ordering uses `createdAt` (the universal entity
  * field); delivery is delete-on-ack, so `id` is the ack key and the recipient's
  * dedup key across at-least-once redelivery.
  */
 export interface Message {
     id: string;
 
-    sender_type: `${MessagePartyKind}`;
+    senderType: `${MessagePartyKind}`;
 
-    sender_id: string;
+    senderId: string;
 
-    recipient_type: `${MessagePartyKind}`;
+    recipientType: `${MessagePartyKind}`;
 
-    recipient_id: string;
+    recipientId: string;
 
     /** opaque payload (base64 E2E ciphertext for analysis messaging) */
     data: MessageData;
@@ -54,7 +54,7 @@ export interface Message {
     metadata: MessageMetadata | null;
 
     /** ISO-8601 timestamp; serialized form crossing every transport (HTTP/AMQP/socket) */
-    created_at: string;
+    createdAt: string;
 }
 
 /**

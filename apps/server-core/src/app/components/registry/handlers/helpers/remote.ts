@@ -36,6 +36,7 @@ export async function ensureRemoteRegistryProject(
 
     const harborProject = await httpClient.project.getOne(context.remoteName, true);
 
+    // `project_id` is Harbor's own field name (@hapic/harbor) — third-party wire shape.
     context.remoteId = `${harborProject.project_id}`;
 
     return harborProject;

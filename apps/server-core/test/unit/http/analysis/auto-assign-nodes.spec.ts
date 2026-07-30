@@ -35,14 +35,14 @@ describe('analysis: auto-assign project nodes', () => {
         // Aggregator project nodes are approved on creation, so they are eligible for
         // auto-assignment to a newly created analysis.
         const { data: aggregatorNode } = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
-        await client.projectNode.create({ node_id: aggregatorNode.id, project_id: project.id });
+        await client.projectNode.create({ nodeId: aggregatorNode.id, projectId: project.id });
 
-        const { data: analysis } = await client.analysis.create({ project_id: project.id });
+        const { data: analysis } = await client.analysis.create({ projectId: project.id });
 
         const { data: persisted } = await client.analysis.getOne(analysis.id);
         expect(persisted.nodes).toBe(1);
-        expect(persisted.nodes_approved).toBe(1);
-        expect(persisted.configuration_node_aggregator_valid).toBe(true);
+        expect(persisted.nodesApproved).toBe(1);
+        expect(persisted.configurationNodeAggregatorValid).toBe(true);
     });
 
     // Note: the "pending project nodes are skipped" branch is covered deterministically by
@@ -56,14 +56,14 @@ describe('analysis: auto-assign project nodes', () => {
         const { data: project } = await client.project.create(createTestProject());
 
         const { data: aggregatorNode } = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
-        await client.projectNode.create({ node_id: aggregatorNode.id, project_id: project.id });
+        await client.projectNode.create({ nodeId: aggregatorNode.id, projectId: project.id });
 
-        const { data: analysis } = await client.analysis.create({ project_id: project.id });
+        const { data: analysis } = await client.analysis.create({ projectId: project.id });
 
         // The node was already auto-assigned — re-assigning it must not raise a conflict.
         const { data: analysisNode } = await client.analysisNode.create({
-            analysis_id: analysis.id,
-            node_id: aggregatorNode.id,
+            analysisId: analysis.id,
+            nodeId: aggregatorNode.id,
         });
         expect(analysisNode.id).toBeDefined();
 

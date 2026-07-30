@@ -51,11 +51,11 @@ export class NodeClientCredentialService implements INodeClientCredentialService
             throw new PermissionDeniedError('You are not permitted to read the credentials of this node client.');
         }
 
-        if (!node.client_id) {
+        if (!node.clientId) {
             throw new BadRequestError('The node has no client provisioned yet.');
         }
 
-        return this.credentialStore.readByClientId(node.client_id);
+        return this.credentialStore.readByClientId(node.clientId);
     }
 
     async setCredentials(
@@ -72,11 +72,11 @@ export class NodeClientCredentialService implements INodeClientCredentialService
             throw new PermissionDeniedError('You are not permitted to write the credentials of this node client.');
         }
 
-        if (!node.client_id) {
+        if (!node.clientId) {
             throw new BadRequestError('The node has no client provisioned yet.');
         }
 
-        return this.credentialStore.writeByClientId(node.client_id, data);
+        return this.credentialStore.writeByClientId(node.clientId, data);
     }
 
     /**
@@ -89,8 +89,8 @@ export class NodeClientCredentialService implements INodeClientCredentialService
         if (
             actor.identity &&
             actor.identity.type === 'client' &&
-            !!node.client_id &&
-            node.client_id === actor.identity.id
+            !!node.clientId &&
+            node.clientId === actor.identity.id
         ) {
             return true;
         }
@@ -101,6 +101,6 @@ export class NodeClientCredentialService implements INodeClientCredentialService
             return false;
         }
 
-        return isRealmResourceWritable(actor.realm, node.realm_id);
+        return isRealmResourceWritable(actor.realm, node.realmId);
     }
 }

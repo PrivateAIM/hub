@@ -68,13 +68,13 @@ export async function uploadRequestFilesToBucket(
                         {
                             meta: {
                                 id: randomUUID(),
-                                actor_type: actor.type,
-                                actor_id: actor.id,
+                                actorType: actor.type,
+                                actorId: actor.id,
                                 name: path.basename(info.filename),
                                 path: info.filename,
                                 directory: path.dirname(info.filename),
-                                realm_id: identity.realmId,
-                                bucket_id: bucket.id,
+                                realmId: identity.realmId,
+                                bucketId: bucket.id,
                                 bucket,
                             },
                             data: file,

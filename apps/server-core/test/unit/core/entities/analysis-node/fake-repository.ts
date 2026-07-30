@@ -11,6 +11,6 @@ import { FakeEntityRepository } from '@privateaim/server-test-kit';
 
 export class FakeAnalysisNodeRepository extends FakeEntityRepository<AnalysisNode> implements IAnalysisNodeRepository {
     async findManyWithNodeByAnalysis(analysisId: string): Promise<AnalysisNode[]> {
-        return this.findManyBy({ analysis_id: analysisId });
+        return this.findManyBy({ analysisId });
     }
 }

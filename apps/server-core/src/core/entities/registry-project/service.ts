@@ -28,6 +28,13 @@ type RegistryProjectServiceContext = {
     nodeRepository?: IEntityRepository<Node>;
 };
 
+/**
+ * The permission-gated field, as a checked literal — see the twin in
+ * core/entities/registry/service.ts. A stale string makes `hasSecretField()`
+ * return false and skips the REGISTRY_MANAGE gate instead of failing.
+ */
+const SECRET_FIELD = 'accountSecret' satisfies keyof RegistryProject;
+
 export class RegistryProjectService extends AbstractEntityService implements IRegistryProjectService {
     protected repository: IRegistryProjectRepository;
 
@@ -72,8 +79,8 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     private hasSecretField(entity: RegistryProject): boolean {
-        return isPropertySet(entity, 'account_secret') &&
-            !!entity.account_secret;
+        return isPropertySet(entity, SECRET_FIELD) &&
+            !!entity.accountSecret;
     }
 
     private async checkSecretFieldAccess(entities: RegistryProject[], actor: ActorContext): Promise<void> {
@@ -89,10 +96,10 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             actor.identity.type === 'client' &&
             this.nodeRepository
         ) {
-            const node = await this.nodeRepository.findOneBy({ client_id: actor.identity.id });
-            if (node && node.registry_project_id) {
+            const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id });
+            if (node && node.registryProjectId) {
                 const requestedIds = new Set(entities.map((e) => e.id));
-                if (requestedIds.size === 1 && requestedIds.has(node.registry_project_id)) {
+                if (requestedIds.size === 1 && requestedIds.has(node.registryProjectId)) {
                     return;
                 }
             }
@@ -129,11 +136,11 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 
-        const previousExternalName = entity.external_name;
+        const previousExternalName = entity.externalName;
 
         const merged = this.repository.merge(entity, validated);
 
@@ -142,8 +149,8 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         if (this.registryManager) {
             if (
                 previousExternalName &&
-                validated.external_name &&
-                previousExternalName !== validated.external_name
+                validated.externalName &&
+                previousExternalName !== validated.externalName
             ) {
                 await this.registryManager.unlinkProject(saved);
                 await this.registryManager.linkProject(saved.id);
@@ -163,7 +170,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 

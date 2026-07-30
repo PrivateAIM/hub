@@ -17,25 +17,25 @@ export async function handleAuthupUserEvent(context: EventRecord<EntityType.USER
         const dataSource = await useDataSource();
 
         const projectRepository = dataSource.getRepository(ProjectEntity);
-        const projects = await projectRepository.find({ where: { user_id: context.data.id } });
+        const projects = await projectRepository.find({ where: { userId: context.data.id } });
 
         for (const project of projects) {
-            project.user_id = null;
+            project.userId = null;
         }
 
         await projectRepository.save(projects);
 
         const analysisRepository = dataSource.getRepository(AnalysisEntity);
-        const analyses = await analysisRepository.find({ where: { user_id: context.data.id } });
+        const analyses = await analysisRepository.find({ where: { userId: context.data.id } });
 
         for (const analysis of analyses) {
-            analysis.user_id = null;
+            analysis.userId = null;
         }
 
         await analysisRepository.save(analyses);
 
         const analysisFileRepository = dataSource.getRepository(AnalysisEntity);
-        const analysisFiles = await analysisFileRepository.find({ where: { user_id: context.data.id } });
+        const analysisFiles = await analysisFileRepository.find({ where: { userId: context.data.id } });
 
         await analysisRepository.remove(analysisFiles);
     }

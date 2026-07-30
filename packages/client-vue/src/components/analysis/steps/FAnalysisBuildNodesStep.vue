@@ -24,7 +24,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const passed = computed(() => props.entity.build_nodes_valid);
+        const passed = computed(() => props.entity.buildNodesValid);
 
         const message = computed(() => {
             if (passed.value) {

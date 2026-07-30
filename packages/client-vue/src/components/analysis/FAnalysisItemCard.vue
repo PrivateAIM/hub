@@ -96,7 +96,7 @@ export default defineComponent({
                 <FDisplayName
                     class="analysis-item-card-title"
                     :name="entity.name"
-                    :display-name="entity.display_name"
+                    :display-name="entity.displayName"
                 >
                     <template #default="props">
                         <VCIcon
@@ -161,7 +161,7 @@ export default defineComponent({
                     <span class="text-fg-muted">
                         created
                     </span>
-                    <VCTimeago :datetime="entity.created_at" />
+                    <VCTimeago :datetime="entity.createdAt" />
                 </small>
             </div>
             <div class="ms-auto">
@@ -169,7 +169,7 @@ export default defineComponent({
                     <span class="text-fg-muted">
                         updated
                     </span>
-                    <VCTimeago :datetime="entity.updated_at" />
+                    <VCTimeago :datetime="entity.updatedAt" />
                 </small>
             </div>
         </div>

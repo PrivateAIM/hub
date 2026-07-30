@@ -67,26 +67,26 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
 
         await this.repository.validateJoinColumns(validated);
 
-        if (validated.realm_id) {
-            if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
+        if (validated.realmId) {
+            if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
                 throw new PermissionDeniedError('You are not permitted to create this project.');
             }
         } else {
-            validated.realm_id = this.getActorRealmId(actor);
+            validated.realmId = this.getActorRealmId(actor);
         }
 
         if (actor.identity) {
             switch (actor.identity.type) {
                 case 'user': {
-                    validated.user_id = actor.identity.id;
+                    validated.userId = actor.identity.id;
                     break;
                 }
                 case 'robot': {
-                    validated.robot_id = actor.identity.id;
+                    validated.robotId = actor.identity.id;
                     break;
                 }
                 case 'client': {
-                    validated.client_id = actor.identity.id;
+                    validated.clientId = actor.identity.id;
                     break;
                 }
                 default: {
@@ -114,7 +114,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             throw new EntityNotFoundError({ entity: 'project' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 
@@ -133,7 +133,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             throw new EntityNotFoundError({ entity: 'project' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();
         }
 

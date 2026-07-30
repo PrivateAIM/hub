@@ -17,7 +17,7 @@ export type AuthupProvisioningPermission = {
 /**
  * The subset of Authup's root provisioning shape we emit for tests.
  *
- * All top-level entries are global (`realm_id = null`, `client_id = null`);
+ * All top-level entries are global (`realmId = null`, `clientId = null`);
  * the built-in `admin` role's `globalPermissions: ['*']` picks them up
  * automatically at provisioning time.
  */

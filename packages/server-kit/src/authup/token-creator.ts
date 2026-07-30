@@ -18,6 +18,7 @@ export type AuthupClientTokenCreatorCreateContext = {
 export function createAuthupClientTokenCreator(ctx: AuthupClientTokenCreatorCreateContext): TokenCreator {
     const client = new OAuth2Client({ request: { baseURL: ctx.baseURL } });
 
+    // OAuth2 token-request parameters — spec-frozen, snake_case forever.
     return () => client.token.createWithClientCredentials({
         client_id: ctx.clientId,
         client_secret: ctx.clientSecret,
@@ -35,6 +36,7 @@ export type AuthupUserTokenCreatorCreateContext = {
 export function createAuthupUserTokenCreator(ctx: AuthupUserTokenCreatorCreateContext): TokenCreator {
     const client = new OAuth2Client({ request: { baseURL: ctx.baseURL } });
 
+    // OAuth2 token-request parameters — spec-frozen, snake_case forever.
     return () => client.token.createWithPassword({
         username: ctx.name,
         password: ctx.password,

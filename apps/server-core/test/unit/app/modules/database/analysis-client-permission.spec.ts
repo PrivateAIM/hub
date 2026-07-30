@@ -31,9 +31,9 @@ function createAnalysisRepository(analyses: Partial<Analysis>[]): IAnalysisRepos
 function createAnalysis(overrides: Partial<Analysis> = {}): Partial<Analysis> {
     return {
         id: randomUUID(),
-        realm_id: randomUUID(),
-        client_id: 'client-1',
-        configuration_locked: false,
+        realmId: randomUUID(),
+        clientId: 'client-1',
+        configurationLocked: false,
         ...overrides,
     };
 }
@@ -57,7 +57,7 @@ function permissionHandler(...permissions: { id: string, name: string }[]) {
 describe('AnalysisClientPermissionService', () => {
     describe('getMany', () => {
         it('should return the client permissions of the analysis client', async () => {
-            const analysis = createAnalysis({ client_id: 'client-1' });
+            const analysis = createAnalysis({ clientId: 'client-1' });
             const authup = createFakeAuthupClient({
                 handlers: {
                     'GET /client-permissions': () => ({
@@ -88,7 +88,7 @@ describe('AnalysisClientPermissionService', () => {
         });
 
         it('should return empty without calling authup when no client is provisioned', async () => {
-            const analysis = createAnalysis({ client_id: null });
+            const analysis = createAnalysis({ clientId: null });
             const authup = createFakeAuthupClient();
             const service = new AnalysisClientPermissionService({
                 authup,
@@ -105,7 +105,7 @@ describe('AnalysisClientPermissionService', () => {
 
     describe('create', () => {
         it('should grant a self-capability', async () => {
-            const analysis = createAnalysis({ client_id: 'client-1' });
+            const analysis = createAnalysis({ clientId: 'client-1' });
             const authup = createFakeAuthupClient({
                 handlers: {
                     'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION),
@@ -142,7 +142,7 @@ describe('AnalysisClientPermissionService', () => {
         });
 
         it('should reject when the analysis configuration is locked', async () => {
-            const analysis = createAnalysis({ configuration_locked: true });
+            const analysis = createAnalysis({ configurationLocked: true });
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION) } });
             const service = new AnalysisClientPermissionService({
                 authup,
@@ -155,7 +155,7 @@ describe('AnalysisClientPermissionService', () => {
         });
 
         it('should reject when the analysis has no client provisioned', async () => {
-            const analysis = createAnalysis({ client_id: null });
+            const analysis = createAnalysis({ clientId: null });
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION) } });
             const service = new AnalysisClientPermissionService({
                 authup,
@@ -209,7 +209,7 @@ describe('AnalysisClientPermissionService', () => {
 
     describe('delete', () => {
         it('should remove the matching client permission', async () => {
-            const analysis = createAnalysis({ client_id: 'client-1' });
+            const analysis = createAnalysis({ clientId: 'client-1' });
             const authup = createFakeAuthupClient({
                 handlers: {
                     'GET /client-permissions': () => ({
@@ -241,7 +241,7 @@ describe('AnalysisClientPermissionService', () => {
         });
 
         it('should 404 when no matching client permission exists', async () => {
-            const analysis = createAnalysis({ client_id: 'client-1' });
+            const analysis = createAnalysis({ clientId: 'client-1' });
             const authup = createFakeAuthupClient({ handlers: { 'GET /client-permissions': () => ({ data: [], meta: { total: 0 } }) } });
             const service = new AnalysisClientPermissionService({
                 authup,

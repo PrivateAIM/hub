@@ -33,26 +33,35 @@ export class BucketEntity implements Bucket {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid', nullable: true })
-    actor_id: string | null;
+    @Column({
+        name: 'actor_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    actorId: string | null;
 
     @Column({
+        name: 'actor_type',
         type: 'varchar',
         length: 64,
         nullable: true,
     })
-    actor_type: string | null;
+    actorType: string | null;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid', nullable: true })
-    realm_id: Realm['id'] | null;
+    @Column({
+        name: 'realm_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    realmId: Realm['id'] | null;
 }

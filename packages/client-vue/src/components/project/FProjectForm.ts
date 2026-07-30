@@ -64,9 +64,9 @@ const FProjectForm = defineComponent({
         const busy = ref(false);
         const form = reactive({
             name: '',
-            display_name: '',
+            displayName: '',
             description: '',
-            master_image_id: '',
+            masterImageId: '',
         });
 
         const nodeIds = ref<string[]>([]);
@@ -84,7 +84,7 @@ const FProjectForm = defineComponent({
         );
 
         const nameValidation = useFieldValidation($v.fields.name);
-        const displayNameValidation = useFieldValidation($v.fields.display_name);
+        const displayNameValidation = useFieldValidation($v.fields.displayName);
         const descriptionValidation = useFieldValidation($v.fields.description);
 
         const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
@@ -117,9 +117,9 @@ const FProjectForm = defineComponent({
 
         const handleMasterImagePicker = (item: MasterImage | null) => {
             if (item) {
-                form.master_image_id = item.id;
+                form.masterImageId = item.id;
             } else {
-                form.master_image_id = '';
+                form.masterImageId = '';
             }
         };
 
@@ -143,8 +143,8 @@ const FProjectForm = defineComponent({
                     }
 
                     await apiClient.projectNode.create({
-                        project_id: manager.data.value.id,
-                        node_id: nodeId,
+                        projectId: manager.data.value.id,
+                        nodeId,
                     });
                 }
             }
@@ -171,9 +171,9 @@ const FProjectForm = defineComponent({
                 },
                 {
                     default: () => h(VCFormInput, {
-                        modelValue: form.display_name == null ? '' : String(form.display_name),
+                        modelValue: form.displayName == null ? '' : String(form.displayName),
                         'onUpdate:modelValue': (input: string) => {
-                            form.display_name = input;
+                            form.displayName = input;
                         },
                     }),
                 },
@@ -217,7 +217,7 @@ const FProjectForm = defineComponent({
             );
 
             const masterImagePicker = h(FMasterImagePicker, {
-                entityId: form.master_image_id,
+                entityId: form.masterImageId,
                 onResolved(value?: MasterImage) {
                     handleMasterImagePicker(value ?? null);
                 },

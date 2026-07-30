@@ -41,9 +41,9 @@ describe('src/controllers/core/analysis', () => {
         const { client } = suite;
 
         const { data: project } = await client.project.create(createTestProject());
-        const { data: analysis } = await client.analysis.create(createTestAnalysis({ project_id: project.id }));
+        const { data: analysis } = await client.analysis.create(createTestAnalysis({ projectId: project.id }));
 
-        expect(analysis.project_id).toEqual(project.id);
+        expect(analysis.projectId).toEqual(project.id);
 
         details = removeDateProperties(analysis);
     });
@@ -85,11 +85,11 @@ describe('src/controllers/core/analysis', () => {
         try {
             await client.analysis.create({
                 ...details,
-                project_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+                projectId: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
             });
         } catch (e) {
             if (isClientError(e)) {
-                expect(e.response.data.message).toEqual(EntityRelationLookupError.notFound('project', ['project_id']).message);
+                expect(e.response.data.message).toEqual(EntityRelationLookupError.notFound('project', ['projectId']).message);
                 return;
             }
 
@@ -107,12 +107,12 @@ describe('src/controllers/core/analysis', () => {
         try {
             await client.analysis.create({
                 ...details,
-                project_id: project.id,
-                master_image_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
+                projectId: project.id,
+                masterImageId: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
             });
         } catch (e) {
             if (isClientError(e)) {
-                expect(e.response.data.message).toEqual(EntityRelationLookupError.notFound('master_image', ['master_image_id']).message);
+                expect(e.response.data.message).toEqual(EntityRelationLookupError.notFound('masterImage', ['masterImageId']).message);
                 return;
             }
 

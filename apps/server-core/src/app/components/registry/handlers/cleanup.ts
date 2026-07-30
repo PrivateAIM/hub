@@ -31,7 +31,7 @@ export class RegistryCleanupHandler implements ComponentHandler<
         const repository = dataSource.getRepository(RegistryEntity);
         const entity = await repository.createQueryBuilder('registry')
             .addSelect([
-                'registry.account_secret',
+                'registry.accountSecret',
             ])
             .where('registry.id = :id', { id: value.id })
             .getOne();
@@ -47,7 +47,7 @@ export class RegistryCleanupHandler implements ComponentHandler<
 
         const projectRepository = dataSource.getRepository(RegistryProjectEntity);
         const projectEntities = await projectRepository.find();
-        const projectEntityExternalNames = projectEntities.map((item) => item.external_name);
+        const projectEntityExternalNames = projectEntities.map((item) => item.externalName);
 
         for (const project of projects) {
             const index = projectEntityExternalNames.indexOf(`${project.name}`);

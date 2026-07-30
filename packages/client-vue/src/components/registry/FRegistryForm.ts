@@ -47,8 +47,8 @@ export default defineComponent({
         const form = reactive({
             name: '',
             host: '',
-            account_name: '',
-            account_secret: '',
+            accountName: '',
+            accountSecret: '',
         });
 
         const updatedAt = useUpdatedAt(props.entity);
@@ -67,8 +67,8 @@ export default defineComponent({
 
         const nameValidation = useFieldValidation($v.fields.name);
         const hostValidation = useFieldValidation($v.fields.host);
-        const accountNameValidation = useFieldValidation($v.fields.account_name);
-        const accountSecretValidation = useFieldValidation($v.fields.account_secret);
+        const accountNameValidation = useFieldValidation($v.fields.accountName);
+        const accountSecretValidation = useFieldValidation($v.fields.accountSecret);
 
         const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
@@ -147,9 +147,9 @@ export default defineComponent({
                 },
                 {
                     default: () => h(VCFormInput, {
-                        modelValue: form.account_name == null ? '' : String(form.account_name),
+                        modelValue: form.accountName == null ? '' : String(form.accountName),
                         'onUpdate:modelValue': (input: string) => {
-                            form.account_name = input;
+                            form.accountName = input;
                         },
                         placeholder: '...',
                     }),
@@ -166,9 +166,9 @@ export default defineComponent({
                 },
                 {
                     default: () => h(VCFormInput, {
-                        modelValue: form.account_secret == null ? '' : String(form.account_secret),
+                        modelValue: form.accountSecret == null ? '' : String(form.accountSecret),
                         'onUpdate:modelValue': (input: string) => {
-                            form.account_secret = input;
+                            form.accountSecret = input;
                         },
                         placeholder: '...',
                     }),

@@ -28,7 +28,7 @@ export class RegistryProjectUnlinkHandler implements ComponentHandler<
         const registryRepository = dataSource.getRepository(RegistryEntity);
         const registryEntity = await registryRepository.createQueryBuilder('registry')
             .addSelect([
-                'registry.account_secret',
+                'registry.accountSecret',
             ])
             .where('registry.id = :id', { id: value.registryId })
             .getOne();
@@ -91,14 +91,14 @@ export class RegistryProjectUnlinkHandler implements ComponentHandler<
             const project = await projectRepository.findOneBy({ id: value.id });
 
             if (project) {
-                project.external_id = null;
+                project.externalId = null;
 
-                project.account_id = null;
-                project.account_name = null;
-                project.account_secret = null;
+                project.accountId = null;
+                project.accountName = null;
+                project.accountSecret = null;
 
-                project.webhook_exists = false;
-                project.webhook_name = null;
+                project.webhookExists = false;
+                project.webhookName = null;
 
                 await projectRepository.save(project);
             }

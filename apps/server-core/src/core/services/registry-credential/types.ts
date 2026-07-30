@@ -12,10 +12,10 @@ import type { ActorContext } from '@privateaim/server-kit';
  * The registry coordinates a node needs to authenticate against its own
  * docker registry project (Harbor robot account): the registry host plus
  * account credentials, projected from {@link Registry}, and the project
- * namespace (`external_name`), which only lives on {@link RegistryProject}.
+ * namespace (`externalName`), which only lives on {@link RegistryProject}.
  */
-export type RegistryCredentials =    & Pick<Registry, 'host' | 'account_name' | 'account_secret'> &
-    Pick<RegistryProject, 'external_name'>;
+export type RegistryCredentials =    & Pick<Registry, 'host' | 'accountName' | 'accountSecret'> &
+    Pick<RegistryProject, 'externalName'>;
 
 export interface INodeRegistryCredentialService {
     getCredentials(nodeId: string, actor: ActorContext): Promise<RegistryCredentials>;

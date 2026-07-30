@@ -16,7 +16,7 @@ export class AnalysisNodeLogValidator extends Container<AnalysisNodeLog> {
         super.initialize();
 
         this.mount(
-            'node_id',
+            'nodeId',
             createValidator(
                 zod
                     .uuidv4(),
@@ -24,7 +24,7 @@ export class AnalysisNodeLogValidator extends Container<AnalysisNodeLog> {
         );
 
         this.mount(
-            'analysis_id',
+            'analysisId',
             createValidator(
                 zod
                     .uuidv4(),

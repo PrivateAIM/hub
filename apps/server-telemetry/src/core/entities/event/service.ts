@@ -68,12 +68,12 @@ export class EventService extends AbstractEntityService implements IEventService
 
         await this.repository.validateJoinColumns(validated);
 
-        if (validated.realm_id) {
-            if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
+        if (validated.realmId) {
+            if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
                 throw new PermissionDeniedError('You are not permitted to create this event.');
             }
         } else {
-            validated.realm_id = this.getActorRealmId(actor);
+            validated.realmId = this.getActorRealmId(actor);
         }
 
         const entity = this.repository.create(validated);
@@ -90,8 +90,8 @@ export class EventService extends AbstractEntityService implements IEventService
             throw new EntityNotFoundError({ entity: 'event' });
         }
 
-        if (entity.realm_id) {
-            if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+        if (entity.realmId) {
+            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
                 throw new PermissionDeniedError('You are not permitted to delete this event.');
             }
         }

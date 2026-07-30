@@ -84,10 +84,10 @@ describe('bucket-file HTTP endpoints', () => {
 
             const body = await response.json();
             expect(body.data.id).toBe(fileId);
-            expect(body.data.bucket_id).toBe(bucketId);
+            expect(body.data.bucketId).toBe(bucketId);
             expect(body.data.name).toBe('test-file.json');
-            expect(body.data.created_at).toBeDefined();
-            expect(body.data.updated_at).toBeDefined();
+            expect(body.data.createdAt).toBeDefined();
+            expect(body.data.updatedAt).toBeDefined();
             expect(body.meta.schema).toBeDefined();
             expect(body.meta.schema.name).toBe('bucketFile');
         });

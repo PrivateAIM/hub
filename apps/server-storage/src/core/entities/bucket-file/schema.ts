@@ -14,10 +14,10 @@ const schemaMapping = { bucket: DomainType.BUCKET };
 export const bucketFileSchema = defineSchema<BucketFile>({
     name: DomainType.BUCKET_FILE,
     strict: true,
-    fields: { default: ['id', 'name', 'path', 'directory', 'size', 'hash', 'created_at', 'updated_at', 'realm_id', 'actor_type', 'actor_id', 'bucket_id'] },
-    filters: { allowed: ['id', 'name', 'directory', 'realm_id', 'actor_type', 'actor_id', 'bucket_id'] },
+    fields: { default: ['id', 'name', 'path', 'directory', 'size', 'hash', 'createdAt', 'updatedAt', 'realmId', 'actorType', 'actorId', 'bucketId'] },
+    filters: { allowed: ['id', 'name', 'directory', 'realmId', 'actorType', 'actorId', 'bucketId'] },
     relations: { allowed: ['bucket'] },
-    sort: { allowed: ['id', 'directory', 'name', 'updated_at', 'created_at'] },
+    sort: { allowed: ['id', 'directory', 'name', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

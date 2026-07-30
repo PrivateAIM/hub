@@ -96,7 +96,7 @@ describe('controllers/bucket-file', () => {
                     resolve(headers.length);
                 });
 
-                client.bucket.stream(details.bucket_id)
+                client.bucket.stream(details.bucketId)
                     .then((data) => Readable.fromWeb(data as any))
                     .then((data) => {
                         data.pipe(extract);

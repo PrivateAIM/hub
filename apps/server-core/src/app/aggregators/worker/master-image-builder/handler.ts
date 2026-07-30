@@ -36,28 +36,28 @@ export async function handleMasterImageBuilderEvent(
 
     switch (context.key) {
         case MasterImageBuilderEvent.EXECUTION_STARTED: {
-            entity.build_status = ProcessStatus.STARTED;
-            entity.build_progress = 0;
+            entity.buildStatus = ProcessStatus.STARTED;
+            entity.buildProgress = 0;
             break;
         }
         case MasterImageBuilderEvent.EXECUTION_PROGRESS: {
             const temp = value as MasterImageBuilderExecutionProgressPayload;
 
             if (
-                !entity.build_progress ||
-                temp.progress.percent > entity.build_progress
+                !entity.buildProgress ||
+                temp.progress.percent > entity.buildProgress
             ) {
-                entity.build_progress = Math.min(temp.progress.percent, 100);
+                entity.buildProgress = Math.min(temp.progress.percent, 100);
             }
             break;
         }
         case MasterImageBuilderEvent.EXECUTION_FAILED: {
-            entity.build_status = ProcessStatus.FAILED;
+            entity.buildStatus = ProcessStatus.FAILED;
             break;
         }
         case MasterImageBuilderEvent.EXECUTION_FINISHED: {
-            entity.build_status = ProcessStatus.EXECUTED;
-            entity.build_progress = 100;
+            entity.buildStatus = ProcessStatus.EXECUTED;
+            entity.buildProgress = 100;
         }
     }
 
@@ -67,11 +67,11 @@ export async function handleMasterImageBuilderEvent(
         await eventComponentCaller.callCreate({
             name: context.key,
             data: {},
-            ref_type: DomainType.MASTER_IMAGE,
-            ref_id: entity.id,
+            refType: DomainType.MASTER_IMAGE,
+            refId: entity.id,
             scope: 'builder',
             expiring: true,
-            expires_at: new Date(
+            expiresAt: new Date(
                 Date.now() + (1000 * 60 * 60 * 24),
             ).toISOString(),
         });

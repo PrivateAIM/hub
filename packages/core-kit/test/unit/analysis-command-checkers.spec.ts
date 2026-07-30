@@ -22,34 +22,34 @@ function createBaseAnalysis(overrides?: Partial<Analysis>): Analysis {
         name: null,
         description: null,
         nodes: 0,
-        nodes_approved: 0,
-        configuration_locked: false,
-        configuration_entrypoint_valid: true,
-        configuration_image_valid: true,
-        configuration_node_default_valid: true,
-        configuration_node_aggregator_valid: true,
-        configuration_nodes_valid: true,
-        build_status: null,
-        build_nodes_valid: true,
-        build_progress: null,
-        build_hash: null,
-        build_os: null,
-        build_size: null,
-        distribution_status: null,
-        distribution_progress: null,
-        execution_status: null,
-        execution_progress: null,
-        created_at: new Date(),
-        updated_at: new Date(),
+        nodesApproved: 0,
+        configurationLocked: false,
+        configurationEntrypointValid: true,
+        configurationImageValid: true,
+        configurationNodeDefaultValid: true,
+        configurationNodeAggregatorValid: true,
+        configurationNodesValid: true,
+        buildStatus: null,
+        buildNodesValid: true,
+        buildProgress: null,
+        buildHash: null,
+        buildOs: null,
+        buildSize: null,
+        distributionStatus: null,
+        distributionProgress: null,
+        executionStatus: null,
+        executionProgress: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         registry: {} as Registry,
-        registry_id: 'registry-id',
-        realm_id: 'realm-id',
-        user_id: 'user-id',
-        project_id: 'project-id',
+        registryId: 'registry-id',
+        realmId: 'realm-id',
+        userId: 'user-id',
+        projectId: 'project-id',
         project: {} as Project,
-        image_command_arguments: null,
-        master_image_id: null,
-        master_image: {} as MasterImage,
+        imageCommandArguments: null,
+        masterImageId: null,
+        masterImage: {} as MasterImage,
         ...overrides,
     };
 }
@@ -66,43 +66,43 @@ describe('AnalysisConfiguratorCommandChecker', () => {
         });
 
         it('should throw when already locked', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true });
+            const entity = createBaseAnalysis({ configurationLocked: true });
             expect(() => AnalysisConfiguratorCommandChecker.canLock(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build already initialized', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.STARTING });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.STARTING });
             expect(() => AnalysisConfiguratorCommandChecker.canLock(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when default node invalid', () => {
-            const entity = createBaseAnalysis({ configuration_node_default_valid: false });
+            const entity = createBaseAnalysis({ configurationNodeDefaultValid: false });
             expect(() => AnalysisConfiguratorCommandChecker.canLock(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when aggregator node invalid', () => {
-            const entity = createBaseAnalysis({ configuration_node_aggregator_valid: false });
+            const entity = createBaseAnalysis({ configurationNodeAggregatorValid: false });
             expect(() => AnalysisConfiguratorCommandChecker.canLock(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when entrypoint invalid', () => {
-            const entity = createBaseAnalysis({ configuration_entrypoint_valid: false });
+            const entity = createBaseAnalysis({ configurationEntrypointValid: false });
             expect(() => AnalysisConfiguratorCommandChecker.canLock(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when image invalid', () => {
-            const entity = createBaseAnalysis({ configuration_image_valid: false });
+            const entity = createBaseAnalysis({ configurationImageValid: false });
             expect(() => AnalysisConfiguratorCommandChecker.canLock(entity)).toThrow(AnalysisError);
         });
 
         it('should check conditions in order: locked → build → default node → aggregator → entrypoint → image', () => {
             const entity = createBaseAnalysis({
-                configuration_locked: true,
-                build_status: ProcessStatus.STARTING,
-                configuration_node_default_valid: false,
-                configuration_node_aggregator_valid: false,
-                configuration_entrypoint_valid: false,
-                configuration_image_valid: false,
+                configurationLocked: true,
+                buildStatus: ProcessStatus.STARTING,
+                configurationNodeDefaultValid: false,
+                configurationNodeAggregatorValid: false,
+                configurationEntrypointValid: false,
+                configurationImageValid: false,
             });
             expect(() => AnalysisConfiguratorCommandChecker.canLock(entity))
                 .toThrow('The analysis configuration is locked.');
@@ -111,47 +111,47 @@ describe('AnalysisConfiguratorCommandChecker', () => {
 
     describe('canUnlock', () => {
         it('should allow unlocking when locked and no build started', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: null });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: null });
             expect(() => AnalysisConfiguratorCommandChecker.canUnlock(entity)).not.toThrow();
         });
 
         it('should throw when not locked', () => {
-            const entity = createBaseAnalysis({ configuration_locked: false });
+            const entity = createBaseAnalysis({ configurationLocked: false });
             expect(() => AnalysisConfiguratorCommandChecker.canUnlock(entity)).toThrow(AnalysisError);
         });
 
         it('should allow unlocking when build FAILED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.FAILED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.FAILED });
             expect(() => AnalysisConfiguratorCommandChecker.canUnlock(entity)).not.toThrow();
         });
 
         it('should allow unlocking when build STOPPED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STOPPED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STOPPED });
             expect(() => AnalysisConfiguratorCommandChecker.canUnlock(entity)).not.toThrow();
         });
 
         it('should allow unlocking when build STOPPING', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STOPPING });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STOPPING });
             expect(() => AnalysisConfiguratorCommandChecker.canUnlock(entity)).not.toThrow();
         });
 
         it('should throw when build STARTING', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTING });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTING });
             expect(() => AnalysisConfiguratorCommandChecker.canUnlock(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build STARTED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTED });
             expect(() => AnalysisConfiguratorCommandChecker.canUnlock(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build EXECUTING', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTING });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.EXECUTING });
             expect(() => AnalysisConfiguratorCommandChecker.canUnlock(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build EXECUTED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.EXECUTED });
             expect(() => AnalysisConfiguratorCommandChecker.canUnlock(entity)).toThrow(AnalysisError);
         });
     });
@@ -164,99 +164,99 @@ describe('AnalysisConfiguratorCommandChecker', () => {
 describe('AnalysisBuilderCommandChecker', () => {
     describe('canStart', () => {
         it('should allow when config locked, nodes valid, no build started', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: null });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: null });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).not.toThrow();
         });
 
         it('should throw when config not locked', () => {
-            const entity = createBaseAnalysis({ configuration_locked: false });
+            const entity = createBaseAnalysis({ configurationLocked: false });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when nodes not approved', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_nodes_valid: false });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildNodesValid: false });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should allow retry when build FAILED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.FAILED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.FAILED });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).not.toThrow();
         });
 
         it('should allow retry when build STOPPED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STOPPED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STOPPED });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).not.toThrow();
         });
 
         it('should throw when build STARTING', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTING });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTING });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build STARTED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTED });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build EXECUTING', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTING });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.EXECUTING });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build EXECUTED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.EXECUTED });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build STOPPING', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STOPPING });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STOPPING });
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
     });
 
     describe('canCheck', () => {
         it('should allow when config locked and build in progress', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTING });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTING });
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should throw when config not locked', () => {
-            const entity = createBaseAnalysis({ configuration_locked: false, build_status: ProcessStatus.STARTING });
+            const entity = createBaseAnalysis({ configurationLocked: false, buildStatus: ProcessStatus.STARTING });
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when no build started', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: null });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: null });
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).toThrow(AnalysisError);
         });
 
         it('should allow when build EXECUTED (reconciliation after data loss)', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.EXECUTED });
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should allow when build STARTED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STARTED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTED });
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should allow when build EXECUTING', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.EXECUTING });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.EXECUTING });
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should allow when build FAILED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.FAILED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.FAILED });
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should allow when build STOPPED', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STOPPED });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STOPPED });
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should allow when build STOPPING', () => {
-            const entity = createBaseAnalysis({ configuration_locked: true, build_status: ProcessStatus.STOPPING });
+            const entity = createBaseAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STOPPING });
             expect(() => AnalysisBuilderCommandChecker.canCheck(entity)).not.toThrow();
         });
     });
@@ -269,99 +269,99 @@ describe('AnalysisBuilderCommandChecker', () => {
 describe('AnalysisDistributorCommandChecker', () => {
     describe('canStart', () => {
         it('should allow when build EXECUTED and no distribution started', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: null });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: null });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).not.toThrow();
         });
 
         it('should throw when not built', () => {
-            const entity = createBaseAnalysis({ build_status: null });
+            const entity = createBaseAnalysis({ buildStatus: null });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build not EXECUTED', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.STARTED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.STARTED });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should allow retry when distribution FAILED', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.FAILED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.FAILED });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).not.toThrow();
         });
 
         it('should allow retry when distribution STOPPED', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.STOPPED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.STOPPED });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).not.toThrow();
         });
 
         it('should throw when distribution STARTING', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.STARTING });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.STARTING });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when distribution STARTED', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.STARTED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.STARTED });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when distribution EXECUTING', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.EXECUTING });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.EXECUTING });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when distribution EXECUTED', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.EXECUTED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.EXECUTED });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when distribution STOPPING', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.STOPPING });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.STOPPING });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
     });
 
     describe('canCheck', () => {
         it('should allow when build EXECUTED and distribution in progress', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.STARTED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.STARTED });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should allow when distribution STARTING', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.STARTING });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.STARTING });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should allow when distribution FAILED', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.FAILED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.FAILED });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should throw when distribution not initialized', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: null });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: null });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).toThrow(AnalysisError);
         });
 
         it('should allow when distribution EXECUTED (reconciliation after data loss)', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.EXECUTED, distribution_status: ProcessStatus.EXECUTED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: ProcessStatus.EXECUTED });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).not.toThrow();
         });
 
         it('should throw when build not initialized', () => {
-            const entity = createBaseAnalysis({ build_status: null });
+            const entity = createBaseAnalysis({ buildStatus: null });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build not finished', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.STARTING });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.STARTING });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build FAILED', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.FAILED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.FAILED });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).toThrow(AnalysisError);
         });
 
         it('should throw when build STOPPED', () => {
-            const entity = createBaseAnalysis({ build_status: ProcessStatus.STOPPED });
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.STOPPED });
             expect(() => AnalysisDistributorCommandChecker.canCheck(entity)).toThrow(AnalysisError);
         });
     });

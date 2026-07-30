@@ -37,12 +37,12 @@ export default defineComponent({
         <template #default="{ data, update, busy }">
             <template v-if="data">
                 <FImageCommandArguments
-                    :items="(data.image_command_arguments || data.master_image?.command_arguments) ?? undefined"
+                    :items="(data.imageCommandArguments || data.masterImage?.commandArguments) ?? undefined"
                     :readonly="readonly || busy"
 
                     @submit="(value) => {
                         update({
-                            image_command_arguments: value
+                            imageCommandArguments: value
                         })
                     }"
                 />

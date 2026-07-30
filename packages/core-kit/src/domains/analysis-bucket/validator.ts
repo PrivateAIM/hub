@@ -17,13 +17,13 @@ export class AnalysisBucketValidator extends Container<AnalysisBucket> {
         super.initialize();
 
         this.mount(
-            'analysis_id',
+            'analysisId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );
 
         this.mount(
-            'bucket_id',
+            'bucketId',
             { group: ValidatorGroup.CREATE },
             createValidator(z.uuid()),
         );

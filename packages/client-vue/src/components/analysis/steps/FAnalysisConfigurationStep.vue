@@ -52,22 +52,22 @@ export default defineComponent({
         };
 
         const passed = computed(() => props.entity &&
-            props.entity.configuration_entrypoint_valid &&
-                props.entity.configuration_image_valid &&
-                props.entity.configuration_nodes_valid);
+            props.entity.configurationEntrypointValid &&
+                props.entity.configurationImageValid &&
+                props.entity.configurationNodesValid);
 
         const progress = computed(() => {
             let current = 0;
 
-            if (props.entity.configuration_entrypoint_valid) {
+            if (props.entity.configurationEntrypointValid) {
                 current++;
             }
 
-            if (props.entity.configuration_image_valid) {
+            if (props.entity.configurationImageValid) {
                 current++;
             }
 
-            if (props.entity.configuration_nodes_valid) {
+            if (props.entity.configurationNodesValid) {
                 current++;
             }
 

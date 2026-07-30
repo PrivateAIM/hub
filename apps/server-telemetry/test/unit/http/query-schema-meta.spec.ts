@@ -38,8 +38,8 @@ describe('src/adapters/http/controllers (query schema meta)', () => {
     const eventPayload: Partial<Event> = {
         scope: 'model',
         name: 'updated',
-        ref_type: 'project',
-        ref_id: '4b324d99-1984-4081-a47d-10e809092075',
+        refType: 'project',
+        refId: '4b324d99-1984-4081-a47d-10e809092075',
     };
 
     it('should describe the full query vocabulary on a collection response', async () => {
@@ -55,7 +55,7 @@ describe('src/adapters/http/controllers (query schema meta)', () => {
         // every hub schema opts into strict key validation
         expect(meta.schema.strict).toBe(true);
         expect(meta.schema.filters.allowed).toContain('name');
-        expect(meta.schema.sort.allowed).toContain('created_at');
+        expect(meta.schema.sort.allowed).toContain('createdAt');
         expect(meta.schema.pagination.maxLimit).toEqual(50);
         // eventSchema omits `relations` entirely, so the normalized shape
         // reports nulls — the key itself is still present.

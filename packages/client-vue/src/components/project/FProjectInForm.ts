@@ -48,7 +48,7 @@ const FProjectInForm = defineComponent({
         const busy = ref(false);
         const form = reactive({
             comment: '',
-            approval_status: '' as ProjectNodeApprovalStatus,
+            approvalStatus: '' as ProjectNodeApprovalStatus,
         });
 
         const options = [
@@ -71,7 +71,7 @@ const FProjectInForm = defineComponent({
         );
 
         const commentValidation = useFieldValidation($v.fields.comment);
-        const approvalStatusValidation = useFieldValidation($v.fields.approval_status);
+        const approvalStatusValidation = useFieldValidation($v.fields.approvalStatus);
 
         const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
@@ -125,9 +125,9 @@ const FProjectInForm = defineComponent({
                 },
                 {
                     default: () => h(VCFormSelect, {
-                        modelValue: form.approval_status,
+                        modelValue: form.approvalStatus,
                         'onUpdate:modelValue': (input: unknown) => {
-                            form.approval_status = input as ProjectNodeApprovalStatus;
+                            form.approvalStatus = input as ProjectNodeApprovalStatus;
                         },
                         options: options.map((option) => ({
                             value: option,

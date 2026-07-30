@@ -65,7 +65,7 @@ export default defineComponent({
 
         const vNodes = useTemplateRef<typeof FAnalysisNodes>('analysisNodes');
         const vNodesQuery : QueryBuildInput<AnalysisNode, 3> = {
-            filters: { analysis_id: props.entity.id },
+            filters: { analysisId: props.entity.id },
             sort: 'node.name',
         };
 
@@ -154,15 +154,15 @@ export default defineComponent({
                 ref="analysisNodes"
                 :header="false"
                 :query="vNodesQuery"
-                :realm-id="entity.realm_id"
+                :realm-id="entity.realmId"
                 :source-id="entity.id"
             >
                 <template #body="props">
                     <div
                         class="flex flex-row flex-wrap justify-between"
                         :class="{
-                            'flex-row': entity.configuration_locked,
-                            'flex-col gap-1': !entity.configuration_locked
+                            'flex-row': entity.configurationLocked,
+                            'flex-col gap-1': !entity.configurationLocked
                         }"
                     >
                         <template
@@ -171,7 +171,7 @@ export default defineComponent({
                         >
                             <div
                                 class="w-full px-2"
-                                :class="{'w-full px-2 lg:w-6/12': entity.configuration_locked}"
+                                :class="{'w-full px-2 lg:w-6/12': entity.configurationLocked}"
                             >
                                 <div class="flex flex-col gap-2 m-1">
                                     <div class="progress-step flex flex-col gap-1">
@@ -184,7 +184,7 @@ export default defineComponent({
                                                 </h6>
                                             </div>
                                             <div
-                                                v-if="!entity.configuration_locked"
+                                                v-if="!entity.configurationLocked"
                                                 class="ms-auto"
                                             >
                                                 <VCButton
@@ -200,11 +200,11 @@ export default defineComponent({
                                         <div class="flex flex-row flex-wrap items-center gap-x-2">
                                             <small class="text-fg-muted">
                                                 approval:
-                                                <FAnalysisNodeApprovalStatus :status="item.approval_status" />
+                                                <FAnalysisNodeApprovalStatus :status="item.approvalStatus" />
                                             </small>
                                             <small class="text-fg-muted ms-auto">
                                                 execution:
-                                                <FAnalysisNodeExecutionStatus :status="item.execution_status" />
+                                                <FAnalysisNodeExecutionStatus :status="item.executionStatus" />
                                             </small>
                                         </div>
                                         <FProgressBar
@@ -214,11 +214,11 @@ export default defineComponent({
                                         />
                                     </div>
 
-                                    <template v-if="item.execution_status">
+                                    <template v-if="item.executionStatus">
                                         <div>
                                             <FAnalysisNodeLogs
-                                                :analysis-id="item.analysis_id"
-                                                :node-id="item.node_id"
+                                                :analysis-id="item.analysisId"
+                                                :node-id="item.nodeId"
                                             />
                                         </div>
                                     </template>
@@ -257,7 +257,7 @@ export default defineComponent({
                 <div class="modal-body">
                     <FAnalysisNodePicker
                         :analysis-id="entity.id"
-                        :project-id="entity.project_id"
+                        :project-id="entity.projectId"
                         @created="handleCreated"
                         @deleted="handleDeleted"
                         @failed="handleFailed"

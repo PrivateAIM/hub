@@ -60,14 +60,14 @@ describe('worker analysis aggregators', () => {
         const projectRepository = dataSource.getRepository(ProjectEntity);
         const project = await projectRepository.save(projectRepository.create({
             name: faker.string.alpha({ length: 16, casing: 'lower' }),
-            realm_id: faker.string.uuid(),
+            realmId: faker.string.uuid(),
         }));
 
         const repository = dataSource.getRepository(AnalysisEntity);
         return repository.save(repository.create({
             name: faker.string.alpha({ length: 16, casing: 'lower' }),
-            realm_id: project.realm_id,
-            project_id: project.id,
+            realmId: project.realmId,
+            projectId: project.id,
             ...overrides,
         }));
     }
@@ -79,8 +79,8 @@ describe('worker analysis aggregators', () => {
     describe('analysis-builder', () => {
         it('should apply build metadata on CHECK_FINISHED with status EXECUTED', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.STARTED,
-                build_progress: 40,
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
             });
 
             const payload: AnalysisBuilderCheckFinishedPayload = {
@@ -98,20 +98,20 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.build_status).toBe(ProcessStatus.EXECUTED);
-            expect(entity.build_progress).toBe(100);
-            expect(entity.build_hash).toBe('sha256:abc');
-            expect(entity.build_os).toBe('linux');
-            expect(entity.build_size).toBe(1024);
+            expect(entity.buildStatus).toBe(ProcessStatus.EXECUTED);
+            expect(entity.buildProgress).toBe(100);
+            expect(entity.buildHash).toBe('sha256:abc');
+            expect(entity.buildOs).toBe('linux');
+            expect(entity.buildSize).toBe(1024);
         });
 
         it('should keep build metadata and progress on CHECK_FINISHED with in-progress status', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.STARTED,
-                build_progress: 40,
-                build_hash: 'sha256:previous',
-                build_os: 'linux',
-                build_size: 512,
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
+                buildHash: 'sha256:previous',
+                buildOs: 'linux',
+                buildSize: 512,
             });
 
             const payload: AnalysisBuilderCheckFinishedPayload = {
@@ -126,22 +126,22 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.build_status).toBe(ProcessStatus.STARTED);
-            expect(entity.build_progress).toBe(40);
-            expect(entity.build_hash).toBe('sha256:previous');
-            expect(entity.build_os).toBe('linux');
-            expect(entity.build_size).toBe(512);
+            expect(entity.buildStatus).toBe(ProcessStatus.STARTED);
+            expect(entity.buildProgress).toBe(40);
+            expect(entity.buildHash).toBe('sha256:previous');
+            expect(entity.buildOs).toBe('linux');
+            expect(entity.buildSize).toBe(512);
         });
 
         it('should reset build artifacts on CHECK_FINISHED with status FAILED (data loss recovery)', async () => {
             const analysis = await createAnalysis({
-                configuration_locked: true,
-                build_nodes_valid: true,
-                build_status: ProcessStatus.EXECUTED,
-                build_progress: 100,
-                build_hash: 'sha256:lost',
-                build_os: 'linux',
-                build_size: 512,
+                configurationLocked: true,
+                buildNodesValid: true,
+                buildStatus: ProcessStatus.EXECUTED,
+                buildProgress: 100,
+                buildHash: 'sha256:lost',
+                buildOs: 'linux',
+                buildSize: 512,
             });
 
             const payload: AnalysisBuilderCheckFinishedPayload = {
@@ -156,11 +156,11 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.build_status).toBe(ProcessStatus.FAILED);
-            expect(entity.build_progress).toBe(0);
-            expect(entity.build_hash).toBeNull();
-            expect(entity.build_os).toBeNull();
-            expect(entity.build_size).toBeNull();
+            expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
+            expect(entity.buildProgress).toBe(0);
+            expect(entity.buildHash).toBeNull();
+            expect(entity.buildOs).toBeNull();
+            expect(entity.buildSize).toBeNull();
 
             // the analysis must be rebuildable again after the reset
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).not.toThrow();
@@ -168,8 +168,8 @@ describe('worker analysis aggregators', () => {
 
         it('should not modify the entity on CHECK_FINISHED without status', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.STARTING,
-                build_hash: 'sha256:previous',
+                buildStatus: ProcessStatus.STARTING,
+                buildHash: 'sha256:previous',
             });
 
             const payload: AnalysisBuilderCheckFinishedPayload = { id: analysis.id };
@@ -181,14 +181,14 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.build_status).toBe(ProcessStatus.STARTING);
-            expect(entity.build_hash).toBe('sha256:previous');
+            expect(entity.buildStatus).toBe(ProcessStatus.STARTING);
+            expect(entity.buildHash).toBe('sha256:previous');
         });
 
         it('should not mark the build as FAILED on CHECK_FAILED', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.STARTED,
-                build_progress: 40,
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
             });
 
             await handleAnalysisBuilderEvent(
@@ -198,12 +198,12 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.build_status).toBe(ProcessStatus.STARTED);
-            expect(entity.build_progress).toBe(40);
+            expect(entity.buildStatus).toBe(ProcessStatus.STARTED);
+            expect(entity.buildProgress).toBe(40);
         });
 
         it('should mark the build as FAILED on EXECUTION_FAILED', async () => {
-            const analysis = await createAnalysis({ build_status: ProcessStatus.STARTED });
+            const analysis = await createAnalysis({ buildStatus: ProcessStatus.STARTED });
 
             await handleAnalysisBuilderEvent(
                 { id: analysis.id },
@@ -212,16 +212,16 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.build_status).toBe(ProcessStatus.FAILED);
+            expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
         });
     });
 
     describe('analysis-distributor', () => {
         it('should mark the distribution as EXECUTED on CHECK_FINISHED with status EXECUTED', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.EXECUTED,
-                distribution_status: ProcessStatus.STARTED,
-                distribution_progress: 40,
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
             });
 
             const payload: AnalysisDistributorCheckFinishedPayload = {
@@ -236,15 +236,15 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.distribution_status).toBe(ProcessStatus.EXECUTED);
-            expect(entity.distribution_progress).toBe(100);
+            expect(entity.distributionStatus).toBe(ProcessStatus.EXECUTED);
+            expect(entity.distributionProgress).toBe(100);
         });
 
         it('should mark the distribution as FAILED on CHECK_FINISHED with status FAILED', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.EXECUTED,
-                distribution_status: ProcessStatus.STARTED,
-                distribution_progress: 40,
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
             });
 
             const payload: AnalysisDistributorCheckFinishedPayload = {
@@ -259,15 +259,15 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.distribution_status).toBe(ProcessStatus.FAILED);
-            expect(entity.distribution_progress).toBe(0);
+            expect(entity.distributionStatus).toBe(ProcessStatus.FAILED);
+            expect(entity.distributionProgress).toBe(0);
         });
 
         it('should keep progress on CHECK_FINISHED with in-progress status', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.EXECUTED,
-                distribution_status: ProcessStatus.STARTED,
-                distribution_progress: 40,
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
             });
 
             const payload: AnalysisDistributorCheckFinishedPayload = {
@@ -282,14 +282,14 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.distribution_status).toBe(ProcessStatus.STARTED);
-            expect(entity.distribution_progress).toBe(40);
+            expect(entity.distributionStatus).toBe(ProcessStatus.STARTED);
+            expect(entity.distributionProgress).toBe(40);
         });
 
         it('should not modify the entity on CHECK_FINISHED without status', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.EXECUTED,
-                distribution_status: ProcessStatus.STARTING,
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTING,
             });
 
             const payload: AnalysisDistributorCheckFinishedPayload = { id: analysis.id };
@@ -301,14 +301,14 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.distribution_status).toBe(ProcessStatus.STARTING);
+            expect(entity.distributionStatus).toBe(ProcessStatus.STARTING);
         });
 
         it('should not mark the distribution as FAILED on CHECK_FAILED', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.EXECUTED,
-                distribution_status: ProcessStatus.STARTED,
-                distribution_progress: 40,
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
             });
 
             await handleAnalysisDistributorEvent(
@@ -318,14 +318,14 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.distribution_status).toBe(ProcessStatus.STARTED);
-            expect(entity.distribution_progress).toBe(40);
+            expect(entity.distributionStatus).toBe(ProcessStatus.STARTED);
+            expect(entity.distributionProgress).toBe(40);
         });
 
         it('should mark the distribution as FAILED on EXECUTION_FAILED', async () => {
             const analysis = await createAnalysis({
-                build_status: ProcessStatus.EXECUTED,
-                distribution_status: ProcessStatus.STARTED,
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
             });
 
             await handleAnalysisDistributorEvent(
@@ -335,7 +335,7 @@ describe('worker analysis aggregators', () => {
             );
 
             const entity = await findAnalysis(analysis.id);
-            expect(entity.distribution_status).toBe(ProcessStatus.FAILED);
+            expect(entity.distributionStatus).toBe(ProcessStatus.FAILED);
         });
     });
 });

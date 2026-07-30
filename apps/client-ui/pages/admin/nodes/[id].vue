@@ -63,9 +63,9 @@ export default defineComponent({
         await manager.resolve({
             query: {
                 fields: [
-                    '+registry_id',
-                    '+registry_project_id',
-                    '+external_name',
+                    '+registryId',
+                    '+registryProjectId',
+                    '+externalName',
                 ],
             },
         });
@@ -97,8 +97,8 @@ export default defineComponent({
             {
                 name: 'Client',
                 icon: 'fa6-solid:ghost',
-                url: entity.client_id && canManageClient.value ?
-                    `/admin/clients/${entity.client_id}` :
+                url: entity.clientId && canManageClient.value ?
+                    `/admin/clients/${entity.clientId}` :
                     `${base}/client`,
             },
             {

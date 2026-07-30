@@ -24,7 +24,7 @@ import {
 import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from './analysis.ts';
 
-@Unique(['bucket_id', 'analysis_id'])
+@Unique(['bucketId', 'analysisId'])
 @Entity({ name: 'analysis_buckets' })
 export class AnalysisBucketEntity implements AnalysisBucket {
     @PrimaryGeneratedColumn('uuid')
@@ -33,13 +33,13 @@ export class AnalysisBucketEntity implements AnalysisBucket {
     @Column({ type: 'varchar', length: 64 })
     type: `${AnalysisBucketType}`;
 
-    @Column({ type: 'uuid' })
-    bucket_id: string;
+    @Column({ name: 'bucket_id', type: 'uuid' })
+    bucketId: string;
 
     // ------------------------------------------------------------------
 
-    @Column()
-    analysis_id: Analysis['id'];
+    @Column({ name: 'analysis_id' })
+    analysisId: Analysis['id'];
 
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
@@ -47,14 +47,14 @@ export class AnalysisBucketEntity implements AnalysisBucket {
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid' })
-    realm_id: Realm['id'];
+    @Column({ name: 'realm_id', type: 'uuid' })
+    realmId: Realm['id'];
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 }

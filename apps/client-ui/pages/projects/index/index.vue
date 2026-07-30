@@ -50,8 +50,8 @@ export default defineNuxtComponent({
         const { realmId } = storeToRefs(store);
 
         const query = computed(() => ({
-            filters: { realm_id: realmId.value },
-            sort: { updated_at: 'DESC' },
+            filters: { realmId: realmId.value },
+            sort: { updatedAt: 'DESC' },
         }));
 
         return { query };

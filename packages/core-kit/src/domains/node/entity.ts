@@ -13,9 +13,9 @@ import type { NodeType } from './constants';
 export interface Node {
     id: string;
 
-    external_name: string | null;
+    externalName: string | null;
 
-    public_key: string | null;
+    publicKey: string | null;
 
     name: string;
 
@@ -27,30 +27,30 @@ export interface Node {
 
     // ------------------------------------------------------------------
 
-    registry_id: Registry['id'] | null;
+    registryId: Registry['id'] | null;
 
     registry: Registry | null;
 
-    registry_project_id: RegistryProject['id'] | null;
+    registryProjectId: RegistryProject['id'] | null;
 
-    registry_project: RegistryProject | null;
+    registryProject: RegistryProject | null;
 
     // ------------------------------------------------------------------
 
-    client_id: Client['id'] | null;
+    clientId: Client['id'] | null;
 
     /**
      * @deprecated
      */
-    robot_id: Client['id'] | null;
+    robotId: Client['id'] | null;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'];
+    realmId: Realm['id'];
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
+    updatedAt: string;
 }

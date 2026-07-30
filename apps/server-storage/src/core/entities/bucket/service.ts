@@ -66,17 +66,17 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        if (validated.realm_id) {
-            if (!isRealmResourceWritable(actor.realm, validated.realm_id)) {
+        if (validated.realmId) {
+            if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
                 throw new PermissionDeniedError('You are not permitted to create this bucket.');
             }
         } else {
-            validated.realm_id = this.getActorRealmId(actor);
+            validated.realmId = this.getActorRealmId(actor);
         }
 
         return this.caller.create({
-            actor_id: actor.identity.id,
-            actor_type: actor.identity.type,
+            actorId: actor.identity.id,
+            actorType: actor.identity.type,
             ...validated,
         });
     }
@@ -92,7 +92,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         if (!this.isOwnedByActor(entity, actor)) {
             await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_UPDATE });
 
-            if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
                 throw new PermissionDeniedError();
             }
         }
@@ -123,7 +123,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         if (!this.isOwnedByActor(entity, actor)) {
             await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_DELETE });
 
-            if (!isRealmResourceWritable(actor.realm, entity.realm_id)) {
+            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
                 throw new PermissionDeniedError();
             }
         }
@@ -133,7 +133,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
     private isOwnedByActor(entity: Bucket, actor: ActorContext): boolean {
         if (!actor.identity) return false;
-        return entity.actor_type === actor.identity.type &&
-            entity.actor_id === actor.identity.id;
+        return entity.actorType === actor.identity.type &&
+            entity.actorId === actor.identity.id;
     }
 }

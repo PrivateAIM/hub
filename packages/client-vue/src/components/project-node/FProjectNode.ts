@@ -55,11 +55,11 @@ export default defineComponent({
                 }
 
                 if (props.target === Target.PROJECT) {
-                    return entity.project_realm_id;
+                    return entity.projectRealmId;
                 }
 
                 if (props.target === Target.NODE) {
-                    return entity.node_realm_id;
+                    return entity.nodeRealmId;
                 }
 
                 return undefined;
@@ -74,11 +74,11 @@ export default defineComponent({
                     }
 
                     if (props.target === Target.PROJECT) {
-                        return realmId === event.data.project_realm_id;
+                        return realmId === event.data.projectRealmId;
                     }
 
                     if (props.target === Target.NODE) {
-                        return realmId === event.data.node_realm_id;
+                        return realmId === event.data.nodeRealmId;
                     }
 
                     return false;
@@ -132,12 +132,12 @@ export default defineComponent({
         ) {
             if (props.target === Target.PROJECT) {
                 const { data: project } = await apiClient
-                    .project.getOne(manager.data.value.project_id);
+                    .project.getOne(manager.data.value.projectId);
 
                 manager.data.value[props.target] = project;
             } else {
                 const { data: node } = await apiClient
-                    .node.getOne(manager.data.value.node_id);
+                    .node.getOne(manager.data.value.nodeId);
 
                 manager.data.value[props.target] = node;
             }
@@ -154,7 +154,7 @@ export default defineComponent({
                         return h('div', [
                             h(FDisplayName, {
                                 name: manager.data.value?.project.name,
-                                displayName: manager.data.value?.project.display_name,
+                                displayName: manager.data.value?.project.displayName,
                             }),
                         ]);
                     }

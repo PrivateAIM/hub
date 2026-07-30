@@ -48,49 +48,6 @@ export default defineComponent({
             ],
         });
 
-        const fields = [
-            {
-                key: 'id', 
-                label: 'ID', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
-            },
-            {
-                key: 'realm', 
-                label: 'Realm', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
-            },
-            {
-                key: 'approval_status', 
-                label: 'Approval Status', 
-                thClass: 'text-center', 
-                tdClass: 'text-center',
-            },
-            {
-                key: 'run_status', 
-                label: 'Run Status', 
-                thClass: 'text-center', 
-                tdClass: 'text-center',
-            },
-            {
-                key: 'updated_at', 
-                label: 'Updated At', 
-                thClass: 'text-center', 
-                tdClass: 'text-center',
-            },
-            {
-                key: 'created_at', 
-                label: 'Created At', 
-                thClass: 'text-left', 
-                tdClass: 'text-left',
-            },
-            {
-                key: 'options', 
-                label: '', 
-                tdClass: 'text-left', 
-            },
-        ];
 
         const api = injectCoreHTTPClient();
         const store = injectStore();
@@ -103,13 +60,13 @@ export default defineComponent({
                 node: true,
                 analysis: true,
             },
-            filters: { analysis: { project_id: props.entity.id } },
-            sort: { updated_at: 'DESC' },
+            filters: { analysis: { projectId: props.entity.id } },
+            sort: { updatedAt: 'DESC' },
         };
 
         const download = (item: AnalysisNode) => {
             if (typeof window !== 'undefined') {
-                window.open(api.analysis.getFileDownloadURL(item.analysis_id), '_blank');
+                window.open(api.analysis.getFileDownloadURL(item.analysisId), '_blank');
             }
         };
 
@@ -122,7 +79,6 @@ export default defineComponent({
         };
 
         return {
-            fields,
             realmId,
             canManage,
             query,

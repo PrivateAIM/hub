@@ -36,12 +36,13 @@ export class ProjectEntity implements Project {
     name: string;
 
     @Column({
+        name: 'display_name',
         type: 'varchar',
         length: 256,
         nullable: true,
         default: null,
     })
-    display_name: string | null;
+    displayName: string | null;
 
     @Column({ type: 'text', nullable: true })
     description: string | null;
@@ -64,30 +65,46 @@ export class ProjectEntity implements Project {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid' })
-    realm_id: Realm['id'];
+    @Column({ name: 'realm_id', type: 'uuid' })
+    realmId: Realm['id'];
 
-    @Column({ type: 'uuid', nullable: true })
-    client_id: Client['id'] | null;
+    @Column({
+        name: 'client_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    clientId: Client['id'] | null;
 
-    @Column({ type: 'uuid', nullable: true })
-    user_id: User['id'] | null;
+    @Column({
+        name: 'user_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    userId: User['id'] | null;
 
-    @Column({ type: 'uuid', nullable: true })
-    robot_id: Client['id'] | null;
+    @Column({
+        name: 'robot_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    robotId: Client['id'] | null;
 
-    @Column({ nullable: true, default: null })
-    master_image_id: MasterImage['id'] | null;
+    @Column({
+        name: 'master_image_id', 
+        nullable: true, 
+        default: null, 
+    })
+    masterImageId: MasterImage['id'] | null;
 
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })
-    master_image: MasterImageEntity | null;
+    masterImage: MasterImageEntity | null;
 }

@@ -15,6 +15,6 @@ export class FakeAnalysisRepository extends FakeEntityRepository<Analysis> imple
     }
 
     async countByProject(projectId: string): Promise<number> {
-        return this.getAll().filter((entity) => entity.project_id === projectId).length;
+        return this.getAll().filter((entity) => entity.projectId === projectId).length;
     }
 }

@@ -38,6 +38,23 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
     };
 }
 
+/**
+ * Introspection delivers each grant's realm/client scope as the OAuth2 wire
+ * shape (`realm_id` / `client_id`), while `@authup/access`'s `BasePermission`
+ * is camelCase (`realmId` / `clientId`). Those two keys are deliberately NOT
+ * forwarded: `PermissionMemoryProvider` indexes a grant by
+ * `buildPermissionKey({ name, realmId, clientId })`, but the evaluator is built
+ * with `realmId: null, clientId: null` and `RequestPermissionChecker` never
+ * supplies per-check overrides, so every lookup keys both scope segments as
+ * the wildcard. Populating the grant side alone would key the stored grants
+ * by their real realm and client, and make every check miss — denying
+ * everything.
+ *
+ * Until hub scopes lookups too (plan 016, IPermissionEvaluator alignment), the
+ * scope is intentionally dropped rather than half-applied. Previously these were
+ * passed as `realm_id`/`client_id`, which `BasePermission` silently discarded —
+ * the same behaviour, but reading as though the scope were honoured.
+ */
 export function applyTokenVerificationData(
     event: IAppEvent,
     data: TokenVerificationDataMinimal,
@@ -47,13 +64,7 @@ export function applyTokenVerificationData(
     if (fakeAbilities) {
         repository = new FakePermissionProvider();
     } else {
-        repository = new PermissionMemoryProvider(data.permissions.map((p) => ({
-            permission: {
-                name: p.name,
-                realm_id: p.realm_id,
-                client_id: p.client_id,
-            },
-        })));
+        repository = new PermissionMemoryProvider(data.permissions.map((p) => ({ permission: { name: p.name } })));
     }
 
     const permissionEvaluator = new PermissionEvaluator({

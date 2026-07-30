@@ -22,35 +22,35 @@ export interface AnalysisBucketFile {
 
     // ------------------------------------------------------------------
 
-    created_at: string;
+    createdAt: string;
 
-    updated_at: string;
-
-    // ------------------------------------------------------------------
-
-    bucket_id: string;
-
-    bucket_file_id: string;
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    analysis_bucket_id: AnalysisBucket['id'];
+    bucketId: string;
 
-    analysis_bucket: AnalysisBucket;
+    bucketFileId: string;
 
     // ------------------------------------------------------------------
 
-    analysis_id: Analysis['id'];
+    analysisBucketId: AnalysisBucket['id'];
+
+    analysisBucket: AnalysisBucket;
+
+    // ------------------------------------------------------------------
+
+    analysisId: Analysis['id'];
 
     analysis: Analysis;
 
     // ------------------------------------------------------------------
 
-    realm_id: Realm['id'];
+    realmId: Realm['id'];
 
-    client_id: Client['id'] | null;
+    clientId: Client['id'] | null;
 
-    user_id: User['id'] | null;
+    userId: User['id'] | null;
 
-    robot_id: Client['id'] | null;
+    robotId: Client['id'] | null;
 }

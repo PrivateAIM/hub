@@ -32,16 +32,20 @@ export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid', nullable: true })
-    event_id: Event['id'];
+    @Column({
+        name: 'event_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    eventId: Event['id'];
 
     // ------------------------------------------------------------------
 
@@ -49,11 +53,11 @@ export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
     @JoinColumn({ name: 'analysis_id' })
     analysis: AnalysisEntity;
 
-    @Column()
-    analysis_id: Analysis['id'];
+    @Column({ name: 'analysis_id' })
+    analysisId: Analysis['id'];
 
-    @Column({ type: 'uuid' })
-    analysis_realm_id: Realm['id'];
+    @Column({ name: 'analysis_realm_id', type: 'uuid' })
+    analysisRealmId: Realm['id'];
 
     // ------------------------------------------------------------------
 
@@ -61,9 +65,9 @@ export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
-    @Column()
-    node_id: Node['id'];
+    @Column({ name: 'node_id' })
+    nodeId: Node['id'];
 
-    @Column({ type: 'uuid' })
-    node_realm_id: Realm['id'];
+    @Column({ name: 'node_realm_id', type: 'uuid' })
+    nodeRealmId: Realm['id'];
 }

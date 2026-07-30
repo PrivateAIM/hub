@@ -29,7 +29,7 @@ import {
 import { AnalysisEntity } from './analysis.ts';
 import { AnalysisBucketEntity } from './analysis-bucket.ts';
 
-@Unique(['analysis_id', 'path'])
+@Unique(['analysisId', 'path'])
 @Entity({ name: 'analysis_bucket_files' })
 export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     @PrimaryGeneratedColumn('uuid')
@@ -43,30 +43,42 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'uuid' })
-    bucket_id: string;
+    @Column({ name: 'bucket_id', type: 'uuid' })
+    bucketId: string;
 
-    @Column({ type: 'uuid' })
-    bucket_file_id: string;
-
-    // ------------------------------------------------------------------
-
-    @Column({ type: 'uuid', nullable: true })
-    client_id: Client['id'] | null;
-
-    @Column({ type: 'uuid', nullable: true })
-    robot_id: Client['id'] | null;
-
-    @Column({ type: 'uuid', nullable: true })
-    user_id: User['id'] | null;
-
-    @Column({ type: 'uuid' })
-    realm_id: Realm['id'];
+    @Column({ name: 'bucket_file_id', type: 'uuid' })
+    bucketFileId: string;
 
     // ------------------------------------------------------------------
 
-    @Column()
-    analysis_id: Analysis['id'];
+    @Column({
+        name: 'client_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    clientId: Client['id'] | null;
+
+    @Column({
+        name: 'robot_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    robotId: Client['id'] | null;
+
+    @Column({
+        name: 'user_id', 
+        type: 'uuid', 
+        nullable: true, 
+    })
+    userId: User['id'] | null;
+
+    @Column({ name: 'realm_id', type: 'uuid' })
+    realmId: Realm['id'];
+
+    // ------------------------------------------------------------------
+
+    @Column({ name: 'analysis_id' })
+    analysisId: Analysis['id'];
 
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
@@ -74,20 +86,20 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
 
     // ------------------------------------------------------------------
 
-    @Column()
-    analysis_bucket_id: AnalysisBucket['id'];
+    @Column({ name: 'analysis_bucket_id' })
+    analysisBucketId: AnalysisBucket['id'];
 
     @ManyToOne(() => AnalysisBucketEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_bucket_id' })
-    analysis_bucket: AnalysisBucketEntity;
+    analysisBucket: AnalysisBucketEntity;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 }

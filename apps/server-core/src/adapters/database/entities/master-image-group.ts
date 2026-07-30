@@ -28,14 +28,18 @@ export class MasterImageGroupEntity implements MasterImageGroup {
     path: string;
 
     @Index()
-    @Column({ type: 'varchar', length: 512 })
-    virtual_path: string;
+    @Column({
+        name: 'virtual_path', 
+        type: 'varchar', 
+        length: 512, 
+    })
+    virtualPath: string;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 }

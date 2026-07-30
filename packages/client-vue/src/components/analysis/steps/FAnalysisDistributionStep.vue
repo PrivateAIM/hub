@@ -46,11 +46,11 @@ export default defineComponent({
         };
 
         const progress = computed(() => {
-            if (props.entity.distribution_status === ProcessStatus.EXECUTED) {
+            if (props.entity.distributionStatus === ProcessStatus.EXECUTED) {
                 return 100;
             }
 
-            return props.entity.distribution_progress || 0;
+            return props.entity.distributionProgress || 0;
         });
 
         return {
@@ -72,7 +72,7 @@ export default defineComponent({
                     3. Distribution
                 </div>
                 <div class="ms-auto">
-                    <FProcessStatus :value="entity.distribution_status">
+                    <FProcessStatus :value="entity.distributionStatus">
                         <template #default=" { iconName, iconClass, classSuffix }">
                             <VCIcon
                                 :name="iconName"

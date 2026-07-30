@@ -16,13 +16,13 @@ export interface AnalysisNode {
 
     // ------------------------------------------------------------------
 
-    approval_status: AnalysisNodeApprovalStatus | null;
+    approvalStatus: AnalysisNodeApprovalStatus | null;
 
     // ------------------------------------------------------------------
 
-    execution_status: ProcessStatus | null;
+    executionStatus: ProcessStatus | null;
 
-    execution_progress: number | null;
+    executionProgress: number | null;
 
     // ------------------------------------------------------------------
 
@@ -30,27 +30,27 @@ export interface AnalysisNode {
 
     // ------------------------------------------------------------------
 
-    artifact_tag: string | null;
+    artifactTag: string | null;
 
-    artifact_digest: string | null;
-
-    // ------------------------------------------------------------------
-
-    created_at: string;
-
-    updated_at: string;
+    artifactDigest: string | null;
 
     // ------------------------------------------------------------------
 
-    analysis_id: Analysis['id'];
+    createdAt: string;
+
+    updatedAt: string;
+
+    // ------------------------------------------------------------------
+
+    analysisId: Analysis['id'];
 
     analysis: Analysis;
 
-    analysis_realm_id: Realm['id'];
+    analysisRealmId: Realm['id'];
 
-    node_id: Node['id'];
+    nodeId: Node['id'];
 
     node: Node;
 
-    node_realm_id: Realm['id'];
+    nodeRealmId: Realm['id'];
 }

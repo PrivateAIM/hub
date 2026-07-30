@@ -54,10 +54,10 @@ export default defineComponent({
     setup(props, setup) {
         const busy = ref(false);
         const form = reactive({
-            external_name: '',
+            externalName: '',
             name: '',
             type: RegistryProjectType.DEFAULT,
-            registry_id: '',
+            registryId: '',
         });
 
         const manager = createEntityManager({
@@ -73,7 +73,7 @@ export default defineComponent({
         );
 
         const nameValidation = useFieldValidation($v.fields.name);
-        const externalNameValidation = useFieldValidation($v.fields.external_name);
+        const externalNameValidation = useFieldValidation($v.fields.externalName);
         const typeValidation = useFieldValidation($v.fields.type);
 
         const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
@@ -92,11 +92,11 @@ export default defineComponent({
         );
 
         const isExternalNameUnchanged = computed(() => {
-            if (!manager.data.value || !manager.data.value.external_name) {
+            if (!manager.data.value || !manager.data.value.externalName) {
                 return true;
             }
 
-            return manager.data.value.external_name !== form.external_name;
+            return manager.data.value.externalName !== form.externalName;
         });
 
         const toggleForm = (key: keyof typeof form, id: any) => {
@@ -108,18 +108,18 @@ export default defineComponent({
         };
 
         const generateAlias = () => {
-            form.external_name = createNanoID();
+            form.externalName = createNanoID();
         };
 
         const resetAlias = () => {
             if (!manager.data.value) return;
 
-            form.external_name = manager.data.value.external_name;
+            form.externalName = manager.data.value.externalName;
         };
 
         const initFromProperties = () => {
             if (props.registryId) {
-                form.registry_id = props.registryId;
+                form.registryId = props.registryId;
             }
 
             if (typeof manager.data.value === 'undefined') {
@@ -177,9 +177,9 @@ export default defineComponent({
                 },
                 {
                     default: () => h(VCFormInput, {
-                        modelValue: form.external_name == null ? '' : String(form.external_name),
+                        modelValue: form.externalName == null ? '' : String(form.externalName),
                         'onUpdate:modelValue': (input: string) => {
-                            form.external_name = input;
+                            form.externalName = input;
                         },
                     }),
                 },
@@ -193,8 +193,8 @@ export default defineComponent({
             }, () => [
                 h('div', { class: 'mb-1' }, [
                     (!isExternalNameUnchanged.value ?
-                        'If you change the external_name, a new representation will be created in the Registry.' :
-                        'If you don\'t want to chose a external_name by your own, you can generate one.'
+                        'If you change the externalName, a new representation will be created in the Registry.' :
+                        'If you don\'t want to chose a externalName by your own, you can generate one.'
                     ),
                 ]),
                 h(VCButton, {
@@ -256,14 +256,14 @@ export default defineComponent({
                         [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h(VCButton, {
                             attrs: { disabled: props.busy },
                             size: 'xs',
-                            color: form.registry_id === props.data.id ? 'warning' : 'neutral',
+                            color: form.registryId === props.data.id ? 'warning' : 'neutral',
                             onClick($event: any) {
                                 $event.preventDefault();
 
-                                toggleForm('registry_id', props.data.id);
+                                toggleForm('registryId', props.data.id);
                             },
                         }, () => [
-                            h(VCIcon, { name: form.registry_id === props.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
+                            h(VCIcon, { name: form.registryId === props.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus' }),
                         ]),
                     }),
                 ];

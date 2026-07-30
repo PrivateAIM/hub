@@ -27,7 +27,7 @@ import type { ProcessStatus } from '@privateaim/kit';
 import { AnalysisEntity } from './analysis.ts';
 import { NodeEntity } from './node.ts';
 
-@Unique(['node_id', 'analysis_id'])
+@Unique(['nodeId', 'analysisId'])
 @Entity({ name: 'analysis_nodes' })
 export class AnalysisNodeEntity implements AnalysisNode {
     @PrimaryGeneratedColumn('uuid')
@@ -36,27 +36,30 @@ export class AnalysisNodeEntity implements AnalysisNode {
     // ------------------------------------------------------------------
 
     @Column({
+        name: 'approval_status',
         type: 'varchar', 
         length: 32, 
         default: null, 
     })
-    approval_status: AnalysisNodeApprovalStatus | null;
+    approvalStatus: AnalysisNodeApprovalStatus | null;
 
     @Column({
+        name: 'execution_status',
         type: 'varchar', 
         length: 32, 
         nullable: true, 
         default: null,
     })
-    execution_status: ProcessStatus | null;
+    executionStatus: ProcessStatus | null;
 
     @Column({
+        name: 'execution_progress',
         type: 'int', 
         unsigned: true, 
         nullable: true, 
         default: null,
     })
-    execution_progress: number | null;
+    executionProgress: number | null;
 
     // ------------------------------------------------------------------
 
@@ -64,46 +67,48 @@ export class AnalysisNodeEntity implements AnalysisNode {
     comment: string;
 
     @Column({
+        name: 'artifact_tag',
         type: 'varchar', 
         length: 32, 
         nullable: true, 
     })
-    artifact_tag: string | null;
+    artifactTag: string | null;
 
     @Column({
+        name: 'artifact_digest',
         type: 'varchar', 
         length: 512, 
         nullable: true, 
     })
-    artifact_digest: string | null;
+    artifactDigest: string | null;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn({ transformer: dateToISOStringTransformer })
-    created_at: string;
+    @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
+    createdAt: string;
 
-    @UpdateDateColumn({ transformer: dateToISOStringTransformer })
-    updated_at: string;
+    @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
+    updatedAt: string;
 
     // ------------------------------------------------------------------
 
-    @Column()
-    analysis_id: Analysis['id'];
+    @Column({ name: 'analysis_id' })
+    analysisId: Analysis['id'];
 
     @ManyToOne(() => AnalysisEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'analysis_id' })
     analysis: AnalysisEntity;
 
-    @Column({ type: 'uuid' })
-    analysis_realm_id: Realm['id'];
+    @Column({ name: 'analysis_realm_id', type: 'uuid' })
+    analysisRealmId: Realm['id'];
 
-    @Column()
-    node_id: Node['id'];
+    @Column({ name: 'node_id' })
+    nodeId: Node['id'];
 
     @ManyToOne(() => NodeEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
-    @Column({ type: 'uuid' })
-    node_realm_id: Realm['id'];
+    @Column({ name: 'node_realm_id', type: 'uuid' })
+    nodeRealmId: Realm['id'];
 }

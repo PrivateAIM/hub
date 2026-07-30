@@ -54,7 +54,7 @@ describe('adapters/http/message', () => {
         const pulled = await client.message.pull();
         expect(pulled.messages).toHaveLength(1);
         expect(pulled.messages[0].data).toBe('hello over http');
-        expect(pulled.messages[0].sender_id).toBe(SELF_ID);
+        expect(pulled.messages[0].senderId).toBe(SELF_ID);
         expect(pulled.messages[0].metadata).toEqual({ analysisId: 'analysis-1' });
 
         await client.message.ack({ ids: pulled.messages.map((m) => m.id) });

@@ -65,11 +65,11 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             throw new PermissionDeniedError('You are not permitted to read the credentials of this analysis client.');
         }
 
-        if (!analysis.client_id) {
+        if (!analysis.clientId) {
             throw new BadRequestError('The analysis has no client provisioned yet.');
         }
 
-        return this.credentialStore.readByClientId(analysis.client_id);
+        return this.credentialStore.readByClientId(analysis.clientId);
     }
 
     async setCredentials(
@@ -91,15 +91,15 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
         });
 
-        if (!isRealmResourceWritable(actor.realm, analysis.realm_id)) {
+        if (!isRealmResourceWritable(actor.realm, analysis.realmId)) {
             throw new PermissionDeniedError('You are not permitted to write the credentials of this analysis client.');
         }
 
-        if (!analysis.client_id) {
+        if (!analysis.clientId) {
             throw new BadRequestError('The analysis has no client provisioned yet.');
         }
 
-        return this.credentialStore.writeByClientId(analysis.client_id, { secret });
+        return this.credentialStore.writeByClientId(analysis.clientId, { secret });
     }
 
     /**
@@ -111,14 +111,14 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
      */
     protected async isAuthorized(analysis: Analysis, actor: ActorContext): Promise<boolean> {
         if (actor.identity && actor.identity.type === 'client') {
-            const node = await this.nodeRepository.findOneBy({ client_id: actor.identity.id });
+            const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id });
             if (node) {
                 const analysisNode = await this.analysisNodeRepository.findOneBy({
-                    analysis_id: analysis.id,
-                    node_id: node.id,
+                    analysisId: analysis.id,
+                    nodeId: node.id,
                 });
 
-                if (analysisNode && analysisNode.approval_status === AnalysisNodeApprovalStatus.APPROVED) {
+                if (analysisNode && analysisNode.approvalStatus === AnalysisNodeApprovalStatus.APPROVED) {
                     return true;
                 }
             }

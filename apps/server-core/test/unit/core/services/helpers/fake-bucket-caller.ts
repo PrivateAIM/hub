@@ -16,7 +16,7 @@ type BucketCallerCall = {
 export class FakeBucketCaller implements IBucketCaller {
     private calls: BucketCallerCall[] = [];
 
-    async callCreate(data: { name: string; realm_id: string }, meta?: { correlationId?: string }): Promise<void> {
+    async callCreate(data: { name: string; realmId: string }, meta?: { correlationId?: string }): Promise<void> {
         this.calls.push({
             method: 'callCreate', 
             data, 

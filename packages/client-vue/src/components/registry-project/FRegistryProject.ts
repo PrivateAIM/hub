@@ -73,12 +73,12 @@ export default defineComponent({
             props,
             onResolved(entity) {
                 if (entity) {
-                    form.secret = entity.account_secret || '';
+                    form.secret = entity.accountSecret || '';
                 }
             },
             onUpdated: (entity) => {
                 if (entity) {
-                    form.secret = entity.account_secret || '';
+                    form.secret = entity.accountSecret || '';
                 }
             },
         });
@@ -86,9 +86,9 @@ export default defineComponent({
         await manager.resolve({
             query: {
                 fields: [
-                    '+account_id',
-                    '+account_name',
-                    '+account_secret',
+                    '+accountId',
+                    '+accountName',
+                    '+accountSecret',
                 ],
             },
         });
@@ -134,7 +134,7 @@ export default defineComponent({
                         h('input', {
                             class: 'form-control',
                             type: 'text',
-                            value: manager.data.value?.external_name || '',
+                            value: manager.data.value?.externalName || '',
                             disabled: true,
                         }),
                     ]),
@@ -145,7 +145,7 @@ export default defineComponent({
                             h('input', {
                                 class: 'form-control',
                                 type: 'text',
-                                value: manager.data.value?.account_name || '',
+                                value: manager.data.value?.accountName || '',
                                 placeholder: '...',
                                 disabled: true,
                             }),
@@ -173,8 +173,8 @@ export default defineComponent({
                     h('div', [
                         h('strong', { class: 'pe-1' }, 'Webhook:'),
                         h(VCIcon, {
-                            name: manager.data.value?.webhook_exists ? 'fa6-solid:check' : 'fa6-solid:xmark',
-                            class: manager.data.value?.webhook_exists ? 'text-success-600' : 'text-error-600',
+                            name: manager.data.value?.webhookExists ? 'fa6-solid:check' : 'fa6-solid:xmark',
+                            class: manager.data.value?.webhookExists ? 'text-success-600' : 'text-error-600',
                         }),
                     ]),
                 ]),

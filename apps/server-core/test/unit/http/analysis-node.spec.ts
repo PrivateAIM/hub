@@ -43,18 +43,18 @@ describe('src/controllers/core/analysis-node', () => {
         expect(node.id).toBeDefined();
 
         await client.projectNode.create({
-            node_id: node.id,
-            project_id: project.id,
+            nodeId: node.id,
+            projectId: project.id,
         });
 
-        const { data: analysis } = await client.analysis.create({ project_id: project.id });
+        const { data: analysis } = await client.analysis.create({ projectId: project.id });
 
         expect(analysis.id).toBeDefined();
 
         const { data: analysisNode } = await client.analysisNode.create({
-            analysis_id: analysis.id,
-            node_id: node.id,
-            execution_status: ProcessStatus.STARTING,
+            analysisId: analysis.id,
+            nodeId: node.id,
+            executionStatus: ProcessStatus.STARTING,
         });
 
         delete analysisNode.analysis;
@@ -68,11 +68,11 @@ describe('src/controllers/core/analysis-node', () => {
 
         const { data } = await client.analysisNode.update(details.id, {
             ...details,
-            execution_status: ProcessStatus.STARTED,
-            execution_progress: 10,
+            executionStatus: ProcessStatus.STARTED,
+            executionProgress: 10,
         });
 
-        expect(data.execution_status).toEqual(ProcessStatus.STARTED);
+        expect(data.executionStatus).toEqual(ProcessStatus.STARTED);
 
         extendObject(details, data);
     });

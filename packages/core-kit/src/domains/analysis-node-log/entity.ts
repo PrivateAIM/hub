@@ -18,7 +18,7 @@ export interface AnalysisNodeLog {
 
     labels: Record<string, string>,
 
-    time: string | bigint | null,
+    time: string | null,
 
     /**
      * e.g: entrypointNotFound, ...
@@ -30,11 +30,11 @@ export interface AnalysisNodeLog {
      */
     status: string | null;
 
-    analysis_realm_id: Realm['id'];
+    analysisRealmId: Realm['id'];
 
-    analysis_id: Analysis['id'];
+    analysisId: Analysis['id'];
 
-    node_id: Node['id'];
+    nodeId: Node['id'];
 
-    node_realm_id: Realm['id'];
+    nodeRealmId: Realm['id'];
 }

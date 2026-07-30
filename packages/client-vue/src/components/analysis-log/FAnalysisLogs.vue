@@ -39,7 +39,7 @@ export default defineComponent({
 
         const collect = async (target: Log[], offset = 0) : Promise<void> => {
             const response = await httpClient.analysisLog.getMany({
-                filters: { analysis_id: props.entityId },
+                filters: { analysisId: props.entityId },
                 pagination: { offset },
             });
 

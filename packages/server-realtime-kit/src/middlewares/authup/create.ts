@@ -51,8 +51,8 @@ export function mountAuthorizationMiddleware(
         if (socket.data.identity) {
             logger?.info(`Socket/${socket.id}: ${socket.data.identity.type} connected.`, {
                 [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                actor_type: socket.data.identity.type,
-                actor_id: socket.data.identity.id,
+                actorType: socket.data.identity.type,
+                actorId: socket.data.identity.id,
             });
         } else {
             logger?.warn(`Socket/${socket.id}: Not authenticated.`, { [LogFlag.CHANNEL]: LogChannel.WEBSOCKET });
@@ -65,8 +65,8 @@ export function mountAuthorizationMiddleware(
             if (socket.data.identity) {
                 logger?.info(`Socket/${socket.id}: ${socket.data.identity.type} disconnected`, {
                     [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                    actor_type: socket.data.identity.type,
-                    actor_id: socket.data.identity.id,
+                    actorType: socket.data.identity.type,
+                    actorId: socket.data.identity.id,
                 });
             }
         });

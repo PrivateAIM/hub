@@ -37,26 +37,26 @@ export class ProjectNodeSubscriber extends BaseSubscriber<
                     },
                 ];
 
-                if (data.project_realm_id) {
+                if (data.projectRealmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.project_realm_id],
+                        namespace: [DomainEventNamespace, data.projectRealmId],
                         channel: DomainType.PROJECT_NODE,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.project_realm_id],
+                        namespace: [DomainEventNamespace, data.projectRealmId],
                         channel: [DomainType.PROJECT_NODE, data.id],
                     });
                 }
 
-                if (data.node_realm_id) {
+                if (data.nodeRealmId) {
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        namespace: [DomainEventNamespace, data.nodeRealmId],
                         channel: DomainType.PROJECT_NODE,
                     });
 
                     destinations.push({
-                        namespace: [DomainEventNamespace, data.node_realm_id],
+                        namespace: [DomainEventNamespace, data.nodeRealmId],
                         channel: [DomainType.PROJECT_NODE, data.id],
                     });
                 }

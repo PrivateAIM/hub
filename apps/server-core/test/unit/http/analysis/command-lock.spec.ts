@@ -44,18 +44,18 @@ describe('analysis/command-lock', () => {
         // Create the analysis before the project nodes so this suite can drive the
         // node-validation gates one analysis-node at a time. Approved project nodes are
         // auto-assigned at analysis creation; creating the analysis first keeps that a no-op.
-        const { data: analysisRecord } = await client.analysis.create({ project_id: project.id });
+        const { data: analysisRecord } = await client.analysis.create({ projectId: project.id });
 
         analysis = analysisRecord;
 
         await client.projectNode.create({
-            node_id: nodeDefault.id,
-            project_id: project.id,
+            nodeId: nodeDefault.id,
+            projectId: project.id,
         });
 
         await client.projectNode.create({
-            node_id: nodeAggregator.id,
-            project_id: project.id,
+            nodeId: nodeAggregator.id,
+            projectId: project.id,
         });
     });
 
@@ -89,8 +89,8 @@ describe('analysis/command-lock', () => {
         const { client } = suite;
 
         await client.analysisNode.create({
-            analysis_id: analysis.id,
-            node_id: nodeDefault.id,
+            analysisId: analysis.id,
+            nodeId: nodeDefault.id,
         });
 
         try {
@@ -114,8 +114,8 @@ describe('analysis/command-lock', () => {
         const { client } = suite;
 
         await client.analysisNode.create({
-            analysis_id: analysis.id,
-            node_id: nodeAggregator.id,
+            analysisId: analysis.id,
+            nodeId: nodeAggregator.id,
         });
 
         try {

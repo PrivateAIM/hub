@@ -28,7 +28,7 @@ export class EntityEventSocketHandler implements IEntityEventHandler {
             const roomName = this.buildChannel(destination.channel);
 
             const fullEventName = buildDomainEventFullName(
-                ctx.metadata.ref_type,
+                ctx.metadata.refType,
                 ctx.metadata.event,
             );
 
@@ -39,8 +39,8 @@ export class EntityEventSocketHandler implements IEntityEventHandler {
                 .emit(fullEventName, {
                     data: ctx.data,
                     meta: {
-                        refType: ctx.metadata.ref_type,
-                        refId: ctx.metadata.ref_id,
+                        refType: ctx.metadata.refType,
+                        refId: ctx.metadata.refId,
                         event: ctx.metadata.event,
                         namespace,
                         roomName,

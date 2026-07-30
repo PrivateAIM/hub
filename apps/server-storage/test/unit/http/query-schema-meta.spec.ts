@@ -48,7 +48,7 @@ describe('src/adapters/http/controllers (query schema meta)', () => {
         expect(meta.schema.strict).toBe(true);
         expect(meta.schema.fields.default).toContain('name');
         expect(meta.schema.filters.allowed).toContain('name');
-        expect(meta.schema.sort.allowed).toContain('created_at');
+        expect(meta.schema.sort.allowed).toContain('createdAt');
         expect(meta.schema.pagination.maxLimit).toEqual(50);
         // bucketSchema omits `relations` entirely, so the normalized shape
         // reports nulls — the key itself is still present.

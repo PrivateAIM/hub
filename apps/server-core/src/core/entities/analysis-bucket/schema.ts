@@ -6,20 +6,21 @@
  */
 
 import { defineSchema } from '@rapiq/core';
+import type { AnalysisBucket } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 
 const schemaMapping = { analysis: DomainType.ANALYSIS };
 
-export const analysisBucketSchema = defineSchema({
+export const analysisBucketSchema = defineSchema<AnalysisBucket>({
     name: DomainType.ANALYSIS_BUCKET,
     strict: true,
     fields: {
-        default: ['id', 'type', 'bucket_id', 'analysis_id', 'realm_id', 'created_at', 'updated_at'],
-        allowed: ['id', 'type', 'bucket_id', 'analysis_id', 'realm_id', 'created_at', 'updated_at'],
+        default: ['id', 'type', 'bucketId', 'analysisId', 'realmId', 'createdAt', 'updatedAt'],
+        allowed: ['id', 'type', 'bucketId', 'analysisId', 'realmId', 'createdAt', 'updatedAt'],
     },
-    filters: { allowed: ['analysis_id', 'type'] },
+    filters: { allowed: ['analysisId', 'type'] },
     relations: { allowed: ['analysis'] },
-    sort: { allowed: ['type', 'created_at', 'updated_at'] },
+    sort: { allowed: ['type', 'createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

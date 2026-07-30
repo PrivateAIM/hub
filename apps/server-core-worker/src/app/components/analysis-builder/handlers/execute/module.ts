@@ -67,7 +67,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             this.logger?.error({
                 message: e,
                 command: AnalysisBuilderCommand.EXECUTE,
-                analysis_id: value.id,
+                analysisId: value.id,
                 [LogFlag.REF_ID]: value.id,
                 event: AnalysisBuilderEvent.EXECUTION_FAILED,
             });
@@ -113,7 +113,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         } catch (e) {
             this.logger?.error('Building image failed', {
                 command: AnalysisBuilderCommand.EXECUTE,
-                analysis_id: analysis.id,
+                analysisId: analysis.id,
                 [LogFlag.REF_ID]: analysis.id,
             });
 
@@ -129,7 +129,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         } catch (e) {
             this.logger?.error('Creating container failed', {
                 command: AnalysisBuilderCommand.EXECUTE,
-                analysis_id: analysis.id,
+                analysisId: analysis.id,
                 [LogFlag.REF_ID]: analysis.id,
             });
 
@@ -143,7 +143,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         } catch (e) {
             this.logger?.error('Packing container failed', {
                 command: AnalysisBuilderCommand.EXECUTE,
-                analysis_id: analysis.id,
+                analysisId: analysis.id,
                 [LogFlag.REF_ID]: analysis.id,
             });
 
@@ -159,7 +159,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         } catch (e) {
             this.logger?.error('Commiting container failed', {
                 command: AnalysisBuilderCommand.EXECUTE,
-                analysis_id: analysis.id,
+                analysisId: analysis.id,
                 [LogFlag.REF_ID]: analysis.id,
             });
 
@@ -193,7 +193,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         this.logger?.info({
             message: 'Building image',
             command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
 
@@ -229,7 +229,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 this.logger?.info({
                     message: 'Built image',
                     command: AnalysisBuilderCommand.EXECUTE,
-                    analysis_id: analysis.id,
+                    analysisId: analysis.id,
                     [LogFlag.REF_ID]: analysis.id,
                 });
             },
@@ -241,7 +241,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         this.logger?.info({
             message: 'Creating container',
             command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
 
@@ -251,7 +251,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         this.logger?.info({
             message: 'Created container',
             command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
 
@@ -264,14 +264,14 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
     ) : Promise<void> {
         this.logger?.info('Packing container', {
             command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
 
         const { data: analysisBuckets } = await this.coreClient.analysisBucket.getMany({
             filters: {
                 type: AnalysisBucketType.CODE,
-                analysis_id: analysis.id,
+                analysisId: analysis.id,
             },
         });
 
@@ -281,11 +281,11 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         }
 
         const analysisBucketFiles = await getManyAll((page) => this.coreClient.analysisBucketFile.getMany({
-            filters: { analysis_bucket_id: analysisBucket.id },
+            filters: { analysisBucketId: analysisBucket.id },
             pagination: page,
         }));
 
-        const webStream = await this.storageClient.bucket.stream(analysisBucket.bucket_id);
+        const webStream = await this.storageClient.bucket.stream(analysisBucket.bucketId);
         const nodeStream = stream.Readable.fromWeb(webStream as any);
 
         await packDockerContainerWithTarStream(
@@ -308,21 +308,21 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 onEntryPackStarted: (entry) => {
                     this.logger?.debug(`Packing ${entry.type} ${entry.name} (${entry.size} bytes)`, {
                         command: AnalysisBuilderCommand.EXECUTE,
-                        analysis_id: analysis.id,
+                        analysisId: analysis.id,
                         [LogFlag.REF_ID]: analysis.id,
                     });
                 },
                 onEntryPackFinished: (entry) => {
                     this.logger?.debug(`Packed ${entry.type} ${entry.name} (${entry.size} bytes)`, {
                         command: AnalysisBuilderCommand.EXECUTE,
-                        analysis_id: analysis.id,
+                        analysisId: analysis.id,
                         [LogFlag.REF_ID]: analysis.id,
                     });
                 },
                 onEntryPackFailed: (_, entry) => {
                     this.logger?.error(`Packing ${entry.type} ${entry.name} (${entry.size} bytes) failed`, {
                         command: AnalysisBuilderCommand.EXECUTE,
-                        analysis_id: analysis.id,
+                        analysisId: analysis.id,
                         [LogFlag.REF_ID]: analysis.id,
                     });
                 },
@@ -331,7 +331,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
 
         this.logger?.info('Packed container', {
             command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
     }
@@ -343,7 +343,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         this.logger?.info({
             message: 'Commiting container',
             command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
 
@@ -355,7 +355,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         this.logger?.info({
             message: 'Commited container',
             command: AnalysisBuilderCommand.EXECUTE,
-            analysis_id: analysis.id,
+            analysisId: analysis.id,
             [LogFlag.REF_ID]: analysis.id,
         });
     }

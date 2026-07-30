@@ -52,7 +52,7 @@ export class RegistryProjectRepositoryAdapter implements IRegistryProjectReposit
 
     async findOneWithSecret(id: string): Promise<RegistryProject | null> {
         const qb = this.repository.createQueryBuilder('registryProject')
-            .addSelect(['registryProject.account_secret'])
+            .addSelect(['registryProject.accountSecret'])
             .where('registryProject.id = :id', { id });
 
         return qb.getOne();

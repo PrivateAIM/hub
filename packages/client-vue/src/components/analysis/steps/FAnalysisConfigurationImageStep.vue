@@ -24,7 +24,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const passed = computed(() => props.entity.configuration_image_valid);
+        const passed = computed(() => props.entity.configurationImageValid);
 
         const message = computed(() => {
             if (passed.value) {

@@ -44,12 +44,12 @@ describe('controllers/analysis-file', () => {
         const { data: project } = await client.project.create(createTestProject());
         expect(project.id).toBeDefined();
 
-        const { data: analysis } = await client.analysis.create({ project_id: project.id });
+        const { data: analysis } = await client.analysis.create({ projectId: project.id });
         expect(analysis.id).toBeDefined();
 
         const { data: analysisBucket } = await client.analysisBucket.create({
-            analysis_id: analysis.id,
-            bucket_id: randomUUID(),
+            analysisId: analysis.id,
+            bucketId: randomUUID(),
             type: AnalysisBucketType.CODE,
         });
 

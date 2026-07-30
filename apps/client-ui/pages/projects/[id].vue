@@ -76,11 +76,11 @@ export default defineComponent({
 
         const projectNode : Ref<ProjectNode | null> = ref(null);
 
-        if (manager.data.value.realm_id !== store.realmId) {
+        if (manager.data.value.realmId !== store.realmId) {
             const response = await api.projectNode.getMany({
                 filters: {
-                    project_id: manager.data.value.id,
-                    node_realm_id: store.realmId,
+                    projectId: manager.data.value.id,
+                    nodeRealmId: store.realmId,
                 },
             });
 
@@ -92,7 +92,7 @@ export default defineComponent({
         }
 
         // todo: maybe ref of store.realmId
-        const isProjectOwner = computed(() => manager.data.value && store.realmId === manager.data.value.realm_id);
+        const isProjectOwner = computed(() => manager.data.value && store.realmId === manager.data.value.realmId);
 
         const isNodeAuthority = computed(() => !!projectNode.value);
 
@@ -167,7 +167,7 @@ export default defineComponent({
             <VCIcon name="fa6-solid:diagram-project" />
             <FDisplayName
                 :name="entity.name"
-                :display-name="entity.display_name"
+                :display-name="entity.displayName"
             />
         </h1>
 

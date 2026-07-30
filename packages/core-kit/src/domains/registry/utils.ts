@@ -11,5 +11,5 @@ export function buildRegistryClientConnectionStringFromRegistry(entity: Registry
     // todo: support other registries beside harbor and v2.0
 
     const url = `https://${entity.host}/api/v2.0/`;
-    return `${entity.account_name}:${entity.account_secret}@${url}`;
+    return `${entity.accountName}:${entity.accountSecret}@${url}`;
 }

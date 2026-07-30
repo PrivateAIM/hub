@@ -13,6 +13,12 @@ import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { WEEK_IN_MS, isObject } from '@privateaim/kit';
 import type { EventComponentCaller } from '../../components';
 
+/**
+ * Entity timestamp properties, excluded from an update diff so a save does not
+ * register as a change on every entity view.
+ */
+const TIMESTAMP_KEYS = new Set<string>(['createdAt', 'updatedAt', 'expiresAt']);
+
 export type EntityEventHandlerContext = {
     eventComponentCaller?: EventComponentCaller,
     logger?: Logger,
@@ -29,34 +35,34 @@ export class EntityEventHandler implements IEntityEventHandler {
     }
 
     async handle(ctx: EntityEventHandleOptions): Promise<void> {
-        if (ctx.metadata.ref_type === DomainType.EVENT) {
+        if (ctx.metadata.refType === DomainType.EVENT) {
             return;
         }
 
         const entity : Partial<Event> = {
-            ref_type: ctx.metadata.ref_type,
+            refType: ctx.metadata.refType,
 
             name: ctx.metadata.event,
             scope: 'entity',
 
             expiring: true,
-            expires_at: new Date(
+            expiresAt: new Date(
                 Date.now() + WEEK_IN_MS,
             ).toISOString(),
         };
 
-        if (ctx.metadata.ref_id) {
-            entity.ref_id = ctx.metadata.ref_id;
+        if (ctx.metadata.refId) {
+            entity.refId = ctx.metadata.refId;
         }
 
         const keys : (keyof Event)[] = [
-            'actor_id',
-            'actor_type',
-            'actor_name',
-            'request_path',
-            'request_method',
-            'request_ip_address',
-            'request_user_agent',
+            'actorId',
+            'actorType',
+            'actorName',
+            'requestPath',
+            'requestMethod',
+            'requestIpAddress',
+            'requestUserAgent',
         ];
 
         for (const key of keys) {
@@ -66,10 +72,10 @@ export class EntityEventHandler implements IEntityEventHandler {
         }
 
         if (
-            entity.request_ip_address &&
-            entity.request_ip_address === '::1'
+            entity.requestIpAddress &&
+            entity.requestIpAddress === '::1'
         ) {
-            entity.request_ip_address = '127.0.0.1';
+            entity.requestIpAddress = '127.0.0.1';
         }
 
         const data : EventData = {};
@@ -82,8 +88,11 @@ export class EntityEventHandler implements IEntityEventHandler {
             const diff : ObjectDiff = {};
             const keys = Object.keys(ctx.data);
             for (const key of keys) {
-                // skip date changes
-                if (key.endsWith('_at')) {
+                // skip date changes. An explicit set rather than a suffix test:
+                // the previous `key.endsWith('_at')` silently matched nothing
+                // once the properties became camelCase, so every update event
+                // started carrying timestamp churn in its diff.
+                if (TIMESTAMP_KEYS.has(key)) {
                     continue;
                 }
 

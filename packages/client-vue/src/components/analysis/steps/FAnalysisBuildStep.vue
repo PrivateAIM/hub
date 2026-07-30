@@ -38,11 +38,11 @@ export default defineComponent({
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
         const progress = computed(() => {
-            if (props.entity.build_status === ProcessStatus.EXECUTED) {
+            if (props.entity.buildStatus === ProcessStatus.EXECUTED) {
                 return 100;
             }
 
-            return props.entity.build_progress || 0;
+            return props.entity.buildProgress || 0;
         });
 
         const handleExecuted = (type: string, command: string) => {
@@ -56,8 +56,8 @@ export default defineComponent({
         };
 
         const size = computed(() => {
-            if (props.entity.build_size) {
-                return humanFileSize(props.entity.build_size);
+            if (props.entity.buildSize) {
+                return humanFileSize(props.entity.buildSize);
             }
 
             return null;
@@ -82,7 +82,7 @@ export default defineComponent({
                     Build
                 </div>
                 <div class="ms-auto">
-                    <FProcessStatus :value="entity.build_status">
+                    <FProcessStatus :value="entity.buildStatus">
                         <template #default=" { iconName, iconClass, classSuffix }">
                             <VCIcon
                                 :name="iconName"
@@ -139,7 +139,7 @@ export default defineComponent({
                         </FAnalysisBuildNodesStep>
                     </div>
 
-                    <template v-if="entity.build_os || entity.build_hash || size">
+                    <template v-if="entity.buildOs || entity.buildHash || size">
                         <hr>
 
                         <div>
@@ -149,26 +149,26 @@ export default defineComponent({
                             </div>
                             <div class="flex flex-col">
                                 <div
-                                    v-if="entity.build_os"
+                                    v-if="entity.buildOs"
                                     class="flex flex-row gap-1"
                                 >
                                     <div>
                                         <strong>OS</strong>
                                     </div>
                                     <div>
-                                        {{ entity.build_os }}
-                                        <VCIcon :name="'fa6-brands:' + entity.build_os" />
+                                        {{ entity.buildOs }}
+                                        <VCIcon :name="'fa6-brands:' + entity.buildOs" />
                                     </div>
                                 </div>
                                 <div
-                                    v-if="entity.build_hash"
+                                    v-if="entity.buildHash"
                                     class="flex flex-row gap-1"
                                 >
                                     <div>
                                         <strong>Hash</strong>
                                     </div>
                                     <div style="word-break: break-all;">
-                                        {{ entity.build_hash }}
+                                        {{ entity.buildHash }}
                                     </div>
                                 </div>
                                 <div
