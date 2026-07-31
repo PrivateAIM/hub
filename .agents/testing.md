@@ -364,6 +364,26 @@ first. `nx.json`'s `test: { dependsOn: ["^build"] }` handles that for
 `npx nx run-many -t test`; a bare `npm run test -w packages/client-vue` on a
 cold tree does not.
 
+## Build-Config Tests (client-ui)
+
+`apps/client-ui/test/` is a plain node vitest config with no plugins — it
+renders nothing. Its one suite, `unit/icon-bundle.spec.ts`, guards the icon
+subset the app ships (see [conventions.md](conventions.md#icons)) by pinning one
+uniquely-attributable icon per scanned source, so removing any glob fails
+exactly one assertion.
+
+It drives the real `@nuxt/icon` plugin object — `load('\0virtual:nuxt-icon-bundle')`
+runs the whole scan → resolve → generate path by itself — rather than reading a
+built bundle. That is deliberate: CI's build cache carries only `**/dist/**` and
+`.nx`, so `apps/client-ui/.output` does **not** survive into the test job, and a
+spec asserting against it would either fail or need extra cache plumbing.
+Asserting a rendered page cannot work at all — `@iconify/vue` resolves icons
+client-side, so SSR output carries empty `<svg>` shells either way.
+
+Note `nuxi typecheck` (client-ui's `build:types`) **does** cover `test/**` under
+Nuxt 4 strict, unlike every other workspace, whose `tsconfig.build.json` includes
+`src/**` only.
+
 ## Fakes Over Mocks
 
 **Always prefer fake implementations over `vi.fn()` / `vi.mock()`.** The hexagonal architecture with dependency inversion makes every dependency injectable via a port interface — if it doesn't, that's a signal the architecture isn't fully hexagonal yet and should be fixed.

@@ -63,12 +63,35 @@ export default defineComponent({
             return null;
         });
 
+        // `buildOs` is docker's image `Os`, i.e. a GOOS value. Resolve it to a
+        // literal icon name rather than interpolating one: build-time icon
+        // scanners (see the `NuxtIconBundle` plugin in client-ui's
+        // nuxt.config.ts) only ever see literals, so a composed name is never
+        // bundled and renders an empty slot. `darwin` has no brand icon of its
+        // own, and any unmapped value now yields no icon at all instead of a
+        // request for one that does not exist.
+        const buildOsIcon = computed(() => {
+            switch (props.entity.buildOs) {
+                case 'linux':
+                    return 'fa6-brands:linux';
+                case 'windows':
+                    return 'fa6-brands:windows';
+                case 'darwin':
+                    return 'fa6-brands:apple';
+                case 'freebsd':
+                    return 'fa6-brands:freebsd';
+                default:
+                    return null;
+            }
+        });
+
         return {
             progress,
             handleUpdated,
             handleFailed,
             handleExecuted,
             size,
+            buildOsIcon,
             resolveTextColorClass,
         };
     },
@@ -157,7 +180,10 @@ export default defineComponent({
                                     </div>
                                     <div>
                                         {{ entity.buildOs }}
-                                        <VCIcon :name="'fa6-brands:' + entity.buildOs" />
+                                        <VCIcon
+                                            v-if="buildOsIcon"
+                                            :name="buildOsIcon"
+                                        />
                                     </div>
                                 </div>
                                 <div
