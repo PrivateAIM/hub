@@ -143,6 +143,37 @@ not follow that rule.** Applying it here would rewrite ~7 manifests and disturb
 release-please's `node-workspace` plugin (`updatePeerDependencies: true` in
 `release-please-config.json`).
 
+### Root `overrides`
+
+`npm install` runs **without `--force`**. If it ever ERESOLVEs again, fix the
+conflict — do not reach for `--force` or `--legacy-peer-deps`. Both silently
+produce a tree that disagrees with the manifests: the pre-bump lockfile
+declared `pinia@^4.0.2` and `@pinia/nuxt@^1.0.1` while actually installing
+`3.0.4` / `0.11.3`, and `--legacy-peer-deps` drops pinia outright and breaks
+the client-ui build.
+
+**There is exactly one override, and it earns its place:**
+
+| Override | Why |
+|---|---|
+| `pinia` | `@pinia/nuxt` 1.x peers `pinia@^4.0.2`; `@authup/client-web-kit` still peers `^3.0.0`. This is the only genuine conflict in the tree, and without the override `npm install` ERESOLVEs. It deliberately runs authup's store outside its declared peer range — `packages/client-vue/test/` covers that path (the harness installs `@authup/client-web-kit` first and its `usePermissionCheck` sites call `injectStore()`), so those specs are the regression net. Drop it once authup widens the peer. |
+
+`typeorm`, `vue`, `validup` and `@vuecs/core` were overridden historically and
+have been **removed** — every requirer now declares a compatible range on its
+own (`validup` in particular: all 26 declarations are `^1.0.0` since the
+ilingo/validup 1.x line landed, so the old `^0.4.0`-vs-`^0.5.x` split is gone).
+Removing all four left the resolved tree byte-identical, each still a single
+hoisted copy.
+
+Before adding an override, check whether one is actually needed — an override
+**rewrites the ranges npm records in the lockfile**, so reading the lockfile
+back will show every requirer already "agreeing" and makes a stale override
+look load-bearing. Query the registry for the real declared range instead:
+
+```bash
+npm view <pkg>@<version> peerDependencies.<dep> dependencies.<dep>
+```
+
 ## Validation
 
 **Zod 4** schemas via `validup` adapters. Domain types in kit packages have corresponding validators:

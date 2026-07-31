@@ -26,8 +26,8 @@
         "url": "https://tada5hi.net"
     },
     "devDependencies": {
-        "@authup/access": "^1.0.0-beta.57",
-        "@authup/core-kit": "^1.0.0-beta.57",
+        "@authup/access": "^1.0.0-beta.58",
+        "@authup/core-kit": "^1.0.0-beta.58",
         "@privateaim/core-http-kit": "^0.13.0",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.13.0",
@@ -37,8 +37,8 @@
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
-        "@authup/access": "^1.0.0-beta.57",
-        "@authup/core-kit": "^1.0.0-beta.57",
+        "@authup/access": "^1.0.0-beta.58",
+        "@authup/core-kit": "^1.0.0-beta.58",
         "@privateaim/core-http-kit": "^0.13.0",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.13.0",
