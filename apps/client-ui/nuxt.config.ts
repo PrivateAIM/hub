@@ -9,11 +9,19 @@ import type { ModuleOptions } from '@authup/client-web-nuxt';
 import path from 'node:path';
 import { defineNuxtConfig } from 'nuxt/config';
 import tailwindcss from '@tailwindcss/vite';
+import { NuxtIconBundle } from '@nuxt/icon/vite';
+import { iconBundleOptions } from './icon-bundle.config.ts';
 
 export default defineNuxtConfig({
     vite: {
         plugins: [
             tailwindcss(),
+            // Ship only the icons this app renders — @nuxt/icon's STANDALONE
+            // vite plugin, not the Nuxt module. `plugins/vuecs.ts` imports the
+            // `virtual:nuxt-icon-bundle/register` module it emits. The options
+            // (and the reasoning behind every glob) live next door, so
+            // `test/unit/icon-bundle.spec.ts` can pin them.
+            NuxtIconBundle(iconBundleOptions),
         ],
     },
 

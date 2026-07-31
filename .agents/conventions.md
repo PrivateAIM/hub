@@ -311,6 +311,37 @@ These stay snake_case and must not be swept into a rename:
   VictoriaLogs query syntax.
 - Environment variables.
 
+## Icons
+
+`apps/client-ui` bundles only the icons it renders: `@nuxt/icon`'s standalone
+vite plugin (options in `apps/client-ui/icon-bundle.config.ts`) scans source for
+`<collection>:<name>` literals and emits that subset into
+`virtual:nuxt-icon-bundle/register`, which `plugins/vuecs.ts` imports. It
+registers through `addIcon` from `@iconify/vue` — the same global store
+`<VCIcon>` resolves against — so no component knows about it.
+
+**Rule: an icon name must be a literal.** A composed name is invisible to the
+scan, so it is never bundled and `@iconify/vue` falls back to fetching it from
+the public Iconify API at runtime:
+
+```vue
+<!-- Bad — never bundled; resolved over the network, or not at all -->
+<VCIcon :name="'fa6-brands:' + entity.buildOs" />
+
+<!-- Good — a computed switch over literals (FProcessStatus.vue,
+     FAnalysisBuildStep.vue) -->
+<VCIcon v-if="buildOsIcon" :name="buildOsIcon" />
+```
+
+The same applies to `packages/client-vue` and `packages/client-vue-theme`: they
+are scanned as source, and they are published, so a consuming app's scanner sees
+exactly the same literals.
+
+Both halves fail **silently** — an unmatched glob or a composed name yields an
+empty icon slot, not a build error. `apps/client-ui/test/unit/icon-bundle.spec.ts`
+guards the glob list by pinning one uniquely-attributable icon per scanned
+source; it drives the real plugin, so it needs no build output.
+
 ## Logging
 
 Logs flow through Winston → `LoggerTransport` (`packages/server-telemetry-kit/src/services/logger/transport.ts`) → telemetry/VictoriaLogs, where every string/number/boolean key of the metadata object becomes a **queryable label**. UI views (e.g. the analysis log panel) filter by these labels — see `AnalysisLogController`, which queries `refType=analysis` + `refId=<id>`.

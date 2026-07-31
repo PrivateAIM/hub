@@ -180,7 +180,10 @@ list handlers keep receiving `{ data, meta }`.
 
 - `vue` — Vue 3 framework (composition API)
 - `@vuecs/*` — component framework (forms, lists, tables, pagination, overlays, icons)
-- `@vuecs/icon` + Iconify — SVG icons (`fa6-solid` / `fa6-brands` collections; no webfont)
+- `@vuecs/icon` + Iconify — SVG icons (`fa6-solid` / `fa6-brands` collections; no webfont). Icon
+  names must be written as **literals** — consuming apps bundle only the names a build-time scan
+  finds in this package's source, so a composed name (`` `fa6-brands:${os}` ``) is never bundled.
+  See [client-ui — Icons](./index.md#icons).
 - `validup` / `@validup/vue` / `@validup/zod` — form validation wired to the core-kit Zod validators
 - `ilingo` / `@ilingo/vue` — translations
 - `@authup/client-web-kit` — authentication UI
