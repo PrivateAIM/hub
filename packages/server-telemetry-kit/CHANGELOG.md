@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.13.1](https://github.com/PrivateAIM/hub/compare/v0.13.0...v0.13.1) (2026-08-05)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.13.0 to ^0.13.1
+    * @privateaim/server-kit bumped from ^0.13.0 to ^0.13.1
+    * @privateaim/telemetry-kit bumped from ^0.13.0 to ^0.13.1
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.13.0 to ^0.13.1
+    * @privateaim/server-kit bumped from ^0.13.0 to ^0.13.1
+    * @privateaim/telemetry-kit bumped from ^0.13.0 to ^0.13.1
+
 ## [0.13.0](https://github.com/PrivateAIM/hub/compare/v0.12.6...v0.13.0) (2026-07-30)
 
 

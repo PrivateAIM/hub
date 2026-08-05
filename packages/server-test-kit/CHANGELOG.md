@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.13.1](https://github.com/PrivateAIM/hub/compare/v0.13.0...v0.13.1) (2026-08-05)
+
+
+### Bug Fixes
+
+* **deps:** bump authup to beta.59, rapiq to beta.16 and the vuecs packages ([9e53ad1](https://github.com/PrivateAIM/hub/commit/9e53ad11fe49dc3dc6ad827998dc02ef26304378))
+* **deps:** bump ilingo, validup, trapi and authup to their latest versions ([9461ec8](https://github.com/PrivateAIM/hub/commit/9461ec8f7024c6bfdb4a26baef2fc7491eb00680))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.13.0 to ^0.13.1
+    * @privateaim/server-kit bumped from ^0.13.0 to ^0.13.1
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.13.0 to ^0.13.1
+    * @privateaim/server-kit bumped from ^0.13.0 to ^0.13.1
+
 ## [0.13.0](https://github.com/PrivateAIM/hub/compare/v0.12.7...v0.13.0) (2026-07-30)
 
 
