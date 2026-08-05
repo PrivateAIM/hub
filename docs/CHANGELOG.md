@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.13.1](https://github.com/PrivateAIM/hub/compare/v0.13.0...v0.13.1) (2026-08-05)
+
+
+### Bug Fixes
+
+* **deps:** bump authup to beta.59, rapiq to beta.16 and the vuecs packages ([9e53ad1](https://github.com/PrivateAIM/hub/commit/9e53ad11fe49dc3dc6ad827998dc02ef26304378))
+
+
+### Performance Improvements
+
+* **client-ui:** ship only the icons the UI renders ([#1812](https://github.com/PrivateAIM/hub/issues/1812)) ([6a6ea00](https://github.com/PrivateAIM/hub/commit/6a6ea00216b23be0f029a35e1de6eb0170dd6c87)), closes [#1811](https://github.com/PrivateAIM/hub/issues/1811)
+
 ## [0.13.0](https://github.com/PrivateAIM/hub/compare/v0.12.6...v0.13.0) (2026-07-30)
 
 
