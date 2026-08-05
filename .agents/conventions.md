@@ -326,6 +326,49 @@ These stay snake_case and must not be swept into a rename:
   VictoriaLogs query syntax.
 - Environment variables.
 
+## Entity Resolution (client-vue)
+
+`createEntityManager` resolves an entity two ways, and they are mutually
+exclusive by design — **an id-driven resolve never falls back to the collection.**
+
+- **By id.** An id that was *supplied* is an exact selector: resolve that record
+  or nothing. A `getOne` that throws (404, 403) resolves `null`; it must not drop
+  into the collection branch, which would substitute a different entity for the
+  one that was asked for.
+- **By query.** Only when no id was supplied, and only when the query carries a
+  real selector. `fields` and `include` say *what* to return, never *which* row,
+  so a projection-only query matches everything and the `limit: 1` read hands
+  back an arbitrary record from the actor's readable scope.
+
+**Supplied is presence, not truthiness.** `''` is a supplied id — it is how a
+form says "no entity yet" (`FProjectForm` initialises `form.masterImageId = ''`
+and passes it straight in as `entityId`). It resolves `null` quietly, with no
+request: a blank id must not reach `getOne` either, because `getOne('')` builds
+`GET /<collection>/` and lets the arbitrary-row read back in through another
+door. `null` and `undefined` are *absent*, so they still fall through to the
+query branch.
+
+A selector means at least one filter whose value is not `undefined` — rapiq drops
+`undefined` values before the request, so `{ analysisId: undefined, type: 'code' }`
+widens to every code bucket rather than narrowing. `null` stays a selector; it is
+a meaningful filter value.
+
+The helpers are `isEntityIdSupplied` / `isEntityIdResolvable` / `hasQuerySelector`
+in `packages/client-vue/src/core/entity-manager/utils.ts`, and they are **type
+guards** rather than boolean predicates — the truthiness checks they replaced were
+also narrowing `EntityID<RECORD> | null | undefined` for the `getOne` call. Only
+`nuxi typecheck` (Nuxt 4 strict, via client-ui's `build:types`) catches losing
+that; the repo itself builds at `strict: false`.
+
+Why this matters: the failure is silent and looks like a working page. A detail
+page whose route param stopped resolving rendered — and permitted edit and delete
+of — the first row in scope, which is how a registry project's Harbor robot
+`accountSecret` ended up in a form belonging to a different record.
+
+`packages/client-vue/test/unit/core/entity-manager.spec.ts` pins every branch, and
+`test/unit/components/f-master-image-picker.spec.ts` pins the create-mode path on a
+real form component.
+
 ## Icons
 
 `apps/client-ui` bundles only the icons it renders: `@nuxt/icon`'s standalone
