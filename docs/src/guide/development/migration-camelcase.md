@@ -143,3 +143,57 @@ Telemetry `events.data.diff` records which entity fields changed, keyed by field
 name. Rows written before the upgrade keep their `snake_case` keys. They are
 rendered as-is and never matched by name, so they are left untouched rather than
 rewritten.
+
+### Authup attribute policies
+
+::: warning Read this before enabling attribute policies
+Nothing here changes behaviour today, and there is nothing to do at upgrade time.
+It matters the first time an **attribute policy** is switched on in Authup.
+:::
+
+Five server-core permission checks hand a whole `Analysis` entity to
+`@authup/access` as an attribute bag:
+
+```ts
+await actor.permissionChecker.check({
+    name: PermissionName.ANALYSIS_UPDATE,
+    data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
+});
+```
+
+- `apps/server-core/src/core/entities/analysis/service.ts` — create, update, delete
+- `apps/server-core/src/core/services/client-credential/analysis.ts`
+- `apps/server-core/src/app/modules/database/analysis-client-permission.ts`
+
+The attribute **policies** that match on those key names live in **Authup's
+database**, not in this repository, so the rename could not carry them along. As
+hub is wired today the bag is never read: token introspection delivers
+policy-free grants, so the evaluator never receives a `policy` field and every
+verdict is `allow`. The mismatch is therefore latent.
+
+It becomes real the moment an attribute policy is attached to an analysis
+permission. Any policy still written against the old key names stops matching:
+
+| Old attribute key | New attribute key |
+|---|---|
+| `realm_id` | `realmId` |
+| `user_id` | `userId` |
+| `project_id` | `projectId` |
+| `master_image_id` | `masterImageId` |
+| `registry_id` | `registryId` |
+| `client_id` | `clientId` |
+| `display_name` | `displayName` |
+| `configuration_locked` | `configurationLocked` |
+| `configuration_*_valid` | `configuration*Valid` |
+| `build_status`, `build_os`, `build_hash`, … | `buildStatus`, `buildOs`, `buildHash`, … |
+| `distribution_status`, `distribution_progress` | `distributionStatus`, `distributionProgress` |
+| `execution_status`, `execution_progress` | `executionStatus`, `executionProgress` |
+| `nodes_approved` | `nodesApproved` |
+| `created_at`, `updated_at` | `createdAt`, `updatedAt` |
+
+**A policy that no longer matches fails in the direction the policy was shaped
+for.** An allowlist-shaped policy (`realm_id == X` ⇒ allow) stops granting and
+fails closed — noisy, but safe. A **denylist**-shaped policy
+(`configuration_locked == true` ⇒ deny) stops denying and fails **open**, which
+is silent. Audit any deployed attribute policy against the table above before
+enabling it.
