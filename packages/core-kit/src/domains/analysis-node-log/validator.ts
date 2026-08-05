@@ -7,11 +7,11 @@
 
 import zod from 'zod';
 import { LogLevel } from '@privateaim/telemetry-kit';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { createValidator } from '@validup/zod';
 import type { AnalysisNodeLog } from './entity.ts';
 
-export class AnalysisNodeLogValidator extends Container<AnalysisNodeLog> {
+export class AnalysisNodeLogValidator extends TypedContainer<AnalysisNodeLog> {
     protected override initialize() {
         super.initialize();
 

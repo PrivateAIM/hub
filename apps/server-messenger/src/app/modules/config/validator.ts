@@ -7,11 +7,11 @@
 
 import { EnvironmentName } from '@privateaim/server-kit';
 import { createValidator } from '@validup/zod';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import zod from 'zod';
 import type { Config } from './types.ts';
 
-export class ConfigValidator extends Container<Config> {
+export class ConfigValidator extends TypedContainer<Config> {
     protected initialize() {
         super.initialize();
 

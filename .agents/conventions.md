@@ -290,12 +290,27 @@ IS the relation — a `@JoinColumn` with no paired scalar FK. Skipping on
 typo (`@Column({ name: 'registryid' })` plus a matching `@JoinColumn`) would pass
 both the guard and the `synchronize()`-based suites.
 
-**Still unguarded:** validup `mount()` keys. `mount`'s signature is
-`Path<T> | (string & {})`, so any string compiles, and a stale key silently stops
-validating that field — the value is then dropped from the write. All 156 mount
-keys were verified by hand against their `Container<T>` at plan 017; only the
-Harbor webhook validator legitimately keeps snake_case. There is no automated net
-for this yet.
+validup `mount()` keys are guarded by the compiler, not by a spec. `Container`'s
+`mount` signature is `Path<T> | (string & {})`, so any string compiles and a stale
+key silently stops validating that field — the value is then dropped from the
+write, and the request still returns `200`. **Every validator therefore extends
+`TypedContainer<T>` from `@privateaim/kit`, never `Container<T>` directly**; it
+re-types `mount` to `ITypedContainer<T, C>['mount']`, which is validup's own
+overload set minus that second arm. `declare` makes this a pure type-level
+narrowing — the emitted class body is empty.
+
+`Path<T>` still admits the nested and wildcard forms (`registry.accountSecret`,
+`registry.*`), and a container whose `T` genuinely has snake_case properties keeps
+its keys — which is why the Harbor webhook validator is unaffected.
+
+The narrowing itself is pinned by `packages/kit/test/types/typed-container.test-d.ts`,
+run through vitest's typecheck mode (`typecheck.enabled` in that package's
+`vitest.config.ts`). It has to be a **type test**: every `tsconfig.build.json`
+includes `src/**` only, so a `@ts-expect-error` in an ordinary spec would be
+checked by nothing in CI.
+
+The proper fix belongs upstream in validup; `TypedContainer` stands until the
+`(string & {})` arm is gone.
 
 ### Naming exceptions
 

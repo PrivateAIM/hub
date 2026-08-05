@@ -6,12 +6,12 @@
  */
 
 import { isNameValid } from '@authup/core-kit';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import type { Project } from './entity.ts';
 
-export class ProjectValidator extends Container<Project> {
+export class ProjectValidator extends TypedContainer<Project> {
     protected override initialize() {
         super.initialize();
 

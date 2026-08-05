@@ -7,12 +7,11 @@
 
 import type { Node } from './entity.ts';
 import { NodeType } from './constants.ts';
-import { Container } from 'validup';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
-import { ValidatorGroup } from '@privateaim/kit';
+import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
 
-export class NodeValidator extends Container<Node> {
+export class NodeValidator extends TypedContainer<Node> {
     protected override initialize() {
         super.initialize();
 

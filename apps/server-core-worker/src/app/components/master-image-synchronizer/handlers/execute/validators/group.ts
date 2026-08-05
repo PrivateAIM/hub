@@ -5,12 +5,12 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import type { DockenGroupAttributes } from '../types';
 
-export class DockenGroupAttributesValidator extends Container<DockenGroupAttributes> {
+export class DockenGroupAttributesValidator extends TypedContainer<DockenGroupAttributes> {
     protected initialize() {
         super.initialize();
 

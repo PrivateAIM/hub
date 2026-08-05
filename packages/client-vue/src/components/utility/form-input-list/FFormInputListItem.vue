@@ -16,7 +16,7 @@
 import { IFieldValidation } from '@ilingo/validup-vue';
 import { useValidup } from '@validup/vue';
 import { createValidator } from '@validup/zod';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { z } from 'zod';
 import { VCButton } from '@vuecs/button';
 import { VCFormGroup, VCFormInput } from '@vuecs/forms';
@@ -26,7 +26,7 @@ import {
     reactive,
 } from 'vue';
 
-class FormInputListItemValidator extends Container<{ name: string }> {
+class FormInputListItemValidator extends TypedContainer<{ name: string }> {
     protected override initialize() {
         super.initialize();
         this.mount('name', createValidator(z.string().min(2).max(512)));

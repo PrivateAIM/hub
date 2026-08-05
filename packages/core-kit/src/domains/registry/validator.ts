@@ -5,13 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Container } from 'validup';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
-import { ValidatorGroup } from '@privateaim/kit';
+import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
 import type { Registry } from './entity.ts';
 
-export class RegistryValidator extends Container<Registry> {
+export class RegistryValidator extends TypedContainer<Registry> {
     protected override initialize() {
         super.initialize();
 

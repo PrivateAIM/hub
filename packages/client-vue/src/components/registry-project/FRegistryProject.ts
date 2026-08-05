@@ -16,7 +16,7 @@ import {
     ServiceID,
     registryRobotSecretRegex,
 } from '@privateaim/core-kit';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { VCButton } from '@vuecs/button';
@@ -39,7 +39,7 @@ import {
     wrapFnWithBusyState,
 } from '../../core';
 
-class RegistryProjectSecretValidator extends Container<{ secret: string }> {
+class RegistryProjectSecretValidator extends TypedContainer<{ secret: string }> {
     protected override initialize() {
         super.initialize();
 

@@ -7,11 +7,11 @@
 
 import { z } from 'zod';
 import { createValidator } from '@validup/zod';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import type { CTSMessagingMessage } from '../types';
 import { CTSMessagingPartyValidator } from './to';
 
-export class CTSMessagingMessageValidator extends Container<CTSMessagingMessage> {
+export class CTSMessagingMessageValidator extends TypedContainer<CTSMessagingMessage> {
     protected initialize() {
         super.initialize();
 
