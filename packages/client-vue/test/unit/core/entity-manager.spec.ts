@@ -172,4 +172,54 @@ describe('createEntityManager', () => {
         expect(handle.manager.data.value).toBeNull();
         expect(coreClient.requests).toHaveLength(0);
     });
+
+    // An id that resolves to `''` rather than `undefined` is the same failure with
+    // a different shape — a route param can be either. Truthiness cannot tell an
+    // empty id from an absent one, so both gates test for presence instead.
+    describe('when a supplied id is blank', () => {
+        it('should not fall through to the collection via props', async () => {
+            const { coreClient, handle } = mountManagerProbe(
+                {
+                    entityId: '',
+                    queryFilters: { name: 'demo' },
+                },
+                undefined,
+                { 'GET /projects': () => ({ data: [{ id: 'someone-elses', name: 'demo' }], meta: { total: 1 } }) },
+            );
+
+            await handle.result;
+
+            expect(handle.manager.data.value).toBeNull();
+            expect(coreClient.requests).toHaveLength(0);
+        });
+
+        it('should not fall through to the collection via the resolve context', async () => {
+            const { coreClient, handle } = mountManagerProbe(
+                {},
+                { id: '', query: { filters: { name: 'demo' } } },
+                { 'GET /projects': () => ({ data: [{ id: 'someone-elses', name: 'demo' }], meta: { total: 1 } }) },
+            );
+
+            await handle.result;
+
+            expect(handle.manager.data.value).toBeNull();
+            expect(coreClient.requests).toHaveLength(0);
+        });
+
+        // A blank id must not reach `getOne` either: `getOne('')` builds `GET
+        // /projects/`, which is the COLLECTION endpoint — the same arbitrary-row
+        // read by another route.
+        it('should not request the collection endpoint through getOne', async () => {
+            const { coreClient, handle } = mountManagerProbe(
+                { entityId: '' },
+                undefined,
+                { '*': () => ({ data: [{ id: 'someone-elses' }], meta: { total: 1 } }) },
+            );
+
+            await handle.result;
+
+            expect(handle.manager.data.value).toBeNull();
+            expect(coreClient.requests).toHaveLength(0);
+        });
+    });
 });

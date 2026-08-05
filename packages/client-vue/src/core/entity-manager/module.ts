@@ -32,7 +32,12 @@ import type {
     EntityManagerRenderFn, 
     EntityManagerResolveContext,
 } from './type';
-import { buildEntityManagerSlotProps, hasQuerySelector } from './utils';
+import {
+    buildEntityManagerSlotProps,
+    hasQuerySelector,
+    isEntityIdResolvable,
+    isEntityIdSupplied,
+} from './utils';
 
 export function createEntityManager<
     TYPE extends keyof DomainTypeMap,
@@ -276,10 +281,11 @@ export function createEntityManager<
         }
 
         // An id is an EXACT selector: resolve that entity or nothing. Falling
-        // through to the collection branch when the lookup fails (404, 403) would
-        // substitute a different entity for the one that was asked for.
-        if (resolveCtx.id) {
-            if (typeof domainAPI.getOne === 'function') {
+        // through to the collection branch when the lookup fails (404, 403), or
+        // when the id arrived blank, would substitute a different entity for the
+        // one that was asked for.
+        if (isEntityIdSupplied(resolveCtx.id)) {
+            if (isEntityIdResolvable(resolveCtx.id) && typeof domainAPI.getOne === 'function') {
                 try {
                     const { data } = await domainAPI.getOne(resolveCtx.id, resolveCtx.query as QueryBuildInput<any>);
 
@@ -422,7 +428,10 @@ export function createEntityManager<
                 } as any;
             }
 
-            if (ctx.props.entityId) {
+            // Presence, not truthiness — a blank `entityId` prop is still the
+            // caller saying "resolve this id". Dropping it here would leave `id`
+            // undefined and hand the resolve to the query-driven branch below.
+            if (isEntityIdSupplied(ctx.props.entityId)) {
                 id = ctx.props.entityId;
             }
         }

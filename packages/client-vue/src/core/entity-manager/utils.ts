@@ -15,6 +15,33 @@ import type {
 } from './type';
 
 /**
+ * Was an entity id supplied at all?
+ *
+ * Presence, not truthiness — `''` is a supplied id, and a route param that fails
+ * to resolve is `''` as readily as it is `undefined`. Testing truthiness would let
+ * a blank id degrade into the query-driven path and resolve an arbitrary row,
+ * which is the whole failure this guard exists to prevent.
+ */
+export function isEntityIdSupplied<T>(id: T) : id is NonNullable<T> {
+    return typeof id !== 'undefined' && id !== null;
+}
+
+/**
+ * Can this id actually address a record?
+ *
+ * A blank one cannot, and must not be handed to `getOne` either: `getOne('')`
+ * builds `GET /<collection>/` — the collection endpoint — so the arbitrary-row
+ * read would simply come back through another door.
+ */
+export function isEntityIdResolvable<T>(id: T) : id is NonNullable<T> {
+    if (!isEntityIdSupplied(id)) {
+        return false;
+    }
+
+    return typeof id !== 'string' || id.trim().length > 0;
+}
+
+/**
  * Does this query narrow the collection to a specific row?
  *
  * `fields` and `include` say WHAT to return, never WHICH row — a projection-only
