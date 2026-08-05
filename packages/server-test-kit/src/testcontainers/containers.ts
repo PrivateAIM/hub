@@ -5,12 +5,35 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createRequire } from 'node:module';
 import type { StartedNetwork, StartedTestContainer } from 'testcontainers';
 import { GenericContainer, Network, Wait } from 'testcontainers';
 import { buildAuthupProvisioningModule } from './provisioning.ts';
 import type { DatabaseConnection } from './types.ts';
 
-const AUTHUP_IMAGE = 'authup/authup';
+/**
+ * Tag the Authup container with the **installed** `@authup/core-kit` version,
+ * so the server under test always matches the client libraries hub compiles
+ * against.
+ *
+ * An untagged image resolves to `latest`, and testcontainers reuses a locally
+ * cached image rather than re-pulling it. A bump of `@authup/*` therefore left
+ * the suite running against whatever Authup happened to be on the machine —
+ * green, while never exercising the version being shipped. `AUTHUP_IMAGE_TAG`
+ * overrides the derived tag when a specific image needs to be pinned.
+ */
+function resolveAuthupImage(): string {
+    if (process.env.AUTHUP_IMAGE_TAG) {
+        return `authup/authup:${process.env.AUTHUP_IMAGE_TAG}`;
+    }
+
+    const require = createRequire(import.meta.url);
+    const { version } = require('@authup/core-kit/package.json');
+
+    return `authup/authup:${version}`;
+}
+
+const AUTHUP_IMAGE = resolveAuthupImage();
 const AUTHUP_PORT = 3000;
 const AUTHUP_PROVISIONING_TARGET = '/usr/src/app/writable/provisioning/hub.mjs';
 

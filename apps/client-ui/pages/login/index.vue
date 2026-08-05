@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { Realm } from '@authup/core-kit';
-import { CLIENT_WEB_NAME } from '@authup/core-kit';
+import { CLIENT_ADMIN_CONSOLE_NAME } from '@authup/core-kit';
 import {
     ARealmGrid,
     buildAuthorizeURL,
@@ -39,9 +39,15 @@ export default defineNuxtComponent({
         const apiClient = injectHTTPClient();
 
         // Configurable per deployment (AUTHUP_CLIENT_ID); defaults to the
-        // Authup built-in "web" client. The client must register
+        // Authup built-in "admin-console" client. The client must register
         // `<ui-origin>/login/callback` as a redirect URI.
-        const clientId = (runtimeConfig.public.authupClientId as string) || CLIENT_WEB_NAME;
+        //
+        // Authup beta.59 removed the shared `web` system client, so the two
+        // remaining built-ins are per-app: `admin-console` and
+        // `account-console`. This UI is the admin surface, so it defaults to
+        // the former; a deployment serving the UI from its own origin should
+        // still register a dedicated client and set AUTHUP_CLIENT_ID.
+        const clientId = (runtimeConfig.public.authupClientId as string) || CLIENT_ADMIN_CONSOLE_NAME;
 
         const realmGrid = ref<{ reset: () => void } | null>(null);
 

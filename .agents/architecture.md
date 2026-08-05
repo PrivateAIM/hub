@@ -43,8 +43,11 @@ Each service has the same structural elements:
 - `app/modules/config/` — `ConfigModule` (env reading)
 - `app/modules/http/` — `HTTPModule` (server + controllers or socket)
 - `app/modules/components/` — `ComponentsModule` (AMQP consumers, if applicable)
-- `app/modules/swagger/` — `SwaggerModule` (API docs, for HTTP services)
 - Minimal `start.ts` / `cli/commands/start.ts` — just `createApplication()` + `app.setup()`
+
+There is **no** `SwaggerModule`. OpenAPI docs are generated at **build time** by
+`build:swagger` (`trapi generate`, part of `npm run build` in server-core and
+server-storage), not by a DI module at boot.
 
 ### Core Layer (`core/`)
 
@@ -287,7 +290,8 @@ Manages log aggregation via VictoriaLogs and event tracking via TypeORM.
 
 ### server-storage
 
-File/object storage service backed by MinIO/S3.
+File/object storage service, backed by MinIO/S3 or the local filesystem behind a
+common `IStorageAdapter` port.
 
 **Adapters:**
 - `BucketEntity` / `BucketFileEntity` — TypeORM entities in `adapters/database/entities/`
@@ -295,8 +299,12 @@ File/object storage service backed by MinIO/S3.
 - `BucketController` / `BucketFileController` — thin HTTP controllers with upload/stream endpoints
 
 **Service-specific modules:**
-- `MinioModule` — creates MinIO client, registers in container
-- `ComponentsModule` — resolves MinIO from container, starts BucketComponent via `QueueWorkerComponentCaller`
+- `StorageModule` — selects the storage backend from config and registers it under
+  `StorageInjectionKey` as an `IStorageAdapter` port: `MinioStorageAdapter` (MinIO/S3)
+  or `FsStorageAdapter` (local filesystem). Controllers and components depend on the
+  port, not on a MinIO client.
+- `ComponentsModule` — resolves the storage adapter from the container, starts the
+  bucket + bucket-file consumers via `QueueWorkerComponentCaller`
 
 ### server-core-worker
 
@@ -316,17 +324,27 @@ Background worker executing Docker containers. No database entities — purely q
 
 ### server-messenger
 
-Real-time messaging relay via Socket.io. No database, no REST entities.
+Durable store-and-forward message broker (plan 013). It is **no longer** the
+database-less Socket.io relay: messages are persisted to a mailbox and delivered by
+`send` / `pull` / `ack` over REST, with the socket reduced to a payload-free wakeup
+signal. The legacy relay/presence surface is kept alongside it for coexistence until
+decommission (plan 013 phase 5).
 
 **Adapters:**
+- `adapters/database/entities/` — the message mailbox entity (+ `migrations/{mysql,postgres}/`)
+- `adapters/http/controllers/message/` — REST message surface (send/pull/ack). **Not**
+  an entity API: no `{ data, meta }` envelope.
 - `adapters/socket/controllers/connection/` — Socket.io connection lifecycle handlers
-- `adapters/socket/controllers/messaging/` — Message relay handlers
+- `adapters/socket/controllers/messaging/` — legacy relay handlers
 - `adapters/socket/register.ts` — controller registration helper
 
 **Service-specific modules:**
-- `HTTPModule` — creates HTTP server + Socket.io server with Authup auth middleware
-
-**Minimal service** — no database, no components, no swagger.
+- `DatabaseModule` — `DataSource` + `MessageRepository`
+- `WakeupModule` — redis pub/sub when redis is present (cross-instance), else an
+  in-process fallback; emits the payload-free `messagePending` into the recipient's
+  local socket room
+- `SweeperModule` — 60s timer deleting messages past their absolute `expiresAt`
+- `HTTPModule` — HTTP server + Socket.io server with Authup auth middleware
 
 ## Configuration
 

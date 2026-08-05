@@ -41,9 +41,10 @@ export default defineNuxtConfig({
         public: {
             authupUrl: process.env.AUTHUP_URL,
             // OAuth2 client the UI uses for the authorization-code (PKCE) login
-            // flow. Defaults to the Authup built-in "web" client (CLIENT_WEB_NAME)
-            // at the call site; override per deployment when the UI runs on its
-            // own origin and uses a dedicated client. The client must register
+            // flow. Defaults to the Authup built-in "admin-console" client
+            // (CLIENT_ADMIN_CONSOLE_NAME) at the call site; override per
+            // deployment when the UI runs on its own origin and uses a
+            // dedicated client. The client must register
             // `<ui-origin>/login/callback` as a redirect URI.
             authupClientId: process.env.AUTHUP_CLIENT_ID,
             coreUrl: process.env.CORE_URL,

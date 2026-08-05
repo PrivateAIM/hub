@@ -515,25 +515,25 @@ app/modules/<name>/
 | Module | Name | Dependencies | Registers |
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
-| DatabaseModule | `database` | none | `DataSource`, 12 repo adapters, `RegistryManager` |
+| DatabaseModule | `database` | `entityEvent`?, `authupClient`? | `DataSource`, 13 repo adapters, `RegistryManager` |
 | ComponentsModule | `components` | `database` | `TaskManager`, `RegistryComponentCaller` |
 | AnalysisModule | `analysis` | `database`, `components` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
-| SwaggerModule | `swagger` | `config` | nothing (generates docs) |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
 | AggregatorsModule | `aggregators` | `database`, `components` | nothing (starts AMQP event consumers) |
-| HTTPModule | `http` | `config`, `database`, `analysis` | `Server`, `Router` |
-| AuthupSetupModule | `authupSetup` | none | nothing (provisions realm, clients, permissions) |
-| TelemetryClientModule | `telemetryClient` | (optional) | `TelemetryClient` |
+| HTTPModule | `http` | `config`, `database`, `analysis`, `telemetryClient`? | `App`, `Server`, `Router` |
+| TelemetryClientModule | `telemetryClient` | `config`, `authupHook`? | `TelemetryClient` |
+
+`?` marks an **optional** dependency (`{ name, optional: true }`) — the module still
+sets up when that one is absent.
 
 ### server-telemetry Module Inventory
 
 | Module | Name | Dependencies | Registers |
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
-| DatabaseModule | `database` | none | `DataSource` |
+| DatabaseModule | `database` | `entityEvent`? | `DataSource` |
 | VictoriaLogsModule | `victoriaLogs` | `config` | `VictoriaLogsClient`, `LogStore` |
-| SwaggerModule | `swagger` | `config` | nothing (generates docs) |
-| ComponentsModule | `components` | none | nothing (starts event + log consumers) |
+| ComponentsModule | `components` | `database`, `victoriaLogs` | nothing (starts event + log consumers) |
 | HTTPModule | `http` | `config`, `database`, `victoriaLogs` | `Server`, `Router` |
 
 ### server-storage Module Inventory
@@ -541,20 +541,24 @@ app/modules/<name>/
 | Module | Name | Dependencies | Registers |
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
-| DatabaseModule | `database` | none | `DataSource` |
-| MinioModule | `minio` | `config` | `MinioClient` |
-| SwaggerModule | `swagger` | `config` | nothing (generates docs) |
-| ComponentsModule | `components` | `minio` | nothing (starts bucket consumers) |
-| HTTPModule | `http` | `config`, `database`, `minio`, `components` | `Server`, `Router` |
+| DatabaseModule | `database` | `entityEvent`? | `DataSource` |
+| StorageModule | `storage` | `config` | `IStorageAdapter` (`MinioStorageAdapter` or `FsStorageAdapter`) |
+| ComponentsModule | `components` | `storage`, `database` | nothing (starts bucket + bucket-file consumers) |
+| HTTPModule | `http` | `config`, `database`, `storage` | `Server`, `Router` |
+
+The storage backend is a **port**, not a hard-wired MinIO client: `StorageModule`
+picks `MinioStorageAdapter` or `FsStorageAdapter` from config and registers it under
+`StorageInjectionKey`.
 
 ### server-core-worker Module Inventory
 
 | Module | Name | Dependencies | Registers |
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
-| CoreClientModule | `coreClient` | `config` | nothing (calls `setCoreClient()`) |
-| StorageClientModule | `storageClient` | `config` | nothing (calls `setStorageClient()`) |
-| ComponentsModule | `components` | none | nothing (starts 4 worker components) |
+| CoreClientModule | `coreClient` | `config`, `authupHook`? | nothing (calls `setCoreClient()`) |
+| StorageClientModule | `storageClient` | `config`, `authupHook`? | nothing (calls `setStorageClient()`) |
+| DockerModule | `docker` | none | `DockerInjectionKey` (dockerode client) |
+| ComponentsModule | `components` | `coreClient`, `storageClient`, `docker` | nothing (starts 4 worker components) |
 | HTTPModule | `http` | `config` | `Server` (health-check only) |
 
 ### server-messenger Module Inventory
@@ -562,7 +566,15 @@ app/modules/<name>/
 | Module | Name | Dependencies | Registers |
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
-| HTTPModule | `http` | `config` | `Server`, `SocketServer` |
+| DatabaseModule | `database` | none | `DataSource`, `MessageRepository` |
+| WakeupModule | `wakeup` | `config`, `redis`? | `WakeupInjectionKey` |
+| SweeperModule | `sweeper` | `database` | nothing (expires stored messages) |
+| HTTPModule | `http` | `config`, `database`, `wakeup` | `Server`, `SocketServer` |
+
+server-messenger is **no longer** the database-less relay this table used to describe:
+the durable mailbox from plan 013 phase 1 gave it a `DataSource` + `MessageRepository`,
+a `SweeperModule` that expires stored messages, and a `WakeupModule` backing the
+payload-free `messagePending` notification (redis pub/sub + socket emit).
 
 ## Docker
 

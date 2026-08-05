@@ -102,7 +102,7 @@ dependency is provided one of two ways, decided by env:
 | Dependency | External (used as-is)             | Otherwise (testcontainer)          |
 |------------|-----------------------------------|------------------------------------|
 | Database   | `DB_TYPE` set (CI services, `test:mysql`, `test:psql`) | PostgreSQL container |
-| Authup     | `AUTHUP_URL` set                  | `authup/authup` container          |
+| Authup     | `AUTHUP_URL` set                  | `authup/authup:<@authup/core-kit version>` container |
 
 The shared helpers live in `@privateaim/server-test-kit`
 (`src/testcontainers/`, `src/authup-token.ts`, `src/setup.ts`):
@@ -129,9 +129,19 @@ The shared helpers live in `@privateaim/server-test-kit`
   `admin`/`master` token for tests that issue raw `fetch` requests (uploads,
   streaming) instead of the authenticated API client.
 
-The Authup image is `authup/authup` (currently beta.54, matching `@authup/*`). Each
-test app registers `AuthupHookModule` + `AuthupClientModule` so the middleware takes
-the real introspection path rather than the fake-identity fallback.
+The Authup image is `authup/authup`, tagged with the **installed `@authup/core-kit`
+version** — `resolveAuthupImage()` reads it from the resolved package at run time, so
+the server under test always matches the client libraries hub compiles against. Set
+`AUTHUP_IMAGE_TAG` to pin a different image.
+
+> Do **not** revert this to an untagged `authup/authup`. Untagged resolves to `latest`,
+> and testcontainers reuses a locally cached image instead of re-pulling, so a machine
+> holding an older `latest` runs the whole suite against a stale Authup — green, while
+> never exercising the version being shipped. That is exactly what happened during the
+> beta.58 → beta.59 bump: the suite passed against a cached beta.57.
+
+Each test app registers `AuthupHookModule` + `AuthupClientModule` so the middleware
+takes the real introspection path rather than the fake-identity fallback.
 
 Enabling the Authup client does **not** activate `NodeClientService` /
 `AnalysisClientService`: the test database module builds serviceless subscribers

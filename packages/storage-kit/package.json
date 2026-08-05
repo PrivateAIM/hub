@@ -31,18 +31,18 @@
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.58",
+        "@authup/core-kit": "^1.0.0-beta.59",
         "@privateaim/kit": "^0.13.0",
-        "@rapiq/codec-url": "^2.0.0-beta.13",
-        "@rapiq/core": "^2.0.0-beta.13",
+        "@rapiq/codec-url": "^2.0.0-beta.16",
+        "@rapiq/core": "^2.0.0-beta.16",
         "hapic": "^3.0.1",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.58",
+        "@authup/core-kit": "^1.0.0-beta.59",
         "@privateaim/kit": "^0.13.0",
-        "@rapiq/codec-url": "^2.0.0-beta.13",
-        "@rapiq/core": "^2.0.0-beta.13",
+        "@rapiq/codec-url": "^2.0.0-beta.16",
+        "@rapiq/core": "^2.0.0-beta.16",
         "hapic": "^3.0.1"
     },
     "scripts": {

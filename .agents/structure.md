@@ -14,9 +14,9 @@ Runnable services and the frontend, located in `apps/`.
 |------------------------|----------------------------------------------|---------------------------------------|
 | `server-core`          | Main REST API — analyses, projects, nodes, registries | server-kit, server-db-kit, server-http-kit, core-kit |
 | `server-core-worker`   | Background worker — Docker container execution | server-kit, server-core-worker-kit, dockerode |
-| `server-storage`       | File/object storage service (MinIO/S3)       | server-kit, server-storage-kit, storage-kit |
+| `server-storage`       | File/object storage service (MinIO/S3 or filesystem) | server-kit, server-storage-kit, storage-kit |
 | `server-telemetry`     | Log aggregation via VictoriaLogs             | server-kit, server-telemetry-kit, telemetry-kit |
-| `server-messenger`     | Real-time messaging (Socket.io)              | server-kit, messenger-kit             |
+| `server-messenger`     | Durable store-and-forward message broker (REST + Socket.io wakeup) | server-kit, messenger-kit |
 
 ### Frontend
 
@@ -131,7 +131,6 @@ apps/server-core/src/
 │   ├── modules/
 │   │   ├── analysis/              # AnalysisModule (builder, configurator, distributor, storage)
 │   │   ├── aggregators/            # AggregatorsModule (starts AMQP event consumers)
-│   │   ├── authup-setup/          # AuthupSetupModule (realm, client, permissions)
 │   │   ├── components/            # ComponentsModule (TaskManager, callers, task consumers)
 │   │   ├── config/                # ConfigModule (env, paths)
 │   │   ├── database/              # DatabaseModule (DataSource, repos, subscribers, node-client)
@@ -142,7 +141,6 @@ apps/server-core/src/
 │   │   ├── harbor/                # HarborModule (registry setup)
 │   │   ├── http/                  # HTTPModule (router, controllers, server, socket)
 │   │   ├── registry/              # RegistryManagerAdapter
-│   │   ├── swagger/               # SwaggerModule (API docs generation)
 │   │   └── telemetry-client/      # TelemetryClientModule
 │   ├── aggregators/               # AMQP event consumers
 │   └── components/                # AMQP task consumers (registry)
@@ -178,7 +176,6 @@ apps/server-telemetry/src/
 │   │   ├── database/              # DatabaseModule (DataSource, subscribers)
 │   │   ├── http/                  # HTTPModule (router, controllers, server)
 │   │   ├── victoria-logs/         # VictoriaLogsModule (client + LogStore)
-│   │   ├── swagger/               # SwaggerModule (API docs generation)
 │   │   └── components/            # ComponentsModule (starts event + log consumers)
 │   └── components/                # AMQP task consumers (event, log)
 ├── cli/                           # CLI entry point (citty)
@@ -197,10 +194,11 @@ apps/server-storage/src/
 │   │   ├── entities/              # BucketEntity, BucketFileEntity
 │   │   ├── subscribers/           # BucketSubscriber, BucketFileSubscriber
 │   │   └── migrations/            # postgres/ and mysql/
-│   └── http/
-│       └── controllers/
-│           ├── bucket/            # BucketController (CRUD + upload + stream)
-│           └── bucket-file/       # BucketFileController (CRUD + stream)
+│   ├── http/
+│   │   └── controllers/
+│   │       ├── bucket/            # BucketController (CRUD + upload + stream)
+│   │       └── bucket-file/       # BucketFileController (CRUD + stream)
+│   └── storage/                   # IStorageAdapter impls: minio.ts, fs.ts
 ├── app/                           # Orchestration & DI wiring
 │   ├── builder.ts                 # ServerStorageApplicationBuilder
 │   ├── factory.ts                 # createApplication()
@@ -208,8 +206,7 @@ apps/server-storage/src/
 │   │   ├── config/                # ConfigModule (env, paths)
 │   │   ├── database/              # DatabaseModule (DataSource, subscribers)
 │   │   ├── http/                  # HTTPModule (router, controllers, server)
-│   │   ├── minio/                 # MinioModule (S3 client)
-│   │   ├── swagger/               # SwaggerModule (API docs generation)
+│   │   ├── storage/               # StorageModule (IStorageAdapter: minio | fs)
 │   │   └── components/            # ComponentsModule (starts bucket consumers)
 │   ├── components/                # AMQP task consumers (bucket, bucket-file)
 │   └── domains/                   # Domain utility helpers
@@ -239,6 +236,7 @@ apps/server-core-worker/src/
 │   │   ├── http/                  # HTTPModule (health-check server)
 │   │   ├── core-client/           # CoreClientModule (API client setup)
 │   │   ├── storage-client/        # StorageClientModule (API client setup)
+│   │   ├── docker/                # DockerModule (dockerode client)
 │   │   └── components/            # ComponentsModule (starts 4 worker components)
 │   └── components/                # AMQP task consumers (builder, distributor, master-image-*)
 ├── index.ts                       # Entry point (no citty CLI — uses dotenv/config)
@@ -250,10 +248,16 @@ apps/server-core-worker/src/
 ```
 apps/server-messenger/src/
 ├── adapters/                      # External system implementations
+│   ├── database/
+│   │   ├── entities/              # Message mailbox entity
+│   │   └── migrations/            # postgres/ and mysql/
+│   ├── http/
+│   │   ├── controllers/message/   # REST message surface (send/pull/ack, no envelope)
+│   │   └── request/helpers/       # Request helpers
 │   └── socket/
 │       ├── controllers/
 │       │   ├── connection/        # Socket.io connection handlers
-│       │   └── messaging/         # Socket.io messaging handlers
+│       │   └── messaging/         # Legacy relay handlers (kept until plan 013 phase 5)
 │       ├── register.ts            # Socket controller registration
 │       └── types.ts               # Socket adapter types
 ├── app/                           # Orchestration & DI wiring
@@ -261,6 +265,10 @@ apps/server-messenger/src/
 │   ├── factory.ts                 # createApplication()
 │   └── modules/
 │       ├── config/                # ConfigModule (env, paths)
+│       ├── database/              # DatabaseModule (DataSource, MessageRepository)
+│       │   └── repositories/message/
+│       ├── wakeup/                # WakeupModule (redis pub/sub -> `messagePending`)
+│       ├── sweeper/               # SweeperModule (expires stored messages)
 │       └── http/                  # HTTPModule (HTTP server + Socket.io server)
 ├── cli/                           # CLI entry point (citty)
 └── constants.ts

@@ -23,7 +23,7 @@ docker run -e ... privateaim/hub ui
 |----------|---------|-------------|
 | `NUXT_PUBLIC_CORE_URL` | — | Core API base URL |
 | `NUXT_PUBLIC_AUTHUP_URL` | — | Authup URL |
-| `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `web` | OAuth2 client used for the login (authorization-code) flow |
+| `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `admin-console` | OAuth2 client used for the login (authorization-code) flow |
 | `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
 | `NUXT_PUBLIC_TELEMETRY_URL` | — | Telemetry service URL |
 | `NUXT_PUBLIC_MESSENGER_URL` | — | Messenger service URL |
@@ -38,9 +38,21 @@ login form and configured identity providers live. Authup redirects back to
 `<ui-origin>/login/callback`, and the `@authup/client-web-nuxt` routing interceptor
 exchanges the authorization code for a session.
 
-The OAuth client is configurable via `NUXT_PUBLIC_AUTHUP_CLIENT_ID` (default: `web`, the
-Authup built-in web client). The configured client **must** register
-`<ui-origin>/login/callback` as an allowed redirect URI.
+The OAuth client is configurable via `NUXT_PUBLIC_AUTHUP_CLIENT_ID` (default:
+`admin-console`, an Authup built-in client provisioned for every realm). The configured
+client **must** register `<ui-origin>/login/callback` as an allowed redirect URI.
+
+::: warning Upgrading from Authup < 1.0.0-beta.59
+Authup beta.59 removed the shared `web` system client that used to be provisioned for
+every realm ([authup#3379](https://github.com/authup/authup/pull/3379)). Existing `web`
+rows survive and keep working, but they no longer track `PUBLIC_URL` / `TRUSTED_ORIGINS`
+changes, and realms created after the upgrade get no `web` client at all — which is why
+the default moved to `admin-console`.
+
+A deployment serving the UI from its own origin should register a **dedicated** client
+(once per realm, e.g. via a wildcard `realms[]` provisioning entry named `"*"`) and point
+`NUXT_PUBLIC_AUTHUP_CLIENT_ID` at it, rather than sharing Authup's console client.
+:::
 
 ## Key Features
 
