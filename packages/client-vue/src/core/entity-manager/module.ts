@@ -32,7 +32,7 @@ import type {
     EntityManagerRenderFn, 
     EntityManagerResolveContext,
 } from './type';
-import { buildEntityManagerSlotProps } from './utils';
+import { buildEntityManagerSlotProps, hasQuerySelector } from './utils';
 
 export function createEntityManager<
     TYPE extends keyof DomainTypeMap,
@@ -275,27 +275,41 @@ export function createEntityManager<
             return null;
         }
 
-        if (resolveCtx.id && typeof domainAPI.getOne === 'function') {
-            try {
-                const { data } = await domainAPI.getOne(resolveCtx.id, resolveCtx.query as QueryBuildInput<any>);
+        // An id is an EXACT selector: resolve that entity or nothing. Falling
+        // through to the collection branch when the lookup fails (404, 403) would
+        // substitute a different entity for the one that was asked for.
+        if (resolveCtx.id) {
+            if (typeof domainAPI.getOne === 'function') {
+                try {
+                    const { data } = await domainAPI.getOne(resolveCtx.id, resolveCtx.query as QueryBuildInput<any>);
 
-                entity.value = data;
+                    entity.value = data;
 
-                if (socket) {
-                    socket.subscribe();
-                }
+                    if (socket) {
+                        socket.subscribe();
+                    }
 
-                resolved(entity.value);
+                    resolved(entity.value);
 
-                return entity.value;
-            } catch (e) {
-                if (e instanceof Error) {
-                    error.value = e;
+                    return entity.value;
+                } catch (e) {
+                    if (e instanceof Error) {
+                        error.value = e;
+                    }
                 }
             }
+
+            resolved(null);
+
+            return null;
         }
 
-        if (resolveCtx.query && typeof domainAPI.getMany === 'function') {
+        // Without an id the query must carry the selector itself — see
+        // `hasQuerySelector`. A projection-only query (`fields`/`include`, which is
+        // what a detail page passes alongside an `entityId` that failed to resolve)
+        // matches everything, so `limit: 1` below would render — and permit edit and
+        // delete of — the first row in the actor's readable scope.
+        if (hasQuerySelector(resolveCtx.query) && typeof domainAPI.getMany === 'function') {
             try {
                 const response = await domainAPI.getMany({
                     ...resolveCtx.query as QueryBuildInput<any>,

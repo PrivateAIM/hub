@@ -14,6 +14,30 @@ import type {
     EntityManagerSlotProps,
 } from './type';
 
+/**
+ * Does this query narrow the collection to a specific row?
+ *
+ * `fields` and `include` say WHAT to return, never WHICH row — a projection-only
+ * query matches everything, so resolving it with `limit: 1` hands back an
+ * arbitrary entity from the actor's readable scope. Only `filters` selects.
+ *
+ * An empty `filters` object is not a selector either: it narrows nothing.
+ */
+export function hasQuerySelector<T extends Record<string, any>>(
+    query?: QueryBuildInput<T, 3>,
+) : boolean {
+    if (!query) {
+        return false;
+    }
+
+    const { filters } = query;
+    if (!filters || typeof filters !== 'object') {
+        return false;
+    }
+
+    return Object.keys(filters).length > 0;
+}
+
 export function buildEntityManagerSlotProps<T extends Record<string, any>>(
     input: EntityManager<T>,
 ) : EntityManagerSlotProps<T> {
