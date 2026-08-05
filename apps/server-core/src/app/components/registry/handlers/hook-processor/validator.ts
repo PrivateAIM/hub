@@ -7,7 +7,7 @@
 
 // eslint-disable-next-line max-classes-per-file
 import zod from 'zod';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { createValidator } from '@validup/zod';
 import type {
     RegistryHook,
@@ -16,7 +16,7 @@ import type {
     RegistryHookResource,
 } from './types.ts';
 
-class RegistryHookResourceValidator extends Container<RegistryHookResource> {
+class RegistryHookResourceValidator extends TypedContainer<RegistryHookResource> {
     protected initialize() {
         super.initialize();
 
@@ -34,7 +34,7 @@ class RegistryHookResourceValidator extends Container<RegistryHookResource> {
     }
 }
 
-class RegistryHookRepositoryValidator extends Container<RegistryHookRepository> {
+class RegistryHookRepositoryValidator extends TypedContainer<RegistryHookRepository> {
     protected initialize() {
         super.initialize();
 
@@ -52,7 +52,7 @@ class RegistryHookRepositoryValidator extends Container<RegistryHookRepository> 
     }
 }
 
-class RegistryHookEventDataValidator extends Container<RegistryHookEventData> {
+class RegistryHookEventDataValidator extends TypedContainer<RegistryHookEventData> {
     protected initialize() {
         super.initialize();
 
@@ -75,7 +75,7 @@ class RegistryHookEventDataValidator extends Container<RegistryHookEventData> {
     }
 }
 
-export class RegistryHookValidator extends Container<RegistryHook> {
+export class RegistryHookValidator extends TypedContainer<RegistryHook> {
     protected initialize() {
         super.initialize();
 

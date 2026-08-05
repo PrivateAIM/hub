@@ -5,14 +5,14 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import type { MasterImageCommandArgument } from '@privateaim/core-kit';
 import { DockenImageAttributeCommandArguments } from './image-command-argument';
 import type { DockenImageAttributes } from '../types';
 
-export class DockenImageAttributesValidator extends Container<DockenImageAttributes> {
+export class DockenImageAttributesValidator extends TypedContainer<DockenImageAttributes> {
     protected initialize() {
         super.initialize();
 

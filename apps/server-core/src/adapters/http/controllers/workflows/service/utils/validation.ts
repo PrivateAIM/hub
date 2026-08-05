@@ -7,7 +7,7 @@
 
 import { RegistryAPICommand } from '@privateaim/core-kit';
 import { createValidator } from '@validup/zod';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { z } from 'zod';
 
 type ValidationResult = {
@@ -16,7 +16,7 @@ type ValidationResult = {
     secret?: string
 };
 
-export class ServiceRegistryValidator extends Container<ValidationResult> {
+export class ServiceRegistryValidator extends TypedContainer<ValidationResult> {
     protected initialize() {
         super.initialize();
 

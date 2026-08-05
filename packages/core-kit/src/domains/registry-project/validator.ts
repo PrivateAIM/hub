@@ -7,12 +7,11 @@
 
 import type { RegistryProject } from './entity.ts';
 import { RegistryProjectType } from './constants.ts';
-import { Container } from 'validup';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
-import { ValidatorGroup } from '@privateaim/kit';
+import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
 
-export class RegistryProjectValidator extends Container<RegistryProject> {
+export class RegistryProjectValidator extends TypedContainer<RegistryProject> {
     protected override initialize() {
         super.initialize();
 

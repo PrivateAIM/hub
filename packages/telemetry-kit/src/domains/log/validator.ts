@@ -6,12 +6,12 @@
  */
 
 import { createValidator } from '@validup/zod';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import zod from 'zod';
 import { LogChannel, LogLevel } from './constants';
 import type { LogInput } from './entity';
 
-export class LogValidator extends Container<LogInput> {
+export class LogValidator extends TypedContainer<LogInput> {
     protected override initialize() {
         super.initialize();
 

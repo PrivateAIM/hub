@@ -30,7 +30,7 @@ export default defineComponent({
         });
 
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('admin-clients-id');
 
         const entity: Ref<Client> = ref(null) as any;
 

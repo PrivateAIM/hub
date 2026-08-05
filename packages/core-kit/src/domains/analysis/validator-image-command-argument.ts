@@ -5,12 +5,12 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import type { MasterImageCommandArgument } from '../master-image/types.ts';
 
-export class ImageAttributeCommandArgumentsValidator extends Container<MasterImageCommandArgument> {
+export class ImageAttributeCommandArgumentsValidator extends TypedContainer<MasterImageCommandArgument> {
     protected override initialize() {
         super.initialize();
 

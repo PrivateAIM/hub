@@ -40,7 +40,7 @@ export default defineComponent({
         });
 
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('admin-realms-id');
 
         const entity: Ref<Realm> = ref(null) as any;
 

@@ -43,7 +43,7 @@ export default defineComponent({
         });
 
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('projects-id');
         const store = injectStore();
         const api = injectCoreHTTPClient();
 
@@ -51,7 +51,7 @@ export default defineComponent({
 
         const manager = createEntityManager<`${DomainType.PROJECT}`, Project>({
             type: `${DomainType.PROJECT}`,
-            props: { entityId: useRoute().params.id as string },
+            props: { entityId: useRoute('projects-id').params.id as string },
             onUpdated() {
                 if (toast) {
                     toast.show({ variant: 'success', body: 'The project was successfully updated.' });

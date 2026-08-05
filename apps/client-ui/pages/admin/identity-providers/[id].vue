@@ -39,7 +39,7 @@ export default defineComponent({
         });
 
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('admin-identity-providers-id');
 
         const entity: Ref<IdentityProvider> = ref(null) as any;
 

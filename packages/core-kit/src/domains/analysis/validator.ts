@@ -7,14 +7,13 @@
 
 import { BadRequestError } from '@privateaim/errors';
 import { isNameValid } from '@authup/core-kit';
-import { Container } from 'validup';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import type { Analysis } from './entity.ts';
-import { ValidatorGroup } from '@privateaim/kit';
+import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
 import { ImageAttributeCommandArgumentsValidator } from './validator-image-command-argument.ts';
 
-export class AnalysisValidator extends Container<Analysis> {
+export class AnalysisValidator extends TypedContainer<Analysis> {
     protected override initialize() {
         super.initialize();
 

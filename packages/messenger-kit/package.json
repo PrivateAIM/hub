@@ -36,10 +36,12 @@
     },
     "devDependencies": {
         "@privateaim/core-kit": "^0.13.1",
+        "@privateaim/kit": "^0.13.1",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
-        "@privateaim/core-kit": "^0.13.1"
+        "@privateaim/core-kit": "^0.13.1",
+        "@privateaim/kit": "^0.13.1"
     },
     "publishConfig": {
         "access": "public"

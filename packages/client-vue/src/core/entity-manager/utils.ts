@@ -14,6 +14,61 @@ import type {
     EntityManagerSlotProps,
 } from './type';
 
+/**
+ * Was an entity id supplied at all?
+ *
+ * Presence, not truthiness — `''` is a supplied id, and a route param that fails
+ * to resolve is `''` as readily as it is `undefined`. Testing truthiness would let
+ * a blank id degrade into the query-driven path and resolve an arbitrary row,
+ * which is the whole failure this guard exists to prevent.
+ */
+export function isEntityIdSupplied<T>(id: T) : id is NonNullable<T> {
+    return typeof id !== 'undefined' && id !== null;
+}
+
+/**
+ * Can this id actually address a record?
+ *
+ * A blank one cannot, and must not be handed to `getOne` either: `getOne('')`
+ * builds `GET /<collection>/` — the collection endpoint — so the arbitrary-row
+ * read would simply come back through another door.
+ */
+export function isEntityIdResolvable<T>(id: T) : id is NonNullable<T> {
+    if (!isEntityIdSupplied(id)) {
+        return false;
+    }
+
+    return typeof id !== 'string' || id.trim().length > 0;
+}
+
+/**
+ * Does this query narrow the collection to a specific row?
+ *
+ * `fields` and `include` say WHAT to return, never WHICH row — a projection-only
+ * query matches everything, so resolving it with `limit: 1` hands back an
+ * arbitrary entity from the actor's readable scope. Only `filters` selects.
+ *
+ * An empty `filters` object is not a selector either: it narrows nothing.
+ */
+export function hasQuerySelector<T extends Record<string, any>>(
+    query?: QueryBuildInput<T, 3>,
+) : boolean {
+    if (!query) {
+        return false;
+    }
+
+    const { filters } = query;
+    if (!filters || typeof filters !== 'object') {
+        return false;
+    }
+
+    // A key whose value is `undefined` is dropped by rapiq before the request, so
+    // counting keys alone would call `{ analysisId: undefined, type: 'code' }` a
+    // selector while it actually widens to every code bucket in scope. `null` is
+    // left alone — it is a meaningful filter value, not an absent one.
+    return Object.values(filters).some((value) => typeof value !== 'undefined');
+}
+
 export function buildEntityManagerSlotProps<T extends Record<string, any>>(
     input: EntityManager<T>,
 ) : EntityManagerSlotProps<T> {

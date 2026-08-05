@@ -5,13 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Container } from 'validup';
 import type { AnalysisBucketFile } from './entity.ts';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
-import { ValidatorGroup } from '@privateaim/kit';
+import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
 
-export class AnalysisBucketFileValidator extends Container<AnalysisBucketFile> {
+export class AnalysisBucketFileValidator extends TypedContainer<AnalysisBucketFile> {
     protected override initialize() {
         super.initialize();
 

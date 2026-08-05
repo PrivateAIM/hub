@@ -37,7 +37,7 @@ export default defineComponent({
 
         const manager = createEntityManager({
             type: `${DomainType.ANALYSIS}`,
-            props: { entityId: useRoute().params.id as string },
+            props: { entityId: useRoute('analyses-id').params.id as string },
             onFailed(e) {
                 if (toast) {
                     toast.show({ variant: 'warning', body: e.message });

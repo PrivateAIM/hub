@@ -10,7 +10,7 @@ import { injectStore } from '@authup/client-web-kit';
 import { IFieldValidation } from '@ilingo/validup-vue';
 import { useValidup } from '@validup/vue';
 import { createValidator } from '@validup/zod';
-import { Container } from 'validup';
+import { TypedContainer } from '@privateaim/kit';
 import { z } from 'zod';
 import {
     computed,
@@ -23,7 +23,7 @@ import {
 import { VCButton } from '@vuecs/button';
 import { VCFormGroup, VCFormInput, useSubmitButton } from '@vuecs/forms';
 
-class LoginCredentialsValidator extends Container<{
+class LoginCredentialsValidator extends TypedContainer<{
     name: string;
     password: string;
     realmId: string;

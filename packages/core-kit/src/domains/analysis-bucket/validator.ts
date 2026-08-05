@@ -7,12 +7,11 @@
 
 import type { AnalysisBucket } from './entity.ts';
 import { AnalysisBucketType } from './constants.ts';
-import { Container } from 'validup';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
-import { ValidatorGroup } from '@privateaim/kit';
+import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
 
-export class AnalysisBucketValidator extends Container<AnalysisBucket> {
+export class AnalysisBucketValidator extends TypedContainer<AnalysisBucket> {
     protected override initialize() {
         super.initialize();
 

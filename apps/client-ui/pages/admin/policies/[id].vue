@@ -25,7 +25,7 @@ export default defineComponent({
         });
 
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('admin-policies-id');
 
         const entity : Ref<Policy> = ref(null) as any;
 

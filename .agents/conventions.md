@@ -290,12 +290,27 @@ IS the relation — a `@JoinColumn` with no paired scalar FK. Skipping on
 typo (`@Column({ name: 'registryid' })` plus a matching `@JoinColumn`) would pass
 both the guard and the `synchronize()`-based suites.
 
-**Still unguarded:** validup `mount()` keys. `mount`'s signature is
-`Path<T> | (string & {})`, so any string compiles, and a stale key silently stops
-validating that field — the value is then dropped from the write. All 156 mount
-keys were verified by hand against their `Container<T>` at plan 017; only the
-Harbor webhook validator legitimately keeps snake_case. There is no automated net
-for this yet.
+validup `mount()` keys are guarded by the compiler, not by a spec. `Container`'s
+`mount` signature is `Path<T> | (string & {})`, so any string compiles and a stale
+key silently stops validating that field — the value is then dropped from the
+write, and the request still returns `200`. **Every validator therefore extends
+`TypedContainer<T>` from `@privateaim/kit`, never `Container<T>` directly**; it
+re-types `mount` to `ITypedContainer<T, C>['mount']`, which is validup's own
+overload set minus that second arm. `declare` makes this a pure type-level
+narrowing — the emitted class body is empty.
+
+`Path<T>` still admits the nested and wildcard forms (`registry.accountSecret`,
+`registry.*`), and a container whose `T` genuinely has snake_case properties keeps
+its keys — which is why the Harbor webhook validator is unaffected.
+
+The narrowing itself is pinned by `packages/kit/test/types/typed-container.test-d.ts`,
+run through vitest's typecheck mode (`typecheck.enabled` in that package's
+`vitest.config.ts`). It has to be a **type test**: every `tsconfig.build.json`
+includes `src/**` only, so a `@ts-expect-error` in an ordinary spec would be
+checked by nothing in CI.
+
+The proper fix belongs upstream in validup; `TypedContainer` stands until the
+`(string & {})` arm is gone.
 
 ### Naming exceptions
 
@@ -310,6 +325,49 @@ These stay snake_case and must not be swept into a rename:
 - Third-party payloads — `@hapic/harbor`'s `project_id`, dockerode, MinIO,
   VictoriaLogs query syntax.
 - Environment variables.
+
+## Entity Resolution (client-vue)
+
+`createEntityManager` resolves an entity two ways, and they are mutually
+exclusive by design — **an id-driven resolve never falls back to the collection.**
+
+- **By id.** An id that was *supplied* is an exact selector: resolve that record
+  or nothing. A `getOne` that throws (404, 403) resolves `null`; it must not drop
+  into the collection branch, which would substitute a different entity for the
+  one that was asked for.
+- **By query.** Only when no id was supplied, and only when the query carries a
+  real selector. `fields` and `include` say *what* to return, never *which* row,
+  so a projection-only query matches everything and the `limit: 1` read hands
+  back an arbitrary record from the actor's readable scope.
+
+**Supplied is presence, not truthiness.** `''` is a supplied id — it is how a
+form says "no entity yet" (`FProjectForm` initialises `form.masterImageId = ''`
+and passes it straight in as `entityId`). It resolves `null` quietly, with no
+request: a blank id must not reach `getOne` either, because `getOne('')` builds
+`GET /<collection>/` and lets the arbitrary-row read back in through another
+door. `null` and `undefined` are *absent*, so they still fall through to the
+query branch.
+
+A selector means at least one filter whose value is not `undefined` — rapiq drops
+`undefined` values before the request, so `{ analysisId: undefined, type: 'code' }`
+widens to every code bucket rather than narrowing. `null` stays a selector; it is
+a meaningful filter value.
+
+The helpers are `isEntityIdSupplied` / `isEntityIdResolvable` / `hasQuerySelector`
+in `packages/client-vue/src/core/entity-manager/utils.ts`, and they are **type
+guards** rather than boolean predicates — the truthiness checks they replaced were
+also narrowing `EntityID<RECORD> | null | undefined` for the `getOne` call. Only
+`nuxi typecheck` (Nuxt 4 strict, via client-ui's `build:types`) catches losing
+that; the repo itself builds at `strict: false`.
+
+Why this matters: the failure is silent and looks like a working page. A detail
+page whose route param stopped resolving rendered — and permitted edit and delete
+of — the first row in scope, which is how a registry project's Harbor robot
+`accountSecret` ended up in a form belonging to a different record.
+
+`packages/client-vue/test/unit/core/entity-manager.spec.ts` pins every branch, and
+`test/unit/components/f-master-image-picker.spec.ts` pins the create-mode path on a
+real form component.
 
 ## Icons
 

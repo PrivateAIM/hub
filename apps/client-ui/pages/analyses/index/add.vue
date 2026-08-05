@@ -21,7 +21,7 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmId } = storeToRefs(store);
 
-        const route = useRoute();
+        const route = useRoute('analyses-index-add');
         if (typeof route.query.projectId === 'string') {
             projectId.value = route.query.projectId;
         }

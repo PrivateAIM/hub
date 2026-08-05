@@ -41,7 +41,7 @@ export default defineComponent({
         });
 
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('admin-users-id');
 
         const entity : Ref<User> = ref(null) as any;
 
