@@ -128,6 +128,35 @@ describe('createEntityManager', () => {
             expect(coreClient.requests).toHaveLength(0);
         });
 
+        // rapiq drops `undefined` filter values before the request, so a filter set
+        // that is entirely undefined widens to everything rather than narrowing.
+        it('should resolve null when every filter value is undefined', async () => {
+            const { coreClient, handle } = mountManagerProbe(
+                {},
+                { query: { filters: { name: undefined } } },
+                { 'GET /projects': () => ({ data: [{ id: 'someone-elses' }], meta: { total: 1 } }) },
+            );
+
+            await handle.result;
+
+            expect(handle.manager.data.value).toBeNull();
+            expect(coreClient.requests).toHaveLength(0);
+        });
+
+        // `null` is a real filter value ("where x is null"), not an absent one.
+        it('should treat a null filter value as a selector', async () => {
+            const { coreClient, handle } = mountManagerProbe(
+                {},
+                { query: { filters: { name: null } } },
+                { 'GET /projects': () => ({ data: [{ id: 'abc', name: null }], meta: { total: 1 } }) },
+            );
+
+            await handle.result;
+
+            expect(handle.manager.data.value).toEqual({ id: 'abc', name: null });
+            expect(coreClient.requests).toHaveLength(1);
+        });
+
         it('should still resolve through the collection when the query carries a selector', async () => {
             const { coreClient, handle } = mountManagerProbe(
                 {},

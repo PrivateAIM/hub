@@ -62,7 +62,11 @@ export function hasQuerySelector<T extends Record<string, any>>(
         return false;
     }
 
-    return Object.keys(filters).length > 0;
+    // A key whose value is `undefined` is dropped by rapiq before the request, so
+    // counting keys alone would call `{ analysisId: undefined, type: 'code' }` a
+    // selector while it actually widens to every code bucket in scope. `null` is
+    // left alone — it is a meaningful filter value, not an absent one.
+    return Object.values(filters).some((value) => typeof value !== 'undefined');
 }
 
 export function buildEntityManagerSlotProps<T extends Record<string, any>>(
