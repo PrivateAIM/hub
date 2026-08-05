@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.13.2](https://github.com/PrivateAIM/hub/compare/v0.13.1...v0.13.2) (2026-08-05)
+
+
+### Bug Fixes
+
+* camelCase rename follow-ups — validator mount-key guard, entity-manager fallback, typedPages ([#1816](https://github.com/PrivateAIM/hub/issues/1816)) ([328c404](https://github.com/PrivateAIM/hub/commit/328c404d4c111296b29521bf98b33561c37fb73a)), closes [#1807](https://github.com/PrivateAIM/hub/issues/1807)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.13.1 to ^0.13.2
+    * @privateaim/kit bumped from ^0.13.1 to ^0.13.2
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.13.1 to ^0.13.2
+    * @privateaim/kit bumped from ^0.13.1 to ^0.13.2
+
 ## [0.13.1](https://github.com/PrivateAIM/hub/compare/v0.13.0...v0.13.1) (2026-08-05)
 
 
