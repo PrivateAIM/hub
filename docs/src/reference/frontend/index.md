@@ -24,6 +24,7 @@ docker run -e ... privateaim/hub ui
 | `NUXT_PUBLIC_CORE_URL` | — | Core API base URL |
 | `NUXT_PUBLIC_AUTHUP_URL` | — | Authup URL |
 | `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `admin-console` | OAuth2 client used for the login (authorization-code) flow |
+| `NUXT_PUBLIC_ACCOUNT_URL` | `<NUXT_PUBLIC_AUTHUP_URL>/account` | Authup account console, linked from the "Account" sidebar entry |
 | `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
 | `NUXT_PUBLIC_TELEMETRY_URL` | — | Telemetry service URL |
 | `NUXT_PUBLIC_MESSENGER_URL` | — | Messenger service URL |
@@ -53,6 +54,22 @@ A deployment serving the UI from its own origin should register a **dedicated** 
 (once per realm, e.g. via a wildcard `realms[]` provisioning entry named `"*"`) and point
 `NUXT_PUBLIC_AUTHUP_CLIENT_ID` at it, rather than sharing Authup's console client.
 :::
+
+## Account Self-Service
+
+The UI has **no settings area of its own**. Profile, password, authenticators, sessions
+and connected applications live in **Authup's account console**, served by Authup's
+server-core on the IdP origin as of `v1.0.0-beta.59`. Keeping a second, thinner surface
+in the UI would only split the account UX across two origins.
+
+The header's account icon links straight at `<NUXT_PUBLIC_ACCOUNT_URL>/?ref=<ui-origin>`,
+defaulting to `<NUXT_PUBLIC_AUTHUP_URL>/account`. It is the only entry point — the sidebar
+carries no account entry, so the one link that leaves for the IdP origin sits in one place
+rather than two. The console renders the `ref` origin as a back link after validating it
+against the trusted app origins; the UI origin is already required to be trusted for the
+login callback, so this needs no extra deployment configuration. Set
+`NUXT_PUBLIC_ACCOUNT_URL` for deployments where the console is not reachable under
+`<NUXT_PUBLIC_AUTHUP_URL>/account`.
 
 ## Key Features
 

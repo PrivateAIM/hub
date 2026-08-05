@@ -44,9 +44,19 @@ docker run privateaim/hub ui
 | `NUXT_PUBLIC_CORE_URL` | — | Core API base URL |
 | `NUXT_PUBLIC_AUTHUP_URL` | — | Authup URL |
 | `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `admin-console` | OAuth2 client used for the login (authorization-code) flow |
+| `NUXT_PUBLIC_ACCOUNT_URL` | `<NUXT_PUBLIC_AUTHUP_URL>/account` | Authup account console, linked from the header's account icon |
 | `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
 | `NUXT_PUBLIC_TELEMETRY_URL` | — | Telemetry service URL |
 | `NUXT_PUBLIC_MESSENGER_URL` | — | Messenger service URL |
+
+## Account Self-Service
+
+The UI has no settings area of its own. Profile, password, authenticators, sessions and
+connected applications live in **Authup's account console**, served by Authup's
+server-core on the IdP origin as of `v1.0.0-beta.59`. The header's account icon links
+straight at `<NUXT_PUBLIC_ACCOUNT_URL>/?ref=<ui-origin>`; the console renders the `ref`
+origin as a back link after validating it against the trusted app origins, which the UI
+origin already has to be in for the login callback.
 
 ## License
 

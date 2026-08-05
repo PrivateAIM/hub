@@ -14,7 +14,7 @@ const repositoryRoot = path.resolve(import.meta.dirname, '..', '..');
  * Options for `@nuxt/icon`'s standalone vite plugin, which bundles ONLY the
  * icons this app renders instead of registering the whole Font Awesome 6
  * solid + brands collections at runtime (1,902 icons, ~429 KB gzip, for the
- * 115 actually used).
+ * 116 actually used).
  *
  * The plugin scans source for `<collection>:<name>` literals and emits them
  * into `virtual:nuxt-icon-bundle/register`, which registers through `addIcon`

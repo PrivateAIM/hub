@@ -56,6 +56,13 @@ export default defineNuxtConfig({
             // dedicated client. The client must register
             // `<ui-origin>/login/callback` as a redirect URI.
             authupClientId: process.env.AUTHUP_CLIENT_ID,
+            // Self-service account console (profile, password, authenticators,
+            // sessions, applications), served by Authup's server-core on the
+            // IdP origin as of v1.0.0-beta.59. The UI has no settings area of
+            // its own and links here instead. Empty falls back to
+            // `<authupUrl>/account` at the call site; override per deployment
+            // (NUXT_PUBLIC_ACCOUNT_URL at container runtime).
+            accountUrl: process.env.ACCOUNT_URL || '',
             coreUrl: process.env.CORE_URL,
             storageUrl: process.env.STORAGE_URL,
             telemetryUrl: process.env.TELEMETRY_URL,

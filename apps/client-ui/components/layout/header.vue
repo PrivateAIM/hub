@@ -13,6 +13,7 @@ import { VCNavItems } from '@vuecs/navigation';
 import { computed, ref, useColorMode } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutTopNavigationRegistryId, Navigation } from '../../config/layout';
+import { useAccountConsoleURL } from '../../core';
 import Logo from '../svg/Logo';
 
 export default defineNuxtComponent({
@@ -55,7 +56,12 @@ export default defineNuxtComponent({
             isDark.value = !isDark.value;
         };
 
+        // Leaves the app: self-service lives in Authup's account console on
+        // the IdP origin, so this is a plain anchor rather than a <NuxtLink>.
+        const accountURL = useAccountConsoleURL();
+
         return {
+            accountURL,
             authenticated,
             user,
             toggleNav,
@@ -132,13 +138,17 @@ export default defineNuxtComponent({
                                     </span>
                                 </nuxt-link>
                             </li>
-                            <li class="vc-nav-item">
-                                <nuxt-link
-                                    :to="'/settings'"
+                            <li
+                                v-if="accountURL"
+                                class="vc-nav-item"
+                            >
+                                <a
+                                    :href="accountURL"
                                     class="vc-nav-link"
+                                    aria-label="Account"
                                 >
-                                    <VCIcon name="fa6-solid:gear" />
-                                </nuxt-link>
+                                    <VCIcon name="fa6-solid:user-gear" />
+                                </a>
                             </li>
                             <li class="vc-nav-item">
                                 <nuxt-link

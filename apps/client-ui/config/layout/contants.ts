@@ -115,8 +115,14 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
         },
     },
     {
+        // Gated like the only entry it heads. A separator renders as visible
+        // text (`vc-nav-separator`) and is NOT dropped when the items below
+        // it are filtered out, so an ungated one would dangle over nothing
+        // for a logged-in user — account self-service moved to the header's
+        // link into the Authup account console.
         name: 'Others',
         type: 'separator',
+        meta: { [LayoutKey.REQUIRED_LOGGED_OUT]: true },
     },
     {
         name: 'Login',
@@ -124,13 +130,6 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
         url: '/login',
         icon: 'fa6-solid:right-to-bracket',
         meta: { [LayoutKey.REQUIRED_LOGGED_OUT]: true },
-    },
-    {
-        name: 'Settings',
-        type: 'link',
-        url: '/settings',
-        icon: 'fa6-solid:gear',
-        meta: { [LayoutKey.REQUIRED_LOGGED_IN]: true },
     },
 ];
 export const LayoutSideAdminNavigation: NavigationItem<NavigationItemMeta>[] = [
