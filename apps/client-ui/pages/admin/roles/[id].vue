@@ -41,7 +41,7 @@ export default defineComponent({
         });
 
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('admin-roles-id');
 
         const entity : Ref<Role> = ref(null) as any;
 

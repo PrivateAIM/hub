@@ -28,7 +28,7 @@ export default defineComponent({
     async setup() {
         const toast = useToast();
 
-        const route = useRoute();
+        const route = useRoute('admin-nodes-id');
 
         // Must run before the first await — the injection context is only
         // available synchronously in setup().

@@ -32,7 +32,7 @@ export default defineComponent({
         });
 
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('admin-services-registry-id');
 
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY}`,

@@ -19,7 +19,7 @@ import { createError, navigateTo } from '#app';
 export default defineComponent({
     components: { VCIcon },
     async setup() {
-        const route = useRoute();
+        const route = useRoute('admin-events-id');
 
         const entity = ref<null | Event>(null);
 

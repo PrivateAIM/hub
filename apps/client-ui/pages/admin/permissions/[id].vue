@@ -33,7 +33,7 @@ export default defineComponent({
         });
 
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('admin-permissions-id');
 
         const entity : Ref<Permission> = ref(null) as any;
 

@@ -34,7 +34,7 @@ export default defineNuxtComponent({
         try {
             // authup beta.57 wraps every single-record endpoint in a
             // { data, meta } envelope — unwrap to the bare record.
-            const { data } = await injectHTTPClient().user.getOne(useRoute().params.id as string);
+            const { data } = await injectHTTPClient().user.getOne(useRoute('users-id').params.id as string);
             user.value = data;
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {

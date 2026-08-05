@@ -31,7 +31,7 @@ export default defineNuxtComponent({
     },
     async setup(props) {
         const toast = useToast();
-        const route = useRoute();
+        const route = useRoute('admin-services-registry-id-projects-projectId');
 
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY_PROJECT}`,

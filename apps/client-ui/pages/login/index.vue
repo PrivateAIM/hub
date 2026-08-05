@@ -33,7 +33,7 @@ export default defineNuxtComponent({
             layout: 'auth',
         });
 
-        const route = useRoute();
+        const route = useRoute('login');
         const toast = useToast();
         const runtimeConfig = useRuntimeConfig();
         const apiClient = injectHTTPClient();

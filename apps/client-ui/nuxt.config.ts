@@ -28,6 +28,15 @@ export default defineNuxtConfig({
     experimental: {
         appManifest: false,
         scanPageMeta: false,
+        // Generates a `RouteNamedMap` from the `pages/` tree, so `useRoute(name)`
+        // narrows `params` to that route's own segments. Without it a mistyped or
+        // renamed route param (`[project_id]` -> `[projectId]`) is invisible:
+        // `route.params.x` is `string | string[]` for every route, so the page
+        // renders with an `undefined` id.
+        //
+        // Every `useRoute()` MUST pass its route name — without the generic it
+        // returns a union of all routes and no `params` member resolves.
+        typedPages: true,
     },
 
     devtools: { componentInspector: false },
