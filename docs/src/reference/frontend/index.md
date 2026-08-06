@@ -62,14 +62,23 @@ and connected applications live in **Authup's account console**, served by Authu
 server-core on the IdP origin as of `v1.0.0-beta.59`. Keeping a second, thinner surface
 in the UI would only split the account UX across two origins.
 
-The header's account icon links straight at `<NUXT_PUBLIC_ACCOUNT_URL>/?ref=<ui-origin>`,
-defaulting to `<NUXT_PUBLIC_AUTHUP_URL>/account`. It is the only entry point — the sidebar
-carries no account entry, so the one link that leaves for the IdP origin sits in one place
-rather than two. The console renders the `ref` origin as a back link after validating it
+The header's account icon links straight at
+`<NUXT_PUBLIC_ACCOUNT_URL>/?ref=<ui-origin>&realmId=<session-realm>`, defaulting to
+`<NUXT_PUBLIC_AUTHUP_URL>/account`. It is the only entry point — the sidebar carries no
+account entry, so the one link that leaves for the IdP origin sits in one place rather
+than two. The console renders the `ref` origin as a back link after validating it
 against the trusted app origins; the UI origin is already required to be trusted for the
 login callback, so this needs no extra deployment configuration. Set
 `NUXT_PUBLIC_ACCOUNT_URL` for deployments where the console is not reachable under
 `<NUXT_PUBLIC_AUTHUP_URL>/account`.
+
+`realmId` is a safety net for the session mismatch between the two origins: the UI's
+session outlives the IdP's, so the account icon still renders after the IdP session has
+expired. The console applies the hint only when it sees an unauthenticated visitor, and
+then starts the authorization-code flow against that realm instead of asking which realm
+to sign in to — a question the visitor was never asked when signing into the UI. It is
+ignored while a console session exists, and while the console carries an `error` param,
+so a denied consent cannot loop back into the flow.
 
 ## Key Features
 

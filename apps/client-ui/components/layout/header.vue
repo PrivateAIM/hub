@@ -27,6 +27,7 @@ export default defineNuxtComponent({
     setup() {
         const store = injectStore();
         const {
+            realmId,
             status,
             user,
         } = storeToRefs(store);
@@ -58,7 +59,15 @@ export default defineNuxtComponent({
 
         // Leaves the app: self-service lives in Authup's account console on
         // the IdP origin, so this is a plain anchor rather than a <NuxtLink>.
-        const accountURL = useAccountConsoleURL();
+        //
+        // The session realm rides along so that an IdP session which expired
+        // under this still-authenticated UI session resumes on that realm's
+        // sign-in instead of the console's realm chooser. It has to be a
+        // computed: the store resolves the session AFTER setup runs, so a
+        // realm read once here would be empty on exactly the page load that
+        // follows the redirect back from the IdP.
+        const buildAccountURL = useAccountConsoleURL();
+        const accountURL = computed(() => buildAccountURL({ realmId: realmId.value }));
 
         return {
             accountURL,

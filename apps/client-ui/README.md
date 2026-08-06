@@ -54,9 +54,15 @@ docker run privateaim/hub ui
 The UI has no settings area of its own. Profile, password, authenticators, sessions and
 connected applications live in **Authup's account console**, served by Authup's
 server-core on the IdP origin as of `v1.0.0-beta.59`. The header's account icon links
-straight at `<NUXT_PUBLIC_ACCOUNT_URL>/?ref=<ui-origin>`; the console renders the `ref`
-origin as a back link after validating it against the trusted app origins, which the UI
-origin already has to be in for the login callback.
+straight at `<NUXT_PUBLIC_ACCOUNT_URL>/?ref=<ui-origin>&realmId=<session-realm>`; the
+console renders the `ref` origin as a back link after validating it against the trusted
+app origins, which the UI origin already has to be in for the login callback.
+
+`realmId` matters only once the IdP session is gone — the UI session outlives it, so the
+account icon still renders while the console sees an unauthenticated visitor. The console
+consumes the hint in exactly that state and starts the authorization-code flow for that
+realm, rather than presenting a realm chooser; it is ignored while a console session
+exists.
 
 ## License
 
