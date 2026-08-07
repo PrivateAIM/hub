@@ -40,7 +40,7 @@
         "@authup/kit": "^1.0.0-beta.59"
     },
     "dependencies": {
-        "nanoid": "^6.0.0",
+        "nanoid": "^6.0.1",
         "pathtrace": "^2.2.3",
         "validup": "^1.0.0"
     },
