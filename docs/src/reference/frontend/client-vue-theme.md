@@ -49,7 +49,7 @@ All tokens are CSS custom properties; overriding them reskins the UI without tou
 | `--privateaim-brand-coral` | `#FF5B5B` — primary; the vuecs `primary` scale is color-mixed from it |
 | `--privateaim-brand-teal` | `#4ECDC4` |
 | `--privateaim-brand-purple` | `#6259ca` |
-| `--privateaim-brand-blue` | `#2776dc` |
+| `--privateaim-brand-blue` | `#1e90ff` |
 | `--privateaim-brand-rust` | `#a6592d` |
 
 ### Chrome (header, navbar, sidebar, footer — flips with mode)

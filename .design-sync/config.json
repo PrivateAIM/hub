@@ -1,0 +1,8 @@
+{
+    "projectId": "81c2de77-640f-4e47-98b3-83f928ea566b",
+    "pkg": "@privateaim/client-vue-theme",
+    "shape": "custom",
+    "note": "Vue 3 design system — outside the design-sync converter's React-only envelope; never run the converter here. The project is the user's pre-existing, hand-built 'PrivateAIM / FLAME Design System' presentation project (sources: node-ui flame preset, privateaim website, hub). Hub syncs are surgical, additive edits recorded in NOTES.md.",
+    "lastSync": "2026-08-09",
+    "lastSyncCommit": "b5a3f6f39"
+}

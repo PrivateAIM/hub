@@ -123,7 +123,7 @@ export default defineComponent({
         // light-dark switch flows straight through to the canvas.
         const palette = {
             continent: [128, 128, 128] as number[],
-            link: [39, 118, 220] as number[], // --privateaim-brand-blue
+            link: [30, 144, 255] as number[], // --privateaim-brand-blue
             packet: [78, 205, 196] as number[], // --privateaim-brand-teal
             node: [78, 205, 196] as number[], // --privateaim-brand-teal
             hub: [255, 91, 91] as number[], // --privateaim-brand-coral
@@ -187,7 +187,7 @@ export default defineComponent({
             const styles = window.getComputedStyle(document.documentElement);
             const read = (name: string, fallback: number[]) => toRGB(styles.getPropertyValue(name), fallback);
             palette.continent = read('--vc-color-fg-muted', [150, 158, 170]);
-            palette.link = read('--privateaim-brand-blue', [39, 118, 220]);
+            palette.link = read('--privateaim-brand-blue', [30, 144, 255]);
             palette.packet = read('--privateaim-brand-teal', [78, 205, 196]);
             palette.node = read('--privateaim-brand-teal', [78, 205, 196]);
             palette.hub = read('--privateaim-brand-coral', [255, 91, 91]);
