@@ -33,16 +33,16 @@
     "devDependencies": {
         "@authup/core-kit": "^1.0.0-beta.59",
         "@privateaim/kit": "^0.13.2",
-        "@rapiq/codec-url": "^2.0.0-beta.16",
-        "@rapiq/core": "^2.0.0-beta.16",
+        "@rapiq/codec-url": "^2.0.0-beta.19",
+        "@rapiq/core": "^2.0.0-beta.19",
         "hapic": "^3.0.1",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
         "@authup/core-kit": "^1.0.0-beta.59",
         "@privateaim/kit": "^0.13.2",
-        "@rapiq/codec-url": "^2.0.0-beta.16",
-        "@rapiq/core": "^2.0.0-beta.16",
+        "@rapiq/codec-url": "^2.0.0-beta.19",
+        "@rapiq/core": "^2.0.0-beta.19",
         "hapic": "^3.0.1"
     },
     "scripts": {
