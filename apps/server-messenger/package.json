@@ -62,7 +62,7 @@
     "devDependencies": {
         "@privateaim/messenger-http-kit": "^0.13.2",
         "@privateaim/server-test-kit": "^0.13.2",
-        "better-sqlite3": "^13.0.2",
+        "better-sqlite3": "^13.0.3",
         "vitest": "^4.1.10"
     }
 }
