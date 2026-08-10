@@ -7,6 +7,7 @@
 
 <script lang="ts">
 import { usePermissionCheck } from '@authup/client-web-kit';
+import { getManyAll } from '@privateaim/core-http-kit';
 import type { Project, ProjectNode } from '@privateaim/core-kit';
 import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
@@ -61,12 +62,12 @@ export default defineComponent({
         const projectNodes : Ref<ProjectNode[]> = ref([]);
         const loadProjectNodes = async () => {
             try {
-                const response = await client.projectNode.getMany({
+                // exhaustively paginated — a single page (maxLimit 50) would
+                // silently misrepresent the fleet counts for larger projects.
+                projectNodes.value = await getManyAll((pagination) => client.projectNode.getMany({
                     filters: { projectId: props.entity.id },
-                    pagination: { limit: 50 },
-                });
-
-                projectNodes.value = response.data;
+                    pagination,
+                }));
             } catch {
                 // the fleet strip is a progressive enhancement of the card —
                 // a failed load keeps identity + counts intact.

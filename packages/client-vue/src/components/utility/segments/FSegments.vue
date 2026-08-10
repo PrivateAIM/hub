@@ -31,6 +31,7 @@ export default defineComponent({
             type="button"
             class="cursor-pointer whitespace-nowrap rounded-md border-0 bg-transparent px-3 py-1 text-[0.76rem] font-bold"
             :class="item.key === modelValue ? 'bg-bg text-fg shadow-sm' : 'text-fg-muted hover:text-fg'"
+            :aria-pressed="item.key === modelValue"
             @click.prevent="$emit('update:modelValue', item.key)"
         >
             {{ item.label }}

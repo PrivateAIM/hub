@@ -92,8 +92,21 @@ export function createListRaw<
 
     let query : QueryBuildInput<Entity<RECORD>> | undefined;
 
+    let queued : ListMeta<RECORD> | null = null;
+
     async function load(input: ListMeta<RECORD> = {}) {
-        if (typeof domainAPI?.getMany !== 'function' || busy.value) return;
+        if (typeof domainAPI?.getMany !== 'function') return;
+
+        // Coalesce concurrent calls: a plain early return here silently
+        // dropped a load requested while another was in flight (e.g. an
+        // inbox segment switched during the initial request — the stale
+        // response landed and the selected segment never loaded). Keep
+        // only the LATEST input; the queued run re-reads `props.query`
+        // when it executes, so it carries the freshest filters.
+        if (busy.value) {
+            queued = input;
+            return;
+        }
 
         busy.value = true;
         meta.value.busy = true;
@@ -156,6 +169,15 @@ export function createListRaw<
         } finally {
             busy.value = false;
             meta.value.busy = false;
+        }
+
+        // A load requested while this one ran supersedes both the loadAll
+        // continuation and onLoaded — it represents newer input.
+        if (queued) {
+            const next = queued;
+            queued = null;
+            await load(next);
+            return;
         }
 
         if (context.loadAll) {

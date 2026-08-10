@@ -167,7 +167,7 @@ export default defineComponent({
                     class="animate-spin text-[0.62rem]"
                 />
                 {{ executionState }}
-                <template v-if="executionState === 'running' && entity.executionProgress !== null">
+                <template v-if="executionState === 'running' && typeof entity.executionProgress === 'number'">
                     · {{ entity.executionProgress }}%
                 </template>
             </span>

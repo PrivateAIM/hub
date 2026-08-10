@@ -63,7 +63,7 @@ export function createTestAnalysisNode(overrides: Partial<AnalysisNode> = {}) : 
         analysisId: 'analysis-test',
         analysisRealmId: 'realm-test',
         nodeId: node.id,
-        nodeRealmId: 'realm-other',
+        nodeRealmId: node.realmId,
         ...overrides,
         node,
     } as AnalysisNode;

@@ -7,6 +7,7 @@
 
 <script lang="ts">
 import { usePermissionCheck } from '@authup/client-web-kit';
+import { getManyAll } from '@privateaim/core-http-kit';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCButton } from '@vuecs/button';
@@ -69,14 +70,15 @@ export default defineComponent({
             nodesBusy.value = true;
 
             try {
-                const response = await client.analysisNode.getMany({
+                // exhaustively paginated — a single page (maxLimit 50) would
+                // silently misrepresent the distribution counts and the
+                // expander label for fleets beyond the page size.
+                nodes.value = await getManyAll((pagination) => client.analysisNode.getMany({
                     filters: { analysisId: props.entity.id },
                     relations: { node: true },
                     sort: { createdAt: 'ASC' },
-                    pagination: { limit: 50 },
-                });
-
-                nodes.value = response.data;
+                    pagination,
+                }));
             } catch {
                 // the lanes are a progressive enhancement of the card —
                 // a failed load keeps the stage rail intact.
@@ -172,7 +174,7 @@ export default defineComponent({
 
         <div
             v-if="nodes.length > 0"
-            class="mt-1 flex flex-col gap-2 border-t border-border pt-2"
+            class="mt-1 flex flex-col gap-2 overflow-x-auto border-t border-border pt-2"
         >
             <template v-if="partition.summarized">
                 <FAnalysisNodeDistribution :entities="nodes" />
