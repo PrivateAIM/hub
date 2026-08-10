@@ -63,11 +63,11 @@ describe('components/FAnalysisItemCard', () => {
         // only the exception lane is visible; the healthy fleet is collapsed
         expect(wrapper.text()).toContain(rejected.node.name);
         expect(wrapper.text()).not.toContain(healthy[0].node.name);
-        expect(wrapper.text()).toContain('7 more nodes on track');
+        expect(wrapper.text()).toContain('7 more nodes');
 
         // expanding reveals the collapsed lanes
         const expander = wrapper.findAll('button').find(
-            (button) => button.text().includes('more nodes on track'),
+            (button) => button.text().includes('more nodes'),
         );
         expect(expander).toBeDefined();
 

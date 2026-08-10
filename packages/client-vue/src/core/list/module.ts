@@ -111,6 +111,12 @@ export function createListRaw<
         busy.value = true;
         meta.value.busy = true;
 
+        // Drained in the finally block: the queued input must survive a
+        // FAILED run too — draining only after the try/finally stranded it
+        // on rejection (the switched segment never loaded) and replayed the
+        // stale input on the NEXT unrelated load, overwriting its result.
+        let drained = false;
+
         try {
             if (context.queryFilters) {
                 const filters = (input.filters || {}) as FiltersBuildInput<Entity<RECORD>>;
@@ -169,14 +175,18 @@ export function createListRaw<
         } finally {
             busy.value = false;
             meta.value.busy = false;
+
+            // A load requested while this one ran supersedes the loadAll
+            // continuation and onLoaded — it represents newer input.
+            if (queued) {
+                const next = queued;
+                queued = null;
+                drained = true;
+                await load(next);
+            }
         }
 
-        // A load requested while this one ran supersedes both the loadAll
-        // continuation and onLoaded — it represents newer input.
-        if (queued) {
-            const next = queued;
-            queued = null;
-            await load(next);
+        if (drained) {
             return;
         }
 
@@ -349,10 +359,12 @@ export function createListRaw<
                 // `data.length > 0` (its render condition is data presence),
                 // so a band returned from its children while the list is
                 // still empty is silently dropped — it must be a SIBLING
-                // of the body.
+                // of the body. The wrapper class lets layout variants
+                // (`.entity-grid`) apply the body's layout to the band, so
+                // skeletons stand in the same grid as the rows they mimic.
                 if (busy.value && data.value.length === 0) {
                     const band = renderLoadingBand(false);
-                    if (band) children.push(band);
+                    if (band) children.push(h('div', { class: 'vc-list-loading-band' }, [band]));
                 }
 
                 children.push(h(VCListBody, {}, () => {

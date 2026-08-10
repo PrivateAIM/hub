@@ -82,6 +82,21 @@ describe('core/analysis-node-state', () => {
         expect(partition.hidden).toHaveLength(healthy.length);
     });
 
+    it('should keep the lane budget even when every node is an exception', () => {
+        // fresh distribution: every approval pending — without the cap the
+        // summarized branch rendered ALL lanes plus a "0 more" expander
+        const nodes = Array.from(
+            { length: ANALYSIS_NODE_LANE_BUDGET + 2 },
+            () => createTestAnalysisNode({ approvalStatus: null }),
+        );
+
+        const partition = partitionAnalysisNodeLanes(nodes);
+
+        expect(partition.summarized).toBeTruthy();
+        expect(partition.lanes).toHaveLength(ANALYSIS_NODE_LANE_BUDGET);
+        expect(partition.hidden).toHaveLength(2);
+    });
+
     it('should count state distributions in stable order and drop empty states', () => {
         const nodes = [
             createTestAnalysisNode({

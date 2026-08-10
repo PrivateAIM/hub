@@ -78,8 +78,11 @@ export function partitionAnalysisNodeLanes(
     const lanes : AnalysisNode[] = [];
     const hidden : AnalysisNode[] = [];
 
+    // Exceptions lead, but the budget still bounds the card: a fleet whose
+    // nodes are ALL unsettled (fresh distribution — every approval pending)
+    // would otherwise render every lane and defeat the summarization.
     for (const node of nodes) {
-        if (isAnalysisNodeException(node)) {
+        if (isAnalysisNodeException(node) && lanes.length < budget) {
             lanes.push(node);
         } else {
             hidden.push(node);

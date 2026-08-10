@@ -92,7 +92,8 @@
  * `.entity-cards` keeps the row chrome but calms it for the taller
  * dossier/inbox cards: more padding, larger radius, whisper shadow.
  */
-.entity-grid .vc-list-body {
+.entity-grid .vc-list-body,
+.entity-grid .vc-list-loading-band {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
     gap: 1rem;

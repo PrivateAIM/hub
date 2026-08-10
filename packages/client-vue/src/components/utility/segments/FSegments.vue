@@ -24,13 +24,19 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="inline-flex w-max gap-0.5 rounded-lg border border-border bg-bg-elevated p-0.5">
+    <div
+        role="group"
+        class="inline-flex w-max gap-0.5 rounded-lg border border-border bg-bg-elevated p-0.5"
+    >
+        <!-- dark:bg-fg/10 — the dark theme lifts bg-elevated ABOVE bg, so a
+             bg-bg pill would render as the darkest chip; a faint fg overlay
+             keeps the selected segment reading as raised in both modes. -->
         <button
             v-for="item in items"
             :key="item.key"
             type="button"
             class="cursor-pointer whitespace-nowrap rounded-md border-0 bg-transparent px-3 py-1 text-[0.76rem] font-bold"
-            :class="item.key === modelValue ? 'bg-bg text-fg shadow-sm' : 'text-fg-muted hover:text-fg'"
+            :class="item.key === modelValue ? 'bg-bg text-fg shadow-sm dark:bg-fg/10' : 'text-fg-muted hover:text-fg'"
             :aria-pressed="item.key === modelValue"
             @click.prevent="$emit('update:modelValue', item.key)"
         >

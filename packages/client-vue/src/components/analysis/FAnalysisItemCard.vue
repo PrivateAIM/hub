@@ -66,8 +66,10 @@ export default defineComponent({
 
         const nodes : Ref<AnalysisNode[]> = ref([]);
         const nodesBusy = ref(false);
+        const nodesFailed = ref(false);
         const loadNodes = async () => {
             nodesBusy.value = true;
+            nodesFailed.value = false;
 
             try {
                 // exhaustively paginated — a single page (maxLimit 50) would
@@ -81,7 +83,9 @@ export default defineComponent({
                 }));
             } catch {
                 // the lanes are a progressive enhancement of the card —
-                // a failed load keeps the stage rail intact.
+                // a failed load keeps the stage rail intact, but the
+                // section must say so instead of silently vanishing.
+                nodesFailed.value = true;
             } finally {
                 nodesBusy.value = false;
             }
@@ -110,6 +114,8 @@ export default defineComponent({
             canDelete,
             nodes,
             nodesBusy,
+            nodesFailed,
+            loadNodes,
             partition,
             lanesExpanded,
             toggleLanes,
@@ -199,6 +205,7 @@ export default defineComponent({
                     />
                 </div>
                 <button
+                    v-if="partition.hidden.length > 0"
                     class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md border border-dashed border-border
                            bg-transparent py-1 text-xs font-bold text-fg-muted hover:border-primary-600 hover:text-primary-600"
                     @click.prevent="toggleLanes"
@@ -211,7 +218,7 @@ export default defineComponent({
                         collapse
                     </template>
                     <template v-else>
-                        {{ partition.hidden.length }} more nodes on track — show all
+                        {{ partition.hidden.length }} more nodes — show all
                     </template>
                 </button>
             </template>
@@ -238,6 +245,19 @@ export default defineComponent({
                 size="sm"
                 width="92%"
             />
+        </div>
+        <div
+            v-else-if="nodesFailed"
+            class="mt-1 flex items-center gap-2 border-t border-border pt-2 text-xs text-fg-muted"
+        >
+            node details unavailable
+            <button
+                class="cursor-pointer rounded border border-border bg-transparent px-2 py-0.5 font-bold text-fg-muted
+                       hover:border-primary-600 hover:text-primary-600"
+                @click.prevent="loadNodes"
+            >
+                retry
+            </button>
         </div>
     </div>
 </template>

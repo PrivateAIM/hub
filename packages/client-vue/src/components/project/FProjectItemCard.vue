@@ -60,7 +60,10 @@ export default defineComponent({
         const client = injectCoreHTTPClient();
 
         const projectNodes : Ref<ProjectNode[]> = ref([]);
+        const fleetFailed = ref(false);
         const loadProjectNodes = async () => {
+            fleetFailed.value = false;
+
             try {
                 // exhaustively paginated — a single page (maxLimit 50) would
                 // silently misrepresent the fleet counts for larger projects.
@@ -70,7 +73,9 @@ export default defineComponent({
                 }));
             } catch {
                 // the fleet strip is a progressive enhancement of the card —
-                // a failed load keeps identity + counts intact.
+                // a failed load keeps identity + counts intact, but the strip
+                // must say so instead of posing as "0 joined".
+                fleetFailed.value = true;
             }
         };
 
@@ -112,6 +117,8 @@ export default defineComponent({
             canDelete,
             projectNodes,
             fleet,
+            fleetFailed,
+            loadProjectNodes,
             handleDeleted,
         };
     },
@@ -175,7 +182,20 @@ export default defineComponent({
 
         <div class="flex items-center gap-2.5 text-xs">
             <span class="flex-none font-bold text-fg-muted">Nodes</span>
-            <template v-if="entity.nodes > 0">
+            <template v-if="fleetFailed">
+                <span class="flex h-2 min-w-16 flex-1 overflow-hidden rounded-full border border-border bg-bg" />
+                <span class="flex-none text-fg-muted">
+                    status unavailable
+                    <button
+                        class="ms-1 cursor-pointer rounded border border-border bg-transparent px-1.5 font-bold text-fg-muted
+                               hover:border-primary-600 hover:text-primary-600"
+                        @click.prevent="loadProjectNodes"
+                    >
+                        retry
+                    </button>
+                </span>
+            </template>
+            <template v-else-if="entity.nodes > 0">
                 <span class="flex h-2 min-w-16 flex-1 overflow-hidden rounded-full border border-border bg-bg">
                     <span
                         v-if="fleet.approved"
