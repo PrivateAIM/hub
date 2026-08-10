@@ -17,6 +17,7 @@ import {
     isHubError,
 } from '@privateaim/errors';
 import { isHTTPError } from '@ebec/http';
+import { CodecError, ParseError } from '@rapiq/core';
 import { EntityRelationLookupError } from 'typeorm-extension';
 import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'validup';
 
@@ -26,9 +27,12 @@ import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'v
  * 1. HubError instance                 → returned as-is
  * 2. EntityRelationLookupError         → EntityRelationInvalidError
  * 3. validup Issue error               → BadRequestError carrying issues
- * 4. foreign @ebec/http HTTPError      → HubError with the closest semantic code
- * 5. driver error w/ a recognised code → EntityConflictError or StorageInsufficientError
- * 6. anything else                     → InternalError
+ * 4. rapiq decode error                → BadRequestError (ParseError covers the
+ *    per-parameter subclasses, CodecError an unresolvable codec stamp — both are
+ *    triggered by wire input; Adapter/Build/Merge/Schema errors stay internal)
+ * 5. foreign @ebec/http HTTPError      → HubError with the closest semantic code
+ * 6. driver error w/ a recognised code → EntityConflictError or StorageInsufficientError
+ * 7. anything else                     → InternalError
  *
  * The HTTP-status concern is handled separately by `httpStatusFromCode` in
  * the adapter — this function only assigns a semantic `code`.
@@ -54,6 +58,13 @@ export function sanitizeError(input: unknown): HubError {
 
         error.issues.push(...input.issues);
         return error;
+    }
+
+    if (input instanceof ParseError || input instanceof CodecError) {
+        return new BadRequestError({
+            message: input.message,
+            stack: input.stack,
+        });
     }
 
     if (isHTTPError(input)) {
