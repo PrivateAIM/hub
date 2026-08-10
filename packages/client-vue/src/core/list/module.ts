@@ -304,26 +304,36 @@ export function createListRaw<
             // (e.g. a `<VCTable>` with `:columns` driving auto-render) and
             // per-item rendering is skipped. Otherwise fall back to
             // <VCListBody> + per-item <VCListItem>.
+            const renderLoadingBand = (overlay: boolean) => {
+                if (options.loading === false) return null;
+                const slot = slots[EntityListSlotName.LOADING];
+                // The slot is the FIRST-PAINT skeleton: it stands in
+                // for the empty body while the initial load runs.
+                // Refresh-with-data keeps the default spinner overlay
+                // — a skeleton appended BELOW live rows would read as
+                // phantom items.
+                if (slot && !overlay) return slot(undefined);
+                if (loadingOpt?.content) {
+                    return h(loadingOpt.tag ?? 'div', { class: 'vc-list-loading' }, loadingOpt.content);
+                }
+                return h(VCListLoading, { overlay });
+            };
+
             const bodySlot = slots[EntityListSlotName.BODY];
             if (bodySlot) {
                 children.push(bodySlot(slotProps()));
             } else {
+                // First-load band: <VCListBody> emits ONLY when
+                // `data.length > 0` (its render condition is data presence),
+                // so a band returned from its children while the list is
+                // still empty is silently dropped — it must be a SIBLING
+                // of the body.
+                if (busy.value && data.value.length === 0) {
+                    const band = renderLoadingBand(false);
+                    if (band) children.push(band);
+                }
+
                 children.push(h(VCListBody, {}, () => {
-                    const renderLoadingBand = (overlay: boolean) => {
-                        if (options.loading === false) return null;
-                        const slot = slots[EntityListSlotName.LOADING];
-                        if (slot) return slot(undefined);
-                        if (loadingOpt?.content) {
-                            return h(loadingOpt.tag ?? 'div', { class: 'vc-list-loading' }, loadingOpt.content);
-                        }
-                        return h(VCListLoading, { overlay });
-                    };
-
-                    // First-load: data is empty AND busy → show loading in place.
-                    if (busy.value && data.value.length === 0) {
-                        return renderLoadingBand(false);
-                    }
-
                     if (data.value.length === 0) {
                         // The `noMore` chrome below renders for exactly this
                         // state (`!busy && total === 0`) — suppress the default

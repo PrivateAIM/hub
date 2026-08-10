@@ -11,9 +11,10 @@ import { PermissionName } from '@privateaim/kit';
 import type { QueryBuildInput } from '@rapiq/core';
 import { computed } from 'vue';
 import {
-    FAnalyses, 
-    FPagination, 
-    FSearch, 
+    FAnalyses,
+    FAnalysisItemCardSkeleton,
+    FPagination,
+    FSearch,
     FTitle,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
@@ -22,10 +23,11 @@ import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination: FPagination, 
-        ListSearch: FSearch, 
-        ListTitle: FTitle, 
+        ListPagination: FPagination,
+        ListSearch: FSearch,
+        ListTitle: FTitle,
         FAnalyses,
+        FAnalysisItemCardSkeleton,
     },
     setup() {
         definePageMeta({
@@ -46,7 +48,11 @@ export default defineNuxtComponent({
         const store = injectStore();
         const { realmId } = storeToRefs(store);
 
-        const query = computed<QueryBuildInput<Analysis, 3>>(() => ({ filters: { realmId: realmId.value } }));
+        const query = computed<QueryBuildInput<Analysis, 3>>(() => ({
+            filters: { realmId: realmId.value },
+            relations: { project: true },
+            sort: { updatedAt: 'DESC' },
+        }));
 
         return { query };
     },
@@ -54,13 +60,19 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <div class="m-t-10">
+        <div class="m-t-10 entity-cards">
             <FAnalyses :query="query">
                 <template #header="props">
                     <ListTitle />
                     <ListSearch
                         :load="props.load"
                         :meta="props.meta"
+                    />
+                </template>
+                <template #loading>
+                    <FAnalysisItemCardSkeleton
+                        v-for="index in 3"
+                        :key="index"
                     />
                 </template>
                 <template #footer="props">

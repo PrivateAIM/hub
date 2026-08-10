@@ -5,9 +5,11 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { ARealm } from '@authup/client-web-kit';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
 import { VCLink } from '@vuecs/link';
+import { VCTimeago } from '@vuecs/timeago';
 import type { AnalysisBucket, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import type { QueryBuildInput } from '@rapiq/core';
@@ -16,18 +18,21 @@ import { computed, defineComponent } from 'vue';
 import { FAnalysisBucket, FAnalysisBucketDownload } from '../analysis-bucket';
 import FDisplayName from '../FDisplayName';
 import { FAnalysisNodeApprovalCommand } from './FAnalsisNodeApprovalCommand';
-import { FAnalysisNodeApprovalStatus } from './FAnalysisNodeApprovalStatus';
-import { resolveTextColorClass } from '../../core';
+import {
+    resolveAnalysisNodeApprovalState,
+    resolveAnalysisNodeExecutionState,
+} from '../../core';
 
 export default defineComponent({
     components: {
+        ARealm,
         FAnalysisBucket,
         FAnalysisBucketDownload,
         FDisplayName,
         FAnalysisNodeApprovalCommand,
-        FAnalysisNodeApprovalStatus,
         VCButton,
         VCIcon,
+        VCTimeago,
     },
     props: {
         entity: {
@@ -48,6 +53,9 @@ export default defineComponent({
             },
         } satisfies QueryBuildInput<AnalysisBucket, 3>));
 
+        const approvalState = computed(() => resolveAnalysisNodeApprovalState(props.entity));
+        const executionState = computed(() => resolveAnalysisNodeExecutionState(props.entity));
+
         const handleDeleted = (data: AnalysisNode) => {
             emit('deleted', data);
         };
@@ -64,162 +72,162 @@ export default defineComponent({
             VCLink,
 
             bucketQuery,
+            approvalState,
+            executionState,
 
             handleDeleted,
             handleFailed,
             handleUpdated,
-
-            resolveTextColorClass,
         };
     },
 });
 </script>
 <template>
-    <div class="flex flex-col gap-1 w-full">
-        <div class="w-full">
-            <div class="flex flex-row items-center">
-                <div>
-                    <slot
-                        name="title"
-                        :data="entity"
-                    >
-                        <VCIcon
-                            name="fa6-solid:microscope"
-                            class="me-1"
-                        />
-
-                        <FDisplayName
-                            :name="entity.analysis.name"
-                            :display-name="entity.analysis.displayName"
-                        />
-                    </slot>
-                </div>
-                <div class="ms-auto flex flex-row gap-1">
-                    <slot
-                        name="itemActions"
-                        :data="entity"
-                    >
-                        <VCButton
-                            :as="VCLink"
-                            :to="'/analyses/' + entity.analysis.id"
-                            :disabled="busy"
-                            size="xs"
-                            color="neutral"
-                        >
-                            <VCIcon name="fa6-solid:bars" />
-                        </VCButton>
-                        <FAnalysisBucket :query="bucketQuery">
-                            <template #default="{ data: bucket }">
-                                <FAnalysisBucketDownload
-                                    v-if="bucket"
-                                    :entity="bucket"
-                                    :with-icon="true"
-                                    :with-text="false"
-                                />
-                            </template>
-                        </FAnalysisBucket>
-                        <FAnalysisNodeApprovalCommand
-                            :entity-id="entity.id"
-                            :approval-status="entity.approvalStatus"
-                            :with-icon="true"
-                            :element-type="'button'"
-                            :command="'approve'"
-                            :with-text="false"
-                            @updated="handleUpdated"
-                        />
-                        <FAnalysisNodeApprovalCommand
-                            :entity-id="entity.id"
-                            :approval-status="entity.approvalStatus"
-                            :with-icon="true"
-                            :element-type="'button'"
-                            :command="'reject'"
-                            :with-text="false"
-                            @updated="handleUpdated"
-                        />
-                    </slot>
-                </div>
-            </div>
+    <div
+        class="relative flex w-full flex-col gap-2"
+        :class="approvalState === 'pending' ?
+            'ps-3 before:absolute before:inset-y-0 before:start-0 before:w-[3px] before:rounded-full before:bg-warning-600 before:content-[\'\']' :
+            ''"
+    >
+        <div class="flex flex-row items-center gap-1.5 text-xs text-fg-muted">
+            <VCIcon
+                name="fa6-solid:globe"
+                class="text-[0.7rem]"
+            />
+            <ARealm :query-filters="{ id: entity.analysisRealmId }">
+                <template #default="scope">
+                    <b
+                        v-if="scope && scope.data"
+                        class="text-fg"
+                    >{{ scope.data.name }}</b>
+                    <b
+                        v-else
+                        class="text-fg"
+                    >{{ entity.analysisRealmId }}</b>
+                </template>
+            </ARealm>
+            requests execution on your node
+            <b class="text-fg">{{ entity.node?.name ?? entity.nodeId }}</b>
+            <small class="ms-auto whitespace-nowrap">
+                requested <VCTimeago :datetime="entity.createdAt" />
+            </small>
         </div>
-        <slot
-            name="body"
-            :data="entity"
+
+        <div class="flex flex-row items-center gap-2.5">
+            <span class="entity-icon h-7 w-7 flex-none text-[0.8rem]">
+                <VCIcon name="fa6-solid:microscope" />
+            </span>
+            <VCLink
+                :to="'/analyses/' + entity.analysisId"
+                class="text-[0.95rem] font-bold"
+            >
+                <FDisplayName
+                    :name="entity.analysis?.name ?? entity.analysisId"
+                    :display-name="entity.analysis?.displayName"
+                />
+            </VCLink>
+            <span
+                class="ms-auto rounded-full px-2.5 py-0.5 text-[0.68rem] font-bold tracking-wide"
+                :class="{
+                    'bg-warning-600/15 text-warning-600': approvalState === 'pending',
+                    'bg-success-600/15 text-success-600': approvalState === 'approved',
+                    'bg-error-600/15 text-error-600': approvalState === 'rejected',
+                }"
+            >
+                {{ approvalState }}
+            </span>
+        </div>
+
+        <div
+            v-if="entity.artifactTag || approvalState === 'approved'"
+            class="flex flex-wrap items-center gap-1.5"
         >
-            <div class="flex flex-wrap -mx-2">
-                <div class="w-full px-2 md:w-4/12 flex items-center flex-col">
-                    <div>
-                        <strong><VCIcon name="fa6-solid:server" /> Node</strong>
-                    </div>
-                    <div>
-                        {{ entity.node.name }}
-                    </div>
-                </div>
-                <div class="w-full px-2 md:w-4/12 flex items-center flex-col">
-                    <div>
-                        <strong><VCIcon name="fa6-solid:heart-pulse" /> Status</strong>
-                    </div>
-                    <div>
-                        <FAnalysisNodeApprovalStatus
-                            :status="entity.approvalStatus"
-                        >
-                            <template #default="slotProps">
-                                <span
-                                    :class="resolveTextColorClass(slotProps.classSuffix)"
-                                >
-                                    {{ slotProps.statusText }}
-                                </span>
-                            </template>
-                        </FAnalysisNodeApprovalStatus>
-                    </div>
-                </div>
-                <div class="w-full px-2 md:w-4/12 flex items-center flex-col">
-                    <div>
-                        <strong><VCIcon name="fa6-solid:user" /> Creator</strong>
-                    </div>
-                    <div>
-                        <template v-if="entity.analysis.userId">
-                            {{ entity.analysis.userId }}
-                        </template>
-                    </div>
-                </div>
-                <!-- todo: this is only possible when authup supports user access from other realm -->
-                <!--
-                <div class="flex grow items-center flex-col">
-                    <div>
-                        <strong><i class="fa fa-user" /> Creator</strong>
-                    </div>
-                    <div>
-                        <AUser :entity-id="entity.userId">
-                            <template #default="{ data }">
-                                {{ data.name }}
-                            </template>
-                        </AUser>
-                    </div>
-                </div>
-                -->
-            </div>
-        </slot>
-        <slot
-            name="footer"
-            :data="entity"
+            <span
+                v-if="entity.artifactTag"
+                class="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-2.5 py-0.5 font-mono text-[0.68rem] text-fg-muted"
+            >
+                <VCIcon
+                    name="fa6-solid:cube"
+                    class="text-[0.62rem]"
+                />
+                {{ entity.artifactTag }}
+            </span>
+            <span
+                v-if="approvalState === 'approved' && executionState !== 'waiting'"
+                class="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-2.5 py-0.5 text-[0.68rem] font-bold"
+                :class="{
+                    'text-primary-600': executionState === 'running',
+                    'text-success-600': executionState === 'done',
+                    'text-error-600': executionState === 'failed',
+                }"
+            >
+                <VCIcon
+                    v-if="executionState === 'running'"
+                    name="fa6-solid:rotate"
+                    class="animate-spin text-[0.62rem]"
+                />
+                {{ executionState }}
+                <template v-if="executionState === 'running' && entity.executionProgress !== null">
+                    · {{ entity.executionProgress }}%
+                </template>
+            </span>
+        </div>
+
+        <div
+            v-if="approvalState === 'rejected' && entity.comment"
+            class="rounded-md border border-dashed border-border bg-bg px-2.5 py-1.5 text-xs text-fg-muted"
         >
-            <div class="flex flex-row">
-                <div class="">
-                    <small>
-                        <span class="text-fg-muted">
-                            created
-                        </span>
-                        <VCTimeago :datetime="entity.createdAt" />
-                    </small>
-                </div>
-                <div class="ms-auto">
-                    <small>
-                        <span class="text-fg-muted">
-                            updated
-                        </span>
-                        <VCTimeago :datetime="entity.updatedAt" />
-                    </small>
-                </div>
-            </div>
-        </slot>
+            <VCIcon
+                name="fa6-solid:comment"
+                class="me-1 text-[0.68rem]"
+            />
+            “{{ entity.comment }}”
+        </div>
+
+        <div class="flex flex-row items-center gap-1.5 border-t border-border pt-2">
+            <slot
+                name="itemActions"
+                :data="entity"
+            >
+                <FAnalysisNodeApprovalCommand
+                    :entity-id="entity.id"
+                    :approval-status="entity.approvalStatus"
+                    :with-icon="true"
+                    :element-type="'button'"
+                    :command="'approve'"
+                    @updated="handleUpdated"
+                    @failed="handleFailed"
+                />
+                <FAnalysisNodeApprovalCommand
+                    :entity-id="entity.id"
+                    :approval-status="entity.approvalStatus"
+                    :with-icon="true"
+                    :element-type="'button'"
+                    :command="'reject'"
+                    @updated="handleUpdated"
+                    @failed="handleFailed"
+                />
+                <FAnalysisBucket :query="bucketQuery">
+                    <template #default="{ data: bucket }">
+                        <FAnalysisBucketDownload
+                            v-if="bucket"
+                            :entity="bucket"
+                            :with-icon="true"
+                            :with-text="false"
+                        />
+                    </template>
+                </FAnalysisBucket>
+                <VCButton
+                    :as="VCLink"
+                    :to="'/analyses/' + entity.analysisId"
+                    :disabled="busy"
+                    size="xs"
+                    color="neutral"
+                    class="ms-auto"
+                >
+                    <VCIcon name="fa6-solid:bars" />
+                </VCButton>
+            </slot>
+        </div>
     </div>
 </template>

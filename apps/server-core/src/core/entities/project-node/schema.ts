@@ -30,7 +30,7 @@ export const projectNodeSchema = defineSchema<ProjectNode>({
             'nodeRealmId',
         ],
     },
-    filters: { allowed: ['projectRealmId', 'projectId', 'nodeRealmId', 'nodeId'] },
+    filters: { allowed: ['approvalStatus', 'projectRealmId', 'projectId', 'nodeRealmId', 'nodeId'] },
     relations: { allowed: ['node', 'project'] },
     sort: { allowed: ['createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },

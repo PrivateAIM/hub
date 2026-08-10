@@ -7,29 +7,39 @@
 
 <script lang="ts">
 import { usePermissionCheck } from '@authup/client-web-kit';
-import type { Analysis } from '@privateaim/core-kit';
+import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
 import { VCLink } from '@vuecs/link';
+import { VCPlaceholder } from '@vuecs/placeholder';
 import { VCTimeago } from '@vuecs/timeago';
-import type { PropType, SlotsType } from 'vue';
-import { defineComponent, ref } from 'vue';
+import type { PropType, Ref, SlotsType } from 'vue';
+import {
+    computed, 
+    defineComponent, 
+    onMounted, 
+    ref,
+} from 'vue';
 import type { EntityListSlotName } from '../../core';
+import { injectCoreHTTPClient, partitionAnalysisNodeLanes } from '../../core';
 import FDisplayName from '../FDisplayName';
 import FEntityDelete from '../FEntityDelete';
-import FAnalysisStatus from './status/FAnalysisStatus.vue';
-import FAnalysisProgressBar from './FAnalysisProgressBar.vue';
+import FAnalysisNodeDistribution from '../analysis-node/FAnalysisNodeDistribution.vue';
+import FAnalysisNodeLane from '../analysis-node/FAnalysisNodeLane.vue';
+import FAnalysisStageRail from './FAnalysisStageRail.vue';
 
 export default defineComponent({
     components: {
-        FAnalysisProgressBar,
-        FAnalysisPipeline: FAnalysisStatus,
+        FAnalysisNodeDistribution,
+        FAnalysisNodeLane,
+        FAnalysisStageRail,
         FDisplayName,
         FEntityDelete,
         VCButton,
         VCIcon,
         VCLink,
+        VCPlaceholder,
         VCTimeago,
     },
     props: {
@@ -48,86 +58,99 @@ export default defineComponent({
             data: Analysis
         }
     }>,
-    setup(_props, { emit }) {
-        const extendedView = ref(true);
-        const toggleView = () => {
-            extendedView.value = !extendedView.value;
+    setup(props, { emit }) {
+        const canDelete = usePermissionCheck({ name: PermissionName.ANALYSIS_DELETE });
+
+        const client = injectCoreHTTPClient();
+
+        const nodes : Ref<AnalysisNode[]> = ref([]);
+        const nodesBusy = ref(false);
+        const loadNodes = async () => {
+            nodesBusy.value = true;
+
+            try {
+                const response = await client.analysisNode.getMany({
+                    filters: { analysisId: props.entity.id },
+                    relations: { node: true },
+                    sort: { createdAt: 'ASC' },
+                    pagination: { limit: 50 },
+                });
+
+                nodes.value = response.data;
+            } catch {
+                // the lanes are a progressive enhancement of the card —
+                // a failed load keeps the stage rail intact.
+            } finally {
+                nodesBusy.value = false;
+            }
         };
 
-        const canDelete = usePermissionCheck({ name: PermissionName.ANALYSIS_DELETE });
+        onMounted(() => {
+            if (props.entity.nodes > 0) {
+                loadNodes();
+            }
+        });
+
+        const partition = computed(() => partitionAnalysisNodeLanes(nodes.value));
+
+        const lanesExpanded = ref(false);
+        const toggleLanes = () => {
+            lanesExpanded.value = !lanesExpanded.value;
+        };
 
         const handleDeleted = (data: Analysis) => {
             emit('deleted', data);
         };
 
-        const handleExecuted = (component: string, command: string) => {
-            emit('executed', component, command);
-        };
-
-        const handleFailed = (error: Error) => {
-            emit('failed', error);
-        };
-
-        const handleUpdated = (data: Analysis) => {
-            emit('updated', data);
-        };
-
         return {
             VCLink,
 
-            extendedView,
-            toggleView,
-
             canDelete,
+            nodes,
+            nodesBusy,
+            partition,
+            lanesExpanded,
+            toggleLanes,
             handleDeleted,
-            handleExecuted,
-            handleFailed,
-            handleUpdated,
         };
     },
 });
 </script>
 <template>
-    <div
-        class="flex flex-col analysis-item-card"
-    >
-        <div class="flex flex-row items-center">
-            <div class="me-1">
+    <div class="flex w-full flex-col">
+        <div class="flex flex-row items-center gap-2.5">
+            <span class="entity-icon h-7 w-7 flex-none text-[0.8rem]">
+                <VCIcon name="fa6-solid:microscope" />
+            </span>
+            <VCLink
+                :to="'/analyses/' + entity.id"
+                class="text-[0.95rem] font-bold"
+            >
                 <FDisplayName
-                    class="analysis-item-card-title"
                     :name="entity.name"
                     :display-name="entity.displayName"
-                >
-                    <template #default="props">
-                        <VCIcon
-                            name="fa6-solid:microscope"
-                            class="me-1"
-                        />
-                        <VCLink :to="'/analyses/' + entity.id">
-                            {{ props.display }}
-                        </VCLink>
-                    </template>
-                </FDisplayName>
-            </div>
-            <div class="ms-auto flex items-center">
+                />
+            </VCLink>
+            <span
+                v-if="entity.project"
+                class="rounded-full border border-border bg-bg px-2 font-mono text-[0.68rem] text-fg-muted"
+            >
+                {{ entity.project.name }}
+            </span>
+            <div class="ms-auto flex items-center gap-1">
                 <slot
                     name="itemActions"
                     :data="entity"
                 >
-                    <VCButton
-                        size="xs"
-                        color="neutral"
-                        @click.prevent="toggleView"
-                    >
-                        <VCIcon :name="!extendedView ? 'fa6-solid:chevron-down' : 'fa6-solid:chevron-up'" />
-                    </VCButton>
+                    <small class="me-1.5 whitespace-nowrap text-fg-muted">
+                        updated <VCTimeago :datetime="entity.updatedAt" />
+                    </small>
                     <VCButton
                         :as="VCLink"
                         :to="'/analyses/' + entity.id"
                         :disabled="busy"
                         size="xs"
                         color="neutral"
-                        class="ms-1"
                     >
                         <VCIcon name="fa6-solid:bars" />
                     </VCButton>
@@ -138,49 +161,81 @@ export default defineComponent({
                             :entity-type="'analysis'"
                             :disabled="busy"
                             size="sm"
-                            class="ms-1"
                             @deleted="handleDeleted"
                         />
                     </template>
                 </slot>
             </div>
         </div>
-        <FAnalysisPipeline
-            :entity="entity"
-            :with-command="extendedView"
-            :list-direction="extendedView ? 'column' : 'row'"
-            @updated="handleUpdated"
-            @deleted="handleDeleted"
-            @executed="handleExecuted"
-            @failed="handleFailed"
-        />
-        <FAnalysisProgressBar :entity="entity" />
-        <div class="flex flex-row">
-            <div class="">
-                <small>
-                    <span class="text-fg-muted">
-                        created
-                    </span>
-                    <VCTimeago :datetime="entity.createdAt" />
-                </small>
-            </div>
-            <div class="ms-auto">
-                <small>
-                    <span class="text-fg-muted">
-                        updated
-                    </span>
-                    <VCTimeago :datetime="entity.updatedAt" />
-                </small>
-            </div>
+
+        <FAnalysisStageRail :entity="entity" />
+
+        <div
+            v-if="nodes.length > 0"
+            class="mt-1 flex flex-col gap-2 border-t border-border pt-2"
+        >
+            <template v-if="partition.summarized">
+                <FAnalysisNodeDistribution :entities="nodes" />
+                <div
+                    v-if="partition.lanes.length > 0"
+                    class="flex flex-col gap-1.5"
+                >
+                    <FAnalysisNodeLane
+                        v-for="node in partition.lanes"
+                        :key="node.id"
+                        :entity="node"
+                    />
+                </div>
+                <div
+                    v-if="lanesExpanded"
+                    class="flex flex-col gap-1.5"
+                >
+                    <FAnalysisNodeLane
+                        v-for="node in partition.hidden"
+                        :key="node.id"
+                        :entity="node"
+                    />
+                </div>
+                <button
+                    class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-md border border-dashed border-border
+                           bg-transparent py-1 text-xs font-bold text-fg-muted hover:border-primary-600 hover:text-primary-600"
+                    @click.prevent="toggleLanes"
+                >
+                    <VCIcon
+                        :name="lanesExpanded ? 'fa6-solid:chevron-up' : 'fa6-solid:chevron-down'"
+                        class="text-[0.6rem]"
+                    />
+                    <template v-if="lanesExpanded">
+                        collapse
+                    </template>
+                    <template v-else>
+                        {{ partition.hidden.length }} more nodes on track — show all
+                    </template>
+                </button>
+            </template>
+            <template v-else>
+                <div class="flex flex-col gap-1.5">
+                    <FAnalysisNodeLane
+                        v-for="node in nodes"
+                        :key="node.id"
+                        :entity="node"
+                    />
+                </div>
+            </template>
+        </div>
+        <div
+            v-else-if="nodesBusy"
+            class="mt-1 flex flex-col gap-1.5 border-t border-border pt-2"
+            aria-hidden="true"
+        >
+            <VCPlaceholder
+                size="sm"
+                width="100%"
+            />
+            <VCPlaceholder
+                size="sm"
+                width="92%"
+            />
         </div>
     </div>
 </template>
-<style scoped>
-.analysis-item-card {
-    width: 100%;
-}
-
-.analysis-item-card-title {
-    font-size: 1rem;
-}
-</style>

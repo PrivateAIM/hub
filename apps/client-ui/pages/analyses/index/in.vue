@@ -8,14 +8,24 @@
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AnalysisNode } from '@privateaim/core-kit';
+import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import type { QueryBuildInput } from '@rapiq/core';
-import { useTemplateRef } from 'vue';
+import type { Ref } from 'vue';
+import {
+    computed, 
+    ref, 
+    useTemplateRef, 
+    watch,
+} from 'vue';
+import type { SegmentItem } from '@privateaim/client-vue';
 import {
     FAnalysisNodeInCard,
+    FAnalysisNodeInCardSkeleton,
     FAnalysisNodes,
     FPagination,
     FSearch,
-    FTitle, 
+    FSegments,
+    FTitle,
     injectCoreHTTPClient,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
@@ -28,7 +38,9 @@ export default defineNuxtComponent({
         ListSearch: FSearch,
         ListTitle: FTitle,
         FAnalysisNodeInCard,
+        FAnalysisNodeInCardSkeleton,
         FAnalysisNodes,
+        FSegments,
     },
     setup() {
         definePageMeta({
@@ -47,13 +59,29 @@ export default defineNuxtComponent({
 
         const canManage = usePermissionCheck({ name: PermissionName.ANALYSIS_APPROVE });
 
-        const query : QueryBuildInput<AnalysisNode, 3> = {
+        const segment : Ref<string> = ref('pending');
+        const segments : SegmentItem[] = [
+            {
+                key: 'pending', 
+                label: 'Pending', 
+                emphasis: true, 
+            },
+            { key: 'approved', label: 'Approved' },
+            { key: 'rejected', label: 'Rejected' },
+        ];
+
+        const query = computed<QueryBuildInput<AnalysisNode, 3>>(() => ({
+            filters: {
+                approvalStatus: segment.value === 'pending' ?
+                    null :
+                    segment.value as AnalysisNodeApprovalStatus,
+            },
             relations: {
                 node: true,
                 analysis: true,
             },
             sort: { updatedAt: 'DESC' },
-        };
+        }));
 
         const download = (item: AnalysisNode) => {
             if (typeof window !== 'undefined') {
@@ -62,6 +90,16 @@ export default defineNuxtComponent({
         };
 
         const listNode = useTemplateRef<typeof FAnalysisNodes>('listNode');
+
+        // flush: 'post' — the list re-reads its `query` prop inside load(),
+        // and with the default pre-render flush the new segment filter has
+        // not been pushed into the child yet, so it reloads with the STALE
+        // filter of the previous segment.
+        watch(segment, () => {
+            if (listNode.value) {
+                listNode.value.load({ pagination: { offset: 0 } });
+            }
+        }, { flush: 'post' });
 
         const handleUpdated = (item: AnalysisNode) => {
             if (listNode.value) {
@@ -72,6 +110,8 @@ export default defineNuxtComponent({
         return {
             realmId,
             canManage,
+            segment,
+            segments,
             query,
             download,
             handleUpdated,
@@ -82,7 +122,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <div class="m-t-10">
+        <div class="m-t-10 entity-cards">
             <FAnalysisNodes
                 ref="listNode"
                 :target="'analysis'"
@@ -95,6 +135,18 @@ export default defineNuxtComponent({
                     <ListSearch
                         :load="props.load"
                         :meta="props.meta"
+                    />
+                    <div class="mb-3 mt-1">
+                        <FSegments
+                            v-model="segment"
+                            :items="segments"
+                        />
+                    </div>
+                </template>
+                <template #loading>
+                    <FAnalysisNodeInCardSkeleton
+                        v-for="index in 3"
+                        :key="index"
                     />
                 </template>
                 <template #footer="props">

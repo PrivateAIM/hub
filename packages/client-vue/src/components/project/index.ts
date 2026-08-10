@@ -12,4 +12,5 @@ export { FProjectItem } from './FProjectItem';
 
 export { default as FProjectCreator } from './FProjectCreator.vue';
 export { default as FProjectItemCard } from './FProjectItemCard.vue';
+export { default as FProjectItemCardSkeleton } from './FProjectItemCardSkeleton.vue';
 export { FProjects } from './FProjects';

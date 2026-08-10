@@ -8,14 +8,19 @@
 import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { ProjectNode } from '@privateaim/core-kit';
+import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
+import type { QueryBuildInput } from '@rapiq/core';
 import type { Ref } from 'vue';
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import type { SegmentItem } from '@privateaim/client-vue';
 import {
     FPagination,
     FProjectNodeInCard,
+    FProjectNodeInCardSkeleton,
     FProjectNodes,
     FSearch,
-    FTitle, 
+    FSegments,
+    FTitle,
     injectCoreHTTPClient,
 } from '@privateaim/client-vue';
 import { defineNuxtComponent } from '#app';
@@ -26,9 +31,11 @@ export default defineNuxtComponent({
     components: {
         FPagination,
         FSearch,
+        FSegments,
         FTitle,
         FProjectNodes,
         FProjectNodeInCard,
+        FProjectNodeInCardSkeleton,
     },
     async setup() {
         definePageMeta({
@@ -47,6 +54,38 @@ export default defineNuxtComponent({
 
         const nodeId : Ref<string | null> = ref(null);
 
+        const segment : Ref<string> = ref('pending');
+        const segments : SegmentItem[] = [
+            {
+                key: 'pending',
+                label: 'Pending',
+                emphasis: true,
+            },
+            { key: 'approved', label: 'Approved' },
+            { key: 'rejected', label: 'Rejected' },
+        ];
+
+        const query = computed<QueryBuildInput<ProjectNode, 3>>(() => ({
+            filters: {
+                approvalStatus: segment.value === 'pending' ?
+                    null :
+                    segment.value as ProjectNodeApprovalStatus,
+            },
+            sort: { updatedAt: 'DESC' },
+        }));
+
+        const listNode = ref<null | typeof FProjectNodes>(null);
+
+        // Registered before the await below — vue/no-watch-after-await.
+        // flush: 'post' — the list re-reads its `query` prop inside load();
+        // with the default pre-render flush the new segment filter has not
+        // been pushed into the child yet (stale-filter reload).
+        watch(segment, () => {
+            if (listNode.value) {
+                listNode.value.load({ pagination: { offset: 0 } });
+            }
+        }, { flush: 'post' });
+
         try {
             const response = await api.node.getMany({ filters: { realmId: realmId.value } });
 
@@ -57,8 +96,6 @@ export default defineNuxtComponent({
         } catch {
             // do nothing :)
         }
-
-        const listNode = ref<null | typeof FProjectNodes>(null);
 
         const handleUpdated = (item: ProjectNode) => {
             if (listNode.value) {
@@ -73,6 +110,9 @@ export default defineNuxtComponent({
         return {
             realmId,
             nodeId,
+            segment,
+            segments,
+            query,
             handleFailed,
             handleUpdated,
             canManage,
@@ -83,7 +123,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <div class="m-t-10">
+        <div class="m-t-10 entity-cards">
             <FProjectNodes
                 ref="listNode"
                 :direction="'in'"
@@ -92,12 +132,25 @@ export default defineNuxtComponent({
                 :source-id="nodeId ?? undefined"
                 :include-project="true"
                 :include-node="true"
+                :query="query"
             >
                 <template #header="props">
                     <FTitle />
                     <FSearch
                         :load="props.load"
                         :meta="props.meta"
+                    />
+                    <div class="mb-3 mt-1">
+                        <FSegments
+                            v-model="segment"
+                            :items="segments"
+                        />
+                    </div>
+                </template>
+                <template #loading>
+                    <FProjectNodeInCardSkeleton
+                        v-for="index in 2"
+                        :key="index"
                     />
                 </template>
                 <template #footer="props">
@@ -110,7 +163,7 @@ export default defineNuxtComponent({
                     <FProjectNodeInCard
                         :key="props.data.id"
                         :entity="props.data"
-                        @updated="props.updated"
+                        @updated="handleUpdated"
                     />
                 </template>
             </FProjectNodes>
