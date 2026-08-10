@@ -8,10 +8,11 @@
 import { computed } from 'vue';
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import {
-    FPagination, 
-    FProjectItem, 
-    FProjects, 
-    FSearch, 
+    FPagination,
+    FProjectItem,
+    FProjectItemCardSkeleton,
+    FProjects,
+    FSearch,
     FTitle,
 } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
@@ -20,11 +21,12 @@ import { defineNuxtComponent, definePageMeta } from '#imports';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination: FPagination, 
-        ListSearch: FSearch, 
-        ListTitle: FTitle, 
-        FProjects, 
+        ListPagination: FPagination,
+        ListSearch: FSearch,
+        ListTitle: FTitle,
+        FProjects,
         FProjectItem,
+        FProjectItemCardSkeleton,
     },
     setup() {
         definePageMeta({
@@ -51,6 +53,7 @@ export default defineNuxtComponent({
 
         const query = computed(() => ({
             filters: { realmId: realmId.value },
+            relations: { masterImage: true },
             sort: { updatedAt: 'DESC' },
         }));
 
@@ -60,7 +63,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <div class="m-t-10">
+        <div class="m-t-10 entity-grid">
             <FProjects
                 :query="query"
             >
@@ -69,6 +72,12 @@ export default defineNuxtComponent({
                     <ListSearch
                         :load="props.load"
                         :meta="props.meta"
+                    />
+                </template>
+                <template #loading>
+                    <FProjectItemCardSkeleton
+                        v-for="index in 4"
+                        :key="index"
                     />
                 </template>
                 <template #footer="props">

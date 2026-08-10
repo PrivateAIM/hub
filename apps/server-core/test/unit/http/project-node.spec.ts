@@ -14,6 +14,7 @@ import {
 } from 'vitest';
 import { createTestApplication } from '../../app';
 import type { ProjectNode } from '@privateaim/core-kit';
+import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import {  expectProperties } from '../../utils';
 import { createTestNode, createTestProject } from '../../utils/domains';
 
@@ -57,6 +58,27 @@ describe('src/controllers/core/project-node', () => {
 
         const { data } = await client.projectNode.getOne(details.id);
         expectProperties(details, data);
+    });
+
+    it('should filter collection by approval status', async () => {
+        const { client } = suite;
+
+        // The row's status depends on the approval-skip env, so pin the
+        // filter against whatever it actually is — including the pending
+        // (`null` => IS NULL) form the inbox segments rely on.
+        const { data: current } = await client.projectNode.getOne(details.id);
+
+        const matching = await client.projectNode.getMany({ filters: { approvalStatus: current.approvalStatus } });
+        expect(matching.data.map((item) => item.id)).toContain(details.id);
+
+        const nonMatching = await client.projectNode.getMany({
+            filters: {
+                approvalStatus: current.approvalStatus === null ?
+                    ProjectNodeApprovalStatus.APPROVED :
+                    null,
+            },
+        });
+        expect(nonMatching.data.map((item) => item.id)).not.toContain(details.id);
     });
 
     it('should delete resource', async () => {

@@ -8,6 +8,7 @@
 export * from './form-input-list';
 export * from './title';
 export * from './search';
+export * from './segments';
 export * from './pagination';
 export * from './progress-bar';
 export * from './translation';

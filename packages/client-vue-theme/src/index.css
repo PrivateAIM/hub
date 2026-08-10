@@ -151,6 +151,13 @@
         --vc-color-bg: #2a2d35;
         --vc-color-bg-muted: #343742;
         --vc-color-border: #3e414c;
+        /*
+         * @vuecs/design's dark `bg-elevated` (neutral-800, #262626) lands
+         * BELOW the softened content surface above — an "elevated" card
+         * would render darker than the page it sits on. Lift it one tonal
+         * step past bg-muted so card-panel / tiles read as raised.
+         */
+        --vc-color-bg-elevated: #3a3e49;
 
         /*
          * Warning / danger surfaces — tinted panels (alert-warning,
@@ -302,6 +309,18 @@
     .btn-close {
         @apply cursor-pointer border-0 bg-transparent text-fg-muted
                hover:text-fg;
+    }
+
+    /* Entity identity glyph — the tinted square in front of an entity's
+       name (analysis/project cards, inbox requests). Brand purple, the
+       same accent the card system uses; sizing comes from utilities on
+       the markup (w-7 h-7 text-[…]). */
+    .entity-icon {
+        display: grid;
+        place-items: center;
+        border-radius: 0.4375rem;
+        background: color-mix(in oklab, var(--privateaim-brand-purple) 12%, transparent);
+        color: var(--privateaim-brand-purple);
     }
 }
 

@@ -42,9 +42,12 @@ describe('createList dispatch', () => {
 
         const { coreClient } = mountWith((ctx) => {
             const list = createList({
-                type: 'project', 
-                setup: ctx, 
-                props: {}, 
+                type: 'project',
+                setup: ctx,
+                // drive load() manually — with the auto-load racing it, the
+                // explicit call below would coalesce into a second request
+                // and make the count assertion ambiguous.
+                props: { loadOnSetup: false },
             });
             load = list.load;
         }, { 'GET /projects': () => ({ data: [{ id: 'p-1' }], meta: { total: 1 } }) });
