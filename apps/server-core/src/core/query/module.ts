@@ -9,7 +9,6 @@ import { BadRequestError } from '@ebec/http';
 import { createURLCodec } from '@rapiq/codec-url';
 import type {
     ICondition,
-    IFilter,
     IFilters,
     IQuery,
     ObjectLiteral,
@@ -20,6 +19,7 @@ import {
     FilterFieldOperator,
     Query,
     SchemaRegistry,
+    isFilter,
     isFilters,
     isObject,
 } from '@rapiq/core';
@@ -117,10 +117,11 @@ export function decodeQuery<RECORD extends ObjectLiteral = ObjectLiteral>(
 /**
  * Append server-derived conditions (a route realm, an owner scope, ...)
  * onto a decoded query by AND-wrapping its filter tree. The wrap makes the
- * appended scope non-displaceable: unlike a filters merge (per-field
- * replace, flat-root-AND restriction), a client-sent condition on the same
+ * appended scope non-displaceable: a client-sent condition on the same
  * field intersects with the scope instead of replacing it, and compound
- * client trees (`or(...)`) are preserved as-is. Same guarantee class as a
+ * client trees (`or(...)`) are preserved as-is. Since @rapiq/core
+ * 2.0.0-beta.19, `Filters.merge`/`mergeQueries` compose conjunctively too,
+ * so no library merge path can displace it either. Same guarantee class as a
  * mandatory `andWhere` at the repository — expressed once in the IR.
  * Appended conditions do not pass through `decodeQuery`, so the schema
  * allow-lists do not constrain them (server-derived context).
@@ -169,13 +170,17 @@ export function collectRootFilterValues(query: IQuery): Record<string, string> {
                 continue;
             }
 
-            // A non-compound condition is a leaf `Filter` (carries a field).
-            const leaf = condition as IFilter;
-            if (leaf.operator !== FilterFieldOperator.EQUAL) {
-                throw new BadRequestError(`The filter operator '${leaf.operator}' on '${leaf.field}' is not supported here; only equality (eq) filters are allowed.`);
+            // Only a leaf `Filter` (carries a field) is forwardable; any other
+            // ICondition implementation has no label semantics here.
+            if (!isFilter(condition)) {
+                throw new BadRequestError(`The filter condition '${condition.operator}' is not supported here; only equality (eq) filters are allowed.`);
             }
 
-            out[leaf.field] = `${leaf.value}`;
+            if (condition.operator !== FilterFieldOperator.EQUAL) {
+                throw new BadRequestError(`The filter operator '${condition.operator}' on '${condition.field}' is not supported here; only equality (eq) filters are allowed.`);
+            }
+
+            out[condition.field] = `${condition.value}`;
         }
     };
 

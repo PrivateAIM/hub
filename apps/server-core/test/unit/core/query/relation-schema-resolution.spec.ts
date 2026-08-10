@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ICondition, IFilters, IQuery } from '@rapiq/core';
-import { isFilters } from '@rapiq/core';
+import type { IFilters, IQuery } from '@rapiq/core';
+import { isFilter, isFilters } from '@rapiq/core';
 import {
     describe,
     expect,
@@ -25,12 +25,14 @@ import { decodeQuery } from '../../../../src/core/query/index.ts';
 function filterFields(query: IQuery): string[] {
     const out: string[] = [];
     const walk = (group: IFilters) => {
-        for (const condition of group.value as ICondition[]) {
+        for (const condition of group.value) {
             if (isFilters(condition)) {
                 walk(condition);
                 continue;
             }
-            out.push((condition as { field: string }).field);
+            if (isFilter(condition)) {
+                out.push(condition.field);
+            }
         }
     };
     if (isFilters(query.filters)) {
