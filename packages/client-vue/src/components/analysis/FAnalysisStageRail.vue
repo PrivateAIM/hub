@@ -65,6 +65,21 @@ export default defineComponent({
             type: Object as PropType<Analysis>,
             required: true,
         },
+        /**
+         * Dots only — no stage labels, no sub-captions, tighter circles and
+         * connectors. For places that show the rail as one line inside a
+         * denser element (a project card row), where the full rail's ~250px
+         * of labelled columns would dominate whatever it sits in.
+         *
+         * The stage computation is shared, so a compact rail can never
+         * disagree with the full one about what state an analysis is in.
+         * Each dot keeps its label as a `title`, so the meaning is still
+         * reachable on hover.
+         */
+        compact: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props) {
         const stages = computed<AnalysisStage[]>(() => {
@@ -182,17 +197,38 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div class="flex items-start overflow-x-auto px-1 pb-1 pt-3">
+    <div
+        class="flex overflow-x-auto"
+        :class="compact ? 'items-center' : 'items-start px-1 pb-1 pt-3'"
+    >
         <template
             v-for="(stage, index) in stages"
             :key="stage.key"
         >
             <span
                 v-if="index > 0"
-                class="mt-3 h-0.5 min-w-2 flex-1"
-                :class="stages[index - 1]?.state === 'done' ? 'bg-success-600' : 'bg-border'"
+                class="h-0.5 flex-1"
+                :class="[
+                    stages[index - 1]?.state === 'done' ? 'bg-success-600' : 'bg-border',
+                    compact ? 'min-w-1.5' : 'mt-3 min-w-2',
+                ]"
             />
-            <div class="flex w-24 flex-none flex-col items-center gap-1 text-center">
+            <div
+                v-if="compact"
+                class="grid h-3.5 w-3.5 flex-none place-items-center rounded-full border-2 text-[0.4rem]"
+                :class="STATE_CIRCLE_CLASS[stage.state]"
+                :title="`${stage.label}: ${stage.sub}`"
+            >
+                <VCIcon
+                    v-if="resolveIcon(stage)"
+                    :name="resolveIcon(stage)!"
+                    :class="stage.state === 'run' ? 'animate-spin' : ''"
+                />
+            </div>
+            <div
+                v-else
+                class="flex w-24 flex-none flex-col items-center gap-1 text-center"
+            >
                 <span
                     class="grid h-6 w-6 place-items-center rounded-full border-2 text-[0.6rem]"
                     :class="STATE_CIRCLE_CLASS[stage.state]"
