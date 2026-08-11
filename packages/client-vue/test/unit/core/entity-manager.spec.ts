@@ -64,6 +64,35 @@ function mountManagerProbe(
 
 describe('createEntityManager', () => {
     describe('when an id is supplied', () => {
+        /**
+         * The analysis detail page hydrates its project this way so the
+         * breadcrumb can name it without a second request. Losing the
+         * forwarding fails SILENTLY — the relation is simply absent and the
+         * crumb falls back to a generic label.
+         */
+        it('should forward props.query relations to the lookup', async () => {
+            const { coreClient, handle } = mountManagerProbe(
+                { entityId: 'abc', query: { relations: { masterImage: true } } },
+                undefined,
+                {
+                    'GET /projects/:id': (req) => ({
+                        data: {
+                            id: req.params.id, 
+                            name: 'demo', 
+                            masterImage: { id: 'mi-1', name: 'base' }, 
+                        },
+                        meta: {},
+                    }),
+                },
+            );
+
+            await handle.result;
+
+            // rapiq serializes `relations` as `include` on the wire.
+            expect(coreClient.requests[0].url).toContain('include=masterImage');
+            expect(handle.manager.data.value.masterImage).toEqual({ id: 'mi-1', name: 'base' });
+        });
+
         it('should resolve that entity', async () => {
             const { coreClient, handle } = mountManagerProbe(
                 { entityId: 'abc' },

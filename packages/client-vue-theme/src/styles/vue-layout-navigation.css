@@ -61,8 +61,6 @@
  * still comes from that rule.
  */
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.active:not(.vc-nav-link-root),
-.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.router-link-active:not(.vc-nav-link-root),
-.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.nuxt-link-active:not(.vc-nav-link-root),
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.router-link-exact-active,
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item-nested.active .vc-nav-link.nuxt-link-exact-active {
     background: color-mix(in srgb, var(--privateaim-brand-coral) 16%, var(--privateaim-chrome-bg-elevated));
@@ -89,14 +87,24 @@
  * `--pills` so it does not clobber the domain-entity pills' own active
  * paint below — the `:not()` keeps this 0,4,0 coral rule from outranking
  * the pills' lower-specificity `.active` rule.
+ *
+ * Deliberately NOT matching `.router-link-active` / `.nuxt-link-active`.
+ * Those are vue-router's PREFIX classes: every ancestor path lights up, so
+ * a sidebar group whose children are `/projects` and `/projects/in` paints
+ * BOTH rows active while standing on the second one.
+ *
+ * `.active` comes from `<VCLink :active>`, which `<VCNavItem>` feeds from
+ * @vuecs/navigation's own scoring — a best-match-wins pass that elects
+ * exactly ONE winner per nav (`findBestItemMatches`). It still covers the
+ * prefix case correctly: at `/projects/<id>` the `/projects` item is the
+ * highest scorer and so is the one that lights up. The exact-active classes
+ * are kept as a harmless backstop for links rendered through a custom
+ * `#link` slot, which never receive the computed `active` prop.
  */
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.active:not(.vc-nav-link-root),
 
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link:active,
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link:hover,
-
-.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.router-link-active:not(.vc-nav-link-root),
-.vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.nuxt-link-active:not(.vc-nav-link-root),
 
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.router-link-exact-active,
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-link.nuxt-link-exact-active {
@@ -248,4 +256,60 @@
         align-items: center;
         justify-content: center;
     }
+}
+
+/*
+ * Breadcrumb (<VCBreadcrumb>).
+ *
+ * @vuecs/navigation ships the STRUCTURE only — flex rows, gaps and
+ * `list-style: none` — so without this the trail inherits the global anchor
+ * colour and body font size and reads as primary content sitting above the
+ * page title. It is secondary chrome: smaller, muted, and only the
+ * interactive crumbs pick up brand colour on hover.
+ */
+.vc-breadcrumb {
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.vc-breadcrumb-link {
+    color: var(--privateaim-chrome-fg-muted);
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.vc-breadcrumb-link:hover,
+.vc-breadcrumb-link:focus-visible {
+    color: var(--privateaim-brand-coral);
+    text-decoration: none;
+}
+
+/*
+ * The current page. `<VCBreadcrumb>` treats the last crumb as current and
+ * renders it as a non-navigable `<VCBreadcrumbPage>`, so it is deliberately
+ * the only crumb at full foreground strength — it names where you are.
+ */
+.vc-breadcrumb-page {
+    color: var(--privateaim-chrome-fg);
+    font-weight: 600;
+}
+
+/*
+ * Dimmer than the crumbs it divides, so the trail reads as words rather than
+ * as an evenly-weighted row of glyphs.
+ */
+.vc-breadcrumb-separator {
+    color: var(--privateaim-chrome-fg-muted);
+    opacity: 0.55;
+}
+
+/*
+ * `<VCIcon>` renders through @iconify/vue, which emits a bare `<svg>` sized in
+ * `em` and painted with `currentColor` — no class of its own to hook. Colour
+ * and scale therefore already follow the crumb; this only softens the glyph so
+ * it does not out-weigh the label beside it.
+ */
+.vc-breadcrumb-link > svg,
+.vc-breadcrumb-page > svg {
+    opacity: 0.85;
 }
