@@ -88,9 +88,10 @@ import {
 
 `FContentAction` is the primary action of a collection section, rendered at the
 right of the section's title row. It is route-aware: `+ Add` on `overviewUrl`,
-`← Back` on `addUrl`, and **nothing** on any other route — so a section needs
-exactly one of them regardless of which of its routes is active, and sibling
-list routes (an approval queue, say) do not inherit a create action.
+`← Back` on `addUrl`, and **nothing** on any other route. A section therefore
+mounts a single instance no matter which of its routes is active, rather than
+one per route — and a sibling list route such as an approval queue renders no
+action at all instead of inheriting a create action.
 
 ```vue
 <FContentAction
