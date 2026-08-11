@@ -59,8 +59,8 @@
         "@faker-js/faker": "^10.5.0",
         "@privateaim/server-test-kit": "^0.13.2",
         "@trapi/cli": "^2.0.4",
-        "better-sqlite3": "^13.0.2",
-        "testcontainers": "^12.0.4",
+        "better-sqlite3": "^13.0.3",
+        "testcontainers": "^12.1.0",
         "vitest": "^4.1.10"
     },
     "scripts": {
