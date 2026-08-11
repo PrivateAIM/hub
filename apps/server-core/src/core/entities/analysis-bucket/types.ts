@@ -12,7 +12,7 @@ export interface IAnalysisBucketRepository extends IEntityRepository<AnalysisBuc
 
 export interface IAnalysisBucketService {
     getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisBucket>>;
-    getOne(id: string): Promise<AnalysisBucket>;
+    getOne(id: string, query?: Record<string, any>): Promise<AnalysisBucket>;
     create(data: Partial<AnalysisBucket>, actor: ActorContext): Promise<AnalysisBucket>;
     update(id: string, data: Partial<AnalysisBucket>, actor: ActorContext): Promise<AnalysisBucket>;
     delete(id: string, actor: ActorContext): Promise<AnalysisBucket>;

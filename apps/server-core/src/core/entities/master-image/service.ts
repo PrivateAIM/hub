@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { eq } from '@rapiq/core';
 import type { MasterImage } from '@privateaim/core-kit';
 import { MasterImageCommand } from '@privateaim/core-kit';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
-import { decodeQuery } from '../../query/index.ts';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { masterImageSchema } from './schema.ts';
 import type {
     IMasterImageBuilderCaller,
@@ -56,8 +57,14 @@ export class MasterImageService extends AbstractEntityService implements IMaster
         return this.repository.findMany(decodeQuery(query, { schema: masterImageSchema }));
     }
 
-    async getOne(id: string): Promise<MasterImage> {
-        const entity = await this.repository.findOneById(id);
+    /**
+     * `findOneById` takes no query, so an actor-supplied `fields`/`relations`
+     * selection has to go through `findMany` with an `id` condition appended.
+     */
+    async getOne(id: string, query?: Record<string, any>): Promise<MasterImage> {
+        const entity = query ?
+            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: masterImageSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
+            await this.repository.findOneById(id);
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'master-image' });

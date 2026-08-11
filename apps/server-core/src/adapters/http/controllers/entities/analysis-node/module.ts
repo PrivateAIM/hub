@@ -66,8 +66,10 @@ export class AnalysisNodeController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
+        @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<AnalysisNode>> {
-        const entity = await this.service.getOne(id);
+        const query = useRequestQuery(event);
+        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
 
         return { data: entity, meta: { schema: describeQuerySchema(analysisNodeSchema, RECORD_QUERY_PARAMETERS) } };
     }

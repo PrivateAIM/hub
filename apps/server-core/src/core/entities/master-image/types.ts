@@ -32,7 +32,7 @@ export interface IMasterImageBuilderCaller {
 
 export interface IMasterImageService {
     getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<MasterImage>>;
-    getOne(id: string): Promise<MasterImage>;
+    getOne(id: string, query?: Record<string, any>): Promise<MasterImage>;
     executeCommand(command: `${MasterImageCommand}`, data: Record<string, any>, actor: ActorContext): Promise<MasterImage | undefined>;
     delete(id: string, actor: ActorContext): Promise<MasterImage>;
 }

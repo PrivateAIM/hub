@@ -19,7 +19,7 @@ export interface IAnalysisFileMetadataRecalculator {
 
 export interface IAnalysisBucketFileService {
     getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>>;
-    getOne(id: string): Promise<AnalysisBucketFile>;
+    getOne(id: string, query?: Record<string, any>): Promise<AnalysisBucketFile>;
     create(data: Partial<AnalysisBucketFile>, actor: ActorContext): Promise<AnalysisBucketFile>;
     update(id: string, data: Partial<AnalysisBucketFile>, actor: ActorContext): Promise<AnalysisBucketFile>;
     delete(id: string, actor: ActorContext): Promise<AnalysisBucketFile>;

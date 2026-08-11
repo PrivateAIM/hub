@@ -12,5 +12,5 @@ export interface IAnalysisNodeEventRepository extends IEntityRepository<Analysis
 
 export interface IAnalysisNodeEventService {
     getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisNodeEvent>>;
-    getOne(id: string): Promise<AnalysisNodeEvent>;
+    getOne(id: string, query?: Record<string, any>): Promise<AnalysisNodeEvent>;
 }

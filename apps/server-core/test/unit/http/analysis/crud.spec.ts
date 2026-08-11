@@ -62,6 +62,21 @@ describe('src/controllers/core/analysis', () => {
         expectProperties(details, data);
     });
 
+    /**
+     * The record endpoint publishes `relations` in its `meta.schema`
+     * (`RECORD_QUERY_PARAMETERS`), so it has to honour them. The UI depends on
+     * this: the analysis breadcrumb names the owning project from the relation
+     * rather than issuing a second request.
+     */
+    it('should read resource with a relation', async () => {
+        const { client } = suite;
+        const { data } = await client.analysis.getOne(details.id, { relations: { project: true } });
+
+        expect(data.project).toBeDefined();
+        expect(data.project.id).toEqual(details.projectId);
+        expect(data.project.name).toBeDefined();
+    });
+
     it('should update resource', async () => {
         const { client } = suite;
         details.name = 'test-a';
