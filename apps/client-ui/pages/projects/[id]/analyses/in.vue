@@ -14,7 +14,6 @@ import {
     FAnalysisNodeInCard,
     FAnalysisNodes,
     FPagination,
-    FSearch,
     FTitle, 
     injectCoreHTTPClient,
 } from '@privateaim/client-vue';
@@ -24,7 +23,6 @@ import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 export default defineComponent({
     components: {
         ListPagination: FPagination,
-        ListSearch: FSearch,
         ListTitle: FTitle,
         FAnalysisNodeInCard,
         FAnalysisNodes,
@@ -99,12 +97,8 @@ export default defineComponent({
                 :direction="'in'"
                 :query="query"
             >
-                <template #header="props">
+                <template #header>
                     <ListTitle />
-                    <ListSearch
-                        :load="props.load"
-                        :meta="props.meta"
-                    />
                 </template>
                 <template #footer="props">
                     <ListPagination
