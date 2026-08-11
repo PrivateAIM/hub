@@ -80,10 +80,9 @@ export default defineNuxtComponent({
     <div>
         <VCBreadcrumb
             :items="breadcrumbItems"
-            class="mb-2"
         />
 
-        <div class="flex flex-row flex-wrap gap-3 items-center justify-between mb-3">
+        <div class="flex flex-row flex-wrap gap-3 items-center justify-between mb-2">
             <h1 class="title no-border mb-0">
                 <VCIcon
                     name="fa6-solid:building"

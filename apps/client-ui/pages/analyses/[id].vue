@@ -164,10 +164,9 @@ export default defineComponent({
         <VCBreadcrumb
             v-if="entity"
             :items="breadcrumbItems"
-            class="mb-2"
         />
 
-        <h1 class="title no-border mb-3">
+        <h1 class="title no-border mb-2">
             <VCIcon name="fa6-solid:microscope" /> Analysis
             <span class="sub-title">
                 <template v-if="entity">

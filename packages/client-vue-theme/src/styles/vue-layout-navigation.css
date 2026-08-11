@@ -76,10 +76,25 @@
     border: none;
 }
 
+/*
+ * The nested-child gutter (the 6px `border-left` set further down) is a
+ * SPACER, not a rule — it must never be visible in any state.
+ *
+ * It used to be painted `--privateaim-chrome-bg-elevated` to disappear into
+ * the elevated panel a group gets while active. That only held because a
+ * group's children were only ever on screen while the group WAS active. An
+ * `expanded` group renders its children with the route outside it, where no
+ * panel is painted, and the gutter became a floating vertical stripe beside
+ * the child rows.
+ *
+ * `transparent` is correct in both states: the background painted behind the
+ * border is the parent's — the elevated panel when active, the plain sidebar
+ * otherwise — so the gutter always matches whatever it sits on.
+ */
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item .vc-nav-link,
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item:hover .vc-nav-link,
 .vc-nav-items:not(.vc-nav-items--pills) .vc-nav-item.active .vc-nav-link {
-    border-left-color: var(--privateaim-chrome-bg-elevated) !important;
+    border-left-color: transparent !important;
 }
 
 /*
@@ -236,10 +251,11 @@
     color: var(--color-on-primary);
 }
 
+/* Indent gutter for nested children — see the transparency note above. */
 .vc-nav-item-nested .vc-nav-items .vc-nav-link {
     border-left-width: 6px;
     border-left-style: solid;
-    border-left-color: var(--privateaim-chrome-bg);
+    border-left-color: transparent;
 }
 
 @media (max-width: 768px) {
@@ -270,6 +286,18 @@
 .vc-breadcrumb {
     font-size: 0.8rem;
     line-height: 1.4;
+
+    /*
+     * Spacing lives here, not on the call sites, so it is one number to tune
+     * rather than fourteen `mb-*` utilities to keep in sync.
+     *
+     * Deliberately much larger than the title's own bottom margin (0.5rem):
+     * the gaps encode the grouping. The breadcrumb is ANCESTOR CONTEXT and
+     * steps back, while the page title and the tab row beneath it are one
+     * unit and close up. With the two gaps near-equal the three rows read as
+     * a single undifferentiated stack.
+     */
+    margin-bottom: 1.75rem;
 }
 
 .vc-breadcrumb-link {

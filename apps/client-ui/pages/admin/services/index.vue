@@ -72,10 +72,9 @@ export default defineNuxtComponent({
     <div>
         <VCBreadcrumb
             :items="breadcrumbItems"
-            class="mb-2"
         />
 
-        <h1 class="title no-border mb-3">
+        <h1 class="title no-border mb-2">
             <VCIcon name="fa6-solid:signs-post" /> Services <span class="sub-title">Management</span>
         </h1>
 

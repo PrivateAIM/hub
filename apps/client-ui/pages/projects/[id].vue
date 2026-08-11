@@ -239,10 +239,9 @@ export default defineComponent({
     <div>
         <VCBreadcrumb
             :items="breadcrumbItems"
-            class="mb-2"
         />
 
-        <h1 class="title no-border mb-3">
+        <h1 class="title no-border mb-2">
             <VCIcon name="fa6-solid:diagram-project" />
             <FDisplayName
                 :name="entity.name"
