@@ -5,11 +5,9 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { VCIcon } from '@vuecs/icon';
 import { VCToaster } from '@vuecs/overlays';
 import { computed, defineComponent, ref } from 'vue';
 import { useRuntimeConfig } from '#imports';
-import { TOOLS } from '../../config/tools';
 import Logo from '../svg/Logo';
 import AboutModal from './about-modal.vue';
 
@@ -17,7 +15,6 @@ export default defineComponent({
     components: {
         AboutModal,
         Logo,
-        VCIcon,
         VCToaster,
     },
     setup() {
@@ -44,7 +41,6 @@ export default defineComponent({
             year,
             version,
             aboutVisible,
-            tools: TOOLS,
         };
     },
 });
@@ -95,32 +91,6 @@ export default defineComponent({
                                 target="_blank"
                                 rel="noopener"
                             >GitHub</a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <div class="page-footer-heading">
-                        Built with
-                    </div>
-                    <ul class="page-footer-links">
-                        <li
-                            v-for="tool in tools"
-                            :key="tool.name"
-                            class="page-footer-tool"
-                        >
-                            <span>{{ tool.name }}</span>
-                            <a
-                                :href="tool.website"
-                                target="_blank"
-                                rel="noopener"
-                                :aria-label="`${tool.name} documentation`"
-                            ><VCIcon name="fa6-solid:book" /></a>
-                            <a
-                                :href="tool.repository"
-                                target="_blank"
-                                rel="noopener"
-                                :aria-label="`${tool.name} on GitHub`"
-                            ><VCIcon name="fa6-brands:github" /></a>
                         </li>
                     </ul>
                 </div>
@@ -178,9 +148,15 @@ export default defineComponent({
     padding: 1.5rem 1.5rem 1.25rem 1.5rem;
 }
 
+/*
+ * Two columns, not three: the brand blurb takes the free space and the link
+ * column is sized to its content, so it sits against the right edge. A `1fr`
+ * second column would leave it stranded mid-width now that the third column
+ * (the open-source credits, which moved to the About dialog) is gone.
+ */
 @media (min-width: 768px) {
     .page-footer-main {
-        grid-template-columns: 2fr 1fr 1fr;
+        grid-template-columns: 1fr auto;
         gap: 2rem;
     }
 }
@@ -237,23 +213,6 @@ export default defineComponent({
     flex-direction: column;
     gap: 0.25rem;
     font-size: 0.875rem;
-}
-
-.page-footer-tool {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.page-footer-tool a {
-    display: inline-flex;
-    align-items: center;
-    color: var(--privateaim-chrome-fg-muted);
-}
-
-.page-footer-tool a:hover {
-    color: var(--privateaim-brand-coral);
 }
 
 .page-footer-bottom {
