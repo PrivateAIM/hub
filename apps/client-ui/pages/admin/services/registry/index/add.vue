@@ -5,8 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { PermissionName } from '@authup/core-kit';
 import type { Registry } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import { RegistryForm } from '@privateaim/client-vue';
 import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -19,7 +19,11 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionName.CLIENT_CREATE,
+                // Was authup's CLIENT_CREATE, which gates an unrelated
+                // resource: it let an actor with no registry rights open this
+                // form while locking out a registry admin who happens to lack
+                // it. The parent page already requires REGISTRY_MANAGE.
+                PermissionName.REGISTRY_MANAGE,
             ],
         });
 

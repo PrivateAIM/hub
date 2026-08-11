@@ -73,10 +73,36 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
         meta: { [LayoutKey.REQUIRED_LOGGED_IN]: true },
     },
     {
+        // Deliberately url-less. `VCNavItem` renders an item that HAS
+        // children as a submenu trigger and never reads its `url`
+        // (`renderLeaf` runs only when `!hasChildren`), so a linked parent
+        // owning a submenu is not expressible — the same reason the admin
+        // "Auth" / "General" groups carry no url.
+        //
+        // `expanded` (@vuecs/navigation >= 4.5.0) keeps both directions
+        // permanently visible instead of collapsing them whenever the active
+        // route sits outside the section: this reads as a titled section, not
+        // a disclosure. No trigger is rendered in that mode, so the label is
+        // inert — which is why the section still needs its own leaf children
+        // rather than being a link.
+        //
+        // Analyses have no top-level entry of their own: they belong to a
+        // project and are reached through `/projects/:id/analyses` (both
+        // directions), which is also where the per-project approval queue
+        // lives.
         name: 'Projects',
         type: 'link',
-        url: '/projects',
+        expanded: true,
         icon: 'fa6-solid:diagram-project',
+        // An analysis lives at `/analyses/:id`, which matches none of this
+        // group's urls. Without this the whole default sidebar scores 0 there
+        // and "Info" wins by default — `calculateItemScoreForPath` returns 1
+        // for `url === '/'` unconditionally, making it the fallback winner on
+        // any otherwise-unmatched path. The group cannot be elected active
+        // itself (a parent's score seeds its children's, so a child always
+        // scores at least as high), but the match puts the section on the
+        // active trail, which is what highlights and expands it.
+        activeMatch: '/analyses',
         meta: {
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -95,24 +121,42 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
                 PermissionName.ANALYSIS_EXECUTION_STOP,
             ],
         },
-    },
-    {
-        name: 'Analyses',
-        type: 'link',
-        url: '/analyses',
-        icon: 'fa6-solid:microscope',
-        meta: {
-            requireLoggedIn: true,
-            requirePermissions: [
-                PermissionName.ANALYSIS_CREATE,
-                PermissionName.ANALYSIS_DELETE,
-                PermissionName.ANALYSIS_UPDATE,
-                PermissionName.ANALYSIS_APPROVE,
+        children: [
+            {
+                name: 'Outgoing',
+                type: 'link',
+                url: '/projects',
+                icon: 'fa6-solid:file-export',
+                meta: {
+                    [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                    [LayoutKey.REQUIRED_PERMISSIONS]: [
+                        PermissionName.PROJECT_CREATE,
+                        PermissionName.PROJECT_DELETE,
+                        PermissionName.PROJECT_UPDATE,
 
-                PermissionName.ANALYSIS_EXECUTION_START,
-                PermissionName.ANALYSIS_EXECUTION_STOP,
-            ],
-        },
+                        PermissionName.ANALYSIS_CREATE,
+                        PermissionName.ANALYSIS_DELETE,
+                        PermissionName.ANALYSIS_UPDATE,
+
+                        PermissionName.ANALYSIS_RESULT_READ,
+                        PermissionName.ANALYSIS_EXECUTION_START,
+                        PermissionName.ANALYSIS_EXECUTION_STOP,
+                    ],
+                },
+            },
+            {
+                name: 'Incoming',
+                type: 'link',
+                url: '/projects/in',
+                icon: 'fa6-solid:file-import',
+                meta: {
+                    [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                    [LayoutKey.REQUIRED_PERMISSIONS]: [
+                        PermissionName.PROJECT_APPROVE,
+                    ],
+                },
+            },
+        ],
     },
     {
         // Gated like the only entry it heads. A separator renders as visible

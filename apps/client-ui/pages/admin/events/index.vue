@@ -8,12 +8,14 @@
 <script lang="ts">
 import { PermissionName } from '@privateaim/kit';
 import { VCIcon } from '@vuecs/icon';
+import { VCBreadcrumb } from '@vuecs/navigation';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
+import { useSectionBreadcrumb } from '../../../composables/breadcrumb';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { VCIcon },
+    components: { VCBreadcrumb, VCIcon },
     setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -22,6 +24,19 @@ export default defineNuxtComponent({
                 PermissionName.EVENT_READ,
                 PermissionName.EVENT_DELETE,
             ],
+        });
+
+        const breadcrumbItems = useSectionBreadcrumb({
+            root: {
+                label: 'Admin', 
+                url: '/admin', 
+                icon: 'fa6-solid:gear', 
+            },
+            section: {
+                label: 'Events', 
+                url: '/admin/events', 
+                icon: 'fa6-solid:bullhorn', 
+            },
         });
 
         const toast = useToast();
@@ -35,6 +50,7 @@ export default defineNuxtComponent({
         };
 
         return {
+            breadcrumbItems,
             handleDeleted,
             handleFailed,
         };
@@ -43,6 +59,11 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
+        <VCBreadcrumb
+            :items="breadcrumbItems"
+            class="mb-2"
+        />
+
         <h1 class="title no-border mb-3">
             <VCIcon name="fa6-solid:bullhorn" /> Events <span class="sub-title">Management</span>
         </h1>

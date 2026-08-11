@@ -5,38 +5,52 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Project } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
+import { FContentAction } from '@privateaim/client-vue';
+import { VCBreadcrumb } from '@vuecs/navigation';
 import { VCIcon } from '@vuecs/icon';
-import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta, useToast } from '#imports';
+import { useSectionBreadcrumb } from '../../composables/breadcrumb';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
-    components: { VCIcon },
+    components: {
+        FContentAction, 
+        VCBreadcrumb, 
+        VCIcon, 
+    },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
 
-        const tabs: NavigationItem[] = [
-            {
-                name: 'Create',
-                url: '/projects/add',
-                icon: 'fa6-solid:plus',
+        // "Outgoing" / "Incoming" are children of the global sidebar's
+        // "Projects" group, not tabs of this page.
+        const breadcrumbItems = useSectionBreadcrumb({
+            section: {
+                label: 'Projects', 
+                url: '/projects', 
+                icon: 'fa6-solid:diagram-project', 
             },
-            {
-                name: 'Outgoing',
-                url: '/projects',
-                icon: 'fa6-solid:file-export',
-            },
-            {
-                name: 'Incoming',
-                url: '/projects/in',
-                icon: 'fa6-solid:file-import',
-            },
-        ];
+            children: [
+                {
+                    url: '/projects/in', 
+                    label: 'Incoming', 
+                    icon: 'fa6-solid:file-import', 
+                },
+                {
+                    url: '/projects/add', 
+                    label: 'Add', 
+                    icon: 'fa6-solid:plus', 
+                },
+            ],
+        });
+
+        const canCreate = usePermissionCheck({ name: PermissionName.PROJECT_CREATE });
 
         const toast = useToast();
 
@@ -47,30 +61,33 @@ export default defineNuxtComponent({
         };
 
         return {
+            breadcrumbItems,
+            canCreate,
             handleCreated,
-            tabs,
         };
     },
 });
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">
-            <VCIcon name="fa6-solid:diagram-project" /> Projects
-            <span class="sub-title">Manage incoming & outgoing projects</span>
-        </h1>
+        <VCBreadcrumb
+            :items="breadcrumbItems"
+            class="mb-2"
+        />
 
-        <div class="content-wrapper">
-            <div class="content-sidebar flex-col">
-                <VCNavItems
-                    :data="tabs"
-                    variant="pills"
-                    orientation="vertical"
-                />
-            </div>
-            <div class="content-container">
-                <NuxtPage @created="handleCreated" />
-            </div>
+        <div class="flex flex-row flex-wrap gap-3 items-center justify-between mb-3">
+            <h1 class="title no-border mb-0">
+                <VCIcon name="fa6-solid:diagram-project" /> Projects
+                <span class="sub-title">Manage incoming & outgoing projects</span>
+            </h1>
+
+            <FContentAction
+                overview-url="/projects"
+                add-url="/projects/add"
+                :add-disabled="!canCreate"
+            />
         </div>
+
+        <NuxtPage @created="handleCreated" />
     </div>
 </template>

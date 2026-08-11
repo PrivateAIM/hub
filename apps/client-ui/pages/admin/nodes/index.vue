@@ -6,16 +6,23 @@
   -->
 
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Node } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import { FContentAction } from '@privateaim/client-vue';
+import { VCBreadcrumb } from '@vuecs/navigation';
 import { VCIcon } from '@vuecs/icon';
-import type { NavigationItem } from '@vuecs/navigation';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent, navigateTo } from '#app';
+import { useSectionBreadcrumb } from '../../../composables/breadcrumb';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { VCIcon },
+    components: {
+        FContentAction, 
+        VCBreadcrumb, 
+        VCIcon, 
+    },
     setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -27,18 +34,27 @@ export default defineNuxtComponent({
             ],
         });
 
-        const tabs: NavigationItem[] = [
-            {
-                name: 'overview',
-                url: '/admin/nodes',
-                icon: 'fa6-solid:bars',
+        const breadcrumbItems = useSectionBreadcrumb({
+            root: {
+                label: 'Admin', 
+                url: '/admin', 
+                icon: 'fa6-solid:gear', 
             },
-            {
-                name: 'add',
-                url: '/admin/nodes/add',
-                icon: 'fa6-solid:plus',
+            section: {
+                label: 'Nodes', 
+                url: '/admin/nodes', 
+                icon: 'fa6-solid:server', 
             },
-        ];
+            children: [
+                {
+                    url: '/admin/nodes/add', 
+                    label: 'Add', 
+                    icon: 'fa6-solid:plus', 
+                },
+            ],
+        });
+
+        const canCreate = usePermissionCheck({ name: PermissionName.NODE_CREATE });
 
         const toast = useToast();
 
@@ -57,34 +73,38 @@ export default defineNuxtComponent({
         };
 
         return {
+            breadcrumbItems,
+            canCreate,
             handleCreated,
             handleDeleted,
             handleFailed,
-            tabs,
         };
     },
 });
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">
-            <VCIcon name="fa6-solid:server" /> Node <span class="sub-title">Management</span>
-        </h1>
-        <div class="content-wrapper">
-            <div class="content-sidebar flex-col">
-                <VCNavItems
-                    :data="tabs"
-                    variant="pills"
-                    orientation="vertical"
-                />
-            </div>
-            <div class="content-container">
-                <NuxtPage
-                    @created="handleCreated"
-                    @deleted="handleDeleted"
-                    @failed="handleFailed"
-                />
-            </div>
+        <VCBreadcrumb
+            :items="breadcrumbItems"
+            class="mb-2"
+        />
+
+        <div class="flex flex-row flex-wrap gap-3 items-center justify-between mb-3">
+            <h1 class="title no-border mb-0">
+                <VCIcon name="fa6-solid:server" /> Node <span class="sub-title">Management</span>
+            </h1>
+
+            <FContentAction
+                overview-url="/admin/nodes"
+                add-url="/admin/nodes/add"
+                :add-disabled="!canCreate"
+            />
         </div>
+
+        <NuxtPage
+            @created="handleCreated"
+            @deleted="handleDeleted"
+            @failed="handleFailed"
+        />
     </div>
 </template>

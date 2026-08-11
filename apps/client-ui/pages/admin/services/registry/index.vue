@@ -6,16 +6,24 @@
   -->
 
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Registry } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
+import { FContentAction } from '@privateaim/client-vue';
+import { VCBreadcrumb } from '@vuecs/navigation';
 import type { NavigationItem } from '@vuecs/navigation';
 import { VCIcon } from '@vuecs/icon';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
+import { useSectionBreadcrumb } from '../../../../composables/breadcrumb';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { VCIcon },
+    components: {
+        FContentAction, 
+        VCBreadcrumb, 
+        VCIcon, 
+    },
     setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -27,21 +35,45 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
+        const breadcrumbItems = useSectionBreadcrumb({
+            root: {
+                label: 'Admin', 
+                url: '/admin', 
+                icon: 'fa6-solid:gear', 
+            },
+            section: {
+                label: 'Registry', 
+                url: '/admin/services/registry', 
+                icon: 'fa6-brands:docker', 
+            },
+            children: [
+                {
+                    url: '/admin/services/registry/add', 
+                    label: 'Add', 
+                    icon: 'fa6-solid:plus', 
+                },
+                {
+                    url: '/admin/services/registry/client', 
+                    label: 'Client', 
+                    icon: 'fa6-solid:ghost', 
+                },
+            ],
+        });
+
+        const canCreate = usePermissionCheck({ name: PermissionName.REGISTRY_MANAGE });
+
+        // "add" left the tab set for the title-row action; "client" is a real
+        // sibling view, so the remainder stays as a horizontal pill row.
         const tabs: NavigationItem[] = [
             {
-                name: 'overview', 
-                url: '/admin/services/registry', 
-                icon: 'fa6-solid:bars', 
+                name: 'Overview',
+                url: '/admin/services/registry',
+                icon: 'fa6-solid:bars',
             },
             {
-                name: 'add', 
-                url: '/admin/services/registry/add', 
-                icon: 'fa6-solid:plus', 
-            },
-            {
-                name: 'client', 
-                url: '/admin/services/registry/client', 
-                icon: 'fa6-solid:ghost', 
+                name: 'Client',
+                url: '/admin/services/registry/client',
+                icon: 'fa6-solid:ghost',
             },
         ];
 
@@ -50,6 +82,8 @@ export default defineNuxtComponent({
         };
 
         return {
+            breadcrumbItems,
+            canCreate,
             handleDeleted,
             tabs,
         };
@@ -58,24 +92,36 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">
-            <VCIcon
-                name="fa6-brands:docker"
-                class="me-1"
-            /> Registry
-            <span class="sub-title ms-1">Management</span>
-        </h1>
-        <div class="content-wrapper">
-            <div class="content-sidebar flex-col">
+        <VCBreadcrumb
+            :items="breadcrumbItems"
+            class="mb-2"
+        />
+
+        <div class="flex flex-row flex-wrap gap-3 items-center justify-between mb-3">
+            <h1 class="title no-border mb-0">
+                <VCIcon
+                    name="fa6-brands:docker"
+                    class="me-1"
+                /> Registry
+                <span class="sub-title ms-1">Management</span>
+            </h1>
+
+            <FContentAction
+                overview-url="/admin/services/registry"
+                add-url="/admin/services/registry/add"
+                :add-disabled="!canCreate"
+            />
+        </div>
+
+        <div class="m-b-20 m-t-10">
+            <div class="flex-wrap flex-row flex items-center">
                 <VCNavItems
                     :data="tabs"
                     variant="pills"
-                    orientation="vertical"
                 />
             </div>
-            <div class="content-container">
-                <NuxtPage @deleted="handleDeleted" />
-            </div>
         </div>
+
+        <NuxtPage @deleted="handleDeleted" />
     </div>
 </template>
