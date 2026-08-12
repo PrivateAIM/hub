@@ -74,9 +74,17 @@ export default defineNuxtComponent({
             :items="breadcrumbItems"
         />
 
-        <h1 class="title no-border mb-2">
-            <VCIcon name="fa6-solid:signs-post" /> Services <span class="sub-title">Management</span>
-        </h1>
+        <div class="mb-2">
+            <h1 class="title no-border mb-0">
+                <VCIcon
+                    name="fa6-solid:signs-post"
+                    class="me-1"
+                /> Services
+            </h1>
+            <p class="mt-1 text-sm text-fg-muted">
+                Internal and third-party services Hub depends on
+            </p>
+        </div>
 
         <h6>
             Internal

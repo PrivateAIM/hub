@@ -88,10 +88,18 @@ export default defineNuxtComponent({
             :items="breadcrumbItems"
         />
 
-        <div class="flex flex-row flex-wrap gap-3 items-center justify-between mb-2">
-            <h1 class="title no-border mb-0">
-                <VCIcon name="fa6-solid:server" /> Node <span class="sub-title">Management</span>
-            </h1>
+        <div class="flex flex-row flex-wrap gap-3 items-start justify-between mb-2">
+            <div class="mb-0">
+                <h1 class="title no-border mb-0">
+                    <VCIcon
+                        name="fa6-solid:server"
+                        class="me-1"
+                    /> Nodes
+                </h1>
+                <p class="mt-1 text-sm text-fg-muted">
+                    Compute sites that run analyses on local data
+                </p>
+            </div>
 
             <FContentAction
                 overview-url="/admin/nodes"

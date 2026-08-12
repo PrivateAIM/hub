@@ -63,9 +63,17 @@ export default defineNuxtComponent({
             :items="breadcrumbItems"
         />
 
-        <h1 class="title no-border mb-2">
-            <VCIcon name="fa6-solid:bullhorn" /> Events <span class="sub-title">Management</span>
-        </h1>
+        <div class="mb-2">
+            <h1 class="title no-border mb-0">
+                <VCIcon
+                    name="fa6-solid:bullhorn"
+                    class="me-1"
+                /> Events
+            </h1>
+            <p class="mt-1 text-sm text-fg-muted">
+                Domain events emitted across Hub services
+            </p>
+        </div>
         <div>
             <NuxtPage
                 @deleted="handleDeleted"

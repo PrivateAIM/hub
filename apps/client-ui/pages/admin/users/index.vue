@@ -81,16 +81,18 @@ export default defineNuxtComponent({
             :items="breadcrumbItems"
         />
 
-        <div class="flex flex-row flex-wrap gap-3 items-center justify-between mb-2">
-            <h1 class="title no-border mb-0">
-                <VCIcon
-                    name="fa6-solid:user"
-                    class="me-1"
-                /> User
-                <span class="sub-title ms-1">
-                    Management
-                </span>
-            </h1>
+        <div class="flex flex-row flex-wrap gap-3 items-start justify-between mb-2">
+            <div class="mb-0">
+                <h1 class="title no-border mb-0">
+                    <VCIcon
+                        name="fa6-solid:user"
+                        class="me-1"
+                    /> Users
+                </h1>
+                <p class="mt-1 text-sm text-fg-muted">
+                    People with access to this realm
+                </p>
+            </div>
 
             <FContentAction
                 overview-url="/admin/users"

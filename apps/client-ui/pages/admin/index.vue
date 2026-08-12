@@ -19,8 +19,13 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">
-            Dashboard <span class="sub-title">Overview</span>
-        </h1>
+        <div class="mb-3">
+            <h1 class="title no-border mb-0">
+                Admin
+            </h1>
+            <p class="mt-1 text-sm text-fg-muted">
+                Realm, access and platform services
+            </p>
+        </div>
     </div>
 </template>

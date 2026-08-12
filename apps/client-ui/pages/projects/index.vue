@@ -11,6 +11,8 @@ import { PermissionName } from '@privateaim/kit';
 import { FContentAction } from '@privateaim/client-vue';
 import { VCBreadcrumb } from '@vuecs/navigation';
 import { VCIcon } from '@vuecs/icon';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { defineNuxtComponent, navigateTo } from '#app';
 import { definePageMeta, useToast } from '#imports';
 import { useSectionBreadcrumb } from '../../composables/breadcrumb';
@@ -50,6 +52,26 @@ export default defineNuxtComponent({
             ],
         });
 
+        const route = useRoute();
+
+        /**
+         * One `<h1>` serves `/projects`, `/projects/in` and `/projects/add`, so
+         * the description has to follow the route — a single line covering both
+         * directions ("incoming & outgoing") described neither view accurately
+         * once they became separate sidebar entries.
+         */
+        const subtitle = computed(() => {
+            if (route.path === '/projects/in') {
+                return 'Projects other realms want your nodes to join';
+            }
+
+            if (route.path === '/projects/add') {
+                return 'Name it now — nodes and analyses come after';
+            }
+
+            return 'Projects your realm created';
+        });
+
         const canCreate = usePermissionCheck({ name: PermissionName.PROJECT_CREATE });
 
         const toast = useToast();
@@ -62,6 +84,7 @@ export default defineNuxtComponent({
 
         return {
             breadcrumbItems,
+            subtitle,
             canCreate,
             handleCreated,
         };
@@ -74,11 +97,18 @@ export default defineNuxtComponent({
             :items="breadcrumbItems"
         />
 
-        <div class="flex flex-row flex-wrap gap-3 items-center justify-between mb-2">
-            <h1 class="title no-border mb-0">
-                <VCIcon name="fa6-solid:diagram-project" /> Projects
-                <span class="sub-title">Manage incoming & outgoing projects</span>
-            </h1>
+        <div class="flex flex-row flex-wrap gap-3 items-start justify-between mb-2">
+            <div>
+                <h1 class="title no-border mb-0">
+                    <VCIcon
+                        name="fa6-solid:diagram-project"
+                        class="me-1"
+                    /> Projects
+                </h1>
+                <p class="mt-1 text-sm text-fg-muted">
+                    {{ subtitle }}
+                </p>
+            </div>
 
             <FContentAction
                 overview-url="/projects"
