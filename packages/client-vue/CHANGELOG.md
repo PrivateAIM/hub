@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.13.3](https://github.com/PrivateAIM/hub/compare/v0.13.2...v0.13.3) (2026-08-13)
+
+
+### Features
+
+* project-anchored analyses, title-row add action and breadcrumbs ([#1825](https://github.com/PrivateAIM/hub/issues/1825)) ([61b71fa](https://github.com/PrivateAIM/hub/commit/61b71fa8a146d46aad624eb260e107e16fa176a8))
+* redesign analysis & project list views ([#1821](https://github.com/PrivateAIM/hub/issues/1821)) ([c22e39e](https://github.com/PrivateAIM/hub/commit/c22e39ed392854aa7e70c8d0a62cbb844e974e63))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/core-kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/core-realtime-kit bumped from ^0.10.20 to ^0.10.21
+    * @privateaim/kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/storage-kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/telemetry-kit bumped from ^0.13.2 to ^0.13.3
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/core-kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/storage-kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/telemetry-kit bumped from ^0.13.2 to ^0.13.3
+
 ## [0.13.2](https://github.com/PrivateAIM/hub/compare/v0.13.1...v0.13.2) (2026-08-05)
 
 
