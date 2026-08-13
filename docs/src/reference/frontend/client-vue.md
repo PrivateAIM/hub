@@ -84,7 +84,26 @@ import {
 | Master Image | list, picker, group management |
 | Bucket File | list, upload, stream |
 | Event / Log | list, details |
-| Utility | `FEntityDelete`, `FProcessStatus`, login form |
+| Utility | `FEntityDelete`, `FProcessStatus`, `FContentAction`, login form |
+
+`FContentAction` is the primary action of a collection section, rendered at the
+right of the section's title row. It is route-aware: `+ Add` on `overviewUrl`,
+`← Back` on `addUrl`, and **nothing** on any other route. A section therefore
+mounts a single instance no matter which of its routes is active, rather than
+one per route — and a sibling list route such as an approval queue renders no
+action at all instead of inheriting a create action.
+
+```vue
+<FContentAction
+    overview-url="/admin/clients"
+    add-url="/admin/clients/add"
+    :add-disabled="!canCreate"
+/>
+```
+
+`addDisabled` carries the create permission; `VCButton` blocks activation of a
+disabled link target, so it cannot navigate into a page the actor would be
+rejected from.
 
 ### Composables
 

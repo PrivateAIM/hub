@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { eq } from '@rapiq/core';
 import type { Analysis } from '@privateaim/core-kit';
 import {
     AnalysisCommand,
@@ -31,7 +32,7 @@ import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
 import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';
 import type { AnalysisDistributor } from '../../services/analysis-distributor/index.ts';
 import type { AnalysisStorageManager } from '../../services/analysis-storage-manager/index.ts';
-import { decodeQuery } from '../../query/index.ts';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisSchema } from './schema.ts';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository, IAnalysisService } from './types.ts';
 
@@ -94,8 +95,15 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         return this.repository.findMany(decodeQuery(query, { schema: analysisSchema }));
     }
 
-    async getOne(id: string): Promise<Analysis> {
-        const entity = await this.repository.findOneById(id);
+    /**
+     * `findOneById` takes no query, so an actor-supplied `fields`/`relations`
+     * selection has to go through `findMany` with an `id` condition appended —
+     * the same shape `ProjectService.getOne` uses.
+     */
+    async getOne(id: string, query?: Record<string, any>): Promise<Analysis> {
+        const entity = query ?
+            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: analysisSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
+            await this.repository.findOneById(id);
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis' });

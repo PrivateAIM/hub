@@ -14,7 +14,7 @@ export interface IProjectNodeRepository extends IEntityRepository<ProjectNode> {
 
 export interface IProjectNodeService {
     getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<ProjectNode>>;
-    getOne(id: string): Promise<ProjectNode>;
+    getOne(id: string, query?: Record<string, any>): Promise<ProjectNode>;
     create(data: Partial<ProjectNode>, actor: ActorContext): Promise<ProjectNode>;
     update(id: string, data: Partial<ProjectNode>, actor: ActorContext): Promise<ProjectNode>;
     delete(id: string, actor: ActorContext): Promise<ProjectNode>;

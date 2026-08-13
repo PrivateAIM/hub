@@ -8,18 +8,33 @@
 import { ServiceID } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { VCIcon } from '@vuecs/icon';
+import { VCBreadcrumb } from '@vuecs/navigation';
 import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
+import { useSectionBreadcrumb } from '~/composables/breadcrumb';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
-    components: { VCIcon },
+    components: { VCBreadcrumb, VCIcon },
     setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
                 PermissionName.SERVICE_MANAGE,
             ],
+        });
+
+        const breadcrumbItems = useSectionBreadcrumb({
+            root: {
+                label: 'Admin', 
+                url: '/admin', 
+                icon: 'fa6-solid:gear', 
+            },
+            section: {
+                label: 'Services', 
+                url: '/admin/services', 
+                icon: 'fa6-solid:signs-post', 
+            },
         });
 
         const items = [
@@ -45,6 +60,7 @@ export default defineNuxtComponent({
         };
 
         return {
+            breadcrumbItems,
             goTo,
             items,
             thirdPartyItems,
@@ -54,9 +70,21 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">
-            <VCIcon name="fa6-solid:signs-post" /> Services <span class="sub-title">Management</span>
-        </h1>
+        <VCBreadcrumb
+            :items="breadcrumbItems"
+        />
+
+        <div class="mb-2">
+            <h1 class="title no-border mb-0">
+                <VCIcon
+                    name="fa6-solid:signs-post"
+                    class="me-1"
+                /> Services
+            </h1>
+            <p class="mt-1 text-sm text-fg-muted">
+                Internal and third-party services Hub depends on
+            </p>
+        </div>
 
         <h6>
             Internal

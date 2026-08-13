@@ -7,16 +7,23 @@
 
 <script lang="ts">
 
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Permission } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
+import { FContentAction } from '@privateaim/client-vue';
+import { VCBreadcrumb } from '@vuecs/navigation';
 import { VCIcon } from '@vuecs/icon';
-import type { NavigationItem } from '@vuecs/navigation';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
+import { useSectionBreadcrumb } from '../../../composables/breadcrumb';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { VCIcon },
+    components: {
+        FContentAction, 
+        VCBreadcrumb, 
+        VCIcon, 
+    },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -28,18 +35,27 @@ export default defineNuxtComponent({
             ],
         });
 
-        const items: NavigationItem[] = [
-            {
-                name: 'overview',
-                url: '/admin/permissions',
-                icon: 'fa6-solid:bars',
+        const breadcrumbItems = useSectionBreadcrumb({
+            root: {
+                label: 'Admin', 
+                url: '/admin', 
+                icon: 'fa6-solid:gear', 
             },
-            {
-                name: 'add',
-                url: '/admin/permissions/add',
-                icon: 'fa6-solid:plus',
+            section: {
+                label: 'Permissions', 
+                url: '/admin/permissions', 
+                icon: 'fa6-solid:users', 
             },
-        ];
+            children: [
+                {
+                    url: '/admin/permissions/add', 
+                    label: 'Add', 
+                    icon: 'fa6-solid:plus', 
+                },
+            ],
+        });
+
+        const canCreate = usePermissionCheck({ name: PermissionName.PERMISSION_CREATE });
 
         const handleDeleted = (e: Permission) => {
             const toast = useToast();
@@ -52,36 +68,43 @@ export default defineNuxtComponent({
         };
 
         return {
+            breadcrumbItems,
+            canCreate,
             handleDeleted,
             handleFailed,
-            items,
         };
     },
 });
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">
-            <VCIcon
-                name="fa6-solid:users"
-                class="me-1"
-            /> Permission
-            <span class="sub-title ms-1">Management</span>
-        </h1>
-        <div class="content-wrapper">
-            <div class="content-sidebar flex-col">
-                <VCNavItems
-                    :data="items"
-                    variant="pills"
-                    orientation="vertical"
-                />
+        <VCBreadcrumb
+            :items="breadcrumbItems"
+        />
+
+        <div class="flex flex-row flex-wrap gap-3 items-start justify-between mb-2">
+            <div class="mb-0">
+                <h1 class="title no-border mb-0">
+                    <VCIcon
+                        name="fa6-solid:users"
+                        class="me-1"
+                    /> Permissions
+                </h1>
+                <p class="mt-1 text-sm text-fg-muted">
+                    Individual capabilities, granted to users, roles and clients
+                </p>
             </div>
-            <div class="content-container">
-                <NuxtPage
-                    @deleted="handleDeleted"
-                    @failed="handleFailed"
-                />
-            </div>
+
+            <FContentAction
+                overview-url="/admin/permissions"
+                add-url="/admin/permissions/add"
+                :add-disabled="!canCreate"
+            />
         </div>
+
+        <NuxtPage
+            @deleted="handleDeleted"
+            @failed="handleFailed"
+        />
     </div>
 </template>

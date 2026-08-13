@@ -56,9 +56,17 @@ export default {
 </script>
 <template>
     <div class="flex flex-col gap-3">
-        <h1 class="title no-border mb-0">
-            <VCIcon name="fa6-solid:atom" /> Master Images <span class="sub-title">Management</span>
-        </h1>
+        <div class="mb-0">
+            <h1 class="title no-border mb-0">
+                <VCIcon
+                    name="fa6-solid:atom"
+                    class="me-1"
+                /> Master Images
+            </h1>
+            <p class="mt-1 text-sm text-fg-muted">
+                Base images used to build analysis images
+            </p>
+        </div>
         <div class="mb-2">
             <VCNavItems
                 :data="tabs"

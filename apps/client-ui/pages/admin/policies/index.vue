@@ -1,15 +1,22 @@
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Policy } from '@authup/core-kit';
 import { PermissionName as AuthupPermissionName } from '@authup/core-kit';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
+import { FContentAction } from '@privateaim/client-vue';
+import { VCBreadcrumb } from '@vuecs/navigation';
 import { VCIcon } from '@vuecs/icon';
-import type { NavigationItem } from '@vuecs/navigation';
 import { useToast } from '../../../composables/toast';
+import { useSectionBreadcrumb } from '../../../composables/breadcrumb';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { VCIcon },
+    components: {
+        FContentAction, 
+        VCBreadcrumb, 
+        VCIcon, 
+    },
     setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -24,18 +31,28 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const items: NavigationItem[] = [
-            {
-                name: 'overview', 
+        // A policy IS a permission record in authup, hence the PERMISSION_* gate.
+        const breadcrumbItems = useSectionBreadcrumb({
+            root: {
+                label: 'Admin', 
+                url: '/admin', 
+                icon: 'fa6-solid:gear', 
+            },
+            section: {
+                label: 'Policies', 
                 url: '/admin/policies', 
-                icon: 'fa6-solid:bars', 
+                icon: 'fa6-solid:scale-balanced', 
             },
-            {
-                name: 'add', 
-                url: '/admin/policies/add', 
-                icon: 'fa6-solid:plus', 
-            },
-        ];
+            children: [
+                {
+                    url: '/admin/policies/add', 
+                    label: 'Add', 
+                    icon: 'fa6-solid:plus', 
+                },
+            ],
+        });
+
+        const canCreate = usePermissionCheck({ name: AuthupPermissionName.PERMISSION_CREATE });
 
         const handleDeleted = (e: Policy) => {
             if (toast) {
@@ -50,36 +67,43 @@ export default defineNuxtComponent({
         };
 
         return {
+            breadcrumbItems,
+            canCreate,
             handleDeleted,
             handleFailed,
-            items,
         };
     },
 });
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">
-            <VCIcon
-                name="fa6-solid:scale-balanced"
-                class="me-1"
-            /> Policy
-            <span class="sub-title ms-1">Management</span>
-        </h1>
-        <div class="content-wrapper">
-            <div class="content-sidebar flex-col">
-                <VCNavItems
-                    :data="items"
-                    variant="pills"
-                    orientation="vertical"
-                />
+        <VCBreadcrumb
+            :items="breadcrumbItems"
+        />
+
+        <div class="flex flex-row flex-wrap gap-3 items-start justify-between mb-2">
+            <div class="mb-0">
+                <h1 class="title no-border mb-0">
+                    <VCIcon
+                        name="fa6-solid:scale-balanced"
+                        class="me-1"
+                    /> Policies
+                </h1>
+                <p class="mt-1 text-sm text-fg-muted">
+                    Time, date, attribute and identity rules that constrain a permission
+                </p>
             </div>
-            <div class="content-container">
-                <NuxtPage
-                    @deleted="handleDeleted"
-                    @failed="handleFailed"
-                />
-            </div>
+
+            <FContentAction
+                overview-url="/admin/policies"
+                add-url="/admin/policies/add"
+                :add-disabled="!canCreate"
+            />
         </div>
+
+        <NuxtPage
+            @deleted="handleDeleted"
+            @failed="handleFailed"
+        />
     </div>
 </template>

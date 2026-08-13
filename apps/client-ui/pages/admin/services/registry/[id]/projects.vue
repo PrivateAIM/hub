@@ -6,9 +6,10 @@
   -->
 
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
+import { FContentAction } from '@privateaim/client-vue';
 import type { Registry } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import type { NavigationItem } from '@vuecs/navigation';
 import { computed, toRef } from 'vue';
 import type { PropType } from 'vue';
 import { definePageMeta } from '#imports';
@@ -16,6 +17,7 @@ import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
 
 export default defineNuxtComponent({
+    components: { FContentAction },
     props: {
         entity: {
             type: Object as PropType<Registry>,
@@ -33,38 +35,30 @@ export default defineNuxtComponent({
 
         const entity = toRef(props, 'entity');
 
-        const tabs = computed<NavigationItem[]>(() => {
-            const base = `/admin/services/registry/${entity.value.id}/projects`;
+        const canCreate = usePermissionCheck({ name: PermissionName.REGISTRY_MANAGE });
 
-            return [
-                {
-                    name: 'overview',
-                    icon: 'fa6-solid:bars',
-                    url: base,
-                },
-                {
-                    name: 'add',
-                    icon: 'fa6-solid:plus',
-                    url: `${base}/add`,
-                },
-            ];
-        });
+        // Only "overview" and "add" existed here, so nothing is left to tab
+        // between — the action alone replaces the rail.
+        const overviewUrl = computed(() => `/admin/services/registry/${entity.value.id}/projects`);
 
-        return { tabs };
+        return {
+            addUrl: computed(() => `${overviewUrl.value}/add`),
+            overviewUrl,
+            canCreate,
+        };
     },
 });
 </script>
 <template>
-    <div class="content-wrapper">
-        <div class="content-sidebar flex-col">
-            <VCNavItems
-                :data="tabs"
-                variant="pills"
-                orientation="vertical"
+    <div>
+        <div class="flex flex-row flex-wrap gap-3 items-center justify-end mb-3">
+            <FContentAction
+                :overview-url="overviewUrl"
+                :add-url="addUrl"
+                :add-disabled="!canCreate"
             />
         </div>
-        <div class="content-container">
-            <NuxtPage :entity="entity" />
-        </div>
+
+        <NuxtPage :entity="entity" />
     </div>
 </template>

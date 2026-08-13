@@ -16,7 +16,8 @@ import {
 import { FDisplayName, createEntityManager, injectCoreHTTPClient } from '@privateaim/client-vue';
 import { PermissionName } from '@privateaim/kit';
 import { VCIcon } from '@vuecs/icon';
-import type { NavigationItem } from '@vuecs/navigation';
+import type { BreadcrumbItem, NavigationItem } from '@vuecs/navigation';
+import { VCBreadcrumb } from '@vuecs/navigation';
 import type { Ref } from 'vue';
 import {
     computed,
@@ -35,7 +36,11 @@ import {
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineComponent({
-    components: { FDisplayName, VCIcon },
+    components: {
+        FDisplayName, 
+        VCBreadcrumb, 
+        VCIcon, 
+    },
     async setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -104,6 +109,74 @@ export default defineComponent({
             return '/projects';
         });
 
+        /**
+         * Named from the RESOLVED project, not from url segments. The
+         * sub-view crumb is derived from the route because those ARE the
+         * page's own sections.
+         *
+         * This does not replace the back arrow below: the arrow honours
+         * `refPath` and returns you to wherever you came from (Incoming, say),
+         * which is a history affordance a hierarchical trail cannot express.
+         */
+        const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
+            const project = manager.data.value;
+            if (!project) {
+                return [];
+            }
+
+            const items: BreadcrumbItem[] = [
+                {
+                    label: 'Projects',
+                    to: '/projects',
+                    icon: 'fa6-solid:diagram-project',
+                },
+                {
+                    label: project.displayName || project.name,
+                    to: `/projects/${project.id}`,
+                },
+            ];
+
+            const base = `/projects/${project.id}`;
+            const sections = [
+                {
+                    url: `${base}/analyses`, 
+                    label: 'Analyses', 
+                    icon: 'fa6-solid:microscope', 
+                },
+                {
+                    url: `${base}/analyses/in`, 
+                    label: 'Incoming', 
+                    icon: 'fa6-solid:file-import', 
+                },
+                {
+                    url: `${base}/analyses/add`, 
+                    label: 'Add', 
+                    icon: 'fa6-solid:plus', 
+                },
+                {
+                    url: `${base}/settings`, 
+                    label: 'Settings', 
+                    icon: 'fa6-solid:gear', 
+                },
+            ];
+
+            // `/analyses/in` also needs its `/analyses` ancestor, so collect
+            // every section the current path sits under, shortest url first.
+            const matched = sections
+                .filter((s) => route.path === s.url || route.path.startsWith(`${s.url}/`))
+                .sort((a, b) => a.url.length - b.url.length);
+
+            for (const section of matched) {
+                items.push({
+                    label: section.label,
+                    to: section.url,
+                    icon: section.icon,
+                });
+            }
+
+            return items;
+        });
+
         const tabs = computed<NavigationItem[]>(() => {
             const base = `/projects/${manager.data.value?.id}`;
 
@@ -151,6 +224,7 @@ export default defineComponent({
         };
 
         return {
+            breadcrumbItems,
             entity: manager.data.value,
             projectNode: projectNode.value,
             backLink,
@@ -163,7 +237,11 @@ export default defineComponent({
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">
+        <VCBreadcrumb
+            :items="breadcrumbItems"
+        />
+
+        <h1 class="title no-border mb-2">
             <VCIcon name="fa6-solid:diagram-project" />
             <FDisplayName
                 :name="entity.name"

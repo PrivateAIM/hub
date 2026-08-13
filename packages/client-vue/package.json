@@ -86,6 +86,7 @@
         "validup": "^1.0.0",
         "vitest": "^4.1.10",
         "vue": "^3.5.40",
+        "vue-router": "^5.2.0",
         "vue-tsc": "^3.3.8",
         "zod": "^4.4.3"
     },
@@ -127,6 +128,7 @@
         "socket.io-client": "^4.8.2",
         "validup": "^1.0.0",
         "vue": "^3.5.35",
+        "vue-router": "^5.2.0",
         "zod": "^4.3.6"
     },
     "publishConfig": {

@@ -13,7 +13,7 @@ import {
     it,
 } from 'vitest';
 import { createTestApplication } from '../../app';
-import { createTestNode } from '../../utils/domains';
+import { createTestNode, createTestProject } from '../../utils/domains';
 
 // Every query-capable GET carries the endpoint's queryable vocabulary under
 // meta.schema — the static allow-list upper bound, with relation capabilities
@@ -105,6 +105,38 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
 
         // sort derives its allow-list from the declared default
         expect(meta.schema.sort).toEqual({ allowed: ['path'], default: { path: 'ASC' } });
+    });
+
+    /**
+     * Publishing a vocabulary the endpoint then ignores is worse than not
+     * publishing it: the failure is silent, the caller gets a 200, and the
+     * relation is simply absent. Every record controller advertised
+     * `relations` via RECORD_QUERY_PARAMETERS while only four of them read the
+     * request query at all — the analysis breadcrumb surfaced it by naming
+     * every project "Project".
+     */
+    it('should honour the relations it advertises on a record read', async () => {
+        const { client } = suite;
+
+        const { data: project } = await client.project.create(createTestProject());
+        const { data: node } = await client.node.create(createTestNode());
+        const { data: projectNode } = await client.projectNode.create({
+            nodeId: node.id,
+            projectId: project.id,
+        });
+
+        const { data, meta } = await client.projectNode.getOne(
+            projectNode.id,
+            { relations: { project: true } },
+        );
+
+        expect(meta.schema.relations.allowed).toContain('project');
+        expect(data.project).toBeDefined();
+        expect(data.project.id).toEqual(project.id);
+
+        await client.projectNode.delete(projectNode.id);
+        await client.node.delete(node.id);
+        await client.project.delete(project.id);
     });
 
     it('should not describe mutations', async () => {

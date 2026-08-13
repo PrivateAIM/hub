@@ -6,16 +6,23 @@
   -->
 
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Realm } from '@authup/core-kit';
 import { PermissionName } from '@authup/core-kit';
 import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
+import { FContentAction } from '@privateaim/client-vue';
+import { VCBreadcrumb } from '@vuecs/navigation';
 import { VCIcon } from '@vuecs/icon';
-import type { NavigationItem } from '@vuecs/navigation';
+import { useSectionBreadcrumb } from '../../../composables/breadcrumb';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
-    components: { VCIcon },
+    components: {
+        FContentAction, 
+        VCBreadcrumb, 
+        VCIcon, 
+    },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -30,18 +37,27 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const items: NavigationItem[] = [
-            {
-                name: 'overview', 
+        const breadcrumbItems = useSectionBreadcrumb({
+            root: {
+                label: 'Admin', 
+                url: '/admin', 
+                icon: 'fa6-solid:gear', 
+            },
+            section: {
+                label: 'Realms', 
                 url: '/admin/realms', 
-                icon: 'fa6-solid:bars', 
+                icon: 'fa6-solid:building', 
             },
-            {
-                name: 'add', 
-                url: '/admin/realms/add', 
-                icon: 'fa6-solid:plus', 
-            },
-        ];
+            children: [
+                {
+                    url: '/admin/realms/add', 
+                    label: 'Add', 
+                    icon: 'fa6-solid:plus', 
+                },
+            ],
+        });
+
+        const canCreate = usePermissionCheck({ name: PermissionName.REALM_CREATE });
 
         const handleDeleted = (e: Realm) => {
             toast.show({ variant: 'success', body: `The realm ${e.name} was successfully deleted.` });
@@ -52,36 +68,43 @@ export default defineNuxtComponent({
         };
 
         return {
+            breadcrumbItems,
+            canCreate,
             handleDeleted,
             handleFailed,
-            items,
         };
     },
 });
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">
-            <VCIcon
-                name="fa6-solid:building"
-                class="me-1"
-            /> Realm
-            <span class="sub-title ms-1">Management</span>
-        </h1>
-        <div class="content-wrapper">
-            <div class="content-sidebar flex-col">
-                <VCNavItems
-                    :data="items"
-                    variant="pills"
-                    orientation="vertical"
-                />
+        <VCBreadcrumb
+            :items="breadcrumbItems"
+        />
+
+        <div class="flex flex-row flex-wrap gap-3 items-start justify-between mb-2">
+            <div class="mb-0">
+                <h1 class="title no-border mb-0">
+                    <VCIcon
+                        name="fa6-solid:building"
+                        class="me-1"
+                    /> Realms
+                </h1>
+                <p class="mt-1 text-sm text-fg-muted">
+                    Tenants owning their own users, projects and nodes
+                </p>
             </div>
-            <div class="content-container">
-                <NuxtPage
-                    @deleted="handleDeleted"
-                    @failed="handleFailed"
-                />
-            </div>
+
+            <FContentAction
+                overview-url="/admin/realms"
+                add-url="/admin/realms/add"
+                :add-disabled="!canCreate"
+            />
         </div>
+
+        <NuxtPage
+            @deleted="handleDeleted"
+            @failed="handleFailed"
+        />
     </div>
 </template>

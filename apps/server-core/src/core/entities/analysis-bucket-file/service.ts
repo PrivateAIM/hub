@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { eq } from '@rapiq/core';
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -12,7 +13,7 @@ import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/s
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IAnalysisBucketFileRepository, IAnalysisBucketFileService, IAnalysisFileMetadataRecalculator } from './types.ts';
 import { AnalysisBucketFileValidator } from '@privateaim/core-kit';
-import { decodeQuery } from '../../query/index.ts';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisBucketFileSchema } from './schema.ts';
 
 type AnalysisBucketFileServiceContext = {
@@ -38,8 +39,14 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         return this.repository.findMany(decodeQuery(query, { schema: analysisBucketFileSchema }));
     }
 
-    async getOne(id: string): Promise<AnalysisBucketFile> {
-        const entity = await this.repository.findOneById(id);
+    /**
+     * `findOneById` takes no query, so an actor-supplied `fields`/`relations`
+     * selection has to go through `findMany` with an `id` condition appended.
+     */
+    async getOne(id: string, query?: Record<string, any>): Promise<AnalysisBucketFile> {
+        const entity = query ?
+            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: analysisBucketFileSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
+            await this.repository.findOneById(id);
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });

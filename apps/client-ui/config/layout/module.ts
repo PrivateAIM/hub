@@ -138,7 +138,30 @@ export class Navigation {
 
         if (canPass) {
             if (item.children) {
-                item.children = await this.reduce(item.children);
+                const children = await this.reduce(item.children);
+
+                // A group parent that lost every child has nothing left to
+                // reveal, and `VCNavItem` renders a childless item as a leaf
+                // — which for a url-less group means an inert dead entry.
+                // Reachable for the "Projects" group: its gate is the UNION
+                // of both directions, so an actor holding only
+                // ANALYSIS_APPROVE passes the parent while failing both
+                // "Outgoing" (no analysis-approve there) and "Incoming"
+                // (PROJECT_APPROVE).
+                if (children.length === 0 && !item.url) {
+                    return undefined;
+                }
+
+                // Copy rather than assign into `item.children`: `item` is the
+                // very object held by the module-level LayoutSide*Navigation
+                // constant, so writing the filtered list back would prune the
+                // source permanently. Every later resolve reduces the ALREADY
+                // reduced array, and the arrays only ever shrink — so a realm
+                // switch into a realm without PROJECT_APPROVE would drop
+                // "Incoming" for the rest of the page's life, including after
+                // switching back. The resolver re-runs on exactly that signal
+                // (the sidebar watches `store.realmManagement`).
+                return { ...item, children };
             }
 
             return item;

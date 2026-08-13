@@ -48,8 +48,10 @@ export class MasterImageGroupController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,
+        @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<MasterImageGroup>> {
-        const entity = await this.service.getOne(id);
+        const query = useRequestQuery(event);
+        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
 
         return {
             data: entity,

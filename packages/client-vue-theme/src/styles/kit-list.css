@@ -99,6 +99,21 @@
     gap: 1rem;
 }
 
+/*
+ * Wider tiles on large displays. At 1920x1080 the content column is ~1631px,
+ * which fits four 22rem tiles at ~396px each — narrow for a tile that now
+ * expands to list its recent analyses (a name column, the stage rail and a
+ * timestamp on one row). Raising the MINIMUM rather than pinning a column
+ * count keeps `auto-fill` doing its job: three tiles at 1920, and still more
+ * on an ultra-wide display instead of three stretched ones.
+ */
+@media (min-width: 1600px) {
+    .entity-grid .vc-list-body,
+    .entity-grid .vc-list-loading-band {
+        grid-template-columns: repeat(auto-fill, minmax(26rem, 1fr));
+    }
+}
+
 .entity-grid .vc-list-item {
     display: flex;
     background: transparent;

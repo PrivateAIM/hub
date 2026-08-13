@@ -5,14 +5,17 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { injectStore, storeToRefs } from '@authup/client-web-kit';
+import { injectStore, storeToRefs, usePermissionCheck } from '@authup/client-web-kit';
 import { computed, toRef } from 'vue';
 import type { PropType } from 'vue';
 import type { Project, ProjectNode } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
+import { FContentAction } from '@privateaim/client-vue';
 import type { NavigationItem } from '@vuecs/navigation';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
+    components: { FContentAction },
     props: {
         entity: {
             type: Object as PropType<Project>,
@@ -31,48 +34,58 @@ export default defineNuxtComponent({
 
         const isOwner = computed(() => entity.value.realmId === realmId.value);
 
-        const tabs = computed<NavigationItem[]>(() => {
-            const base = `/projects/${entity.value.id}/analyses`;
+        const canCreate = usePermissionCheck({ name: PermissionName.ANALYSIS_CREATE });
 
-            return [
-                {
-                    name: 'Outgoing',
-                    icon: 'fa6-solid:file-export',
-                    url: base,
-                },
-                {
-                    name: 'Incoming',
-                    icon: 'fa6-solid:file-import',
-                    url: `${base}/in`,
-                },
-                ...(isOwner.value ? [
-                    {
-                        name: 'Add',
-                        icon: 'fa6-solid:plus',
-                        url: `${base}/add`,
-                    },
-                ] : []),
-            ];
-        });
+        const base = computed(() => `/projects/${entity.value.id}/analyses`);
 
-        return { tabs };
+        // "Add" left the tab set for the row's right-hand action; only the two
+        // real directions remain.
+        const tabs = computed<NavigationItem[]>(() => [
+            {
+                name: 'Outgoing',
+                icon: 'fa6-solid:file-export',
+                url: base.value,
+            },
+            {
+                name: 'Incoming',
+                icon: 'fa6-solid:file-import',
+                url: `${base.value}/in`,
+            },
+        ]);
+
+        // Only the owning realm can add an analysis to the project — a node
+        // authority sees the same view but read-only.
+        const canAdd = computed(() => isOwner.value && canCreate.value);
+
+        return {
+            addUrl: computed(() => `${base.value}/add`),
+            overviewUrl: base,
+            canAdd,
+            tabs,
+        };
     },
 });
 </script>
 <template>
-    <div class="content-wrapper">
-        <div class="content-sidebar flex-col">
-            <VCNavItems
-                :data="tabs"
-                variant="pills"
-                orientation="vertical"
+    <div>
+        <div class="flex flex-row flex-wrap gap-3 items-center justify-between mb-3">
+            <div class="flex-wrap flex-row flex items-center">
+                <VCNavItems
+                    :data="tabs"
+                    variant="pills"
+                />
+            </div>
+
+            <FContentAction
+                :overview-url="overviewUrl"
+                :add-url="addUrl"
+                :add-disabled="!canAdd"
             />
         </div>
-        <div class="content-container">
-            <NuxtPage
-                :entity="entity"
-                :visitor-project-node="visitorProjectNode"
-            />
-        </div>
+
+        <NuxtPage
+            :entity="entity"
+            :visitor-project-node="visitorProjectNode"
+        />
     </div>
 </template>

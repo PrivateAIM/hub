@@ -18,7 +18,6 @@ import {
     FProjectNodeInCard,
     FProjectNodeInCardSkeleton,
     FProjectNodes,
-    FSearch,
     FSegments,
     FTitle,
     injectCoreHTTPClient,
@@ -30,7 +29,6 @@ import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 export default defineNuxtComponent({
     components: {
         FPagination,
-        FSearch,
         FSegments,
         FTitle,
         FProjectNodes,
@@ -134,12 +132,8 @@ export default defineNuxtComponent({
                 :include-node="true"
                 :query="query"
             >
-                <template #header="props">
+                <template #header>
                     <FTitle />
-                    <FSearch
-                        :load="props.load"
-                        :meta="props.meta"
-                    />
                     <div class="mb-3 mt-1">
                         <FSegments
                             v-model="segment"
