@@ -64,7 +64,7 @@ export default {
                 /> Master Images
             </h1>
             <p class="mt-1 text-sm text-fg-muted">
-                Base images analyses are built from
+                Base images used to build analysis images
             </p>
         </div>
         <div class="mb-2">

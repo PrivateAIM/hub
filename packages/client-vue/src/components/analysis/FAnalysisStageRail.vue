@@ -73,8 +73,10 @@ export default defineComponent({
          *
          * The stage computation is shared, so a compact rail can never
          * disagree with the full one about what state an analysis is in.
-         * Each dot keeps its label as a `title`, so the meaning is still
-         * reachable on hover.
+         * Dropping the visible labels would otherwise drop the meaning, so
+         * each dot carries it twice: a `title` for pointer hover, and
+         * `role="img"` + `aria-label` for assistive technology, which does
+         * not reliably announce `title` on a non-interactive element.
          */
         compact: {
             type: Boolean,
@@ -215,8 +217,10 @@ export default defineComponent({
             />
             <div
                 v-if="compact"
+                role="img"
                 class="grid h-3.5 w-3.5 flex-none place-items-center rounded-full border-2 text-[0.4rem]"
                 :class="STATE_CIRCLE_CLASS[stage.state]"
+                :aria-label="`${stage.label}: ${stage.sub}`"
                 :title="`${stage.label}: ${stage.sub}`"
             >
                 <VCIcon
