@@ -92,26 +92,26 @@
  * `.entity-cards` keeps the row chrome but calms it for the taller
  * dossier/inbox cards: more padding, larger radius, whisper shadow.
  */
+/*
+ * Tiles are wide because a project tile carries a second list inside it (its
+ * recent analyses: a name, a stage rail and a timestamp on one line). At the
+ * old 22rem the analysis names truncated and the rail crowded the timestamp —
+ * the column was narrower than one of its own rows needed.
+ *
+ * Rows stay stretched to the tallest tile in the row (the grid default): the
+ * badge strip carries `mt-auto`, so equal heights are what put the badges on
+ * a shared baseline across the row.
+ *
+ * One value rather than a breakpoint. The content column is the viewport less
+ * ~291px of chrome, so 30rem yields three tiles at 2056, two from ~1250 up,
+ * and one below that — a larger minimum reads better on a wide display but
+ * collapses a 1280 laptop to a single tile per row.
+ */
 .entity-grid .vc-list-body,
 .entity-grid .vc-list-loading-band {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
     gap: 1rem;
-}
-
-/*
- * Wider tiles on large displays. At 1920x1080 the content column is ~1631px,
- * which fits four 22rem tiles at ~396px each — narrow for a tile that now
- * expands to list its recent analyses (a name column, the stage rail and a
- * timestamp on one row). Raising the MINIMUM rather than pinning a column
- * count keeps `auto-fill` doing its job: three tiles at 1920, and still more
- * on an ultra-wide display instead of three stretched ones.
- */
-@media (min-width: 1600px) {
-    .entity-grid .vc-list-body,
-    .entity-grid .vc-list-loading-band {
-        grid-template-columns: repeat(auto-fill, minmax(26rem, 1fr));
-    }
 }
 
 .entity-grid .vc-list-item {
