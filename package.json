@@ -20,9 +20,9 @@
         "@tada5hi/commitlint-config": "^1.3.1",
         "@tada5hi/eslint-config": "^2.3.1",
         "@tada5hi/tsconfig": "^0.7.2",
-        "@types/node": "^26.1.2",
+        "@types/node": "^26.2.0",
         "cross-env": "^10.1.0",
-        "eslint": "^10.8.0",
+        "eslint": "^10.8.1",
         "eslint-plugin-vue": "^10.10.0",
         "husky": "^9.1.7",
         "lint-staged": "^17.2.0",
@@ -30,8 +30,8 @@
         "rimraf": "^6.1.3",
         "tsdown": "^0.22.14",
         "typescript": "6.0.3",
-        "typescript-eslint": "^8.65.0",
-        "unplugin-swc": "^1.5.9",
+        "typescript-eslint": "^8.67.0",
+        "unplugin-swc": "^1.5.10",
         "validup": "^1.0.0"
     },
     "scripts": {
