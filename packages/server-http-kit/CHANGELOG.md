@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.13.3](https://github.com/PrivateAIM/hub/compare/v0.13.2...v0.13.3) (2026-08-13)
+
+
+### Features
+
+* redesign analysis & project list views ([#1821](https://github.com/PrivateAIM/hub/issues/1821)) ([c22e39e](https://github.com/PrivateAIM/hub/commit/c22e39ed392854aa7e70c8d0a62cbb844e974e63))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/server-kit bumped from ^0.13.2 to ^0.13.3
+    * @privateaim/telemetry-kit bumped from ^0.13.2 to ^0.13.3
+
 ## [0.13.2](https://github.com/PrivateAIM/hub/compare/v0.13.1...v0.13.2) (2026-08-05)
 
 

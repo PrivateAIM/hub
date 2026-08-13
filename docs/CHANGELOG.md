@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.13.3](https://github.com/PrivateAIM/hub/compare/v0.13.2...v0.13.3) (2026-08-13)
+
+
+### Features
+
+* **client-ui:** carry the session realm into the account console link ([669acc9](https://github.com/PrivateAIM/hub/commit/669acc93d81f52f6842fc5bb8d2697cdd9cbbe32))
+* **client-vue-theme:** adopt aim-blue as brand blue ([5beea6f](https://github.com/PrivateAIM/hub/commit/5beea6f412296ef18686e88cc6cba36600a21e8d))
+* project-anchored analyses, title-row add action and breadcrumbs ([#1825](https://github.com/PrivateAIM/hub/issues/1825)) ([61b71fa](https://github.com/PrivateAIM/hub/commit/61b71fa8a146d46aad624eb260e107e16fa176a8))
+
 ## [0.13.2](https://github.com/PrivateAIM/hub/compare/v0.13.1...v0.13.2) (2026-08-05)
 
 
