@@ -30,14 +30,14 @@
     },
     "devDependencies": {
         "@authup/core-kit": "^1.0.0-beta.59",
-        "@authup/kit": "^1.0.0-beta.59",
+        "@authup/kit": "^1.0.0-beta.61",
         "cross-env": "^10.1.0",
         "unplugin-swc": "^1.5.10",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
         "@authup/core-kit": "^1.0.0-beta.59",
-        "@authup/kit": "^1.0.0-beta.59"
+        "@authup/kit": "^1.0.0-beta.61"
     },
     "dependencies": {
         "nanoid": "^6.0.1",
