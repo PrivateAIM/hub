@@ -47,7 +47,7 @@
     },
     "homepage": "https://github.com/PrivateAim/hub#readme",
     "dependencies": {
-        "@authup/client-web-kit-theme": "^1.0.0-beta.59",
+        "@authup/client-web-kit-theme": "^1.0.0-beta.61",
         "@vuecs/design": "^1.2.0",
         "@vuecs/theme-tailwind": "^6.4.2"
     },
