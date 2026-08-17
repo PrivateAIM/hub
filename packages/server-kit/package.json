@@ -42,7 +42,7 @@
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
-        "@authup/access": "^1.0.0-beta.59",
+        "@authup/access": "^1.0.0-beta.61",
         "@authup/core-http-kit": "^1.0.0-beta.59",
         "@authup/core-kit": "^1.0.0-beta.59",
         "@rapiq/core": "^2.0.0-beta.19",
@@ -52,7 +52,7 @@
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
-        "@authup/access": "^1.0.0-beta.59",
+        "@authup/access": "^1.0.0-beta.61",
         "@authup/core-http-kit": "^1.0.0-beta.59",
         "@authup/core-kit": "^1.0.0-beta.59",
         "@rapiq/core": "^2.0.0-beta.19",
