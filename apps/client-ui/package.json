@@ -27,7 +27,7 @@
         "@authup/client-web-kit-theme": "^1.0.0-beta.59",
         "@authup/client-web-nuxt": "^1.0.0-beta.59",
         "@authup/core-http-kit": "^1.0.0-beta.59",
-        "@authup/core-kit": "^1.0.0-beta.59",
+        "@authup/core-kit": "^1.0.0-beta.61",
         "@authup/i18n": "^1.0.0-beta.59",
         "@authup/kit": "^1.0.0-beta.59",
         "@iconify-json/fa6-brands": "^1.2.6",

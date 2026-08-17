@@ -29,19 +29,19 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "dependencies": {
-        "@authup/core-kit": "^1.0.0-beta.59",
+        "@authup/core-kit": "^1.0.0-beta.61",
         "@privateaim/errors": "^0.8.42",
         "@validup/zod": "^1.0.0",
         "validup": "^1.0.0",
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.59",
+        "@authup/core-kit": "^1.0.0-beta.61",
         "@privateaim/kit": "^0.13.3",
         "@privateaim/telemetry-kit": "^0.13.3"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.59",
+        "@authup/core-kit": "^1.0.0-beta.61",
         "@privateaim/kit": "^0.13.3",
         "@privateaim/telemetry-kit": "^0.13.3"
     },

@@ -15,7 +15,7 @@
     "dependencies": {
         "@authup/access": "^1.0.0-beta.59",
         "@authup/core-http-kit": "^1.0.0-beta.59",
-        "@authup/core-kit": "^1.0.0-beta.59",
+        "@authup/core-kit": "^1.0.0-beta.61",
         "@authup/kit": "^1.0.0-beta.59",
         "@authup/server-adapter-web": "^1.0.0-beta.59",
         "@hapic/harbor": "^3.0.1",
