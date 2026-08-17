@@ -47,7 +47,7 @@
         "routup": "^6.1.0",
         "socket.io": "^4.8.3",
         "typeorm": "^1.1.0",
-        "typeorm-extension": "^4.0.0-beta.1",
+        "typeorm-extension": "^4.0.0",
         "validup": "^1.0.0",
         "zod": "^4.4.3"
     },

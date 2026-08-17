@@ -48,7 +48,7 @@
         "@rapiq/core": "^2.0.0-beta.19",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
-        "typeorm-extension": "^4.0.0-beta.1",
+        "typeorm-extension": "^4.0.0",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
@@ -58,7 +58,7 @@
         "@rapiq/core": "^2.0.0-beta.19",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
-        "typeorm-extension": "^4.0.0-beta.1"
+        "typeorm-extension": "^4.0.0"
     },
     "publishConfig": {
         "access": "public"
