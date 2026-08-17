@@ -32,7 +32,7 @@
         "@authup/core-kit": "^1.0.0-beta.59",
         "@authup/kit": "^1.0.0-beta.59",
         "cross-env": "^10.1.0",
-        "unplugin-swc": "^1.5.9",
+        "unplugin-swc": "^1.5.10",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
@@ -40,7 +40,7 @@
         "@authup/kit": "^1.0.0-beta.59"
     },
     "dependencies": {
-        "nanoid": "^6.0.0",
+        "nanoid": "^6.0.1",
         "pathtrace": "^2.2.3",
         "validup": "^1.0.0"
     },

@@ -39,9 +39,9 @@
         "eldin": "^1.3.0",
         "envix": "^1.5.0",
         "hapic": "^3.0.1",
-        "mysql2": "^3.23.2",
+        "mysql2": "^3.23.3",
         "orkos": "^1.1.1",
-        "pg": "^8.22.0",
+        "pg": "^8.23.0",
         "redis-extension": "^2.0.4",
         "reflect-metadata": "^0.2.2",
         "routup": "^6.1.0",
@@ -62,7 +62,7 @@
     "devDependencies": {
         "@privateaim/messenger-http-kit": "^0.13.3",
         "@privateaim/server-test-kit": "^0.13.3",
-        "better-sqlite3": "^13.0.2",
+        "better-sqlite3": "^13.0.3",
         "vitest": "^4.1.10"
     }
 }

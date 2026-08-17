@@ -33,7 +33,7 @@
         "@privateaim/server-kit": "^0.13.3",
         "@rapiq/core": "^2.0.0-beta.19",
         "hapic": "^3.0.1",
-        "testcontainers": "^12.0.4",
+        "testcontainers": "^12.1.0",
         "typeorm": "^1.1.0",
         "vitest": "^4.1.10"
     },
