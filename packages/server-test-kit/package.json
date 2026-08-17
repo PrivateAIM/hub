@@ -31,7 +31,7 @@
         "@privateaim/core-http-kit": "^0.13.3",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.13.3",
-        "@rapiq/core": "^2.0.0-beta.19",
+        "@rapiq/core": "^2.1.0",
         "hapic": "^3.0.1",
         "testcontainers": "^12.1.0",
         "typeorm": "^1.1.0",
@@ -43,7 +43,7 @@
         "@privateaim/core-http-kit": "^0.13.3",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.13.3",
-        "@rapiq/core": "^2.0.0-beta.19",
+        "@rapiq/core": "^2.1.0",
         "hapic": "^3.0.1",
         "typeorm": "^1.1.0"
     },

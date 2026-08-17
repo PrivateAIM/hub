@@ -34,8 +34,8 @@
         "@authup/core-kit": "^1.0.0-beta.59",
         "@authup/kit": "^1.0.0-beta.59",
         "@privateaim/kit": "^0.13.3",
-        "@rapiq/codec-url": "^2.0.0-beta.19",
-        "@rapiq/core": "^2.0.0-beta.19",
+        "@rapiq/codec-url": "^2.1.0",
+        "@rapiq/core": "^2.1.0",
         "hapic": "^3.0.1",
         "vitest": "^4.1.10"
     },
@@ -43,8 +43,8 @@
         "@authup/core-kit": "^1.0.0-beta.59",
         "@authup/kit": "^1.0.0-beta.59",
         "@privateaim/kit": "^0.13.3",
-        "@rapiq/codec-url": "^2.0.0-beta.19",
-        "@rapiq/core": "^2.0.0-beta.19",
+        "@rapiq/codec-url": "^2.1.0",
+        "@rapiq/core": "^2.1.0",
         "hapic": "^3.0.1"
     },
     "scripts": {
