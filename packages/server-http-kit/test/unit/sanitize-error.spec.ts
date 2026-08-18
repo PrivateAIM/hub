@@ -59,10 +59,14 @@ describe('core/error/sanitize', () => {
         expect(output.issues.map((issue) => issue.path)).toEqual([['publicKey'], ['secret']]);
     });
 
-    it('should serialize the parse trace into the wire payload', () => {
-        // `issues` reaches the client through the error middleware, which reads
-        // it straight off the sanitized error — so an issue-less error must not
-        // emit the key, and a traced one must.
+    it('should keep the parse trace across a JSON round trip', () => {
+        // `toJSON()`, NOT the wire payload: `mountErrorMiddleware` builds its own
+        // object and always emits `issues` (empty array included), while
+        // `BaseError.toJSON()` omits the key when the trace is empty. What this
+        // pins is that the trace survives serialization at all — an issue that
+        // did not would be dropped on any hop between services. The
+        // client-visible payload is pinned over real HTTP in server-core's
+        // `test/unit/http/query-decode-guard.spec.ts`.
         const traced = sanitizeError(ParseError.inputRejected([
             buildIssue({
                 code: ErrorCode.KEY_NOT_ALLOWED,
@@ -81,6 +85,8 @@ describe('core/error/sanitize', () => {
             path: ['publicKey'],
         });
 
+        // The empty-trace half of the same asymmetry: omitted by `toJSON()`,
+        // present as `[]` on the wire.
         expect(JSON.parse(JSON.stringify(sanitizeError(new Error('boom')))).issues)
             .toBeUndefined();
     });

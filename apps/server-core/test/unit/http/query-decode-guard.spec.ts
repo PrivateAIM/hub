@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { randomUUID } from 'node:crypto';
 import { buildQueryString } from '@privateaim/core-http-kit';
 import type { Node } from '@privateaim/core-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
@@ -101,6 +102,18 @@ describe('src/adapters/http (query decode guard)', () => {
     // run in rapiq's default drop mode and prune silently. Adopting
     // `throwOnFailure` across every parameter is what would make the trace
     // report a whole query at once.
+    // The other half of the payload contract: `issues` is ALWAYS on the wire, as
+    // an array, so a client can read it without a presence guard. It is not the
+    // same shape `HubError.toJSON()` produces — that one omits the key when the
+    // trace is empty — because the error middleware assembles its own payload.
+    // Only this path is client-visible, and only this test covers it.
+    it('emits an empty issue list on a failure that carries no trace', async () => {
+        const body = await requestErrorBody(`nodes/${randomUUID()}`);
+
+        expect(body.statusCode).toEqual(404);
+        expect(body.issues).toEqual([]);
+    });
+
     it('carries one issue per aggregate under the current decode configuration', async () => {
         const body = await requestErrorBody(strictQuery({ filters: { publicKey: 'x', type: 'y' } }));
 
