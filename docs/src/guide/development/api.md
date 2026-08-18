@@ -87,8 +87,12 @@ bespoke shapes stay flat.** These endpoints answer with their own shape and neve
 ## Query Capability Discovery
 
 Every query-capable `GET` describes its own queryable vocabulary under `meta.schema` — which
-`filter`, `fields`, `sort` and `include` keys the endpoint accepts, plus the pagination cap — so a
-consumer never has to read server source to build a valid query.
+`filter`, `fields`, `sort` and `include` **URL parameters** the endpoint accepts, plus the pagination
+cap — so a consumer never has to read server source to build a valid query.
+
+The description keys those parameters by their **canonical** names, which for two of them differ from
+the URL spelling: `filter` is described under `filters`, `include` under `relations`, and `sort`
+under `sorts`. `fields` and the pagination cap keep one name.
 
 Collection reads advertise the full vocabulary:
 

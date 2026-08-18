@@ -65,8 +65,10 @@ the analysis client credentials), all stream methods, the URL builders, and the 
 ### Query Capability Discovery
 
 Every query-capable `GET` describes its own queryable vocabulary under `meta.schema` — which
-`filter`, `fields`, `sort` and `include` keys the endpoint accepts, plus the pagination cap — so a
-consumer never has to inspect server source to build a query:
+`filter`, `fields`, `sort` and `include` **URL parameters** the endpoint accepts, plus the pagination
+cap — so a consumer never has to inspect server source to build a query. The description keys them by
+their **canonical** names, so `filter` is described under `filters`, `include` under `relations` and
+`sort` under `sorts`:
 
 ```typescript
 const { meta } = await client.node.getMany();
