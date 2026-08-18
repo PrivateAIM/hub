@@ -75,12 +75,14 @@ console.log(meta.schema);
 // {
 //     name: 'node',
 //     strict: true,
+//     indexes:    null,
 //     fields:     { default: ['id', 'name', /* ... */], allowed: ['id', 'name', /* ... */] },
-//     filters:    { allowed: ['id', 'name', 'online', 'hidden', 'clientId', 'realmId', 'robotId'] },
+//     filters:    { allowed: ['id', 'name', 'online', 'hidden', 'clientId', 'realmId', 'robotId'],
+//                   caseSensitive: null, indexed: false },
 //     pagination: { maxLimit: 50 },
 //     relations:  { allowed: ['registryProject', 'registry'],
 //                   schemas: { registryProject: 'registryProject', registry: 'registry' } },
-//     sort:       { allowed: ['name', 'updatedAt', 'createdAt'], default: null },
+//     sorts:      { allowed: ['name', 'updatedAt', 'createdAt'], default: null, indexed: false },
 // }
 ```
 
@@ -96,8 +98,11 @@ Reading rules:
 - relation vocabulary is **referenced, not expanded**: `relations.schemas` names the schema
   governing each relation — dotted keys like `filter[registry.name]` follow the `registry` entity's
   own description, found on its own endpoints.
+- the sort vocabulary is described under **`sorts`**; the URL parameter carrying it is still
+  `sort` (`?sort=-updatedAt`). `describe()` emits `sorts` only — rapiq 2.1 dropped the `sort`
+  alias from the description.
 - single-record `GET`s carry only the subset a record read processes (`fields` + `relations`); the
-  `filters`, `sort` and `pagination` keys are **absent**, not `null`.
+  `filters`, `sorts` and `pagination` keys are **absent**, not `null`.
 - mutations describe nothing — their `meta` is exactly `{}`.
 
 `GET /logs` on the [telemetry service](/reference/telemetry/) is the one query endpoint without

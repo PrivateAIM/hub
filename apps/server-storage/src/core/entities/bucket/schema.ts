@@ -14,6 +14,6 @@ export const bucketSchema = defineSchema<Bucket>({
     strict: true,
     fields: { default: ['id', 'name', 'region', 'createdAt', 'updatedAt', 'realmId', 'actorId', 'actorType'] },
     filters: { allowed: ['id', 'name', 'realmId', 'actorType', 'actorId'] },
-    sort: { allowed: ['id', 'updatedAt', 'createdAt'] },
+    sorts: { allowed: ['id', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
 });

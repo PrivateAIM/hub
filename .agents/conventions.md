@@ -152,18 +152,46 @@ declared `pinia@^4.0.2` and `@pinia/nuxt@^1.0.1` while actually installing
 `3.0.4` / `0.11.3`, and `--legacy-peer-deps` drops pinia outright and breaks
 the client-ui build.
 
-**There is exactly one override, and it earns its place:**
+**There are currently no overrides at all**, and the `overrides` key is absent
+from the root manifest. `typeorm`, `vue`, `validup`, `@vuecs/core` and finally
+`pinia` were each overridden historically and have all been removed as their
+requirers converged on compatible ranges; the resolved tree stayed unchanged
+each time, every one of them a single hoisted copy.
 
-| Override | Why |
-|---|---|
-| `pinia` | `@pinia/nuxt` 1.x peers `pinia@^4.0.2`; `@authup/client-web-kit` still peers `^3.0.0`. This is the only genuine conflict in the tree, and without the override `npm install` ERESOLVEs. It deliberately runs authup's store outside its declared peer range — `packages/client-vue/test/` covers that path (the harness installs `@authup/client-web-kit` first and its `usePermissionCheck` sites call `injectStore()`), so those specs are the regression net. Drop it once authup widens the peer. |
+`pinia` was the last to go, at authup `1.0.0-beta.62`: it existed because
+`@pinia/nuxt` 1.x peers `pinia@^4.0.2` while `@authup/client-web-kit` still
+peered `^3.0.0`, which made `npm install` ERESOLVE. beta.62 peers `^4.0.2`
+itself, so the conflict is gone and authup's store no longer runs outside its
+declared peer range. `packages/client-vue/test/` remains the regression net for
+that path (the harness installs `@authup/client-web-kit` first and its
+`usePermissionCheck` sites call `injectStore()`).
 
-`typeorm`, `vue`, `validup` and `@vuecs/core` were overridden historically and
-have been **removed** — every requirer now declares a compatible range on its
-own (`validup` in particular: all 26 declarations are `^1.0.0` since the
-ilingo/validup 1.x line landed, so the old `^0.4.0`-vs-`^0.5.x` split is gone).
-Removing all four left the resolved tree byte-identical, each still a single
-hoisted copy.
+`validup` in particular is now `^2.0.1` across all its declarations — a mixed
+range there is not cosmetic. `@validup/vue`'s `useValidup()` and validup's own
+`isValidupError()` duck-type against a specific module instance, so two
+side-by-side copies silently stop recognising each other's `Container`/`Issue`
+values.
+
+**Check for a split tree after any bump in this ecosystem**, even when every
+declared range agrees. The authup beta.62 bump initially left
+`@authup/client-web-kit`, `@validup/vue` and `@ilingo/validup-vue` installed as
+three nested copies each (under `apps/client-ui`, `packages/client-vue` and
+`node_modules/@authup/client-web-nuxt`) at *identical versions* — npm had
+simply declined to hoist them. `npm dedupe` collapsed all three back to one
+copy. Nothing warns about this, and `npm ls <pkg>` prints one line per
+requirer, so read the placement keys instead:
+
+```bash
+python3 -c "import json;d=json.load(open('package-lock.json'))['packages'];\
+print([k for k in d if k.endswith('node_modules/@validup/vue')])"
+```
+
+Never regenerate the lockfile with `npm install --package-lock-only` to answer
+such a question. It resolves optional dependencies for the **current platform
+only** and silently drops every other one — on macOS that removed all 82
+`@esbuild/*`, `@node-rs/*` and `@tailwindcss/oxide-*` entries for Linux and
+Windows, which would break `npm ci` on CI. A plain `npm install` preserves the
+entries it does not need to touch.
 
 Before adding an override, check whether one is actually needed — an override
 **rewrites the ranges npm records in the lockfile**, so reading the lockfile

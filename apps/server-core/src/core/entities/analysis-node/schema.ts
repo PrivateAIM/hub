@@ -36,7 +36,7 @@ export const analysisNodeSchema = defineSchema<AnalysisNode>({
     },
     filters: { allowed: ['executionStatus', 'approvalStatus', 'analysisId', 'analysisRealmId', 'nodeId', 'nodeRealmId'] },
     relations: { allowed: ['node', 'analysis'] },
-    sort: { allowed: ['createdAt', 'updatedAt'] },
+    sorts: { allowed: ['createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

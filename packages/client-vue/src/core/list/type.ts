@@ -36,7 +36,7 @@ export type ListMeta<T extends Record<string, any>> = ObjectLiteralKeys<{
     busy?: boolean,
     [Parameter.PAGINATION]?: PaginationBuildInput,
     [Parameter.FILTERS]?: FiltersBuildInput<T, 3>,
-    [Parameter.SORT]?: SortsBuildInput<T, 3>,
+    [Parameter.SORTS]?: SortsBuildInput<T, 3>,
     [Parameter.FIELDS]?: FieldsBuildInput<T, 3>,
     [Parameter.RELATIONS]?: RelationsBuildInput<T, 3>
 }>;

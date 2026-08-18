@@ -20,7 +20,7 @@ export default defineComponent({
             type: `${DomainType.NODE}`,
             props,
             setup,
-            query: { sort: { name: 'ASC' } },
+            query: { sorts: { name: 'ASC' } },
         });
 
         setDefaults({ noMore: { content: 'No more nodes available...' } });

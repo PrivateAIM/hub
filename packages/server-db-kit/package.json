@@ -28,13 +28,13 @@
     "devDependencies": {
         "cross-env": "^10.1.0",
         "typeorm": "^1.1.0",
-        "typeorm-extension": "^4.0.0-beta.1",
+        "typeorm-extension": "^4.1.0",
         "unplugin-swc": "^1.5.10",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
         "typeorm": "^1.1.0",
-        "typeorm-extension": "^4.0.0-beta.1"
+        "typeorm-extension": "^4.1.0"
     },
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",

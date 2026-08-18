@@ -13,6 +13,6 @@ export const eventSchema = defineSchema<Event>({
     name: DomainType.EVENT,
     strict: true,
     filters: { allowed: ['scope', 'name', 'refType', 'refId', 'realmId', 'createdAt', 'updatedAt'] },
-    sort: { allowed: ['expiresAt', 'createdAt', 'updatedAt'] },
+    sorts: { allowed: ['expiresAt', 'createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },
 });

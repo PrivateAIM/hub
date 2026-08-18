@@ -69,7 +69,7 @@ export default defineNuxtComponent({
                     null :
                     segment.value as ProjectNodeApprovalStatus,
             },
-            sort: { updatedAt: 'DESC' },
+            sorts: { updatedAt: 'DESC' },
         }));
 
         const listNode = ref<null | typeof FProjectNodes>(null);

@@ -31,7 +31,7 @@ export const analysisNodeEventSchema = defineSchema<AnalysisNodeEvent>({
     },
     filters: { allowed: ['analysisId', 'nodeId'] },
     relations: { allowed: ['analysis', 'node'] },
-    sort: { allowed: ['createdAt', 'updatedAt'] },
+    sorts: { allowed: ['createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

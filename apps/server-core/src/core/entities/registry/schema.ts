@@ -17,6 +17,6 @@ export const registrySchema = defineSchema<Registry>({
         allowed: ['id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt', 'accountSecret'],
     },
     filters: { allowed: ['id', 'name'] },
-    sort: { allowed: ['id', 'updatedAt', 'createdAt'] },
+    sorts: { allowed: ['id', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
 });

@@ -34,12 +34,12 @@
     },
     "devDependencies": {
         "@privateaim/messenger-kit": "^0.13.3",
-        "hapic": "^3.0.1",
+        "hapic": "^3.0.2",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
         "@privateaim/messenger-kit": "^0.13.3",
-        "hapic": "^3.0.1"
+        "hapic": "^3.0.2"
     },
     "publishConfig": {
         "access": "public"

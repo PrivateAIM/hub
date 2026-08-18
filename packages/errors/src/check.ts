@@ -5,33 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasInstanceof, isBaseError, isObject } from '@ebec/core';
+import { matchesInstanceof } from '@ebec/core';
 import type { HubError } from './module.ts';
 import { HUB_ERROR_INSTANCE } from './module.ts';
 
 /**
  * Duck-type guard for HubError.
  *
- * Fast path: input has the HubError marker in its `@instanceof` chain.
- * Subclass instances also accumulate this marker, so this guard matches
- * any HubError subclass.
+ * The `@instanceof` chain decides, and only the chain: it matches when the
+ * HubError marker is in it, as the native symbol (in-process) or its
+ * serialized string form (JSON-rehydrated). Subclass instances accumulate
+ * this marker, so any HubError subclass (`BadRequestError`,
+ * `EntityNotFoundError`, ...) matches too, while a foreign `@ebec/core`
+ * error (rapiq's `ParseError`, which since 2.2 also carries an `issues`
+ * array) does not: it announced its ancestry and HubError is not in it.
  *
- * Slow path: input is shape-compatible with HubError (BaseError + has
- * `issues: Issue[]`). Catches cases where the marker is missing — plain
- * objects rehydrated from JSON, older builds without the marker.
+ * Chain-less input never matches. A shape-based fallback for pre-chain
+ * JSON (`BaseError` + `issues: Issue[]`) used to cover that case, but
+ * `@ebec/core`'s `isBaseError` became chain-only, so that fallback could
+ * never fire — and now that every `BaseError` carries an `issues` array,
+ * the shape it checked for would no longer distinguish a HubError from any
+ * other ebec-derived error anyway.
  */
 export function isHubError(input: unknown): input is HubError {
-    if (hasInstanceof(input, HUB_ERROR_INSTANCE)) {
-        return true;
-    }
-
-    if (!isBaseError(input)) {
-        return false;
-    }
-
-    if (!isObject(input)) {
-        return false;
-    }
-
-    return Array.isArray(input.issues);
+    return matchesInstanceof(input, HUB_ERROR_INSTANCE);
 }

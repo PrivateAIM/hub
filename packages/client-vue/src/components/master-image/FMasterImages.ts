@@ -37,7 +37,7 @@ export default defineComponent({
                     delete filters.name;
                 }
             },
-            query: { sort: { virtualPath: 'ASC' } },
+            query: { sorts: { virtualPath: 'ASC' } },
         });
 
         setDefaults({

@@ -59,7 +59,7 @@ export default defineComponent({
                 analysis: true,
             },
             filters: { analysis: { projectId: props.entity.id } },
-            sort: { updatedAt: 'DESC' },
+            sorts: { updatedAt: 'DESC' },
         };
 
         const download = (item: AnalysisNode) => {

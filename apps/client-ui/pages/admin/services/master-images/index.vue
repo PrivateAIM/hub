@@ -142,7 +142,7 @@ export default {
                         filters: {
                             refType: 'masterImage'
                         },
-                        sort: {
+                        sorts: {
                             createdAt: 'DESC'
                         }
                     }"

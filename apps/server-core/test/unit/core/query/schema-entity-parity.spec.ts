@@ -49,7 +49,7 @@ import { DataSourceOptionsBuilder } from '../../../../src/app/modules/database/i
 
 /**
  * Plan 017 guard for the OTHER half of the rename: a rapiq schema is a set of
- * string allow-lists (`fields`, `filters`, `sort`, `relations`) that the compiler
+ * string allow-lists (`fields`, `filters`, `sorts`, `relations`) that the compiler
  * only checks against the domain TYPE, never against the entity metadata. A key
  * that resolves against neither does not error — a stale `filters.allowed` entry
  * surfaces as a runtime "key is not permitted", and a field missing from

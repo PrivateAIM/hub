@@ -140,7 +140,7 @@ export default defineComponent({
             try {
                 const { data } = await client.analysis.getMany({
                     filters: { projectId: props.entity.id },
-                    sort: { updatedAt: 'DESC' },
+                    sorts: { updatedAt: 'DESC' },
                     pagination: { limit: RECENT_ANALYSIS_LIMIT },
                 });
 

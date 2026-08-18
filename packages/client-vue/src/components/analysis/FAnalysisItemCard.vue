@@ -78,7 +78,7 @@ export default defineComponent({
                 nodes.value = await getManyAll((pagination) => client.analysisNode.getMany({
                     filters: { analysisId: props.entity.id },
                     relations: { node: true },
-                    sort: { createdAt: 'ASC' },
+                    sorts: { createdAt: 'ASC' },
                     pagination,
                 }));
             } catch {

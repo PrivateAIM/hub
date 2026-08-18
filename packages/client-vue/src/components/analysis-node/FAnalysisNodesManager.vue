@@ -66,7 +66,7 @@ export default defineComponent({
         const vNodes = useTemplateRef<typeof FAnalysisNodes>('analysisNodes');
         const vNodesQuery : QueryBuildInput<AnalysisNode, 3> = {
             filters: { analysisId: props.entity.id },
-            sort: 'node.name',
+            sorts: 'node.name',
         };
 
         const add = () => toggleModal();

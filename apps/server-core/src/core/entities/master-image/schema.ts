@@ -34,6 +34,6 @@ export const masterImageSchema = defineSchema<MasterImage>({
         ],
     },
     filters: { allowed: ['id', 'name', 'path', 'virtualPath', 'groupVirtualPath'] },
-    sort: { default: { path: 'ASC' } },
+    sorts: { default: { path: 'ASC' } },
     pagination: { maxLimit: 50 },
 });

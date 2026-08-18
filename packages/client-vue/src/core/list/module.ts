@@ -533,11 +533,21 @@ export function createListRaw<
                 return;
             }
 
-            const isSorted = query &&
-                query.sort &&
-                // query is build input here, so sort is always the build-input
+            // `sorts` is rapiq's canonical spelling since 2.1.0; `sort` is
+            // the deprecated alias it still accepts on QueryBuildInput. Read
+            // both — dropping the alias would silently stop prepending for a
+            // consumer that still spells it the old way. Matched on a DEFINED
+            // value, not key presence: the documented migration wrapper
+            // `{ sorts: props.sorts, sort: props.sort }` carries both keys
+            // with an undefined value.
+            const querySorts = query && (
+                typeof query.sorts !== 'undefined' ? query.sorts : query.sort
+            );
+
+            const isSorted = typeof querySorts !== 'undefined' &&
+                // query is build input here, so this is always the build-input
                 // form (not an already-assembled ISorts node).
-                isQuerySortedDescByDate(query.sort as SortsBuildInput<RECORD>) &&
+                isQuerySortedDescByDate(querySorts as SortsBuildInput<RECORD>) &&
                 meta.value?.pagination?.offset === 0;
 
             if (isSorted) {

@@ -32,7 +32,7 @@
         "typescript": "6.0.3",
         "typescript-eslint": "^8.67.0",
         "unplugin-swc": "^1.5.10",
-        "validup": "^1.0.0"
+        "validup": "^2.0.1"
     },
     "scripts": {
         "commit": "npx git-cz",
@@ -44,8 +44,5 @@
     },
     "lint-staged": {
         "*.{vue,js,ts}": "npm run lint:fix"
-    },
-    "overrides": {
-        "pinia": "^4.0.2"
     }
 }
