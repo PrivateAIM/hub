@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.14.0](https://github.com/PrivateAIM/hub/compare/v0.13.3...v0.14.0) (2026-08-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** the sort vocabulary published under `meta.schema` is renamed from `sort` to `sorts`, with no alias — rapiq's describe() emits only the plural key. The URL query parameter is unchanged (`?sort=-updatedAt` still works), and `sort` remains accepted as a deprecated build-input alias, so only consumers reading `meta.schema.sort` are affected. Schema descriptions additionally gain `indexes`, `filters.caseSensitive`, `filters.indexed` and `sorts.indexed`. For npm consumers, `ListMeta` in @privateaim/client-vue renames its `sort` key to `sorts`, and `HubError.issues` in @privateaim/errors is now `ReadonlyArray<Issue>` sourced from @ebec/core rather than a mutable `Issue[]` from validup — build the array before constructing the error and pass it through the constructor options.
+
+### Bug Fixes
+
+* **deps:** bump authup to beta.62, rapiq to 2.2 and the ebec/hapic/validup/ilingo stack ([#1843](https://github.com/PrivateAIM/hub/issues/1843)) ([8115fb0](https://github.com/PrivateAIM/hub/commit/8115fb00e148d42bd861c858e324d4b9f32028e6))
+* **deps:** bump the minorandpatch group across 1 directory with 13 updates ([#1829](https://github.com/PrivateAIM/hub/issues/1829)) ([32e641f](https://github.com/PrivateAIM/hub/commit/32e641f3a15d909c9a95676690464daba154b7da))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.13.3 to ^0.14.0
+    * @privateaim/core-realtime-kit bumped from ^0.10.21 to ^0.10.22
+    * @privateaim/kit bumped from ^0.13.3 to ^0.14.0
+    * @privateaim/server-core-worker-kit bumped from ^0.13.1 to ^0.13.2
+    * @privateaim/server-db-kit bumped from ^0.13.3 to ^0.14.0
+    * @privateaim/server-http-kit bumped from ^0.13.3 to ^0.14.0
+    * @privateaim/server-kit bumped from ^0.13.3 to ^0.14.0
+    * @privateaim/server-realtime-kit bumped from ^0.13.3 to ^0.14.0
+    * @privateaim/server-storage-kit bumped from ^0.13.1 to ^0.13.2
+    * @privateaim/server-telemetry bumped from ^0.13.3 to ^0.14.0
+    * @privateaim/server-telemetry-kit bumped from ^0.13.3 to ^0.13.4
+    * @privateaim/storage-kit bumped from ^0.13.3 to ^0.14.0
+    * @privateaim/telemetry-kit bumped from ^0.13.3 to ^0.14.0
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.13.3 to ^0.14.0
+    * @privateaim/server-test-kit bumped from ^0.13.3 to ^0.14.0
+
 ## [0.13.3](https://github.com/PrivateAIM/hub/compare/v0.13.2...v0.13.3) (2026-08-13)
 
 
