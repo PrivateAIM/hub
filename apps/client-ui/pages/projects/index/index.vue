@@ -54,7 +54,7 @@ export default defineNuxtComponent({
         const query = computed(() => ({
             filters: { realmId: realmId.value },
             relations: { masterImage: true },
-            sort: { updatedAt: 'DESC' },
+            sorts: { updatedAt: 'DESC' },
         }));
 
         return { query };

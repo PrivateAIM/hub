@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Issue } from '@ebec/core';
 import { isObject } from '@privateaim/kit';
 import type { HubError } from '@privateaim/errors';
 import { httpStatusFromCode } from '@privateaim/errors';
@@ -12,14 +13,13 @@ import type { Logger } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { App } from 'routup';
 import { defineErrorHandler } from 'routup';
-import type { Issue } from 'validup';
 import { sanitizeError } from '../core';
 
 type ErrorResponsePayload = {
     statusCode: number,
     code: string,
     message: string,
-    issues: Issue[],
+    issues: ReadonlyArray<Issue>,
     [key: string]: any
 };
 

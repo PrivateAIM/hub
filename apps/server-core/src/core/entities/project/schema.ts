@@ -20,7 +20,7 @@ export const projectSchema = defineSchema<Project>({
     },
     filters: { allowed: ['id', 'name', 'displayName', 'realmId', 'userId'] },
     relations: { allowed: ['masterImage'] },
-    sort: { allowed: ['id', 'name', 'displayName', 'updatedAt', 'createdAt'] },
+    sorts: { allowed: ['id', 'name', 'displayName', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

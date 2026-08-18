@@ -67,7 +67,7 @@ export default defineComponent({
             filters: {
                 projectId: projectId
             },
-            sort: 'node.name'
+            sorts: 'node.name'
         }"
     >
         <template #header="props">

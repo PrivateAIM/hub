@@ -39,7 +39,7 @@ Every single-record method (`getOne`, `create`, `update`, `delete`) resolves to 
 collections were already enveloped.
 
 Query-capable `GET`s advertise the endpoint's queryable vocabulary under `meta.schema`
-(`fields`/`filters`/`sort`/`relations`/`pagination` on collections, the `fields` + `relations`
+(`fields`/`filters`/`sorts`/`relations`/`pagination` on collections, the `fields` + `relations`
 subset on record reads); mutations carry `meta: {}`. The reading rules are documented once, in
 [`@privateaim/core-http-kit`](/reference/core/core-http-kit#query-capability-discovery).
 

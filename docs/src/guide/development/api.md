@@ -87,8 +87,12 @@ bespoke shapes stay flat.** These endpoints answer with their own shape and neve
 ## Query Capability Discovery
 
 Every query-capable `GET` describes its own queryable vocabulary under `meta.schema` — which
-`filter`, `fields`, `sort` and `include` keys the endpoint accepts, plus the pagination cap — so a
-consumer never has to read server source to build a valid query.
+`filter`, `fields`, `sort` and `include` **URL parameters** the endpoint accepts, plus the pagination
+cap — so a consumer never has to read server source to build a valid query.
+
+The description keys those parameters by their **canonical** names, which for two of them differ from
+the URL spelling: `filter` is described under `filters`, `include` under `relations`, and `sort`
+under `sorts`. `fields` and the pagination cap keep one name.
 
 Collection reads advertise the full vocabulary:
 
@@ -97,28 +101,34 @@ Collection reads advertise the full vocabulary:
 {
     "name": "node",
     "strict": true,
+    "indexes": null,
     "fields": {
         "default": ["id", "name", "clientId", "externalName", "hidden", "type", "online", "publicKey", "robotId", "realmId", "registryId", "registryProjectId", "createdAt", "updatedAt"],
         "allowed": ["id", "name", "clientId", "externalName", "hidden", "type", "online", "publicKey", "robotId", "realmId", "registryId", "registryProjectId", "createdAt", "updatedAt"]
     },
-    "filters": { "allowed": ["id", "name", "online", "hidden", "clientId", "realmId", "robotId"] },
+    "filters": {
+        "allowed": ["id", "name", "online", "hidden", "clientId", "realmId", "robotId"],
+        "caseSensitive": null,
+        "indexed": false
+    },
     "pagination": { "maxLimit": 50 },
     "relations": {
         "allowed": ["registryProject", "registry"],
         "schemas": { "registryProject": "registryProject", "registry": "registry" }
     },
-    "sort": { "allowed": ["name", "updatedAt", "createdAt"], "default": null }
+    "sorts": { "allowed": ["name", "updatedAt", "createdAt"], "default": null, "indexed": false }
 }
 ```
 
 Single-record reads advertise only the subset a record read processes — `fields` and `relations`.
-The `filters`, `sort` and `pagination` keys are **absent** (not `null`):
+The `filters`, `sorts` and `pagination` keys are **absent** (not `null`):
 
 ```jsonc
 // GET /nodes/1f9c0b7a-...  ->  meta.schema
 {
     "name": "node",
     "strict": true,
+    "indexes": null,
     "fields": { "default": ["id", "name", /* ... */], "allowed": ["id", "name", /* ... */] },
     "relations": {
         "allowed": ["registryProject", "registry"],
@@ -141,9 +151,16 @@ Mutations (`POST`, `DELETE`) describe nothing — their `meta` is exactly `{}`.
 - Relation vocabulary is **referenced, not expanded**. `relations.schemas` names the schema
   governing each relation instead of inlining it, so dotted keys such as `filter[registry.name]`
   are discovered from the `registry` entity's own endpoints.
-- `sort.allowed` is **derived from `sort.default`** when no explicit allow-list is declared
-  (e.g. master images declare `sort: { default: { path: 'ASC' } }` and describe as
-  `{ allowed: ["path"], default: { path: "ASC" } }`).
+- The sort vocabulary is described under **`sorts`**, while the URL parameter that carries it
+  stays **`sort`** (`?sort=-updatedAt`). rapiq 2.1 made `sorts` the canonical spelling on every
+  developer-authored surface and `describe()` emits only that key — there is no `sort` alias in the
+  description.
+- `sorts.allowed` is **derived from `sorts.default`** when no explicit allow-list is declared
+  (e.g. master images declare `sorts: { default: { path: 'ASC' } }` and describe as
+  `{ allowed: ["path"], default: { path: "ASC" }, indexed: false }`).
+- `indexes`, `filters.indexed` and `sorts.indexed` come from rapiq 2.1's schema index
+  declarations. No hub schema declares `indexes` yet, so these read `null` / `false`
+  throughout — an index-backed query surface is not enforced today.
 
 ### Endpoints without capability discovery
 
@@ -152,6 +169,50 @@ Mutations (`POST`, `DELETE`) describe nothing — their `meta` is exactly `{}`.
 | `GET /logs` (telemetry) | Decoded as an open query — its filters are dynamic VictoriaLogs labels rather than a declared vocabulary, so there is nothing to describe. This is the one query endpoint without `meta.schema`. |
 | `GET /analyses/:id/client/permissions` | Proxies Authup `ClientPermission` records; no Hub-side schema exists. |
 | `POST /buckets/:id/upload` | A write that answers with a collection; it advertises `total` only. |
+
+## Error Responses
+
+Every failure answers with the same flat object — never the `{ data, meta }` envelope:
+
+```jsonc
+{
+    "statusCode": 400,
+    "code": "bad_request",
+    "message": "The input was rejected: 1 violation.",
+    "issues": [
+        {
+            "type": "item",
+            "code": "keyNotAllowed",
+            "path": ["publicKey"],
+            "message": "The key publicKey is not permitted.",
+            "meta": { "parameter": "filters", "key": "publicKey" }
+        }
+    ]
+}
+```
+
+- `code` is the semantic error code; `statusCode` is what it maps to. Branch on `code`, not on the
+  message.
+- `issues` is **always present**, as an array — empty when the failure carries no structured detail.
+
+### Reading `issues`
+
+`issues` is a tree of plain-data nodes (`type: "item"` leaves, `type: "group"` nodes with their own
+`issues`). It comes from two sources:
+
+- **Payload validation** — one issue per rejected attribute, `path` naming it.
+- **Query decoding** — one issue per rejected query key. **This is the only place the offending key
+  appears.** A query parse collects its violations and raises a single aggregate error whose
+  `message` is just a count, so a client that reads `message` alone cannot tell what to fix.
+
+Read `code` (machine-readable) and `path` (canonical, alias-resolved position) — `message` is
+human-facing text, not a contract. On a query-decode issue, `meta.parameter` names the parameter in
+its **canonical** spelling (`filters`, `relations`, `sorts`), which for two of them differs from the
+URL parameter the client sent (`filter`, `include`); `meta.key` echoes the raw client key.
+
+Today a rejected query yields **one** issue, not one per bad key: the strict expression dialect
+throws on the first disallowed filter key and ends the parse, while the remaining parameters prune
+silently. That is Hub's decode configuration, not a protocol limit.
 
 ## Core Entities
 

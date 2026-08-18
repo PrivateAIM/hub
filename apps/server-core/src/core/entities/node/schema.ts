@@ -23,7 +23,7 @@ export const nodeSchema = defineSchema<Node>({
     },
     filters: { allowed: ['id', 'name', 'online', 'hidden', 'clientId', 'realmId', 'robotId'] },
     relations: { allowed: ['registryProject', 'registry'] },
-    sort: { allowed: ['name', 'updatedAt', 'createdAt'] },
+    sorts: { allowed: ['name', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

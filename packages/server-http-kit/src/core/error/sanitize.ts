@@ -26,10 +26,11 @@ import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'v
  *
  * 1. HubError instance                 → returned as-is
  * 2. EntityRelationLookupError         → EntityRelationInvalidError
- * 3. validup Issue error               → BadRequestError carrying issues
- * 4. rapiq decode error                → BadRequestError (ParseError covers the
- *    per-parameter subclasses, CodecError an unresolvable codec stamp — both are
- *    triggered by wire input; Adapter/Build/Merge/Schema errors stay internal)
+ * 3. rapiq decode error                → BadRequestError carrying its parse trace
+ *    (ParseError covers the per-parameter subclasses, CodecError an unresolvable
+ *    codec stamp — both are triggered by wire input; Adapter/Build/Merge/Schema
+ *    errors stay internal)
+ * 4. validup Issue error               → BadRequestError carrying issues
  * 5. foreign @ebec/http HTTPError      → HubError with the closest semantic code
  * 6. driver error w/ a recognised code → EntityConflictError or StorageInsufficientError
  * 7. anything else                     → InternalError
@@ -49,21 +50,41 @@ export function sanitizeError(input: unknown): HubError {
         });
     }
 
-    if (isValidupError(input)) {
-        const paths = input.issues.map((issue) => stringifyPath(issue.path));
-        const error = new BadRequestError({
-            stack: input.stack,
-            message: input.message || buildErrorMessageForAttributes(paths),
-        });
-
-        error.issues.push(...input.issues);
-        return error;
-    }
-
+    // BEFORE the validup branch, and that order is load-bearing. `isValidupError`
+    // falls back to a SHAPE check — any `Error` carrying a non-empty, well-formed
+    // `issues` array matches — and since @ebec/core 1.3.2 every `BaseError` has an
+    // `issues` array, a rapiq `ParseError` that collected a trace now satisfies it.
+    // Classified there, a decode failure would be reported as a validation failure
+    // and its message rebuilt from validup's attribute-path helper. Same trap as the
+    // one `isHubError` had to be narrowed for; validup's guard is upstream, so the
+    // fix here is to claim rapiq's errors first.
     if (input instanceof ParseError || input instanceof CodecError) {
+        // The trace is the whole diagnostic. Since @rapiq/core 2.2 a parse records
+        // every violation instead of stopping at the first and raises ONE aggregate
+        // whose message is only a count — `The input was rejected: 2 violations.` —
+        // so without `issues` a 400 no longer tells the client which key was
+        // rejected or why. Each issue carries the machine-readable `code`, the
+        // canonical `path`, the raw client `key` and the offending value.
+        //
+        // Passed through unmapped: @ebec/core 1.3.2 vendored blemish's issue model,
+        // which is the one rapiq emits, so a rapiq issue IS the `Issue` that
+        // `HubError` and the validup branch already carry. Note `meta.parameter` is
+        // the CANONICAL parameter name (`filters`, `relations`), not the URL
+        // spelling the client sent (`filter`, `include`) — `path` and `key` are
+        // what identify the offending input.
         return new BadRequestError({
             message: input.message,
             stack: input.stack,
+            issues: input.issues,
+        });
+    }
+
+    if (isValidupError(input)) {
+        const paths = input.issues.map((issue) => stringifyPath(issue.path));
+        return new BadRequestError({
+            stack: input.stack,
+            message: input.message || buildErrorMessageForAttributes(paths),
+            issues: input.issues,
         });
     }
 

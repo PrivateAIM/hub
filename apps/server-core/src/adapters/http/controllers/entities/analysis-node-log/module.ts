@@ -28,7 +28,8 @@ import type { IAppEvent } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ForceLoggedInMiddleware, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { describeQuerySchema } from '@privateaim/server-kit';
-import { ValidupError, buildErrorMessageForAttribute, defineIssueItem } from 'validup';
+import { ValidupError, buildErrorMessageForAttribute } from 'validup';
+import { defineIssueItem } from '@ebec/core';
 import {
     AnalysisEntity,
     NodeEntity,

@@ -68,7 +68,7 @@ export default defineNuxtComponent({
             },
         ];
 
-        const query : QueryBuildInput<Registry> = { sort: { updatedAt: 'DESC' } };
+        const query : QueryBuildInput<Registry> = { sorts: { updatedAt: 'DESC' } };
 
         const canManage = usePermissionCheck({ name: PermissionName.REGISTRY_MANAGE });
 

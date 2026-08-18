@@ -20,7 +20,7 @@ export const analysisBucketSchema = defineSchema<AnalysisBucket>({
     },
     filters: { allowed: ['analysisId', 'type'] },
     relations: { allowed: ['analysis'] },
-    sort: { allowed: ['type', 'createdAt', 'updatedAt'] },
+    sorts: { allowed: ['type', 'createdAt', 'updatedAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

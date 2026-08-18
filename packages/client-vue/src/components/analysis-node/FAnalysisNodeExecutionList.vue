@@ -34,7 +34,7 @@ export default defineComponent({
     setup(props) {
         const query : QueryBuildInput<AnalysisNode, 3> = {
             filters: { analysisId: props.entity.id },
-            sort: 'node.name',
+            sorts: 'node.name',
         };
 
         return {

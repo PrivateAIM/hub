@@ -46,7 +46,7 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
         expect(meta.schema.strict).toBe(true);
         expect(meta.schema.fields.allowed).toContain('name');
         expect(meta.schema.filters.allowed).toContain('name');
-        expect(meta.schema.sort.allowed).toContain('name');
+        expect(meta.schema.sorts.allowed).toContain('name');
         expect(meta.schema.pagination.maxLimit).toEqual(50);
         // deep-equal pins the referenced-not-expanded relation contract
         expect(meta.schema.relations).toEqual({
@@ -65,10 +65,10 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
         expect(meta.schema.strict).toBe(true);
         expect(meta.schema.fields).toBeDefined();
         expect(meta.schema.relations).toBeDefined();
-        // a record read processes neither filters, nor sort, nor pagination —
+        // a record read processes neither filters, nor sorts, nor pagination —
         // the keys are ABSENT from the description, not normalized to null
         expect(meta.schema.filters).toBeUndefined();
-        expect(meta.schema.sort).toBeUndefined();
+        expect(meta.schema.sorts).toBeUndefined();
         expect(meta.schema.pagination).toBeUndefined();
 
         await suite.client.node.delete(entity.id);
@@ -94,7 +94,7 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
         expect(meta.schema.relations).toEqual({ allowed: null, schemas: null });
     });
 
-    it('should report an undeclared field allow-list as null and derive sort from its default', async () => {
+    it('should report an undeclared field allow-list as null and derive sorts from its default', async () => {
         const { meta } = await suite.client.masterImage.getMany();
 
         // masterImageSchema declares `fields.default` only: `null` means the
@@ -103,8 +103,15 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
         expect(meta.schema.fields.allowed).toBeNull();
         expect(meta.schema.fields.default).toContain('path');
 
-        // sort derives its allow-list from the declared default
-        expect(meta.schema.sort).toEqual({ allowed: ['path'], default: { path: 'ASC' } });
+        // sorts derives its allow-list from the declared default. `indexed`
+        // is rapiq 2.1's schema-index declaration, normalized onto every
+        // sorts/filters description — false because no hub schema declares
+        // `indexes` yet.
+        expect(meta.schema.sorts).toEqual({
+            allowed: ['path'],
+            default: { path: 'ASC' },
+            indexed: false,
+        });
     });
 
     /**

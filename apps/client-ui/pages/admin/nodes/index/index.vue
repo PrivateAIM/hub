@@ -78,7 +78,7 @@ export default defineNuxtComponent({
 
         const query = computed<QueryBuildInput<Node, 3>>(() => ({
             filters: { realmId: realmManagementId.value },
-            sort: { updatedAt: 'DESC' },
+            sorts: { updatedAt: 'DESC' },
         }));
 
         const handleDeleted = async (item: Node) => {

@@ -17,7 +17,7 @@ export const bucketFileSchema = defineSchema<BucketFile>({
     fields: { default: ['id', 'name', 'path', 'directory', 'size', 'hash', 'createdAt', 'updatedAt', 'realmId', 'actorType', 'actorId', 'bucketId'] },
     filters: { allowed: ['id', 'name', 'directory', 'realmId', 'actorType', 'actorId', 'bucketId'] },
     relations: { allowed: ['bucket'] },
-    sort: { allowed: ['id', 'directory', 'name', 'updatedAt', 'createdAt'] },
+    sorts: { allowed: ['id', 'directory', 'name', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

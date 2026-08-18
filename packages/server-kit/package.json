@@ -29,36 +29,33 @@
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "dependencies": {
-        "@hapic/oauth2": "^4.0.1",
+        "@authup/core-http-kit": "^1.0.0-beta.62",
+        "@authup/core-kit": "^1.0.0-beta.62",
+        "@hapic/oauth2": "^4.0.2",
         "@isaacs/ttlcache": "^2.1.5",
         "@privateaim/kit": "^0.13.3",
+        "@rapiq/core": "^2.2.0",
         "@socket.io/redis-emitter": "^5.1.0",
         "eldin": "^1.3.0",
         "envix": "^1.5.0",
-        "hapic": "^3.0.1",
+        "hapic": "^3.0.2",
         "orkos": "^1.1.1",
         "triple-beam": "^1.4.1",
         "winston": "^3.19.0",
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
-        "@authup/access": "^1.0.0-beta.59",
-        "@authup/core-http-kit": "^1.0.0-beta.59",
-        "@authup/core-kit": "^1.0.0-beta.59",
-        "@rapiq/core": "^2.0.0-beta.19",
+        "@authup/access": "^1.0.0-beta.62",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
-        "typeorm-extension": "^4.0.0-beta.1",
+        "typeorm-extension": "^4.1.0",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
-        "@authup/access": "^1.0.0-beta.59",
-        "@authup/core-http-kit": "^1.0.0-beta.59",
-        "@authup/core-kit": "^1.0.0-beta.59",
-        "@rapiq/core": "^2.0.0-beta.19",
+        "@authup/access": "^1.0.0-beta.62",
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
-        "typeorm-extension": "^4.0.0-beta.1"
+        "typeorm-extension": "^4.1.0"
     },
     "publishConfig": {
         "access": "public"

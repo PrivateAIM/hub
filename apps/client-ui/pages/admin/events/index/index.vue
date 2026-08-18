@@ -104,7 +104,7 @@ export default defineComponent({
 
         const query = computed<QueryBuildInput<Event, 3>>(() => ({
             filters: { realmId: [realmManagementId.value, null] },
-            sort: { updatedAt: 'DESC' },
+            sorts: { updatedAt: 'DESC' },
             pagination: { limit: 50 },
         }));
 

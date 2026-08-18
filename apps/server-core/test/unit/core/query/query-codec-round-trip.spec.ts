@@ -8,7 +8,7 @@
 import { buildQueryString } from '@privateaim/core-http-kit';
 import {
     FilterCompoundOperator,
-    FiltersParseError,
+    ParseError,
     eq,
     isFilter,
     or,
@@ -49,7 +49,7 @@ describe('core/query codec round trip', () => {
         const query = roundTrip({
             filters: { name: 'x' },
             fields: ['id', 'name'],
-            sort: { createdAt: 'DESC' },
+            sorts: { createdAt: 'DESC' },
             pagination: { limit: 5 },
         });
 
@@ -81,8 +81,45 @@ describe('core/query codec round trip', () => {
         // the v2 expression dialect (what buildQueryString emits) resolves
         // paths strictly and rejects the key with a typed ParseError (wire:
         // 400 via sanitizeError) ...
+        //
+        // Since @rapiq/core 2.2 a parse no longer stops at the first
+        // violation: it records every one and raises a single aggregate
+        // ParseError (code `inputRejected`) carrying the whole trace on
+        // `issues`. The per-parameter subclass (FiltersParseError) is what
+        // the trace names, not what is thrown, so assert on the base class
+        // plus the issue — asserting the subclass would pass vacuously
+        // against any ParseError once rapiq changes the aggregation again.
         expect(() => roundTrip({ filters: { publicKey: 'x' } }))
-            .toThrowError(FiltersParseError);
+            .toThrowError(ParseError);
+
+        let raised: unknown;
+        try {
+            roundTrip({ filters: { publicKey: 'x' } });
+        } catch (e) {
+            raised = e;
+        }
+
+        expect(raised).toBeInstanceOf(ParseError);
+        expect((raised as ParseError).issues).toEqual([
+            expect.objectContaining({
+                code: 'keyNotAllowed',
+                path: ['publicKey'],
+                meta: expect.objectContaining({ parameter: 'filters', key: 'publicKey' }),
+            }),
+        ]);
+    });
+
+    it('accepts the deprecated sort build-input key alongside the canonical sorts', () => {
+        // rapiq 2.1 made `sorts` canonical and kept `sort` as a deprecated
+        // alias, removed in 3.0. hub's own callers were migrated, but
+        // client-vue and the HTTP kits are published, so a consumer still
+        // spelling it `sort` must keep working — and the URL parameter it
+        // encodes to is `sort` either way.
+        const encoded = buildQueryString<Node>({ sort: { createdAt: 'DESC' } });
+        expect(encoded).toContain('sort=');
+
+        const query = decodeQuery(encoded.slice(1), { schema: nodeSchema });
+        expect(query.sorts.value).toEqual([{ name: 'createdAt', operator: 'DESC' }]);
     });
 
     it('prunes a filter key outside the allow-list in the legacy bracket dialect', () => {

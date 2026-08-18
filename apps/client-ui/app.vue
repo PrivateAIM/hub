@@ -14,7 +14,18 @@ export default defineNuxtComponent({
             charset: 'utf-8',
             titleTemplate: 'PrivateAim - HUB',
             meta: [],
-            link: [],
+            link: [
+                /*
+                 * The flame mark. Browsers that support SVG icons take this one
+                 * (crisp at every size); the rest fall back to the /favicon.ico
+                 * link Nuxt injects by default.
+                 */
+                {
+                    rel: 'icon',
+                    type: 'image/svg+xml',
+                    href: '/favicon.svg',
+                },
+            ],
         });
     },
 });

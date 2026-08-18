@@ -26,24 +26,24 @@
         "url": "https://github.com/tada5hi"
     },
     "dependencies": {
-        "@validup/zod": "^1.0.0",
-        "validup": "^1.0.0",
+        "@validup/zod": "^2.0.1",
+        "validup": "^2.0.1",
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.59",
+        "@authup/core-kit": "^1.0.0-beta.62",
         "@privateaim/kit": "^0.13.3",
-        "@rapiq/codec-url": "^2.0.0-beta.19",
-        "@rapiq/core": "^2.0.0-beta.19",
-        "hapic": "^3.0.1",
+        "@rapiq/codec-url": "^2.2.0",
+        "@rapiq/core": "^2.2.0",
+        "hapic": "^3.0.2",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.59",
+        "@authup/core-kit": "^1.0.0-beta.62",
         "@privateaim/kit": "^0.13.3",
-        "@rapiq/codec-url": "^2.0.0-beta.19",
-        "@rapiq/core": "^2.0.0-beta.19",
-        "hapic": "^3.0.1"
+        "@rapiq/codec-url": "^2.2.0",
+        "@rapiq/core": "^2.2.0",
+        "hapic": "^3.0.2"
     },
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",

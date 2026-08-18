@@ -20,7 +20,7 @@ export const registryProjectSchema = defineSchema<RegistryProject>({
     },
     filters: { allowed: ['id', 'name', 'registryId', 'externalName', 'type'] },
     relations: { allowed: ['registry'] },
-    sort: { allowed: ['id', 'updatedAt', 'createdAt'] },
+    sorts: { allowed: ['id', 'updatedAt', 'createdAt'] },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

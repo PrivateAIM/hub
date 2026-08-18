@@ -10,7 +10,7 @@ import type { Schema, SchemaDescription } from '@rapiq/core';
 
 /**
  * The parameter subset advertised on single-record reads: a record
- * response never advertises filter/sort/pagination vocabulary (no
+ * response never advertises filters/sorts/pagination vocabulary (no
  * single read processes those). NOTE: today only the node / project /
  * registry / registry-project / bucket / bucket-file single reads
  * actually decode `fields`/`relations`

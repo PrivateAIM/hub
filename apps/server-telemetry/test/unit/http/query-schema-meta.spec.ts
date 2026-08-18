@@ -55,7 +55,7 @@ describe('src/adapters/http/controllers (query schema meta)', () => {
         // every hub schema opts into strict key validation
         expect(meta.schema.strict).toBe(true);
         expect(meta.schema.filters.allowed).toContain('name');
-        expect(meta.schema.sort.allowed).toContain('createdAt');
+        expect(meta.schema.sorts.allowed).toContain('createdAt');
         expect(meta.schema.pagination.maxLimit).toEqual(50);
         // eventSchema omits `relations` entirely, so the normalized shape
         // reports nulls — the key itself is still present.
@@ -85,10 +85,10 @@ describe('src/adapters/http/controllers (query schema meta)', () => {
         expect(meta.schema.strict).toBe(true);
         expect(meta.schema.fields).toBeDefined();
         expect(meta.schema.relations).toBeDefined();
-        // a record read processes neither filters, nor sort, nor pagination —
+        // a record read processes neither filters, nor sorts, nor pagination —
         // the keys are ABSENT from the description, not normalized to null
         expect(meta.schema.filters).toBeUndefined();
-        expect(meta.schema.sort).toBeUndefined();
+        expect(meta.schema.sorts).toBeUndefined();
         expect(meta.schema.pagination).toBeUndefined();
 
         await client.event.delete(entity.id);

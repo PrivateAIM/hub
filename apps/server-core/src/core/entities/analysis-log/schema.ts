@@ -13,6 +13,6 @@ export const analysisLogSchema = defineSchema<AnalysisLog>({
     name: DomainType.ANALYSIS_LOG,
     strict: true,
     filters: { allowed: ['level', 'analysisId'] },
-    sort: { allowed: ['time'] },
+    sorts: { allowed: ['time'] },
     pagination: { maxLimit: 50 },
 });
