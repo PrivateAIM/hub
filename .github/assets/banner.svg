@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-label="FLAME Hub — federated analytics, the data never moves">
+  <defs>
+    <radialGradient id="ember" cx="16%" cy="52%" r="42%">
+      <stop offset="0%" stop-color="#F04A13" stop-opacity=".30"/>
+      <stop offset="55%" stop-color="#F04A13" stop-opacity=".07"/>
+      <stop offset="100%" stop-color="#F04A13" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F04A13"/>
+      <stop offset="55%" stop-color="#F7931A"/>
+      <stop offset="100%" stop-color="#F7931A" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="300" fill="#14100E"/>
+  <rect width="1200" height="300" fill="url(#ember)"/>
+
+  <g transform="translate(96 68) scale(0.39)">
+    <path fill="#f04a13" d="M155 10C140 75 85 125 53 185C19.4 248 58 411 155 411C252 411 290.6 248 257 185C225 125 170 75 155 10Z"/>
+    <path fill="#f15a29" d="M155 10C145 75 105 128 80 185C55 242 68 340 155 411C100 345 88 262 108 198C128 134 150 75 155 10Z"/>
+    <path fill="#f7931a" d="M155 140C180 200 220 245 220 305C220 360 198 405 155 405C112 405 90 360 90 305C90 245 130 200 155 140Z"/>
+    <path fill="#f7ede9" d="M155 235C172 275 192 300 192 340C192 378 175 400 155 400C135 400 118 378 118 340C118 300 138 275 155 235Z"/>
+  </g>
+
+  <text x="266" y="150" fill="#FBF4F1"
+        font-family="'Helvetica Neue',Helvetica,Arial,'Liberation Sans',sans-serif"
+        font-size="72" font-weight="700" letter-spacing="11">FLAME HUB</text>
+
+  <rect x="270" y="180" width="132" height="3" rx="1.5" fill="url(#rule)"/>
+
+  <text x="268" y="223" fill="#B49E97"
+        font-family="'Helvetica Neue',Helvetica,Arial,'Liberation Sans',sans-serif"
+        font-size="27" font-weight="400" letter-spacing="1.2">Federated analytics across institutions.</text>
+  <text x="268" y="258" fill="#7E6C66"
+        font-family="'Helvetica Neue',Helvetica,Arial,'Liberation Sans',sans-serif"
+        font-size="27" font-weight="400" letter-spacing="1.2">The data never moves.</text>
+</svg>
