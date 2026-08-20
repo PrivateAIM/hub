@@ -284,7 +284,29 @@ Manages log aggregation via VictoriaLogs and event tracking via TypeORM.
 
 **Service-specific modules:**
 - `VictoriaLogsModule` — registers VictoriaLogs client + `LogStore` in container
-- `ComponentsModule` — starts EventComponent + LogComponent via `QueueWorkerComponentCaller`
+- `ComponentsModule` — resolves `EventRepository` from the container and starts
+  EventComponent + LogComponent via `QueueWorkerComponentCaller`
+
+**Event retention sweep:** `EventComponentCleanerHandler` (once at start, then daily
+at 01:00) drops every `expiring` row whose `expiresAt` has passed — the entity-event
+subscriber stamps a one-week window (`WEEK_IN_MS`). The handler owns only the
+schedule: the sweep itself is `IEventRepository.deleteExpired(now, { batchSize })`,
+so nothing in `app/components/` reaches for a `DataSource`.
+
+The delete is **batched** (`EVENT_RETENTION_SWEEP_BATCH_SIZE`, 1000). Steady state
+removes a trickle, but the first sweep after a retention change — or the day a full
+window first matures — can match millions of rows, and the cleaner runs on every
+replica. Batching selects ids then deletes by id, because `DELETE ... LIMIT` is
+MySQL-only; the loop drains, and a batch that removes nothing means another
+replica's sweep owns those rows, so it stops and the next tick takes the remainder.
+A `batchSize` that is not a positive safe integer falls back to the default —
+typeorm ignores a falsy `take`, which would silently restore the unbounded select.
+
+Selecting **ids only** matters twice over: the row carries a `text` `data` blob
+behind a deserialize transformer, and a delete-by-id does not fire
+`BaseSubscriber.beforeRemove`, so the sweep no longer publishes one `DELETED`
+domain event per expired row. Nothing in hub subscribes to the telemetry `EVENT`
+channel, so that traffic was pure Redis noise.
 
 **Special concern:** The telemetry service IS the log writer, so its own logger cannot use `useLogComponentCaller()` (circular). The `LogComponentWriteHandler` accepts an optional `LogStore` param with `MemoryLogStore` fallback.
 
@@ -343,7 +365,12 @@ decommission (plan 013 phase 5).
 - `WakeupModule` — redis pub/sub when redis is present (cross-instance), else an
   in-process fallback; emits the payload-free `messagePending` into the recipient's
   local socket room
-- `SweeperModule` — 60s timer deleting messages past their absolute `expiresAt`
+- `SweeperModule` — 60s timer deleting messages past their absolute `expiresAt`,
+  via the same batched `deleteExpired(now, { batchSize })` shape as the telemetry
+  event sweep (`MESSAGE_SWEEP_BATCH_SIZE`, 1000). The id select uses `Raw`, not
+  `LessThan`: `expires_at` is a datetime column behind a `string`-typed property,
+  and `now` must stay a bound `Date` — an ISO string satisfies the property type
+  but MySQL truncates the trailing `Z` when casting it
 - `HTTPModule` — HTTP server + Socket.io server with Authup auth middleware
 
 ## Configuration

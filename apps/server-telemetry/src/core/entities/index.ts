@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './event/constants.ts';
 export * from './event/types.ts';
 export * from './event/service.ts';
 export * from './event/schema.ts';

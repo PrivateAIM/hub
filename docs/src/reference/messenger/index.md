@@ -37,7 +37,7 @@ Authenticated as the calling identity (e.g. a node's `client_credentials` token)
 | `POST` | `/messages/ack` `{ ids }` | Acknowledge messages by id — the broker deletes them (delete-on-ack). |
 | `GET`  | `/messages/stream` | Server-Sent Events stream of payload-free `messagePending` wakeups for the caller (and one on connect). The client pulls via `GET /messages` on each event. |
 
-Messages carry a uniform TTL (24h); a background sweep reaps expired rows. Contract types live in `@privateaim/messenger-kit`; the Hapic client is `@privateaim/messenger-http-kit`.
+Messages carry a uniform TTL (24h); a background sweep reaps expired rows in bounded batches, so a backlog never becomes one long-running delete. Contract types live in `@privateaim/messenger-kit`; the Hapic client is `@privateaim/messenger-http-kit`.
 
 ## Wakeup (`messagePending`)
 

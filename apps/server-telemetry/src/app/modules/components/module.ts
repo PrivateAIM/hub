@@ -16,6 +16,7 @@ import {
     LogTaskMessageBusRouting,
 } from '@privateaim/server-telemetry-kit';
 import type { LogStore } from '../../../core/services/log-store/types.ts';
+import { DatabaseInjectionKey } from '../database/constants.ts';
 import { EventComponent } from '../../components/event/index.ts';
 import { LogComponent } from '../../components/log/index.ts';
 import { LogStoreInjectionKey } from '../victoria-logs/constants.ts';
@@ -32,6 +33,10 @@ export class ComponentsModule implements IModule {
             logStore = logStoreResult.data;
         }
 
+        // hard resolve: `database` is a declared dependency, so a missing
+        // repository is a wiring bug rather than an optional feature.
+        const eventRepository = container.resolve(DatabaseInjectionKey.EventRepository);
+
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
         const messageBusResult = container.tryResolve(MessageBusInjectionKey);
@@ -39,7 +44,7 @@ export class ComponentsModule implements IModule {
 
         const components : Component<any>[] = [
             new MessageBusWorkerComponentCaller(
-                new EventComponent({ logger }),
+                new EventComponent({ repository: eventRepository, logger }),
                 {
                     consumeRouting: EventTaskMessageBusRouting,
                     publishRouting: EventEventMessageBusRouting,

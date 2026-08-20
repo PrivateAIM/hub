@@ -7,8 +7,14 @@
 
 import type { Message, MessageParty } from '@privateaim/messenger-kit';
 import type { DataSource, Repository } from 'typeorm';
+import { In, Raw } from 'typeorm';
 import { MessageEntity } from '../../../../../adapters/database/entities/message.ts';
-import type { IMessageRepository, MessagePersistInput } from '../../../../../core/entities/message/types.ts';
+import { MESSAGE_SWEEP_BATCH_SIZE } from '../../../../../core/entities/message/constants.ts';
+import type {
+    IMessageRepository,
+    MessageDeleteExpiredOptions,
+    MessagePersistInput,
+} from '../../../../../core/entities/message/types.ts';
 
 export class MessageRepositoryAdapter implements IMessageRepository {
     protected repository: Repository<MessageEntity>;
@@ -58,13 +64,57 @@ export class MessageRepositoryAdapter implements IMessageRepository {
             .execute();
     }
 
-    async deleteExpired(now: Date): Promise<number> {
-        const result = await this.repository.createQueryBuilder()
-            .delete()
-            .from(MessageEntity)
-            .where('expiresAt < :now', { now })
-            .execute();
+    async deleteExpired(now: Date, options: MessageDeleteExpiredOptions = {}): Promise<number> {
+        // A non-positive or non-integral size must never reach `take`: typeorm
+        // ignores a falsy one, which would silently restore the single
+        // unbounded DELETE this batching exists to prevent, and the rest reach
+        // the driver as invalid SQL. Fall back to the default instead.
+        const requested = options.batchSize;
+        const batchSize = typeof requested === 'number' &&
+            Number.isSafeInteger(requested) &&
+            requested > 0 ?
+            requested :
+            MESSAGE_SWEEP_BATCH_SIZE;
 
-        return result.affected ?? 0;
+        let total = 0;
+
+        for (;;) {
+            // ids only: the row carries an opaque `data` payload behind a
+            // deserialize transformer, and nothing but the id is needed here.
+            const rows = await this.repository.find({
+                select: { id: true },
+                where: {
+                    // Raw, not LessThan: the column is a datetime while the
+                    // property is typed as an ISO string, and `now` must stay
+                    // a bound Date. An ISO string would satisfy the property
+                    // type but MySQL truncates the trailing `Z` when casting
+                    // it to a datetime.
+                    expiresAt: Raw((alias) => `${alias} < :now`, { now }),
+                },
+                take: batchSize,
+            });
+
+            if (rows.length === 0) {
+                break;
+            }
+
+            const result = await this.repository.delete({ id: In(rows.map((row) => row.id)) });
+
+            // A driver that does not report affected rows still made progress,
+            // so count the batch rather than returning 0.
+            total += result.affected ?? rows.length;
+
+            // Another replica's sweep already owns these rows. Stop rather than
+            // re-selecting them; the next tick picks up whatever is left.
+            if (result.affected === 0) {
+                break;
+            }
+
+            if (rows.length < batchSize) {
+                break;
+            }
+        }
+
+        return total;
     }
 }

@@ -78,7 +78,10 @@ See [API Reference](/guide/development/api#response-shapes) for the full contrac
 - **LogStore port** (`core/services/log-store/types.ts`) — defines `query`, `write`, `delete` operations
 - **VictoriaLogsLogStore** — production implementation with query injection protection
 - **MemoryLogStore** — in-memory fallback for startup and testing
-- **EventComponent** / **LogComponent** — AMQP consumers for async event and log ingestion
+- **EventComponent** / **LogComponent** — AMQP consumers for async event and log ingestion.
+  EventComponent also owns the retention sweep: expiring events are dropped once at
+  start and daily at 01:00, in bounded batches so a matured retention window never
+  becomes one long-running delete.
 
 ::: warning
 The telemetry service is the log writer itself, so its own logger cannot use the log component caller (would be circular). It uses a `MemoryLogStore` fallback internally.

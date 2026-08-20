@@ -9,14 +9,18 @@ import type { Logger } from '@privateaim/server-kit';
 import { BaseComponent } from '@privateaim/server-kit';
 import type { EventComponentEventMap } from '@privateaim/server-telemetry-kit';
 import { EventCommand } from '@privateaim/server-telemetry-kit';
+import type { IEventRepository } from '../../../core/entities/index.ts';
 import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers/index.ts';
 
 export class EventComponent extends BaseComponent<EventComponentEventMap> {
-    constructor(ctx?: { logger?: Logger }) {
+    constructor(ctx: { repository: IEventRepository, logger?: Logger }) {
         super();
 
-        this.mount(EventCommand.CREATE, new EventComponentCreateHandler({ logger: ctx?.logger }));
-        this.mount(EventCommand.CLEAN, new EventComponentCleanerHandler({ logger: ctx?.logger }));
+        this.mount(EventCommand.CREATE, new EventComponentCreateHandler({ logger: ctx.logger }));
+        this.mount(EventCommand.CLEAN, new EventComponentCleanerHandler({
+            repository: ctx.repository,
+            logger: ctx.logger,
+        }));
     }
 
     async start() {
