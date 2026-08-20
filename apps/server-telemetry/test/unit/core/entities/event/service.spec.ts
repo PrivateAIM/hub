@@ -16,8 +16,8 @@ import {
 } from 'vitest';
 import { EventService } from '../../../../../src/core/entities/event/service.ts';
 import type { FakePermissionChecker } from '@privateaim/server-test-kit';
+import { FakeEventRepository } from './fake-repository.ts';
 import {
-    FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
     createMasterRealmActor,
@@ -49,11 +49,11 @@ function createTestEvent(overrides?: Partial<Event>): Event {
 }
 
 describe('EventService', () => {
-    let repository: FakeEntityRepository<Event>;
+    let repository: FakeEventRepository;
     let service: EventService;
 
     beforeEach(() => {
-        repository = new FakeEntityRepository<Event>();
+        repository = new FakeEventRepository();
         service = new EventService({ repository });
     });
 

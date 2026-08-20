@@ -8,8 +8,22 @@
 import type { Event } from '@privateaim/telemetry-kit';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 
-export interface IEventRepository extends IEntityRepository<Event> {
+export type EventDeleteExpiredOptions = {
+    /**
+     * Rows removed per statement. Defaults to
+     * EVENT_RETENTION_SWEEP_BATCH_SIZE, which anything that is not a positive
+     * safe integer also falls back to.
+     */
+    batchSize?: number,
+};
 
+export interface IEventRepository extends IEntityRepository<Event> {
+    /**
+     * Retention sweep: drop every expiring row whose expiresAt lies before the
+     * given instant (non-expiring rows are kept forever). Returns the number of
+     * removed rows. Removal is batched (see EVENT_RETENTION_SWEEP_BATCH_SIZE).
+     */
+    deleteExpired(now: string, options?: EventDeleteExpiredOptions): Promise<number>;
 }
 
 export interface IEventService {

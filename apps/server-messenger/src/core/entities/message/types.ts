@@ -23,6 +23,14 @@ export type MessagePersistInput = Omit<Message, 'id' | 'createdAt'> & {
     expiresAt: string;
 };
 
+export type MessageDeleteExpiredOptions = {
+    /**
+     * Rows removed per statement. Defaults to MESSAGE_SWEEP_BATCH_SIZE, which
+     * anything that is not a positive safe integer also falls back to.
+     */
+    batchSize?: number,
+};
+
 export interface IMessageRepository {
     /** Persist one row per recipient and return the stored messages. */
     createMany(input: MessagePersistInput[]): Promise<Message[]>;
@@ -33,8 +41,12 @@ export interface IMessageRepository {
     /** Delete the named messages for `recipient` (type + id) — delete-on-ack. */
     ackByIds(recipient: MessageParty, ids: string[]): Promise<void>;
 
-    /** Delete messages whose absolute expiry (`expiresAt`) is before `now` (TTL sweep); returns the count removed. */
-    deleteExpired(now: Date): Promise<number>;
+    /**
+     * Delete messages whose absolute expiry (`expiresAt`) is before `now` (TTL
+     * sweep); returns the count removed. Removal is batched (see
+     * MESSAGE_SWEEP_BATCH_SIZE).
+     */
+    deleteExpired(now: Date, options?: MessageDeleteExpiredOptions): Promise<number>;
 }
 
 export interface IMessageService {

@@ -12,8 +12,12 @@ import {
     describe,
     expect,
     it,
+    vi,
 } from 'vitest';
+import { MESSAGE_SWEEP_BATCH_SIZE } from '../../../../../src/core/entities/message/constants.ts';
 import type { IMessageRepository, MessagePersistInput } from '../../../../../src/core/entities/message/types.ts';
+import { MessageEntity } from '../../../../../src/adapters/database/entities/message.ts';
+import { MessageRepositoryAdapter } from '../../../../../src/app/modules/database/repositories/message/repository.ts';
 import { createTestDatabaseApplication } from '../../../../app/factory.ts';
 import type { TestApplication } from '../../../../app/module.ts';
 
@@ -104,5 +108,73 @@ describe('database/message-repository', () => {
 
         const remaining = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50);
         expect(remaining.map((m) => m.data)).toEqual(['fresh']);
+    });
+
+    describe('deleteExpired batching', () => {
+        const seedExpired = async (recipient: string, count: number) => {
+            await repository.createMany(
+                Array.from({ length: count }, (_, i) => persistInput(recipient, `${i}`, Date.now() - 60_000)),
+            );
+        };
+
+        it('should drain every expired message across several batches', async () => {
+            // the sweep runs every 60s on every replica; a bounded statement
+            // that does not loop would leave a permanent backlog behind.
+            const recipient = randomUUID();
+            await seedExpired(recipient, 5);
+
+            await repository.deleteExpired(new Date(), { batchSize: 2 });
+
+            const remaining = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50);
+            expect(remaining).toHaveLength(0);
+        });
+
+        it('should bound each statement to the batch size', async () => {
+            const recipient = randomUUID();
+            await seedExpired(recipient, 5);
+
+            const ormRepository = app.dataSource.getRepository(MessageEntity);
+            const adapter = new MessageRepositoryAdapter(app.dataSource);
+            const findSpy = vi.spyOn(ormRepository, 'find');
+            const deleteSpy = vi.spyOn(ormRepository, 'delete');
+
+            await adapter.deleteExpired(new Date(), { batchSize: 2 });
+
+            // at least three rounds for this test's own five rows, rather than
+            // one sweeping DELETE over the whole mailbox
+            expect(deleteSpy.mock.calls.length).toBeGreaterThanOrEqual(3);
+            // asserted so the bound check below can never pass vacuously
+            expect(findSpy).toHaveBeenCalled();
+            for (const [options] of findSpy.mock.calls) {
+                expect(options?.take).toEqual(2);
+            }
+
+            findSpy.mockRestore();
+            deleteSpy.mockRestore();
+        });
+
+        it.each([0, -1, 2.5, Number.POSITIVE_INFINITY, Number.NaN])(
+            'should fall back to the default batch size for an unusable batchSize (%s)',
+            async (batchSize) => {
+                // a batchSize of 0 is the one that matters: typeorm ignores a
+                // falsy take, silently restoring the unbounded sweep this
+                // batching exists to prevent.
+                const recipient = randomUUID();
+                await seedExpired(recipient, 1);
+
+                const ormRepository = app.dataSource.getRepository(MessageEntity);
+                const adapter = new MessageRepositoryAdapter(app.dataSource);
+                const findSpy = vi.spyOn(ormRepository, 'find');
+
+                await adapter.deleteExpired(new Date(), { batchSize });
+
+                expect(findSpy).toHaveBeenCalled();
+                for (const [options] of findSpy.mock.calls) {
+                    expect(options?.take).toEqual(MESSAGE_SWEEP_BATCH_SIZE);
+                }
+
+                findSpy.mockRestore();
+            },
+        );
     });
 });

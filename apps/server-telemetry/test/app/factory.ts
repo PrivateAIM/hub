@@ -15,6 +15,7 @@ import { ConfigModule } from '../../src/app/modules/config/index.ts';
 import { VictoriaLogsModule } from '../../src/app/modules/victoria-logs/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';
 
+import { TestApplication } from './module.ts';
 import { TestHTTPApplication } from './http.ts';
 import { createTestDatabaseModule } from './database.ts';
 
@@ -32,4 +33,14 @@ export function createTestApplication(): TestHTTPApplication {
     ];
 
     return new TestHTTPApplication({ modules });
+}
+
+export function createTestDatabaseApplication(): TestApplication {
+    const modules: IModule[] = [
+        new ConfigModule(),
+        new LoggerModule(),
+        createTestDatabaseModule(),
+    ];
+
+    return new TestApplication({ modules });
 }

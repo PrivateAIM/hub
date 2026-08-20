@@ -5,22 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { wait } from '@privateaim/kit';
 import type { ComponentHandler, Logger } from '@privateaim/server-kit';
 import cron from 'node-cron';
-import { LessThan } from 'typeorm';
-import { useDataSource } from 'typeorm-extension';
 import type { EventCommand, EventComponentEventMap } from '@privateaim/server-telemetry-kit';
-import { EventEntity } from '../../../../../adapters/database/index.ts';
+import type { IEventRepository } from '../../../../../core/entities/index.ts';
 
 export class EventComponentCleanerHandler implements ComponentHandler<
     EventComponentEventMap,
     EventCommand.CLEAN
 > {
+    protected repository: IEventRepository;
+
     protected logger: Logger | undefined;
 
-    constructor(ctx?: { logger?: Logger }) {
-        this.logger = ctx?.logger;
+    constructor(ctx: { repository: IEventRepository, logger?: Logger }) {
+        this.repository = ctx.repository;
+        this.logger = ctx.logger;
     }
 
     async initialize() : Promise<void> {
@@ -32,36 +32,17 @@ export class EventComponentCleanerHandler implements ComponentHandler<
     }
 
     async handle(): Promise<void> {
-        const dataSource = await useDataSource();
-        const repository = dataSource.getRepository(EventEntity);
-
+        // ISO-8601, because expiresAt is a varchar compared lexicographically.
         const isoDate = new Date().toISOString();
 
         this.logger?.info(`Removing expired event entities before ${isoDate}`);
 
-        const handleBatch = async (
-            limit: number,
-        ) : Promise<void> => {
-            const entities = await repository.find({
-                where: {
-                    expiring: true,
-                    expiresAt: LessThan(isoDate),
-                },
-                take: limit,
-            });
+        // Batching, the id-only select and the delete-by-id all live behind the
+        // port — the sweep can match millions of rows after a retention change.
+        const removed = await this.repository.deleteExpired(isoDate);
 
-            await repository
-                .remove(entities);
-
-            if (entities.length < limit) {
-                return Promise.resolve();
-            }
-
-            return Promise.resolve()
-                .then(() => wait(0))
-                .then(() => handleBatch(limit));
-        };
-
-        return handleBatch(100);
+        if (removed > 0) {
+            this.logger?.info(`Removed ${removed} expired event entities`);
+        }
     }
 }
