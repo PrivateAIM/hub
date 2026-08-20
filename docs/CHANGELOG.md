@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.1](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.14.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* **server-telemetry,server-messenger:** batch the expiry sweeps behind the repository ports ([#1848](https://github.com/PrivateAIM/hub/issues/1848)) ([a205843](https://github.com/PrivateAIM/hub/commit/a205843e6fa797e051682fe617a7e54046f36206))
+
 ## [0.14.0](https://github.com/PrivateAIM/hub/compare/v0.13.3...v0.14.0) (2026-08-18)
 
 
