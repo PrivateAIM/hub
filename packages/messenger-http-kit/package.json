@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/messenger-http-kit",
     "type": "module",
-    "version": "0.14.0",
+    "version": "0.14.1",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -33,12 +33,12 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "devDependencies": {
-        "@privateaim/messenger-kit": "^0.14.0",
+        "@privateaim/messenger-kit": "^0.14.1",
         "hapic": "^3.0.2",
         "vitest": "^4.1.10"
     },
     "peerDependencies": {
-        "@privateaim/messenger-kit": "^0.14.0",
+        "@privateaim/messenger-kit": "^0.14.1",
         "hapic": "^3.0.2"
     },
     "publishConfig": {
