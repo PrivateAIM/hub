@@ -35,7 +35,7 @@
         "hapic": "^3.0.2",
         "testcontainers": "^12.1.0",
         "typeorm": "^1.1.0",
-        "vitest": "^4.1.10"
+        "vitest": "^4.1.11"
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.62",

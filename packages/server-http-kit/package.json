@@ -50,7 +50,7 @@
         "redis-extension": "^2.0.4",
         "routup": "^6.1.0",
         "typeorm-extension": "^4.1.0",
-        "vitest": "^4.1.10"
+        "vitest": "^4.1.11"
     },
     "peerDependencies": {
         "redis-extension": "^2.0.4",

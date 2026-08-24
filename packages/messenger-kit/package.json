@@ -37,7 +37,7 @@
     "devDependencies": {
         "@privateaim/core-kit": "^0.14.0",
         "@privateaim/kit": "^0.14.0",
-        "vitest": "^4.1.10"
+        "vitest": "^4.1.11"
     },
     "peerDependencies": {
         "@privateaim/core-kit": "^0.14.0",
