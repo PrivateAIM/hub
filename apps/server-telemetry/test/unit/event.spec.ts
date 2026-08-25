@@ -55,7 +55,16 @@ describe('controllers/event', () => {
             actorType: 'user',
             actorId: '9b921a45-3846-40ed-a392-deb26a4cc757',
             actorName: 'admin',
-            expiresAt: '2025-08-08T10:14:05.475Z',
+            // MUST stay in the future. `expiring: true` makes this row a
+            // candidate for the retention sweep, and
+            // `EventComponentCleanerHandler.initialize()` runs that sweep
+            // immediately on every application start — so a sibling spec file
+            // booting its own app deletes an already-expired row out from
+            // under this one, between `create` and `delete`. That raced only
+            // under full-suite parallelism, which is why it passed in
+            // isolation. A hard-coded literal reintroduces the bug the day it
+            // goes stale.
+            expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
         };
 
         const { data } = await client.event.create(input);
