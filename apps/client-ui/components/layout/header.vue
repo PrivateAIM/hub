@@ -141,16 +141,27 @@ export default defineNuxtComponent({
                                     <!--
                                         authup >= 1.0.0-beta.63 narrows the
                                         session user to `id` / `name` /
-                                        `displayName`, so no email reaches the
-                                        client and a real Gravatar can no
-                                        longer be resolved. The component md5s
-                                        whatever it is handed, so passing the
-                                        subject id keeps a stable avatar that
-                                        still DIFFERS per account (an
-                                        unhashable value would collapse every
+                                        `displayName`.
+
+                                        The email is NOT absent from the wire —
+                                        the introspection response the store
+                                        consumes still carries `email` and
+                                        `email_verified`. But `buildUser()`
+                                        destructures only `name` and
+                                        `nickname`, and the store exposes no
+                                        raw payload, so a consumer has no
+                                        supported way to reach it and no real
+                                        Gravatar hash can be derived. Do not
+                                        re-introspect here to recover it: that
+                                        repeats the round-trip authup
+                                        deliberately removed, on every render.
+
+                                        The component md5s whatever it is
+                                        handed, so passing the subject id keeps
+                                        a stable avatar that still DIFFERS per
+                                        account (an unhashable value, such as a
+                                        raw UUID via `hash`, collapses every
                                         user onto one shared placeholder).
-                                        It also stops sending a hashed email
-                                        address to a third party.
                                     -->
                                     <VCGravatar :email="user.id" />
                                     <span>
