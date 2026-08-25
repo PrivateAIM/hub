@@ -11,7 +11,9 @@ export async function streamToBuffer(stream: Stream): Promise<Buffer> {
     return new Promise <Buffer>((resolve, reject) => {
         const parts : Buffer[] = [];
 
-        stream.on('data', (chunk) => parts.push(chunk));
+        stream.on('data', (chunk) => {
+            parts.push(chunk);
+        });
         stream.on('end', () => resolve(Buffer.concat(parts)));
         stream.on('error', (err) => reject(err));
     });

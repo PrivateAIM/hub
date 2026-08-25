@@ -256,6 +256,9 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             for (const [i, tag] of tags.entries()) {
                 const image = this.docker.getImage(tag);
 
+                // dockerode's `Image.push()` returns `Promise<ReadableStream>`, not
+                // `Array.prototype.push` — the return value is consumed below.
+                // eslint-disable-next-line unicorn/no-return-array-push
                 const stream = await image.push(options.push);
 
                 await waitForStream(this.docker, stream, {

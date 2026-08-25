@@ -21,6 +21,9 @@ export async function pushDockerImage(
         imageLatest = input;
     }
 
+    // dockerode's `Image.push()` returns `Promise<ReadableStream>`, not
+    // `Array.prototype.push` — the return value is consumed on the next line.
+    // eslint-disable-next-line unicorn/no-return-array-push
     const stream = await imageLatest.push({ authconfig: authConfig });
 
     await waitForStream(docker, stream);

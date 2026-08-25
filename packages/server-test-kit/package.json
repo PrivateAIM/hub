@@ -26,8 +26,8 @@
         "url": "https://tada5hi.net"
     },
     "devDependencies": {
-        "@authup/access": "^1.0.0-beta.62",
-        "@authup/core-kit": "^1.0.0-beta.62",
+        "@authup/access": "^1.0.0-beta.63",
+        "@authup/core-kit": "^1.0.0-beta.63",
         "@privateaim/core-http-kit": "^0.14.0",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.14.0",
@@ -35,11 +35,11 @@
         "hapic": "^3.0.2",
         "testcontainers": "^12.1.0",
         "typeorm": "^1.1.0",
-        "vitest": "^4.1.10"
+        "vitest": "^4.1.11"
     },
     "peerDependencies": {
-        "@authup/access": "^1.0.0-beta.62",
-        "@authup/core-kit": "^1.0.0-beta.62",
+        "@authup/access": "^1.0.0-beta.63",
+        "@authup/core-kit": "^1.0.0-beta.63",
         "@privateaim/core-http-kit": "^0.14.0",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.14.0",

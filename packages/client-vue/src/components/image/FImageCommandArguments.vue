@@ -83,10 +83,12 @@ export default defineComponent({
         resetItems(itemsPropRef.value);
 
         watch(itemsPropRef, (value, oldValue) => {
-            if (value && value !== oldValue) {
-                resetItems(value);
-                updateVNodes();
+            if (!value || value === oldValue) {
+                return;
             }
+
+            resetItems(value);
+            updateVNodes();
         });
 
         const submit = (data: MasterImageCommandArgument[]) => {

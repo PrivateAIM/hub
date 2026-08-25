@@ -15,7 +15,7 @@ export function isComponentHandler(input: unknown) : input is ComponentHandler {
         return false;
     }
 
-    return !(!hasOwnProperty(input, 'execute') || typeof input.execute !== 'function');
+    return !!hasOwnProperty(input, 'execute') && typeof input.execute === 'function';
 }
 
 export function isComponentHandlerFn(input: unknown) : input is ComponentHandlerFn {

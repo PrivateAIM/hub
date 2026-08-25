@@ -80,11 +80,13 @@ const FProjectInForm = defineComponent({
         }
 
         watch(updatedAt, (val, oldVal) => {
-            if (val && val !== oldVal) {
-                manager.data.value = props.entity;
-
-                initForm();
+            if (!val || val === oldVal) {
+                return;
             }
+
+            manager.data.value = props.entity;
+
+            initForm();
         });
 
         const submit = wrapFnWithBusyState(busy, async () => {

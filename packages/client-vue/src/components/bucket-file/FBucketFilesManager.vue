@@ -110,7 +110,7 @@ export default defineComponent({
         };
 
         const unselectAll = () => {
-            selected.value.splice(0, selected.value.length);
+            selected.value.length = 0;
         };
 
         const dropSelected = wrapFnWithBusyState(busy, async () => {

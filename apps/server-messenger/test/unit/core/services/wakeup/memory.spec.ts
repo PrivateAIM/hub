@@ -47,7 +47,11 @@ describe('core/services/wakeup/memory', () => {
 
     it('should fire the onPending hook on notify', async () => {
         const seen: string[] = [];
-        const wakeup = new MemoryMessageWakeup({ onPending: (recipient) => seen.push(recipient.id) });
+        const wakeup = new MemoryMessageWakeup({
+            onPending: (recipient) => {
+                seen.push(recipient.id);
+            },
+        });
 
         await wakeup.notify(RECIPIENT);
 

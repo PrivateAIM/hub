@@ -59,9 +59,11 @@ export class SweeperModule implements IModule {
     }
 
     async teardown(): Promise<void> {
-        if (this.timer) {
-            clearInterval(this.timer);
-            this.timer = undefined;
+        if (!this.timer) {
+            return;
         }
+
+        clearInterval(this.timer);
+        this.timer = undefined;
     }
 }

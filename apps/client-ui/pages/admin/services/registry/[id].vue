@@ -35,7 +35,7 @@ export default defineComponent({
         const route = useRoute('admin-services-registry-id');
 
         const manager = createEntityManager({
-            type: `${DomainType.REGISTRY}`,
+            type: DomainType.REGISTRY,
             props: { entityId: route.params.id as string },
             onFailed(e) {
                 if (toast) {

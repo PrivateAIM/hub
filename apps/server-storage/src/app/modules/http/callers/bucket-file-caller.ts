@@ -47,6 +47,7 @@ export class BucketFileCallerAdapter implements IBucketFileCaller {
 
                         if (childContext.key === BucketFileEvent.DELETION_FINISHED) {
                             resolve();
+                            return;
                         }
 
                         if (childContext.key === BucketFileEvent.DELETION_FAILED) {

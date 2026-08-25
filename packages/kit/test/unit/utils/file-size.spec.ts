@@ -27,15 +27,15 @@ describe('humanFileSize', () => {
         });
 
         it('returns empty string for whitespace-only string', () => {
-            expect(humanFileSize('   ')).toBe('');
+            expect(humanFileSize(' '.repeat(3))).toBe('');
         });
 
         it('returns empty string for NaN', () => {
-            expect(humanFileSize(Number.NaN)).toBe('');
+            expect(humanFileSize(NaN)).toBe('');
         });
 
         it('returns empty string for Infinity', () => {
-            expect(humanFileSize(Number.POSITIVE_INFINITY)).toBe('');
+            expect(humanFileSize(Infinity)).toBe('');
         });
     });
 

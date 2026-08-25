@@ -138,7 +138,21 @@ export default defineNuxtComponent({
                                     class="vc-nav-link user-link"
                                     :to="'/users/'+user.id"
                                 >
-                                    <VCGravatar :email="user.email ? user.email : ''" />
+                                    <!--
+                                        authup >= 1.0.0-beta.63 narrows the
+                                        session user to `id` / `name` /
+                                        `displayName`, so no email reaches the
+                                        client and a real Gravatar can no
+                                        longer be resolved. The component md5s
+                                        whatever it is handed, so passing the
+                                        subject id keeps a stable avatar that
+                                        still DIFFERS per account (an
+                                        unhashable value would collapse every
+                                        user onto one shared placeholder).
+                                        It also stops sending a hashed email
+                                        address to a third party.
+                                    -->
+                                    <VCGravatar :email="user.id" />
                                     <span>
                                         <FDisplayName
                                             :name="user.name"

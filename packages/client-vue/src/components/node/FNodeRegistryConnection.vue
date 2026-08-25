@@ -44,7 +44,7 @@ export default defineComponent({
         // registry project (+ Harbor robot account) or tearing the existing one
         // down, and answers with the updated node.
         const manager = createEntityManager({
-            type: `${DomainType.NODE}`,
+            type: DomainType.NODE,
             setup,
             props: { entity: entity.value },
         });

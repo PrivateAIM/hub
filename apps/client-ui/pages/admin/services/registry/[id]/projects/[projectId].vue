@@ -34,7 +34,7 @@ export default defineNuxtComponent({
         const route = useRoute('admin-services-registry-id-projects-projectId');
 
         const manager = createEntityManager({
-            type: `${DomainType.REGISTRY_PROJECT}`,
+            type: DomainType.REGISTRY_PROJECT,
             props: {
                 // `id` is the parent `[id]` segment (the registry); the project is
                 // the `[projectId]` segment of this route.

@@ -31,15 +31,15 @@
         "zod": "^4.4.3"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.62",
+        "@authup/core-kit": "^1.0.0-beta.63",
         "@privateaim/kit": "^0.14.0",
         "@rapiq/codec-url": "^2.2.0",
         "@rapiq/core": "^2.2.0",
         "hapic": "^3.0.2",
-        "vitest": "^4.1.10"
+        "vitest": "^4.1.11"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.62",
+        "@authup/core-kit": "^1.0.0-beta.63",
         "@privateaim/kit": "^0.14.0",
         "@rapiq/codec-url": "^2.2.0",
         "@rapiq/core": "^2.2.0",

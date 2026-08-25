@@ -21,7 +21,6 @@ type TokenVerificationDataMinimal = Pick<
 'realm_name' |
 'sub' |
 'sub_kind' |
-'sub_name' |
 'scope'
 >;
 
@@ -32,7 +31,6 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
 
         sub_kind: 'user',
         sub: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
-        sub_name: 'start123',
 
         permissions: [],
     };
@@ -80,10 +78,20 @@ export function applyTokenVerificationData(
         type: data.sub_kind,
         realmId: data.realm_id,
         realmName: data.realm_name,
-        attributes: {
-            id: data.sub,
-            name: data.sub_name,
-        },
+        /**
+         * Only the subject id is carried. `name` used to read the payload's
+         * subject-name claim, which authup removed in `1.0.0-beta.63` as a
+         * claim it never populated -- so this attribute has always resolved
+         * to `undefined`, and with it `metadata.actorName` on every audited
+         * write. Dropping it is behaviour-preserving.
+         *
+         * Do NOT restore it by reading a claim off the introspection payload:
+         * `JWTClaims` carries an index signature, so any key type-checks as
+         * `any` and a wrong guess fails silently rather than at the compiler.
+         * Re-populating the audit actor name needs the claim declared on the
+         * payload type upstream first.
+         */
+        attributes: { id: data.sub },
     });
 
     setRequestEnv(event, 'scopes', unwrapOAuth2Scope(data.scope || []));

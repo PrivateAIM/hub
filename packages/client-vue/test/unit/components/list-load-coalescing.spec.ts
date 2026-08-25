@@ -14,10 +14,7 @@ import { mountClientVueComponent } from '../../utils';
 
 describe('core/list load coalescing', () => {
     it('should run a load requested while another is in flight, instead of dropping it', async () => {
-        let release : () => void = () => {};
-        const pending = new Promise<void>((resolve) => {
-            release = resolve;
-        });
+        const { promise: pending, resolve: release } = Promise.withResolvers<void>();
 
         const entity = createTestAnalysis();
 
@@ -60,10 +57,7 @@ describe('core/list load coalescing', () => {
     });
 
     it('should drain the queued load even when the active request fails', async () => {
-        let reject : (e: Error) => void = () => {};
-        const failing = new Promise<never>((_resolve, rej) => {
-            reject = rej;
-        });
+        const { promise: failing, reject } = Promise.withResolvers<never>();
 
         const entity = createTestAnalysis();
 

@@ -35,7 +35,25 @@ function resolveAuthupImage(): string {
 
 const AUTHUP_IMAGE = resolveAuthupImage();
 const AUTHUP_PORT = 3000;
-const AUTHUP_PROVISIONING_TARGET = '/usr/src/app/writable/provisioning/hub.mjs';
+
+/**
+ * Authup's writable directory, pinned EXPLICITLY rather than inherited from the
+ * image default.
+ *
+ * `1.0.0-beta.63` moved that default from `/usr/src/app/writable` to
+ * `/var/lib/authup`. Because a provisioning file mounted at an unread path is
+ * simply never loaded, the container still started and reported healthy — the
+ * only symptom was every hub permission failing to resolve much later, as
+ * `The evaluation of permissions <name> failed`, since the built-in `admin`
+ * role's `globalPermissions: ['*']` then expanded over Authup's own
+ * permissions alone.
+ *
+ * Setting the variable here makes the mount target and the server agree by
+ * construction, so a future change to the image default cannot silently
+ * un-provision the suites again.
+ */
+const AUTHUP_WRITABLE_DIRECTORY = '/var/lib/authup';
+const AUTHUP_PROVISIONING_TARGET = `${AUTHUP_WRITABLE_DIRECTORY}/provisioning/hub.mjs`;
 
 const POSTGRES_IMAGE = 'postgres:18';
 const POSTGRES_PORT = 5432;
@@ -153,6 +171,7 @@ export async function startAuthupContainer(
     const container = await builder
         .withEnvironment({
             NODE_ENV: 'development',
+            WRITABLE_DIRECTORY_PATH: AUTHUP_WRITABLE_DIRECTORY,
             CLIENT_SYSTEM_ENABLED: 'true',
             CLIENT_SYSTEM_SECRET: 'start123',
             CLIENT_SYSTEM_SECRET_RESET: 'true',

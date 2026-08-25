@@ -64,8 +64,8 @@ describe('core/query default field projection', () => {
         applyQuery(qb, decodeQuery({}, { schema }));
         const row = await qb.getOneOrFail();
 
-        for (const key of Object.keys(seed)) {
-            expect(row[key], `${schema.name}.${key}`).toEqual((seed as ObjectLiteral)[key]);
+        for (const [key, value] of Object.entries(seed)) {
+            expect(row[key], `${schema.name}.${key}`).toEqual(value);
         }
     };
 
