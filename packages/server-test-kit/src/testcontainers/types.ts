@@ -26,6 +26,16 @@ export type AuthupProvisioning = {
 };
 
 /**
+ * The subset of Authup's token-introspection response that
+ * `assertAuthupProvisioning` reads back to confirm a suite's permissions
+ * really resolved.
+ */
+export type AuthupIntrospectionResult = {
+    active?: boolean,
+    permissions?: { name: string }[]
+};
+
+/**
  * Resolved database connection details, propagated from the (single) global
  * setup process to the individual test workers via vitest `provide`/`inject`.
  */

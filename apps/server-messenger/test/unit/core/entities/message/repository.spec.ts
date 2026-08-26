@@ -153,7 +153,7 @@ describe('database/message-repository', () => {
             deleteSpy.mockRestore();
         });
 
-        it.each([0, -1, 2.5, Number.POSITIVE_INFINITY, Number.NaN])(
+        it.each([0, -1, 2.5, Infinity, NaN])(
             'should fall back to the default batch size for an unusable batchSize (%s)',
             async (batchSize) => {
                 // a batchSize of 0 is the one that matters: typeorm ignores a

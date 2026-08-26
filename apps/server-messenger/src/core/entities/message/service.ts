@@ -84,8 +84,7 @@ export class MessageService implements IMessageService {
         // Register the wakeup listener *before* the first query so a notify that commits
         // during the query window is not lost (subscribe registers synchronously). The
         // listener is always torn down in `finally`, so nothing lingers past this call.
-        let signal: () => void = () => {};
-        const pending = new Promise<void>((resolve) => { signal = resolve; });
+        const { promise: pending, resolve: signal } = Promise.withResolvers<void>();
         const unsubscribe = this.wakeup.subscribe(recipient, () => signal());
 
         try {

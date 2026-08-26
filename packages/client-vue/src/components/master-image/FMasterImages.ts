@@ -27,15 +27,17 @@ export default defineComponent({
             props,
             setup: ctx,
             queryFilters: (filters) => {
-                if (
-                    hasOwnProperty(filters, 'name') &&
+                const hasName = hasOwnProperty(filters, 'name') &&
                     typeof filters.name === 'string' &&
-                    filters.name.length > 0
-                ) {
-                    filters.virtualPath = filters.name;
+                    filters.name.length > 0;
 
-                    delete filters.name;
+                if (!hasName) {
+                    return;
                 }
+
+                filters.virtualPath = filters.name;
+
+                delete filters.name;
             },
             query: { sorts: { virtualPath: 'ASC' } },
         });

@@ -39,8 +39,17 @@ export default defineNuxtComponent({
         const apiClient = injectHTTPClient();
 
         // Configurable per deployment (AUTHUP_CLIENT_ID); defaults to the
-        // Authup built-in "admin-console" client. The client must register
-        // `<ui-origin>/login/callback` as a redirect URI.
+        // Authup built-in "admin-console" client.
+        //
+        // The client must register `<ui-origin>/login/callback**` as a
+        // redirect URI — note the trailing `**`. As of authup
+        // `1.0.0-beta.63` the post-login destination rides in the callback
+        // URI's own query (see below), and Authup matches a redirect URI
+        // against the full canonical URL INCLUDING its query string. An
+        // exact `<ui-origin>/login/callback` registration therefore stops
+        // matching the moment a destination is carried, and the login fails
+        // at the authorize step. A `<ui-origin>/**` pattern (what
+        // TRUSTED_ORIGINS generates) covers it too.
         //
         // Authup beta.59 removed the shared `web` system client, so the two
         // remaining built-ins are per-app: `admin-console` and
@@ -55,8 +64,6 @@ export default defineNuxtComponent({
             try {
                 const pkce = await createPKCE();
                 const state = createState();
-
-                const redirectUri = `${window.location.origin}/login/callback`;
 
                 // Preserve the post-login destination AND any sibling query
                 // params on the login URL (e.g. /login?redirect=/projects&x=1
@@ -79,13 +86,29 @@ export default defineNuxtComponent({
                     target = `${url.pathname}${url.search}${url.hash}`;
                 }
 
+                // authup >= 1.0.0-beta.63 no longer stores the destination in
+                // the authorization request. It rides in the callback URI's
+                // own query, so the authorization server carries it back (it
+                // appends `code`/`state` to whatever query is already there)
+                // and `@authup/client-web-nuxt`'s routing interceptor reads
+                // it off the callback route.
+                //
+                // The same string is replayed byte-for-byte at the `/token`
+                // exchange (RFC 6749 4.1.3), so build it ONCE and hand the
+                // identical value to both calls below.
+                const callback = new URL('/login/callback', window.location.origin);
+                if (target) {
+                    callback.searchParams.set('redirect', target);
+                }
+
+                const redirectUri = callback.href;
+
                 saveAuthorizationRequest({
                     state,
                     code_verifier: pkce.code_verifier,
                     redirect_uri: redirectUri,
                     client_id: clientId,
                     realm_id: realm.id,
-                    target,
                 });
 
                 window.location.href = buildAuthorizeURL({

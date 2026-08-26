@@ -39,9 +39,30 @@ login form and configured identity providers live. Authup redirects back to
 `<ui-origin>/login/callback`, and the `@authup/client-web-nuxt` routing interceptor
 exchanges the authorization code for a session.
 
+When the user was sent to the login page from a deep link, the post-login destination
+rides in the callback URI's **own query** (`<ui-origin>/login/callback?redirect=%2Fprojects`),
+so the authorization server carries it back and the interceptor navigates there after the
+exchange. The same string is replayed byte-for-byte at the `/token` exchange
+(RFC 6749 §4.1.3).
+
 The OAuth client is configurable via `NUXT_PUBLIC_AUTHUP_CLIENT_ID` (default:
 `admin-console`, an Authup built-in client provisioned for every realm). The configured
-client **must** register `<ui-origin>/login/callback` as an allowed redirect URI.
+client **must** register `<ui-origin>/login/callback**` as an allowed redirect URI —
+note the trailing `**`. A `<ui-origin>/**` pattern (what `TRUSTED_ORIGINS` generates)
+covers it as well.
+
+::: warning Upgrading to Authup >= 1.0.0-beta.63
+An **exact** `<ui-origin>/login/callback` registration is no longer sufficient. The
+post-login destination now travels in the callback URI's query, and Authup matches a
+redirect URI against the full canonical URL **including** its query string
+(`isSimpleURLMatch`). A deep-link login against an exactly-registered client is refused
+at the authorize step, while a login from the bare login page still succeeds — so the
+breakage looks intermittent.
+
+Widen the client's `redirectUri` (a comma-separated glob list, where `*` stays inside a
+path segment and `**` matches the rest) to `<ui-origin>/login/callback**` before
+upgrading.
+:::
 
 ::: warning Upgrading from Authup < 1.0.0-beta.59
 Authup beta.59 removed the shared `web` system client that used to be provisioned for

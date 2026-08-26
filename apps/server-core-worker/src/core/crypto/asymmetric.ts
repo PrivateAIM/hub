@@ -20,7 +20,10 @@ export async function generateRSAKeyPair() : Promise<{ privateKey: string, publi
                 format: 'pem',
             },
         }, (err: (Error | null), publicKey: string, privateKey: string) => {
-            if (err) reject(err);
+            if (err) {
+                reject(err);
+                return;
+            }
 
             resolve({
                 privateKey,

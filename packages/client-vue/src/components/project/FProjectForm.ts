@@ -108,11 +108,13 @@ const FProjectForm = defineComponent({
         const updatedAt = useUpdatedAt(props.entity);
 
         watch(updatedAt, (val, oldVal) => {
-            if (val && val !== oldVal) {
-                manager.data.value = props.entity ?? null;
-
-                initFromProperties();
+            if (!val || val === oldVal) {
+                return;
             }
+
+            manager.data.value = props.entity ?? null;
+
+            initFromProperties();
         });
 
         const handleMasterImagePicker = (item: MasterImage | null) => {

@@ -46,7 +46,7 @@ export default defineComponent({
         });
 
         const manager = createEntityManager({
-            type: `${DomainType.NODE}`,
+            type: DomainType.NODE,
             props: { entityId: route.params.id as string },
             onFailed(e) {
                 if (toast) {

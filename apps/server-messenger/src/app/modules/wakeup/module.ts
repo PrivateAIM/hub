@@ -84,9 +84,11 @@ export class WakeupModule implements IModule {
     }
 
     async teardown(): Promise<void> {
-        if (this.wakeup) {
-            await this.wakeup.stop();
-            this.wakeup = undefined;
+        if (!this.wakeup) {
+            return;
         }
+
+        await this.wakeup.stop();
+        this.wakeup = undefined;
     }
 }

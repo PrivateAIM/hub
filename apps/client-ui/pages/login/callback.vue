@@ -17,9 +17,9 @@ export default defineNuxtComponent({
         });
 
         // The global routing interceptor (@authup/client-web-nuxt) exchanges
-        // the authorization code and, when an in-app target was stored,
-        // redirects there. Reaching this component means the exchange
-        // succeeded without a stored target.
+        // the authorization code and, when the callback URI carried a
+        // `redirect` query, navigates there. Reaching this component means
+        // the exchange succeeded without such a destination.
         await navigateTo({ path: '/' });
     },
 });

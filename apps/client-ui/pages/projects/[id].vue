@@ -55,7 +55,7 @@ export default defineComponent({
         const canEdit = usePermissionCheck({ name: PermissionName.PROJECT_UPDATE });
 
         const manager = createEntityManager<`${DomainType.PROJECT}`, Project>({
-            type: `${DomainType.PROJECT}`,
+            type: DomainType.PROJECT,
             props: { entityId: useRoute('projects-id').params.id as string },
             onUpdated() {
                 if (toast) {

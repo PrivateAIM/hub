@@ -90,6 +90,7 @@ export async function uploadRequestFilesToBucket(
 
                                 if (childContext.key === BucketFileEvent.CREATION_FINISHED) {
                                     fileResolve(childValue as BucketFileCreationFinishedEventPayload);
+                                    return;
                                 }
 
                                 if (childContext.key === BucketFileEvent.CREATION_FAILED) {

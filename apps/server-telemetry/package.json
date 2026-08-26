@@ -20,8 +20,8 @@
     "license": "Apache-2.0",
     "description": "",
     "dependencies": {
-        "@authup/core-kit": "^1.0.0-beta.62",
-        "@authup/kit": "^1.0.0-beta.62",
+        "@authup/core-kit": "^1.0.0-beta.63",
+        "@authup/kit": "^1.0.0-beta.63",
         "@hapic/victorialogs": "^2.0.2",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/kit": "^0.14.0",
@@ -42,8 +42,8 @@
         "eldin": "^1.3.0",
         "envix": "^1.5.0",
         "hapic": "^3.0.2",
-        "locter": "^4.1.0",
-        "mysql2": "^3.23.3",
+        "locter": "^4.1.1",
+        "mysql2": "^3.24.2",
         "node-cron": "^4.6.0",
         "orkos": "^1.1.1",
         "pg": "^8.23.0",
@@ -61,7 +61,7 @@
         "@trapi/cli": "^2.0.5",
         "better-sqlite3": "^13.0.3",
         "testcontainers": "^12.1.0",
-        "vitest": "^4.1.10"
+        "vitest": "^4.1.11"
     },
     "scripts": {
         "cli": "node dist/cli/index.mjs",

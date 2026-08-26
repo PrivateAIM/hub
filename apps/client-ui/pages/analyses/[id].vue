@@ -41,7 +41,7 @@ export default defineComponent({
         const canEdit = usePermissionCheck({ name: PermissionName.ANALYSIS_UPDATE });
 
         const manager = createEntityManager({
-            type: `${DomainType.ANALYSIS}`,
+            type: DomainType.ANALYSIS,
             props: {
                 entityId: useRoute('analyses-id').params.id as string,
                 // Hydrates the project so the breadcrumb can name it without a

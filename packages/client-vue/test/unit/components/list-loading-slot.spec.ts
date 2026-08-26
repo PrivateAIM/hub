@@ -14,10 +14,7 @@ import { mountClientVueComponent } from '../../utils';
 
 describe('core/list loading slot', () => {
     it('should render the loading slot during the first load and drop it once data arrives', async () => {
-        let release : () => void = () => {};
-        const pending = new Promise<void>((resolve) => {
-            release = resolve;
-        });
+        const { promise: pending, resolve: release } = Promise.withResolvers<void>();
 
         const entity = createTestAnalysis();
 

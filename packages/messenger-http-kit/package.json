@@ -35,7 +35,7 @@
     "devDependencies": {
         "@privateaim/messenger-kit": "^0.14.0",
         "hapic": "^3.0.2",
-        "vitest": "^4.1.10"
+        "vitest": "^4.1.11"
     },
     "peerDependencies": {
         "@privateaim/messenger-kit": "^0.14.0",

@@ -138,7 +138,32 @@ export default defineNuxtComponent({
                                     class="vc-nav-link user-link"
                                     :to="'/users/'+user.id"
                                 >
-                                    <VCGravatar :email="user.email ? user.email : ''" />
+                                    <!--
+                                        authup >= 1.0.0-beta.63 narrows the
+                                        session user to `id` / `name` /
+                                        `displayName`.
+
+                                        The email is NOT absent from the wire —
+                                        the introspection response the store
+                                        consumes still carries `email` and
+                                        `email_verified`. But `buildUser()`
+                                        destructures only `name` and
+                                        `nickname`, and the store exposes no
+                                        raw payload, so a consumer has no
+                                        supported way to reach it and no real
+                                        Gravatar hash can be derived. Do not
+                                        re-introspect here to recover it: that
+                                        repeats the round-trip authup
+                                        deliberately removed, on every render.
+
+                                        The component md5s whatever it is
+                                        handed, so passing the subject id keeps
+                                        a stable avatar that still DIFFERS per
+                                        account (an unhashable value, such as a
+                                        raw UUID via `hash`, collapses every
+                                        user onto one shared placeholder).
+                                    -->
+                                    <VCGravatar :email="user.id" />
                                     <span>
                                         <FDisplayName
                                             :name="user.name"

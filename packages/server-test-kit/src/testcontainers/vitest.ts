@@ -8,6 +8,7 @@
 import { inject } from 'vitest';
 import type { TestProject } from 'vitest/node';
 import { startAuthupContainer, startPostgresContainer } from './containers.ts';
+import { assertAuthupProvisioning } from './provisioning.ts';
 import {
     applyDatabaseConnectionEnv,
     hasAuthupEnv,
@@ -48,11 +49,20 @@ export async function provideDatabase(project: TestProject): Promise<void> {
  */
 export async function provideAuthup(project: TestProject, permissionNames: string[]): Promise<void> {
     if (hasAuthupEnv()) {
-        project.provide('AUTHUP_URL', process.env.AUTHUP_URL as string);
+        const externalURL = process.env.AUTHUP_URL as string;
+
+        await assertAuthupProvisioning(externalURL, permissionNames);
+
+        project.provide('AUTHUP_URL', externalURL);
         return;
     }
 
     const url = await startAuthupContainer(permissionNames, resolveAuthupDatabaseEnv());
+
+    // Verified here, in global setup, rather than left to surface as a wall of
+    // authorization failures once the suite is already running.
+    await assertAuthupProvisioning(url, permissionNames);
+
     process.env.AUTHUP_URL = url;
     project.provide('AUTHUP_URL', url);
 }

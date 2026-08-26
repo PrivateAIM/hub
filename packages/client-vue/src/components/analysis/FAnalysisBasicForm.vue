@@ -62,7 +62,7 @@ export default defineComponent({
         const proposalQuery = computed<QueryBuildInput<Project, 3>>(() => ({ filters: { ...(props.realmId ? { realmId: props.realmId } : {}) } }));
 
         const manager = createEntityManager({
-            type: `${DomainType.ANALYSIS}`,
+            type: DomainType.ANALYSIS,
             setup,
             props,
         });
@@ -98,11 +98,13 @@ export default defineComponent({
         const updatedAt = useUpdatedAt(props.entity);
 
         watch(updatedAt, (val, oldVal) => {
-            if (val && val !== oldVal) {
-                manager.data.value = props.entity ?? null;
-
-                initFromProperties();
+            if (!val || val === oldVal) {
+                return;
             }
+
+            manager.data.value = props.entity ?? null;
+
+            initFromProperties();
         });
 
         const add = wrapFnWithBusyState(busy, async () => {

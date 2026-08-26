@@ -18,8 +18,7 @@ type TokenVerificationDataMinimal = Pick<
 'realm_id' |
 'realm_name' |
 'sub' |
-'sub_kind' |
-'sub_name'
+'sub_kind'
 >;
 
 function generateAbilityNames(): string[] {
@@ -36,7 +35,6 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
 
         sub_kind: 'user',
         sub: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
-        sub_name: 'system',
 
         permissions: generateAbilityNames().map((name) => ({ name })),
     };

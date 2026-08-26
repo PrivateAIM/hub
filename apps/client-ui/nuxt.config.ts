@@ -54,7 +54,10 @@ export default defineNuxtConfig({
             // (CLIENT_ADMIN_CONSOLE_NAME) at the call site; override per
             // deployment when the UI runs on its own origin and uses a
             // dedicated client. The client must register
-            // `<ui-origin>/login/callback` as a redirect URI.
+            // `<ui-origin>/login/callback**` as a redirect URI — the trailing
+            // `**` is required since authup `1.0.0-beta.63`, which carries the
+            // post-login destination in the callback URI's query and matches
+            // registrations against the full URL including that query.
             authupClientId: process.env.AUTHUP_CLIENT_ID,
             // Self-service account console (profile, password, authenticators,
             // sessions, applications), served by Authup's server-core on the

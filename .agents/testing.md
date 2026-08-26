@@ -116,7 +116,18 @@ The shared helpers live in `@privateaim/server-test-kit`
   6, `server-core` 19), listed in its `test/setup.ts`. The built-in `admin` role's
   `globalPermissions: ['*']` picks those up at provisioning time, so the `admin`/`master`
   token resolves them via introspection. The generated `.mjs` is mounted at
-  `/usr/src/app/writable/provisioning/hub.mjs`.
+  `<WRITABLE_DIRECTORY_PATH>/provisioning/hub.mjs`, where `WRITABLE_DIRECTORY_PATH` is
+  **pinned by hub** to `/var/lib/authup` rather than inherited from the image. Authup
+  `1.0.0-beta.63` moved that default (it was `/usr/src/app/writable`), and a provisioning
+  file written anywhere else is simply never read — the container still starts and
+  reports healthy, and the only symptom is every endpoint in the suite later failing with
+  `The evaluation of permissions <name> failed`. Pinning it keeps the mount target and
+  the server in agreement by construction.
+- `assertAuthupProvisioning(baseURL, permissionNames)` — runs in global setup for **both**
+  the container and the external-`AUTHUP_URL` path. It mints the admin token, introspects
+  it, and diffs the resolved permission set against the suite's, so a provisioning miss
+  fails once, immediately, with the missing names — instead of as a wall of authorization
+  failures dozens of assertions away from the cause.
 - Authup runs on the **same database engine as hub** in each environment
   (`resolveAuthupDatabaseEnv`): a dedicated `authup` database on the same
   MySQL/PostgreSQL server (reached via `host.docker.internal`), or its own in-memory
