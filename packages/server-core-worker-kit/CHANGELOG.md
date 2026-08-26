@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.13.3](https://github.com/PrivateAIM/hub/compare/v0.13.2...v0.13.3) (2026-08-26)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.14.0 to ^0.15.0
+    * @privateaim/kit bumped from ^0.14.0 to ^0.15.0
+    * @privateaim/server-kit bumped from ^0.14.0 to ^0.15.0
+
 ## [0.13.2](https://github.com/PrivateAIM/hub/compare/v0.13.1...v0.13.2) (2026-08-18)
 
 
