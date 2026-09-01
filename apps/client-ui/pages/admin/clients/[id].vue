@@ -6,15 +6,13 @@ import { FDisplayName } from '@privateaim/client-vue';
 import { extendObject } from '@authup/kit';
 import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
-import { type Ref, defineComponent } from 'vue';
-import { computed, ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 import {
-    createError,
     definePageMeta,
-    navigateTo,
     useRoute,
     useToast,
 } from '#imports';
+import { useEntityRecord } from '../../../composables/entity-record';
 import { LayoutKey } from '../../../config/layout';
 
 export default defineComponent({
@@ -32,18 +30,18 @@ export default defineComponent({
         const toast = useToast();
         const route = useRoute('admin-clients-id');
 
-        const entity: Ref<Client> = ref(null) as any;
+        // Resolved up front: the handler can run after setup's first await,
+        // where `inject()` no longer resolves.
+        const httpClient = injectHTTPClient();
 
-        try {
-            const { data } = await injectHTTPClient()
+        const entity = await useEntityRecord<Client>(
+            `client:${route.params.id}`,
+            () => httpClient
                 .client
-                .getOne(route.params.id as string, { fields: ['+secret'] });
-
-            entity.value = data;
-        } catch {
-            await navigateTo({ path: '/admin/clients' });
-            throw createError({});
-        }
+                .getOne(route.params.id as string, { fields: ['+secret'] })
+                .then((response) => response.data),
+            '/admin/clients',
+        );
 
         const items = computed<NavigationItem[]>(() => {
             const base = `/admin/clients/${entity.value?.id}`;

@@ -76,6 +76,86 @@ A deployment serving the UI from its own origin should register a **dedicated** 
 `NUXT_PUBLIC_AUTHUP_CLIENT_ID` at it, rather than sharing Authup's console client.
 :::
 
+## Server Rendering and Hydration
+
+The app runs with `ssr: true`, but nothing fetched during the server render used to reach
+the browser. Every detail page issued its request **twice** — once while rendering the
+HTML, once again on the hydrating client. Every list was worse: its initial load ran in a
+detached microtask that resolved *after* the HTML had already been flushed, so the server
+paid for the request and still shipped an empty list, which the client then fetched again.
+
+The handoff runs over **`@authup/client-web-kit`'s hydration store**, provided
+automatically by `@authup/client-web-nuxt`'s kit plugin and backed by
+`nuxtApp.payload.data` — the same bucket `useAsyncData` transports its results in. Hub
+adds no install option and no plugin of its own: `@privateaim/client-vue` calls
+`injectHydrationStore()` and no-ops when it returns `undefined`. Under a host that
+provides no store the server render does not load at all, rather than rendering rows the
+hydrating client has no way to reproduce.
+
+### Lists
+
+`createList` records the initial load under `flame:list:<type>:<useId()>` during the
+server render; the hydrating client adopts that snapshot (`data`, `total`, `meta`) and
+skips its own load. The entry is consumed on read — a collection goes stale, and it must
+not seed a later client-side navigation back to the route.
+
+The key is deliberately **not** derived from the query. A query-derived key has to be
+re-derived identically on the client, which makes filter insertion order, a `query` prop
+assembled from store state that is not populated yet on one side, and two same-query lists
+on one page all load-bearing — and each of them fails silently, as a list that simply
+fetches twice again. `useId()` (Vue 3.5) is stable across the server render and the
+hydrating client for the same position in the component tree, so agreement is structural
+instead of something a caller can get wrong. The entity type is in the key only to bound
+the blast radius of an entry that is recorded but never adopted.
+
+That stability has one prerequisite, and it is easy to break by accident: `createList`
+registers its `onServerPrefetch` hook on **both** sides of the boundary, not just on the
+server. A non-empty `instance.sp` is what makes Vue call `markAsyncBoundary()` after
+setup, handing the component's subtree a fresh `useId` counter. Register the hook only
+when `isServerRuntime()` — the obvious reading — and the boundary exists only on the
+server, so any `useId()` drawn inside or after a list shifts between the two renders: the
+second list on a page then derives the key the server used for the *first* one and adopts
+the wrong rows, with its own load suppressed so it never corrects. The hook body never
+runs on the client — `@vue/server-renderer` is the only thing that invokes `sp` — so
+registering it there is free.
+
+Because the list's rows now reach the payload, a **collection query must not request a
+permission-gated column**. `fields: ['+accountSecret']` on the registry-projects list was
+dropped for exactly this reason: nothing on that page rendered it (the details modal
+re-resolves the record by id), and leaving it in would have written every Harbor robot
+secret into the served HTML document instead of an XHR response. Keep credential columns
+on the record read that displays them.
+
+### Two rules a change here must not break
+
+| Rule | If broken |
+|------|-----------|
+| Never record a failed or coalesced-away load. | An adopted snapshot suppresses the client's own load, so an empty snapshot strands the list on it with no retry. `createListRaw`'s `loaded` flag enforces it — only a load that ran to completion is recorded. |
+| Pass `deep: true` to `useAsyncData`. | Nuxt 4 returns a `shallowRef`, and every detail page updates its entity **per property** (`updateObjectProperties` / `extendObject`). Without it the page silently stops updating after a save. The `useEntityRecord` composable centralises this. |
+
+Never give an authenticated route an `swr` or `isr` route rule — the payload is
+per-request (`nuxt.config.ts` declares exactly one route rule, `'/login/callback': { ssr: false }`).
+
+### Consequences
+
+The server render now **waits** for a list's request (`onServerPrefetch`) where it
+previously did not, so a list's upstream latency sits on the SSR critical path. The nine
+`[id].vue` detail pages already blocked the render this way — they `await` their record in
+`setup()` — so this is not a new class of dependency, but a slow Core API now shows up as
+time-to-first-byte rather than as a spinner.
+
+List rows now render on the server, which puts `<VCTimeago>` on both sides of the boundary
+for the first time. It computes a wall-clock-relative string during `setup()`, so a row
+whose age crosses a bucket boundary between the render and the hydration — or plain
+client/server clock skew — produces a text mismatch, and Vue reports those through
+`console.error` in production builds too. Vue repairs the text, so nothing is
+misrendered, but it is a new source of console noise on list pages and it makes a *real*
+mismatch harder to spot. Giving `VCTimeago` an SSR-stable first render belongs upstream in
+`@vuecs/timeago`; until then, treat a lone timeago mismatch as expected.
+
+Records resolved by `createEntityManager` are **not** handed over yet; those still fetch on
+both sides of the boundary. Tracked as a follow-up.
+
 ## Account Self-Service
 
 The UI has **no settings area of its own**. Profile, password, authenticators, sessions

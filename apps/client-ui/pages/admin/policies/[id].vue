@@ -3,12 +3,12 @@ import { injectHTTPClient } from '@authup/client-web-kit';
 import type { Policy } from '@authup/core-kit';
 import { PermissionName as AuthupPermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
-import { computed, defineComponent, ref } from 'vue';
-import type { Ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { useRoute } from 'vue-router';
-import { createError, definePageMeta, navigateTo } from '#imports';
+import { definePageMeta } from '#imports';
+import { useEntityRecord } from '../../../composables/entity-record';
 import { useToast } from '../../../composables/toast';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { updateObjectProperties } from '../../../utils';
@@ -27,18 +27,18 @@ export default defineComponent({
         const toast = useToast();
         const route = useRoute('admin-policies-id');
 
-        const entity : Ref<Policy> = ref(null) as any;
+        // Resolved up front: the handler can run after setup's first await,
+        // where `inject()` no longer resolves.
+        const httpClient = injectHTTPClient();
 
-        try {
-            const { data } = await injectHTTPClient()
+        const entity = await useEntityRecord<Policy>(
+            `policy:${route.params.id}`,
+            () => httpClient
                 .policy
-                .getOne(route.params.id as string);
-
-            entity.value = data;
-        } catch {
-            await navigateTo({ path: '/admin/policies' });
-            throw createError({});
-        }
+                .getOne(route.params.id as string)
+                .then((response) => response.data),
+            '/admin/policies',
+        );
 
         const items = computed<NavigationItem[]>(() => {
             const base = `/admin/policies/${entity.value?.id}`;

@@ -9,30 +9,34 @@ import { injectTelemetryHTTPClient } from '@privateaim/client-vue';
 import type {
     Event,
 } from '@privateaim/telemetry-kit';
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import { VCIcon } from '@vuecs/icon';
 import {
     useRoute,
 } from '#imports';
-import { createError, navigateTo } from '#app';
+import { useEntityRecord } from '../../../composables/entity-record';
 
 export default defineComponent({
     components: { VCIcon },
     async setup() {
         const route = useRoute('admin-events-id');
 
-        const entity = ref<null | Event>(null);
-
+        // Resolved up front: the handler can run after setup's first await,
+        // where `inject()` no longer resolves.
         const httpClient = injectTelemetryHTTPClient();
-        try {
-            const { data } = await httpClient.event.getOne(route.params.id as string);
-            entity.value = data;
-        } catch {
-            await navigateTo({ path: '/admin/events' });
-            throw createError({});
-        }
 
-        return { entity: entity.value as Event };
+        const entity = await useEntityRecord<Event>(
+            `event:${route.params.id}`,
+            () => httpClient.event
+                .getOne(route.params.id as string)
+                .then((response) => response.data),
+            '/admin/events',
+        );
+
+        // The ref itself — the template unwraps it, so `entity.id` still
+        // resolves, while the plain value this used to return pinned the page
+        // to the record as it stood during setup.
+        return { entity };
     },
 });
 </script>

@@ -41,6 +41,26 @@ export type ListMeta<T extends Record<string, any>> = ObjectLiteralKeys<{
     [Parameter.RELATIONS]?: RelationsBuildInput<T, 3>
 }>;
 
+/**
+ * The initial load's result, recorded during the server render and replayed by
+ * the hydrating client instead of repeating the request.
+ *
+ * Plain JSON only — the host serializes it into its hydration payload
+ * (`nuxtApp.payload.data` under Nuxt), so nothing here survives as anything a
+ * `JSON.parse(JSON.stringify(...))` round trip would not.
+ */
+export type ListHydrationSnapshot<T extends Record<string, any>> = {
+    data: T[],
+    total: number,
+    meta: ListMeta<T>,
+    /**
+     * The composed query the recorded load sent. Carried because it is assigned
+     * only inside the load the client is skipping, and the realtime handler
+     * consults its sorts to place a newly created entity.
+     */
+    query?: QueryBuildInput<T, 3>
+};
+
 export type ListLoadFn<M = any> = (meta?: M) => Promise<void>;
 
 export type ListSlotProps<T, M = any> = {
