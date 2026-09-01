@@ -158,11 +158,17 @@ export default defineComponent({
         -->
         <FRegistries>
             <template #itemActions="itemProps">
+                <!--
+                    Icon-only, so each carries its own accessible name — the icon
+                    conveys the state visually and nothing else would announce it.
+                -->
                 <VCButton
                     v-if="itemProps.data.id === currentRegistryId"
                     disabled
                     size="xs"
                     color="success"
+                    :aria-label="`${itemProps.data.name} is the registry this node is connected to`"
+                    :title="`${itemProps.data.name} is the registry this node is connected to`"
                 >
                     <VCIcon name="fa6-solid:plug" />
                 </VCButton>
@@ -171,6 +177,12 @@ export default defineComponent({
                     :disabled="itemProps.busy || busy"
                     size="xs"
                     :color="selectedId === itemProps.data.id ? 'warning' : 'neutral'"
+                    :aria-label="selectedId === itemProps.data.id ?
+                        `Deselect ${itemProps.data.name}` :
+                        `Select ${itemProps.data.name}`"
+                    :title="selectedId === itemProps.data.id ?
+                        `Deselect ${itemProps.data.name}` :
+                        `Select ${itemProps.data.name}`"
                     @click.prevent="select(itemProps.data.id)"
                 >
                     <VCIcon :name="selectedId === itemProps.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus'" />

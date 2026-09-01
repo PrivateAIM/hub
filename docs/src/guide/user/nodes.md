@@ -11,9 +11,11 @@ Nodes are registered in the Hub with:
 - Registry project association (for receiving analysis containers)
 
 Creating a node connects it to a registry automatically — the oldest configured
-one — and provisions its registry project and robot account. A node is therefore
-never left unable to push or pull images. The assignment is changed afterwards on
-the node's Registry tab; the create form carries no registry field.
+one — and provisions its registry project and robot account, so a node is not
+left unable to push or pull images. With **no** registry configured there is
+nothing to assign: the node is created unconnected and has to be connected once a
+registry exists. The assignment is changed afterward on the node's Registry tab;
+the create form carries no registry field.
 
 ## Node Lifecycle
 

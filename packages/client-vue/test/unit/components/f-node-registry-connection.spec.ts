@@ -75,6 +75,21 @@ describe('FNodeRegistryConnection', () => {
         expect(updateBodies(coreClient)).toEqual([{ registryId: 'registry-2' }]);
     });
 
+    it('should give the icon-only registry actions an accessible name', async () => {
+        const { wrapper } = mountConnection('registry-1');
+
+        await flush();
+
+        // Icon-only buttons announce nothing without one, and the icon IS the
+        // state here (connected vs selectable).
+        const labels = wrapper.findAll('button')
+            .map((button) => button.attributes('aria-label'))
+            .filter(Boolean);
+
+        expect(labels).toContain('first is the registry this node is connected to');
+        expect(labels).toContain('Select second');
+    });
+
     it('should connect a disconnected node', async () => {
         const { wrapper, coreClient } = mountConnection(null);
 

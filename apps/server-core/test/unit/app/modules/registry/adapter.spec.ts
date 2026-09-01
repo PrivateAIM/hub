@@ -68,6 +68,24 @@ describe('RegistryManagerAdapter', () => {
             expect(await manager.findDefaultRegistryId()).toBe(registry.id);
         });
 
+        it('should break a createdAt tie deterministically', async () => {
+            // `created_at` resolution is coarse enough to tie (a seeder loop, an
+            // import, a one-second datetime column). Ordering by it alone would
+            // then leave the row the database returns up to plan or index order,
+            // so two nodes registered minutes apart could land on different
+            // registries — the very thing the oldest-first rule exists to avoid.
+            // The tie goes to the alphabetically first name, not to an arbitrary
+            // uuid: the choice stays predictable to whoever configured them.
+            const first = await createRegistry('2020-01-01T00:00:00.000Z');
+            const second = await createRegistry('2020-01-01T00:00:00.000Z');
+
+            const expected = [first, second]
+                .sort((a, b) => a.name.localeCompare(b.name))[0].id;
+
+            expect(await manager.findDefaultRegistryId()).toBe(expected);
+            expect(await manager.findDefaultRegistryId()).toBe(expected);
+        });
+
         it('should return the oldest registry when several exist', async () => {
             const oldest = await createRegistry('2020-01-01T00:00:00.000Z');
             await createRegistry('2021-01-01T00:00:00.000Z');
