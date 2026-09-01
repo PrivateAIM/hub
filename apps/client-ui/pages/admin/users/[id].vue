@@ -12,19 +12,15 @@ import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
-import { computed, defineComponent, ref } from 'vue';
-import type { Ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 import {
     definePageMeta,
     updateObjectProperties,
     useToast,
 } from '#imports';
-import {
-    createError,
-    navigateTo,
-    useRoute,
-} from '#app';
+import { useRoute } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
+import { useEntityRecord } from '../../../composables/entity-record';
 
 export default defineComponent({
     components: { FDisplayName, VCIcon },
@@ -43,18 +39,21 @@ export default defineComponent({
         const toast = useToast();
         const route = useRoute('admin-users-id');
 
-        const entity : Ref<User> = ref(null) as any;
+        // Resolved up front: the handler can run after setup's first await,
+        // where `inject()` no longer resolves.
+        const httpClient = injectHTTPClient();
 
-        try {
-            const { data } = await injectHTTPClient()
+        // `admin-user:` rather than `user:` — /users/[id] reads the same record
+        // without the `+email` projection, and a shared key would hand whichever
+        // page hydrates second the other one's payload entry.
+        const entity = await useEntityRecord<User>(
+            `admin-user:${route.params.id}`,
+            () => httpClient
                 .user
-                .getOne(route.params.id as string, { fields: ['+email'] });
-
-            entity.value = data;
-        } catch {
-            await navigateTo({ path: '/admin/users' });
-            throw createError({});
-        }
+                .getOne(route.params.id as string, { fields: ['+email'] })
+                .then((response) => response.data),
+            '/admin/users',
+        );
 
         const items = computed<NavigationItem[]>(() => {
             const base = `/admin/users/${entity.value?.id}`;

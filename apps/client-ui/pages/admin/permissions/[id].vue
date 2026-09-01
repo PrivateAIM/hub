@@ -13,11 +13,11 @@ import { FDisplayName } from '@privateaim/client-vue';
 import { VCIcon } from '@vuecs/icon';
 
 import type { NavigationItem } from '@vuecs/navigation';
-import { computed, defineComponent, ref } from 'vue';
-import type { Ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
-import { createError, definePageMeta, navigateTo } from '#imports';
+import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { useEntityRecord } from '../../../composables/entity-record';
 import { useToast } from '../../../composables/toast';
 import { updateObjectProperties } from '../../../utils';
 
@@ -35,18 +35,18 @@ export default defineComponent({
         const toast = useToast();
         const route = useRoute('admin-permissions-id');
 
-        const entity : Ref<Permission> = ref(null) as any;
+        // Resolved up front: the handler can run after setup's first await,
+        // where `inject()` no longer resolves.
+        const httpClient = injectHTTPClient();
 
-        try {
-            const { data } = await injectHTTPClient()
+        const entity = await useEntityRecord<Permission>(
+            `permission:${route.params.id}`,
+            () => httpClient
                 .permission
-                .getOne(route.params.id as string);
-
-            entity.value = data;
-        } catch {
-            await navigateTo({ path: '/admin/permissions' });
-            throw createError({});
-        }
+                .getOne(route.params.id as string)
+                .then((response) => response.data),
+            '/admin/permissions',
+        );
 
         const items = computed<NavigationItem[]>(() => {
             const base = `/admin/permissions/${entity.value?.id}`;

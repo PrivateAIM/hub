@@ -12,18 +12,14 @@ import { PermissionName } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
-import { computed, defineComponent, ref } from 'vue';
-import type { Ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 import {
     definePageMeta,
     useToast,
 } from '#imports';
-import {
-    createError, 
-    navigateTo, 
-    useRoute,
-} from '#app';
+import { useRoute } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
+import { useEntityRecord } from '../../../composables/entity-record';
 import { updateObjectProperties } from '../../../utils';
 
 export default defineComponent({
@@ -43,18 +39,18 @@ export default defineComponent({
         const toast = useToast();
         const route = useRoute('admin-roles-id');
 
-        const entity : Ref<Role> = ref(null) as any;
+        // Resolved up front: the handler can run after setup's first await,
+        // where `inject()` no longer resolves.
+        const httpClient = injectHTTPClient();
 
-        try {
-            const { data } = await injectHTTPClient()
+        const entity = await useEntityRecord<Role>(
+            `role:${route.params.id}`,
+            () => httpClient
                 .role
-                .getOne(route.params.id as string);
-
-            entity.value = data;
-        } catch {
-            await navigateTo({ path: '/admin/roles' });
-            throw createError({});
-        }
+                .getOne(route.params.id as string)
+                .then((response) => response.data),
+            '/admin/roles',
+        );
 
         const items = computed<NavigationItem[]>(() => {
             const base = `/admin/roles/${entity.value?.id}`;
