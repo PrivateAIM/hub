@@ -61,8 +61,8 @@ export async function useEntityRecord<T>(
 
     // Not awaited yet — `useAsyncData` registers the entry synchronously and
     // hands back a promise, and the registration is what has to happen while
-    // the component instance is still current (it is what schedules the server
-    // fetch and the hydration handoff).
+    // the component instance is still current (it is what builds the entry and
+    // seeds it from the hydration payload).
     const asyncData = useAsyncData<T>(key, fn, {
         // MANDATORY. Nuxt 4 backs an async-data entry with a `shallowRef`
         // unless told otherwise, while every detail page applies an update
@@ -71,6 +71,22 @@ export async function useEntityRecord<T>(
         // so dropping this leaves the page rendering pre-save values —
         // nothing throws, nothing is logged, the save just looks lost.
         deep: true,
+
+        // This function owns the one fetch, so that there is exactly one on
+        // every path. Left on the default, Nuxt decides when to run the handler
+        // from a three-way branch, and one arm of it DEFERS the fetch to
+        // `onBeforeMount` — hydrating a key the payload has no entry for. The
+        // explicit `refresh()` below then resolves first and the deferred fetch
+        // repeats it, so the fallback path costs two requests. `immediate:
+        // false` deletes the branch rather than racing it.
+        //
+        // It does not cost the server render anything: `createInitialFetch()`
+        // still runs, so the entry is built and seeded from the payload either
+        // way — only the execute is gated — and `refresh()` writes
+        // `payload.data[key]` exactly as the automatic fetch would. The
+        // renderer waits because this composable is awaited inside the page's
+        // async `setup()`, not because Nuxt registered `onServerPrefetch`.
+        immediate: false,
     });
 
     // The same entry, read back through the one API that declares it as
@@ -83,10 +99,11 @@ export async function useEntityRecord<T>(
 
     const { error, refresh } = await asyncData;
 
-    // While hydrating a key the payload has no entry for, Nuxt 4 DEFERS the
-    // initial fetch to `onBeforeMount`, so the await above resolves with
-    // neither a record nor an error. That is a load which has not run yet, not
-    // a failed one — deciding on it would bounce a page that is merely late.
+    // The only fetch, on every path. Unresolved here means the payload carried
+    // no entry for this key — a server render, a client-side navigation, or a
+    // hydration whose server pass never produced one — never a load that
+    // already failed, which arrives as `error` instead. Deciding without this
+    // would bounce a page that has simply not read anything yet.
     // `refresh` is a closure over the async-data entry, so it needs no context.
     if (!error.value && !isRecordResolved(data)) {
         await refresh();
