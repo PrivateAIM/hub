@@ -6,7 +6,7 @@
  */
 
 import type { Node } from '@privateaim/core-kit';
-import { PermissionName } from '@privateaim/kit';
+import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
@@ -24,8 +24,8 @@ type NodeRegistryCredentialServiceContext = {
 /**
  * Hands a node the credentials of its own registry project (Harbor robot
  * account) so it can pull/push images without holding any management
- * permission. Fail-closed: only a master-realm member or the node's own client
- * may read the secret — everything else is denied.
+ * permission. Fail-closed — see {@link NodeRegistryCredentialService.isAuthorized}
+ * for who may read the secret.
  */
 export class NodeRegistryCredentialService extends AbstractEntityService implements INodeRegistryCredentialService {
     protected repository: INodeRepository;
@@ -76,11 +76,19 @@ export class NodeRegistryCredentialService extends AbstractEntityService impleme
     }
 
     /**
-     * Fail-closed: the node's own client may always read its own credentials
-     * (the referenced identity); any other caller must actually hold
-     * {@link PermissionName.REGISTRY_MANAGE} — the same permission that gates
-     * this secret on the registry-project endpoint. Being a master-realm member
-     * is, by itself, not sufficient: membership is not a permission.
+     * Fail-closed, with three ways in:
+     *
+     * - the node's own client (the referenced identity) reading its own credentials;
+     * - a node administrator of the node's realm — {@link PermissionName.NODE_UPDATE}
+     *   already owns the whole lifecycle of that registry project (connecting
+     *   provisions it, disconnecting destroys it, reconnecting rotates the robot
+     *   account), and the secret is scoped to that one project, so withholding it
+     *   from the caller who may rotate it protects nothing;
+     * - {@link PermissionName.REGISTRY_MANAGE}, which gates this same secret on
+     *   the registry-project endpoint.
+     *
+     * Being a master-realm member is, by itself, not sufficient: membership is
+     * not a permission.
      */
     protected async isAuthorized(node: Node, actor: ActorContext): Promise<boolean> {
         if (
@@ -92,11 +100,23 @@ export class NodeRegistryCredentialService extends AbstractEntityService impleme
             return true;
         }
 
-        try {
-            await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        const holds = async (name: PermissionName): Promise<boolean> => {
+            try {
+                await actor.permissionChecker.preCheck({ name });
+                return true;
+            } catch {
+                return false;
+            }
+        };
+
+        // Realm-scoped: NODE_UPDATE never reaches another realm's node.
+        if (
+            isRealmResourceWritable(actor.realm, node.realmId) &&
+            await holds(PermissionName.NODE_UPDATE)
+        ) {
             return true;
-        } catch {
-            return false;
         }
+
+        return holds(PermissionName.REGISTRY_MANAGE);
     }
 }

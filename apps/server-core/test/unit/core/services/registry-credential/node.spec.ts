@@ -11,6 +11,7 @@ import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { createAllowAllActor } from '@privateaim/server-test-kit';
+import { PermissionName } from '@privateaim/kit';
 import { describe, expect, it } from 'vitest';
 import { NodeRegistryCredentialService } from '../../../../../src/core/services/registry-credential/index.ts';
 import type {
@@ -61,6 +62,23 @@ function masterRealmWithoutPermissionActor(): ActorContext {
         realm: { name: REALM_MASTER_NAME },
         identity: { type: 'user', id: randomUUID() },
         permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
+    } as unknown as ActorContext;
+}
+
+/**
+ * A node administrator: holds NODE_UPDATE but NOT REGISTRY_MANAGE, in the same
+ * realm as the node.
+ */
+function nodeAdminActor(realmId = 'realm-b'): ActorContext {
+    return {
+        realm: { name: 'node-realm', id: realmId },
+        identity: { type: 'user', id: randomUUID() },
+        permissionChecker: {
+            preCheck: async (input: { name: string }) => {
+                if (input.name === PermissionName.NODE_UPDATE) return;
+                throw new Error('forbidden');
+            },
+        },
     } as unknown as ActorContext;
 }
 
@@ -155,6 +173,28 @@ describe('NodeRegistryCredentialService', () => {
 
         await expect(
             service.getCredentials(NODE_ID, nodeClientActor('some-other-client')),
+        ).rejects.toThrow(PermissionDeniedError);
+    });
+
+    it('should return the credentials for a node administrator of the node\'s realm', async () => {
+        // Whoever may update the node already owns the whole lifecycle of that
+        // registry project: connecting provisions it, disconnecting destroys it,
+        // reconnecting rotates the robot account. Withholding the secret from
+        // them while letting them rotate it is inconsistent — and the secret is
+        // scoped to this node's own project, nothing else in the registry.
+        const service = fullSetup();
+
+        const credentials = await service.getCredentials(NODE_ID, nodeAdminActor());
+
+        expect(credentials.accountSecret).toBe('the-secret');
+    });
+
+    it('should deny a node administrator of a different realm', async () => {
+        // NODE_UPDATE is realm-scoped: it never reaches another realm's node.
+        const service = fullSetup();
+
+        await expect(
+            service.getCredentials(NODE_ID, nodeAdminActor('other-realm')),
         ).rejects.toThrow(PermissionDeniedError);
     });
 

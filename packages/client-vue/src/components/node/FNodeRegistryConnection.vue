@@ -53,6 +53,7 @@ export default defineComponent({
         // server response, while the parent's copy is only patched afterwards.
         const current = computed(() => manager.data.value ?? entity.value);
         const connected = computed(() => !!current.value.registryId);
+        const currentRegistryId = computed(() => current.value.registryId);
         const hasProject = computed(() => !!current.value.registryProjectId);
 
         // Staged selection: picking a registry in the list only marks it, the
@@ -91,6 +92,7 @@ export default defineComponent({
         return {
             busy,
             connected,
+            currentRegistryId,
             hasProject,
             selectedId,
             select,
@@ -109,83 +111,110 @@ export default defineComponent({
             with its own robot account, which the node uses to push and pull images.
         </p>
 
-        <template v-if="connected">
-            <VCAlert
-                color="success"
-                variant="soft"
-                size="sm"
-                class="mb-3"
+        <VCAlert
+            v-if="connected"
+            color="success"
+            variant="soft"
+            size="sm"
+            class="mb-3"
+        >
+            <VCIcon
+                name="fa6-solid:plug"
+                class="pe-1"
+            /> This node is connected to a registry.
+            <template v-if="!hasProject">
+                Its registry project has not been provisioned yet.
+            </template>
+        </VCAlert>
+        <VCAlert
+            v-else
+            color="warning"
+            variant="soft"
+            size="sm"
+            class="mb-3"
+        >
+            This node is not connected to a registry. Select one below to connect it.
+        </VCAlert>
+
+        <VCAlert
+            v-if="connected"
+            color="warning"
+            variant="soft"
+            size="sm"
+            class="mb-3"
+        >
+            Switching to another registry provisions a new registry project there and
+            removes the current one together with its robot account — the node will
+            have to pull fresh credentials. Disconnecting removes it without a
+            replacement.
+        </VCAlert>
+
+        <!--
+            The list stays visible while connected: a node is assigned a registry on
+            creation, so re-assigning is the normal interaction, not the exception.
+            The server handles it in a single update (it tears the stale project down
+            and provisions a fresh one on the new registry) — going through
+            Disconnect first would destroy the project for no reason.
+        -->
+        <FRegistries>
+            <template #itemActions="itemProps">
+                <!--
+                    Icon-only, so each carries its own accessible name — the icon
+                    conveys the state visually and nothing else would announce it.
+                -->
+                <VCButton
+                    v-if="itemProps.data.id === currentRegistryId"
+                    disabled
+                    size="xs"
+                    color="success"
+                    :aria-label="`${itemProps.data.name} is the registry this node is connected to`"
+                    :title="`${itemProps.data.name} is the registry this node is connected to`"
+                >
+                    <VCIcon name="fa6-solid:plug" />
+                </VCButton>
+                <VCButton
+                    v-else
+                    :disabled="itemProps.busy || busy"
+                    size="xs"
+                    :color="selectedId === itemProps.data.id ? 'warning' : 'neutral'"
+                    :aria-label="selectedId === itemProps.data.id ?
+                        `Deselect ${itemProps.data.name}` :
+                        `Select ${itemProps.data.name}`"
+                    :title="selectedId === itemProps.data.id ?
+                        `Deselect ${itemProps.data.name}` :
+                        `Select ${itemProps.data.name}`"
+                    @click.prevent="select(itemProps.data.id)"
+                >
+                    <VCIcon :name="selectedId === itemProps.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus'" />
+                </VCButton>
+            </template>
+        </FRegistries>
+
+        <div class="mt-3 flex gap-2">
+            <VCButton
+                color="primary"
+                size="xs"
+                :disabled="busy || !selectedId"
+                @click.prevent="connect"
             >
                 <VCIcon
                     name="fa6-solid:plug"
                     class="pe-1"
-                /> This node is connected to a registry.
-                <template v-if="!hasProject">
-                    Its registry project has not been provisioned yet.
-                </template>
-            </VCAlert>
+                /> {{ connected ? 'Switch' : 'Connect' }}
+            </VCButton>
 
-            <VCAlert
-                color="warning"
-                variant="soft"
-                size="sm"
-                class="mb-3"
+            <VCButton
+                v-if="connected"
+                color="error"
+                size="xs"
+                :disabled="busy"
+                @click.prevent="disconnect"
             >
-                Disconnecting removes the node's registry project and its robot account.
-                Reconnecting provisions a new one — the node will have to pull fresh
-                credentials.
-            </VCAlert>
-
-            <div>
-                <VCButton
-                    color="error"
-                    size="xs"
-                    :disabled="busy"
-                    @click.prevent="disconnect"
-                >
-                    <VCIcon
-                        name="fa6-solid:power-off"
-                        class="pe-1"
-                    /> Disconnect
-                </VCButton>
-            </div>
-        </template>
-        <template v-else>
-            <VCAlert
-                color="warning"
-                variant="soft"
-                size="sm"
-                class="mb-3"
-            >
-                This node is not connected to a registry. Select one below to connect it.
-            </VCAlert>
-
-            <FRegistries>
-                <template #itemActions="itemProps">
-                    <VCButton
-                        :disabled="itemProps.busy || busy"
-                        size="xs"
-                        :color="selectedId === itemProps.data.id ? 'warning' : 'neutral'"
-                        @click.prevent="select(itemProps.data.id)"
-                    >
-                        <VCIcon :name="selectedId === itemProps.data.id ? 'fa6-solid:minus' : 'fa6-solid:plus'" />
-                    </VCButton>
-                </template>
-            </FRegistries>
-
-            <div class="mt-3">
-                <VCButton
-                    color="primary"
-                    size="xs"
-                    :disabled="busy || !selectedId"
-                    @click.prevent="connect"
-                >
-                    <VCIcon
-                        name="fa6-solid:plug"
-                        class="pe-1"
-                    /> Connect
-                </VCButton>
-            </div>
-        </template>
+                <VCIcon
+                    name="fa6-solid:power-off"
+                    class="pe-1"
+                /> Disconnect
+            </VCButton>
+        </div>
     </div>
 </template>

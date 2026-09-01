@@ -26,17 +26,27 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async findDefaultRegistryId(): Promise<string | null> {
-        // Only auto-assign a registry when the choice is unambiguous. There is no
-        // designated "default" registry, so with more than one configured, picking
-        // an arbitrary "first" row would provision the node against the wrong
-        // registry — later surfacing the wrong host in its credentials. When the
-        // choice is ambiguous, require an explicit registry selection instead.
-        const [registries, total] = await this.registryRepository.findAndCount({ take: 2 });
-        if (total !== 1) {
-            return null;
-        }
+        // There is no designated "default" registry, so the oldest one stands in:
+        // a node registered without an explicit choice must still come out
+        // connected — an unassigned node can neither push nor pull analysis
+        // images. Oldest-first keeps the fallback stable, adding a registry later
+        // never re-points what new nodes connect to. An explicit `registryId` in
+        // the payload always wins over this, and the assignment can be changed on
+        // the node's registry tab afterwards.
+        //
+        // `name` breaks a `createdAt` tie: the column's resolution is coarse
+        // enough for a seeder loop or an import to produce equal timestamps, and
+        // ordering by `createdAt` alone would then leave the winner up to plan or
+        // index order — nodes registered minutes apart could land on different
+        // registries, which is exactly what oldest-first exists to prevent. `name`
+        // is unique, so it is a total order, and unlike the (v4, random) `id` it
+        // resolves the tie the way an admin would guess: alphabetically.
+        const registry = await this.registryRepository.findOne({
+            where: {},
+            order: { createdAt: 'ASC', name: 'ASC' },
+        });
 
-        return registries[0].id;
+        return registry?.id ?? null;
     }
 
     async createProject(data: Partial<RegistryProject>): Promise<RegistryProject> {
