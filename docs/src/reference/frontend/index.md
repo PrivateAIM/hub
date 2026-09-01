@@ -27,6 +27,7 @@ docker run -e ... privateaim/hub ui
 | `NUXT_PUBLIC_ACCOUNT_URL` | `<NUXT_PUBLIC_AUTHUP_URL>/account` | Authup account console, linked from the "Account" sidebar entry |
 | `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
 | `NUXT_PUBLIC_TELEMETRY_URL` | — | Telemetry service URL |
+| `NUXT_PUBLIC_COOKIE_DOMAIN` | — (host-only) | `Domain` attribute for the session cookies. Leave empty unless a sibling host must read them — see [Session cookies](#session-cookies) |
 | `NUXT_PUBLIC_MESSENGER_URL` | — | Messenger service URL |
 
 ## Authentication
@@ -74,6 +75,50 @@ the default moved to `admin-console`.
 A deployment serving the UI from its own origin should register a **dedicated** client
 (once per realm, e.g. via a wildcard `realms[]` provisioning entry named `"*"`) and point
 `NUXT_PUBLIC_AUTHUP_CLIENT_ID` at it, rather than sharing Authup's console client.
+:::
+
+## Session cookies
+
+The UI persists its session in cookies at path `/`: `access_token`,
+`access_token_expire_date`, `refresh_token`, `id_token`, `realm` and
+`realm_management`. Authup's own hosted pages — the authorize/login pages and the
+account console — persist **their** session under the *same names*, because both
+sides run `@authup/client-web-kit`'s store.
+
+The two stay apart only while their `(name, domain, path)` cookie keys differ. When
+they collide, the browser keeps **both** records and sends both; a read takes the
+**first**, which is the **older** one. Each side can then hydrate, rotate and
+`cleanup()`-revoke the other's tokens. The symptom is being **logged out on the next
+page reload** — the login itself succeeds, because everything after the code exchange
+is still in memory.
+
+Which deployment layout you run decides what is required:
+
+| Authup is served at | Requirement |
+|---|---|
+| A path on the UI's own origin (`https://hub.example.com/auth`) | Authup including [authup#3495](https://github.com/authup/authup/issues/3495), which scopes the console cookies to that sub-path. **Unreleased as of `1.0.0-beta.63`** — on beta.63 and earlier this layout is broken. Keep `NUXT_PUBLIC_COOKIE_DOMAIN` empty. |
+| A subdomain of the UI host (`auth.hub.example.com`) | `NUXT_PUBLIC_COOKIE_DOMAIN` must be empty, or at least not cover that host. A `Domain` value is delivered to every subdomain of itself, so it reaches Authup's origin and collides there. |
+| A separate origin (`auth.example.com`, or any unrelated host) | Nothing. Separate cookie jars. |
+
+**Rule: leave `NUXT_PUBLIC_COOKIE_DOMAIN` empty.** Host-only cookies are correct in all
+three layouts. Set it only when a *sibling* host genuinely has to read the cookie
+itself, and never to a value that covers Authup's host. The Helm chart refuses that
+combination at render time (`flameHub.validateCookieDomain`).
+
+It buys the Hub nothing by default: the services read the bearer token from the
+`Authorization` header, and their cookie fallback only ever sees same-origin requests
+under a shared hostname.
+
+::: warning Changing `NUXT_PUBLIC_COOKIE_DOMAIN` from a value to empty
+The switch does not clear what browsers already hold. The previously written
+`Domain`-scoped records survive, they are **older** than the host-only ones written
+after the change, and they therefore keep winning the read — so a returning user can
+stay broken past the fix.
+
+`access_token` and `access_token_expire_date` carry a `maxAge` and lapse with the
+token, but `refresh_token`, `id_token`, `realm` and `realm_management` are session
+cookies: they live until the browser is closed. Have affected users close the browser
+once, or clear the site's cookies.
 :::
 
 ## Server Rendering and Hydration

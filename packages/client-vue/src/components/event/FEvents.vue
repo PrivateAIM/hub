@@ -9,6 +9,7 @@ import type {
     Event,
 } from '@privateaim/telemetry-kit';
 import type { QueryBuildInput } from '@rapiq/core';
+import { and, defineFilters, isCondition } from '@rapiq/core';
 import type { PropType } from 'vue';
 import {
     defineComponent,
@@ -33,19 +34,42 @@ export default defineComponent({
         const busy = ref(false);
         const data = ref<Event[]>([]);
 
+        /**
+         * `FSearch` emits a rapiq EXPRESSION (`contains('name', text)`), while the
+         * page passes a record bag (`{ realmId: [...] }`). Spreading the two
+         * together produced `{ realmId, operator, value, field }`, which encodes as
+         * `eq(operator,'contains')...` and is rejected by the strict `eventSchema`
+         * with a 400. Combine them with `and()` instead.
+         */
+        const mergeFilters = (page?: any, incoming?: any) => {
+            if (!isCondition(incoming)) {
+                return { ...(page || {}), ...(incoming || {}) };
+            }
+
+            // `and(defineFilters({}), …)` throws `filters:compound:empty`
+            return page && Object.keys(page).length > 0 ?
+                and(defineFilters(page), incoming) :
+                incoming;
+        };
+
         const resolve = async (query?: QueryBuildInput<Event, 3>) => {
             busy.value = true;
 
-            const response = await httpClient.event.getMany(query);
+            // `finally`, not a trailing assignment: a rejected request would
+            // otherwise leave the table wedged in its loading state until a
+            // full page reload.
+            try {
+                const response = await httpClient.event.getMany(query);
 
-            data.value = response.data;
+                data.value = response.data;
 
-            meta.value.pagination = {
-                ...meta.value.pagination,
-                ...response.meta,
-            };
-
-            busy.value = false;
+                meta.value.pagination = {
+                    ...meta.value.pagination,
+                    ...response.meta,
+                };
+            } finally {
+                busy.value = false;
+            }
         };
 
         const load = (input: ListMeta<Event>) => resolve({
@@ -54,10 +78,7 @@ export default defineComponent({
                 ...(props.query?.pagination || {}),
                 ...(input.pagination || {}),
             },
-            filters: {
-                ...(props.query?.filters || {}),
-                ...(input.filters || {}),
-            },
+            filters: mergeFilters(props.query?.filters, input.filters),
         });
 
         const handleDeleted = (input: Event) => {

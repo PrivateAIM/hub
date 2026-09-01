@@ -9,6 +9,8 @@ import type { BaseServerConfig } from '@privateaim/server-kit';
 
 export interface Config extends BaseServerConfig {
     publicURL: string;
+    /** Days a bus-ingested event row is kept. `0` keeps rows forever. */
+    eventRetentionDays: number;
     victoriaLogsURL?: string | null;
     victoriaLogsIngestorURL?: string | null;
     victoriaLogsQuerierURL?: string | null;

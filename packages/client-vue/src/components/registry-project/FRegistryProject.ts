@@ -67,6 +67,9 @@ export default defineComponent({
 
         const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
+        // monotonic guard for the socket-triggered secret re-read below
+        let secretRefreshToken = 0;
+
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY_PROJECT}`,
             setup,
@@ -76,22 +79,41 @@ export default defineComponent({
                     form.secret = entity.accountSecret || '';
                 }
             },
+            // The socket payload no longer carries `accountSecret` — BaseSubscriber
+            // strips every `select: false` column from entity events, so the room
+            // (joinable with REGISTRY_PROJECT_MANAGE) cannot leak a field whose HTTP
+            // read requires REGISTRY_MANAGE. Re-read over HTTP instead, which does
+            // enforce it. Deliberately NOT `manager.resolve({ reset: true })`: that
+            // nulls the entity first, unmounting the panel for a frame and leaving
+            // it blank for good if the re-read fails.
             onUpdated: (entity) => {
-                if (entity) {
-                    form.secret = entity.accountSecret || '';
+                if (!entity || !entity.id) {
+                    return;
                 }
+
+                // Last request issued wins. Without this a slower earlier re-read can
+                // resolve after a later one and pin a STALE secret in the form — the
+                // exact failure this re-read exists to prevent — and a response for a
+                // previously displayed record could overwrite the current one.
+                secretRefreshToken += 1;
+                const token = secretRefreshToken;
+
+                void apiClient.registryProject
+                    .getOne(entity.id, { fields: ['+accountId', '+accountName', '+accountSecret'] })
+                    .then(({ data }) => {
+                        if (token !== secretRefreshToken) {
+                            return;
+                        }
+
+                        form.secret = data.accountSecret || '';
+                    })
+                    .catch(() => {
+                        // keep rendering the record already on screen
+                    });
             },
         });
 
-        await manager.resolve({
-            query: {
-                fields: [
-                    '+accountId',
-                    '+accountName',
-                    '+accountSecret',
-                ],
-            },
-        });
+        await manager.resolve({ query: { fields: ['+accountId', '+accountName', '+accountSecret'] } });
 
         const execute = async (command: RegistryAPICommand) => wrapFnWithBusyState(busy, async () => {
             if (!manager.data.value) return;

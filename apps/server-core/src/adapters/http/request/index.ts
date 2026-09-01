@@ -6,4 +6,3 @@
  */
 
 export * from './helpers/index.ts';
-export * from './repository.ts';

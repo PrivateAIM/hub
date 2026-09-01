@@ -104,7 +104,7 @@ export default defineComponent({
 
         const query = computed<QueryBuildInput<Event, 3>>(() => ({
             filters: { realmId: [realmManagementId.value, null] },
-            sorts: { updatedAt: 'DESC' },
+            sorts: { createdAt: 'DESC' },
             pagination: { limit: 50 },
         }));
 
@@ -137,6 +137,7 @@ export default defineComponent({
             <FSearch
                 :load="props.load"
                 :meta="props.meta"
+                :fields="['name']"
             />
         </template>
         <template #footer="props">
@@ -195,9 +196,6 @@ export default defineComponent({
                 </template>
                 <template #cell-createdAt="{ row }">
                     <VCTimeago :datetime="row.createdAt" />
-                </template>
-                <template #cell-updatedAt="{ row }">
-                    <VCTimeago :datetime="row.updatedAt" />
                 </template>
                 <VCTableLoading />
                 <VCTableEmpty />

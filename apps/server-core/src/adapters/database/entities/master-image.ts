@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { deserialize, serialize } from '@authup/kit';
 import type { ProcessStatus } from '@privateaim/kit';
-import { bigintNumberTransformer, dateToISOStringTransformer } from '@privateaim/server-db-kit';
+import { bigintNumberTransformer, dateToISOStringTransformer, serializedTextTransformer } from '@privateaim/server-db-kit';
 import {
     Column,
     CreateDateColumn,
@@ -95,14 +94,7 @@ export class MasterImageEntity implements MasterImage {
         name: 'command_arguments',
         type: 'text',
         nullable: true,
-        transformer: {
-            to(value: any): any {
-                return serialize(value);
-            },
-            from(value: any): any {
-                return deserialize(value);
-            },
-        },
+        transformer: serializedTextTransformer,
     })
     commandArguments: MasterImageCommandArgument[] | null;
 

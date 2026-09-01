@@ -30,12 +30,6 @@ export class EventAPI extends BaseAPI implements IEventAPI {
         return response;
     }
 
-    async update(id: Event['id'], data: Partial<Event>): Promise<EntityRecordResponse<Event>> {
-        const { data: response } = await this.client.post(`events/${id}`, data);
-
-        return response;
-    }
-
     async create(data: Partial<Event>): Promise<EntityRecordResponse<Event>> {
         const { data: response } = await this.client.post('events', data);
 

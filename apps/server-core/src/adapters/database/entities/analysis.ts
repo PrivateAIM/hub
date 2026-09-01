@@ -13,7 +13,7 @@ import type {
     Project,
     Registry,
 } from '@privateaim/core-kit';
-import { bigintNumberTransformer, dateToISOStringTransformer } from '@privateaim/server-db-kit';
+import { bigintNumberTransformer, dateToISOStringTransformer, serializedTextTransformer } from '@privateaim/server-db-kit';
 import {
     Column,
     CreateDateColumn,
@@ -24,7 +24,6 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { deserialize, serialize } from '@authup/kit';
 import type { ProcessStatus } from '@privateaim/kit';
 import { MasterImageEntity } from './master-image.ts';
 import { ProjectEntity } from './project.ts';
@@ -219,14 +218,7 @@ export class AnalysisEntity implements Analysis {
         name: 'image_command_arguments',
         type: 'text',
         nullable: true,
-        transformer: {
-            to(value: any): any {
-                return serialize(value);
-            },
-            from(value: any): any {
-                return deserialize(value);
-            },
-        },
+        transformer: serializedTextTransformer,
     })
     imageCommandArguments: MasterImageCommandArgument[] | null;
 

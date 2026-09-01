@@ -7,6 +7,7 @@
 
 import type { TypedToken } from 'eldin';
 import { ConfigInjectionKey as BaseConfigInjectionKey } from '@privateaim/server-kit';
+import { EVENT_RETENTION_DAYS_DEFAULT } from '../../../core/entities/event/constants.ts';
 import type { Config } from './types.ts';
 
 export const ConfigInjectionKey = BaseConfigInjectionKey as unknown as TypedToken<Config>;
@@ -20,6 +21,8 @@ export const ConfigDefaults = {
     CLIENT_SECRET: 'start123',
 
     PUBLIC_URL: 'http://localhost:3000',
+
+    EVENT_RETENTION_DAYS: EVENT_RETENTION_DAYS_DEFAULT,
 } as const;
 
 export enum EnvironmentInputKey {
@@ -41,4 +44,6 @@ export enum EnvironmentInputKey {
     AUTHUP_URL = 'AUTHUP_URL',
 
     PUBLIC_URL = 'PUBLIC_URL',
+
+    EVENT_RETENTION_DAYS = 'EVENT_RETENTION_DAYS',
 }

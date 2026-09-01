@@ -13,7 +13,7 @@ npm install @privateaim/telemetry-kit
 ### HTTP Client
 
 ```typescript
-import { APIClient } from '@privateaim/telemetry-kit';
+import { APIClient, EventScope } from '@privateaim/telemetry-kit';
 
 const client = new APIClient({
     baseURL: 'http://localhost:4002',
@@ -25,7 +25,9 @@ const { data: logs, meta } = await client.log.getMany({
 });
 
 // Create an event — { data: Event, meta: {} }
-const { data: event } = await client.event.create({ name: 'analysis.started', /* ... */ });
+const { data: event } = await client.event.create({
+    scope: EventScope.ENTITY, name: 'updated', refType: 'analysis', refId: analysisId,
+});
 
 // Get an event — { data: Event, meta: { schema } }
 const { data: entity } = await client.event.getOne(eventId);
@@ -33,7 +35,7 @@ const { data: entity } = await client.event.getOne(eventId);
 
 ### Response Shapes
 
-Every single-record method (`getOne`, `create`, `update`, `delete`) resolves to the
+Every single-record method (`getOne`, `create`, `delete`) resolves to the
 `{ data, meta }` record envelope — destructure `data` at the call site. `getMany` is unchanged:
 collections were already enveloped.
 
@@ -57,8 +59,14 @@ barrel. See the [core-http-kit migration note](/reference/core/core-http-kit#mig
 
 ### Domain Types
 
+`Event.scope` is a **closed** vocabulary — `EventScope.ENTITY` | `BUILDER` | `SYNCHRONIZER` — enforced
+by the validator on both the `POST /events` and AMQP ingest paths. `name` and `refType` stay
+free-form: `name`'s vocabulary is scope-relative and `refType`'s is owned by the producing service's
+own `DomainType`, neither of which a Layer-0 kit can import.
+
+
 ```typescript
-import { Event, Log } from '@privateaim/telemetry-kit';
+import { Event, EventScope, Log } from '@privateaim/telemetry-kit';
 ```
 
 ## API
@@ -88,7 +96,7 @@ function doWork(client: ITelemetryClient) { /* … */ }
 
 | Sub-API | Contract |
 |---|---|
-| `event` | `IEventAPI` |
+| `event` | `IEventAPI` (append-only audit records: no `update`) |
 | `log` | `ILogAPI` (append-and-query only: no `getOne`/`update`, and a query-keyed `deleteMany`) |
 
 ## Testing

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '@privateaim/kit';
+import type { DomainEventName, ObjectLiteral } from '@privateaim/kit';
 
 export type EntityEventDestination = {
     namespace?: string | string[],
@@ -22,7 +22,7 @@ export type EntityEventMetadata = {
     refType: string,
     refId?: string,
 
-    event: string,
+    event: `${DomainEventName}`,
 
     requestPath?: string | null,
     requestMethod?: string | null;
@@ -38,6 +38,12 @@ export type EntityEventPublishOptions<
     T extends ObjectLiteral = ObjectLiteral,
 > = {
     data: T,
+    /**
+     * Pre-mutation snapshot, `updated` events only. IN-PROCESS ONLY: the redis and
+     * socket handlers must keep building their wire payload as an explicit literal —
+     * never `{ ...ctx }` — so this never leaves the process. Its only reader is
+     * @privateaim/server-telemetry-kit's EntityEventHandler, which reduces it to a diff.
+     */
     dataPrevious?: T,
     metadata: EntityEventMetadata,
     destinations: EntityEventDestinations | EntityEventDestinationsFn<T>

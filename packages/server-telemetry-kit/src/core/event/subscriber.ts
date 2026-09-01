@@ -8,9 +8,9 @@
 import { isEqual } from 'smob';
 import type { EntityEventHandleOptions, IEntityEventHandler, Logger } from '@privateaim/server-kit';
 import type { Event, EventData } from '@privateaim/telemetry-kit';
-import { DomainType } from '@privateaim/telemetry-kit';
+import { DomainType, EVENT_DATA_SECRET_KEY_REGEX } from '@privateaim/telemetry-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
-import { WEEK_IN_MS, isObject } from '@privateaim/kit';
+import { DomainEventName, isObject } from '@privateaim/kit';
 import type { IEventPublisher } from './types.ts';
 
 /**
@@ -54,10 +54,7 @@ export class EntityEventHandler implements IEntityEventHandler {
             name: ctx.metadata.event,
             scope: 'entity',
 
-            expiring: true,
-            expiresAt: new Date(
-                Date.now() + WEEK_IN_MS,
-            ).toISOString(),
+            // retention is stamped at ingest by server-telemetry (EVENT_RETENTION_DAYS).
         };
 
         if (ctx.metadata.refId) {
@@ -80,18 +77,10 @@ export class EntityEventHandler implements IEntityEventHandler {
             }
         }
 
-        if (
-            entity.requestIpAddress &&
-            entity.requestIpAddress === '::1'
-        ) {
-            entity.requestIpAddress = '127.0.0.1';
-        }
-
         const data : EventData = {};
 
         if (
-            // todo: use enum
-            ctx.metadata.event === 'updated' &&
+            ctx.metadata.event === DomainEventName.UPDATED &&
             ctx.dataPrevious
         ) {
             const diff : ObjectDiff = {};
@@ -102,6 +91,16 @@ export class EntityEventHandler implements IEntityEventHandler {
                 // once the properties became camelCase, so every update event
                 // started carrying timestamp churn in its diff.
                 if (TIMESTAMP_KEYS.has(key)) {
+                    continue;
+                }
+
+                // Never audit a credential. `ctx.data` is the incoming save
+                // payload, so a `select: false` column such as
+                // `registry.accountSecret` IS present here while
+                // `ctx.dataPrevious` (loaded from the database without
+                // select:false columns) is NOT — the value therefore always
+                // compares as changed and would always be recorded.
+                if (EVENT_DATA_SECRET_KEY_REGEX.test(key)) {
                     continue;
                 }
 

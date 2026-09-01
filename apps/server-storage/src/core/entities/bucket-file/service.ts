@@ -69,7 +69,7 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
 
         const { id: entityId } = entity;
 
-        await this.repository.remove(entity);
+        await this.repository.remove(entity, { data: actor.metadata });
 
         entity.id = entityId;
 

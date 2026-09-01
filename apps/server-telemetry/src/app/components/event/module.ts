@@ -13,10 +13,14 @@ import type { IEventRepository } from '../../../core/entities/index.ts';
 import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers/index.ts';
 
 export class EventComponent extends BaseComponent<EventComponentEventMap> {
-    constructor(ctx: { repository: IEventRepository, logger?: Logger }) {
+    constructor(ctx: {
+        repository: IEventRepository, 
+        logger?: Logger, 
+        retentionDays?: number 
+    }) {
         super();
 
-        this.mount(EventCommand.CREATE, new EventComponentCreateHandler({ logger: ctx.logger }));
+        this.mount(EventCommand.CREATE, new EventComponentCreateHandler({ logger: ctx.logger, retentionDays: ctx.retentionDays }));
         this.mount(EventCommand.CLEAN, new EventComponentCleanerHandler({
             repository: ctx.repository,
             logger: ctx.logger,

@@ -31,6 +31,7 @@ docker run -e ... privateaim/hub telemetry cli start
 | `VICTORIA_LOGS_URL` | — | VictoriaLogs base URL |
 | `VICTORIA_LOGS_INGESTOR_URL` | — | VictoriaLogs ingest endpoint (overrides base URL) |
 | `VICTORIA_LOGS_QUERIER_URL` | — | VictoriaLogs query endpoint (overrides base URL) |
+| `EVENT_RETENTION_DAYS` | `7` | Days a bus-ingested event row is kept before the sweep drops it. Stamped at ingest when the publisher supplied no `expiresAt`; `0` keeps rows forever. Events created directly via `POST /events` are never stamped. |
 
 All VictoriaLogs variables are optional. When unset, an in-memory log store is used as a fallback.
 
@@ -73,15 +74,29 @@ endpoint in Hub that carries **no** `meta.schema` — `meta` holds only `total`,
 See [API Reference](/guide/development/api#response-shapes) for the full contract and the
 `meta.schema` reading rules.
 
+::: warning Event `data` is sanitized on write
+Every event row is written through one validator, on both the `POST /events` path and the AMQP
+ingest path. Keys matching `/(password|secret|hash|token|credential)/i` are dropped, `diff` survives
+only as a one-level map of `{ next, previous }` scalar pairs (an entry whose `previous` is absent is
+dropped — that is the signature of a write-only credential column) and everything else is discarded.
+Audit diffs therefore never contain `registry.accountSecret` or `registryProject.accountSecret`; the
+denylist also — deliberately, fail-closed — suppresses the non-secret `bucketFile.hash`,
+`analysis.buildHash` and `masterImage.buildHash` columns.
+:::
+
+
 ## Architecture
 
 - **LogStore port** (`core/services/log-store/types.ts`) — defines `query`, `write`, `delete` operations
 - **VictoriaLogsLogStore** — production implementation with query injection protection
 - **MemoryLogStore** — in-memory fallback for startup and testing
 - **EventComponent** / **LogComponent** — AMQP consumers for async event and log ingestion.
-  EventComponent also owns the retention sweep: expiring events are dropped once at
-  start and daily at 01:00, in bounded batches so a matured retention window never
-  becomes one long-running delete.
+  EventComponent owns retention at both ends. It stamps the window on ingest from
+  `EVENT_RETENTION_DAYS` (publishers no longer stamp; an explicit `expiresAt`, or
+  `expiring: false`, from the publisher still wins), and it runs the sweep: expiring
+  events are dropped once at start and daily at 01:00 on a fixed, non-configurable
+  schedule, in bounded batches so a matured retention window never becomes one
+  long-running delete.
 
 ::: warning
 The telemetry service is the log writer itself, so its own logger cannot use the log component caller (would be circular). It uses a `MemoryLogStore` fallback internally.
