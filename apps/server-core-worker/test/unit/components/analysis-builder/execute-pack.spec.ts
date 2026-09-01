@@ -196,6 +196,28 @@ async function pack(entries: TarEntry[], bucketFilePaths: string[], transform?: 
 }
 
 /**
+ * Decode a packed archive back into its entries. A name over 100 bytes is split
+ * across ustar's `prefix` and `name` fields, so it is NOT contiguous in the raw
+ * bytes — a substring assertion silently passes over exactly the shapes worth
+ * asserting on.
+ */
+function readTar(buffer: Buffer): Promise<{ name: string, type: Headers['type'] }[]> {
+    const extract = tar.extract();
+    const entries: { name: string, type: Headers['type'] }[] = [];
+
+    return new Promise((resolve, reject) => {
+        extract.on('entry', (headers, stream, next) => {
+            entries.push({ name: headers.name, type: headers.type });
+            stream.on('end', next);
+            stream.resume();
+        });
+        extract.on('error', reject);
+        extract.on('finish', () => resolve(entries));
+        extract.end(buffer);
+    });
+}
+
+/**
  * A response body that hands over `chunks` and then stalls or fails, standing in
  * for the storage download. `cancelled` flips when the consumer closes it, which
  * is the only observable proof that the source readable was destroyed.
@@ -237,6 +259,44 @@ describe('AnalysisBuilderExecuteHandler > packContainer', () => {
         expect(archives).toHaveLength(1);
         expect(archives[0].path).toBe(AnalysisContainerPath.CODE);
         expect(archives[0].content.includes(ENTRYPOINT)).toBe(true);
+    });
+
+    it('should pack the bucket-file paths the storage service really produces', async () => {
+        // The no-false-positives half of the allow-list. `packBucketFiles` calls
+        // `pack.entry({ name, size })` with no `type`, so tar-stream derives
+        // `'file'` — but the derivation runs through the header encoder, and a
+        // name over 100 bytes takes the pax path with a header of its own. These
+        // are real shapes: the uploader sends `webkitRelativePath` verbatim, so
+        // deep and non-ASCII paths are the norm, not the edge.
+        const paths = [
+            'entrypoint.py',
+            'mycode/sub/dir/util.py',
+            `${'a/'.repeat(60)}deep.py`,
+            'Ordner/Grüße_日本語_файл.py',
+            'empty.py',
+        ];
+
+        const { promise, archives } = await pack(
+            paths.map((name) => ({
+                name,
+                type: undefined,
+                body: name === 'empty.py' ? '' : 'x',
+            })),
+            paths,
+        );
+
+        await expect(promise).resolves.toBeUndefined();
+
+        expect(archives).toHaveLength(1);
+
+        // Assert on the decoded entries, not on "it resolved" — otherwise this
+        // passes just as happily for an empty tar. The types are the point: the
+        // producer never sets one, so every entry here reached the allow-list as
+        // `'file'` and was let through.
+        const entries = await readTar(archives[0].content);
+
+        expect(entries.map((entry) => entry.name)).toEqual(paths);
+        expect(entries.every((entry) => entry.type === 'file')).toBe(true);
     });
 
     it('should reject a file that does not belong to the analysis', async () => {
