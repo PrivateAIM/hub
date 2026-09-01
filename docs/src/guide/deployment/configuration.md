@@ -59,3 +59,26 @@ created database.
 |----------|----------|-------------|
 | `VICTORIA_LOGS_URL` | Yes | VictoriaLogs endpoint URL |
 | `EVENT_RETENTION_DAYS` | No | Days an audit/event row is kept before the daily sweep removes it (default `7`; `0` = keep forever) |
+
+## Frontend Variables (client-ui)
+
+The full list lives in the [frontend reference](../../reference/frontend/index.md#environment-variables).
+One of them is a deployment decision rather than a service address:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NUXT_PUBLIC_COOKIE_DOMAIN` | No | `Domain` attribute for the UI's session cookies. **Leave empty.** |
+
+### Where Authup is served matters
+
+The UI and Authup's own hosted pages persist their sessions under the **same cookie
+names**. If both can see each other's cookies, they hydrate, rotate and revoke each
+other's tokens, and the user is logged out on the next page reload.
+
+Empty (host-only) cookies are correct in every layout. Setting a `Domain` delivers the
+cookies to every subdomain of that value — including Authup's host, if it sits below it.
+Serving Authup on a path of the UI's own origin additionally requires an Authup build
+containing [authup#3495](https://github.com/authup/authup/issues/3495).
+
+The layout matrix and the upgrade caveat are documented under
+[Session cookies](../../reference/frontend/index.md#session-cookies).
