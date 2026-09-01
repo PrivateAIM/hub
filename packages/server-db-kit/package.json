@@ -22,6 +22,7 @@
     "license": "Apache-2.0",
     "description": "This package contains server side db helpers & utilities.",
     "dependencies": {
+        "@authup/kit": "^1.0.0-beta.63",
         "@privateaim/kit": "^0.15.0",
         "@privateaim/server-kit": "^0.15.0"
     },

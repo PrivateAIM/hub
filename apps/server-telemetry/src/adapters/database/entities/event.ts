@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
+import { dateToISOStringTransformer, serializedTextTransformer } from '@privateaim/server-db-kit';
 import type { Realm } from '@authup/core-kit';
-import { deserialize, serialize } from '@authup/kit';
 import type { ObjectLiteral } from '@privateaim/kit';
 import {
     Column,
@@ -19,10 +18,18 @@ import {
 } from 'typeorm';
 import type {
     Event,
+    EventScope,
 } from '@privateaim/telemetry-kit';
 
+// Read path: the admin list filters realmId in [realm, null] and orders by
+// createdAt; the retention sweep matches expiring + expiresAt. Every other
+// filterable key of `eventSchema` is a leftmost prefix of one of these.
+// Nothing under request_*/actor_* is filterable or sortable at all — those
+// ten single-column indexes were pure write cost on a write-mostly table.
 @Index(['name', 'scope'])
 @Index(['refType', 'refId'])
+@Index(['realmId', 'createdAt'])
+@Index(['expiring', 'expiresAt'])
 @Entity({ name: 'events' })
 export class EventEntity implements Event {
     @PrimaryGeneratedColumn('uuid')
@@ -30,13 +37,11 @@ export class EventEntity implements Event {
 
     @Index()
     @Column({ type: 'varchar', length: 64 })
-    scope: string;
+    scope: `${EventScope}`;
 
-    @Index()
     @Column({ type: 'varchar', length: 64 })
     name: string;
 
-    @Index()
     @Column({
         name: 'ref_type', 
         type: 'varchar', 
@@ -56,26 +61,17 @@ export class EventEntity implements Event {
     @Column({
         type: 'text',
         nullable: true,
-        transformer: {
-            to(value: any): any {
-                return serialize(value);
-            },
-            from(value: any): any {
-                return deserialize(value);
-            },
-        },
+        transformer: serializedTextTransformer,
     })
     data: ObjectLiteral | null;
 
     // ------------------------------------------------------------------
 
-    @Index()
     @Column({ type: 'boolean', default: false })
     expiring: boolean;
 
     // ------------------------------------------------------------------
 
-    @Index()
     @Column({
         name: 'request_path',
         type: 'varchar',
@@ -84,7 +80,6 @@ export class EventEntity implements Event {
     })
     requestPath: string | null;
 
-    @Index()
     @Column({
         name: 'request_method',
         type: 'varchar',
@@ -93,16 +88,14 @@ export class EventEntity implements Event {
     })
     requestMethod: string | null;
 
-    @Index()
     @Column({
         name: 'request_ip_address',
         type: 'varchar',
-        length: 15,
+        length: 45,
         nullable: true,
     })
     requestIpAddress: string | null;
 
-    @Index()
     @Column({
         name: 'request_user_agent',
         type: 'varchar',
@@ -113,7 +106,6 @@ export class EventEntity implements Event {
 
     // ------------------------------------------------------------------
 
-    @Index()
     @Column({
         name: 'actor_type',
         type: 'varchar',
@@ -122,7 +114,6 @@ export class EventEntity implements Event {
     })
     actorType: string | null;
 
-    @Index()
     @Column({
         name: 'actor_id', 
         type: 'uuid', 
@@ -130,7 +121,6 @@ export class EventEntity implements Event {
     })
     actorId: string | null;
 
-    @Index()
     @Column({
         name: 'actor_name',
         type: 'varchar',

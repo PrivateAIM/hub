@@ -94,7 +94,6 @@ Implementations that connect domain logic to external systems.
 - `controllers/entities/<name>/module.ts` — Thin controllers (extract request → delegate to service → send response)
 - `controllers/workflows/` — Non-CRUD workflow controllers (root, service)
 - `request/helpers/actor.ts` — `buildActorContext(req)` bridge from HTTP to domain
-- `request/repository.ts` — `RequestRepositoryAdapter` (audit metadata injection)
 
 **Socket** (`adapters/socket/`):
 - WebSocket controllers and server setup
@@ -288,8 +287,10 @@ Manages log aggregation via VictoriaLogs and event tracking via TypeORM.
   EventComponent + LogComponent via `QueueWorkerComponentCaller`
 
 **Event retention sweep:** `EventComponentCleanerHandler` (once at start, then daily
-at 01:00) drops every `expiring` row whose `expiresAt` has passed — the entity-event
-subscriber stamps a one-week window (`WEEK_IN_MS`). The handler owns only the
+at 01:00) drops every `expiring` row whose `expiresAt` has passed. The window is
+stamped at **ingest** by `EventComponentCreateHandler` from `EVENT_RETENTION_DAYS`
+(default 7 days; `0` keeps rows forever) — publishers no longer stamp, and an
+explicit `expiresAt`, or `expiring: false`, from the publisher wins. The handler owns only the
 schedule: the sweep itself is `IEventRepository.deleteExpired(now, { batchSize })`,
 so nothing in `app/components/` reaches for a `DataSource`.
 

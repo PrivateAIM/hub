@@ -5,7 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IEntityAPI } from '../types-base';
+import type { IEntityAPISlim } from '../types-base';
 import type { Event } from './entity';
 
-export interface IEventAPI extends IEntityAPI<Event, Partial<Event>, Partial<Event>> {}
+/**
+ * Append-only: events are an audit trail, so there is no `update`. The server
+ * exposes no PATCH/POST `/events/:id` route and no EVENT_UPDATE permission —
+ * `IEntityAPI` would have promised a method that always 404s.
+ */
+export interface IEventAPI extends IEntityAPISlim<Event, Partial<Event>> {}

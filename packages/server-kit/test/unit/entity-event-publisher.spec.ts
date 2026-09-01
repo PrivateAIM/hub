@@ -11,6 +11,7 @@ import {
     it, 
     vi, 
 } from 'vitest';
+import { DomainEventName } from '@privateaim/kit';
 import { EntityEventPublisher } from '../../src';
 import type { EntityEventHandleOptions, IEntityEventHandler } from '../../src';
 
@@ -20,7 +21,7 @@ function createTestPublishContext() {
         metadata: {
             refType: 'testEntity',
             refId: '1',
-            event: 'created',
+            event: DomainEventName.CREATED,
         },
         destinations: [
             { channel: 'test-channel' },
@@ -59,7 +60,7 @@ describe('src/entity-event/publisher', () => {
 
         const ctx = {
             data: { id: '1' },
-            metadata: { refType: 'test', event: 'created' },
+            metadata: { refType: 'test', event: DomainEventName.CREATED },
             destinations: [
                 { channel: 'ch1', namespace: 'ns1' },
                 { channel: 'ch2' },
@@ -83,7 +84,7 @@ describe('src/entity-event/publisher', () => {
 
         const ctx = {
             data: { id: '1', realmId: 'realm-abc' },
-            metadata: { refType: 'test', event: 'created' },
+            metadata: { refType: 'test', event: DomainEventName.CREATED },
             destinations: (data: any) => [
                 { channel: `realm/${data.realmId}` },
             ],

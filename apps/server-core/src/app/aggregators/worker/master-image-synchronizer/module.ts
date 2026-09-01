@@ -48,10 +48,6 @@ export class MasterImageSynchronizerAggregator extends BaseComponent<MasterImage
                     data: {},
                     refType: DomainType.MASTER_IMAGE,
                     scope: 'synchronizer',
-                    expiring: true,
-                    expiresAt: new Date(
-                        Date.now() + (1000 * 60 * 60 * 24),
-                    ).toISOString(),
                 });
             }
         });

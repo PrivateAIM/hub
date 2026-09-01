@@ -37,9 +37,11 @@ import { EntitySubscriber } from '@privateaim/server-db-kit';
 |--------|-------------|
 | `data-source` | Data source options builder and TypeORM configuration |
 | `subscriber` | Base subscriber class for entity lifecycle events |
+| `transformer` | TypeORM value transformers: `dateToISOStringTransformer`, `bigintNumberTransformer`, `serializedTextTransformer` |
 
 ## Dependencies
 
+- `@authup/kit` — Serialization helpers
 - `@privateaim/kit` — Core utilities
 - `@privateaim/server-kit` — Server foundation
 - `typeorm` — ORM

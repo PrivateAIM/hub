@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
-import { deserialize, serialize } from '@authup/kit';
+import { dateToISOStringTransformer, serializedTextTransformer } from '@privateaim/server-db-kit';
 import type { Message, MessageData, MessageMetadata } from '@privateaim/messenger-kit';
 import {
     Column,
@@ -52,20 +51,14 @@ export class MessageEntity implements Message {
     @Column({
         type: 'text',
         nullable: true,
-        transformer: {
-            to: (value: MessageData): string => serialize(value),
-            from: (value: string | null): MessageData => deserialize<MessageData>(value),
-        },
+        transformer: serializedTextTransformer,
     })
     data!: MessageData;
 
     @Column({
         type: 'text',
         nullable: true,
-        transformer: {
-            to: (value: MessageMetadata | null): string => serialize(value),
-            from: (value: string | null): MessageMetadata | null => deserialize<MessageMetadata | null>(value),
-        },
+        transformer: serializedTextTransformer,
     })
     metadata!: MessageMetadata | null;
 

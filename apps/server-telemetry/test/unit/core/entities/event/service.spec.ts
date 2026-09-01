@@ -29,7 +29,7 @@ function createTestEvent(overrides?: Partial<Event>): Event {
         id: randomUUID(),
         refType: 'project',
         refId: randomUUID(),
-        scope: 'model',
+        scope: 'entity',
         name: 'updated',
         data: null,
         expiring: false,
@@ -113,14 +113,14 @@ describe('EventService', () => {
             const result = await service.create(
                 {
                     refType: 'analysis',
-                    scope: 'model',
+                    scope: 'entity',
                     name: 'created',
                 },
                 createAllowAllActor(),
             );
 
             expect(result.refType).toBe('analysis');
-            expect(result.scope).toBe('model');
+            expect(result.scope).toBe('entity');
             expect(result.name).toBe('created');
             expect(repository.getAll()).toHaveLength(1);
         });
@@ -130,7 +130,7 @@ describe('EventService', () => {
                 service.create(
                     {
                         refType: 'analysis',
-                        scope: 'model',
+                        scope: 'entity',
                         name: 'created',
                     },
                     createDenyAllActor(),
@@ -144,7 +144,7 @@ describe('EventService', () => {
             const result = await service.create(
                 {
                     refType: 'analysis',
-                    scope: 'model',
+                    scope: 'entity',
                     name: 'created',
                 },
                 actor,
@@ -161,13 +161,36 @@ describe('EventService', () => {
                 service.create(
                     {
                         refType: 'analysis',
-                        scope: 'model',
+                        scope: 'entity',
                         name: 'created',
                         realmId: otherRealmId,
                     },
                     actor,
                 ),
             ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        // Column bounds live in the released 1771519574696 migration and are
+        // invisible to CI: the sqlite leg ignores varchar length, and the
+        // pg/mysql legs build their schema with `dataSource.synchronize()`
+        // from the entity. Without this the validator's literals are unpinned.
+        // `scope` is bounded by the closed EventScope vocabulary instead.
+        it.each([
+            ['scope', 'model'], // outside EventScope
+            ['name', 'x'.repeat(65)],
+            ['refType', 'x'.repeat(65)],
+            ['expiresAt', '2026-01-01T00:00:00.12345678Z'], // 29 chars > varchar(28)
+            ['expiring', null], // column is NOT NULL
+        ])('should reject an out-of-bounds %s', async (key, value) => {
+            await expect(service.create(
+                {
+                    refType: 'analysis',
+                    scope: 'entity',
+                    name: 'created',
+                    [key as string]: value,
+                },
+                createAllowAllActor(),
+            )).rejects.toThrow();
         });
     });
 

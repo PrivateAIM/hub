@@ -70,10 +70,6 @@ export async function handleMasterImageBuilderEvent(
             refType: DomainType.MASTER_IMAGE,
             refId: entity.id,
             scope: 'builder',
-            expiring: true,
-            expiresAt: new Date(
-                Date.now() + (1000 * 60 * 60 * 24),
-            ).toISOString(),
         });
     }
 }

@@ -25,5 +25,7 @@ export async function normalizeConfig(input: Partial<Config>): Promise<Config> {
         clientSecret: validated.clientSecret ?? ConfigDefaults.CLIENT_SECRET,
 
         publicURL: validated.publicURL ?? `http://localhost:${validated.port ?? ConfigDefaults.PORT}`,
+
+        eventRetentionDays: validated.eventRetentionDays ?? ConfigDefaults.EVENT_RETENTION_DAYS,
     };
 }
