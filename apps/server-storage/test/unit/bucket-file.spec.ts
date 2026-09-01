@@ -99,7 +99,9 @@ describe('controllers/bucket-file', () => {
                 client.bucket.stream(details.bucketId)
                     .then((data) => Readable.fromWeb(data as any))
                     .then((data) => {
-                        data.pipe(extract);
+                        // see bucket/stream.ts: tar-stream >= 3.2.1 types extract as a
+                        // `streamx` Writable, which node's pipe accepts duck-typed.
+                        data.pipe(extract as unknown as NodeJS.WritableStream);
                     })
                     .catch(() => resolve(0));
             },

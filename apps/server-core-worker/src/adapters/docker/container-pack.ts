@@ -7,17 +7,17 @@
 
 import type { Readable } from 'node:stream';
 import type { Container } from 'dockerode';
-import type { Headers } from 'tar-stream';
+import type { Header } from 'tar-stream';
 import tar from 'tar-stream';
 
 export type DockerContainerPackOptions = {
     path: string,
 
-    validateEntry?: (entry: Headers) => void,
+    validateEntry?: (entry: Header) => void,
 
-    onEntryPackStarted?: (entry: Headers) => void,
-    onEntryPackFinished?: (entry: Headers) => void,
-    onEntryPackFailed?: (error: Error, entry: Headers) => void,
+    onEntryPackStarted?: (entry: Header) => void,
+    onEntryPackFinished?: (entry: Header) => void,
+    onEntryPackFailed?: (error: Error, entry: Header) => void,
 };
 
 export async function packDockerContainerWithTarStream(
@@ -77,7 +77,9 @@ export async function packDockerContainerWithTarStream(
             });
 
             stream.on('end', () => {
-                entry.end();
+                // streamx types end()'s argument as required; the runtime no-ops on
+                // undefined, so this stays a plain end().
+                entry.end(undefined);
             });
 
             stream.on('error', (err) => {
@@ -95,10 +97,14 @@ export async function packDockerContainerWithTarStream(
             pack.finalize();
         });
 
-        container.putArchive(pack, { path: options.path })
+        // tar-stream >= 3.2.1 types pack/extract as `streamx` streams rather than node
+        // ones. docker-modem only calls .on('error') and .pipe(req) on the archive, never
+        // the members streamx lacks (isPaused/unpipe/wrap), so the bridge is honest.
+        container.putArchive(pack as unknown as NodeJS.ReadableStream, { path: options.path })
             .then(() => resolve())
             .catch((err) => reject(err));
 
-        readable.pipe(extract);
+        // node's pipe drives the streamx destination through write/end/'drain'.
+        readable.pipe(extract as unknown as NodeJS.WritableStream);
     });
 }
