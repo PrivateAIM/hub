@@ -19,9 +19,14 @@ export class ConfigValidator extends TypedContainer<Config> {
             zod.enum([EnvironmentName.TEST, EnvironmentName.DEVELOPMENT, EnvironmentName.PRODUCTION]),
         ));
         this.mount('port', { optional: true }, createValidator(zod.number().int().nonnegative().max(65535)));
-        // Fail loud on a negative value: readInt passes it through, and a
-        // negative retention would stamp an already-expired row on every write.
-        this.mount('eventRetentionDays', { optional: true }, createValidator(zod.number().int().nonnegative()));
+        // Fail loud at boot on a value the stamp cannot represent. `readInt` passes
+        // both ends through: a negative retention would stamp an already-expired row
+        // on every write, and a value large enough to push `Date.now() + days * DAY_IN_MS`
+        // past the ±8.64e15ms Date range makes `toISOString()` throw INSIDE
+        // EventComponentCreateHandler — which catches, emits `creationFailed` and drops
+        // the row, so a single typo would silently disable auditing entirely.
+        // 36500 days is a century; anything beyond that is not a retention policy.
+        this.mount('eventRetentionDays', { optional: true }, createValidator(zod.number().int().nonnegative().max(36500)));
 
         this.mount('realm', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('clientId', { optional: true }, createValidator(zod.string().min(1)));

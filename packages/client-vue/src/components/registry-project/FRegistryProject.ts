@@ -67,6 +67,9 @@ export default defineComponent({
 
         const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
+        // monotonic guard for the socket-triggered secret re-read below
+        let secretRefreshToken = 0;
+
         const manager = createEntityManager({
             type: `${DomainType.REGISTRY_PROJECT}`,
             setup,
@@ -88,9 +91,20 @@ export default defineComponent({
                     return;
                 }
 
+                // Last request issued wins. Without this a slower earlier re-read can
+                // resolve after a later one and pin a STALE secret in the form — the
+                // exact failure this re-read exists to prevent — and a response for a
+                // previously displayed record could overwrite the current one.
+                secretRefreshToken += 1;
+                const token = secretRefreshToken;
+
                 void apiClient.registryProject
                     .getOne(entity.id, { fields: ['+accountId', '+accountName', '+accountSecret'] })
                     .then(({ data }) => {
+                        if (token !== secretRefreshToken) {
+                            return;
+                        }
+
                         form.secret = data.accountSecret || '';
                     })
                     .catch(() => {

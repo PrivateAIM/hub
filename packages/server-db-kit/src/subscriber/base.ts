@@ -50,8 +50,15 @@ function withoutHiddenColumns<T extends ObjectLiteral>(
     // keeps using the live entity's secret after the save that fires this hook
     const output = { ...entity };
     for (const column of hidden) {
-        // propertyPath, not propertyName — an embedded column's leaf name is not the key
-        delete output[column.propertyPath];
+        // Take the FIRST path segment, not the whole `propertyPath`. For a plain
+        // column the two are identical. For an embedded column the path is dotted
+        // (`profile.secret`) and the value lives nested, so `delete output['profile.secret']`
+        // would remove nothing and leak it — while `propertyName` ('secret') would
+        // delete an unrelated top-level key. Dropping the embedded ROOT is
+        // deliberately over-broad and fail-closed: losing the non-secret siblings of
+        // a hidden column from an event payload is acceptable, leaking the column is
+        // not. Hub declares no embedded columns today, so this changes nothing yet.
+        delete output[column.propertyPath.split('.')[0]];
     }
 
     return output;
