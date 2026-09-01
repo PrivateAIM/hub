@@ -10,6 +10,11 @@ Nodes are registered in the Hub with:
 - Realm assignment (organizational scope)
 - Registry project association (for receiving analysis containers)
 
+Creating a node connects it to a registry automatically — the oldest configured
+one — and provisions its registry project and robot account. A node is therefore
+never left unable to push or pull images. The assignment is changed afterwards on
+the node's Registry tab; the create form carries no registry field.
+
 ## Node Lifecycle
 
 1. **Register** — administrator creates the node entry in Hub
@@ -21,10 +26,15 @@ Nodes are registered in the Hub with:
 
 A node pushes and pulls analysis images through its own **registry project** — a
 dedicated project in the docker registry with its own robot account. This is
-managed on the node's **Registry** tab (`/admin/nodes/:id/registry`):
+assigned on creation and managed afterwards on the node's **Registry** tab
+(`/admin/nodes/:id/registry`):
 
 - **Connect** — pick a registry and connect. Hub provisions a registry project
   and robot account for the node and links them in the registry.
+- **Switch** — pick a different registry while connected. Hub provisions a new
+  registry project there and removes the old one together with its robot
+  account, in a single update — going through Disconnect first is neither
+  needed nor desirable.
 - **Disconnect** — clears the node's registry assignment and removes its
   registry project together with the robot account. The node itself is kept;
   reconnecting provisions a **new** project, so the node has to pull fresh
@@ -57,6 +67,17 @@ GET /nodes/:id?fields=+accountSecret
 ```
 
 This field-level access control is enforced by the Node service's permission checker.
+
+The node's **registry** credentials (host, project, robot account name and
+secret) are read from the Registry tab. Three callers may read them:
+
+- the node's own client, for its own credentials;
+- a **node administrator of the node's realm** (`node_update`) — that permission
+  already governs the whole lifecycle of the registry project, since connecting
+  provisions it and reconnecting rotates the robot account;
+- a registry administrator (`registry_manage`).
+
+Master-realm membership alone grants nothing — it is not a permission.
 
 ## Related
 

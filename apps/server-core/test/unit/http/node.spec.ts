@@ -98,6 +98,31 @@ describe('src/controllers/core/node', () => {
         expect(found.registryProjectId).toBeNull();
     });
 
+    it('should auto-connect a registry on create when several exist', async () => {
+        const { client } = suite;
+
+        const { data: first } = await client.registry.create({
+            name: faker.string.alpha({ length: 16, casing: 'lower' }),
+            host: faker.internet.domainName(),
+        });
+        const { data: second } = await client.registry.create({
+            name: faker.string.alpha({ length: 16, casing: 'lower' }),
+            host: faker.internet.domainName(),
+        });
+
+        // The node create form does not carry a registry when the admin picks
+        // none, so a payload without `registryId` is the common case. It must
+        // still come out connected — with more than one registry configured, a
+        // freshly registered node used to be left unassigned.
+        const { data: node } = await client.node.create(createTestNode());
+        expect([first.id, second.id]).toContain(node.registryId);
+        expect(node.registryProjectId).not.toBeNull();
+
+        await client.node.delete(node.id);
+        await client.registry.delete(first.id);
+        await client.registry.delete(second.id);
+    });
+
     it('should tear down the registry project on disconnect', async () => {
         const { client } = suite;
 
