@@ -10,7 +10,7 @@ import type { ICoreClient } from '@privateaim/core-http-kit';
 import { createFakeClient } from '@privateaim/core-http-kit/testing';
 import type { Client as DockerClient } from 'docken';
 import type { AnalysisBuilderCheckPayload } from '@privateaim/server-core-worker-kit';
-import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
+import { AnalysisBuilderCommand, AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import { describe, expect, it } from 'vitest';
 import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/app/components/constants';
 import { AnalysisBuilderCheckHandler } from '../../../../src/app/components/analysis-builder/handlers/check/module';
@@ -45,7 +45,7 @@ function createCoreClient(analysis: Record<string, any> = {}) {
 const PAYLOAD: AnalysisBuilderCheckPayload = { id: ANALYSIS_ID };
 
 function run(coreClient: ICoreClient, docker: FakeDockerClient) {
-    const context = new FakeComponentHandlerContext();
+    const context = new FakeComponentHandlerContext(AnalysisBuilderCommand.CHECK);
     const handler = new AnalysisBuilderCheckHandler({
         coreClient,
         // `docken`'s Client is a concrete class, not a port, so the fake cannot

@@ -167,6 +167,7 @@ code under test actually talks to, and do not migrate one layer into another.
 |---|---|---|---|
 | **Port fakes** | The domain port interface (`IEntityRepository`, `IPermissionChecker`, …) | Entity/business services in `core/` | no |
 | **Transport-level FakeClient** | hapic's `MemoryTransport`, under a real client | Anything that CONSUMES an HTTP client: client-vue components, worker components | no |
+| **A real docker daemon** | dockerode against the local socket | The two worker specs that pack or build an image | **yes** |
 | **Testcontainers** | The real process | HTTP integration suites for server-core / storage / telemetry, with real Authup enforcement | **yes** |
 
 ### Transport-level FakeClient
@@ -333,6 +334,14 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
   construct them DIRECTLY (`new AnalysisBuilderCheckHandler({ coreClient, docker })`)
   — no container, no message bus. Shared doubles live in
   `test/unit/components/fakes/`.
+- **Two worker specs are the exception and need a real docker daemon**:
+  `test/unit/docker/pack.spec.ts` (pulls alpine, `putArchive`) and
+  `test/unit/components/master-image-builder/execute.spec.ts` (builds a `FROM
+  scratch` fixture, the only coverage of the streamx `Pack` → `buildImage`
+  hand-off from #1863). The second writes a fixture under
+  `writable/master-images/`, which `master-images.spec.ts` deletes wholesale
+  before cloning the catalogue — hence `fileParallelism: false` in that package's
+  `test/vitest.config.ts`. Do not re-enable it without decoupling the fixture.
 - `createTestApplication({ telemetryHandlers })` (server-core) opts in to a faked
   telemetry client, which is the only way to exercise `AnalysisLogController` /
   `AnalysisNodeLogController` without a live telemetry service.
