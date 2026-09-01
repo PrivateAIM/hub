@@ -12,12 +12,16 @@ export default defineConfig({
     test: {
         include: ['test/unit/**/*.spec.ts'],
 
-        // Spec files here share one on-disk directory, `writable/master-images`,
-        // and the synchronizer `master-images.spec.ts` drives starts by deleting
-        // it wholesale (GitHubClient.cloneRepository -> fs.rm(destination,
-        // { recursive: true })). Run in parallel, that wipes the fixture
-        // `components/master-image-builder/execute.spec.ts` is mid-build on.
-        // Costs ~2s across the whole suite.
+        // Two spec files share one on-disk directory, `writable/master-images`:
+        //
+        // - `master-images.spec.ts` drives the synchronizer, which begins by
+        //   deleting that directory wholesale — `GitHubClient.cloneRepository`
+        //   calls `fs.rm(destination, { recursive: true })` before cloning.
+        // - `components/master-image-builder/execute.spec.ts` builds an image
+        //   from a fixture it writes inside that same directory.
+        //
+        // Run in parallel, the first deletes the fixture the second is building
+        // from. Serializing costs ~2s across the whole suite.
         fileParallelism: false,
     },
     plugins: [swc.vite()],
