@@ -463,12 +463,32 @@ A separate `tests-migrations` CI job runs the migration CLI end-to-end for `serv
 1. `migration run` — applies all migrations forward
 2. `migration revert` × N — undoes every migration in reverse order (verifies every `down()` works)
 3. `migration run` — re-applies the full chain (verifies idempotency)
+4. `npm run test:schema-drift` — asserts the migrated schema matches the entity metadata
 
 This catches SQL syntax errors, cross-DB type mismatches, and `down()` regressions across every migration. It does **not** catch data-correctness bugs in `UPDATE`/`INSERT` migrations against pre-existing rows — those still require manual smoke-testing against a populated database.
 
+The drift step (4) exists because the migration chain and the entity classes are two
+**independent** descriptions of the same schema, and nothing else compares them: the
+round-trip exercises only the chain, while the integration suites `synchronize()` from
+the entities — so a migration that writes something the entities do not describe (or an
+entity change with no migration) passed every gate and surfaced only as
+`migration generate` noise (issue #1823: the `analyses` table carried
+`analysis_entity`-derived constraint names through two table renames).
+`scripts/assert-schema-drift.mjs` (all four server apps) wraps typeorm-extension's
+`assertSchemaMatchesMetadata` with `skipWithoutMigrations: true` — sqlite carries no
+migrations, so there are never two descriptions to compare — and rethrows anything that
+is not a `SchemaDriftError`, so an unreachable database is not reported as drift.
+
+authup's populated round-trip (`verify-latest-migration.mjs`) was deliberately **not**
+ported. The blocker is that the script boots the real application to do the seeding,
+and hub's `tests-migrations` job carries none of the infrastructure a hub service boots
+against (Authup at minimum — the job provides databases only). A port would also have
+to seed around telemetry's documented-lossy IPv6 `down()` (the newest telemetry
+migration narrows `request_ip_address` back to varchar(15) on revert). Open follow-up.
+
 The job pre-flights with a sanity check that the compiled migrations exist under `apps/<service>/dist/adapters/database/migrations/{mysql,postgres}/` — without this guard, running the CLI from the wrong working directory results in typeorm silently reporting "No migrations are pending" with exit code 0, masking the failure.
 
-Locally, run the same `run → revert × N → run` flow against a running compose stack:
+Locally, run the same `run → revert × N → run → drift` flow against a running compose stack:
 
 ```bash
 # MySQL
@@ -481,6 +501,7 @@ export DB_TYPE=mysql DB_HOST=127.0.0.1 DB_PORT=3306 \
 node dist/cli/index.mjs migration run
 node dist/cli/index.mjs migration revert    # repeat once per migration
 node dist/cli/index.mjs migration run       # idempotency replay
+npm run test:schema-drift                   # migrated schema ↔ entity metadata
 ```
 
 ```bash
@@ -494,6 +515,7 @@ export DB_TYPE=postgres DB_HOST=127.0.0.1 DB_PORT=5432 \
 node dist/cli/index.mjs migration run
 node dist/cli/index.mjs migration revert
 node dist/cli/index.mjs migration run
+npm run test:schema-drift
 ```
 
 The CLI auto-creates the target database if it does not exist.

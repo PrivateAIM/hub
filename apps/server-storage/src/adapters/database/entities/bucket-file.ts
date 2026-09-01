@@ -12,6 +12,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
@@ -26,6 +27,7 @@ export class BucketFileEntity implements BucketFile {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Index()
     @Column({ type: 'varchar', length: 256 })
     name: string;
 
@@ -35,6 +37,7 @@ export class BucketFileEntity implements BucketFile {
     @Column({ type: 'varchar', length: 4096 })
     hash: string;
 
+    @Index()
     @Column({ nullable: true })
     directory: string;
 
@@ -48,35 +51,44 @@ export class BucketFileEntity implements BucketFile {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
-        name: 'actor_type', 
-        type: 'varchar', 
-        length: 64, 
+        name: 'actor_type',
+        type: 'varchar',
+        length: 64,
     })
     actorType: string;
 
+    @Index()
     @Column({ name: 'actor_id', type: 'uuid' })
     actorId: string;
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
-        name: 'realm_id', 
-        type: 'uuid', 
-        nullable: true, 
+        name: 'realm_id',
+        type: 'uuid',
+        nullable: true,
     })
     realmId: Realm['id'] | null;
 
     // ------------------------------------------------------------------
 
+    // Deliberately NOT indexed on its own: the class-level
+    // UNIQUE(bucketId, path) leads with bucket_id and already serves both the
+    // query surface (the schema's `indexes` declares its leftmost prefix) and
+    // the MySQL foreign key — a single here would be pure redundancy.
     @Column({ name: 'bucket_id' })
     bucketId: BucketEntity['id'];
 

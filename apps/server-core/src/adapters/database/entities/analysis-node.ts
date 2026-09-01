@@ -10,6 +10,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
@@ -35,19 +36,21 @@ export class AnalysisNodeEntity implements AnalysisNode {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
         name: 'approval_status',
-        type: 'varchar', 
-        length: 32, 
-        default: null, 
+        type: 'varchar',
+        length: 32,
+        default: null,
     })
     approvalStatus: AnalysisNodeApprovalStatus | null;
 
+    @Index()
     @Column({
         name: 'execution_status',
-        type: 'varchar', 
-        length: 32, 
-        nullable: true, 
+        type: 'varchar',
+        length: 32,
+        nullable: true,
         default: null,
     })
     executionStatus: ProcessStatus | null;
@@ -84,14 +87,17 @@ export class AnalysisNodeEntity implements AnalysisNode {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({ name: 'analysis_id' })
     analysisId: Analysis['id'];
 
@@ -99,6 +105,7 @@ export class AnalysisNodeEntity implements AnalysisNode {
     @JoinColumn({ name: 'analysis_id' })
     analysis: AnalysisEntity;
 
+    @Index()
     @Column({ name: 'analysis_realm_id', type: 'uuid' })
     analysisRealmId: Realm['id'];
 
@@ -109,6 +116,7 @@ export class AnalysisNodeEntity implements AnalysisNode {
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
+    @Index()
     @Column({ name: 'node_realm_id', type: 'uuid' })
     nodeRealmId: Realm['id'];
 }

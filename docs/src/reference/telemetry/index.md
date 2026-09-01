@@ -58,6 +58,15 @@ Event and log endpoints answer with a `{ data, meta }` envelope — the record (
 under `data`. `GET /events` and `GET /events/:id` advertise the endpoint's queryable vocabulary at
 `meta.schema`; `POST /events`, `DELETE /events/:id` and `POST /logs` carry `meta: {}`.
 
+The event vocabulary is deliberately narrow: filterable on `scope`, `name`, `refType`, `refId` and
+`realmId`; sortable on `createdAt` only, with `createdAt DESC` as the default — a sort parameter
+that decodes to nothing falls back to newest-first rather than to no ordering at all.
+`createdAt` and `updatedAt` are **not** filterable — both
+are datetime columns behind a read-side transformer, so a timestamp filter would compare an ISO
+string against the database's native storage format and match wrong rows silently. An
+expression-dialect filter on them answers 400; the legacy bracket form drops silently. Events are
+append-only, so `updatedAt` always equals `createdAt` and adds no ordering.
+
 Two surfaces stay outside that contract:
 
 | Endpoint | Shape |

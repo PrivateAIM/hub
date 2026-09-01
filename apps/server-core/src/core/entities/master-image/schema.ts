@@ -12,6 +12,15 @@ import { DomainType } from '@privateaim/core-kit';
 export const masterImageSchema = defineSchema<MasterImage>({
     name: DomainType.MASTER_IMAGE,
     strict: true,
+    indexes: [
+        ['id'],
+        ['name'],
+        ['path'],
+        ['virtualPath'],
+        ['groupVirtualPath'],
+        ['createdAt'],
+        ['updatedAt'],
+    ],
     // Explicit root projection governing the master-image list/detail response
     // shape. `include=masterImage` (analysis/project) hydrates the relation as a
     // full subtree regardless (rapiq beta.8). `commandArguments` is a json column,
@@ -33,7 +42,14 @@ export const masterImageSchema = defineSchema<MasterImage>({
             'updatedAt',
         ],
     },
-    filters: { allowed: ['id', 'name', 'path', 'virtualPath', 'groupVirtualPath'] },
-    sorts: { default: { path: 'ASC' } },
+    filters: { allowed: ['id', 'name', 'path', 'virtualPath', 'groupVirtualPath'], indexed: true },
+    // The allow-list was previously derived from the default (`['path']` only),
+    // which silently ignored the `virtualPath` sort client-vue's FMasterImages
+    // has been requesting all along — the explicit list makes it bind.
+    sorts: {
+        allowed: ['name', 'path', 'virtualPath', 'createdAt', 'updatedAt'],
+        default: { path: 'ASC' },
+        indexed: true,
+    },
     pagination: { maxLimit: 50 },
 });

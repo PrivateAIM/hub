@@ -14,13 +14,22 @@ const schemaMapping = { analysis: DomainType.ANALYSIS };
 export const analysisBucketSchema = defineSchema<AnalysisBucket>({
     name: DomainType.ANALYSIS_BUCKET,
     strict: true,
+    // The UNIQUE(bucketId, analysisId) is deliberately not declared: its leading
+    // column `bucketId` is not queryable, and the declaration describes the
+    // query surface, not the whole table.
+    indexes: [
+        ['analysisId'],
+        ['type'],
+        ['createdAt'],
+        ['updatedAt'],
+    ],
     fields: {
         default: ['id', 'type', 'bucketId', 'analysisId', 'realmId', 'createdAt', 'updatedAt'],
         allowed: ['id', 'type', 'bucketId', 'analysisId', 'realmId', 'createdAt', 'updatedAt'],
     },
-    filters: { allowed: ['analysisId', 'type'] },
+    filters: { allowed: ['analysisId', 'type'], indexed: true },
     relations: { allowed: ['analysis'] },
-    sorts: { allowed: ['type', 'createdAt', 'updatedAt'] },
+    sorts: { allowed: ['type', 'createdAt', 'updatedAt'], indexed: true },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

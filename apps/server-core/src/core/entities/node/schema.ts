@@ -17,13 +17,27 @@ const schemaMapping = {
 export const nodeSchema = defineSchema<Node>({
     name: DomainType.NODE,
     strict: true,
+    // `name` anchors through the UNIQUE(name, realmId) it leads. The
+    // UNIQUE(externalName, registryId) is deliberately not declared: its leading
+    // column is not queryable.
+    indexes: [
+        ['id'],
+        ['name', 'realmId'],
+        ['online'],
+        ['hidden'],
+        ['clientId'],
+        ['realmId'],
+        ['robotId'],
+        ['createdAt'],
+        ['updatedAt'],
+    ],
     fields: {
         default: ['id', 'name', 'clientId', 'externalName', 'hidden', 'type', 'online', 'publicKey', 'robotId', 'realmId', 'registryId', 'registryProjectId', 'createdAt', 'updatedAt'],
         allowed: ['id', 'name', 'clientId', 'externalName', 'hidden', 'type', 'online', 'publicKey', 'robotId', 'realmId', 'registryId', 'registryProjectId', 'createdAt', 'updatedAt'],
     },
-    filters: { allowed: ['id', 'name', 'online', 'hidden', 'clientId', 'realmId', 'robotId'] },
+    filters: { allowed: ['id', 'name', 'online', 'hidden', 'clientId', 'realmId', 'robotId'], indexed: true },
     relations: { allowed: ['registryProject', 'registry'] },
-    sorts: { allowed: ['name', 'updatedAt', 'createdAt'] },
+    sorts: { allowed: ['name', 'updatedAt', 'createdAt'], indexed: true },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

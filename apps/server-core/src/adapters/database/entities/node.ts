@@ -10,9 +10,10 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     JoinColumn,
     ManyToOne,
-    PrimaryGeneratedColumn, 
+    PrimaryGeneratedColumn,
     Unique,
     UpdateDateColumn,
 } from 'typeorm';
@@ -50,16 +51,18 @@ export class NodeEntity implements Node {
     @Column({ type: 'varchar', length: 128 })
     name: string;
 
+    @Index()
     @Column({ type: 'boolean', default: false })
     hidden: boolean;
 
     @Column({
-        type: 'varchar', 
-        length: 64, 
+        type: 'varchar',
+        length: 64,
         default: NodeType.DEFAULT,
     })
     type: `${NodeType}`;
 
+    @Index()
     @Column({ type: 'boolean', default: false })
     online: boolean;
 
@@ -84,28 +87,33 @@ export class NodeEntity implements Node {
     @JoinColumn({ name: 'registry_project_id' })
     registryProject: RegistryProject | null;
 
+    @Index()
     @Column({
-        name: 'client_id', 
-        type: 'uuid', 
-        nullable: true, 
+        name: 'client_id',
+        type: 'uuid',
+        nullable: true,
     })
     clientId: Client['id'] | null;
 
+    @Index()
     @Column({
-        name: 'robot_id', 
-        type: 'uuid', 
-        nullable: true, 
+        name: 'robot_id',
+        type: 'uuid',
+        nullable: true,
     })
     robotId: Client['id'] | null;
 
+    @Index()
     @Column({ name: 'realm_id', type: 'uuid' })
     realmId: Realm['id'];
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 }

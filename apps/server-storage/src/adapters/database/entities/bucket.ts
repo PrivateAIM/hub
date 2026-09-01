@@ -12,6 +12,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -21,6 +22,7 @@ export class BucketEntity implements Bucket {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Index()
     @Column({ type: 'varchar', length: 256 })
     name: string;
 
@@ -33,21 +35,25 @@ export class BucketEntity implements Bucket {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
-        name: 'actor_id', 
-        type: 'uuid', 
-        nullable: true, 
+        name: 'actor_id',
+        type: 'uuid',
+        nullable: true,
     })
     actorId: string | null;
 
+    @Index()
     @Column({
         name: 'actor_type',
         type: 'varchar',
@@ -58,10 +64,11 @@ export class BucketEntity implements Bucket {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
-        name: 'realm_id', 
-        type: 'uuid', 
-        nullable: true, 
+        name: 'realm_id',
+        type: 'uuid',
+        nullable: true,
     })
     realmId: Realm['id'] | null;
 }

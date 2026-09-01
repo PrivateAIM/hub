@@ -14,13 +14,22 @@ const schemaMapping = { masterImage: DomainType.MASTER_IMAGE };
 export const projectSchema = defineSchema<Project>({
     name: DomainType.PROJECT,
     strict: true,
+    indexes: [
+        ['id'],
+        ['name'],
+        ['displayName'],
+        ['realmId'],
+        ['userId'],
+        ['createdAt'],
+        ['updatedAt'],
+    ],
     fields: {
         default: ['id', 'name', 'displayName', 'description', 'nodes', 'analyses', 'createdAt', 'updatedAt', 'realmId', 'clientId', 'robotId', 'userId', 'masterImageId'],
         allowed: ['id', 'name', 'displayName', 'description', 'nodes', 'analyses', 'createdAt', 'updatedAt', 'realmId', 'clientId', 'robotId', 'userId', 'masterImageId'],
     },
-    filters: { allowed: ['id', 'name', 'displayName', 'realmId', 'userId'] },
+    filters: { allowed: ['id', 'name', 'displayName', 'realmId', 'userId'], indexed: true },
     relations: { allowed: ['masterImage'] },
-    sorts: { allowed: ['id', 'name', 'displayName', 'updatedAt', 'createdAt'] },
+    sorts: { allowed: ['id', 'name', 'displayName', 'updatedAt', 'createdAt'], indexed: true },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

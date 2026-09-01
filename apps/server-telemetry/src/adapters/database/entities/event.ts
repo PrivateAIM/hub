@@ -22,8 +22,10 @@ import type {
 } from '@privateaim/telemetry-kit';
 
 // Read path: the admin list filters realmId in [realm, null] and orders by
-// createdAt; the retention sweep matches expiring + expiresAt. Every other
-// filterable key of `eventSchema` is a leftmost prefix of one of these.
+// createdAt; the retention sweep matches expiring + expiresAt. Every
+// filterable key of `eventSchema` leads one of these or its own single, and
+// the bare `sort=-createdAt` (no realm filter) rides the createdAt single —
+// (realm_id, created_at) cannot serve it, realm_id leads that key (#1842).
 // Nothing under request_*/actor_* is filterable or sortable at all — those
 // ten single-column indexes were pure write cost on a write-mostly table.
 @Index(['name', 'scope'])
@@ -148,6 +150,7 @@ export class EventEntity implements Event {
     })
     expiresAt: string | null;
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 

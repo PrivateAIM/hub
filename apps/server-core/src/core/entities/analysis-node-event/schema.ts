@@ -17,6 +17,12 @@ const schemaMapping = {
 export const analysisNodeEventSchema = defineSchema<AnalysisNodeEvent>({
     name: DomainType.ANALYSIS_NODE_EVENT,
     strict: true,
+    indexes: [
+        ['analysisId'],
+        ['nodeId'],
+        ['createdAt'],
+        ['updatedAt'],
+    ],
     fields: {
         default: [
             'id',
@@ -29,9 +35,9 @@ export const analysisNodeEventSchema = defineSchema<AnalysisNodeEvent>({
             'nodeRealmId',
         ],
     },
-    filters: { allowed: ['analysisId', 'nodeId'] },
+    filters: { allowed: ['analysisId', 'nodeId'], indexed: true },
     relations: { allowed: ['analysis', 'node'] },
-    sorts: { allowed: ['createdAt', 'updatedAt'] },
+    sorts: { allowed: ['createdAt', 'updatedAt'], indexed: true },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

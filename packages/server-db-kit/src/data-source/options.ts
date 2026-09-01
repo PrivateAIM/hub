@@ -95,7 +95,16 @@ export class DataSourceOptionsBuilder {
 
             Object.assign(options, {
                 migrations: [migrationPath],
-                migrationsTransactionMode: 'all',
+                // 'each', never 'all': under 'all' every pending migration fuses
+                // into ONE postgres transaction, so a lock the first migration
+                // takes is held across every later one — AlignAnalysesConstraintNames'
+                // ACCESS EXCLUSIVE on `analyses` (its first RENAME CONSTRAINT)
+                // would span QueryIndexes' entire 58-index build, blocking reads
+                // on the busiest table for the whole window at pod boot. 'each'
+                // commits per migration, keeping every postgres migration atomic
+                // on its own; MySQL auto-commits DDL statement by statement
+                // regardless, so 'all' never bought it anything there.
+                migrationsTransactionMode: 'each',
             } as DataSourceOptions);
         }
 

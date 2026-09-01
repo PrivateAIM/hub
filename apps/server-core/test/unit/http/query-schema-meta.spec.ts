@@ -94,7 +94,7 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
         expect(meta.schema.relations).toEqual({ allowed: null, schemas: null });
     });
 
-    it('should report an undeclared field allow-list as null and derive sorts from its default', async () => {
+    it('should report an undeclared field allow-list as null and describe the indexed sorts', async () => {
         const { meta } = await suite.client.masterImage.getMany();
 
         // masterImageSchema declares `fields.default` only: `null` means the
@@ -103,14 +103,18 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
         expect(meta.schema.fields.allowed).toBeNull();
         expect(meta.schema.fields.default).toContain('path');
 
-        // sorts derives its allow-list from the declared default. `indexed`
-        // is rapiq 2.1's schema-index declaration, normalized onto every
-        // sorts/filters description — false because no hub schema declares
-        // `indexes` yet.
+        // Since #1842 every entity schema declares `indexes` and opts into
+        // the indexed policies, so the description advertises them: filters
+        // report the anchor mode, sorts report `indexed: true`, and the sort
+        // allow-list is declared explicitly (it used to derive from the
+        // default, `['path']` only, which silently ignored the `virtualPath`
+        // sort client-vue requests).
+        expect(meta.schema.indexes).not.toBeNull();
+        expect(meta.schema.filters.indexed).toEqual('anchor');
         expect(meta.schema.sorts).toEqual({
-            allowed: ['path'],
+            allowed: ['name', 'path', 'virtualPath', 'createdAt', 'updatedAt'],
             default: { path: 'ASC' },
-            indexed: false,
+            indexed: true,
         });
     });
 

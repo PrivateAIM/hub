@@ -235,17 +235,39 @@ Adopted from authup — see [authup-conventions.md](references/authup-convention
   `analysis_entity` → `analysis`, and that hidden rename has since misled every
   later migration that referenced the table by its old name. A rename in
   particular must never hide behind an unrelated migration name.
+- **A `RENAME TABLE` must re-derive every constraint name on the table** (or let
+  `migration generate` write the DDL). typeorm hashes auto-generated index/FK
+  names from table + column names, but a rename carries the old name strings
+  over, so the live schema and the entity metadata silently disagree — every
+  later `migration generate` opens with spurious drop/recreates, and the drift
+  gate reports the same noise. The two `analyses` renames left seven
+  `analysis_entity`-derived hashes behind, repaired by
+  `1788400000000-AlignAnalysesConstraintNames` (#1823).
 - **Consolidation happens at release time, not merge time.** A release window's
   migrations may be squashed into one file per dialect as a deliberate last step
   before the release PR merges (keeping the earliest timestamp so ordering against
-  the released chain holds). Shipping several named migrations in one release is fine.
+  the released chain holds) — but this is optional; shipping several named
+  migrations in one release is fine. Anyone who executed the pre-squash files must
+  drop their dev DB (the CLI re-creates it) or fix its `migrations` table by hand.
 - **Released migrations are immutable.** Amend freely while the migration lives only
-  on its own unmerged branch; once it ships in a release, never touch it.
+  on its own unmerged branch; once it ships in a release, never touch it. Before
+  touching an existing migration, verify against the release tags / last
+  release-PR merge that it has not shipped — folding a change into an
+  already-released file is the failure mode this rule exists to prevent. A
+  merged-but-unreleased migration may still be recreated, but only via the
+  release-time consolidation path above.
 - **Always verify with the round-trip** — `migration run` → `revert` × N → `run`,
   against both MySQL and PostgreSQL. See [testing.md](testing.md#migration-tests).
   Note that MySQL DDL is not transactional: a migration that fails halfway leaves
   the schema partially altered, so a broken `up()` must be fixed against a fresh
   database.
+- **The drift gate closes what the round-trip cannot see.** Every server app
+  ships `scripts/assert-schema-drift.mjs` (`npm run test:schema-drift`): after
+  `migration run`, it asserts the migrated schema matches the entity metadata
+  via typeorm-extension's `assertSchemaMatchesMetadata`
+  (`skipWithoutMigrations: true`, so the sqlite leg skips; anything but a
+  `SchemaDriftError` is rethrown — an unreachable database is not drift). The
+  `tests-migrations` CI job runs it after the idempotency replay.
 - **FK delete rules**: cascade only when the child genuinely cannot exist without
   the parent (`registry_projects.registry_id`). When the child is an independent
   resource that merely *points at* the parent, use `ON DELETE SET NULL` so deleting
@@ -304,7 +326,7 @@ Two guards enforce this, and both are in CI via the ordinary spec globs:
 | Guard | Catches |
 |---|---|
 | `apps/<service>/test/unit/adapters/database/column-naming.spec.ts` | a forgotten `@Column({ name })` — asserts no column name has an uppercase letter and that each equals `snakeCase(property)` |
-| `apps/<service>/test/unit/core/query/schema-entity-parity.spec.ts` | a rapiq allow-list key that resolves against no entity column, via rapiq's `assertSchemaMatchesEntity`, plus a coverage assertion against `entitySchemas` so a schema added later cannot go unguarded |
+| `apps/<service>/test/unit/core/query/schema-entity-parity.spec.ts` | a rapiq allow-list key that resolves against no entity column, plus a declared `indexes` sequence no entity index backs, via rapiq's `assertSchemaMatchesEntity`; an allow-listed filter/sort key that leads no declared sequence, via `collectNonLeadingQueryKeys` (`@privateaim/server-test-kit`); plus a coverage assertion against `entitySchemas` so a schema added later cannot go unguarded |
 
 Both build a `DataSource` from the **production** `DataSourceOptionsBuilder` with
 an in-memory sqlite driver (`toMetadataOnlyDataSourceOptions` in
@@ -317,6 +339,25 @@ IS the relation — a `@JoinColumn` with no paired scalar FK. Skipping on
 `relationMetadata` alone would exempt every FK column, so a consistently applied
 typo (`@Column({ name: 'registryid' })` plus a matching `@JoinColumn`) would pass
 both the guard and the `synchronize()`-based suites.
+
+Since #1842 every entity schema also declares `indexes` — **query-surface-only**
+property-name sequences, each a leftmost prefix of a real PK/unique/`@Index` —
+and opts into rapiq's indexed policies (`filters: { indexed: true }`, anchor
+mode, plus `sorts: { indexed: true }`). The parity spec pins the invariant from
+both sides: `assertSchemaMatchesEntity` rejects a declared sequence no entity
+index backs, and `collectNonLeadingQueryKeys` rejects an allow-listed
+filter/sort key that leads no declared sequence — a key that leads nothing makes
+enforcement reject (filters, a hard 400) or drop (sorts, silently unsorted) a
+query the allow-lists themselves advertise. **Adding a key to any
+`filters.allowed` / `sorts.allowed` therefore requires the backing entity index
+and its migration in the same change** — the parity spec fails otherwise.
+
+Never allow-list a filter on a column behind `dateToISOStringTransformer` — the
+timestamp-filter trap. Transformers apply on read, never to WHERE binds, so such
+a filter compares an ISO string against the driver's native storage format and
+matches wrong rows *silently*. This is why the telemetry event schema's
+`createdAt`/`updatedAt` filters were removed; sorting on them is fine (no bind
+involved).
 
 validup `mount()` keys are guarded by the compiler, not by a spec. `Container`'s
 `mount` signature is `Path<T> | (string & {})`, so any string compiles and a stale

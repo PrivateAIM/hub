@@ -77,14 +77,14 @@ console.log(meta.schema);
 // {
 //     name: 'node',
 //     strict: true,
-//     indexes:    null,
+//     indexes:    [['id'], ['name', 'realmId'], ['online'], /* ... */],
 //     fields:     { default: ['id', 'name', /* ... */], allowed: ['id', 'name', /* ... */] },
 //     filters:    { allowed: ['id', 'name', 'online', 'hidden', 'clientId', 'realmId', 'robotId'],
-//                   caseSensitive: null, indexed: false },
+//                   caseSensitive: null, indexed: 'anchor' },
 //     pagination: { maxLimit: 50 },
 //     relations:  { allowed: ['registryProject', 'registry'],
 //                   schemas: { registryProject: 'registryProject', registry: 'registry' } },
-//     sorts:      { allowed: ['name', 'updatedAt', 'createdAt'], default: null, indexed: false },
+//     sorts:      { allowed: ['name', 'updatedAt', 'createdAt'], default: null, indexed: true },
 // }
 ```
 
@@ -103,6 +103,11 @@ Reading rules:
 - the sort vocabulary is described under **`sorts`**; the URL parameter carrying it is still
   `sort` (`?sort=-updatedAt`). `describe()` emits `sorts` only — rapiq 2.1 dropped the `sort`
   alias from the description.
+- `indexes` lists the schema's declared index sequences (property-name-spelled, each backed by a
+  real database index), and `filters.indexed: 'anchor'` / `sorts.indexed: true` announce the
+  indexed policies: every and-group of a `filter` expression must contain at least one filter on
+  a key that **leads** one of the sequences, or the query answers 400. Every `filters.allowed`
+  key is index-leading, so a filter built from the allow-list is always anchored.
 - single-record `GET`s carry only the subset a record read processes (`fields` + `relations`); the
   `filters`, `sorts` and `pagination` keys are **absent**, not `null`.
 - mutations describe nothing — their `meta` is exactly `{}`.

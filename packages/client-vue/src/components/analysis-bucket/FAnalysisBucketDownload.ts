@@ -8,7 +8,7 @@
 import type { AnalysisBucket } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
-import { ActionCommandElementType, injectStorageHTTPClient, renderActionCommand } from '../../core';
+import { ActionCommandElementType, renderActionCommand } from '../../core';
 
 const FAnalysisBucketDownload = defineComponent({
     props: {
@@ -30,17 +30,17 @@ const FAnalysisBucketDownload = defineComponent({
         },
     },
     setup(props, { slots }) {
-        const storageClient = injectStorageHTTPClient();
-
         const execute = async () => {
             if (!props.entity.bucketId) {
                 return;
             }
 
-            const url = storageClient.bucket.getStreamURL(props.entity.bucketId);
-
+            // Same-origin, so the host-only session cookie is sent along. A direct
+            // cross-subdomain storage URL cannot carry it, and a navigation
+            // cannot carry an Authorization header either. The Nuxt server
+            // proxies through to storage in-cluster.
             window.open(
-                url,
+                `/api/download/bucket/${props.entity.bucketId}`,
                 '_blank',
             );
         };

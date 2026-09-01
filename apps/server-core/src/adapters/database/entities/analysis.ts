@@ -42,6 +42,7 @@ export class AnalysisEntity implements Analysis {
     })
     name: string;
 
+    @Index()
     @Column({
         name: 'display_name',
         type: 'varchar',
@@ -71,10 +72,11 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
-        name: 'configuration_locked', 
-        type: 'boolean', 
-        default: false, 
+        name: 'configuration_locked',
+        type: 'boolean',
+        default: false,
     })
     configurationLocked: boolean;
 
@@ -224,9 +226,11 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 
@@ -255,19 +259,21 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({ name: 'realm_id', type: 'uuid' })
     realmId: Realm['id'];
 
     // ------------------------------------------------------------------
 
     @Column({
-        name: 'user_id', 
-        nullable: true, 
-        type: 'uuid', 
+        name: 'user_id',
+        nullable: true,
+        type: 'uuid',
     })
     userId: User['id'];
 
     // ------------------------------------------------------------------
+    @Index()
     @Column({ name: 'project_id', type: 'uuid' })
     projectId: Project['id'];
 

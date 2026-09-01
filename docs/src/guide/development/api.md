@@ -101,7 +101,7 @@ Collection reads advertise the full vocabulary:
 {
     "name": "node",
     "strict": true,
-    "indexes": null,
+    "indexes": [["id"], ["name", "realmId"], ["online"], ["hidden"], ["clientId"], ["realmId"], ["robotId"], ["createdAt"], ["updatedAt"]],
     "fields": {
         "default": ["id", "name", "clientId", "externalName", "hidden", "type", "online", "publicKey", "robotId", "realmId", "registryId", "registryProjectId", "createdAt", "updatedAt"],
         "allowed": ["id", "name", "clientId", "externalName", "hidden", "type", "online", "publicKey", "robotId", "realmId", "registryId", "registryProjectId", "createdAt", "updatedAt"]
@@ -109,14 +109,14 @@ Collection reads advertise the full vocabulary:
     "filters": {
         "allowed": ["id", "name", "online", "hidden", "clientId", "realmId", "robotId"],
         "caseSensitive": null,
-        "indexed": false
+        "indexed": "anchor"
     },
     "pagination": { "maxLimit": 50 },
     "relations": {
         "allowed": ["registryProject", "registry"],
         "schemas": { "registryProject": "registryProject", "registry": "registry" }
     },
-    "sorts": { "allowed": ["name", "updatedAt", "createdAt"], "default": null, "indexed": false }
+    "sorts": { "allowed": ["name", "updatedAt", "createdAt"], "default": null, "indexed": true }
 }
 ```
 
@@ -128,7 +128,7 @@ The `filters`, `sorts` and `pagination` keys are **absent** (not `null`):
 {
     "name": "node",
     "strict": true,
-    "indexes": null,
+    "indexes": [["id"], ["name", "realmId"], /* ... */],
     "fields": { "default": ["id", "name", /* ... */], "allowed": ["id", "name", /* ... */] },
     "relations": {
         "allowed": ["registryProject", "registry"],
@@ -155,12 +155,33 @@ Mutations (`POST`, `DELETE`) describe nothing — their `meta` is exactly `{}`.
   stays **`sort`** (`?sort=-updatedAt`). rapiq 2.1 made `sorts` the canonical spelling on every
   developer-authored surface and `describe()` emits only that key — there is no `sort` alias in the
   description.
-- `sorts.allowed` is **derived from `sorts.default`** when no explicit allow-list is declared
-  (e.g. master images declare `sorts: { default: { path: 'ASC' } }` and describe as
-  `{ allowed: ["path"], default: { path: "ASC" }, indexed: false }`).
-- `indexes`, `filters.indexed` and `sorts.indexed` come from rapiq 2.1's schema index
-  declarations. No hub schema declares `indexes` yet, so these read `null` / `false`
-  throughout — an index-backed query surface is not enforced today.
+- `sorts.allowed` is **derived from `sorts.default`** when a schema declares only a default —
+  though every hub schema now declares its sort allow-list explicitly, so what you read is what
+  was declared.
+- `indexes`, `filters.indexed` and `sorts.indexed` come from rapiq's schema index declarations,
+  and every hub **entity** schema declares them: `indexes` lists the queryable index sequences
+  (as property names, each backed by a real database index), `filters.indexed: "anchor"`
+  announces anchor-mode filter enforcement and `sorts.indexed: true` index-backed sorting.
+  `indexes: null` means the schema declares none — and two live endpoints do publish it:
+  `GET /analysis-logs` and `GET /analysis-node-logs` describe the VictoriaLogs-backed log
+  schemas, which have no TypeORM entity (and so no database index) behind them, so their
+  `meta.schema` carries `indexes: null` with both policies `false`. For a client, anchor mode
+  means every and-group of a `filter` expression must contain at least one filter on a key that
+  **leads** (is position 0 of) one of the `indexes` sequences; a disallowed or unanchored
+  expression-dialect filter answers 400. Hub keeps every `filters.allowed` key index-leading, so
+  a filter built from the allow-list is always anchored. Sorts narrow differently: with
+  `sorts.indexed: true` the sort key list must equal a leftmost prefix of **one** declared
+  `indexes` sequence; otherwise the whole sort parameter is **silently replaced** by the
+  schema's `sorts.default` (or decodes to no ordering when none exists), with no issue in the
+  parse trace. The check runs on the *client-authored* keys only: an entry whose key **and**
+  direction match `sorts.default` exactly is removed first, and just the remainder must form
+  the prefix. A single advertised key therefore always binds — that is the invariant. On the
+  schemas that declare a default (`analysis`: `updatedAt DESC`, `masterImage`: `path ASC`,
+  `event`: `createdAt DESC`), the default entry plus **one** other advertised key also binds
+  through that exemption, as a two-column `ORDER BY` no declared sequence covers — e.g.
+  `GET /master-images?sort=path,name` executes `ORDER BY path, name` with no `(path, name)`
+  index behind it. Any other key combination is dropped: hub declares composite sequences,
+  but none whose members are all sortable.
 
 ### Endpoints without capability discovery
 

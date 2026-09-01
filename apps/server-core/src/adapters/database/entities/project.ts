@@ -7,12 +7,13 @@
 
 import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import {
-    Column, 
-    CreateDateColumn, 
-    Entity, 
-    JoinColumn, 
-    ManyToOne, 
-    PrimaryGeneratedColumn, 
+    Column,
+    CreateDateColumn,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import type { MasterImage, Project } from '@privateaim/core-kit';
@@ -35,6 +36,7 @@ export class ProjectEntity implements Project {
     })
     name: string;
 
+    @Index()
     @Column({
         name: 'display_name',
         type: 'varchar',
@@ -65,28 +67,32 @@ export class ProjectEntity implements Project {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({ name: 'realm_id', type: 'uuid' })
     realmId: Realm['id'];
 
     @Column({
-        name: 'client_id', 
-        type: 'uuid', 
-        nullable: true, 
+        name: 'client_id',
+        type: 'uuid',
+        nullable: true,
     })
     clientId: Client['id'] | null;
 
+    @Index()
     @Column({
-        name: 'user_id', 
-        type: 'uuid', 
-        nullable: true, 
+        name: 'user_id',
+        type: 'uuid',
+        nullable: true,
     })
     userId: User['id'] | null;
 

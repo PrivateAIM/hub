@@ -10,7 +10,8 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    PrimaryGeneratedColumn, 
+    Index,
+    PrimaryGeneratedColumn,
     Unique,
     UpdateDateColumn,
 } from 'typeorm';
@@ -50,9 +51,11 @@ export class RegistryEntity implements Registry {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 }
