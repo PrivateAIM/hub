@@ -295,8 +295,17 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 path: AnalysisContainerPath.CODE,
 
                 validateEntry: (entry) => {
-                    if (!entry.type || entry.type !== 'file') {
-                        return;
+                    // An allow-list, not a deny-list. `entry.type` is `null` at
+                    // runtime for every typeflag tar-stream does not recognise,
+                    // and `pack.entry()` re-types a null entry back to a regular
+                    // file on the way out — so anything that is not already a
+                    // plain file has to be rejected here, never skipped.
+                    // The only producer of this stream is server-storage's
+                    // `packBucketFiles`, which emits regular files exclusively;
+                    // docker's `putArchive` creates parent directories itself,
+                    // so nested paths need no directory entries either.
+                    if (entry.type !== 'file') {
+                        throw new Error(`Unsupported tar entry type ${entry.type} for ${entry.name}.`);
                     }
 
                     const index = analysisBucketFiles.findIndex((analysisBucketFile) => analysisBucketFile.path === entry.name);
