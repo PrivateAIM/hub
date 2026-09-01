@@ -216,10 +216,14 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         });
 
         entry.write(content);
-        entry.end();
+        // streamx types end()'s argument as required; the runtime no-ops on
+        // undefined, so this stays a plain end().
+        entry.end(undefined);
 
+        // tar-stream >= 3.2.1 types pack as a `streamx` Readable. streamx' pipe drives a
+        // node destination through write/end/'drain', so only the declarations disagree.
         const buildStream = await this.docker
-            .buildImage(pack.pipe(createGzip()), {
+            .buildImage((pack as unknown as NodeJS.ReadableStream).pipe(createGzip()), {
                 t: this.buildImageTag(analysis),
                 platform: 'linux/amd64',
             });

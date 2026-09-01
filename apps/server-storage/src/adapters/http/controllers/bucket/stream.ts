@@ -37,7 +37,11 @@ async function packFile(
         name: file.path,
         size: file.size,
     });
-    await pipeline(source, entry);
+
+    // tar-stream >= 3.2.1 types its entry sink as a `streamx` Writable, not a node one.
+    // It is not a node Writable, but it has the write/end/'drain' contract node's
+    // pipeline duck-types against, so only the declarations are incompatible.
+    await pipeline(source, entry as unknown as NodeJS.WritableStream);
 }
 
 export function packBucketFiles(
