@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { DomainEventName } from '@privateaim/kit';
 import type {
     EntityEventDestinations,
     EntityEventDestinationsFn,
@@ -14,7 +15,7 @@ import type {
 } from '@privateaim/server-kit';
 
 export type SubscriberPublishPayload<T> = {
-    type: string,
+    type: `${DomainEventName}`,
     data: T,
     dataPrevious?: T,
     metadata?: Partial<EntityEventMetadata>,

@@ -127,4 +127,37 @@ describe('src/subscriber/base', () => {
         await subscriber.beforeRemove({ entity: undefined, queryRunner: { data: {} } } as any);
         expect(publisher.safePublish).not.toHaveBeenCalled();
     });
+
+    it('should not publish columns declared select:false', async () => {
+        // `registryProject.accountSecret` reached the `/resources` socket rooms and
+        // the telemetry audit diff verbatim. The strip is metadata-derived, so
+        // `select: false` stays the single declaration.
+        const publisher = createMockPublisher();
+
+        const subscriber = new BaseSubscriber({
+            refType: 'registryProject',
+            destinations: [{ channel: 'test' }],
+            publisher,
+        });
+
+        const entity = { id: '1', accountSecret: 'NEW' };
+        await subscriber.afterUpdate({
+            entity,
+            databaseEntity: { id: '1', accountSecret: 'OLD' },
+            queryRunner: { data: {} },
+            metadata: {
+                columns: [
+                    { propertyPath: 'id', isSelect: true },
+                    { propertyPath: 'accountSecret', isSelect: false },
+                ],
+            },
+        } as any);
+
+        const ctx = (publisher.safePublish as any).mock.calls[0][0];
+        expect(ctx.data).toEqual({ id: '1' });
+        expect(ctx.dataPrevious).toEqual({ id: '1' });
+        // negative control: a copy, not a mutation — the registry link handler
+        // keeps using the live entity's secret after the save that fires this hook.
+        expect(entity.accountSecret).toBe('NEW');
+    });
 });

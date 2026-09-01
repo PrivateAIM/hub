@@ -14,3 +14,11 @@
  * drains by looping.
  */
 export const EVENT_RETENTION_SWEEP_BATCH_SIZE = 1000;
+
+/**
+ * Days a bus-ingested event row is kept before the sweep drops it. `0` keeps
+ * rows forever. Matches the previous hard-coded `WEEK_IN_MS` window for the
+ * entity bridge; the two master-image producers previously used 24h and now
+ * share this default.
+ */
+export const EVENT_RETENTION_DAYS_DEFAULT = 7;

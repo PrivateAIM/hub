@@ -33,7 +33,6 @@ export class EventRepositoryAdapter implements IEventRepository {
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Event>> {
         const qb = this.repository.createQueryBuilder('ev');
-        qb.groupBy('ev.id');
 
         const { pagination } = applyQuery(qb, query);
 

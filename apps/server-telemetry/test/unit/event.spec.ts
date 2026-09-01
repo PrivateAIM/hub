@@ -35,7 +35,7 @@ describe('controllers/event', () => {
     it('should create resource', async () => {
         const client = suite.client();
         const input : Partial<Event> = {
-            scope: 'model',
+            scope: 'entity',
             name: 'updated',
             refType: 'project',
             refId: '4b324d99-1984-4081-a47d-10e809092075',

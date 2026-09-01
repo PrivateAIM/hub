@@ -122,8 +122,7 @@ apps/server-core/src/
 │   │   │   ├── entities/<entity>/module.ts  # Thin controllers
 │   │   │   └── workflows/         # Non-CRUD workflow controllers
 │   │   └── request/
-│   │       ├── helpers/actor.ts   # buildActorContext bridge
-│   │       └── repository.ts      # RequestRepositoryAdapter (audit)
+│   │       └── helpers/actor.ts   # buildActorContext bridge
 │   └── socket/                    # WebSocket handlers
 ├── app/                           # Orchestration & DI wiring
 │   ├── builder.ts                 # ServerCoreApplicationBuilder

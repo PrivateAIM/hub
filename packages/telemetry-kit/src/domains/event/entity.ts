@@ -9,6 +9,7 @@
 
 import type { Realm } from '@authup/core-kit';
 import type { ObjectDiff } from '@privateaim/kit';
+import type { EventScope } from './constants';
 
 export type EventData = {
     diff?: ObjectDiff,
@@ -22,6 +23,11 @@ export interface Event {
      * domaine
      *
      * eg. analysis, node, analysisNode, ....
+     *
+     * Deliberately free-form: the vocabulary is the union of three sibling
+     * kits' `DomainType`, and typing it here would make this Layer-0 package
+     * depend on core-kit AND storage-kit. Every in-tree producer already passes
+     * a `DomainType` member. authup makes the same call for the same reason.
      */
     refType: string;
 
@@ -31,14 +37,17 @@ export interface Event {
     refId: string | null;
 
     /**
-     * component, prozess,
-     *
-     * eg. build, push, modelChanges, ...
+     * The producing subsystem. Closed vocabulary — see {@link EventScope}.
      */
-    scope: string;
+    scope: `${EventScope}`;
 
     /**
      * eg. started, starting, finished, ...
+     *
+     * Deliberately free-form: the vocabulary is scope-relative — `DomainEventName`
+     * under `entity`, a worker component event key under `builder` /
+     * `synchronizer` — and those enums live in packages a Layer-0 kit cannot
+     * import. Both producers are already narrow at their own call site.
      */
     name: string;
 
@@ -81,5 +90,10 @@ export interface Event {
 
     createdAt: string;
 
+    /**
+     * Vestigial. Events are append-only — no update route, no EVENT_UPDATE
+     * permission, no service method — so this always equals `createdAt`. Kept
+     * only because the column ships in the released 1771519574696 migration.
+     */
     updatedAt: string;
 }

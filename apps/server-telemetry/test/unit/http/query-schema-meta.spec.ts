@@ -36,7 +36,7 @@ describe('src/adapters/http/controllers (query schema meta)', () => {
     });
 
     const eventPayload: Partial<Event> = {
-        scope: 'model',
+        scope: 'entity',
         name: 'updated',
         refType: 'project',
         refId: '4b324d99-1984-4081-a47d-10e809092075',

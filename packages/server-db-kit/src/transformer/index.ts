@@ -7,3 +7,4 @@
 
 export * from './bigint-number.ts';
 export * from './date-iso-string.ts';
+export * from './serialized-text.ts';

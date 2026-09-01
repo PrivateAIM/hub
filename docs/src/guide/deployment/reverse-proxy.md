@@ -46,6 +46,8 @@ http {
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
             proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
 
         # Authentication
@@ -53,6 +55,8 @@ http {
             rewrite ^/auth/(.*) /$1 break;
             proxy_pass http://authup:3000;
             proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
 
         # Storage
@@ -60,6 +64,8 @@ http {
             rewrite ^/storage/(.*) /$1 break;
             proxy_pass http://storage:3000;
             proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
 
         # Telemetry
@@ -67,6 +73,8 @@ http {
             rewrite ^/telemetry/(.*) /$1 break;
             proxy_pass http://telemetry:3000;
             proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
 
         # Messenger with WebSocket support
@@ -77,10 +85,25 @@ http {
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
             proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
 }
 ```
+
+::: warning `X-Forwarded-For` must be set on every proxied location
+`proxy_set_header` is not inherited from a sibling `location`, so each block above sets the
+forwarding headers itself. Without them the header reaches the service exactly as the client sent
+it — with the real peer address appended nowhere — and the client IP recorded on every audit event
+is entirely client-supplied.
+
+Note this makes the true address *present* in the chain, not yet *authoritative*: hub currently
+reads the leftmost entry (`getRequestIP(event, { trustProxy: true })`), which a client can still
+prepend to. Tracked in [#1868](https://github.com/PrivateAIM/hub/issues/1868). If your ingress
+terminates client connections directly, `proxy_set_header X-Forwarded-For $remote_addr` (overwrite
+rather than append) closes that today.
+:::
 
 ::: tip
 For production, add SSL termination, rate limiting, and appropriate `proxy_read_timeout` values for long-running WebSocket connections.

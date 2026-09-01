@@ -58,3 +58,4 @@ created database.
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `VICTORIA_LOGS_URL` | Yes | VictoriaLogs endpoint URL |
+| `EVENT_RETENTION_DAYS` | No | Days an audit/event row is kept before the daily sweep removes it (default `7`; `0` = keep forever) |

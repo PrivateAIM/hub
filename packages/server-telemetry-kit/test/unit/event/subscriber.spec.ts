@@ -79,7 +79,7 @@ describe('core/event (EntityEventHandler)', () => {
         });
     });
 
-    it('should normalize an IPv6 loopback request address', async () => {
+    it('should carry an IPv6 request address through unrewritten', async () => {
         await handler.handle(buildContext({
             metadata: {
                 refType: 'analysis', 
@@ -88,7 +88,7 @@ describe('core/event (EntityEventHandler)', () => {
             },
         }));
 
-        expect(publisher.last.requestIpAddress).toBe('127.0.0.1');
+        expect(publisher.last.requestIpAddress).toBe('::1');
     });
 
     it('should diff only the changed scalar properties on an update', async () => {
@@ -132,6 +132,31 @@ describe('core/event (EntityEventHandler)', () => {
         expect(publisher.last.data).toEqual({ diff: {} });
     });
 
+    it('should exclude credential-named properties from the diff', async () => {
+        // `registry.accountSecret` is `select: false`: present in the save
+        // payload, absent from the database pre-image, so it always compares as
+        // changed. It used to be written verbatim into an audit row readable by
+        // every EVENT_READ holder and rendered in the admin UI.
+        await handler.handle(buildContext({
+            metadata: {
+                refType: 'registry', 
+                refId: 'registry-1', 
+                event: 'updated',
+            },
+            data: {
+                id: 'registry-1', 
+                name: 'next', 
+                accountSecret: 's3cr3t',
+            },
+            dataPrevious: {
+                id: 'registry-1', 
+                name: 'previous',
+            },
+        }));
+
+        expect(publisher.last.data).toEqual({ diff: { name: { next: 'next', previous: 'previous' } } });
+    });
+
     it('should skip object and array valued properties in the diff', async () => {
         await handler.handle(buildContext({
             data: {
@@ -159,11 +184,14 @@ describe('core/event (EntityEventHandler)', () => {
         expect(publisher.last.data).toEqual({});
     });
 
-    it('should mark published events as expiring', async () => {
+    it('should not stamp retention (owned by the telemetry ingest)', async () => {
+        // EVENT_RETENTION_DAYS is applied by EventComponentCreateHandler, which
+        // owns the table and runs the sweep. A re-added producer-side stamp
+        // would silently pin the old hard-coded window.
         await handler.handle(buildContext({ metadata: { refType: 'analysis', event: 'created' } }));
 
-        expect(publisher.last.expiring).toBe(true);
-        expect(Date.parse(publisher.last.expiresAt as string)).toBeGreaterThan(Date.now());
+        expect(publisher.last.expiring).toBeUndefined();
+        expect(publisher.last.expiresAt).toBeUndefined();
     });
 
     it('should not throw when no publisher is available', async () => {

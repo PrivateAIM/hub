@@ -31,7 +31,7 @@ describe('event HTTP endpoints', () => {
     });
 
     const eventPayload = {
-        scope: 'model',
+        scope: 'entity',
         name: 'updated',
         refType: 'project',
         refId: '4b324d99-1984-4081-a47d-10e809092075',
@@ -39,7 +39,7 @@ describe('event HTTP endpoints', () => {
         expiring: true,
         requestPath: '/projects/4b324d99-1984-4081-a47d-10e809092075',
         requestMethod: 'POST',
-        requestIpAddress: '172.40.1.1',
+        requestIpAddress: '0000:0000:0000:0000:0000:ffff:255.255.255.255',
         requestUserAgent: 'TestAgent/1.0',
         actorType: 'user',
         actorId: '9b921a45-3846-40ed-a392-deb26a4cc757',

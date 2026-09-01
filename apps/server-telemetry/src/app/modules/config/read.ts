@@ -28,5 +28,7 @@ export function readConfigFromEnv(): Partial<Config> {
         victoriaLogsURL: read(EnvironmentInputKey.VICTORIA_LOGS_URL),
         victoriaLogsIngestorURL: read(EnvironmentInputKey.VICTORIA_LOGS_INGESTOR_URL),
         victoriaLogsQuerierURL: read(EnvironmentInputKey.VICTORIA_LOGS_QUERIER_URL),
+
+        eventRetentionDays: readInt(EnvironmentInputKey.EVENT_RETENTION_DAYS, ConfigDefaults.EVENT_RETENTION_DAYS),
     };
 }
