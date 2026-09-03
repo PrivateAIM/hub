@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-db-kit",
     "type": "module",
-    "version": "0.15.0",
+    "version": "0.16.0",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "files": [
@@ -23,8 +23,8 @@
     "description": "This package contains server side db helpers & utilities.",
     "dependencies": {
         "@authup/kit": "^1.0.0-beta.63",
-        "@privateaim/kit": "^0.15.0",
-        "@privateaim/server-kit": "^0.15.0"
+        "@privateaim/kit": "^0.15.1",
+        "@privateaim/server-kit": "^0.16.0"
     },
     "devDependencies": {
         "cross-env": "^10.1.0",

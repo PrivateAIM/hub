@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.15.1](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.15.1) (2026-09-03)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/messenger-kit bumped from ^0.15.0 to ^0.15.1
+  * peerDependencies
+    * @privateaim/messenger-kit bumped from ^0.15.0 to ^0.15.1
+
 ## [0.15.0](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.15.0) (2026-08-26)
 
 
