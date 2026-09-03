@@ -36,6 +36,10 @@ async function packFile(
     const entry = pack.entry({
         name: file.path,
         size: file.size,
+        // Explicit, because tar-stream would otherwise default to 0o644: the
+        // analysis container runs as whatever user its master image declares,
+        // and has to be able to read and execute the code it was handed.
+        mode: 0o755,
     });
     await pipeline(source, entry);
 }

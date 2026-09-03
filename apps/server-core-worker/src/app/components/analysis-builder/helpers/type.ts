@@ -7,6 +7,11 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 
+/**
+ * The slice of an analysis the Dockerfile is derived from.
+ */
+export type DockerFileAnalysis = Pick<Analysis, 'id' | 'masterImageId' | 'imageCommandArguments'>;
+
 export type ContainerPackContext = {
     entity: Analysis,
     masterImagePath: string
