@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.15.1](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.15.1) (2026-09-03)
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group with 8 updates ([#1862](https://github.com/PrivateAIM/hub/issues/1862)) ([450bc71](https://github.com/PrivateAIM/hub/commit/450bc71ca82f0cccee979d61995cd7d371178e95))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/kit bumped from ^0.15.0 to ^0.15.1
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/kit bumped from ^0.15.0 to ^0.15.1
+
 ## [0.15.0](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.15.0) (2026-08-26)
 
 

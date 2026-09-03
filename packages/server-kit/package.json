@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-kit",
     "type": "module",
-    "version": "0.15.0",
+    "version": "0.16.0",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "files": [
@@ -33,7 +33,7 @@
         "@authup/core-kit": "^1.0.0-beta.63",
         "@hapic/oauth2": "^4.0.2",
         "@isaacs/ttlcache": "^2.1.5",
-        "@privateaim/kit": "^0.15.0",
+        "@privateaim/kit": "^0.15.1",
         "@rapiq/core": "^2.2.0",
         "@socket.io/redis-emitter": "^5.1.0",
         "eldin": "^1.3.0",

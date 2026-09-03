@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.15.0](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.15.0) (2026-09-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **telemetry-kit,server-db-kit,server-telemetry:** `EventAPI.update()` and `IEventAPI`'s `update` are removed (the route never existed and there is no EVENT_UPDATE permission). `Event['scope']` is now the closed `EventScope` union, and POST /events answers 400 outside it. `EntityEventMetadata.event` and `SubscriberPublishPayload.type` narrow to `DomainEventName`. Entity-event payloads no longer carry `select:false` columns.
+* **deps:** the OAuth2 client used by the UI must register `<ui-origin>/login/callback**` as a redirect URI — note the trailing `**`. The post-login destination now rides in the callback URI's query, and Authup matches a registered redirect URI against the full canonical URL including its query string, so an exact `<ui-origin>/login/callback` registration stops matching as soon as a destination is carried. The breakage looks intermittent: a login started from the bare login page carries no `redirect` and still succeeds, so only deep-link logins fail.
+
+### Bug Fixes
+
+* **deps:** bump authup to beta.63 and align the toolchain ([#1851](https://github.com/PrivateAIM/hub/issues/1851)) ([80830e6](https://github.com/PrivateAIM/hub/commit/80830e651ccfb46d0d5e362857eb87dba2df9671))
+* **telemetry-kit,server-db-kit,server-telemetry:** harden the telemetry event system ([#1866](https://github.com/PrivateAIM/hub/issues/1866)) ([dd579e9](https://github.com/PrivateAIM/hub/commit/dd579e934bbdaa1408324983fe15795df1babc64))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/server-kit bumped from ^0.15.0 to ^0.16.0
+    * @privateaim/telemetry-kit bumped from ^0.15.0 to ^0.16.0
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/server-kit bumped from ^0.15.0 to ^0.16.0
+    * @privateaim/telemetry-kit bumped from ^0.15.0 to ^0.16.0
+
 ## [0.14.0](https://github.com/PrivateAIM/hub/compare/v0.13.4...v0.14.0) (2026-08-26)
 
 

@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.16.0](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.16.0) (2026-09-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **telemetry-kit,server-db-kit,server-telemetry:** `EventAPI.update()` and `IEventAPI`'s `update` are removed (the route never existed and there is no EVENT_UPDATE permission). `Event['scope']` is now the closed `EventScope` union, and POST /events answers 400 outside it. `EntityEventMetadata.event` and `SubscriberPublishPayload.type` narrow to `DomainEventName`. Entity-event payloads no longer carry `select:false` columns.
+
+### Features
+
+* **client-vue,client-ui:** hand server-rendered data to the client instead of fetching it twice ([#1870](https://github.com/PrivateAIM/hub/issues/1870)) ([d71b19c](https://github.com/PrivateAIM/hub/commit/d71b19c173d94fa369b40eec9861456f4edc531e))
+
+
+### Bug Fixes
+
+* connect every new node to a registry, and let node admins manage that connection ([#1859](https://github.com/PrivateAIM/hub/issues/1859)) ([0be5ce6](https://github.com/PrivateAIM/hub/commit/0be5ce63f7a3a50d70ef3d23351ae4409d47b87b))
+* **deps:** bump the minorandpatch group with 8 updates ([#1862](https://github.com/PrivateAIM/hub/issues/1862)) ([450bc71](https://github.com/PrivateAIM/hub/commit/450bc71ca82f0cccee979d61995cd7d371178e95))
+* **telemetry-kit,server-db-kit,server-telemetry:** harden the telemetry event system ([#1866](https://github.com/PrivateAIM/hub/issues/1866)) ([dd579e9](https://github.com/PrivateAIM/hub/commit/dd579e934bbdaa1408324983fe15795df1babc64))
+
 ## [0.15.0](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.15.0) (2026-08-26)
 
 

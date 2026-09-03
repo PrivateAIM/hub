@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.16.0](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.16.0) (2026-09-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **telemetry-kit,server-db-kit,server-telemetry:** `EventAPI.update()` and `IEventAPI`'s `update` are removed (the route never existed and there is no EVENT_UPDATE permission). `Event['scope']` is now the closed `EventScope` union, and POST /events answers 400 outside it. `EntityEventMetadata.event` and `SubscriberPublishPayload.type` narrow to `DomainEventName`. Entity-event payloads no longer carry `select:false` columns.
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group with 8 updates ([#1862](https://github.com/PrivateAIM/hub/issues/1862)) ([450bc71](https://github.com/PrivateAIM/hub/commit/450bc71ca82f0cccee979d61995cd7d371178e95))
+* **telemetry-kit,server-db-kit,server-telemetry:** harden the telemetry event system ([#1866](https://github.com/PrivateAIM/hub/issues/1866)) ([dd579e9](https://github.com/PrivateAIM/hub/commit/dd579e934bbdaa1408324983fe15795df1babc64))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/server-db-kit bumped from ^0.15.0 to ^0.16.0
+    * @privateaim/server-http-kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/server-kit bumped from ^0.15.0 to ^0.16.0
+    * @privateaim/server-telemetry-kit bumped from ^0.14.0 to ^0.15.0
+    * @privateaim/telemetry-kit bumped from ^0.15.0 to ^0.16.0
+  * devDependencies
+    * @privateaim/server-test-kit bumped from ^0.15.0 to ^0.15.1
+
 ## [0.15.0](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.15.0) (2026-08-26)
 
 
