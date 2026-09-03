@@ -26,14 +26,13 @@ import { waitForStream } from 'docken';
 import type { Container } from 'dockerode';
 import stream from 'node:stream';
 import { createGzip } from 'node:zlib';
-import tar from 'tar-stream';
 import {
     cleanupDockerImage,
     packDockerContainerWithTarStream,
 } from '../../../../../adapters/docker/index.ts';
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
-import { generateDockerFileContent } from '../../helpers';
+import { createBuildContext, generateDockerFileContent } from '../../helpers';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -202,24 +201,10 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             storageClient: this.storageClient,
         });
 
-        const pack = tar.pack();
-        const entry = pack.entry({
-            name: 'Dockerfile',
-            type: 'file',
-            size: content.length,
-        }, (err) => {
-            if (err) {
-                pack.destroy(err);
-            }
-
-            pack.finalize();
-        });
-
-        entry.write(content);
-        entry.end();
+        const context = await createBuildContext(content);
 
         const buildStream = await this.docker
-            .buildImage(pack.pipe(createGzip()), {
+            .buildImage(context.pipe(createGzip()), {
                 t: this.buildImageTag(analysis),
                 platform: 'linux/amd64',
             });

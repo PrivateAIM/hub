@@ -6,7 +6,6 @@
  */
 
 import type {
-    Analysis,
     MasterImage,
     MasterImageCommandArgument,
 } from '@privateaim/core-kit';
@@ -17,11 +16,12 @@ import {
 import type { BucketFile, IStorageClient as StorageClient  } from '@privateaim/storage-kit';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import path from 'node:path';
-import { AnalysisContainerPath } from '../constants';
+import { ANALYSIS_BUILD_CONTEXT_ARCHIVE, AnalysisContainerPath } from '../constants';
 import { BuilderError } from '../error';
+import type { DockerFileAnalysis } from './type';
 
 export async function generateDockerFileContent(
-    entity: Analysis,
+    entity: DockerFileAnalysis,
     ctx: { coreClient: CoreClient; storageClient: StorageClient },
 ) : Promise<string> {
     const { data: analysisBuckets } = await ctx.coreClient.analysisBucket.getMany({
@@ -106,11 +106,12 @@ export async function generateDockerFileContent(
         }
     }
 
-    return `
-    FROM ${REGISTRY_MASTER_IMAGE_PROJECT_NAME}/${masterImage.virtualPath}
-    RUN mkdir -p ${AnalysisContainerPath.CODE}
-    RUN chmod -R +x ${AnalysisContainerPath.CODE}
-
-    CMD [${cmdParts.join(', ')}]
-    `;
+    // The code directory is extracted from an archive in the build context, so it
+    // is created by the builder itself. A RUN would execute as the master image's
+    // USER and fail on any base that drops privileges; see createBuildContext().
+    return [
+        `FROM ${REGISTRY_MASTER_IMAGE_PROJECT_NAME}/${masterImage.virtualPath}`,
+        `ADD ${ANALYSIS_BUILD_CONTEXT_ARCHIVE} ${path.posix.dirname(AnalysisContainerPath.CODE)}/`,
+        `CMD [${cmdParts.join(', ')}]`,
+    ].join('\n');
 }
