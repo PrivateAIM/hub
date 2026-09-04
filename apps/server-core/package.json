@@ -60,10 +60,10 @@
         "routup": "^6.1.0",
         "smob": "^1.6.2",
         "socket.io": "^4.8.3",
-        "typeorm": "^1.1.0",
+        "typeorm": "^1.1.1",
         "typeorm-extension": "^4.1.0",
         "validup": "^2.0.1",
-        "zod": "^4.5.1"
+        "zod": "^4.5.4"
     },
     "devDependencies": {
         "@faker-js/faker": "^10.6.0",
