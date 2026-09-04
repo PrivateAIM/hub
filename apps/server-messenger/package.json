@@ -46,10 +46,10 @@
         "reflect-metadata": "^0.2.2",
         "routup": "^6.1.0",
         "socket.io": "^4.8.3",
-        "typeorm": "^1.1.0",
+        "typeorm": "^1.1.1",
         "typeorm-extension": "^4.1.0",
         "validup": "^2.0.1",
-        "zod": "^4.5.1"
+        "zod": "^4.5.4"
     },
     "scripts": {
         "cli": "node dist/cli/index.mjs",
