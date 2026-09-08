@@ -28,7 +28,7 @@
     "dependencies": {
         "@validup/zod": "^2.0.1",
         "validup": "^2.0.1",
-        "zod": "^4.5.1"
+        "zod": "^4.5.4"
     },
     "devDependencies": {
         "@authup/core-kit": "^1.0.0-beta.63",
