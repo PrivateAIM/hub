@@ -24,10 +24,11 @@ docker run -e ... privateaim/hub ui
 | `NUXT_PUBLIC_CORE_URL` | — | Core API base URL |
 | `NUXT_PUBLIC_AUTHUP_URL` | — | Authup URL |
 | `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `admin-console` | OAuth2 client used for the login (authorization-code) flow |
-| `NUXT_PUBLIC_ACCOUNT_URL` | `<NUXT_PUBLIC_AUTHUP_URL>/account` | Authup account console, linked from the "Account" sidebar entry |
+| `NUXT_PUBLIC_ACCOUNT_URL` | `<NUXT_PUBLIC_AUTHUP_URL>/console/account` | Authup account console, linked from the "Account" sidebar entry |
 | `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
 | `NUXT_PUBLIC_TELEMETRY_URL` | — | Telemetry service URL |
 | `NUXT_PUBLIC_COOKIE_DOMAIN` | — (host-only) | `Domain` attribute for the session cookies. Leave empty unless a sibling host must read them — see [Session cookies](#session-cookies) |
+| `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` | — (none) | Namespace prefixed onto every session cookie name. Set alongside a widened `NUXT_PUBLIC_COOKIE_DOMAIN` — see [Session cookies](#session-cookies) |
 | `NUXT_PUBLIC_MESSENGER_URL` | — | Messenger service URL |
 
 ## Authentication
@@ -96,7 +97,7 @@ Which deployment layout you run decides what is required:
 
 | Authup is served at | Requirement |
 |---|---|
-| A path on the UI's own origin (`https://hub.example.com/auth`) | Authup including [authup#3495](https://github.com/authup/authup/issues/3495), which scopes the console cookies to that sub-path. **Unreleased as of `1.0.0-beta.63`** — on beta.63 and earlier this layout is broken. Keep `NUXT_PUBLIC_COOKIE_DOMAIN` empty. |
+| A path on the UI's own origin (`https://hub.example.com/auth`) | Fixed as of Authup `1.0.0-beta.64` ([authup#3495](https://github.com/authup/authup/issues/3495)/[#3496](https://github.com/authup/authup/pull/3496)): the auth and account consoles now scope their own cookies to that sub-path automatically (`cookiePath`), so they no longer collide with the UI's root-path cookies. **On beta.63 and earlier this layout is broken.** Keep `NUXT_PUBLIC_COOKIE_DOMAIN` empty. |
 | A subdomain of the UI host (`auth.hub.example.com`) | `NUXT_PUBLIC_COOKIE_DOMAIN` must be empty, or at least not cover that host. A `Domain` value is delivered to every subdomain of itself, so it reaches Authup's origin and collides there. |
 | A separate origin (`auth.example.com`, or any unrelated host) | Nothing. Separate cookie jars. |
 
@@ -107,7 +108,20 @@ combination at render time (`flameHub.validateCookieDomain`).
 
 It buys the Hub nothing by default: the services read the bearer token from the
 `Authorization` header, and their cookie fallback only ever sees same-origin requests
-under a shared hostname.
+under a shared hostname. The one case it does matter is a **stream/download**
+endpoint reached by a top-level browser navigation (`GET /buckets/:id/stream`,
+`GET /bucket-files/:id/stream`) — that request cannot carry an `Authorization`
+header, so the widened domain is what lets the storage host read the cookie at all.
+
+When `NUXT_PUBLIC_COOKIE_DOMAIN` genuinely must be widened, also set
+`NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` (Authup `client-web-nuxt` >= `1.0.0-beta.64`,
+[authup#3527](https://github.com/authup/authup/issues/3527)). It namespaces every
+session cookie name (`access_token` → `<prefix>access_token`, …) so a sibling authup
+client reachable at the widened domain — Authup's own hosted pages included — cannot
+write the same cookie names and steal or clobber the UI's session. Set it **before**
+going live with a widened domain: switching it later requires everyone to sign out (or
+clear cookies) first, since the un-prefixed names are neither read nor swept once the
+prefix is in place.
 
 ::: warning Changing `NUXT_PUBLIC_COOKIE_DOMAIN` from a value to empty
 The switch does not clear what browsers already hold. The previously written
@@ -205,18 +219,20 @@ both sides of the boundary. Tracked as a follow-up.
 
 The UI has **no settings area of its own**. Profile, password, authenticators, sessions
 and connected applications live in **Authup's account console**, served by Authup's
-server-core on the IdP origin as of `v1.0.0-beta.59`. Keeping a second, thinner surface
+server-core on the IdP origin as of `v1.0.0-beta.59` (mounted at `/console/account`
+since `v1.0.0-beta.64`; earlier releases served it at bare `/account`). Keeping a
+second, thinner surface
 in the UI would only split the account UX across two origins.
 
 The header's account icon links straight at
 `<NUXT_PUBLIC_ACCOUNT_URL>/?ref=<ui-origin>&realmId=<session-realm>`, defaulting to
-`<NUXT_PUBLIC_AUTHUP_URL>/account`. It is the only entry point — the sidebar carries no
-account entry, so the one link that leaves for the IdP origin sits in one place rather
-than two. The console renders the `ref` origin as a back link after validating it
-against the trusted app origins; the UI origin is already required to be trusted for the
-login callback, so this needs no extra deployment configuration. Set
+`<NUXT_PUBLIC_AUTHUP_URL>/console/account`. It is the only entry point — the sidebar
+carries no account entry, so the one link that leaves for the IdP origin sits in one
+place rather than two. The console renders the `ref` origin as a back link after
+validating it against the trusted app origins; the UI origin is already required to be
+trusted for the login callback, so this needs no extra deployment configuration. Set
 `NUXT_PUBLIC_ACCOUNT_URL` for deployments where the console is not reachable under
-`<NUXT_PUBLIC_AUTHUP_URL>/account`.
+`<NUXT_PUBLIC_AUTHUP_URL>/console/account`.
 
 `realmId` is a safety net for the session mismatch between the two origins: the UI's
 session outlives the IdP's, so the account icon still renders after the IdP session has
