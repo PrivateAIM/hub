@@ -71,28 +71,45 @@ export async function packDockerContainerWithTarStream(
 ) {
     return new Promise<void>((resolve, reject) => {
         const pack = tar.pack();
+        const extract = tar.extract();
         const directories = new Set<string>();
 
-        // Tearing the output pack down matters: putArchive is already streaming
-        // it as its request body, so leaving it neither finalized nor destroyed
-        // stalls that request until the daemon times out.
+        // Every failure route has to end the same way, because two of the three
+        // streams here outlive a plain `reject()`:
+        //
+        // - `pack` is already being consumed by `putArchive`, so an un-finalized,
+        //   un-destroyed pack leaves that request body open forever. The caller's
+        //   `container.remove({ force: true })` then blocks behind the in-flight
+        //   archive request and the build never settles.
+        // - `readable` is the storage download, and node's `pipe()` does not
+        //   forward a SOURCE error to the destination — so nothing else ends it.
+        let failed = false;
         const fail = (err: Error) => {
+            if (failed) {
+                return;
+            }
+
+            failed = true;
+
             pack.destroy(err);
+            readable.destroy();
+
             reject(err);
         };
 
-        readable.on('error', (err) => fail(err));
-
-        const extract = tar.extract();
-        extract.on('error', (err) => fail(err));
+        readable.on('error', fail);
+        extract.on('error', fail);
 
         extract.on('entry', (headers, stream, callback) => {
-            // Destroying the extract destroys the entry stream with it, so this
-            // has to be attached before anything below can bail out: without a
-            // listener that teardown is an uncaught exception, which takes the
-            // worker process down instead of failing the build. The cause is
-            // reported through the extract's own error handler.
-            stream.on('error', () => { /* reported via extract */ });
+            // streamx re-throws an 'error' that has no listener as an
+            // uncaughtException, which kills the worker before the caller can
+            // remove its container. Both this entry stream and the pack sink
+            // below are destroyed on the failure paths — the error itself is
+            // surfaced through `fail`, so these listeners only need to exist.
+            // This one is NOT the handler further down: it has to be registered
+            // before the `validateEntry` catch returns early, which is a path
+            // that handler never reaches.
+            stream.on('error', () => { /* surfaced through fail */ });
 
             if (options.onEntryPackStarted) {
                 options.onEntryPackStarted(headers);
@@ -102,6 +119,7 @@ export async function packDockerContainerWithTarStream(
                 try {
                     options.validateEntry(headers);
                 } catch (e) {
+                    fail(e);
                     callback(e);
 
                     return;
@@ -143,6 +161,8 @@ export async function packDockerContainerWithTarStream(
                 },
             );
 
+            entry.on('error', () => { /* surfaced through fail */ });
+
             stream.on('data', (chunk) => {
                 const written = entry.write(chunk);
                 if (!written) {
@@ -172,7 +192,7 @@ export async function packDockerContainerWithTarStream(
 
         container.putArchive(pack, { path: options.path })
             .then(() => resolve())
-            .catch((err) => reject(err));
+            .catch(fail);
 
         readable.pipe(extract);
     });

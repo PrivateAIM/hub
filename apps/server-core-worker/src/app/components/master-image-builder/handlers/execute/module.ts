@@ -126,6 +126,16 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
 
         const imageFilePath = path.join(MASTER_IMAGES_DIRECTORY_PATH, masterImage.path);
 
+        // `tar.pack` returns a streamx `Pack`, which is NOT a node `Readable` —
+        // it has no `isPaused`/`unpipe`/`wrap` — so it does not really satisfy
+        // dockerode's `NodeJS.ReadableStream` parameter. It compiles because
+        // `@types/tar-stream` declares `Pack extends stream.Readable` (tar-fs
+        // ships no types of its own; `@types/tar-fs` only forwards that `Pack`),
+        // and it works because docker-modem only ever calls `.on('error')` and
+        // `.pipe()` on what it is handed. `container-pack.ts` leans on the same
+        // false declaration for `putArchive`. Deliberately uncast; pinned
+        // end-to-end by test/unit/components/master-image-builder/execute.spec.ts
+        // (#1863).
         const pack = tar.pack(imageFilePath);
         const stream = await this.docker
             .buildImage(pack, {

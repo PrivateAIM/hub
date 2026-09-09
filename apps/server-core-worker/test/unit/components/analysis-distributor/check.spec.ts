@@ -10,7 +10,7 @@ import type { ICoreClient } from '@privateaim/core-http-kit';
 import { createFakeClient } from '@privateaim/core-http-kit/testing';
 import type { Client as DockerClient } from 'docken';
 import type { AnalysisDistributorCheckPayload } from '@privateaim/server-core-worker-kit';
-import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
+import { AnalysisDistributorCommand, AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import { describe, expect, it } from 'vitest';
 import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/app/components/constants';
 import { AnalysisDistributorCheckHandler } from '../../../../src/app/components/analysis-distributor/handlers/check/module';
@@ -87,7 +87,7 @@ function createHandler(coreClient: ICoreClient, docker: FakeDockerClient) {
 }
 
 function run(coreClient: ICoreClient, docker: FakeDockerClient) {
-    const context = new FakeComponentHandlerContext();
+    const context = new FakeComponentHandlerContext(AnalysisDistributorCommand.CHECK);
 
     return createHandler(coreClient, docker)
         .handle(PAYLOAD, context)
