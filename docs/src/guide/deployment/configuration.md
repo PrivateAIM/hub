@@ -63,11 +63,12 @@ created database.
 ## Frontend Variables (client-ui)
 
 The full list lives in the [frontend reference](../../reference/frontend/index.md#environment-variables).
-One of them is a deployment decision rather than a service address:
+Two of them are deployment decisions rather than service addresses, and go together:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `NUXT_PUBLIC_COOKIE_DOMAIN` | No | `Domain` attribute for the UI's session cookies. **Leave empty.** |
+| `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` | No | Namespace prefixed onto every session cookie name. Set this **whenever `NUXT_PUBLIC_COOKIE_DOMAIN` is widened**, so Authup's own hosted pages can't collide with the UI's cookies on that domain. |
 
 ### Where Authup is served matters
 
@@ -76,9 +77,11 @@ names**. If both can see each other's cookies, they hydrate, rotate and revoke e
 other's tokens, and the user is logged out on the next page reload.
 
 Empty (host-only) cookies are correct in every layout. Setting a `Domain` delivers the
-cookies to every subdomain of that value — including Authup's host, if it sits below it.
-Serving Authup on a path of the UI's own origin additionally requires an Authup build
-containing [authup#3495](https://github.com/authup/authup/issues/3495).
+cookies to every subdomain of that value — including Authup's host, if it sits below
+it — in which case also set `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` to keep the two cookie
+sets apart. Serving Authup on a path of the UI's own origin no longer needs either
+variable as of Authup `1.0.0-beta.64` ([authup#3495](https://github.com/authup/authup/issues/3495)):
+the consoles scope their own cookies to that sub-path automatically.
 
 The layout matrix and the upgrade caveat are documented under
 [Session cookies](../../reference/frontend/index.md#session-cookies).
