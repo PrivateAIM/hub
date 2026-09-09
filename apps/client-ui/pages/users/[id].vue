@@ -9,17 +9,13 @@ import { injectHTTPClient } from '@authup/client-web-kit';
 import type { User } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import type { NavigationItem } from '@vuecs/navigation';
-import { isClientErrorWithStatusCode } from 'hapic';
-import type { Ref } from 'vue';
-import { ref } from 'vue';
 import { definePageMeta } from '#imports';
 import {
-    createError,
     defineNuxtComponent,
-    navigateTo,
     useRoute,
 } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
+import { useEntityRecord } from '../../composables/entity-record';
 
 export default defineNuxtComponent({
     components: { FDisplayName },
@@ -29,20 +25,28 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
 
-        const user = ref<null | User>(null) as Ref<User>;
+        const route = useRoute('users-id');
 
-        try {
-            // authup beta.57 wraps every single-record endpoint in a
-            // { data, meta } envelope — unwrap to the bare record.
-            const { data } = await injectHTTPClient().user.getOne(useRoute('users-id').params.id as string);
-            user.value = data;
-        } catch (e) {
-            if (isClientErrorWithStatusCode(e, 404)) {
-                navigateTo({ path: '/' });
-            }
+        // Resolved up front: the handler can run after setup's first await,
+        // where `inject()` no longer resolves.
+        const httpClient = injectHTTPClient();
 
-            throw createError({});
-        }
+        // Behaviour change: EVERY failure now redirects to `/`. The 404-only
+        // check this replaces could not survive `useAsyncData`, which re-wraps
+        // a rejection as a `NuxtError` — so hapic's `instanceof`-based
+        // `isClientErrorWithStatusCode` would never match again. It was the
+        // worse behaviour regardless: a 403 rendered a blank error page, and a
+        // 404 raced an unawaited navigation against the thrown error.
+        //
+        // `.data` unwraps the `{ data, meta }` envelope authup has wrapped
+        // every single-record endpoint in since beta.57.
+        const user = await useEntityRecord<User>(
+            `user:${route.params.id}`,
+            () => httpClient.user
+                .getOne(route.params.id as string)
+                .then((response) => response.data),
+            '/',
+        );
 
         const base = `/users/${user.value.id}`;
         const tabs: NavigationItem[] = [

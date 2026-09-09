@@ -291,12 +291,16 @@ describe('AnalysisBuilderExecuteHandler > packContainer', () => {
 
         // Assert on the decoded entries, not on "it resolved" — otherwise this
         // passes just as happily for an empty tar. The types are the point: the
-        // producer never sets one, so every entry here reached the allow-list as
-        // `'file'` and was let through.
+        // producer never sets one, so every FILE entry here reached the
+        // allow-list as `'file'` and was let through. `container-pack.ts` also
+        // synthesizes missing parent directories for the deep/nested paths
+        // (see container-pack-directories.spec.ts for that behaviour on its
+        // own) — filter those out here so this test stays scoped to the
+        // allow-list's acceptance half.
         const entries = await readTar(archives[0].content);
+        const fileEntries = entries.filter((entry) => entry.type === 'file');
 
-        expect(entries.map((entry) => entry.name)).toEqual(paths);
-        expect(entries.every((entry) => entry.type === 'file')).toBe(true);
+        expect(fileEntries.map((entry) => entry.name)).toEqual(paths);
     });
 
     it('should reject a file that does not belong to the analysis', async () => {
