@@ -16,6 +16,10 @@ export default [
             // and only present once the docs dev server has run locally. Without
             // this, `npm run lint` is red locally but green on a fresh CI checkout.
             '**/.vitepress/cache/**',
+            // Local agent state, including stale git worktrees under
+            // .claude/worktrees/ — untracked and never present on a CI
+            // checkout, but a full local `npm run lint` globs into them.
+            '**/.claude/**',
         ],
     },
     {

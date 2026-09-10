@@ -12,6 +12,14 @@ import { DomainType } from '@privateaim/core-kit';
 export const masterImageGroupSchema = defineSchema<MasterImageGroup>({
     name: DomainType.MASTER_IMAGE_GROUP,
     strict: true,
+    indexes: [
+        ['id'],
+        ['name'],
+        ['path'],
+        ['virtualPath'],
+        ['createdAt'],
+        ['updatedAt'],
+    ],
     fields: {
         default: [
             'id',
@@ -22,6 +30,13 @@ export const masterImageGroupSchema = defineSchema<MasterImageGroup>({
             'updatedAt',
         ],
     },
-    filters: { allowed: ['id', 'name', 'path', 'virtualPath'] },
+    filters: { allowed: ['id', 'name', 'path', 'virtualPath'], indexed: true },
+    // Previously no sorts were declared at all, which under `strict` rejected
+    // every requested sort key — the explicit list mirrors masterImage's
+    // sortable surface, every entry backed by an index.
+    sorts: {
+        allowed: ['name', 'path', 'virtualPath', 'createdAt', 'updatedAt'],
+        indexed: true,
+    },
     pagination: { maxLimit: 50 },
 });

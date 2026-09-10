@@ -21,9 +21,11 @@ export class MasterImageGroupEntity implements MasterImageGroup {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Index()
     @Column({ type: 'varchar', length: 128 })
     name: string;
 
+    @Index()
     @Column({ type: 'varchar', length: 512 })
     path: string;
 
@@ -37,9 +39,11 @@ export class MasterImageGroupEntity implements MasterImageGroup {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 }

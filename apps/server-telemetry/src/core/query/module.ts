@@ -29,11 +29,17 @@ import type { DecodeQueryOptions } from './types.ts';
  */
 export const schemaRegistry = new SchemaRegistry();
 
-const schemas: Schema<any>[] = [
+/**
+ * Every entity schema the registry knows about. Exported so
+ * `test/unit/core/query/schema-entity-parity.spec.ts` can assert it covers ALL
+ * of them — otherwise a schema added later would silently go unguarded.
+ * Mirrors server-core's `entitySchemas`.
+ */
+export const entitySchemas: Schema<any>[] = [
     eventSchema,
 ];
 
-for (const schema of schemas) {
+for (const schema of entitySchemas) {
     schemaRegistry.add(schema);
 }
 

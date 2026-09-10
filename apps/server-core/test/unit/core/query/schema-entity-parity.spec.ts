@@ -6,7 +6,7 @@
  */
 
 import { assertSchemaMatchesEntity } from '@rapiq/adapter-typeorm';
-import { collectUncoveredColumns, toMetadataOnlyDataSourceOptions } from '@privateaim/server-test-kit';
+import { collectNonLeadingQueryKeys, collectUncoveredColumns, toMetadataOnlyDataSourceOptions } from '@privateaim/server-test-kit';
 import type { EntityTarget } from 'typeorm';
 import { DataSource } from 'typeorm';
 import {
@@ -109,5 +109,51 @@ describe('core/query (schema ↔ entity parity)', () => {
     });
     it.each(SCHEMA_ENTITY_TARGETS)('should resolve every %s schema key against the entity', (_name, schema, target) => {
         expect(() => assertSchemaMatchesEntity(schema, target, dataSource)).not.toThrow();
+    });
+
+    // Issue #1842 invariant, over the DESCRIPTION (the normalized shape the
+    // indexed policies actually read): every allow-listed filter/sort key must
+    // LEAD a declared index sequence, or anchor-mode enforcement rejects a
+    // query the allow-lists themselves advertise. `assertSchemaMatchesEntity`
+    // above guards the other half — that every declared sequence is backed by
+    // a real PK/unique/index on the entity.
+    it.each(SCHEMA_ENTITY_TARGETS)('should let every %s allowed filter and sort key lead a declared index', (_name, schema) => {
+        expect(collectNonLeadingQueryKeys(schema.describe())).toEqual([]);
+    });
+
+    // Anti-vacuity guards (authup's indexed-invariant.spec.ts pattern): the
+    // invariant loops read the description, so a renamed description key —
+    // exactly what the `sort` → `sorts` rename in rapiq 2.1 did — would make
+    // them silently check nothing. Array.isArray is the load-bearing shape:
+    // a rename yields `undefined`, which passes `.not.toBeNull()` — only an
+    // array proves the list is there for the loops to iterate.
+    it.each(SCHEMA_ENTITY_TARGETS)('should describe filters, sorts and indexes for %s', (_name, schema) => {
+        const description = schema.describe();
+
+        expect(Array.isArray(description.filters?.allowed)).toBe(true);
+        expect(Array.isArray(description.sorts?.allowed)).toBe(true);
+        expect(Array.isArray(description.indexes)).toBe(true);
+
+        // The policy OPT-IN, which nothing else pins: deleting `indexed: true`
+        // from a schema keeps the invariant above green (the indexes are still
+        // declared), keeps `assertSchemaMatchesEntity` green and keeps every
+        // wire probe answering 200 — enforcement is just silently off, the
+        // exact state #1842 exists to prevent. `describe()` normalizes the
+        // opt-in to 'anchor' / true, and to false when it is absent.
+        expect(description.filters?.indexed).toBe('anchor');
+        expect(description.sorts?.indexed).toBe(true);
+    });
+
+    it('should have allow-listed keys to check at all', () => {
+        const keys = SCHEMA_ENTITY_TARGETS.flatMap(([, schema]) => {
+            const description = schema.describe();
+
+            return [
+                ...(description.filters?.allowed || []),
+                ...(description.sorts?.allowed || []),
+            ];
+        });
+
+        expect(keys.length).toBeGreaterThan(0);
     });
 });

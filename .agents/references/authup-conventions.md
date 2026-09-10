@@ -35,7 +35,7 @@ This documents the conventions Hub should adopt as part of modernization (see Pl
 
 ## Database Migrations
 
-Source: [`.agents/conventions.md` § Database Migrations](https://github.com/authup/authup/blob/master/.agents/conventions.md) (authup), verified 2026-07-26.
+Source: [`.agents/conventions.md` § Database Migrations](https://github.com/authup/authup/blob/master/.agents/conventions.md) (authup), verified 2026-09-01.
 
 **Authup pattern:**
 - **One named migration per feature.** Each feature/PR adds its own migration in both
@@ -43,10 +43,13 @@ Source: [`.agents/conventions.md` § Database Migrations](https://github.com/aut
   `1784460916000-RemoveRobots.ts`) and a doc-comment header explaining the change.
 - **Consolidation happens at release time, not merge time.** A release window's
   migrations *may* be squashed into one file per dialect as a deliberate last step
-  before the release PR merges (keeping the earliest timestamp). Shipping several
-  named migrations in one release is fine.
+  before the release PR merges (keeping the earliest timestamp) — optional; shipping
+  several named migrations in one release is fine. Anyone who executed the
+  pre-squash files must drop their dev DB or fix its `migrations` table by hand.
 - **Released migrations are immutable.** A migration may be amended while it lives
-  only on its own unmerged branch; once released, never touch it.
+  only on its own unmerged branch; once released, never touch it. Before touching an
+  existing migration, verify against the release tags / last release-PR merge that
+  it has not shipped.
 - After adding or amending a migration, run the round-trip: `migration run` →
   `revert` × N → `run`.
 

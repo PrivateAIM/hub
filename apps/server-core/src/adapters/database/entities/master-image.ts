@@ -61,10 +61,11 @@ export class MasterImageEntity implements MasterImage {
     })
     buildSize: number | null;
 
+    @Index()
     @Column({
-        type: 'varchar', 
-        nullable: true, 
-        length: 512, 
+        type: 'varchar',
+        nullable: true,
+        length: 512,
     })
     path: string | null;
 
@@ -84,6 +85,7 @@ export class MasterImageEntity implements MasterImage {
     })
     groupVirtualPath: string;
 
+    @Index()
     @Column({ type: 'varchar' })
     name: string;
 
@@ -100,9 +102,11 @@ export class MasterImageEntity implements MasterImage {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 }

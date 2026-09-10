@@ -10,9 +10,10 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     JoinColumn,
-    ManyToOne, 
-    PrimaryGeneratedColumn, 
+    ManyToOne,
+    PrimaryGeneratedColumn,
     Unique,
     UpdateDateColumn,
 } from 'typeorm';
@@ -34,10 +35,11 @@ export class RegistryProjectEntity implements RegistryProject {
     @Column({ type: 'varchar', length: 128 })
     name: string;
 
+    @Index()
     @Column({
-        type: 'varchar', 
-        length: 64, 
-        nullable: true, 
+        type: 'varchar',
+        length: 64,
+        nullable: true,
         default: RegistryProjectType.DEFAULT,
     })
     type: `${RegistryProjectType}`;
@@ -110,6 +112,7 @@ export class RegistryProjectEntity implements RegistryProject {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({ name: 'registry_id' })
     registryId: Registry['id'];
 
@@ -128,9 +131,11 @@ export class RegistryProjectEntity implements RegistryProject {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 }

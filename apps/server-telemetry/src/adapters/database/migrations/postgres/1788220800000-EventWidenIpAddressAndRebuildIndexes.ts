@@ -1,8 +1,12 @@
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
- * Two changes to `events`, both from the telemetry hardening back-port
- * (PrivateAIM/hub#1745).
+ * Three changes to `events`: two from the telemetry hardening back-port
+ * (PrivateAIM/hub#1745), one from the query-surface index invariant
+ * (PrivateAIM/hub#1842), folded into this still-unreleased migration as the
+ * release window's consolidation step. Anyone who executed the pre-fold file
+ * must drop their dev database (the CLI re-creates it) or fix its `migrations`
+ * table by hand.
  *
  * 1. Widen `request_ip_address` from varchar(15) to varchar(45).
  *    15 fits only a dotted-quad IPv4 literal. The value originates from
@@ -18,15 +22,23 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  *    `events` is write-mostly and carried fourteen indexes. Ten of them
  *    (`name`, `ref_type`, `expiring`, every `request_*`, every `actor_*`) back
  *    keys that no client can address — `eventSchema` allows filtering only on
- *    scope/name/refType/refId/realmId/createdAt/updatedAt and sorting only on
- *    expiresAt/createdAt/updatedAt — so they were pure write cost. Meanwhile
+ *    scope/name/refType/refId/realmId and sorting only on createdAt — so they
+ *    were pure write cost. Meanwhile
  *    the two queries that actually run had no index at all: the admin list
  *    (`realm_id` in [realm, null] ordered by `created_at`) and the retention
  *    sweep (`expiring` + `expires_at <`). `name` and `ref_type` survive as the
  *    leftmost columns of the retained `(name, scope)` and `(ref_type, ref_id)`
  *    composites; `scope` and `ref_id` keep their singles, being filterable and
  *    a leftmost prefix of neither.
- *    Net: 14 indexes -> 6.
+ *
+ * 3. Add a single-column index on `created_at` (#1842). `eventSchema` declares
+ *    its query surface as `indexes` with `indexed` filter/sort policies, and
+ *    the invariant is that every allowed key LEADS a real index. `createdAt`
+ *    is the schema's only sort key, and a bare `sort=-createdAt` (no realm
+ *    filter) cannot ride `(realm_id, created_at)` — its leftmost column is
+ *    `realm_id` — so the sort needs its own single.
+ *
+ *    Net: 14 indexes -> 7.
  *
  * Widening varchar(n) -> varchar(m > n) is a metadata-only change on
  * PostgreSQL 12+, so the table is not rewritten. `down()` narrows back to 15,
@@ -53,9 +65,11 @@ export class EventWidenIpAddressAndRebuildIndexes1788220800000 implements Migrat
 
         await queryRunner.query('CREATE INDEX "IDX_d081c16020e8daee7dea5d3ca7" ON "events" ("realm_id", "created_at")');
         await queryRunner.query('CREATE INDEX "IDX_ae92f92677aad1f01f61bc7347" ON "events" ("expiring", "expires_at")');
+        await queryRunner.query('CREATE INDEX "IDX_7ebab07668bb225b6a04782a7d" ON "events" ("created_at")');
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query('DROP INDEX "public"."IDX_7ebab07668bb225b6a04782a7d"');
         await queryRunner.query('DROP INDEX "public"."IDX_ae92f92677aad1f01f61bc7347"');
         await queryRunner.query('DROP INDEX "public"."IDX_d081c16020e8daee7dea5d3ca7"');
 

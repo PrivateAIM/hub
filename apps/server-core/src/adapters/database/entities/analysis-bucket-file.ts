@@ -20,9 +20,10 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     JoinColumn,
     ManyToOne,
-    PrimaryGeneratedColumn, 
+    PrimaryGeneratedColumn,
     Unique,
     UpdateDateColumn,
 } from 'typeorm';
@@ -35,9 +36,11 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Index()
     @Column({ type: 'varchar', length: 256 })
     path: string;
 
+    @Index()
     @Column({ type: 'boolean', default: false })
     root: boolean;
 
@@ -86,6 +89,7 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({ name: 'analysis_bucket_id' })
     analysisBucketId: AnalysisBucket['id'];
 
@@ -95,9 +99,11 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 

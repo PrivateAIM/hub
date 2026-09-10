@@ -8,12 +8,13 @@
 import { dateToISOStringTransformer } from '@privateaim/server-db-kit';
 import {
     Column,
-    CreateDateColumn, 
-    Entity, 
-    JoinColumn, 
-    ManyToOne, 
-    PrimaryGeneratedColumn, 
-    Unique, 
+    CreateDateColumn,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import type {
@@ -32,11 +33,12 @@ export class ProjectNodeEntity implements ProjectNode {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Index()
     @Column({
         name: 'approval_status',
-        type: 'varchar', 
-        length: 32, 
-        default: null, 
+        type: 'varchar',
+        length: 32,
+        default: null,
     })
     approvalStatus: ProjectNodeApprovalStatus | null;
 
@@ -45,9 +47,11 @@ export class ProjectNodeEntity implements ProjectNode {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 
@@ -60,9 +64,11 @@ export class ProjectNodeEntity implements ProjectNode {
     @JoinColumn({ name: 'project_id' })
     project: ProjectEntity;
 
+    @Index()
     @Column({ name: 'project_realm_id', type: 'uuid' })
     projectRealmId: Realm['id'];
 
+    @Index()
     @Column({ name: 'node_id' })
     nodeId: Node['id'];
 
@@ -70,6 +76,7 @@ export class ProjectNodeEntity implements ProjectNode {
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
+    @Index()
     @Column({ name: 'node_realm_id', type: 'uuid' })
     nodeRealmId: string;
 }

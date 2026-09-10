@@ -10,6 +10,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    Index,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
@@ -32,9 +33,11 @@ export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @CreateDateColumn({ name: 'created_at', transformer: dateToISOStringTransformer })
     createdAt: string;
 
+    @Index()
     @UpdateDateColumn({ name: 'updated_at', transformer: dateToISOStringTransformer })
     updatedAt: string;
 
@@ -53,6 +56,7 @@ export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
     @JoinColumn({ name: 'analysis_id' })
     analysis: AnalysisEntity;
 
+    @Index()
     @Column({ name: 'analysis_id' })
     analysisId: Analysis['id'];
 
@@ -65,6 +69,7 @@ export class AnalysisNodeEventEntity implements AnalysisNodeEvent {
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
+    @Index()
     @Column({ name: 'node_id' })
     nodeId: Node['id'];
 

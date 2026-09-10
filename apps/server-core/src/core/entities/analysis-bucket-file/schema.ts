@@ -17,13 +17,23 @@ const schemaMapping = {
 export const analysisBucketFileSchema = defineSchema<AnalysisBucketFile>({
     name: DomainType.ANALYSIS_BUCKET_FILE,
     strict: true,
+    // `analysisId` anchors through the UNIQUE(analysisId, path) it leads;
+    // `path` still needs its own single for the non-leading position.
+    indexes: [
+        ['analysisId', 'path'],
+        ['path'],
+        ['root'],
+        ['analysisBucketId'],
+        ['createdAt'],
+        ['updatedAt'],
+    ],
     fields: {
         default: ['id', 'path', 'root', 'bucketId', 'bucketFileId', 'clientId', 'robotId', 'userId', 'realmId', 'analysisId', 'analysisBucketId', 'createdAt', 'updatedAt'],
         allowed: ['id', 'path', 'root', 'bucketId', 'bucketFileId', 'clientId', 'robotId', 'userId', 'realmId', 'analysisId', 'analysisBucketId', 'createdAt', 'updatedAt'],
     },
-    filters: { allowed: ['path', 'root', 'analysisBucketId', 'analysisId'] },
+    filters: { allowed: ['path', 'root', 'analysisBucketId', 'analysisId'], indexed: true },
     relations: { allowed: ['analysis', 'analysisBucket'] },
-    sorts: { allowed: ['path', 'createdAt', 'updatedAt'] },
+    sorts: { allowed: ['path', 'createdAt', 'updatedAt'], indexed: true },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

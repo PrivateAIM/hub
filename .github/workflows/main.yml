@@ -214,6 +214,10 @@ jobs:
                 working-directory: apps/${{ matrix.service }}
                 run: node dist/cli/index.mjs migration run
 
+            -   name: Assert the migrated schema matches the entity metadata
+                working-directory: apps/${{ matrix.service }}
+                run: npm run test:schema-drift
+
     lint:
         needs: [build]
         runs-on: ubuntu-latest

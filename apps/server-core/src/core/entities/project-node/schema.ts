@@ -17,6 +17,17 @@ const schemaMapping = {
 export const projectNodeSchema = defineSchema<ProjectNode>({
     name: DomainType.PROJECT_NODE,
     strict: true,
+    // `projectId` anchors through the UNIQUE(projectId, nodeId) it leads;
+    // `nodeId` sits in its non-leading position and needs its own single.
+    indexes: [
+        ['projectId', 'nodeId'],
+        ['nodeId'],
+        ['approvalStatus'],
+        ['projectRealmId'],
+        ['nodeRealmId'],
+        ['createdAt'],
+        ['updatedAt'],
+    ],
     fields: {
         default: [
             'id',
@@ -30,9 +41,12 @@ export const projectNodeSchema = defineSchema<ProjectNode>({
             'nodeRealmId',
         ],
     },
-    filters: { allowed: ['approvalStatus', 'projectRealmId', 'projectId', 'nodeRealmId', 'nodeId'] },
+    filters: {
+        allowed: ['approvalStatus', 'projectRealmId', 'projectId', 'nodeRealmId', 'nodeId'],
+        indexed: true,
+    },
     relations: { allowed: ['node', 'project'] },
-    sorts: { allowed: ['createdAt', 'updatedAt'] },
+    sorts: { allowed: ['createdAt', 'updatedAt'], indexed: true },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });
