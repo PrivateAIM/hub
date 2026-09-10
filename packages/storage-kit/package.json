@@ -26,6 +26,7 @@
         "url": "https://github.com/tada5hi"
     },
     "dependencies": {
+        "@privateaim/errors": "^0.8.42",
         "@validup/zod": "^2.0.1",
         "validup": "^2.0.1",
         "zod": "^4.5.1"

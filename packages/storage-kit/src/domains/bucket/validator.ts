@@ -7,6 +7,7 @@
 
 import { createValidator } from '@validup/zod';
 import zod from 'zod';
+import { BadRequestError } from '@privateaim/errors';
 import type { Bucket } from './entity.ts';
 import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
 
@@ -68,5 +69,25 @@ export class BucketValidator extends TypedContainer<Partial<Bucket>> {
                     .nullable(),
             ),
         );
+    }
+}
+
+/**
+ * refType names the kind of the owning resource, refId the specific
+ * instance — a row with only one of the two set can't be resolved back to
+ * anything. Checked here, against the ALREADY-VALIDATED payload, rather
+ * than as a cross-field check inside one of the two mounts above: both are
+ * `optional: true` CREATE-group mounts, and validup skips an optional
+ * mount entirely when its own key is absent from the input, so a check
+ * embedded in (say) the `refId` mount would never run for the "refType
+ * sent, refId omitted entirely" case this exists to catch.
+ *
+ * Both create-time producers call this once, right after
+ * `validator.run()`: `BucketService.create()` (HTTP) and
+ * `BucketCreateHandler.process()` (AMQP, server-storage-kit).
+ */
+export function assertBucketRefPairing(data: Partial<Bucket>): void {
+    if (Boolean(data.refType) !== Boolean(data.refId)) {
+        throw new BadRequestError('refType and refId must either both be set or both be omitted.');
     }
 }

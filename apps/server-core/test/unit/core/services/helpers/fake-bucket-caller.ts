@@ -7,16 +7,23 @@
 
 import type { IBucketCaller } from '../../../../../src/core/services/analysis-storage-manager/types.ts';
 
+type BucketCallerCreateData = {
+    name: string; 
+    realmId: string; 
+    refType?: string; 
+    refId?: string 
+};
+
 type BucketCallerCall = {
     method: 'callCreate' | 'callDelete';
-    data: Record<string, any>;
+    data: BucketCallerCreateData | { id: string };
     meta?: { correlationId?: string };
 };
 
 export class FakeBucketCaller implements IBucketCaller {
     private calls: BucketCallerCall[] = [];
 
-    async callCreate(data: { name: string; realmId: string }, meta?: { correlationId?: string }): Promise<void> {
+    async callCreate(data: BucketCallerCreateData, meta?: { correlationId?: string }): Promise<void> {
         this.calls.push({
             method: 'callCreate', 
             data, 

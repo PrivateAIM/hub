@@ -14,7 +14,7 @@ import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/s
 import { AbstractEntityService } from '@privateaim/server-kit';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IBucketCaller, IBucketRepository, IBucketService } from './types.ts';
-import { BucketValidator } from '@privateaim/storage-kit';
+import { BucketValidator, assertBucketRefPairing } from '@privateaim/storage-kit';
 import { bucketSchema } from './schema.ts';
 import type { IStorageAdapter } from '../../storage/types.ts';
 
@@ -65,6 +65,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         }
 
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
+        assertBucketRefPairing(validated);
 
         if (validated.realmId) {
             if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
