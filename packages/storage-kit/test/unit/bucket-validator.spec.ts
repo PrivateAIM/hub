@@ -22,11 +22,15 @@ describe('assertBucketRefPairing', () => {
         expect(() => assertBucketRefPairing({ refType: null, refId: null })).not.toThrow();
     });
 
-    it('should reject refType set without refId', () => {
-        expect(() => assertBucketRefPairing({ refType: 'analysis' })).toThrow(BadRequestError);
+    it('should accept refType set without refId', () => {
+        expect(() => assertBucketRefPairing({ refType: 'analysis' })).not.toThrow();
     });
 
     it('should reject refId set without refType', () => {
         expect(() => assertBucketRefPairing({ refId: 'analysis-1' })).toThrow(BadRequestError);
+    });
+
+    it('should reject refId set with refType null', () => {
+        expect(() => assertBucketRefPairing({ refType: null, refId: 'analysis-1' })).toThrow(BadRequestError);
     });
 });

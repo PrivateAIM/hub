@@ -73,21 +73,25 @@ export class BucketValidator extends TypedContainer<Partial<Bucket>> {
 }
 
 /**
- * refType names the kind of the owning resource, refId the specific
- * instance — a row with only one of the two set can't be resolved back to
- * anything. Checked here, against the ALREADY-VALIDATED payload, rather
- * than as a cross-field check inside one of the two mounts above: both are
- * `optional: true` CREATE-group mounts, and validup skips an optional
- * mount entirely when its own key is absent from the input, so a check
- * embedded in (say) the `refId` mount would never run for the "refType
- * sent, refId omitted entirely" case this exists to catch.
+ * refType names the kind of the owning resource, refId a specific
+ * instance of it. refType alone is valid — categorizing a bucket by kind
+ * without pointing at one instance — but refId alone is NOT: an id with no
+ * named type can't be resolved back to anything. So the rule is one-way:
+ * refId requires refType, not the reverse.
+ *
+ * Checked here, against the ALREADY-VALIDATED payload, rather than as a
+ * cross-field check inside the `refId` mount above: it is an `optional:
+ * true` CREATE-group mount, and validup skips an optional mount entirely
+ * when its own key is absent from the input, so a check embedded in it
+ * would never run for the "refId omitted, refType sent alone" case — which
+ * this function must treat as VALID, not reject.
  *
  * Both create-time producers call this once, right after
  * `validator.run()`: `BucketService.create()` (HTTP) and
  * `BucketCreateHandler.process()` (AMQP, server-storage-kit).
  */
 export function assertBucketRefPairing(data: Partial<Bucket>): void {
-    if (Boolean(data.refType) !== Boolean(data.refId)) {
-        throw new BadRequestError('refType and refId must either both be set or both be omitted.');
+    if (data.refId && !data.refType) {
+        throw new BadRequestError('refId requires refType to be set as well.');
     }
 }

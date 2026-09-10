@@ -161,13 +161,17 @@ describe('BucketService', () => {
             expect(call.refId).toBe(refId);
         });
 
-        it('should throw BadRequestError when only refType is set', async () => {
-            await expect(
-                service.create(
-                    { name: 'new-bucket', refType: 'analysis' },
-                    createAllowAllActor('realm-1'),
-                ),
-            ).rejects.toThrow(BadRequestError);
+        it('should delegate to caller with only refType set', async () => {
+            const actor = createAllowAllActor('realm-1');
+
+            await service.create(
+                { name: 'new-bucket', refType: 'analysis' },
+                actor,
+            );
+
+            const call = caller.getCreateCalls()[0];
+            expect(call.refType).toBe('analysis');
+            expect(call.refId).toBeUndefined();
         });
 
         it('should throw BadRequestError when only refId is set', async () => {
