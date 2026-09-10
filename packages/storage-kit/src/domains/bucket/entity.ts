@@ -30,4 +30,22 @@ export interface Bucket {
 
     realmId: Realm['id'] | null;
 
+    // ------------------------------------------------------------------
+
+    /**
+     * eg. analysis
+     *
+     * Deliberately free-form, mirroring telemetry-kit's `Event.refType`: the
+     * vocabulary is whatever the creating service's own `DomainType` names,
+     * and typing it here would make this Layer-0 package depend on core-kit.
+     * Nullable — unlike an event, a bucket the HTTP `POST /buckets` route
+     * creates directly has no natural owning resource to name.
+     */
+    refType: string | null;
+
+    /**
+     * eg. uuid
+     */
+    refId: string | null;
+
 }

@@ -12,7 +12,12 @@ import type { AnalysisBucketType } from '@privateaim/core-kit';
  * Implemented by BucketComponentCaller in server-storage-kit.
  */
 export interface IBucketCaller {
-    callCreate(data: { name: string; realmId: string }, meta?: { correlationId?: string }): Promise<void>;
+    callCreate(data: {
+        name: string; 
+        realmId: string; 
+        refType?: string; 
+        refId?: string 
+    }, meta?: { correlationId?: string }): Promise<void>;
     callDelete(data: { id: string }, meta?: { correlationId?: string }): Promise<void>;
 }
 

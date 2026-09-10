@@ -39,6 +39,8 @@ const FILTER_PROBE_VALUES: Record<string, Record<string, string>> = {
         realmId: PROBE_UUID,
         actorType: 'robot',
         actorId: PROBE_UUID,
+        refType: 'analysis',
+        refId: PROBE_UUID,
     },
     bucketFile: {
         id: PROBE_UUID,

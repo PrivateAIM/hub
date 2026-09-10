@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Bucket } from '@privateaim/storage-kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -141,6 +141,46 @@ describe('BucketService', () => {
                     actor,
                 ),
             ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should delegate to caller with both refType and refId set', async () => {
+            const actor = createAllowAllActor('realm-1');
+            const refId = randomUUID();
+
+            await service.create(
+                {
+                    name: 'new-bucket', 
+                    refType: 'analysis', 
+                    refId, 
+                },
+                actor,
+            );
+
+            const call = caller.getCreateCalls()[0];
+            expect(call.refType).toBe('analysis');
+            expect(call.refId).toBe(refId);
+        });
+
+        it('should delegate to caller with only refType set', async () => {
+            const actor = createAllowAllActor('realm-1');
+
+            await service.create(
+                { name: 'new-bucket', refType: 'analysis' },
+                actor,
+            );
+
+            const call = caller.getCreateCalls()[0];
+            expect(call.refType).toBe('analysis');
+            expect(call.refId).toBeUndefined();
+        });
+
+        it('should throw BadRequestError when only refId is set', async () => {
+            await expect(
+                service.create(
+                    { name: 'new-bucket', refId: randomUUID() },
+                    createAllowAllActor('realm-1'),
+                ),
+            ).rejects.toThrow(BadRequestError);
         });
     });
 

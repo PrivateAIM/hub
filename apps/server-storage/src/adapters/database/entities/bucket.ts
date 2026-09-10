@@ -17,6 +17,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
+@Index(['refType', 'refId'])
 @Entity({ name: 'buckets' })
 export class BucketEntity implements Bucket {
     @PrimaryGeneratedColumn('uuid')
@@ -71,4 +72,25 @@ export class BucketEntity implements Bucket {
         nullable: true,
     })
     realmId: Realm['id'] | null;
+
+    // ------------------------------------------------------------------
+
+    // No @Index() here on its own — the class-level (refType, refId)
+    // composite already leads with it.
+    @Column({
+        name: 'ref_type',
+        type: 'varchar',
+        length: 64,
+        nullable: true,
+    })
+    refType: string | null;
+
+    @Index()
+    @Column({
+        name: 'ref_id',
+        type: 'varchar',
+        length: 64,
+        nullable: true,
+    })
+    refId: string | null;
 }

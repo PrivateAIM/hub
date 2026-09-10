@@ -11,7 +11,7 @@ import {
     BucketCommand,
     BucketEvent,
 } from '@privateaim/server-storage-kit';
-import { BucketValidator, DomainType  } from '@privateaim/storage-kit';
+import { BucketValidator, DomainType, assertBucketRefPairing } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
 import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
@@ -71,6 +71,7 @@ export class BucketCreateHandler implements ComponentHandler<
         );
 
         const data = await this.validator.run(value, { group: ValidatorGroup.CREATE });
+        assertBucketRefPairing(data);
 
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(BucketEntity);
