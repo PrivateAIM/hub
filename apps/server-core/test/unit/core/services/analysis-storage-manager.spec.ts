@@ -7,7 +7,11 @@
 
 import { BadRequestError } from '@privateaim/errors';
 import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
-import { AnalysisBucketType, buildAnalysisBucketName } from '@privateaim/core-kit';
+import {
+    AnalysisBucketType, 
+    DomainType, 
+    buildAnalysisBucketName,
+} from '@privateaim/core-kit';
 import { 
     beforeEach, 
     describe, 
@@ -77,6 +81,8 @@ describe('AnalysisStorageManager', () => {
             expect(createCalls[0].data).toEqual({
                 name: buildAnalysisBucketName(AnalysisBucketType.CODE, 'analysis-1'),
                 realmId: 'realm-1',
+                refType: DomainType.ANALYSIS,
+                refId: 'analysis-1',
             });
         });
 

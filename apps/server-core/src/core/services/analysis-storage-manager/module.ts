@@ -7,7 +7,7 @@
 
 import { BadRequestError } from '@privateaim/errors';
 import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
-import { AnalysisBucketType, buildAnalysisBucketName } from '@privateaim/core-kit';
+import { AnalysisBucketType, DomainType, buildAnalysisBucketName } from '@privateaim/core-kit';
 import type { IEntityRepository } from '@privateaim/server-kit';
 import type { 
     AnalysisStorageMangerCheckOptions, 
@@ -66,6 +66,8 @@ export class AnalysisStorageManager {
             await this.caller.callCreate({
                 name: buildAnalysisBucketName(bucketType, entity.id),
                 realmId: entity.realmId,
+                refType: DomainType.ANALYSIS,
+                refId: entity.id,
             }, { correlationId });
         }
         return entity;

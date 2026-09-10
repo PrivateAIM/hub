@@ -44,5 +44,29 @@ export class BucketValidator extends TypedContainer<Partial<Bucket>> {
                     .nullable(),
             ),
         );
+
+        // Ref fields are create-time only, like region/realmId above — a
+        // bucket's owning resource isn't reassignable through the update
+        // route.
+        this.mount(
+            'refType',
+            { group: ValidatorGroup.CREATE, optional: true },
+            createValidator(
+                zod.string()
+                    .min(1)
+                    .max(64)
+                    .nullable(),
+            ),
+        );
+
+        this.mount(
+            'refId',
+            { group: ValidatorGroup.CREATE, optional: true },
+            createValidator(
+                zod.string()
+                    .uuid()
+                    .nullable(),
+            ),
+        );
     }
 }

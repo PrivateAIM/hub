@@ -10,7 +10,7 @@ import type { EntityCollectionResponse, IEntityAPI } from '../types-base';
 import type { Bucket } from './entity.ts';
 
 export type BucketCreatePayload =    & Pick<Bucket, 'name'> &
-    Partial<Pick<Bucket, 'region' | 'realmId'>>;
+    Partial<Pick<Bucket, 'region' | 'realmId' | 'refType' | 'refId'>>;
 
 export interface IBucketAPI extends IEntityAPI<Bucket, BucketCreatePayload, Partial<BucketCreatePayload>> {
     /**
