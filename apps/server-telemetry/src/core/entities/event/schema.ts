@@ -25,8 +25,13 @@ import { DomainType } from '@privateaim/telemetry-kit';
  * `createdAt` filterable. Sorting `createdAt` is fine (no bind involved).
  *
  * Sorts are `createdAt` only (authup event precedent): events are append-only
- * since #1866, so `updatedAt` always equals `createdAt`, and `expiresAt` is
- * `createdAt` plus a fixed retention window — both were redundant orderings.
+ * since #1866, so `updatedAt` always equals `createdAt` — a redundant
+ * ordering. `expiresAt` is excluded for a different reason: it is not
+ * `createdAt` plus a fixed window in general (an explicit publisher
+ * `expiresAt`, or `expiring: false`, wins over the auto-stamped default, and
+ * `EVENT_RETENTION_DAYS=0` disables the window entirely — see AGENTS.md item
+ * 21), and no declared `indexes` sequence leads it, so allow-listing it would
+ * fail the parity spec's leading-key invariant (#1842).
  * The `createdAt DESC` default is the soft-failure floor: sorts fail SOFT
  * (the whole parameter is silently replaced by the default), so without one
  * a dropped or no-longer-allowed sort key degrades to NO ordering at all —

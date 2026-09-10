@@ -41,5 +41,13 @@ export default defineEventHandler((event) => {
     // Streams chunk-by-chunk and preserves Content-Disposition, so the browser
     // downloads through its own download manager instead of the tab buffering
     // the whole file (a bucket download is a tar packed on the fly).
-    return proxyRequest(event, new URL(target, storageUrl).href);
+    //
+    // `no-store` is forced in `onResponse` — which runs AFTER h3 copies the
+    // upstream headers, so it wins regardless of what storage sends — because
+    // this URL is stable and account-independent (`/api/download/<type>/<id>`
+    // carries no session marker); a cached response would let one account's
+    // browser cache serve another account's session-authorized stream.
+    const forceNoStore = (proxyEvent: typeof event) => setResponseHeader(proxyEvent, 'cache-control', 'no-store');
+
+    return proxyRequest(event, new URL(target, storageUrl).href, { onResponse: forceNoStore });
 });

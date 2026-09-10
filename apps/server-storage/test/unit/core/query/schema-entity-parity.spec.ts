@@ -196,5 +196,12 @@ describe('core/query (schema ↔ entity parity)', () => {
         // EVERY allowed key an offender
         expect(collectNonLeadingQueryKeys({ filters: { allowed: ['a'] } }))
             .toEqual(['filters.a']);
+
+        // an empty declared sequence (`[]`) is ignored, not collected as a
+        // leading `undefined` key — it must not mask a real offender
+        expect(collectNonLeadingQueryKeys({
+            indexes: [[]],
+            filters: { allowed: ['a'] },
+        })).toEqual(['filters.a']);
     });
 });

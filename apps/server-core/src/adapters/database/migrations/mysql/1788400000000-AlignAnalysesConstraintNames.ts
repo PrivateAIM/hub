@@ -30,12 +30,26 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * - FK_37a6c8ecb809264b56dce20f906 (master_image_id → master_images.id, SET NULL)
  *                                                        → FK_344d29541553fb6bce75ce4cd32
  *
- * Foreign key checks are disabled for the duration: every constraint is
- * re-added exactly as it already existed, so re-validating would only add a
- * table scan and a failure mode for rows some past import inserted with the
- * checks off. The checks are restored in a `finally` because the setting is
- * per session and the connection goes back to the pool on failure — an aborted
- * run must not hand the next caller a connection that accepts orphans.
+ * Each foreign key's DROP and its re-ADD are one `ALTER TABLE` statement, not
+ * two. MySQL auto-commits DDL statement by statement, so two separate
+ * statements would expose a window — between the drop and the re-add — in
+ * which the constraint does not exist at all, and a concurrent writer on
+ * ANY session (not just this one) could set a column like `registry_id` to a
+ * value `registries` no longer has, unenforced regardless of that session's
+ * own `FOREIGN_KEY_CHECKS`, because there is no constraint object left to
+ * check against. Folding drop+add into one multi-clause statement closes
+ * that window: InnoDB online DDL applies every clause of a single `ALTER
+ * TABLE` as one metadata operation, so concurrent sessions observe either
+ * the pre- or the post-state, never a torn one with no constraint at all.
+ *
+ * Foreign key checks are disabled for the duration regardless, so the re-add
+ * half of each combined statement does not re-scan the table: the
+ * constraint is byte-identical to the one just dropped, so re-validating
+ * would only add a table scan and a failure mode for rows some past import
+ * inserted with the checks off. The checks are restored in a `finally`
+ * because the setting is per session and the connection goes back to the
+ * pool on failure — an aborted run must not hand the next caller a
+ * connection that accepts orphans.
  *
  * MySQL commits each DDL statement regardless of the surrounding transaction,
  * so a boot killed partway leaves the migration applied but unrecorded and the
@@ -54,12 +68,9 @@ export class AlignAnalysesConstraintNames1788400000000 implements MigrationInter
             await queryRunner.query('ALTER TABLE `analyses` RENAME INDEX `IDX_4b581389a4832bbcf2d6a6c4be` TO `IDX_9a94f99b9efa17f2e4cc1966c4`');
             await queryRunner.query('ALTER TABLE `analyses` RENAME INDEX `IDX_4f1ae42446fd55df797dae5c8b` TO `IDX_5766ce7ee24a73131df7909bcd`');
             await queryRunner.query('ALTER TABLE `analyses` RENAME INDEX `IDX_99e40345e56f04b8cd2dd3d9be` TO `IDX_f279e7807bcb83e92a1f18f10d`');
-            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_deee2261a37e46654165218a889`');
-            await queryRunner.query('ALTER TABLE `analyses` ADD CONSTRAINT `FK_361d962e907f7131f784a218b99` FOREIGN KEY (`registry_id`) REFERENCES `registries`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION');
-            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_d469a78183831f52c8372f6739d`');
-            await queryRunner.query('ALTER TABLE `analyses` ADD CONSTRAINT `FK_e0554a6544a95c16e3fe1214489` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION');
-            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_37a6c8ecb809264b56dce20f906`');
-            await queryRunner.query('ALTER TABLE `analyses` ADD CONSTRAINT `FK_344d29541553fb6bce75ce4cd32` FOREIGN KEY (`master_image_id`) REFERENCES `master_images`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION');
+            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_deee2261a37e46654165218a889`, ADD CONSTRAINT `FK_361d962e907f7131f784a218b99` FOREIGN KEY (`registry_id`) REFERENCES `registries`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION');
+            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_d469a78183831f52c8372f6739d`, ADD CONSTRAINT `FK_e0554a6544a95c16e3fe1214489` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION');
+            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_37a6c8ecb809264b56dce20f906`, ADD CONSTRAINT `FK_344d29541553fb6bce75ce4cd32` FOREIGN KEY (`master_image_id`) REFERENCES `master_images`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION');
         } finally {
             await queryRunner.query('SET FOREIGN_KEY_CHECKS = 1');
         }
@@ -68,12 +79,9 @@ export class AlignAnalysesConstraintNames1788400000000 implements MigrationInter
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query('SET FOREIGN_KEY_CHECKS = 0');
         try {
-            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_344d29541553fb6bce75ce4cd32`');
-            await queryRunner.query('ALTER TABLE `analyses` ADD CONSTRAINT `FK_37a6c8ecb809264b56dce20f906` FOREIGN KEY (`master_image_id`) REFERENCES `master_images`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION');
-            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_e0554a6544a95c16e3fe1214489`');
-            await queryRunner.query('ALTER TABLE `analyses` ADD CONSTRAINT `FK_d469a78183831f52c8372f6739d` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION');
-            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_361d962e907f7131f784a218b99`');
-            await queryRunner.query('ALTER TABLE `analyses` ADD CONSTRAINT `FK_deee2261a37e46654165218a889` FOREIGN KEY (`registry_id`) REFERENCES `registries`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION');
+            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_344d29541553fb6bce75ce4cd32`, ADD CONSTRAINT `FK_37a6c8ecb809264b56dce20f906` FOREIGN KEY (`master_image_id`) REFERENCES `master_images`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION');
+            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_e0554a6544a95c16e3fe1214489`, ADD CONSTRAINT `FK_d469a78183831f52c8372f6739d` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION');
+            await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_361d962e907f7131f784a218b99`, ADD CONSTRAINT `FK_deee2261a37e46654165218a889` FOREIGN KEY (`registry_id`) REFERENCES `registries`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION');
             await queryRunner.query('ALTER TABLE `analyses` RENAME INDEX `IDX_f279e7807bcb83e92a1f18f10d` TO `IDX_99e40345e56f04b8cd2dd3d9be`');
             await queryRunner.query('ALTER TABLE `analyses` RENAME INDEX `IDX_5766ce7ee24a73131df7909bcd` TO `IDX_4f1ae42446fd55df797dae5c8b`');
             await queryRunner.query('ALTER TABLE `analyses` RENAME INDEX `IDX_9a94f99b9efa17f2e4cc1966c4` TO `IDX_4b581389a4832bbcf2d6a6c4be`');

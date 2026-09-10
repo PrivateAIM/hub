@@ -17,6 +17,8 @@ import {
 import {
     bucketFileSchema,
     bucketSchema,
+    decodeQuery,
+    entitySchemas,
 } from '../../../src/core/index.ts';
 import { createTestSuite } from '../../utils/index.ts';
 
@@ -69,7 +71,9 @@ const TARGETS: [string, Schema<any>, string][] = [
  * allow-lists permit. Only FILTERS can surface drift as a 400: sorts fail
  * SOFT under drop mode — a sort key that stops leading a declared index is
  * silently replaced by the schema's sort defaults, still 200 — so the sort
- * probes prove only that the ORDER BY executes. The binding-level
+ * loop above proves only that the ORDER BY executes; the decode-level block
+ * below (ported from `apps/server-core/test/unit/http/query-surface.spec.ts`)
+ * is what pins that no advertised sort key is dropped. The binding-level
  * (row-comes-back) exemplar is
  * `apps/server-telemetry/test/unit/http/event-query-surface.spec.ts`.
  *
@@ -158,5 +162,40 @@ describe('src/adapters/http/controllers (query surface)', () => {
 
             expect(response.status).toBe(400);
         });
+    });
+});
+
+/**
+ * Decode-level pin for what the wire probes above cannot see: sorts fail SOFT
+ * (a dropped key is silently replaced by the schema defaults, still 200), so
+ * only inspecting the decoded IR proves a sort key survives.
+ */
+describe('src/core/query (decode-level sort pins)', () => {
+    it('should keep every advertised single-key sort through decode', () => {
+        const offenders: string[] = [];
+
+        for (const schema of entitySchemas) {
+            const description = schema.describe();
+            const defaults = description.sorts?.default || {};
+
+            for (const key of description.sorts?.allowed || []) {
+                // Probe the direction OPPOSITE to the key's default entry: a
+                // client entry matching the default's exact key+direction is
+                // exempt from the index check, so probing with the default
+                // would let a dropped key masquerade as the substituted
+                // default.
+                const direction = defaults[key] === 'DESC' ? 'ASC' : 'DESC';
+                const wire = direction === 'DESC' ? `-${key}` : key;
+                const query = decodeQuery(`sort=${encodeURIComponent(wire)}`, { schema });
+
+                const bound = query.sorts.value
+                    .some((sort) => sort.name === key && sort.operator === direction);
+                if (!bound) {
+                    offenders.push(`${schema.name}.sorts.${key}`);
+                }
+            }
+        }
+
+        expect(offenders).toEqual([]);
     });
 });

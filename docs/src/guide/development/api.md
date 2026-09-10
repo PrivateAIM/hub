@@ -161,7 +161,8 @@ Mutations (`POST`, `DELETE`) describe nothing — their `meta` is exactly `{}`.
 - `indexes`, `filters.indexed` and `sorts.indexed` come from rapiq's schema index declarations,
   and every hub **entity** schema declares them: `indexes` lists the queryable index sequences
   (as property names, each backed by a real database index), `filters.indexed: "anchor"`
-  announces anchor-mode filter enforcement and `sorts.indexed: true` index-backed sorting.
+  announces anchor-mode filter enforcement and `sorts.indexed: true` index-backed sorting —
+  with one narrow, documented exception for a schema-declared default, covered below.
   `indexes: null` means the schema declares none — and two live endpoints do publish it:
   `GET /analysis-logs` and `GET /analysis-node-logs` describe the VictoriaLogs-backed log
   schemas, which have no TypeORM entity (and so no database index) behind them, so their

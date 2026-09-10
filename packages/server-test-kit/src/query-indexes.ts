@@ -52,7 +52,9 @@ export type QueryIndexInvariantDescription = {
  */
 export function collectNonLeadingQueryKeys(description: QueryIndexInvariantDescription): string[] {
     const leading = new Set(
-        (description.indexes ?? []).map((sequence) => sequence[0]),
+        (description.indexes ?? [])
+            .filter((sequence) => sequence.length > 0)
+            .map((sequence) => sequence[0]),
     );
 
     const offenders: string[] = [];
