@@ -116,13 +116,17 @@ The shared helpers live in `@privateaim/server-test-kit`
   6, `server-core` 19), listed in its `test/setup.ts`. The built-in `admin` role's
   `globalPermissions: ['*']` picks those up at provisioning time, so the `admin`/`master`
   token resolves them via introspection. The generated `.mjs` is mounted at
-  `<WRITABLE_DIRECTORY_PATH>/provisioning/hub.mjs`, where `WRITABLE_DIRECTORY_PATH` is
-  **pinned by hub** to `/var/lib/authup` rather than inherited from the image. Authup
-  `1.0.0-beta.63` moved that default (it was `/usr/src/app/writable`), and a provisioning
-  file written anywhere else is simply never read — the container still starts and
-  reports healthy, and the only symptom is every endpoint in the suite later failing with
-  `The evaluation of permissions <name> failed`. Pinning it keeps the mount target and
-  the server in agreement by construction.
+  `<PROVISIONING_DIRECTORY_PATH>/hub.mjs`, where `PROVISIONING_DIRECTORY_PATH` is
+  **pinned by hub** to `/etc/authup/provisioning` rather than inherited from the image.
+  Authup `1.0.0-beta.63` moved the writable directory once already (`/usr/src/app/writable`
+  → `/var/lib/authup`), and `1.0.0-beta.64`'s FHS image layout retired
+  `WRITABLE_DIRECTORY_PATH` outright, splitting it into `LOG_DIRECTORY_PATH` (what the
+  process writes) and `PROVISIONING_DIRECTORY_PATH` (what it only reads) — the latter now
+  names the provisioning directory itself, with no `provisioning/` subpath appended. A
+  provisioning file written anywhere else is simply never read — the container still
+  starts and reports healthy, and the only symptom is every endpoint in the suite later
+  failing with `The evaluation of permissions <name> failed`. Pinning it keeps the mount
+  target and the server in agreement by construction.
 - `assertAuthupProvisioning(baseURL, permissionNames)` — runs in global setup for **both**
   the container and the external-`AUTHUP_URL` path. It mints the admin token, introspects
   it, and diffs the resolved permission set against the suite's, so a provisioning miss
@@ -167,6 +171,7 @@ code under test actually talks to, and do not migrate one layer into another.
 |---|---|---|---|
 | **Port fakes** | The domain port interface (`IEntityRepository`, `IPermissionChecker`, …) | Entity/business services in `core/` | no |
 | **Transport-level FakeClient** | hapic's `MemoryTransport`, under a real client | Anything that CONSUMES an HTTP client: client-vue components, worker components | no |
+| **A real docker daemon** | dockerode against the local socket | The two worker specs that pack or build an image | **yes** |
 | **Testcontainers** | The real process | HTTP integration suites for server-core / storage / telemetry, with real Authup enforcement | **yes** |
 
 ### Transport-level FakeClient
@@ -333,6 +338,14 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
   construct them DIRECTLY (`new AnalysisBuilderCheckHandler({ coreClient, docker })`)
   — no container, no message bus. Shared doubles live in
   `test/unit/components/fakes/`.
+- **Two worker specs are the exception and need a real docker daemon**:
+  `test/unit/docker/pack.spec.ts` (pulls alpine, `putArchive`) and
+  `test/unit/components/master-image-builder/execute.spec.ts` (builds a `FROM
+  scratch` fixture, the only coverage of the streamx `Pack` → `buildImage`
+  hand-off from #1863). The second writes a fixture under
+  `writable/master-images/`, which `master-images.spec.ts` deletes wholesale
+  before cloning the catalogue — hence `fileParallelism: false` in that package's
+  `test/vitest.config.ts`. Do not re-enable it without decoupling the fixture.
 - `createTestApplication({ telemetryHandlers })` (server-core) opts in to a faked
   telemetry client, which is the only way to exercise `AnalysisLogController` /
   `AnalysisNodeLogController` without a live telemetry service.

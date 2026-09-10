@@ -58,9 +58,16 @@ export default {
         const toast = useToast();
         const refs = toRefs(props);
 
+        // No `+accountSecret` here, deliberately. Nothing on this page renders
+        // it — the details modal passes only `item.id` to RegistryProjectDetails,
+        // which re-resolves the record with its own `+accountSecret` — and since
+        // the list's initial load is now recorded into the hydration payload,
+        // a gated column in a COLLECTION query would put every project's Harbor
+        // robot secret into the served HTML document rather than into an XHR
+        // response. Keep credential columns on the record read that displays them.
         const query : QueryBuildInput<RegistryProject, 3> = {
             filters: { registryId: refs.entity.value.id },
-            fields: ['+accountId', '+accountName', '+accountSecret'],
+            fields: ['+accountId', '+accountName'],
         };
 
         const columns: TableColumn<RegistryProject>[] = [

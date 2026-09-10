@@ -35,13 +35,15 @@ export function buildAuthupProvisioningModule(permissionNames: string[]): string
  * resolvable for the `admin`/`master` token.
  *
  * This exists because the failure it catches is otherwise SILENT and remote
- * from its cause. Authup loads provisioning files from its writable directory;
- * a file written anywhere else is simply never read, so the container starts,
- * reports healthy, and answers introspection normally — with Authup's own
- * permissions and none of hub's. The first symptom is every authorizing
- * endpoint in the suite failing with `The evaluation of permissions <name>
- * failed`, dozens of assertions away from the mount path that caused it.
- * (`1.0.0-beta.63` moved that directory and did exactly this.)
+ * from its cause. Authup loads provisioning files from its provisioning
+ * directory; a file written anywhere else is simply never read, so the
+ * container starts, reports healthy, and answers introspection normally —
+ * with Authup's own permissions and none of hub's. The first symptom is every
+ * authorizing endpoint in the suite failing with `The evaluation of
+ * permissions <name> failed`, dozens of assertions away from the mount path
+ * that caused it. (`1.0.0-beta.63` moved the writable directory and did
+ * exactly this; `1.0.0-beta.64`'s FHS layout then retired it in favour of a
+ * dedicated `PROVISIONING_DIRECTORY_PATH`.)
  *
  * It also covers an externally supplied `AUTHUP_URL`, where the same set has
  * to be provisioned by hand and can drift without warning.
@@ -86,8 +88,8 @@ export async function assertAuthupProvisioning(
         throw new Error(
             `Authup did not provision ${missing.length} of ${permissionNames.length} permission(s) the suite checks: ${missing.join(', ')}.\n` +
             `The admin token resolved ${resolved.size} permission(s), so Authup is reachable and the token is valid — ` +
-            'the provisioning file was not applied. Verify it is written into Authup\'s writable directory ' +
-            '(WRITABLE_DIRECTORY_PATH) under `provisioning/`, or, for an externally provided AUTHUP_URL, that these ' +
+            'the provisioning file was not applied. Verify it is written into Authup\'s provisioning directory ' +
+            '(PROVISIONING_DIRECTORY_PATH), or, for an externally provided AUTHUP_URL, that these ' +
             'permissions exist and are bound to the admin role.',
         );
     }

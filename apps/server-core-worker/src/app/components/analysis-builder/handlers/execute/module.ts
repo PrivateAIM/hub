@@ -26,14 +26,13 @@ import { waitForStream } from 'docken';
 import type { Container } from 'dockerode';
 import stream from 'node:stream';
 import { createGzip } from 'node:zlib';
-import tar from 'tar-stream';
 import {
     cleanupDockerImage,
     packDockerContainerWithTarStream,
 } from '../../../../../adapters/docker/index.ts';
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
-import { generateDockerFileContent } from '../../helpers';
+import { createBuildContext, generateDockerFileContent } from '../../helpers';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -202,24 +201,10 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             storageClient: this.storageClient,
         });
 
-        const pack = tar.pack();
-        const entry = pack.entry({
-            name: 'Dockerfile',
-            type: 'file',
-            size: content.length,
-        }, (err) => {
-            if (err) {
-                pack.destroy(err);
-            }
-
-            pack.finalize();
-        });
-
-        entry.write(content);
-        entry.end();
+        const context = await createBuildContext(content);
 
         const buildStream = await this.docker
-            .buildImage(pack.pipe(createGzip()), {
+            .buildImage(context.pipe(createGzip()), {
                 t: this.buildImageTag(analysis),
                 platform: 'linux/amd64',
             });
@@ -295,8 +280,18 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 path: AnalysisContainerPath.CODE,
 
                 validateEntry: (entry) => {
-                    if (!entry.type || entry.type !== 'file') {
-                        return;
+                    // An allow-list, not a deny-list. `entry.type` is `null` at
+                    // runtime for every typeflag tar-stream does not recognise,
+                    // and `pack.entry()` re-types a null entry back to a regular
+                    // file on the way out — so anything that is not already a
+                    // plain file has to be rejected here, never skipped.
+                    // The only producer of this stream is server-storage's
+                    // `packBucketFiles`, which emits regular files exclusively;
+                    // `container-pack.ts` synthesizes any missing parent
+                    // directories itself at 0o777, rather than leaving docker to
+                    // create them at root:root 0755.
+                    if (entry.type !== 'file') {
+                        throw new Error(`Unsupported tar entry type ${entry.type} for ${entry.name}.`);
                     }
 
                     const index = analysisBucketFiles.findIndex((analysisBucketFile) => analysisBucketFile.path === entry.name);

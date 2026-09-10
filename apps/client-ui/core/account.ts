@@ -10,7 +10,9 @@ import type { AccountConsoleURLOptions } from './types';
 
 /**
  * Build a link into the account console, the self-service surface served
- * by Authup's server-core on the IdP origin (Authup >= 1.0.0-beta.59).
+ * by Authup's server-core on the IdP origin (Authup >= 1.0.0-beta.59, mounted
+ * at `<publicUrl>/console/account` rather than `<publicUrl>/account` since
+ * 1.0.0-beta.64).
  *
  * The UI origin rides along as `ref`, which the account console renders
  * as a back link after validating it against the trusted app origins
@@ -43,7 +45,7 @@ import type { AccountConsoleURLOptions } from './types';
  *
  * The builder returns `undefined` when neither `accountUrl` nor `authupUrl`
  * is configured. The callers drop the entry rather than emit a root-relative
- * `/account` — `<VCNavItems>` only treats an ABSOLUTE url as a plain
+ * `/console/account` — `<VCNavItems>` only treats an ABSOLUTE url as a plain
  * anchor, so a relative one would silently become an in-app route that
  * does not exist.
  */
@@ -52,7 +54,7 @@ export function useAccountConsoleURL() : (options?: AccountConsoleURLOptions) =>
 
     const authupUrl = ((runtimeConfig.public.authupUrl as string | undefined) ?? '')
         .replace(/\/+$/, '');
-    const baseUrl = ((runtimeConfig.public.accountUrl as string | undefined) || (authupUrl ? `${authupUrl}/account` : ''))
+    const baseUrl = ((runtimeConfig.public.accountUrl as string | undefined) || (authupUrl ? `${authupUrl}/console/account` : ''))
         .replace(/\/+$/, '');
 
     const ref = encodeURIComponent(useRequestURL().origin);

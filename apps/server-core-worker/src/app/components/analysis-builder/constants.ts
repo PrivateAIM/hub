@@ -8,3 +8,9 @@
 export enum AnalysisContainerPath {
     CODE = '/opt/code/',
 }
+
+/**
+ * Name of the archive placed in the build context, holding the container paths
+ * the analysis code is later extracted into.
+ */
+export const ANALYSIS_BUILD_CONTEXT_ARCHIVE = 'paths.tar';

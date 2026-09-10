@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { injectHydrationStore, isServerRuntime } from '@authup/client-web-kit';
 import { pickEntityAPI } from '@privateaim/core-http-kit';
 import type { DomainTypeMap } from '@privateaim/core-kit';
 import {
@@ -22,8 +23,10 @@ import {
     computed,
     h,
     isRef,
+    onServerPrefetch,
     ref,
     unref,
+    useId,
 } from 'vue';
 import { createMerger, isObject } from 'smob';
 import { boolableToObject } from '../../utils';
@@ -37,6 +40,7 @@ import type {
     ListCreateContext,
     ListFooterOptions,
     ListHeaderOptions,
+    ListHydrationSnapshot,
     ListItemContentSections,
     ListItemSlotProps,
     ListLoadingOptions,
@@ -89,6 +93,28 @@ export function createListRaw<
     // client has no entity API for (the two log types and the four sub-types),
     // so this resolves to undefined for those and the list stays inert.
     const domainAPI = pickEntityAPI<Entity<RECORD>>(client, context.type);
+
+    // The bucket the host backs with its hydration payload — provided by
+    // `@authup/client-web-nuxt`'s plugin, which runs before hub's own. Must be
+    // resolved synchronously here: `inject` outside setup silently yields
+    // undefined, which is indistinguishable from "the host provides none".
+    const hydrationStore = injectHydrationStore();
+
+    // Request identity for the initial load, agreed on by both sides of the SSR
+    // boundary. `useId` is stable across the server render and the hydrating
+    // client for the same position in the component tree, so nothing has to be
+    // derived from the query — which is what makes the handoff immune to filter
+    // insertion order, to a `query` prop assembled from store state that is not
+    // populated yet on one side, and to two lists of one entity type sharing a
+    // query on one page. The entity type is in the key only to bound the blast
+    // radius of an entry that is recorded but never adopted.
+    const hydrationKey = `flame:list:${context.type}:${useId()}`;
+
+    // Whether a load ran to completion. The initial server-side load records its
+    // result for the client, and an adopted snapshot suppresses the client's own
+    // load — so recording anything a *failed* load left behind would strand the
+    // list on it with no retry.
+    let loaded = false;
 
     let query : QueryBuildInput<Entity<RECORD>> | undefined;
 
@@ -172,6 +198,8 @@ export function createListRaw<
                 limit: response.meta.limit,
                 offset: response.meta.offset,
             };
+
+            loaded = true;
         } finally {
             busy.value = false;
             meta.value.busy = false;
@@ -505,6 +533,92 @@ export function createListRaw<
     }
 
     if (loadOnSetup) {
+        setupInitialLoad();
+    }
+
+    function setupInitialLoad() {
+        // Registered on BOTH sides, and that asymmetry would be a real bug.
+        // A non-empty `instance.sp` is what makes Vue call `markAsyncBoundary()`
+        // after setup, which hands the component's subtree a FRESH `useId`
+        // counter. Registering only on the server would mark the boundary only
+        // on the server, and every `useId()` drawn after this list — a nested
+        // list's own hydration key included — would shift between the two
+        // renders. The hook body never runs on the client: `@vue/server-renderer`
+        // is the only thing that ever invokes `sp`.
+        onServerPrefetch(async () => {
+            // Without a bucket the response could not reach the browser, so the
+            // server render must not pay for the request — and must not render
+            // rows the hydrating client has no way to reproduce.
+            if (!hydrationStore) {
+                return;
+            }
+
+            // Awaiting here is what makes the renderer WAIT: the detached
+            // microtask this replaces resolved after the HTML had already been
+            // flushed, so the server paid for the request and still shipped an
+            // empty list.
+            try {
+                await load();
+            } catch {
+                // Vue's renderer already swallows a rejecting prefetch. This
+                // catch exists only to keep a failed load from being recorded.
+                return;
+            }
+
+            // A load that never reached the response — coalesced away behind an
+            // in-flight one, or an entity type with no `getMany` — fetched
+            // nothing, and an empty snapshot strands the client with no retry.
+            if (!loaded) {
+                return;
+            }
+
+            // ponytail: one JSON round-trip is both the snapshot (the refs keep
+            // mutating after this) and the serializability guarantee — a
+            // non-POJO on `meta` degrades to a plain object instead of making
+            // the host's payload serializer throw on the whole response. Swap
+            // for a structured clone if a recorded value ever needs to survive
+            // as something other than JSON.
+            hydrationStore.set(hydrationKey, JSON.parse(JSON.stringify({
+                data: data.value,
+                total: total.value,
+                meta: meta.value,
+                query,
+            })));
+        });
+
+        if (isServerRuntime()) {
+            return;
+        }
+
+        if (hydrationStore) {
+            const snapshot = hydrationStore.get<ListHydrationSnapshot<RECORD>>(hydrationKey);
+            if (snapshot) {
+                // Consumed on read: unlike a translation, a collection goes
+                // stale, and the entry must not seed a later client-side
+                // navigation back to this route.
+                hydrationStore.delete(hydrationKey);
+
+                data.value = snapshot.data;
+                total.value = snapshot.total;
+                meta.value = snapshot.meta;
+
+                // `query` is assigned nowhere but inside `load()`, which this
+                // path skips — and the socket handler reads it to decide whether
+                // a newly created entity belongs at the TOP of a full first
+                // page. Leaving it undefined silently stops realtime inserts on
+                // every hydrated list until the user pages or searches.
+                query = snapshot.query;
+
+                // Fires exactly once on both paths, so a hydrated list and a
+                // loaded one agree on this published hook.
+                if (context.onLoaded) {
+                    context.onLoaded(meta.value);
+                }
+
+                return;
+            }
+        }
+
         Promise.resolve()
             .then(() => load())
             .catch((e) => console.log(e));
