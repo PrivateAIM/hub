@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.16.1](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.16.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* **server-http-kit:** honor cookiePrefix in the authup cookie fallback ([#1891](https://github.com/PrivateAIM/hub/issues/1891)) ([a0d37a6](https://github.com/PrivateAIM/hub/commit/a0d37a6f1a11ebc0849d75a0de7903fc4a543f93)), closes [#1890](https://github.com/PrivateAIM/hub/issues/1890)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.15.1 to ^0.16.0
+    * @privateaim/core-realtime-kit bumped from ^0.10.24 to ^0.10.25
+    * @privateaim/kit bumped from ^0.15.1 to ^0.16.0
+    * @privateaim/server-core-worker-kit bumped from ^0.13.4 to ^0.14.0
+    * @privateaim/server-db-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/server-http-kit bumped from ^0.15.1 to ^0.16.0
+    * @privateaim/server-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/server-realtime-kit bumped from ^0.15.1 to ^0.16.0
+    * @privateaim/server-storage-kit bumped from ^0.13.4 to ^0.14.0
+    * @privateaim/server-telemetry bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/server-telemetry-kit bumped from ^0.15.0 to ^0.16.0
+    * @privateaim/storage-kit bumped from ^0.15.1 to ^0.16.0
+    * @privateaim/telemetry-kit bumped from ^0.16.0 to ^0.16.1
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.15.1 to ^0.16.0
+    * @privateaim/server-test-kit bumped from ^0.16.0 to ^0.16.1
+
 ## [0.16.0](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.16.0) (2026-09-11)
 
 
