@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.15.1](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.15.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* **deps:** bump authup to beta.65 and follow the FHS provisioning move ([#1882](https://github.com/PrivateAIM/hub/issues/1882)) ([0cb7565](https://github.com/PrivateAIM/hub/commit/0cb756505154ef48b604665e74231d1dcf733a6f))
+* **deps:** bump the minorandpatch group with 8 updates ([#1862](https://github.com/PrivateAIM/hub/issues/1862)) ([450bc71](https://github.com/PrivateAIM/hub/commit/450bc71ca82f0cccee979d61995cd7d371178e95))
+* **server-core-worker,server-storage:** create the code directory regardless of the base image user ([#1875](https://github.com/PrivateAIM/hub/issues/1875)) ([d46f8a3](https://github.com/PrivateAIM/hub/commit/d46f8a3ea8a8b27c86760c444af0f4f51afa6170))
+* **server-core-worker:** reject non-file tar entries, and settle every pack failure route ([#1872](https://github.com/PrivateAIM/hub/issues/1872)) ([fe8294f](https://github.com/PrivateAIM/hub/commit/fe8294fe5b0f6b8d240522bc61963968d515e3a2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-http-kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/core-kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/server-core-worker-kit bumped from ^0.13.3 to ^0.13.4
+    * @privateaim/server-kit bumped from ^0.15.0 to ^0.16.0
+    * @privateaim/server-telemetry-kit bumped from ^0.14.0 to ^0.15.0
+    * @privateaim/storage-kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/telemetry-kit bumped from ^0.15.0 to ^0.16.0
+
 ## [0.15.0](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.15.0) (2026-08-26)
 
 

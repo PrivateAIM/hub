@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.16.0](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.16.0) (2026-09-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* the telemetry event query surface narrowed - filters createdAt/updatedAt are gone (dateToISOStringTransformer never applies to WHERE binds, so they matched wrong rows silently) and sorts allow only createdAt, with createdAt DESC as the new schema default; the analysis filter description is gone (unindexable text column). Multi-key sorts of individually advertised keys decode to the schema's sort default (or no ordering) unless a composite backs them, documented in api.md. En route this fixes masterImage sort handling: the derived allow-list had silently dropped the UI's virtualPath sort, and masterImageGroup rejected every sort key.
+
+### Features
+
+* back every queryable key with a real index and gate schema drift ([#1873](https://github.com/PrivateAIM/hub/issues/1873)) ([cdf83ce](https://github.com/PrivateAIM/hub/commit/cdf83ce24f4c58a247ae461cb80905261a409754))
+
+
+### Bug Fixes
+
+* **deps:** bump authup to beta.65 and follow the FHS provisioning move ([#1882](https://github.com/PrivateAIM/hub/issues/1882)) ([0cb7565](https://github.com/PrivateAIM/hub/commit/0cb756505154ef48b604665e74231d1dcf733a6f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/server-kit bumped from ^0.15.0 to ^0.16.0
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/server-kit bumped from ^0.15.0 to ^0.16.0
+
 ## [0.15.0](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.15.0) (2026-08-26)
 
 
