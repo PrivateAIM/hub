@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.14.1](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.14.1) (2026-09-11)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/server-kit bumped from ^0.16.1 to ^0.16.2
+    * @privateaim/storage-kit bumped from ^0.16.0 to ^0.16.1
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/server-kit bumped from ^0.16.1 to ^0.16.2
+    * @privateaim/storage-kit bumped from ^0.16.0 to ^0.16.1
+
 ## [0.14.0](https://github.com/PrivateAIM/hub/compare/v0.13.4...v0.14.0) (2026-09-11)
 
 
