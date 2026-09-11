@@ -61,7 +61,7 @@
         "@trapi/cli": "^2.0.5",
         "better-sqlite3": "^13.0.3",
         "testcontainers": "^12.1.0",
-        "vitest": "^4.1.11"
+        "vitest": "^5.0.0"
     },
     "scripts": {
         "cli": "node dist/cli/index.mjs",

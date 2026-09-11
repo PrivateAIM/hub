@@ -49,7 +49,7 @@
         "amqp-extension": "^4.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.1.0",
-        "vitest": "^4.1.11"
+        "vitest": "^5.0.0"
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.65",

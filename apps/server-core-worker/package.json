@@ -63,7 +63,7 @@
         "@types/tar-stream": "^3.1.4",
         "@types/uuid": "^11.0.0",
         "ts-node": "^10.9.2",
-        "vitest": "^4.1.11"
+        "vitest": "^5.0.0"
     },
     "publishConfig": {
         "access": "public"
