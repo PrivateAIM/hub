@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.1](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.16.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* **server-http-kit:** honor cookiePrefix in the authup cookie fallback ([#1891](https://github.com/PrivateAIM/hub/issues/1891)) ([a0d37a6](https://github.com/PrivateAIM/hub/commit/a0d37a6f1a11ebc0849d75a0de7903fc4a543f93)), closes [#1890](https://github.com/PrivateAIM/hub/issues/1890)
+
 ## [0.16.0](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.16.0) (2026-09-11)
 
 

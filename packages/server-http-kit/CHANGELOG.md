@@ -1,5 +1,90 @@
 # Changelog
 
+## [0.16.0](https://github.com/PrivateAIM/hub/compare/v0.15.1...v0.16.0) (2026-09-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** the OAuth2 client used by the UI must register `<ui-origin>/login/callback**` as a redirect URI — note the trailing `**`. The post-login destination now rides in the callback URI's query, and Authup matches a registered redirect URI against the full canonical URL including its query string, so an exact `<ui-origin>/login/callback` registration stops matching as soon as a destination is carried. The breakage looks intermittent: a login started from the bare login page carries no `redirect` and still succeeds, so only deep-link logins fail.
+* **deps:** the sort vocabulary published under `meta.schema` is renamed from `sort` to `sorts`, with no alias — rapiq's describe() emits only the plural key. The URL query parameter is unchanged (`?sort=-updatedAt` still works), and `sort` remains accepted as a deprecated build-input alias, so only consumers reading `meta.schema.sort` are affected. Schema descriptions additionally gain `indexes`, `filters.caseSensitive`, `filters.indexed` and `sorts.indexed`. For npm consumers, `ListMeta` in @privateaim/client-vue renames its `sort` key to `sorts`, and `HubError.issues` in @privateaim/errors is now `ReadonlyArray<Issue>` sourced from @ebec/core rather than a mutable `Issue[]` from validup — build the array before constructing the error and pass it through the constructor options.
+* every entity field in HTTP request and response bodies, and in the rapiq query vocabulary (`fields`, `filter`, `sort`, `include`), is renamed from snake_case to camelCase, with no aliases. Telemetry log label keys `ref_type`/`ref_id` become `refType`/`refId`. Affects all `@privateaim/*` packages and the node-facing flat endpoints. Database columns are unchanged.
+* entity record endpoints return { data, meta } instead of the bare record, so consumers must unwrap data; old clients against a new server break. The kit response types are renamed with no deprecated aliases: SingleResourceResponse -> EntityRecordResponse, CollectionResourceResponse -> EntityCollectionResponse, DomainAPI -> IEntityAPI, DomainAPISlim -> IEntityAPISlim.
+* **client-ui:** the Bootstrap-compat CSS classes (.btn*, .alert*, .row/.col, .navbar*, .badge, .is-valid, .form-group, .form-switch, .text-*/.bg-* aliases, .dropdown*) are removed; use the @vuecs components / Tailwind utilities instead.
+* **ui:** vuecs new majors + Tailwind v4 + repo-wide validup 0.5 + authup beta.48 ([#1668](https://github.com/PrivateAIM/hub/issues/1668))
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624))
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607))
+
+### Features
+
+* **analysis:** auto-generate url-friendly name and add display_name ([#1656](https://github.com/PrivateAIM/hub/issues/1656)) ([2d56b10](https://github.com/PrivateAIM/hub/commit/2d56b10f56c590a92f4f8f20a170269ea54d6619))
+* check handlers for analysis building and distribution ([#1318](https://github.com/PrivateAIM/hub/issues/1318)) ([a43ba20](https://github.com/PrivateAIM/hub/commit/a43ba203223ee5ffc00e63c3ff1d8829970590b2))
+* **client-ui:** add search to admin assignment sub-pages ([cb85128](https://github.com/PrivateAIM/hub/commit/cb851280464cf2b7f3008729861662d773552994))
+* **client-ui:** modernize @vuecs/@authup/hapic stack & retire Bootstrap-compat layer ([#1726](https://github.com/PrivateAIM/hub/issues/1726)) ([dc47bf7](https://github.com/PrivateAIM/hub/commit/dc47bf79ad0abac55191c33297f1539d52527188))
+* event (re-) modelling ([#1125](https://github.com/PrivateAIM/hub/issues/1125)) ([621f704](https://github.com/PrivateAIM/hub/commit/621f7041794d0bf6d530445a9c3e7c9b66a373ba))
+* explicitly enable middlewares ([dcb95e1](https://github.com/PrivateAIM/hub/commit/dcb95e1c5750f4119977d12fb4a0a74c1a8424c8))
+* merge server-core & server-core-realtime package ([5298c48](https://github.com/PrivateAIM/hub/commit/5298c48705aa3cc9a2a7ff9e452a8ae1b26e57d8))
+* **messenger:** mount default middlewares ([d7ede75](https://github.com/PrivateAIM/hub/commit/d7ede752688b73a43bb9ca99557ffb17e9594cc1))
+* migrate to esm & replace jest with vitest ([#1368](https://github.com/PrivateAIM/hub/issues/1368)) ([5a4d9d1](https://github.com/PrivateAIM/hub/commit/5a4d9d1ce118f65740aa49caf948208eac299032))
+* migrate to routup v5 with web API handlers ([#1587](https://github.com/PrivateAIM/hub/issues/1587)) ([01c5881](https://github.com/PrivateAIM/hub/commit/01c5881294c4a2768b4842b0ab3ce9bc1345f732))
+* migrated to authup v1.0.0-beta.27 ([f96db78](https://github.com/PrivateAIM/hub/commit/f96db782a5b74e3aa8ab1ada270af770f3c92631))
+* record data/meta envelope, meta.schema discovery and dependency bump ([#1801](https://github.com/PrivateAIM/hub/issues/1801)) ([a509e93](https://github.com/PrivateAIM/hub/commit/a509e932c7f650b58ce237a13993026cb102121c)), closes [#1793](https://github.com/PrivateAIM/hub/issues/1793) [#1794](https://github.com/PrivateAIM/hub/issues/1794)
+* redesign analysis & project list views ([#1821](https://github.com/PrivateAIM/hub/issues/1821)) ([c22e39e](https://github.com/PrivateAIM/hub/commit/c22e39ed392854aa7e70c8d0a62cbb844e974e63))
+* replace robot- with client-authentication/authorization ([#1445](https://github.com/PrivateAIM/hub/issues/1445)) ([f55dc66](https://github.com/PrivateAIM/hub/commit/f55dc668df66f6efa7a0bb2285c91b1d5f2ae9ef))
+* reusable client authentication hook ([0a608cd](https://github.com/PrivateAIM/hub/commit/0a608cd94984314166c15fa11684e022b5ceb53e))
+* track socket engine errors ([39771e4](https://github.com/PrivateAIM/hub/commit/39771e4c7d1eb2f14d2dad968b293d3bd513397c))
+* typed controller signatures, validators in kit packages, swagger via @trapi/cli ([#1590](https://github.com/PrivateAIM/hub/issues/1590)) ([74a35c8](https://github.com/PrivateAIM/hub/commit/74a35c8bed92036a00b581868589c40a192278aa))
+* **ui:** vuecs new majors + Tailwind v4 + repo-wide validup 0.5 + authup beta.48 ([#1668](https://github.com/PrivateAIM/hub/issues/1668)) ([3b39672](https://github.com/PrivateAIM/hub/commit/3b396724ae9ac76b7f80909ec8f64d5ada2fa1c6))
+
+
+### Bug Fixes
+
+* **build:** replace __dirname with import.meta.dirname and enable tsdown shims ([b08de35](https://github.com/PrivateAIM/hub/commit/b08de35f59d325fda2222a3290b75561936e88e1))
+* bump authup to v1.0.0-beta.36 ([76fb047](https://github.com/PrivateAIM/hub/commit/76fb047dfd551e4e3eddb23986693a19e68f8d3c))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.34 ([ab6e812](https://github.com/PrivateAIM/hub/commit/ab6e81246850e6378e364afaf036d4b4155b1673))
+* **deps:** bump [@authup](https://github.com/authup) packages to 1.0.0-beta.35 and align admin pages ([a2d742e](https://github.com/PrivateAIM/hub/commit/a2d742e33638ddc577e44bfffcf85b2698579527))
+* **deps:** bump [@authup](https://github.com/authup) packages to v1.0.0-beta.52 ([#1746](https://github.com/PrivateAIM/hub/issues/1746)) ([6e18df7](https://github.com/PrivateAIM/hub/commit/6e18df7c3c5b3626d75e24b781248e890f7e278c))
+* **deps:** bump @authup/** packages to 1.0.0-beta.31 ([#1510](https://github.com/PrivateAIM/hub/issues/1510)) ([62feb46](https://github.com/PrivateAIM/hub/commit/62feb46e9e555bbd3e2896ec8426c7a3d146cc61))
+* **deps:** bump authup to beta.59, rapiq to beta.16 and the vuecs packages ([9e53ad1](https://github.com/PrivateAIM/hub/commit/9e53ad11fe49dc3dc6ad827998dc02ef26304378))
+* **deps:** bump authup to beta.62, rapiq to 2.2 and the ebec/hapic/validup/ilingo stack ([#1843](https://github.com/PrivateAIM/hub/issues/1843)) ([8115fb0](https://github.com/PrivateAIM/hub/commit/8115fb00e148d42bd861c858e324d4b9f32028e6))
+* **deps:** bump authup to beta.63 and align the toolchain ([#1851](https://github.com/PrivateAIM/hub/issues/1851)) ([80830e6](https://github.com/PrivateAIM/hub/commit/80830e651ccfb46d0d5e362857eb87dba2df9671))
+* **deps:** bump authup to beta.65 and follow the FHS provisioning move ([#1882](https://github.com/PrivateAIM/hub/issues/1882)) ([0cb7565](https://github.com/PrivateAIM/hub/commit/0cb756505154ef48b604665e74231d1dcf733a6f))
+* **deps:** bump ilingo, validup, trapi and authup to their latest versions ([9461ec8](https://github.com/PrivateAIM/hub/commit/9461ec8f7024c6bfdb4a26baef2fc7491eb00680))
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#1162](https://github.com/PrivateAIM/hub/issues/1162)) ([2aa8123](https://github.com/PrivateAIM/hub/commit/2aa8123394aafdd3dbc1eb5284a2bdc5fcc659a9))
+* **deps:** bump the minorandpatch group across 1 directory with 11 updates ([#1653](https://github.com/PrivateAIM/hub/issues/1653)) ([db03012](https://github.com/PrivateAIM/hub/commit/db030128f7d4b766f2202a3afe70ae9bc7f09c5a))
+* **deps:** bump the minorandpatch group across 1 directory with 15 updates ([#1415](https://github.com/PrivateAIM/hub/issues/1415)) ([ae2e03c](https://github.com/PrivateAIM/hub/commit/ae2e03cea61aa74820128bc22039d5f23f51466f))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1329](https://github.com/PrivateAIM/hub/issues/1329)) ([7b394da](https://github.com/PrivateAIM/hub/commit/7b394da159d8e52cc37fe489832307a234f3ddb0))
+* **deps:** bump the minorandpatch group across 1 directory with 16 updates ([#1589](https://github.com/PrivateAIM/hub/issues/1589)) ([3358afc](https://github.com/PrivateAIM/hub/commit/3358afc590f01884ac0f6c3faaa6ef9423e47422))
+* **deps:** bump the minorandpatch group across 1 directory with 19 updates ([#1099](https://github.com/PrivateAIM/hub/issues/1099)) ([30b0ab6](https://github.com/PrivateAIM/hub/commit/30b0ab6b748b287380eb84ac0c8aae4ee22e0be7))
+* **deps:** bump the minorandpatch group across 1 directory with 19 updates ([#1392](https://github.com/PrivateAIM/hub/issues/1392)) ([23060bf](https://github.com/PrivateAIM/hub/commit/23060bfce24100d17d4d83c7ee45ed6d85073c6b))
+* **deps:** bump the minorandpatch group across 1 directory with 2 updates ([#1033](https://github.com/PrivateAIM/hub/issues/1033)) ([b228557](https://github.com/PrivateAIM/hub/commit/b228557eb213761ab97d2d9f8e618b86c50ab155))
+* **deps:** bump the minorandpatch group across 1 directory with 24 updates ([#1084](https://github.com/PrivateAIM/hub/issues/1084)) ([92a3f43](https://github.com/PrivateAIM/hub/commit/92a3f43eb47795a7fff756939a036f2e771bd3cd))
+* **deps:** bump the minorandpatch group with 6 updates ([#1449](https://github.com/PrivateAIM/hub/issues/1449)) ([042a8f5](https://github.com/PrivateAIM/hub/commit/042a8f5444a826d4a2c450c3186e876c41cb5a2b))
+* expose validup validator error ([7f81aca](https://github.com/PrivateAIM/hub/commit/7f81aca88b539c6547afa6fb0aaf645d3dbb80dd))
+* logger usage in http mount error middleware ([de41d68](https://github.com/PrivateAIM/hub/commit/de41d689292eccba9ec2b324bc1e8c0d9fe0bf85))
+* **server-core:** field projections + bump rapiq beta.9 / authup beta.56 (restore json columns) ([#1780](https://github.com/PrivateAIM/hub/issues/1780)) ([0765653](https://github.com/PrivateAIM/hub/commit/07656537a16d55a9b1e9158f378cde40e97cde99))
+* **server-http-kit:** honor cookiePrefix in the authup cookie fallback ([#1891](https://github.com/PrivateAIM/hub/issues/1891)) ([a0d37a6](https://github.com/PrivateAIM/hub/commit/a0d37a6f1a11ebc0849d75a0de7903fc4a543f93)), closes [#1890](https://github.com/PrivateAIM/hub/issues/1890)
+* ship dist directory in published kit packages ([#1719](https://github.com/PrivateAIM/hub/issues/1719)) ([576dcc4](https://github.com/PrivateAIM/hub/commit/576dcc481e9677c0b33fbbf148ce2b1d1c3300c1))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump routup and plugins to v6 ([#1624](https://github.com/PrivateAIM/hub/issues/1624)) ([e49dbd2](https://github.com/PrivateAIM/hub/commit/e49dbd22963e12232def70254eb93ff291422fc0))
+
+
+### Code Refactoring
+
+* camelCase entity properties, domain types & HTTP API ([#1806](https://github.com/PrivateAIM/hub/issues/1806)) ([de57704](https://github.com/PrivateAIM/hub/commit/de57704372da5578f13003e4360e92cb89f052e2))
+* **errors:** introduce @privateaim/errors + sweep @ebec/http ([#1607](https://github.com/PrivateAIM/hub/issues/1607)) ([954e06f](https://github.com/PrivateAIM/hub/commit/954e06fbf8facb49f897b32be84bb93c51a85622))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/kit bumped from ^0.15.1 to ^0.16.0
+    * @privateaim/server-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/telemetry-kit bumped from ^0.16.0 to ^0.16.1
+
 ## [0.15.1](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.15.1) (2026-09-11)
 
 
