@@ -89,4 +89,16 @@ describe('app/components/event/handlers/create', () => {
         expect(optedOut.expiring).toBe(false);
         expect(optedOut.expiresAt ?? null).toBeNull();
     });
+
+    it('corrects an explicit expiring:true with no expiresAt when retention is disabled', async () => {
+        // Retention 0 + no expiresAt means nothing will ever stamp one, so a
+        // caller-supplied `expiring: true` must not survive as-is — it would
+        // otherwise save as expiring=true/expiresAt=null, a row the sweep's
+        // `expiring && expires_at < now` predicate can never match.
+        const handler = new EventComponentCreateHandler({ retentionDays: 0 });
+        const entity = await persist(handler, { ...basePayload, expiring: true });
+
+        expect(entity.expiring).toBe(false);
+        expect(entity.expiresAt ?? null).toBeNull();
+    });
 });
