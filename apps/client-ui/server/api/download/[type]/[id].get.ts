@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { resolveDownloadTarget } from '../../../utils/download-target.ts';
+import { resolveDownloadTarget, resolveDownloadUrl } from '../../../utils/download-target.ts';
 
 /**
  * Same-origin download proxy for the storage service.
@@ -49,5 +49,5 @@ export default defineEventHandler((event) => {
     // browser cache serve another account's session-authorized stream.
     const forceNoStore = (proxyEvent: typeof event) => setResponseHeader(proxyEvent, 'cache-control', 'no-store');
 
-    return proxyRequest(event, new URL(target, storageUrl).href, { onResponse: forceNoStore });
+    return proxyRequest(event, resolveDownloadUrl(target, storageUrl), { onResponse: forceNoStore });
 });

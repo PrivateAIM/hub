@@ -127,7 +127,24 @@ export async function packDockerContainerWithTarStream(
             }
 
             if (headers.type === 'directory') {
-                directories.add(headers.name.replace(/\/+$/, ''));
+                // `collectDirectories` treats its argument as a file path and
+                // pops the last segment off as the "basename" that is not
+                // itself an ancestor — pass the trimmed name (no trailing
+                // slash) so the directory's OWN segment gets popped the same
+                // way a file's would, leaving only its real ancestors.
+                const name = headers.name.replace(/\/+$/, '');
+
+                for (const directory of collectDirectories(name, directories)) {
+                    pack.entry({
+                        name: directory,
+                        type: 'directory',
+                        mode: DIRECTORY_MODE,
+                        uid: 0,
+                        gid: 0,
+                    }, Buffer.alloc(0));
+                }
+
+                directories.add(name);
                 headers.mode = DIRECTORY_MODE;
             } else {
                 for (const directory of collectDirectories(headers.name, directories)) {
@@ -176,10 +193,12 @@ export async function packDockerContainerWithTarStream(
             });
 
             stream.on('error', (err) => {
-                if (options.onEntryPackFailed) {
-                    options.onEntryPackFailed(err, headers);
-                }
-
+                // Do NOT call onEntryPackFailed here: destroying the entry
+                // below makes tar-stream's Sink invoke the SAME completion
+                // callback passed to pack.entry() above, with this same
+                // error — that callback already calls onEntryPackFailed and
+                // forwards to extract's callback(). Calling it here too would
+                // double every failure notification for one real error.
                 entry.destroy(err);
             });
 

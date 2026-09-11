@@ -87,6 +87,14 @@ export class EventComponentCreateHandler implements ComponentHandler<
             if (!data.expiresAt) {
                 data.expiresAt = new Date(Date.now() + (this.retentionDays * DAY_IN_MS)).toISOString();
             }
+        } else if (!data.expiresAt) {
+            // The inverse of the invariant above: a publisher-supplied
+            // `expiring: true` with no `expiresAt`, while retention is disabled
+            // (0 days), would otherwise reach here untouched — a row that
+            // claims to expire but never gets a timestamp, which the sweep's
+            // `expiring && expires_at < now` predicate can never match. There is
+            // no window to stamp it against, so it must not claim one.
+            data.expiring = false;
         }
 
         const dataSource = await useDataSource();
