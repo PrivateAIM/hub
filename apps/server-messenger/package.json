@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-messenger",
     "type": "module",
-    "version": "0.16.1",
+    "version": "0.16.2",
     "private": true,
     "module": "./dist/index.mjs",
     "types": "dist/index.d.ts",
@@ -23,14 +23,14 @@
         "@authup/core-kit": "^1.0.0-beta.65",
         "@authup/kit": "^1.0.0-beta.65",
         "@privateaim/errors": "^0.8.42",
-        "@privateaim/kit": "^0.16.0",
-        "@privateaim/messenger-kit": "^0.16.0",
-        "@privateaim/server-db-kit": "^0.16.1",
-        "@privateaim/server-http-kit": "^0.16.0",
-        "@privateaim/server-kit": "^0.16.1",
-        "@privateaim/server-realtime-kit": "^0.16.0",
-        "@privateaim/server-telemetry-kit": "^0.16.0",
-        "@privateaim/telemetry-kit": "^0.16.1",
+        "@privateaim/kit": "^0.16.1",
+        "@privateaim/messenger-kit": "^0.16.1",
+        "@privateaim/server-db-kit": "^0.16.2",
+        "@privateaim/server-http-kit": "^0.16.1",
+        "@privateaim/server-kit": "^0.16.2",
+        "@privateaim/server-realtime-kit": "^0.16.1",
+        "@privateaim/server-telemetry-kit": "^0.16.1",
+        "@privateaim/telemetry-kit": "^0.16.2",
         "@routup/basic": "^3.0.0",
         "@routup/decorators": "^5.0.0",
         "@validup/zod": "^2.0.1",
@@ -61,8 +61,8 @@
         "test:schema-drift": "node scripts/assert-schema-drift.mjs"
     },
     "devDependencies": {
-        "@privateaim/messenger-http-kit": "^0.16.0",
-        "@privateaim/server-test-kit": "^0.16.1",
+        "@privateaim/messenger-http-kit": "^0.16.1",
+        "@privateaim/server-test-kit": "^0.16.2",
         "better-sqlite3": "^13.0.3",
         "vitest": "^4.1.11"
     }

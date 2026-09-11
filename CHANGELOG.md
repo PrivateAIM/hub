@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.2](https://github.com/PrivateAIM/hub/compare/v0.16.1...v0.16.2) (2026-09-11)
+
+
+### Bug Fixes
+
+* **server-core:** resolve RegistryComponentCaller lazily so Harbor provisioning actually runs ([#1894](https://github.com/PrivateAIM/hub/issues/1894)) ([62c4b2b](https://github.com/PrivateAIM/hub/commit/62c4b2bf0fa83cb879613e419f8274ae66a69d5c)), closes [#1893](https://github.com/PrivateAIM/hub/issues/1893)
+
 ## [0.16.1](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.16.1) (2026-09-11)
 
 

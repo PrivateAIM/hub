@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.16.2](https://github.com/PrivateAIM/hub/compare/v0.16.1...v0.16.2) (2026-09-11)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/core-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/core-realtime-kit bumped from ^0.10.25 to ^0.10.26
+    * @privateaim/kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/storage-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/telemetry-kit bumped from ^0.16.1 to ^0.16.2
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/core-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/storage-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/telemetry-kit bumped from ^0.16.1 to ^0.16.2
+
 ## [0.16.1](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.16.1) (2026-09-11)
 
 
