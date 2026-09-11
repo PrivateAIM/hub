@@ -9,7 +9,7 @@ import type { RegistryProject } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { RegistryEntity, RegistryProjectEntity } from '../../../adapters/database/entities/index.ts';
 import { RegistryCommand } from '../../components/index.ts';
-import type { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
+import type { IRegistryCaller } from '../../../core/harbor/types.ts';
 import type { IRegistryManager } from '../../../core/index.ts';
 
 export class RegistryManagerAdapter implements IRegistryManager {
@@ -17,12 +17,30 @@ export class RegistryManagerAdapter implements IRegistryManager {
 
     protected registryProjectRepository: Repository<RegistryProjectEntity>;
 
-    protected registryComponentCaller?: RegistryComponentCaller;
+    // Either a resolved caller, or a resolver for one. A resolver matters
+    // because `RegistryManagerAdapter` is constructed during
+    // `DatabaseModule.setup()`, which orkos always runs before
+    // `ComponentsModule.setup()` (the latter declares `dependencies: ['database']`)
+    // — the caller a plain instance would carry does not exist yet at that point,
+    // and would stay `undefined` forever. A resolver is instead consulted fresh on
+    // every call, so it only needs the caller to exist by the time something
+    // actually triggers a link/relink/unlink, which is always after every module
+    // is ready.
+    protected registryComponentCaller?: IRegistryCaller | (() => IRegistryCaller | undefined);
 
-    constructor(ctx: { dataSource: DataSource; registryComponentCaller?: RegistryComponentCaller }) {
+    constructor(ctx: {
+        dataSource: DataSource;
+        registryComponentCaller?: IRegistryCaller | (() => IRegistryCaller | undefined);
+    }) {
         this.registryRepository = ctx.dataSource.getRepository(RegistryEntity);
         this.registryProjectRepository = ctx.dataSource.getRepository(RegistryProjectEntity);
         this.registryComponentCaller = ctx.registryComponentCaller;
+    }
+
+    private resolveRegistryComponentCaller(): IRegistryCaller | undefined {
+        return typeof this.registryComponentCaller === 'function' ?
+            this.registryComponentCaller() :
+            this.registryComponentCaller;
     }
 
     async findDefaultRegistryId(): Promise<string | null> {
@@ -67,19 +85,21 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async linkProject(id: string): Promise<void> {
-        if (!this.registryComponentCaller) {
+        const caller = this.resolveRegistryComponentCaller();
+        if (!caller) {
             return;
         }
 
-        await this.registryComponentCaller.call(RegistryCommand.PROJECT_LINK, { id }, {});
+        await caller.call(RegistryCommand.PROJECT_LINK, { id }, {});
     }
 
     async relinkProject(project: RegistryProject): Promise<void> {
-        if (!this.registryComponentCaller) {
+        const caller = this.resolveRegistryComponentCaller();
+        if (!caller) {
             return;
         }
 
-        await this.registryComponentCaller.call(
+        await caller.call(
             RegistryCommand.PROJECT_RELINK,
             {
                 id: project.id,
@@ -92,11 +112,12 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async unlinkProject(project: RegistryProject): Promise<void> {
-        if (!this.registryComponentCaller) {
+        const caller = this.resolveRegistryComponentCaller();
+        if (!caller) {
             return;
         }
 
-        await this.registryComponentCaller.call(
+        await caller.call(
             RegistryCommand.PROJECT_UNLINK,
             {
                 id: project.id,

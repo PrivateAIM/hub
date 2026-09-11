@@ -9,7 +9,7 @@ import { EntityType } from '@authup/core-kit';
 import type { Component, Logger } from '@privateaim/server-kit';
 import { EnvironmentName } from '@privateaim/server-kit';
 import type { Client as RedisClient } from 'redis-extension';
-import type { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
+import type { IRegistryCaller } from '../../../core/harbor/types.ts';
 import {
     handleAuthupRealmEvent,
     handleAuthupRobotEvent,
@@ -18,7 +18,7 @@ import {
 
 type AuthupAggregatorContext = {
     env: string;
-    registryComponentCaller?: RegistryComponentCaller;
+    registryComponentCaller?: IRegistryCaller;
     redisSubscribeClient?: RedisClient;
     logger?: Logger;
 };
