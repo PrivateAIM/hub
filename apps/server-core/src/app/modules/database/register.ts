@@ -36,11 +36,16 @@ export function registerRepositories(container: IContainer, dataSource: DataSour
     container.register(DatabaseInjectionKey.ProjectNodeRepository, { useValue: new ProjectNodeRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.AnalysisNodeRepository, { useValue: new AnalysisNodeRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.AnalysisNodeEventRepository, { useValue: new AnalysisNodeEventRepositoryAdapter(dataSource) });
-    const callerResult = container.tryResolve(ComponentsInjectionKey.RegistryComponentCaller);
     container.register(DatabaseInjectionKey.RegistryManager, {
         useValue: new RegistryManagerAdapter({
             dataSource,
-            registryComponentCaller: callerResult.success ? callerResult.data : undefined,
+            // Resolved lazily: `ComponentsModule` (which registers this) always
+            // sets up AFTER `DatabaseModule` — see the comment on
+            // `RegistryManagerAdapter`.
+            registryComponentCaller: () => {
+                const result = container.tryResolve(ComponentsInjectionKey.RegistryComponentCaller);
+                return result.success ? result.data : undefined;
+            },
         }),
     });
 }
