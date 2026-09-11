@@ -64,6 +64,6 @@
         "@privateaim/messenger-http-kit": "^0.16.0",
         "@privateaim/server-test-kit": "^0.16.1",
         "better-sqlite3": "^13.0.3",
-        "vitest": "^4.1.11"
+        "vitest": "^5.0.0"
     }
 }

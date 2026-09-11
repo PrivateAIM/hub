@@ -29,7 +29,7 @@
         "@privateaim/kit": "^0.16.0",
         "@privateaim/server-kit": "^0.16.1",
         "@privateaim/telemetry-kit": "^0.16.1",
-        "vitest": "^4.1.11"
+        "vitest": "^5.0.0"
     },
     "peerDependencies": {
         "@privateaim/kit": "^0.16.0",
