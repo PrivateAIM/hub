@@ -27,5 +27,7 @@ export class ConfigValidator extends TypedContainer<Config> {
         this.mount('authupURL', { optional: true }, createValidator(zod.url()));
         this.mount('redisConnectionString', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('rabbitMqConnectionString', { optional: true }, createValidator(zod.string().min(1)));
+
+        this.mount('cookiePrefix', { optional: true }, createValidator(zod.string()));
     }
 }

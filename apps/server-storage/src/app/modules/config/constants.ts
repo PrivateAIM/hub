@@ -39,4 +39,6 @@ export enum EnvironmentInputKey {
     AUTHUP_URL = 'AUTHUP_URL',
 
     PUBLIC_URL = 'PUBLIC_URL',
+
+    COOKIE_PREFIX = 'COOKIE_PREFIX',
 }

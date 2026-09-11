@@ -12,6 +12,7 @@ These variables are shared across all services:
 | `AUTHUP_URL` | Yes | Authup identity provider URL |
 | `REDIS_URL` | No | Redis connection URL (for pub/sub and caching) |
 | `AMQP_URL` | No | RabbitMQ connection URL |
+| `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
 
 ## Database Variables
 
@@ -69,6 +70,16 @@ Two of them are deployment decisions rather than service addresses, and go toget
 |----------|----------|-------------|
 | `NUXT_PUBLIC_COOKIE_DOMAIN` | No | `Domain` attribute for the UI's session cookies. **Leave empty.** |
 | `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` | No | Namespace prefixed onto every session cookie name. Set this **whenever `NUXT_PUBLIC_COOKIE_DOMAIN` is widened**, so Authup's own hosted pages can't collide with the UI's cookies on that domain. |
+
+Setting a prefix is only safe once the backend agrees on it: `server-core`,
+`server-storage`, `server-telemetry` and `server-messenger` each fall back to
+reading the `access_token` cookie (for requests that can't carry an
+`Authorization` header — a stream download is a top-level navigation) when the
+identity middleware finds nothing else. That fallback needs the **same**
+prefix, via each service's own `COOKIE_PREFIX` env var (see
+[Common Variables](#common-variables)) — set it to the exact same value as
+`NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` / `COOKIE_PREFIX`, verbatim (no separator
+is inserted automatically on either side).
 
 ### Where Authup is served matters
 

@@ -36,4 +36,6 @@ export enum EnvironmentInputKey {
     REDIS_CONNECTION_STRING = 'REDIS_CONNECTION_STRING',
 
     AUTHUP_URL = 'AUTHUP_URL',
+
+    COOKIE_PREFIX = 'COOKIE_PREFIX',
 }

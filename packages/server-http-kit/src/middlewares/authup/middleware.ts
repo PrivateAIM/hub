@@ -10,7 +10,7 @@ import { useRequestCookie } from '@routup/basic/cookie';
 import type { App } from 'routup';
 import { defineCoreHandler } from 'routup';
 import type { AuthorizationMiddlewareRegistrationOptions } from './types.ts';
-import { applyTokenVerificationData, createFakeTokenVerificationData } from './utils.ts';
+import { applyTokenVerificationData, createFakeTokenVerificationData, resolveAccessTokenCookieName } from './utils.ts';
 
 export function mountAuthorizationMiddleware(
     app: App,
@@ -32,7 +32,7 @@ export function mountAuthorizationMiddleware(
             const data = await verifyRequest(event.request, {
                 tokenVerifier: options.tokenVerifier,
                 tokenByRequest: () => {
-                    const cookieToken = useRequestCookie(event, 'access_token');
+                    const cookieToken = useRequestCookie(event, resolveAccessTokenCookieName(options.cookiePrefix));
                     if (cookieToken) {
                         return cookieToken;
                     }

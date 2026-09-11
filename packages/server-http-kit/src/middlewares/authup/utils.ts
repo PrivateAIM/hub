@@ -24,6 +24,17 @@ type TokenVerificationDataMinimal = Pick<
 'scope'
 >;
 
+/**
+ * Namespaces the cookie-fallback token lookup the same way
+ * `@authup/client-web-nuxt`'s `cookiePrefix` module option namespaces the
+ * cookie it writes. `prefix` is empty by default, so the bare `access_token`
+ * name is unchanged for every deployment that hasn't widened its cookie
+ * domain.
+ */
+export function resolveAccessTokenCookieName(prefix?: string): string {
+    return `${prefix ?? ''}access_token`;
+}
+
 export function createFakeTokenVerificationData(): TokenVerificationDataMinimal {
     return {
         realm_id: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',

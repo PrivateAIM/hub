@@ -20,4 +20,12 @@ export interface BaseServerConfig {
     authupURL?: string;
     redisConnectionString?: string;
     rabbitMqConnectionString?: string;
+
+    /**
+     * Namespace prefixed onto the authup middleware's cookie-fallback token
+     * lookup — must match the `cookiePrefix` a sibling client-ui deployment
+     * was configured with. See
+     * `packages/server-http-kit/src/middlewares/authup/types.ts`.
+     */
+    cookiePrefix?: string;
 }
