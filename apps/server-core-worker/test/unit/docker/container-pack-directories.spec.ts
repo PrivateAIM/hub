@@ -140,15 +140,38 @@ describe('docker/container-pack: directory synthesis', () => {
     it('should force an incoming directory entry to be world-writable, and not duplicate it', async () => {
         const { entries } = await pack([
             {
-                name: 'sub/', 
-                type: 'directory', 
-                mode: 0o755, 
+                name: 'sub/',
+                type: 'directory',
+                mode: 0o755,
             },
             { name: 'sub/file.py', content: 'x' },
         ]);
 
         expect(entries.map((entry) => entry.name)).toEqual(['sub/', 'sub/file.py']);
         expect(entries[0].mode).toBe(0o777);
+    });
+
+    it('should synthesize ancestors of a nested directory entry with no file under it', async () => {
+        // A directory-typed entry with no file anywhere beneath it never runs
+        // through collectDirectories() via the file branch, so its own
+        // ancestors have to be synthesized from the directory branch too —
+        // otherwise Docker's extractor auto-vivifies them at root:root 0755,
+        // exactly the unprivileged-write failure DIRECTORY_MODE exists to
+        // prevent.
+        const { entries } = await pack([
+            { name: 'a/b/empty/', type: 'directory' },
+        ]);
+
+        expect(entries.map((entry) => entry.name)).toEqual([
+            'a/',
+            'a/b/',
+            'a/b/empty/',
+        ]);
+
+        for (const entry of entries) {
+            expect(entry.type).toBe('directory');
+            expect(entry.mode).toBe(0o777);
+        }
     });
 
     it('should pass file entries through unchanged', async () => {
