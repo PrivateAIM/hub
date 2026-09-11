@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.15.1](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.15.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* **deps:** bump authup to beta.65 and follow the FHS provisioning move ([#1882](https://github.com/PrivateAIM/hub/issues/1882)) ([0cb7565](https://github.com/PrivateAIM/hub/commit/0cb756505154ef48b604665e74231d1dcf733a6f))
+* **deps:** bump the minorandpatch group with 8 updates ([#1862](https://github.com/PrivateAIM/hub/issues/1862)) ([450bc71](https://github.com/PrivateAIM/hub/commit/450bc71ca82f0cccee979d61995cd7d371178e95))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/telemetry-kit bumped from ^0.15.0 to ^0.16.0
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.15.0 to ^0.15.1
+    * @privateaim/telemetry-kit bumped from ^0.15.0 to ^0.16.0
+
 ## [0.15.0](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.15.0) (2026-08-26)
 
 

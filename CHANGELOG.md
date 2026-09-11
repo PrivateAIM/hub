@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.16.0](https://github.com/PrivateAIM/hub/compare/v0.15.0...v0.16.0) (2026-09-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* the telemetry event query surface narrowed - filters createdAt/updatedAt are gone (dateToISOStringTransformer never applies to WHERE binds, so they matched wrong rows silently) and sorts allow only createdAt, with createdAt DESC as the new schema default; the analysis filter description is gone (unindexable text column). Multi-key sorts of individually advertised keys decode to the schema's sort default (or no ordering) unless a composite backs them, documented in api.md. En route this fixes masterImage sort handling: the derived allow-list had silently dropped the UI's virtualPath sort, and masterImageGroup rejected every sort key.
+* **telemetry-kit,server-db-kit,server-telemetry:** `EventAPI.update()` and `IEventAPI`'s `update` are removed (the route never existed and there is no EVENT_UPDATE permission). `Event['scope']` is now the closed `EventScope` union, and POST /events answers 400 outside it. `EntityEventMetadata.event` and `SubscriberPublishPayload.type` narrow to `DomainEventName`. Entity-event payloads no longer carry `select:false` columns.
+
+### Features
+
+* back every queryable key with a real index and gate schema drift ([#1873](https://github.com/PrivateAIM/hub/issues/1873)) ([cdf83ce](https://github.com/PrivateAIM/hub/commit/cdf83ce24f4c58a247ae461cb80905261a409754))
+* **client-vue,client-ui:** hand server-rendered data to the client instead of fetching it twice ([#1870](https://github.com/PrivateAIM/hub/issues/1870)) ([d71b19c](https://github.com/PrivateAIM/hub/commit/d71b19c173d94fa369b40eec9861456f4edc531e))
+* squash unreleased migrations and add ref_type/ref_id to buckets ([#1886](https://github.com/PrivateAIM/hub/issues/1886)) ([bbad96a](https://github.com/PrivateAIM/hub/commit/bbad96ac3cf5822c466c27cab9083cbc8d9c2412))
+
+
+### Bug Fixes
+
+* connect every new node to a registry, and let node admins manage that connection ([#1859](https://github.com/PrivateAIM/hub/issues/1859)) ([0be5ce6](https://github.com/PrivateAIM/hub/commit/0be5ce63f7a3a50d70ef3d23351ae4409d47b87b))
+* **deps:** bump authup to beta.65 and follow the FHS provisioning move ([#1882](https://github.com/PrivateAIM/hub/issues/1882)) ([0cb7565](https://github.com/PrivateAIM/hub/commit/0cb756505154ef48b604665e74231d1dcf733a6f))
+* **deps:** bump the minorandpatch group with 8 updates ([#1862](https://github.com/PrivateAIM/hub/issues/1862)) ([450bc71](https://github.com/PrivateAIM/hub/commit/450bc71ca82f0cccee979d61995cd7d371178e95))
+* **server-core-worker,server-storage:** create the code directory regardless of the base image user ([#1875](https://github.com/PrivateAIM/hub/issues/1875)) ([d46f8a3](https://github.com/PrivateAIM/hub/commit/d46f8a3ea8a8b27c86760c444af0f4f51afa6170))
+* **server-core-worker:** reject non-file tar entries, and settle every pack failure route ([#1872](https://github.com/PrivateAIM/hub/issues/1872)) ([fe8294f](https://github.com/PrivateAIM/hub/commit/fe8294fe5b0f6b8d240522bc61963968d515e3a2))
+* **telemetry-kit,server-db-kit,server-telemetry:** harden the telemetry event system ([#1866](https://github.com/PrivateAIM/hub/issues/1866)) ([dd579e9](https://github.com/PrivateAIM/hub/commit/dd579e934bbdaa1408324983fe15795df1babc64))
+
 ## [0.15.0](https://github.com/PrivateAIM/hub/compare/v0.14.0...v0.15.0) (2026-08-26)
 
 
