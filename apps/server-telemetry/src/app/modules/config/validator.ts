@@ -38,6 +38,8 @@ export class ConfigValidator extends TypedContainer<Config> {
         this.mount('redisConnectionString', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('rabbitMqConnectionString', { optional: true }, createValidator(zod.string().min(1)));
 
+        this.mount('cookiePrefix', { optional: true }, createValidator(zod.string()));
+
         this.mount('victoriaLogsURL', { optional: true }, createValidator(zod.url().nullable()));
         this.mount('victoriaLogsIngestorURL', { optional: true }, createValidator(zod.url().nullable()));
         this.mount('victoriaLogsQuerierURL', { optional: true }, createValidator(zod.url().nullable()));

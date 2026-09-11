@@ -123,6 +123,13 @@ going live with a widened domain: switching it later requires everyone to sign o
 clear cookies) first, since the un-prefixed names are neither read nor swept once the
 prefix is in place.
 
+Setting a prefix on the UI alone breaks the very stream/download fallback it was set
+for: `server-core`, `server-storage`, `server-telemetry` and `server-messenger` each
+look for the bare `access_token` cookie name unless told otherwise. Set the matching
+`COOKIE_PREFIX` env var on **every** backend service too — see
+[Deployment Configuration](../../guide/deployment/configuration.md#common-variables) —
+to the exact same string, verbatim (neither side inserts a separator automatically).
+
 ::: warning Changing `NUXT_PUBLIC_COOKIE_DOMAIN` from a value to empty
 The switch does not clear what browsers already hold. The previously written
 `Domain`-scoped records survive, they are **older** than the host-only ones written

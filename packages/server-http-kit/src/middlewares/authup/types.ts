@@ -15,4 +15,14 @@ export type AuthorizationMiddlewareRegistrationOptions = {
     tokenVerifier?: TokenVerifier,
 
     dryRun?: boolean,
+
+    /**
+     * Namespace prefixed onto the cookie-fallback token lookup
+     * (`access_token` -> `<cookiePrefix>access_token`), mirroring
+     * `@authup/client-web-nuxt`'s `cookiePrefix` module option. Must match
+     * the value the UI was deployed with — set whenever `NUXT_PUBLIC_COOKIE_DOMAIN`
+     * is widened to share the session cookie with this service, so Authup's
+     * own hosted pages can't collide with it. Empty (no prefix) by default.
+     */
+    cookiePrefix?: string,
 };

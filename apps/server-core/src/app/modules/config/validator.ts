@@ -30,6 +30,8 @@ export class ConfigValidator extends TypedContainer<Config> {
         this.mount('telemetryURL', { optional: true }, createValidator(zod.url()));
         this.mount('harborURL', { optional: true }, createValidator(zod.url()));
 
+        this.mount('cookiePrefix', { optional: true }, createValidator(zod.string()));
+
         this.mount('redisConnectionString', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('rabbitMqConnectionString', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('vaultConnectionString', { optional: true }, createValidator(zod.string().min(1)));

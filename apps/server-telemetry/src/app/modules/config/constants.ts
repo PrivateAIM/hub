@@ -45,5 +45,7 @@ export enum EnvironmentInputKey {
 
     PUBLIC_URL = 'PUBLIC_URL',
 
+    COOKIE_PREFIX = 'COOKIE_PREFIX',
+
     EVENT_RETENTION_DAYS = 'EVENT_RETENTION_DAYS',
 }

@@ -34,6 +34,8 @@ export function readConfigFromEnv(): Partial<Config> {
         telemetryURL: read(EnvironmentInputKey.TELEMETRY_URL),
         publicURL: read(EnvironmentInputKey.PUBLIC_URL, `http://127.0.0.1:${port}/`),
 
+        cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
+
         masterImagesOwner: read(EnvironmentInputKey.MASTER_IMAGES_OWNER, ConfigDefaults.MASTER_IMAGES_OWNER),
         masterImagesRepository: read(EnvironmentInputKey.MASTER_IMAGES_REPOSITORY, ConfigDefaults.MASTER_IMAGES_REPOSITORY),
         masterImagesBranch: read(EnvironmentInputKey.MASTER_IMAGES_BRANCH, ConfigDefaults.MASTER_IMAGES_BRANCH),

@@ -25,6 +25,8 @@ export function readConfigFromEnv(): Partial<Config> {
         redisConnectionString: read(EnvironmentInputKey.REDIS_CONNECTION_STRING),
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),
 
+        cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
+
         victoriaLogsURL: read(EnvironmentInputKey.VICTORIA_LOGS_URL),
         victoriaLogsIngestorURL: read(EnvironmentInputKey.VICTORIA_LOGS_INGESTOR_URL),
         victoriaLogsQuerierURL: read(EnvironmentInputKey.VICTORIA_LOGS_QUERIER_URL),

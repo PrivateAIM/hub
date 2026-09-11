@@ -39,6 +39,7 @@ All backend services inherit a common set of environment variables:
 | `AUTHUP_URL` | — | Authup identity provider URL |
 | `REDIS_CONNECTION_STRING` | — | Redis connection string |
 | `RABBITMQ_CONNECTION_STRING` | — | RabbitMQ (AMQP) connection string |
+| `COOKIE_PREFIX` | — | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). Must match the `COOKIE_PREFIX` client-ui was deployed with — see [Frontend Variables](/guide/deployment/configuration#frontend-variables-client-ui). |
 
 ## Database Configuration
 

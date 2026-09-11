@@ -27,5 +27,7 @@ export function readConfigFromEnv(): Partial<Config> {
         rabbitMqConnectionString: read(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING),
         redisConnectionString: orFail(read(EnvironmentInputKey.REDIS_CONNECTION_STRING)),
         authupURL: read(EnvironmentInputKey.AUTHUP_URL, ConfigDefaults.AUTHUP_URL),
+
+        cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
     };
 }
