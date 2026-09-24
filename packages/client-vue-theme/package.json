@@ -48,13 +48,13 @@
     "homepage": "https://github.com/PrivateAim/hub#readme",
     "dependencies": {
         "@authup/client-web-kit-theme": "^1.0.0-beta.65",
-        "@vuecs/design": "^1.2.0",
-        "@vuecs/theme-tailwind": "^6.4.2"
+        "@vuecs/design": "^1.2.1",
+        "@vuecs/theme-tailwind": "^6.5.0"
     },
     "peerDependencies": {
         "@vuecs/core": "^3.5.0",
-        "@vuecs/design": "^1.2.0",
-        "@vuecs/theme-tailwind": "^6.4.2",
+        "@vuecs/design": "^1.2.1",
+        "@vuecs/theme-tailwind": "^6.5.0",
         "tailwindcss": "^4.3.3"
     },
     "publishConfig": {
