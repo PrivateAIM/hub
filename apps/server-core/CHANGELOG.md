@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.17.0](https://github.com/PrivateAIM/hub/compare/v0.16.1...v0.17.0) (2026-09-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* **auth:** Hub requires Authup beta.68. Restricted service clients need permission_read with ownOrNull or wider realm reach; the built-in system client already has this access.
+
+### Features
+
+* **auth:** upgrade Authup to beta.68 and use its authorization catalog ([#1903](https://github.com/PrivateAIM/hub/issues/1903)) ([f7e0baa](https://github.com/PrivateAIM/hub/commit/f7e0baa3848f586fd642fe4622574a771b5bafaa))
+
+
+### Bug Fixes
+
+* **server-core:** resolve RegistryComponentCaller lazily so Harbor provisioning actually runs ([#1894](https://github.com/PrivateAIM/hub/issues/1894)) ([62c4b2b](https://github.com/PrivateAIM/hub/commit/62c4b2bf0fa83cb879613e419f8274ae66a69d5c)), closes [#1893](https://github.com/PrivateAIM/hub/issues/1893)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/core-realtime-kit bumped from ^0.10.25 to ^0.10.26
+    * @privateaim/kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/server-core-worker-kit bumped from ^0.14.0 to ^0.14.1
+    * @privateaim/server-db-kit bumped from ^0.16.1 to ^0.17.0
+    * @privateaim/server-http-kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/server-kit bumped from ^0.16.1 to ^0.17.0
+    * @privateaim/server-realtime-kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/server-storage-kit bumped from ^0.14.0 to ^0.14.1
+    * @privateaim/server-telemetry bumped from ^0.16.1 to ^0.17.0
+    * @privateaim/server-telemetry-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/storage-kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/telemetry-kit bumped from ^0.16.1 to ^0.17.0
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/server-test-kit bumped from ^0.16.1 to ^0.17.0
+
 ## [0.16.1](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.16.1) (2026-09-11)
 
 

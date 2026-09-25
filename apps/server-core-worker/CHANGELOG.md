@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.17.0](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.17.0) (2026-09-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* **auth:** Hub requires Authup beta.68. Restricted service clients need permission_read with ownOrNull or wider realm reach; the built-in system client already has this access.
+
+### Features
+
+* **auth:** upgrade Authup to beta.68 and use its authorization catalog ([#1903](https://github.com/PrivateAIM/hub/issues/1903)) ([f7e0baa](https://github.com/PrivateAIM/hub/commit/f7e0baa3848f586fd642fe4622574a771b5bafaa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-http-kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/core-kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/server-core-worker-kit bumped from ^0.14.0 to ^0.14.1
+    * @privateaim/server-kit bumped from ^0.16.1 to ^0.17.0
+    * @privateaim/server-telemetry-kit bumped from ^0.16.0 to ^0.16.1
+    * @privateaim/storage-kit bumped from ^0.16.0 to ^0.17.0
+    * @privateaim/telemetry-kit bumped from ^0.16.1 to ^0.17.0
+
 ## [0.16.0](https://github.com/PrivateAIM/hub/compare/v0.15.1...v0.16.0) (2026-09-11)
 
 
