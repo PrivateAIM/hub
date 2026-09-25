@@ -43,7 +43,7 @@
         "envix": "^1.5.0",
         "hapic": "^3.0.2",
         "locter": "^4.1.1",
-        "mysql2": "^3.24.2",
+        "mysql2": "^3.24.4",
         "node-cron": "^4.6.0",
         "orkos": "^1.1.1",
         "pg": "^8.23.0",
@@ -58,7 +58,7 @@
     "devDependencies": {
         "@faker-js/faker": "^10.6.0",
         "@privateaim/server-test-kit": "^0.17.0",
-        "@trapi/cli": "^2.0.5",
+        "@trapi/cli": "^2.1.2",
         "better-sqlite3": "^13.0.3",
         "testcontainers": "^12.1.0",
         "vitest": "^4.1.11"
