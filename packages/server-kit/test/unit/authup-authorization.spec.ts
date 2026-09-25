@@ -14,19 +14,19 @@ import { createAuthupPermissionEvaluator } from '../../src/authup/authorization.
 
 const catalog: AuthorizationCatalog = {
     permissions: [{
-        name: 'node_update', 
-        realm_id: null, 
-        client_id: null, 
-        decision_strategy: null, 
-        policies: ['binding'], 
+        name: 'node_update',
+        realm_id: null,
+        client_id: null,
+        decision_strategy: null,
+        policies: ['binding'],
     }],
     policies: { binding: { type: 'permissionBinding' }, restricted: { type: 'attributes', query: { name: 'allowed' } } },
 };
 const identity = {
-    id: '00000000-0000-4000-8000-000000000001', 
-    type: 'user' as const, 
-    realmId: '00000000-0000-4000-8000-000000000002', 
-    realmName: 'tenant', 
+    id: '00000000-0000-4000-8000-000000000001',
+    type: 'user' as const,
+    realmId: '00000000-0000-4000-8000-000000000002',
+    realmName: 'tenant',
 };
 
 describe('Authup authorization catalog', () => {
@@ -39,15 +39,15 @@ describe('Authup authorization catalog', () => {
                     expect(new URL(request.url).pathname).toBe('/authorization');
                     requests += 1;
                     return { status: 200, body: catalog };
-                }, 
-            }), 
+                },
+            }),
         });
         const evaluator = await createAuthupPermissionEvaluator(client, {
             identity,
             grants: [{
-                name: 'node_update', 
-                realm_scope: 'own', 
-                policies: ['restricted'], 
+                name: 'node_update',
+                realm_scope: 'own',
+                policies: ['restricted'],
             }],
         });
         const data = (realm: string, name: string) => definePolicyData({
