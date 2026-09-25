@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IClient } from '@authup/core-http-kit';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { PermissionDeniedError } from '@privateaim/errors';
 import type {
@@ -31,6 +32,7 @@ import { registerSocketControllers } from './register.ts';
 
 type SocketServerContext = {
     config: BaseServerConfig;
+    authupClient?: IClient;
     logger?: Logger;
     redisPublishClient?: RedisClient;
     redisSubscribeClient?: RedisClient;
@@ -59,6 +61,7 @@ export function createSocketServer(
     }
 
     mountAuthorizationMiddleware(nsp, {
+        authupClient: ctx.authupClient,
         baseURL: ctx.config.authupURL,
         tokenVerifier: createAuthupTokenVerifier({
             baseURL: ctx.config.authupURL,

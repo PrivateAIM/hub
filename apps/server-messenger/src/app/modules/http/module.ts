@@ -120,6 +120,7 @@ export class HTTPModule implements IModule {
             mountLoggingMiddleware(socketServer, { logger });
 
             mountAuthorizationMiddleware(socketServer, {
+                authupClient: authupResult.success ? authupResult.data : undefined,
                 baseURL: config.authupURL,
                 tokenVerifier: createAuthupTokenVerifier({
                     baseURL: config.authupURL,

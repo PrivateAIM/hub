@@ -27,8 +27,8 @@ import type { ValueTransformer } from 'typeorm';
  * - `to({})` deliberately stays `'{}'`. An empty object is a real value — the telemetry
  *   `EntityEventHandler` writes exactly that — not an absent one. Test emptiness of the
  *   VALUE (`null` / `undefined`), never truthiness, or `{}`, `false` and `0` all become NULL.
- * - `serialize` is not `JSON.stringify`: it passes a raw string through UNQUOTED, which is
- *   what messenger's base64 `data` payload depends on.
+ * - Authup beta.68 quotes strings on write. Its deserializer also accepts the
+ *   legacy unquoted strings, so existing messenger payloads need no backfill.
  */
 export const serializedTextTransformer: ValueTransformer = {
     to(value: unknown): string | null {

@@ -33,24 +33,24 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.65",
-        "@authup/kit": "^1.0.0-beta.65",
+        "@authup/core-kit": "^1.0.0-beta.68",
+        "@authup/kit": "^1.0.0-beta.68",
         "@privateaim/core-kit": "^0.16.0",
         "@privateaim/kit": "^0.16.0",
         "@privateaim/telemetry-kit": "^0.16.1",
-        "@rapiq/codec-url": "^2.2.0",
-        "@rapiq/core": "^2.2.0",
+        "@rapiq/codec-url": "^2.4.0",
+        "@rapiq/core": "^2.4.0",
         "hapic": "^3.0.2",
         "vitest": "^4.1.11"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.65",
-        "@authup/kit": "^1.0.0-beta.65",
+        "@authup/core-kit": "^1.0.0-beta.68",
+        "@authup/kit": "^1.0.0-beta.68",
         "@privateaim/core-kit": "^0.16.0",
         "@privateaim/kit": "^0.16.0",
         "@privateaim/telemetry-kit": "^0.16.1",
-        "@rapiq/codec-url": "^2.2.0",
-        "@rapiq/core": "^2.2.0",
+        "@rapiq/codec-url": "^2.4.0",
+        "@rapiq/core": "^2.4.0",
         "hapic": "^3.0.2"
     },
     "publishConfig": {

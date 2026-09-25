@@ -17,6 +17,10 @@ describe('serializedTextTransformer', () => {
         expect(serializedTextTransformer.to({})).toBe('{}');
     });
 
+    it('reads legacy unquoted messenger payloads', () => {
+        expect(serializedTextTransformer.from('YmFzZTY0')).toBe('YmFzZTY0');
+    });
+
     // why no data backfill is needed
     it('from() normalizes legacy "null"/"undefined" text and SQL NULL to null', () => {
         expect(serializedTextTransformer.from('null')).toBeNull();
@@ -24,9 +28,9 @@ describe('serializedTextTransformer', () => {
         expect(serializedTextTransformer.from(null)).toBeNull();
     });
 
-    // false / 0 pin `?? null` rather than `||`; the raw string pins serialize over JSON.stringify
+    // false / 0 pin `?? null` rather than `||`; string primitives must keep their type.
     it('round-trips real values unchanged, incl. falsy ones and a raw base64 string', () => {
-        const values: unknown[] = [{ a: 1 }, [{ position: 'after' }], {}, 'YmFzZTY0', false, 0];
+        const values: unknown[] = [{ a: 1 }, [{ position: 'after' }], {}, 'YmFzZTY0', '123', 'true', 'null', 'undefined', '', false, 0];
         for (const value of values) {
             expect(serializedTextTransformer.from(serializedTextTransformer.to(value))).toEqual(value);
         }

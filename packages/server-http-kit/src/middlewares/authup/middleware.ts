@@ -19,8 +19,8 @@ export function mountAuthorizationMiddleware(
     if (!options.authupClient) {
         const data = createFakeTokenVerificationData();
 
-        app.use(defineCoreHandler((event) => {
-            applyTokenVerificationData(event, data, options.dryRun);
+        app.use(defineCoreHandler(async (event) => {
+            await applyTokenVerificationData(event, data, options.dryRun, options.authupClient);
             return event.next();
         }));
 
@@ -42,7 +42,7 @@ export function mountAuthorizationMiddleware(
             });
 
             if (data) {
-                applyTokenVerificationData(event, data, options.dryRun);
+                await applyTokenVerificationData(event, data, options.dryRun, options.authupClient);
             }
         } catch (err) {
             return event.next(err);

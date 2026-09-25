@@ -29,6 +29,7 @@ import installNavigation from '@vuecs/navigation';
 import installOverlays from '@vuecs/overlays';
 import installPagination from '@vuecs/pagination';
 import installTable from '@vuecs/table';
+import installTree from '@vuecs/tree';
 import installTimeago from '@vuecs/timeago';
 
 import { defineNuxtPlugin } from '#app';
@@ -87,6 +88,7 @@ export default defineNuxtPlugin({
         ctx.vueApp.use(installOverlays);
         ctx.vueApp.use(installPagination);
         ctx.vueApp.use(installTable);
+        ctx.vueApp.use(installTree);
         ctx.vueApp.use(installIcon);
 
         ctx.vueApp.use(installCountdown);

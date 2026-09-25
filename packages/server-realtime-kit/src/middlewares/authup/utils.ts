@@ -8,6 +8,8 @@
 import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@authup/core-kit';
 import type { PermissionPolicyBinding } from '@authup/access';
 import { PermissionEvaluator, PermissionMemoryProvider } from '@authup/access';
+import type { IClient } from '@authup/core-http-kit';
+import { createAuthupPermissionEvaluator } from '@privateaim/server-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Socket } from '../../types';
@@ -40,33 +42,17 @@ export function createFakeTokenVerificationData(): TokenVerificationDataMinimal 
     };
 }
 
-/**
- * Introspection delivers each grant's realm/client scope as the OAuth2 wire
- * shape (`realm_id` / `client_id`), while `@authup/access`'s `BasePermission`
- * is camelCase (`realmId` / `clientId`). Those two keys are deliberately NOT
- * forwarded: `PermissionMemoryProvider` indexes a grant by
- * `buildPermissionKey({ name, realmId, clientId })`, but the evaluator is built
- * with `realmId: null, clientId: null` and `RequestPermissionChecker` never
- * supplies per-check overrides, so every lookup keys both scope segments as
- * the wildcard. Populating the grant side alone would key the stored grants
- * by their real realm and client, and make every check miss — denying
- * everything.
- *
- * Until hub scopes lookups too (plan 016, IPermissionEvaluator alignment), the
- * scope is intentionally dropped rather than half-applied. Previously these were
- * passed as `realm_id`/`client_id`, which `BasePermission` silently discarded —
- * the same behaviour, but reading as though the scope were honoured.
- */
-export function applyTokenVerificationData(
+export async function applyTokenVerificationData(
     socket: Socket,
     data: TokenVerificationDataMinimal,
     fakeAbilities?: boolean,
+    authupClient?: IClient,
 ) {
     let abilities: PermissionPolicyBinding[];
     if (fakeAbilities) {
         abilities = generateAbilityNames().map((name) => ({ permission: { name } }));
     } else {
-        abilities = data.permissions.map((p) => ({ permission: { name: p.name } }));
+        abilities = [];
     }
 
     socket.data.identity = {
@@ -76,5 +62,15 @@ export function applyTokenVerificationData(
         realmName: data.realm_name,
     };
 
-    socket.data.permissionChecker = new PermissionEvaluator({ provider: new PermissionMemoryProvider(abilities) });
+    socket.data.permissionChecker = authupClient && !fakeAbilities ?
+        await createAuthupPermissionEvaluator(authupClient, {
+            grants: data.permissions,
+            identity: {
+                id: data.sub,
+                type: data.sub_kind,
+                realmId: data.realm_id,
+                realmName: data.realm_name,
+                clientId: data.sub_kind === 'client' ? data.sub : null,
+            },
+        }) : new PermissionEvaluator({ provider: new PermissionMemoryProvider(abilities) });
 }

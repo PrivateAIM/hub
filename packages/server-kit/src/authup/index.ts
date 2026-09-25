@@ -8,3 +8,4 @@
 export * from './client';
 export * from './client-hook';
 export * from './token-creator';
+export * from './authorization.ts';

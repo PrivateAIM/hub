@@ -23,9 +23,13 @@ export function createAuthorizationMiddleware(
     if (!options.baseURL) {
         const data = createFakeTokenVerificationData();
 
-        return (socket, next) => {
-            applyTokenVerificationData(socket, data, options.fakeAbilities);
-            next();
+        return async (socket, next) => {
+            try {
+                await applyTokenVerificationData(socket, data, options.fakeAbilities);
+                next();
+            } catch (e) {
+                next(e as Error);
+            }
         };
     }
 
@@ -34,7 +38,7 @@ export function createAuthorizationMiddleware(
         tokenVerifierHandler: (
             socket: Socket,
             data,
-        ) => applyTokenVerificationData(socket, data, options.fakeAbilities),
+        ) => applyTokenVerificationData(socket, data, options.fakeAbilities, options.authupClient),
     });
 }
 
