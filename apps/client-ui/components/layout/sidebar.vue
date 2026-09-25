@@ -58,6 +58,7 @@ export default defineNuxtComponent({
             () => store.status,
             () => store.userId,
             () => store.realmManagement,
+            () => store.permissionRevision,
         ];
 
         return {

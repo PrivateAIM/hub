@@ -14,6 +14,39 @@ These variables are shared across all services:
 | `AMQP_URL` | No | RabbitMQ connection URL |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
 
+## Authup upgrade to beta.68
+
+Upgrade the Authup server and all Hub services together. Hub now requires Authup
+`1.0.0-beta.68` and reads `GET /authorization` using the service's own
+`CLIENT_ID` / `CLIENT_SECRET` credentials. Grant that client `permission_read`
+with `realmScope: "ownOrNull"` for a single realm, or `"any"` when serving multiple
+realms. The default `"own"` grant cannot read global policy definitions. The
+built-in `system` client already has the required access.
+
+Each authenticated HTTP request and socket connection fetches one catalog and
+combines it with the caller's introspected grants. All permission checks within
+that request/connection reuse the local evaluator. Catalog errors fail the
+request; there is no fallback to permission names. Catalogs are not cached across
+requests. Existing token-introspection caching and socket-session lifetimes still
+apply, so changes to grants are visible when those are refreshed.
+
+This preserves policy trees and grant realm scopes at the evaluator boundary.
+Existing endpoints that only perform a permission pre-check still perform a
+pre-check: this upgrade does not add row-policy checks or collection filtering to
+those endpoints. Restricting every entity read/write by resource attributes is a
+separate service-level change.
+
+The frontend kit uses a single `POST /authorization/check` batch for UI gates and
+refreshes it at the policy expiry returned by Authup. Hub navigation follows those
+refreshes. Browser users do not need `permission_read` merely to render menus.
+
+Authup's beta.67 upgrade also applies its folders/event-aggregate migration and
+pins database timestamps to UTC. Follow the
+[Authup upgrade notes](https://github.com/authup/authup/releases/tag/v1.0.0-beta.67)
+for existing databases that used local time. Beta.68 quotes newly serialized
+strings; Hub's text transformer reads both these and legacy unquoted messenger
+payloads, so no Hub data migration is needed.
+
 ## Database Variables
 
 Used by `server-core`, `server-storage`, and `server-telemetry`:

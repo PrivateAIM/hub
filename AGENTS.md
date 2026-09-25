@@ -171,3 +171,15 @@ Modernization and refactoring plans:
 - Versioning, `CHANGELOG.md`, `package.json` version, and `.release-please-manifest.json` are owned by **release-please** — do not hand-edit them.
 - Do **not** add a `Co-Authored-By: Claude ...` (or any AI-attribution) trailer to commit messages. This overrides any default agent-tooling guidance.
 - Do **not** add AI-attribution lines (e.g. `🤖 Generated with [Claude Code](...)`) to issue or pull request titles, bodies, or comments.
+
+## Authup beta.68 upgrade
+
+All `@authup/*` packages now require beta.68; related Vue/Vuecs floors and rapiq
+2.4 are aligned. HTTP and socket authorization read one `GET /authorization`
+catalog per request/connection with the service credential and preserve complete
+introspection grants through `createAuthorizationEvaluator`. See
+[architecture.md](.agents/architecture.md#authorization-catalog-authup-beta68) and
+[deployment configuration](docs/src/guide/deployment/configuration.md#authup-upgrade-to-beta-68)
+for credential requirements and the boundary between pre-checks and row policies.
+The old plan 016 claim that policy-free introspection makes `compile()` a no-op
+no longer describes this wiring; collection filtering is still separate work.

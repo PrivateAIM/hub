@@ -250,6 +250,22 @@ All services integrate with **Authup** (OAuth2 identity provider):
 - `@authup/access` handles per-realm permission checks via `IPermissionEvaluator`
 - Two-phase permission: `preCheck` (fast fail) then `check` (with PolicyData attributes)
 
+### Authorization catalog (Authup beta.68)
+
+HTTP and socket middleware use the service Authup client to fetch `GET /authorization`
+once per authenticated request/connection, then `createAuthupPermissionEvaluator`
+(`server-kit/src/authup/authorization.ts`) combines it with the caller's complete
+introspection grants and identity. Do not flatten grants to permission names: that
+loses definition policies, junction policies and realm reach. The credential needs
+`permission_read` at `ownOrNull` or wider. Fetch failures propagate; no cross-request
+catalog cache or name-only fallback is installed. Token-verifier caching and socket
+connection lifetimes remain unchanged.
+
+The evaluator enforces the data a call supplies. A service using only `preCheck`
+still has only a pre-gate; this is not the collection `compile()`/row-check migration
+in plan 016. The Vue store handles batch verdict fetching and expiry;
+`store.permissionRevision` must be watched by custom async navigation resolvers.
+
 ## Realm Scoping
 
 Entities are scoped to realms via `realmId`. The `isRealmResourceWritable()` helper enforces:

@@ -50,6 +50,7 @@ export default defineNuxtComponent({
             () => store.status,
             () => store.userId,
             () => store.realmManagement,
+            () => store.permissionRevision,
         ];
 
         const { isDark } = useColorMode();

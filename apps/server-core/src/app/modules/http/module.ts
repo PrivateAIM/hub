@@ -153,6 +153,7 @@ export class HTTPModule implements IModule {
                     const redisSubResult2 = container.tryResolve(RedisSubscribeClientInjectionKey);
                     createSocketServer(server.node!.server as Server, {
                         config,
+                        authupClient: authupResult.success ? authupResult.data : undefined,
                         logger,
                         redisPublishClient: redisPubResult.success ? redisPubResult.data : undefined,
                         redisSubscribeClient: redisSubResult2.success ? redisSubResult2.data : undefined,
