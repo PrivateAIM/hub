@@ -30,14 +30,28 @@
     <a href="./CONTRIBUTING.md">Contributing</a>
 </p>
 
-Institutions each run a **node**; Hub is the centre that decides what runs where. This monorepo
-is the central half: five backend services, a Nuxt frontend, 19 shared TypeScript libraries, and
-the documentation site.
+Institutions each run a **node** ([PrivateAIM/node](https://github.com/PrivateAIM/node)); Hub is
+the centre that decides what runs where. This monorepo is the central half: five backend services,
+a Nuxt frontend, 19 shared TypeScript libraries, and the documentation site.
+
+## How it works
+
+1. **Project.** A researcher proposes a project and picks the nodes it should run on. Each node's
+   institution approves or rejects taking part.
+2. **Analysis.** Within the project, the researcher uploads analysis code and picks a master
+   image. Each node approves the analysis again before its configuration is locked.
+3. **Build.** The worker builds a container image from the code and the master image and pushes
+   it to each node's project in the container registry.
+4. **Run.** Each node pulls the image and runs it next to its own data. Only results flow back to
+   Hub's storage; the data itself never leaves the institution.
+
+📖 [Projects](https://hub.docs.privateaim.net/guide/user/projects.html) ·
+[Analyses](https://hub.docs.privateaim.net/guide/user/analyses.html) ·
+[Approval](https://hub.docs.privateaim.net/guide/user/approval.html)
 
 ## Quick start
 
-Requires **Node.js 24**, npm, and Docker. Running the backend locally also expects
-[Authup](https://authup.org) (OAuth2), Redis, RabbitMQ, and MySQL or PostgreSQL.
+Requires **Node.js 24**, npm, and Docker.
 
 ```bash
 npm ci          # install
@@ -47,16 +61,17 @@ npm run lint    # lint
 ```
 
 ```bash
-docker compose up -d                            # MySQL + Postgres
+docker compose up -d                            # MySQL + Postgres only
 
 npm run dev --workspace=apps/server-core        # Core API
 npm run dev --workspace=apps/client-ui          # Nuxt frontend
 npm run dev --workspace=docs                    # Documentation site
 ```
 
-Every entity endpoint answers with a `{ data, meta }` envelope, and every query-capable `GET`
-publishes the vocabulary it accepts under `meta.schema` — so a client never has to read server
-source to build a valid query.
+The repository's `docker-compose.yml` provides only the databases. The backend services also
+need [Authup](https://authup.org) (OAuth2), Redis and RabbitMQ, which you run yourself. For the
+complete stack with all services and infrastructure, use
+[hub-deployment](https://github.com/PrivateAIM/hub-deployment).
 
 📖 [Local setup](https://hub.docs.privateaim.net/guide/development/) ·
 [API reference](https://hub.docs.privateaim.net/guide/development/api.html) ·
@@ -64,10 +79,45 @@ source to build a valid query.
 
 ## Services
 
-![Architecture](./.github/assets/architecture.png)
+```mermaid
+flowchart LR
+    subgraph hub [FLAME Hub]
+        ui[client-ui]
+        core[server-core]
+        worker[server-core-worker]
+        storage[server-storage]
+        telemetry[server-telemetry]
+        messenger[server-messenger]
+    end
 
-Each backend service follows the same hexagonal (ports &amp; adapters) architecture and ships in
-the shared `privateaim/hub` Docker image, selected at startup with `SERVICE=<name>`.
+    authup[(Authup)]
+    mq{{RabbitMQ}}
+    registry[(Container registry)]
+    nodes[FLAME nodes 1…N]
+
+    ui --> core & storage & telemetry
+    core <--> mq <--> worker
+    worker -- push image --> registry
+    nodes -- pull image --> registry
+    nodes -- status --> core
+    nodes -- results --> storage
+    nodes <--> messenger
+    hub -. tokens .-> authup
+```
+
+Each backend service follows the same hexagonal (ports &amp; adapters) architecture. All of them
+ship in one Docker image, and the container's arguments pick the service and its command:
+
+```bash
+docker run ghcr.io/privateaim/hub core cli start       # Core API
+docker run ghcr.io/privateaim/hub storage cli start    # likewise: telemetry, messenger
+docker run ghcr.io/privateaim/hub core-worker start    # worker
+docker run ghcr.io/privateaim/hub ui start             # frontend
+```
+
+Every entity endpoint answers with a `{ data, meta }` envelope, and every query-capable `GET`
+publishes the vocabulary it accepts under `meta.schema`, so a client never has to read server
+source to build a valid query.
 
 | Service | Responsibility |
 |---------|----------------|

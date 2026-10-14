@@ -28,8 +28,8 @@ Analyses are distributed computations within a project. When a user submits an a
 
 Once approved, an analysis goes through:
 
-1. **Build** — the worker builds a Docker image from the analysis code and master image
-2. **Configure** — storage buckets are provisioned, configuration is locked
+1. **Configure** — storage buckets are provisioned, configuration is locked
+2. **Build** — the worker builds a Docker image from the analysis code and master image
 3. **Distribute** — the container image is pushed to target node registries
 4. **Execute** — nodes pull and run the container against their local data
 5. **Complete** — results are collected and stored
