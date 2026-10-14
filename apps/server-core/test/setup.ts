@@ -17,6 +17,7 @@ import { createTestDatabaseModuleForSetup } from './app/index.ts';
 // The permissions server-core's authorization middleware checks. Provisioned into
 // the test Authup so the admin/master token resolves them.
 const PERMISSIONS: PermissionName[] = [
+    PermissionName.NODE_READ,
     PermissionName.NODE_CREATE,
     PermissionName.NODE_UPDATE,
     PermissionName.NODE_DELETE,
@@ -32,9 +33,13 @@ const PERMISSIONS: PermissionName[] = [
     PermissionName.ANALYSIS_EXECUTION_STOP,
     PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE,
     PermissionName.ANALYSIS_SELF_STORAGE_USE,
+    PermissionName.MASTER_IMAGE_READ,
     PermissionName.MASTER_IMAGE_MANAGE,
+    PermissionName.MASTER_IMAGE_GROUP_READ,
     PermissionName.MASTER_IMAGE_GROUP_MANAGE,
+    PermissionName.REGISTRY_READ,
     PermissionName.REGISTRY_MANAGE,
+    PermissionName.REGISTRY_PROJECT_READ,
     PermissionName.REGISTRY_PROJECT_MANAGE,
 ];
 

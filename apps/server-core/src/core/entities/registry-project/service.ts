@@ -14,8 +14,9 @@ import {
 } from '@privateaim/kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
+import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
 import { holdsPermission } from '../../utils/index.ts';
+import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IRegistryManager } from '../node/types.ts';
@@ -36,6 +37,8 @@ type RegistryProjectServiceContext = {
  */
 const SECRET_FIELD = 'accountSecret' satisfies keyof RegistryProject;
 
+const READ_PERMISSIONS = [PermissionName.REGISTRY_PROJECT_READ, PermissionName.REGISTRY_PROJECT_MANAGE];
+
 export class RegistryProjectService extends AbstractEntityService implements IRegistryProjectService {
     protected repository: IRegistryProjectRepository;
 
@@ -54,7 +57,8 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
-        const result = await this.repository.findMany(decodeQuery(query, { schema: registryProjectSchema }));
+        const scoped = await this.scopeRead(decodeQuery(query, { schema: registryProjectSchema }), actor);
+        const result = await this.repository.findMany(scoped);
 
         if (result.data.some((e) => this.hasSecretField(e))) {
             await this.checkSecretFieldAccess(result.data, actor);
@@ -64,10 +68,13 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<RegistryProject> {
-        const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: registryProjectSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
-            await this.repository.findOneById(id);
+        const scoped = await this.scopeRead(
+            decodeQuery(query, { schema: registryProjectSchema, parameters: ['fields', 'relations'] }),
+            actor,
+        );
 
+        const { data } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+        const entity = data[0];
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
@@ -77,6 +84,29 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         }
 
         return entity;
+    }
+
+    /**
+     * The read scope for list and record alike. A node's own client holds no
+     * read grant and reaches exactly its own project; everyone else is
+     * pre-gated and narrowed by their grant's reach.
+     */
+    private async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+        const ownProjectId = await this.findOwnNodeProjectId(actor);
+        if (ownProjectId) {
+            return appendQueryConditions(query, eq('id', ownProjectId));
+        }
+
+        return scopeReadQuery(query, actor, { names: READ_PERMISSIONS });
+    }
+
+    private async findOwnNodeProjectId(actor: ActorContext): Promise<string | undefined> {
+        if (!actor.identity || actor.identity.type !== 'client' || !this.nodeRepository) {
+            return undefined;
+        }
+
+        const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id });
+        return node?.registryProjectId ?? undefined;
     }
 
     private hasSecretField(entity: RegistryProject): boolean {
@@ -91,18 +121,9 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
         // permission not granted — check node-client condition
 
-        if (
-            actor.identity &&
-            actor.identity.type === 'client' &&
-            this.nodeRepository
-        ) {
-            const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id });
-            if (node && node.registryProjectId) {
-                const requestedIds = new Set(entities.map((e) => e.id));
-                if (requestedIds.size === 1 && requestedIds.has(node.registryProjectId)) {
-                    return;
-                }
-            }
+        const ids = new Set(entities.map((e) => e.id));
+        if (ids.size === 1 && ids.has(await this.findOwnNodeProjectId(actor))) {
+            return;
         }
 
         throw new PermissionDeniedError();

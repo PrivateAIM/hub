@@ -7,7 +7,6 @@
 
 import { createURLCodec } from '@rapiq/codec-url';
 import type {
-    ICondition,
     IQuery,
     ObjectLiteral,
     Schema,
@@ -108,28 +107,5 @@ export function decodeQuery<RECORD extends ObjectLiteral = ObjectLiteral>(
     return parsed ?? new Query({});
 }
 
-/**
- * Append server-derived conditions (a route realm, an owner scope, ...)
- * onto a decoded query by AND-wrapping its filter tree. The wrap makes the
- * appended scope non-displaceable: a client-sent condition on the same
- * field intersects with the scope instead of replacing it, and compound
- * client trees (`or(...)`) are preserved as-is. Since @rapiq/core
- * 2.0.0-beta.19, `Filters.merge`/`mergeQueries` compose conjunctively too,
- * so no library merge path can displace it either. Same guarantee class as a
- * mandatory `andWhere` at the repository — expressed once in the IR.
- * Appended conditions do not pass through `decodeQuery`, so the schema
- * allow-lists do not constrain them (server-derived context).
- *
- * Immutable: returns a new `Query` whose filters node is the AND-wrapped
- * successor; every other parameter node is carried over by reference, so
- * the input query stays untouched.
- */
-export function appendQueryConditions(query: IQuery, ...conditions: ICondition[]): Query {
-    return new Query({
-        fields: query.fields,
-        filters: query.filters.and(...conditions),
-        relations: query.relations,
-        pagination: query.pagination,
-        sorts: query.sorts,
-    });
-}
+// The shared implementation lives in server-kit; re-exported so call sites keep importing from core.
+export { appendQueryConditions } from '@privateaim/server-kit';

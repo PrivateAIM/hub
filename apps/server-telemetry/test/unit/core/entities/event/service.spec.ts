@@ -8,6 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Event } from '@privateaim/telemetry-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { eq } from '@rapiq/core';
 import {
     beforeEach,
     describe,
@@ -57,15 +58,44 @@ describe('EventService', () => {
     });
 
     describe('getMany', () => {
-        it('should return paginated results', async () => {
-            repository.seed([
-                createTestEvent({ id: 'e-1' }),
-                createTestEvent({ id: 'e-2' }),
-            ]);
+        const seedRealms = () => repository.seed([
+            createTestEvent({ id: 'e-1', realmId: 'realm-1' }),
+            createTestEvent({ id: 'e-2', realmId: 'realm-2' }),
+            createTestEvent({ id: 'e-3', realmId: null }),
+        ]);
 
-            const result = await service.getMany({}, createAllowAllActor());
-            expect(result.data).toHaveLength(2);
-            expect(result.meta.total).toBe(2);
+        const ids = (result: { data: Event[] }) => result.data.map((e) => e.id).sort();
+
+        it('should return every realm on an allow verdict', async () => {
+            seedRealms();
+            const actor = createAllowAllActor();
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            const result = await service.getMany({}, actor);
+            expect(ids(result)).toEqual(['e-1', 'e-2', 'e-3']);
+            expect(result.meta.total).toBe(3);
+        });
+
+        it('should apply a conditional verdict', async () => {
+            seedRealms();
+            const actor = createAllowAllActor();
+            actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-2') });
+
+            expect(ids(await service.getMany({}, actor))).toEqual(['e-2']);
+        });
+
+        it('should narrow a post verdict to the actor realm', async () => {
+            seedRealms();
+
+            expect(ids(await service.getMany({}, createAllowAllActor('realm-1')))).toEqual(['e-1']);
+        });
+
+        it('should return nothing on a deny verdict', async () => {
+            seedRealms();
+            const actor = createAllowAllActor();
+            actor.permissionEvaluator.setCompileResult({ verdict: 'deny' });
+
+            expect(ids(await service.getMany({}, actor))).toEqual([]);
         });
 
         it('should check permission', async () => {
@@ -87,8 +117,16 @@ describe('EventService', () => {
             const event = createTestEvent({ id: 'e-1' });
             repository.seed(event);
 
-            const result = await service.getOne('e-1', createAllowAllActor());
+            const result = await service.getOne('e-1', createAllowAllActor('realm-1'));
             expect(result.id).toBe('e-1');
+        });
+
+        it('should throw EntityNotFoundError for an entity out of reach', async () => {
+            repository.seed(createTestEvent({ id: 'e-1', realmId: 'realm-2' }));
+
+            await expect(
+                service.getOne('e-1', createAllowAllActor('realm-1')),
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {

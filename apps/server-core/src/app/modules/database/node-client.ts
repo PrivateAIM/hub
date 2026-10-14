@@ -76,6 +76,8 @@ export class NodeClientService {
         const permissionNames: string[] = [
             // todo: remove this permission, node should be permissionless
             PermissionName.ANALYSIS_UPDATE,
+            // node-side services read /nodes (own node lookup, peer public keys)
+            PermissionName.NODE_READ,
         ];
         const permissionNamesAssigned: string[] = [];
 

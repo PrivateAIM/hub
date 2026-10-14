@@ -23,9 +23,12 @@ export enum PermissionName {
     PROJECT_UPDATE = 'project_update',
     PROJECT_APPROVE = 'project_approve',
 
+    REGISTRY_READ = 'registry_read',
     REGISTRY_MANAGE = 'registry_manage',
+    REGISTRY_PROJECT_READ = 'registry_project_read',
     REGISTRY_PROJECT_MANAGE = 'registry_project_manage',
 
+    NODE_READ = 'node_read',
     NODE_CREATE = 'node_create',
     NODE_DELETE = 'node_delete',
     NODE_UPDATE = 'node_update',
@@ -41,7 +44,9 @@ export enum PermissionName {
     ANALYSIS_SELF_MESSAGE_BROKER_USE = 'analysis_self_message_broker_use',
     ANALYSIS_SELF_STORAGE_USE = 'analysis_self_storage_use',
 
+    MASTER_IMAGE_READ = 'master_image_read',
     MASTER_IMAGE_MANAGE = 'master_image_manage',
+    MASTER_IMAGE_GROUP_READ = 'master_image_group_read',
     MASTER_IMAGE_GROUP_MANAGE = 'master_image_group_manage',
 
     SERVICE_MANAGE = 'service_manage',

@@ -16,11 +16,22 @@ import {
 } from '@privateaim/kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
+import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { nodeSchema } from './schema.ts';
 import type { INodeRepository, INodeService, IRegistryManager } from './types.ts';
+
+/**
+ * Nodes are a global catalog: any one of these grants reads every node, in
+ * every realm (capability gate only, no realm narrowing).
+ */
+const READ_PERMISSIONS = [
+    PermissionName.NODE_READ,
+    PermissionName.NODE_CREATE,
+    PermissionName.NODE_UPDATE,
+    PermissionName.NODE_DELETE,
+];
 
 type NodeServiceContext = {
     repository: INodeRepository;
@@ -41,11 +52,17 @@ export class NodeService extends AbstractEntityService implements INodeService {
         this.validator = new NodeValidator();
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Node>> {
-        return this.repository.findMany(decodeQuery(query, { schema: nodeSchema }));
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Node>> {
+        return this.repository.findMany(await scopeReadQuery(
+            decodeQuery(query, { schema: nodeSchema }),
+            actor,
+            { names: READ_PERMISSIONS, compile: false },
+        ));
     }
 
-    async getOne(id: string, query?: Record<string, any>): Promise<Node> {
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Node> {
+        await actor.permissionEvaluator.preEvaluateOneOf({ name: READ_PERMISSIONS });
+
         const entity = query ?
             await this.repository.findMany(
                 appendQueryConditions(

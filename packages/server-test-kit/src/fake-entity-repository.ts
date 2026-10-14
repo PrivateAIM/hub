@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { compileFilters } from '@rapiq/adapter-memory';
 import type { IQuery } from '@rapiq/core';
 import type {
     EntityPersistContext,
@@ -16,12 +17,26 @@ import type {
 export class FakeEntityRepository<T extends Record<string, any>> implements IEntityRepository<T> {
     private store: T[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    /**
+     * Every query `findMany` received, so a spec can assert the scope a
+     * service appended.
+     */
+    findManyCalls: IQuery[] = [];
+
+    /**
+     * Applies the query's filters (only) through rapiq's in-memory adapter, so
+     * a service's appended scope narrows the result the way the database would.
+     * ponytail: fields/sorts/pagination are not applied; add when a spec needs them.
+     */
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<T>> {
+        this.findManyCalls.push(query);
+        const matches = compileFilters(query.filters);
+        const data = this.store.filter((e) => matches(e));
+
         return {
-            data: [...this.store],
+            data,
             meta: {
-                total: this.store.length,
+                total: data.length,
                 offset: 0,
                 limit: 50,
             },

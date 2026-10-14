@@ -8,7 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import type { MasterImage } from '@privateaim/core-kit';
 import { MasterImageCommand } from '@privateaim/core-kit';
-import { ProcessStatus } from '@privateaim/kit';
+import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import {
     beforeEach,
@@ -24,6 +24,8 @@ import {
 } from '../../helpers/index.ts';
 import { FakeMasterImageBuilderCaller } from './fake-builder-caller.ts';
 import { FakeMasterImageSynchronizerCaller } from './fake-synchronizer-caller.ts';
+
+const READ_PERMISSIONS = [PermissionName.MASTER_IMAGE_READ, PermissionName.MASTER_IMAGE_MANAGE];
 
 function createTestMasterImage(overrides?: Partial<MasterImage>): MasterImage {
     return {
@@ -75,9 +77,17 @@ describe('MasterImageService', () => {
                 createTestMasterImage({ id: 'mi-2' }),
             ]);
 
-            const result = await service.getMany({});
+            const actor = createAllowAllActor();
+            const result = await service.getMany({}, actor);
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
+            expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
+        });
+
+        it('should reject without a read permission', async () => {
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            expect(repository.findManyCalls).toHaveLength(0);
         });
     });
 
@@ -86,12 +96,21 @@ describe('MasterImageService', () => {
             const image = createTestMasterImage({ id: 'mi-1' });
             repository.seed(image);
 
-            const result = await service.getOne('mi-1');
+            const actor = createAllowAllActor();
+            const result = await service.getOne('mi-1', actor);
             expect(result.id).toBe('mi-1');
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
+            expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('nonexistent', createAllowAllActor())).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should reject without a read permission', async () => {
+            repository.seed(createTestMasterImage({ id: 'mi-1' }));
+
+            await expect(service.getOne('mi-1', createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
         });
     });
 

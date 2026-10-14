@@ -31,8 +31,8 @@ export interface IMasterImageBuilderCaller {
 }
 
 export interface IMasterImageService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<MasterImage>>;
-    getOne(id: string, query?: Record<string, any>): Promise<MasterImage>;
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<MasterImage>>;
+    getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<MasterImage>;
     executeCommand(command: `${MasterImageCommand}`, data: Record<string, any>, actor: ActorContext): Promise<MasterImage | undefined>;
     delete(id: string, actor: ActorContext): Promise<MasterImage>;
 }
