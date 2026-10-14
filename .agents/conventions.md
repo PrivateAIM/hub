@@ -565,40 +565,51 @@ Rules:
 - **Protocol, credential, stream and bespoke shapes stay flat** — no envelope. See [architecture.md](architecture.md#response-envelope--query-capability-discovery) for the explicit endpoint list.
 - Hub uses **no** `send()`/`sendCreated()` helpers (only `sendStream` in storage): return the value and set the status via `event.response.status`.
 
-### Repository Field Selection Conventions
+### Field Selection Conventions
 
-Repository adapters define `DEFAULT_FIELDS` (returned by default) and optionally `ALLOWED_FIELDS` (requestable via `?fields=+field_name`). Sensitive columns with `select: false` on the TypeORM entity must be in `ALLOWED_FIELDS` but NOT in `DEFAULT_FIELDS`.
+Field projection is declared on the entity's **rapiq schema**
+(`core/entities/<x>/schema.ts`), not in the repository. `fields.default` is
+what a read returns when the request names no fields; `fields.allowed` is the
+upper bound a client may request with `?fields=…`. The repository only applies
+the decoded query (`decodeQuery(query, { schema })`).
+
+A sensitive column is hidden in two places, and both are required:
+
+- the TypeORM column carries `select: false`, so no read that bypasses the
+  schema (`findOneById`, `findOneBy`, a relation join) ever loads it, and
+  `BaseSubscriber` strips it from published domain events;
+- the schema lists it in `fields.allowed` but **not** in `fields.default`, so
+  it is returned only when explicitly requested.
 
 ```typescript
-// app/modules/database/repositories/registry/repository.ts
-const DEFAULT_FIELDS: ParseAllowedOption<RegistryEntity> = [
-    'id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt',
-];
-
-const ALLOWED_FIELDS: ParseAllowedOption<RegistryEntity> = [
-    ...DEFAULT_FIELDS,
-    'accountSecret',  // select: false on entity — only returned when explicitly requested
-];
-
-// In findMany():
-const fieldsParsed = parseQueryFields<RegistryEntity>(fields, {
-    default: DEFAULT_FIELDS,
-    allowed: ALLOWED_FIELDS,  // NOT DEFAULT_FIELDS — allows opt-in field selection
-    defaultPath: 'registry',
+// core/entities/registry/schema.ts
+export const registrySchema = defineSchema<Registry>({
+    name: DomainType.REGISTRY,
+    fields: {
+        default: ['id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt'],
+        allowed: ['id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt', 'accountSecret'],
+    },
+    // filters / sorts / indexes / pagination …
 });
 ```
 
-When an entity has permission-gated fields, the service's `getMany`/`getOne` methods accept `ActorContext` and check permissions before allowing access:
+Requestable is not the same as permitted. The permission gate lives in the
+**entity service**, which therefore takes an `ActorContext` on its read
+methods, and the controller passes `buildActorContext(event)` for those GETs.
+Two shapes exist today:
 
-```typescript
-// core/entities/registry/service.ts
-async getMany(query: Record<string, any>, actor: ActorContext) {
-    await this.checkSecretFieldAccess(query, actor);
-    return this.repository.findMany(query);
-}
-```
+- **request-side** (`RegistryService.checkSecretFieldAccess`): before the
+  read, collect every `fields` token — strings, arrays and per-relation
+  objects alike — and require `REGISTRY_MANAGE` if any names the secret. The
+  field name is a `satisfies keyof T` constant, so a rename cannot leave a
+  stale string that silently skips the gate.
+- **result-side** (`RegistryProjectService.checkSecretFieldAccess`): after
+  the read, if any returned entity carries the secret, require
+  `REGISTRY_MANAGE` — or let the node's own client through for its own
+  project.
 
-The controller passes `buildActorContext(req)` for GET endpoints on these entities.
+`meta.schema` advertises the static `fields.allowed` list; the actor-dependent
+gate is deliberately not reflected there.
 
 ### Subscriber Conventions
 
