@@ -10,6 +10,7 @@ import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Analysis, AnalysisNode, Node } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
 import type { ActorContext } from '@privateaim/server-kit';
 import { createAllowAllActor } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
@@ -149,6 +150,35 @@ describe('AnalysisClientCredentialService', () => {
         await expect(
             service.getCredentials(ANALYSIS_ID, userActor()),
         ).rejects.toThrow(PermissionDeniedError);
+    });
+
+    it('should deny a manager of another realm', async () => {
+        // ANALYSIS_UPDATE alone is a permission, not a reach: a manager of
+        // realm B must not read realm A's analysis client secret.
+        const { service, reader } = buildService({ analysis: baseAnalysis() });
+
+        const actor = createPermissionActor({
+            realm: { id: randomUUID(), name: 'other-realm' },
+            permissions: [PermissionName.ANALYSIS_UPDATE],
+        });
+
+        await expect(
+            service.getCredentials(ANALYSIS_ID, actor),
+        ).rejects.toThrow(PermissionDeniedError);
+        expect(reader.calls).toHaveLength(0);
+    });
+
+    it('should return credentials for a manager of the analysis realm', async () => {
+        const realmId = randomUUID();
+        const { service } = buildService({ analysis: baseAnalysis({ realmId }) });
+
+        const actor = createPermissionActor({
+            realm: { id: realmId, name: 'analysis-realm' },
+            permissions: [PermissionName.ANALYSIS_UPDATE],
+        });
+
+        const credentials = await service.getCredentials(ANALYSIS_ID, actor);
+        expect(credentials.secret).toBe('the-secret');
     });
 
     it('should reject when the analysis has no client provisioned', async () => {

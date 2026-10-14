@@ -32,8 +32,9 @@ type AnalysisClientCredentialServiceContext = {
 /**
  * Hands the credentials of an analysis' dedicated client to the parties allowed
  * to run it on the node side (plan 010, phase 3 — mechanism A, the pull path).
- * Authorization is fail-closed: only a master-realm member or the node that
- * actually runs the analysis may read the secret.
+ * Authorization is fail-closed: only a manager (ANALYSIS_UPDATE) of the
+ * analysis' realm or the node that actually runs the analysis may read the
+ * secret.
  */
 export class AnalysisClientCredentialService extends AbstractEntityService implements IAnalysisClientCredentialService {
     protected repository: IAnalysisRepository;
@@ -114,8 +115,8 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
     /**
      * Fail-closed: the client of a node that is assigned to this analysis with
      * an APPROVED analysis-node link may always read (the referenced identity);
-     * any other caller must actually hold {@link PermissionName.ANALYSIS_UPDATE}.
-     * Being a master-realm member is, by itself, not sufficient: membership is
+     * any other caller must actually hold {@link PermissionName.ANALYSIS_UPDATE}
+     * and be permitted to write the analysis' realm. Being a master-realm member is, by itself, not sufficient: membership is
      * not a permission.
      */
     protected async isAuthorized(analysis: Analysis, actor: ActorContext): Promise<boolean> {
@@ -133,6 +134,13 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             }
         }
 
-        return holdsPermission(actor, PermissionName.ANALYSIS_UPDATE);
+        // A permission is not a reach: like setCredentials and the node
+        // credential service, a manager must also be permitted to write the
+        // analysis' realm, or one realm's manager reads another realm's secret.
+        if (!await holdsPermission(actor, PermissionName.ANALYSIS_UPDATE)) {
+            return false;
+        }
+
+        return isRealmResourceWritable(actor.realm, analysis.realmId);
     }
 }
