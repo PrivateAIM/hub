@@ -59,7 +59,7 @@ export function collectRootFilterValues(query: IQuery): Record<string, string> {
             // cannot be forwarded faithfully: `and(eq(f,A), eq(f,B))` matches
             // nothing, while last-wins would forward `f=B` — and on the delete
             // path, drop B's logs.
-            if (Object.prototype.hasOwnProperty.call(out, condition.field)) {
+            if (Object.hasOwn(out, condition.field)) {
                 throw new BadRequestError(`The filter field '${condition.field}' may only be specified once here.`);
             }
 
