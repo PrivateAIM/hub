@@ -61,6 +61,12 @@ export class EntityEventHandler implements IEntityEventHandler {
             entity.refId = ctx.metadata.refId;
         }
 
+        // The audited row's realm owns the event, so event reads can be
+        // realm-scoped. Rows without one (master images, …) stay realm-less.
+        if (typeof ctx.data.realmId === 'string') {
+            entity.realmId = ctx.data.realmId;
+        }
+
         const keys : (keyof Event)[] = [
             'actorId',
             'actorType',

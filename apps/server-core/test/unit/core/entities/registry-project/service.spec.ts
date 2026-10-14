@@ -110,7 +110,7 @@ describe('RegistryProjectService', () => {
             const actor = createDenyAllActor();
 
             await expect(service.getMany({}, actor)).rejects.toThrow(PermissionDeniedError);
-            const names = [PermissionName.REGISTRY_PROJECT_READ, PermissionName.REGISTRY_PROJECT_MANAGE];
+            const names = [PermissionName.REGISTRY_PROJECT_READ, PermissionName.REGISTRY_PROJECT_MANAGE, PermissionName.REGISTRY_MANAGE];
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toMatchObject({ name: names });
         });
 

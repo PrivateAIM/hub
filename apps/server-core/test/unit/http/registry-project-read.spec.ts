@@ -41,8 +41,12 @@ describe('registry-project read authorization', () => {
         expect(response.status).toBe(403);
     });
 
-    it('answers 200 for an identity holding the read permission', async () => {
-        const response = await list(await createRestrictedAccessToken([PermissionName.REGISTRY_PROJECT_READ]));
+    it.each([
+        PermissionName.REGISTRY_PROJECT_READ,
+        // registry admins: the same permission already governs the row's secret
+        PermissionName.REGISTRY_MANAGE,
+    ])('answers 200 for an identity holding %s', async (name) => {
+        const response = await list(await createRestrictedAccessToken([name]));
 
         expect(response.status).toBe(200);
     });

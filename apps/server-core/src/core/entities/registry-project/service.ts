@@ -37,7 +37,15 @@ type RegistryProjectServiceContext = {
  */
 const SECRET_FIELD = 'accountSecret' satisfies keyof RegistryProject;
 
-const READ_PERMISSIONS = [PermissionName.REGISTRY_PROJECT_READ, PermissionName.REGISTRY_PROJECT_MANAGE];
+/**
+ * REGISTRY_MANAGE reads too: it already governs this row's secret (below),
+ * the credentials route and the registry admin UI.
+ */
+const READ_PERMISSIONS = [
+    PermissionName.REGISTRY_PROJECT_READ,
+    PermissionName.REGISTRY_PROJECT_MANAGE,
+    PermissionName.REGISTRY_MANAGE,
+];
 
 export class RegistryProjectService extends AbstractEntityService implements IRegistryProjectService {
     protected repository: IRegistryProjectRepository;

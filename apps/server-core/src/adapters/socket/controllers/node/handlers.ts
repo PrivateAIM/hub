@@ -30,8 +30,12 @@ export function registerNodeSocketHandlers(socket: Socket) {
         async (target, cb) => {
             try {
                 await socket.data.permissionEvaluator.preEvaluateOneOf({
+                    // The same grants the HTTP read requires.
                     name: [
+                        PermissionName.NODE_READ,
+                        PermissionName.NODE_CREATE,
                         PermissionName.NODE_UPDATE,
+                        PermissionName.NODE_DELETE,
                     ],
                 });
             } catch {

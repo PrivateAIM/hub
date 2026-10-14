@@ -8,6 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Event } from '@privateaim/telemetry-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
 import { eq } from '@rapiq/core';
 import {
     beforeEach,
@@ -102,7 +103,10 @@ describe('EventService', () => {
             const actor = createAllowAllActor();
             await service.getMany({}, actor);
 
-            expect(actor.permissionEvaluator.preEvaluateOneOfCalls.length).toBeGreaterThan(0);
+            // Pin the one-of: dropping EVENT_DELETE would 403 delete-only roles.
+            const names = [PermissionName.EVENT_READ, PermissionName.EVENT_DELETE];
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0].name).toEqual(names);
+            expect(actor.permissionEvaluator.compileCalls[0].name).toEqual(names);
         });
 
         it('should throw PermissionDeniedError when actor lacks permission', async () => {

@@ -144,7 +144,7 @@ read name **or** any of the entity's write/manage names:
 | master images | `master_image_read`, `master_image_manage` |
 | master image groups | `master_image_group_read`, `master_image_group_manage` |
 | registries | `registry_read`, `registry_manage` |
-| registry projects | `registry_project_read`, `registry_project_manage` |
+| registry projects | `registry_project_read`, `registry_project_manage`, `registry_manage` |
 | events (server-telemetry) | `event_read`, `event_delete` |
 
 A caller holding none of them gets **403** — deliberately, with no fallback.
@@ -156,6 +156,15 @@ a grant carrying a policy Hub cannot turn into a query falls back to the caller'
 own realm. A record read (`GET /<entity>/:id`) applies the same scope, so a row
 out of reach answers 404 exactly like a missing one.
 
+An audit event belongs to the realm of the row it records (a project event to the
+project's realm). Rows without a realm — master images and groups — produce
+realm-less events, visible to `ownOrNull` and `any` grants only. **Events stored
+before this release carry no realm**, so an `own` grant does not see them;
+`ownOrNull` does (and with it every realm's old events).
+
+Realtime follows the same grants: subscribing to node, master-image and
+master-image-group updates requires the read one-of above.
+
 Before upgrading:
 
 - **Provision the new names in your Authup provisioning first.** The built-in
@@ -163,6 +172,8 @@ Before upgrading:
 - Grant `node_read`, `master_image_read` and `master_image_group_read` to every
   role that creates or edits projects or views analyses — project creation lists
   nodes and master images.
+- Grant `registry_read` to roles that manage a node's registry connection
+  (`node_update`): the node's Registry tab lists `/registries` to pick one.
 - The worker's service client (`system`) needs `node_read`, `registry_read` and
   `master_image_read`; `*` covers them once they are provisioned.
 - Node clients receive `node_read` automatically, but only when Hub re-syncs a
@@ -175,9 +186,10 @@ Before upgrading:
   `GET /registry-projects` (narrowed to that one project) and on
   `GET /registry-projects/:id`.
 
-Known gap: relations requested via `include` (e.g.
+Known gaps: relations requested via `include` (e.g.
 `/nodes?include=registryProject`) are not yet gated by the related entity's read
-permission.
+permission, and the registry-project realtime room still broadcasts every realm's
+projects to a subscriber holding `registry_manage` or `registry_project_manage`.
 
 ## Authup upgrade to beta.69
 

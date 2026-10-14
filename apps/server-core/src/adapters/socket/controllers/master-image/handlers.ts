@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildDomainEventFullName } from '@privateaim/kit';
+import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
 import {
     DomainEventSubscriptionName,
     DomainType,
@@ -14,16 +14,36 @@ import {
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
+import { UnauthorizedError } from '@privateaim/errors';
 import {
+    isSocketAuthenticated,
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import type { Socket } from '../../types.ts';
 
 export function registerMasterImageSocketHandlers(socket: Socket) {
+    if (!isSocketAuthenticated(socket)) return;
+
     socket.on(
         buildDomainEventFullName(DomainType.MASTER_IMAGE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
+            // The same grants the HTTP read requires.
+            try {
+                await socket.data.permissionEvaluator.preEvaluateOneOf({
+                    name: [
+                        PermissionName.MASTER_IMAGE_READ,
+                        PermissionName.MASTER_IMAGE_MANAGE,
+                    ],
+                });
+            } catch {
+                if (isEventCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
+
+                return;
+            }
+
             subscribeSocketRoom(socket, buildDomainChannelName(DomainType.MASTER_IMAGE, target));
 
             if (isEventCallback(cb)) {
@@ -35,7 +55,7 @@ export function registerMasterImageSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventFullName(DomainType.MASTER_IMAGE, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.NODE, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.MASTER_IMAGE, target));
         },
     );
 }
