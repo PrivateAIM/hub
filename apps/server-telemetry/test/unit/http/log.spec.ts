@@ -153,12 +153,12 @@ describe('log HTTP endpoints', () => {
             expect(response.status).toBe(400);
         });
 
-        // A negated or disjunctive filter has no label-equality meaning. It used
-        // to be flattened to a bare equality — `!bar` became `foo=bar`, i.e. the
-        // delete hit exactly the logs the caller meant to spare.
+        // Both would otherwise flatten to a bare label equality that deletes
+        // logs the filter does not match: `!bar` became `foo=bar`, and
+        // `labels.foo` + `x.foo` collapsed to one `foo` label, last-wins.
         it.each([
             ['negated', 'filter[foo]=!bar'],
-            ['disjunctive', `filter=${encodeURIComponent("or(eq(foo,'bar'),eq(foo,'baz'))")}`],
+            ['prefix-colliding', 'filter[labels.foo]=bar&filter[x.foo]=baz'],
         ])('should reject a %s filter with 400', async (_label, qs) => {
             const response = await fetch(`${baseURL}/logs?${qs}`, {
                 method: 'DELETE',

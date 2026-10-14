@@ -18,7 +18,9 @@ import {
     isObject,
 } from '@rapiq/core';
 import { eventSchema } from '../entities/event/schema.ts';
-import type { DecodeQueryOptions } from './types.ts';
+import { BadRequestError } from '@privateaim/errors';
+import { collectRootFilterValues } from '@privateaim/server-kit';
+import type { DecodeQueryOptions, LogFilters } from './types.ts';
 
 /**
  * Registry of every entity schema — the server-side allow-list layer.
@@ -86,4 +88,33 @@ export function appendQueryConditions(query: IQuery, ...conditions: ICondition[]
 export function decodeQueryOpen(input: unknown): IQuery {
     const normalized = isObject(input) || typeof input === 'string' ? input : {};
     return queryCodec.decode(normalized) ?? new Query({});
+}
+
+/**
+ * Turn a decoded log query into VictoriaLogs labels. A filter key may carry a
+ * prefix (`labels.refId`), which is stripped, so the uniqueness
+ * `collectRootFilterValues` guarantees for raw keys has to be re-checked on
+ * the FINAL names: `labels.refId` and `x.refId` would otherwise collapse to
+ * one label, last-wins — on the delete path, B's logs for a filter matching
+ * nothing.
+ */
+export function collectLogFilters(query: IQuery, options: { extractTime?: boolean } = {}): LogFilters {
+    const output: LogFilters = { labels: {} };
+
+    for (const [key, value] of Object.entries(collectRootFilterValues(query))) {
+        if (options.extractTime && key === 'time') {
+            output.time = value;
+            continue;
+        }
+
+        const index = key.indexOf('.');
+        const label = index === -1 ? key : key.substring(index + 1);
+        if (Object.hasOwn(output.labels, label)) {
+            throw new BadRequestError(`The filter label '${label}' may only be specified once.`);
+        }
+
+        output.labels[label] = value;
+    }
+
+    return output;
 }

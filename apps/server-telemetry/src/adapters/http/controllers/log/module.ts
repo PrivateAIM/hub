@@ -25,10 +25,9 @@ import {
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware, useRequestPermissionEvaluator } from '@privateaim/server-http-kit';
-import { collectRootFilterValues } from '@privateaim/server-kit';
 import type { IAppEvent } from 'routup';
 import type { LogStore } from '../../../../core/services/log-store/types.ts';
-import { decodeQueryOpen } from '../../../../core/query/index.ts';
+import { collectLogFilters, decodeQueryOpen } from '../../../../core/query/index.ts';
 
 @DTags('logs')
 @DController('/logs')
@@ -77,12 +76,7 @@ export class LogController {
 
         const decoded = decodeQueryOpen(useRequestQuery(event));
 
-        const labels: Record<string, string> = {};
-        for (const [key, value] of Object.entries(collectRootFilterValues(decoded))) {
-            const index = key.indexOf('.');
-            const nextKey = index === -1 ? key : key.substring(index + 1);
-            labels[nextKey] = value;
-        }
+        const { labels } = collectLogFilters(decoded);
 
         const labelKeys = Object.keys(labels);
         if (labelKeys.length === 0) {
@@ -118,22 +112,14 @@ export class LogController {
         const permissionEvaluator = useRequestPermissionEvaluator(event);
         await permissionEvaluator.preEvaluate({ name: PermissionName.LOG_DELETE });
 
+        const { labels, time } = collectLogFilters(decodeQueryOpen(useRequestQuery(event)), { extractTime: true });
+
         let start : number | undefined;
-        const labels : Record<string, string> = {};
-
-        for (const [key, value] of Object.entries(collectRootFilterValues(decodeQueryOpen(useRequestQuery(event))))) {
-            if (key === 'time') {
-                const parsed = Number(value);
-                if (!Number.isFinite(parsed)) {
-                    throw new BadRequestError('Filter time must be a finite unix timestamp.');
-                }
-                start = parsed;
-                continue;
+        if (typeof time !== 'undefined') {
+            start = Number(time);
+            if (!Number.isFinite(start)) {
+                throw new BadRequestError('Filter time must be a finite unix timestamp.');
             }
-
-            const index = key.indexOf('.');
-            const nextKey = index === -1 ? key : key.substring(index + 1);
-            labels[nextKey] = value;
         }
 
         const labelKeys = Object.keys(labels);
