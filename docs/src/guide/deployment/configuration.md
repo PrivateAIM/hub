@@ -28,8 +28,8 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
 - **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
   build.** A command is acknowledged only once its handler finishes. If a build
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the
-  channel and redelivers the command, which now starts a second build rather than
-  being dropped.
+  channel and redelivers the command. A replica still running it ignores the copy,
+  but a redelivery that lands on another worker replica starts a second build.
 - Worker outcome events (started, progress, finished, failed) are applied one at
   a time per server-core replica, and a late `started`/`progress` event no longer
   moves a finished or failed process back to `started`.
