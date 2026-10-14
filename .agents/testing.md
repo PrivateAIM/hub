@@ -112,9 +112,16 @@ dependency is provided one of two ways, decided by env:
 The shared helpers live in `@privateaim/server-test-kit`
 (`src/testcontainers/`, `src/authup-token.ts`, `src/setup.ts`):
 
-- `provideDatabase(project)` — start a PostgreSQL container when no `DB_TYPE` is set,
-  else use the configured database. Publishes the connection to the workers via
-  vitest `provide`.
+- `provideDatabase(project, suite)` — start a PostgreSQL container when no `DB_TYPE` is set,
+  else use the configured server. On mysql/postgres the suite gets its **own**
+  database, `<DB_DATABASE>_<suite>` (`app_core`, `app_storage`, …), dropped and
+  re-created once here in global setup, then published to the workers via vitest
+  `provide`. All four service suites run concurrently against CI's one database
+  server; sharing `app` made every worker's check-then-create `createDatabase`
+  race the other suites (`Key (datname)=(app) already exists`). Workers therefore
+  never create the suite database — only server-core's per-worker
+  `app_core_<pool>` copies, which no other process can name. SQLite is unaffected
+  (in-memory per worker).
 - `provideAuthup(project, permissionNames)` — start an Authup container (unless
   `AUTHUP_URL` is set), provisioned with exactly the permission names the calling
   service checks. Each service passes its own set (`server-storage` 3, `server-telemetry`

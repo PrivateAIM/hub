@@ -46,7 +46,7 @@ async function setup(project: TestProject) {
 
     // Provide a database + Authup instance: an externally configured service
     // (CI) is used as-is, otherwise a testcontainer is started.
-    await provideDatabase(project);
+    await provideDatabase(project, 'telemetry');
     await provideAuthup(project, PERMISSIONS);
 
     const app = new Application({

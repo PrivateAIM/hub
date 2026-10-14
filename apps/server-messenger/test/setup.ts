@@ -15,7 +15,7 @@ async function setup(project: TestProject) {
     // otherwise a testcontainer is started. server-messenger checks no
     // permission names — it authorizes by identity only — so Authup is
     // provisioned with none; it is still required to authenticate at all.
-    await provideDatabase(project);
+    await provideDatabase(project, 'messenger');
     await provideAuthup(project, []);
 
     // create the schema once so the per-test-app synchronizes are no-ops

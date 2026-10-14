@@ -7,6 +7,7 @@
 
 import { inject } from 'vitest';
 import type { TestProject } from 'vitest/node';
+import { buildSuiteDatabaseName, readDatabaseConnectionEnv, recreateDatabase } from '../database/index.ts';
 import { startAuthupContainer, startPostgresContainer } from './containers.ts';
 import { assertAuthupProvisioning } from './provisioning.ts';
 import {
@@ -25,18 +26,36 @@ declare module 'vitest' {
 }
 
 /**
- * Global-setup helper: use an externally provided database when `DB_TYPE` is set,
- * otherwise start a PostgreSQL container. The resolved connection is published to
- * the test workers via `provide` (a `null` connection means "read your inherited
- * env", used for the external case).
+ * Global-setup helper: resolve the database server — the externally configured
+ * one when `DB_TYPE` names a server (CI workflow service, `test:mysql` /
+ * `test:psql`), otherwise a PostgreSQL container — then give the calling suite
+ * its OWN database on it (`<DB_DATABASE>_<suite>`, see
+ * {@link buildSuiteDatabaseName}), dropped and re-created here, once, before any
+ * worker starts. The connection is published to the workers via `provide`, and
+ * applied to this process so the rest of global setup (schema sync) targets it.
+ *
+ * SQLite needs none of this: each worker opens its own in-memory database, so
+ * `null` is published and the workers keep their inherited env.
  */
-export async function provideDatabase(project: TestProject): Promise<void> {
+export async function provideDatabase(project: TestProject, suite: string): Promise<void> {
+    let connection: DatabaseConnection | undefined;
     if (hasDatabaseEnv()) {
-        project.provide('DATABASE_CONNECTION', null);
-        return;
+        connection = readDatabaseConnectionEnv();
+        if (!connection) {
+            project.provide('DATABASE_CONNECTION', null);
+            return;
+        }
+    } else {
+        connection = await startPostgresContainer();
     }
 
-    const connection = await startPostgresContainer();
+    connection = {
+        ...connection,
+        database: buildSuiteDatabaseName(connection.database, suite),
+    };
+
+    await recreateDatabase(connection);
+
     applyDatabaseConnectionEnv(connection);
     project.provide('DATABASE_CONNECTION', connection);
 }

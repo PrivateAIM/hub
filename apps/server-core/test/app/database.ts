@@ -59,13 +59,16 @@ export function createTestDatabaseModule(): IModule {
                         database: `${options.database}_${workerId}`,
                     };
                 }
-            }
 
-            await createDatabase({
-                options,
-                ifNotExist: true,
-                synchronize: false,
-            });
+                // The per-worker database is this worker's alone (the suite's
+                // own `app_core` base, see `provideDatabase`, plus its pool id),
+                // so this check-then-create cannot race another process.
+                await createDatabase({
+                    options,
+                    ifNotExist: true,
+                    synchronize: false,
+                });
+            }
 
             const dataSource = new DataSource(options);
             await dataSource.initialize();
@@ -111,11 +114,6 @@ export function createTestDatabaseModuleForSetup(): IModule {
             const optionsBuilder = new DataSourceOptionsBuilder();
             const options = optionsBuilder.buildWithEnv();
 
-            await createDatabase({
-                options,
-                ifNotExist: true,
-                synchronize: false,
-            });
 
             const dataSource = new DataSource(options);
             await dataSource.initialize();

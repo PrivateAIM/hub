@@ -40,7 +40,7 @@ export type AuthupIntrospectionResult = {
  * setup process to the individual test workers via vitest `provide`/`inject`.
  */
 export type DatabaseConnection = {
-    type: 'postgres',
+    type: 'postgres' | 'mysql',
     host: string,
     port: number,
     username: string,
