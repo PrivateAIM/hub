@@ -9,6 +9,12 @@ import type { ErrorOptions } from '@ebec/core';
 
 export type HubErrorOptions = ErrorOptions & {
     data?: Record<string, any>,
+    /**
+     * The HTTP status to answer, for a code hub's own table does not know
+     * (e.g. an authup error code). Without it the status is derived from the
+     * code via `httpStatusFromCode`.
+     */
+    status?: number,
 };
 
 export type HubErrorInput = string | HubErrorOptions;

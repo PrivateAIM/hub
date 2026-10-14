@@ -16,7 +16,6 @@ import {
     InternalError,
     StorageInsufficientError,
     codeFromHttpStatus,
-    httpStatusFromCode,
     isHubError,
 } from '@privateaim/errors';
 import { isHTTPError } from '@ebec/http';
@@ -30,8 +29,8 @@ import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'v
  * 1. HubError instance                 → returned as-is
  * 2. EntityRelationLookupError         → EntityRelationInvalidError
  * 3. stale authorization catalog       → InternalError
- * 4. any other authup error            → HubError with authup's status
- *    (permission_* → 403, invalid/inactive/expired_token → 401)
+ * 4. any other authup error            → HubError with authup's code and status
+ *    (permission_* → 403, *_token → 401, throttled → 429, upstream → 502)
  * 5. rapiq decode error                → BadRequestError carrying its parse trace
  *    (ParseError covers the per-parameter subclasses, CodecError an unresolvable
  *    codec stamp — both are triggered by wire input; Adapter/Build/Merge/Schema
@@ -41,8 +40,8 @@ import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'v
  * 8. driver error w/ a recognised code → EntityConflictError or StorageInsufficientError
  * 9. anything else                     → InternalError
  *
- * The HTTP-status concern is handled separately by `httpStatusFromCode` in
- * the adapter — this function only assigns a semantic `code`.
+ * The HTTP status is resolved by the adapter: `error.status` when set,
+ * otherwise `httpStatusFromCode(error.code)`.
  */
 export function sanitizeError(input: unknown): HubError {
     if (isHubError(input)) {
@@ -71,21 +70,15 @@ export function sanitizeError(input: unknown): HubError {
     }
 
     // Any other authup error — an evaluator denial (`permission_*`), a dead
-    // bearer forwarded by the auth middleware (`JWTError`: `invalid_token`,
-    // `inactive_token`, `expired_token`), … — answers the status authup itself
-    // assigns it. ABOVE the validup branch for the same reason as the rapiq
-    // branch below: `evaluationFailed` carries the failed policy's issues, so
-    // the validup shape fallback claimed it and the denial answered 400, while
-    // an issue-free authup error fell through to the internal branch and
-    // answered 500. The code is kept verbatim when hub's own table resolves it
-    // to the same status; otherwise it is re-derived from authup's status, so
-    // hub can never answer a different status than authup would.
+    // bearer forwarded by the auth middleware (`JWTError`), a throttle (429),
+    // an upstream failure (502), … — keeps authup's code and answers the
+    // status authup itself assigns it. ABOVE the validup branch for the same
+    // reason as the rapiq branch below: `evaluationFailed` carries the failed
+    // policy's issues, which the validup shape fallback would claim (400).
     if (isAuthupError(input)) {
-        const status = authupHttpStatusFromCode(input.code);
         return new HubError({
-            code: httpStatusFromCode(input.code) === status ?
-                input.code :
-                codeFromHttpStatus(status),
+            code: input.code,
+            status: authupHttpStatusFromCode(input.code),
             message: input.message,
             stack: input.stack,
             issues: input.issues,

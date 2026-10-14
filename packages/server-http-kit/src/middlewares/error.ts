@@ -36,7 +36,7 @@ export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions =
             next = sanitizeError(error);
         }
 
-        const status = httpStatusFromCode(next.code);
+        const status = next.status ?? httpStatusFromCode(next.code);
 
         const payload: ErrorResponsePayload = {
             statusCode: status,

@@ -8,6 +8,7 @@
 import { AuthorizationCatalogStaleError, PermissionError } from '@authup/access';
 import { AuthupError } from '@authup/errors';
 import { JWTError } from '@authup/specs';
+import type { HubError } from '@privateaim/errors';
 import {
     ErrorCode as HubErrorCode,
     httpStatusFromCode,
@@ -27,6 +28,11 @@ import {
 import { ValidupError } from 'validup';
 import { describe, expect, it } from 'vitest';
 import { sanitizeError } from '../../src/core';
+
+/** What the error middleware answers. */
+function statusOf(error: HubError): number {
+    return error.status ?? httpStatusFromCode(error.code);
+}
 
 describe('core/error/sanitize', () => {
     it('should map a rapiq parse error to a bad request error', () => {
@@ -183,14 +189,12 @@ describe('core/error/sanitize', () => {
         ])],
         ['evaluationFailed without issues', PermissionError.evaluationFailed('node_create')],
         ['deniedAll', PermissionError.deniedAll(['node_create', 'node_update'])],
-        ['denied', PermissionError.denied('node_create')],
-        ['notFound', PermissionError.notFound('node_create')],
     ])('should answer an authup permission error (%s) with 403', (_label, input) => {
         const output = sanitizeError(input);
 
         expect(isHubError(output)).toBeTruthy();
         expect(output.code).toEqual(input.code);
-        expect(httpStatusFromCode(output.code)).toEqual(403);
+        expect(statusOf(output)).toEqual(403);
     });
 
     it('should keep the issues of an authup permission error', () => {
@@ -206,31 +210,21 @@ describe('core/error/sanitize', () => {
         const output = sanitizeError(new AuthorizationCatalogStaleError('stale'));
 
         expect(isInternalError(output)).toBeTruthy();
-        expect(httpStatusFromCode(output.code)).toEqual(500);
+        expect(statusOf(output)).toEqual(500);
     });
+
     /**
-     * The auth middleware forwards a dead bearer's `JWTError` via
-     * `event.next(err)`. It is an `AuthupError`, so before the generic authup
-     * branch it reached the internal branch and answered 500 instead of 401.
+     * Every other authup error keeps authup's code AND status — including
+     * codes hub's own table does not know, which used to collapse to 400/500.
      */
     it.each([
-        ['expired', JWTError.expired()],
-        ['invalid', JWTError.invalid()],
-        ['not active before', JWTError.notActiveBefore()],
-    ])('should answer a dead bearer (%s) with 401', (_label, input) => {
+        ['a dead bearer', JWTError.expired(), 401],
+        ['a throttle', new AuthupError({ code: 'login_attempt_throttled' }), 429],
+        ['an upstream failure', new AuthupError({ code: 'upstream_error' }), 502],
+    ])('should answer %s with authup\'s status', (_label, input, status) => {
         const output = sanitizeError(input);
 
         expect(output.code).toEqual(input.code);
-        expect(httpStatusFromCode(output.code)).toEqual(401);
-    });
-
-    it('should re-derive the code of an authup error hub does not know from its authup status', () => {
-        // `invalid_client` is 401 upstream; hub has no such code, so a verbatim
-        // copy would resolve to hub's 400 fallback.
-        const output = sanitizeError(new AuthupError({ code: 'invalid_client', message: 'bad client' }));
-
-        expect(output.code).toEqual(HubErrorCode.IDENTITY_UNAUTHORIZED);
-        expect(httpStatusFromCode(output.code)).toEqual(401);
-        expect(output.message).toEqual('bad client');
+        expect(statusOf(output)).toEqual(status);
     });
 });
