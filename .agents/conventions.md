@@ -626,13 +626,20 @@ what a read returns when the request names no fields; `fields.allowed` is the
 upper bound a client may request with `?fields=…`. The repository only applies
 the decoded query (`decodeQuery(query, { schema })`).
 
-A sensitive column is hidden in two places, and both are required:
+A sensitive column is hidden in three places, and all are required:
 
 - the TypeORM column carries `select: false`, so no read that bypasses the
-  schema (`findOneById`, `findOneBy`, a relation join) ever loads it, and
-  `BaseSubscriber` strips it from published domain events;
+  schema (`findOneById`, `findOneBy`) ever loads it, and `BaseSubscriber`
+  strips it from published domain events;
 - the schema lists it in `fields.allowed` but **not** in `fields.default`, so
-  it is returned only when explicitly requested.
+  it is returned only when explicitly requested;
+- the schema keeps it **root-only** with `createRootOnlyFieldsGate`
+  (`core/query/fields.ts`, rapiq's `fields.validate` hook). A relation fieldset
+  (`include=registry&fields[registry]=+accountSecret`) is selected explicitly by
+  the typeorm adapter, bypassing `select: false`, and never reaches the owning
+  service's gate — so the field is dropped there. `secret-field-gate.spec.ts`
+  derives every `select: false` column from the entity metadata and fails until
+  its schema gates it.
 
 ```typescript
 // core/entities/registry/schema.ts
@@ -641,6 +648,7 @@ export const registrySchema = defineSchema<Registry>({
     fields: {
         default: ['id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt'],
         allowed: ['id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt', 'accountSecret'],
+        validate: createRootOnlyFieldsGate(['accountSecret' satisfies keyof Registry]),
     },
     // filters / sorts / indexes / pagination …
 });
