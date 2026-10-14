@@ -1,26 +1,38 @@
-<a href="https://privateaim.de" target="_blank" rel="noopener noreferrer">
-  <img src="./.github/assets/banner.svg" alt="FLAME Hub — federated analytics across institutions. The data never moves." width="100%">
-</a>
+<p align="center">
+    <a href="https://privateaim.de"><img src="./.github/assets/hero.svg" alt="FLAME Hub" width="128" height="128" /></a>
+</p>
 
-[![CI](https://github.com/PrivateAIM/hub/actions/workflows/main.yml/badge.svg)](https://github.com/PrivateAIM/hub/actions/workflows/main.yml)
-[![CodeQL](https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml/badge.svg)](https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml)
-![node 24](https://img.shields.io/badge/node-24-3c873a?logo=node.js&logoColor=fff)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20701036.svg)](https://doi.org/10.5281/zenodo.20701036)
-[![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE)
+<h1 align="center">FLAME Hub</h1>
 
-A FLAME analysis is a container that travels to the data. Institutions each run a **node**;
-Hub is the centre that decides what runs where — it builds the analysis image, ships it to the
-nodes that joined a project, and collects the results, without ever seeing a row of the
-underlying data.
+<p align="center">
+    <b>Federated analytics across institutions. The data never moves.</b><br>
+    A FLAME analysis is a container that travels to the data. Hub builds the analysis image,<br>
+    ships it to the nodes that joined a project, and collects the results, without ever seeing a row.
+</p>
 
-This monorepo is the central half: five backend services, a Nuxt frontend, 19 shared
-TypeScript libraries, and the documentation site.
+<p align="center">
+    <a href="https://github.com/PrivateAIM/hub/actions/workflows/main.yml"><img src="https://github.com/PrivateAIM/hub/actions/workflows/main.yml/badge.svg" alt="CI" /></a>
+    <a href="https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml"><img src="https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml/badge.svg" alt="CodeQL" /></a>
+    <img src="https://img.shields.io/badge/node-24-3c873a?logo=node.js&logoColor=fff" alt="node 24" />
+    <a href="https://doi.org/10.5281/zenodo.20701036"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.20701036.svg" alt="DOI" /></a>
+    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="license" /></a>
+</p>
 
-**[Documentation](https://hub.docs.privateaim.net)** ·
-[Quick start](#quick-start) ·
-[Services](#services) ·
-[Packages](#packages) ·
-[Contributing](./CONTRIBUTING.md)
+<p align="center">
+    <a href="https://hub.docs.privateaim.net"><b>Documentation</b></a>
+    ·
+    <a href="#quick-start">Quick start</a>
+    ·
+    <a href="#services">Services</a>
+    ·
+    <a href="#packages">Packages</a>
+    ·
+    <a href="./CONTRIBUTING.md">Contributing</a>
+</p>
+
+Institutions each run a **node**; Hub is the centre that decides what runs where. This monorepo
+is the central half: five backend services, a Nuxt frontend, 19 shared TypeScript libraries, and
+the documentation site.
 
 ## Quick start
 
