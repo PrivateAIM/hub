@@ -6,7 +6,6 @@
  */
 
 import { UnauthorizedError } from '@privateaim/errors';
-import { assertIntrospectableToken } from '@privateaim/server-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { createMiddleware } from '@authup/server-adapter-socket-io';
 import type {
@@ -33,15 +32,9 @@ export function createAuthorizationMiddleware(
     const { tokenVerifier } = options;
 
     return createMiddleware({
-        // Refuse a credential that is not structurally a token before it
-        // reaches introspection — see `isIntrospectableToken` for the
-        // credential confusion this closes.
-        tokenVerifier: {
-            verify: async (token, verifyOptions) => {
-                assertIntrospectableToken(token);
-                return tokenVerifier.verify(token, verifyOptions);
-            },
-        },
+        // Built with `createAuthupTokenVerifier`, which refuses malformed
+        // tokens before introspection.
+        tokenVerifier,
         tokenVerifierHandler: (
             socket: Socket,
             data,

@@ -7,7 +7,13 @@
 
 import type { ITokenVerifier } from '@authup/server-adapter-kit';
 import type { Client as RedisClient } from 'redis-extension';
-import type { Client as AuthupClient } from '@authup/core-http-kit';
+import type { Client as AuthupClient, TokenCreator } from '@authup/core-http-kit';
+
+export type AuthTokenVerifierCreateContext = {
+    baseURL?: string,
+    creator: TokenCreator,
+    redisClient?: RedisClient,
+};
 
 export type AuthorizationMiddlewareRegistrationOptions = {
     /**
@@ -16,7 +22,11 @@ export type AuthorizationMiddlewareRegistrationOptions = {
      */
     authupClient?: AuthupClient,
     redisClient?: RedisClient,
-    tokenVerifier?: ITokenVerifier,
+    /**
+     * Build it with `createAuthupTokenVerifier`, which refuses malformed
+     * tokens before introspection.
+     */
+    tokenVerifier: ITokenVerifier,
 
 
     /**
