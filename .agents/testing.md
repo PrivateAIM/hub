@@ -480,6 +480,26 @@ file needs more than one: `import { createFakeClient as createFakeCoreClient } f
 
 When a dependency has no fake yet, create one in the entity's test directory (`test/unit/core/entities/<entity>/`) implementing the port interface.
 
+## UTC & Lock Specs (server-telemetry)
+
+Two specs in `apps/server-telemetry/test/unit/adapters/database/` pin #1900
+against a real server and skip on sqlite (except the lock spec's no-runner
+check):
+
+- `timestamp-timezone.spec.ts` sets the database default to UTC+14
+  (`ALTER DATABASE … SET timezone` / `SET GLOBAL time_zone`, restored in
+  `afterAll`) and the Node process to `Etc/GMT+9` (fixed offset — a DST zone
+  makes the offset assertion seasonal), then checks that a pinned pool reads the
+  true instant and that bound `Date`s bracket it. A control pool built from the
+  raw env options proves the environment really is skewed. On mysql the
+  `SET GLOBAL` is server-wide, so every other suite sharing that server must be
+  pinned too — they are, through the builder.
+- `database-lock.spec.ts` pins mutual exclusion, the timeout and per-name
+  independence of `withDataSourceLock`.
+
+Both were negative-controlled: building `server-db-kit` without the pin / with
+the lock bypassed fails them on mysql and postgres.
+
 ## Migration Tests
 
 The `test` CI job runs the integration suite against MySQL, Postgres, and SQLite, but the schema is built via `dataSource.synchronize()` (see `apps/<service>/test/app/database.ts`) — migration files in `apps/<service>/src/adapters/database/migrations/{mysql,postgres}/` are **not** exercised by that suite.

@@ -115,15 +115,13 @@ async function startAuthupDatabaseContainer(
                 MYSQL_ROOT_PASSWORD: DATABASE_PASSWORD,
                 MYSQL_DATABASE: AUTHUP_DATABASE_NAME,
             })
-            // Wait for the REAL server's TCP listener. The image's entrypoint
-            // first runs a temporary init server (socket only, `port: 0`)
-            // that already logs TWO "ready for connections" lines — mysqld's
-            // and the X Plugin's — so the former `/ready for connections/, 2`
-            // fired during init. Authup then connected while the entrypoint
-            // was restarting mysqld and died at "Creating database..." with
-            // "Can't add new command when connection is in closed state",
-            // never answering `/` (the CI "URL / not accessible" timeouts).
-            .withWaitStrategy(Wait.forLogMessage(new RegExp(`mysqld: ready for connections.*port: ${MYSQL_PORT}\\b`)))
+            // Only the final server listens on 3306. The image's temporary init
+            // server (socket only, `port: 0`) already logs "ready for
+            // connections" TWICE — the X Plugin line and the mysqld line — so
+            // counting bare matches resolved before the restart, and an Authup
+            // that connected in that gap exited for good (it does not retry),
+            // leaving the HTTP wait to time out after STARTUP_TIMEOUT.
+            .withWaitStrategy(Wait.forLogMessage(/mysqld: ready for connections.*port: 3306\s/))
             .withStartupTimeout(STARTUP_TIMEOUT)
             .start();
 

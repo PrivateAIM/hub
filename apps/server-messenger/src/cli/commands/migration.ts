@@ -6,6 +6,7 @@
  */
 
 import { createLogger } from '@privateaim/server-kit';
+import { withDataSourceLock } from '@privateaim/server-db-kit';
 import { defineCommand } from 'citty';
 import path from 'node:path';
 import {
@@ -17,7 +18,7 @@ import {
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
 import { CODE_PATH } from '../../constants.ts';
-import { DataSourceOptionsBuilder } from '../../app/modules/database/index.ts';
+import { DataSourceOptionsBuilder, MIGRATION_DATABASE_LOCK } from '../../app/modules/database/index.ts';
 
 enum MigrationOperation {
     GENERATE = 'generate',
@@ -82,12 +83,18 @@ export function defineCLIMigrationCommand() {
                 try {
                     await dataSource.initialize();
 
-                    if (context.args.operation === MigrationOperation.REVERT) {
-                        await dataSource.undoLastMigration();
-                    } else if (context.args.operation === MigrationOperation.STATUS) {
+                    if (context.args.operation === MigrationOperation.STATUS) {
                         await dataSource.showMigrations();
                     } else {
-                        await dataSource.runMigrations();
+                        // The same mutex a booting replica holds, so a CLI run
+                        // and a replica never apply (or undo) the chain at once.
+                        await withDataSourceLock(dataSource, MIGRATION_DATABASE_LOCK, async () => {
+                            if (context.args.operation === MigrationOperation.REVERT) {
+                                await dataSource.undoLastMigration();
+                            } else {
+                                await dataSource.runMigrations();
+                            }
+                        });
                     }
                 } finally {
                     if (dataSource.isInitialized) {

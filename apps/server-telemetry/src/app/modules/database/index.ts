@@ -6,5 +6,5 @@
  */
 
 export { DatabaseModule } from './module.ts';
-export { DatabaseInjectionKey } from './constants.ts';
+export { DatabaseInjectionKey, MIGRATION_DATABASE_LOCK } from './constants.ts';
 export { DataSourceOptionsBuilder } from './options.ts';
