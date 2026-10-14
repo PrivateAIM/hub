@@ -153,7 +153,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             isPropertySet(validated, 'comment')
         ) {
             if (!isAuthorityOfNode || !canApprove) {
-                throw new BadRequestError(
+                throw new PermissionDeniedError(
                     'You are either no authority of the node or you don\'t have the required permissions.',
                 );
             }
@@ -161,7 +161,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         if (isPropertySet(validated, 'executionStatus')) {
             if (!isAuthorityOfNode || !canUpdate) {
-                throw new BadRequestError(
+                throw new PermissionDeniedError(
                     'You are either no authority of the node or you don\'t have the required permissions.',
                 );
             }
