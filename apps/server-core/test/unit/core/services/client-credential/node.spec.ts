@@ -9,26 +9,23 @@ import { randomUUID } from 'node:crypto';
 import type { Node } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
+import { PermissionName } from '@privateaim/kit';
 import { createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { NodeClientCredentialService } from '../../../../../src/core/services/client-credential/index.ts';
-import type { INodeRepository } from '../../../../../src/core/index.ts';
+import { FakeNodeRepository } from '../../entities/node/fake-repository.ts';
+import { createPermissionActor } from '../../helpers/index.ts';
 import { FakeClientCredentialStore } from './fake-credential-store.ts';
-
-function createNodeRepository(nodes: Partial<Node>[]): INodeRepository {
-    return { findOneById: async (id: string) => nodes.find((n) => n.id === id) ?? null } as unknown as INodeRepository;
-}
 
 /**
  * A logged-in actor that holds NODE_UPDATE but belongs to a specific
  * (non-master) realm — used to exercise the realm-writable gate.
  */
 function realmManagerActor(realmId: string): ActorContext {
-    return {
+    return createPermissionActor({
         realm: { id: realmId, name: realmId },
-        identity: { type: 'user', id: randomUUID() },
-        permissionChecker: { preCheck: async () => { /* permitted */ } },
-    } as unknown as ActorContext;
+        permissions: [PermissionName.NODE_UPDATE],
+    });
 }
 
 /**
@@ -36,19 +33,21 @@ function realmManagerActor(realmId: string): ActorContext {
  * management permission.
  */
 function nodeClientActor(clientId: string): ActorContext {
-    return {
-        realm: { name: 'node-realm' },
+    return createPermissionActor({
+        realm: { id: randomUUID(), name: 'node-realm' },
         identity: { type: 'client', id: clientId },
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    });
 }
 
 const NODE_ID = randomUUID();
 
 function buildService(opts: { node?: Partial<Node>; secret?: string | null }) {
+    const repository = new FakeNodeRepository();
+    if (opts.node) repository.seed(repository.create(opts.node));
+
     const reader = new FakeClientCredentialStore(opts.secret);
     const service = new NodeClientCredentialService({
-        repository: createNodeRepository(opts.node ? [opts.node] : []),
+        repository,
         credentialStore: reader,
     });
     return { service, reader };

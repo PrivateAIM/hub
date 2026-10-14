@@ -14,43 +14,25 @@ import { createAllowAllActor } from '@privateaim/server-test-kit';
 import { PermissionName } from '@privateaim/kit';
 import { describe, expect, it } from 'vitest';
 import { NodeRegistryCredentialService } from '../../../../../src/core/services/registry-credential/index.ts';
-import type {
-    INodeRepository,
-    IRegistryProjectRepository,
-    IRegistryRepository,
-} from '../../../../../src/core/index.ts';
-
-function createNodeRepository(nodes: Partial<Node>[]): INodeRepository {
-    return { findOneById: async (id: string) => nodes.find((n) => n.id === id) ?? null } as unknown as INodeRepository;
-}
-
-function createRegistryRepository(registries: Partial<Registry>[]): IRegistryRepository {
-    return { findOneById: async (id: string) => registries.find((r) => r.id === id) ?? null } as unknown as IRegistryRepository;
-}
-
-function createRegistryProjectRepository(projects: Partial<RegistryProject>[]): IRegistryProjectRepository {
-    return { findOneWithSecret: async (id: string) => projects.find((p) => p.id === id) ?? null } as unknown as IRegistryProjectRepository;
-}
+import { FakeNodeRepository } from '../../entities/node/fake-repository.ts';
+import { FakeRegistryProjectRepository } from '../../entities/registry-project/fake-repository.ts';
+import { FakeRegistryRepository } from '../../entities/registry/fake-repository.ts';
+import { createPermissionActor } from '../../helpers/index.ts';
 
 /**
  * The node's own OAuth2 client — a client-type identity that holds no
  * management permission, in a non-master realm.
  */
 function nodeClientActor(clientId: string): ActorContext {
-    return {
-        realm: { name: 'node-realm' },
+    return createPermissionActor({
+        realm: { id: randomUUID(), name: 'node-realm' },
         identity: { type: 'client', id: clientId },
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    });
 }
 
 function userActor(): ActorContext {
-    return {
-        realm: { name: 'some-realm' },
-        identity: { type: 'user', id: randomUUID() },
-        // A plain user without REGISTRY_MANAGE.
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    // A plain user without REGISTRY_MANAGE.
+    return createPermissionActor({ realm: { id: randomUUID(), name: 'some-realm' } });
 }
 
 /**
@@ -58,11 +40,7 @@ function userActor(): ActorContext {
  * realm membership alone never grants access.
  */
 function masterRealmWithoutPermissionActor(): ActorContext {
-    return {
-        realm: { name: REALM_MASTER_NAME },
-        identity: { type: 'user', id: randomUUID() },
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    return createPermissionActor({ realm: { id: randomUUID(), name: REALM_MASTER_NAME } });
 }
 
 /**
@@ -70,16 +48,10 @@ function masterRealmWithoutPermissionActor(): ActorContext {
  * realm as the node.
  */
 function nodeAdminActor(realmId = 'realm-b'): ActorContext {
-    return {
-        realm: { name: 'node-realm', id: realmId },
-        identity: { type: 'user', id: randomUUID() },
-        permissionChecker: {
-            preCheck: async (input: { name: string }) => {
-                if (input.name === PermissionName.NODE_UPDATE) return;
-                throw new Error('forbidden');
-            },
-        },
-    } as unknown as ActorContext;
+    return createPermissionActor({
+        realm: { id: realmId, name: 'node-realm' },
+        permissions: [PermissionName.NODE_UPDATE],
+    });
 }
 
 const NODE_ID = randomUUID();
@@ -91,10 +63,21 @@ function buildService(opts: {
     registry?: Partial<Registry>;
     registryProject?: Partial<RegistryProject>;
 }) {
+    const repository = new FakeNodeRepository();
+    if (opts.node) repository.seed(repository.create(opts.node));
+
+    const registryRepository = new FakeRegistryRepository();
+    if (opts.registry) registryRepository.seed(registryRepository.create(opts.registry));
+
+    const registryProjectRepository = new FakeRegistryProjectRepository();
+    if (opts.registryProject) {
+        registryProjectRepository.seed(registryProjectRepository.create(opts.registryProject));
+    }
+
     return new NodeRegistryCredentialService({
-        repository: createNodeRepository(opts.node ? [opts.node] : []),
-        registryRepository: createRegistryRepository(opts.registry ? [opts.registry] : []),
-        registryProjectRepository: createRegistryProjectRepository(opts.registryProject ? [opts.registryProject] : []),
+        repository,
+        registryRepository,
+        registryProjectRepository,
     });
 }
 

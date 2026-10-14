@@ -14,49 +14,23 @@ import type { ActorContext } from '@privateaim/server-kit';
 import { createAllowAllActor } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { AnalysisClientCredentialService } from '../../../../../src/core/services/client-credential/index.ts';
-import type {
-    IAnalysisNodeRepository,
-    IAnalysisRepository,
-    INodeRepository,
-} from '../../../../../src/core/index.ts';
+import { FakeAnalysisNodeRepository } from '../../entities/analysis-node/fake-repository.ts';
+import { FakeAnalysisRepository } from '../../entities/analysis/fake-repository.ts';
+import { FakeNodeRepository } from '../../entities/node/fake-repository.ts';
+import { createPermissionActor } from '../../helpers/index.ts';
 import { FakeClientCredentialStore } from './fake-credential-store.ts';
 
-function createAnalysisRepository(analyses: Partial<Analysis>[]): IAnalysisRepository {
-    return { findOneById: async (id: string) => analyses.find((a) => a.id === id) ?? null } as unknown as IAnalysisRepository;
-}
-
-function createNodeRepository(nodes: Partial<Node>[]): INodeRepository {
-    return {
-        findOneBy: async (where: Record<string, any>) => nodes.find(
-            (n) => n.clientId === where.clientId,
-        ) ?? null,
-    } as unknown as INodeRepository;
-}
-
-function createAnalysisNodeRepository(analysisNodes: Partial<AnalysisNode>[]): IAnalysisNodeRepository {
-    return {
-        findOneBy: async (where: Record<string, any>) => analysisNodes.find(
-            (an) => an.analysisId === where.analysisId && an.nodeId === where.nodeId,
-        ) ?? null,
-    } as unknown as IAnalysisNodeRepository;
-}
-
 function nodeClientActor(clientId: string): ActorContext {
-    return {
-        realm: { name: 'node-realm' },
+    // A node client has no analysis-management permission.
+    return createPermissionActor({
+        realm: { id: randomUUID(), name: 'node-realm' },
         identity: { type: 'client', id: clientId },
-        // A node client has no analysis-management permission.
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    });
 }
 
 function userActor(): ActorContext {
-    return {
-        realm: { name: 'some-realm' },
-        identity: { type: 'user', id: randomUUID() },
-        // A plain user without ANALYSIS_UPDATE.
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    // A plain user without ANALYSIS_UPDATE.
+    return createPermissionActor({ realm: { id: randomUUID(), name: 'some-realm' } });
 }
 
 /**
@@ -64,11 +38,7 @@ function userActor(): ActorContext {
  * realm membership alone never grants access.
  */
 function masterRealmWithoutPermissionActor(): ActorContext {
-    return {
-        realm: { name: REALM_MASTER_NAME },
-        identity: { type: 'user', id: randomUUID() },
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    return createPermissionActor({ realm: { id: randomUUID(), name: REALM_MASTER_NAME } });
 }
 
 const ANALYSIS_ID = randomUUID();
@@ -80,11 +50,20 @@ function buildService(opts: {
     analysisNodes?: Partial<AnalysisNode>[];
     secret?: string | null;
 }) {
+    const repository = new FakeAnalysisRepository();
+    if (opts.analysis) repository.seed(repository.create(opts.analysis));
+
+    const nodeRepository = new FakeNodeRepository();
+    nodeRepository.seed((opts.nodes || []).map((node) => nodeRepository.create(node)));
+
+    const analysisNodeRepository = new FakeAnalysisNodeRepository();
+    analysisNodeRepository.seed((opts.analysisNodes || []).map((entity) => analysisNodeRepository.create(entity)));
+
     const reader = new FakeClientCredentialStore(opts.secret);
     const service = new AnalysisClientCredentialService({
-        repository: createAnalysisRepository(opts.analysis ? [opts.analysis] : []),
-        nodeRepository: createNodeRepository(opts.nodes || []),
-        analysisNodeRepository: createAnalysisNodeRepository(opts.analysisNodes || []),
+        repository,
+        nodeRepository,
+        analysisNodeRepository,
         credentialStore: reader,
     });
     return { service, reader };
