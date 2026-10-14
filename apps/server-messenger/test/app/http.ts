@@ -8,10 +8,10 @@
 import { Client } from '@privateaim/messenger-http-kit';
 import type { IMessengerClient } from '@privateaim/messenger-http-kit';
 import {
-    ConfigInjectionKey,
     createAuthupClientAuthenticationHook,
     createAuthupUserTokenCreator,
 } from '@privateaim/server-kit';
+import { ConfigInjectionKey } from '../../src/app/modules/config/index.ts';
 import type { HTTPServer } from '../../src/app/modules/http/constants.ts';
 import { HTTPInjectionKey } from '../../src/app/modules/http/index.ts';
 import { TestApplication } from './module.ts';
