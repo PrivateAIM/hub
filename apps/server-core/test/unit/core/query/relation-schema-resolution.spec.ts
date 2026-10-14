@@ -53,6 +53,17 @@ describe('relation schema resolution', () => {
             expect(filterFields(query)).toContain('analysis.name');
         });
 
+        it('resolves a related analysis clientId filter through schemaMapping', () => {
+            // Node services hold the analysis container's Authup client id
+            // (the token's `sub`), not the analysis id — `filter[analysis.clientId]`
+            // is how they find the analysis a token belongs to.
+            const query = decodeQuery(
+                { filter: { 'analysis.clientId': '6d2ddc5e-8f7a-4f6e-9c0b-2c1e6f1c9a3b' }, include: 'analysis' },
+                { schema: analysisNodeSchema },
+            );
+            expect(filterFields(query)).toContain('analysis.clientId');
+        });
+
         it('resolves a related node filter through schemaMapping', () => {
             const query = decodeQuery(
                 { filter: { 'node.name': 'bar' }, include: 'node' },
