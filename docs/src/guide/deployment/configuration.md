@@ -74,7 +74,7 @@ Authup deployment Hub runs against:
 
 ## Database Variables
 
-Used by `server-core`, `server-storage`, and `server-telemetry`:
+Used by `server-core`, `server-storage`, `server-telemetry`, and `server-messenger`:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -101,6 +101,64 @@ Use SQLite only for tests and throwaway/in-memory (`:memory:`) instances. For an
 database you intend to keep, use MySQL or PostgreSQL. To carry an existing SQLite
 database across a schema change, export its data and re-import it into a freshly
 created database.
+
+### Timestamps are stamped and read in UTC
+
+On MySQL and PostgreSQL every Hub service pins its database sessions to UTC
+(`time_zone` on MySQL, `TimeZone` on PostgreSQL), reads the zone-less
+`created_at` / `updated_at` columns back as UTC, and binds `Date` parameters in
+UTC — whatever timezone the database server or the host running Hub is set to.
+The same pin applies to the `migration` CLI. There is nothing to configure, and
+`DB_PIN_TIMEZONE` is not needed. A database and host already running in UTC (the
+container image sets no `TZ`) see no change.
+
+Before, the database stamped these columns in its session timezone, the driver
+read them in the process timezone, and the messenger's expiry sweep compared
+its `expires_at` column against a `Date` bound in the process timezone, so the
+three only agreed when every clock ran in UTC.
+
+**If the database itself ran in local time**, rows it stamped before this
+upgrade hold local wall-clock values and now read as UTC, shifted by that offset.
+Rows written afterwards are correct. Check the database's zone before upgrading:
+
+```sql
+-- PostgreSQL
+SHOW timezone;
+-- MySQL
+SELECT @@global.time_zone, @@system_time_zone;
+```
+
+If it is not UTC and the historical values matter, convert them once after the
+upgrade, per table and column, with the zone the database used:
+
+```sql
+-- PostgreSQL
+UPDATE events SET created_at = (created_at AT TIME ZONE 'Europe/Berlin') AT TIME ZONE 'UTC';
+-- MySQL (needs the server's time zone tables loaded)
+UPDATE events SET created_at = CONVERT_TZ(created_at, 'Europe/Berlin', '+00:00');
+```
+
+A database setting that contradicts the pin stops the boot with an error naming
+it: a MySQL `timezone` other than UTC, a MySQL `dateStrings` or `typeCast`, or a
+PostgreSQL `TimeZone` other than UTC in the driver's startup `options` (e.g. via
+`DB_DRIVER_EXTRA`). Remove it — half a pin would shift values instead of fixing
+them. A MySQL replication setup is refused the same way for now, since its
+per-connection session cannot be pinned yet.
+
+### Replicas and boot-time migrations
+
+Each service applies pending migrations when it starts. On MySQL and PostgreSQL
+it now does so while holding a database lock named after the service
+(`server-core:migration`, `server-storage:migration`, …), so replicas that start
+at the same time apply the chain once: one runs it, the others wait and then
+find nothing pending. The `migration run` / `migration revert` CLI commands take
+the same lock, so a migration job and a booting replica cannot overlap either.
+server-core's Harbor registry setup (`HARBOR_URL`) is serialized the same way.
+
+A replica that cannot get the lock within 60 seconds fails its boot instead of
+migrating unlocked; the orchestrator restarts it, and by then the chain has been
+applied. Each lock holds one pooled connection while the migration runs on
+another, so the connection pool needs at least two connections.
 
 ## Storage Variables (server-storage)
 

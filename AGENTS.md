@@ -165,6 +165,8 @@ Modernization and refactoring plans:
     Verified: full round-trip (`run` → `revert` × N → `run`) plus drift gate green on all four services × mysql/postgres; all three service suites green; build green.
 
 
+25. typeorm-extension 4.2.0 adoption (#1900, port of authup #3652) — Implemented. `DataSourceOptionsBuilder` (`server-db-kit`) ends with `pinTimezone(options, 'UTC')`, so boot, the migration CLI and the test apps all stamp, read and bind zone-less timestamps in UTC; a contradicting driver setting fails the boot with an `OptionsError`. `withDataSourceLock` (`server-db-kit`) wraps typeorm-extension's `withDatabaseLock` around each service's boot migration and the CLI `run`/`revert` (`'server-<x>:migration'`) and server-core's Harbor setup (`'server-core:harbor-setup'`, find-then-insert). It checks for `better-sqlite3` before creating a runner (that driver shares ONE runner) instead of passing `strict: false`, and times out after 60 s rather than running unlocked. Pinned by `apps/server-telemetry/test/unit/adapters/database/{timestamp-timezone,database-lock}.spec.ts`, both negative-controlled on mysql + postgres. Operator notes (local-time databases, conversion SQL, lock behaviour) in [configuration.md](docs/src/guide/deployment/configuration.md#timestamps-are-stamped-and-read-in-utc); details in [conventions.md](.agents/conventions.md#utc-timestamps--boot-locks).
+
 ## Commits, Issues & Pull Requests
 
 - Commits follow **[Conventional Commits](https://www.conventionalcommits.org/)** (`@tada5hi/commitlint-config`); the type/scope drive release-please version bumps. See [conventions.md](.agents/conventions.md#commit-convention).

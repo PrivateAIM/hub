@@ -304,6 +304,30 @@ Adopted from authup — see [authup-conventions.md](references/authup-convention
   `nodes.registry_project_id` and `analyses.registry_id` all had to be corrected
   from cascade to set-null for this reason.
 
+### UTC Timestamps & Boot Locks
+
+`DataSourceOptionsBuilder` (`server-db-kit`) ends with typeorm-extension's
+`pinTimezone(options, 'UTC')`, so every path that builds options — boot, the
+`migration` CLI, the test apps — pins the session timezone, the reader and the
+`Date` writer (#1900). Never build a production `DataSource` from options that
+bypass the builder, or the zone-less `created_at`/`updated_at` columns are
+stamped and read in different zones again. A conflicting setting (non-UTC mysql
+`timezone`, `dateStrings`, `typeCast`, a postgres `TimeZone`) throws an
+`OptionsError` at boot by design; pinning only the read side was rejected
+upstream because it shifts every value on a local-time database.
+
+Every boot pass that must not run twice at once goes through
+`withDataSourceLock(dataSource, name, fn)`: each `DatabaseModule`'s migration
+run and the matching CLI `run`/`revert` hold `MIGRATION_DATABASE_LOCK`
+(`'server-<x>:migration'`, in each service's `app/modules/database/constants.ts`),
+and server-core's Harbor setup holds `HARBOR_SETUP_DATABASE_LOCK` (it is
+find-then-insert on the `default` registry). The helper checks for
+`better-sqlite3` **before** creating a query runner — that driver hands out ONE
+shared runner, so releasing it would pull it from under whatever else uses it;
+do not "simplify" this to `strict: false`. Lock names are part of the
+deployment contract: a renamed lock is a different mutex, so an outgoing and an
+incoming replica would not wait for each other during a rolling upgrade.
+
 ### Table Naming
 
 Table names are **plural** and snake_case: `nodes`, `projects`, `registries`,
