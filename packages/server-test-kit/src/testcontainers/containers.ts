@@ -79,6 +79,14 @@ const AUTHUP_DATABASE_NAME = 'authup';
 const STARTUP_TIMEOUT = 180_000;
 
 /**
+ * How many trailing Authup log lines a failed start reports. A startup timeout
+ * from the wait strategy says only that `/` never answered; the container's own
+ * output (a crashed migration, an unreachable database) is the cause, and it is
+ * gone once testcontainers removes the container.
+ */
+const AUTHUP_LOG_TAIL = 80;
+
+/**
  * Containers started during global setup, stopped in {@link stopTestContainers}.
  */
 const containers: StartedTestContainer[] = [];
@@ -107,7 +115,15 @@ async function startAuthupDatabaseContainer(
                 MYSQL_ROOT_PASSWORD: DATABASE_PASSWORD,
                 MYSQL_DATABASE: AUTHUP_DATABASE_NAME,
             })
-            .withWaitStrategy(Wait.forLogMessage(/ready for connections/, 2))
+            // Wait for the REAL server's TCP listener. The image's entrypoint
+            // first runs a temporary init server (socket only, `port: 0`)
+            // that already logs TWO "ready for connections" lines — mysqld's
+            // and the X Plugin's — so the former `/ready for connections/, 2`
+            // fired during init. Authup then connected while the entrypoint
+            // was restarting mysqld and died at "Creating database..." with
+            // "Can't add new command when connection is in closed state",
+            // never answering `/` (the CI "URL / not accessible" timeouts).
+            .withWaitStrategy(Wait.forLogMessage(new RegExp(`mysqld: ready for connections.*port: ${MYSQL_PORT}\\b`)))
             .withStartupTimeout(STARTUP_TIMEOUT)
             .start();
 
@@ -175,26 +191,47 @@ export async function startAuthupContainer(
         builder = builder.withNetwork(network);
     }
 
-    const container = await builder
-        .withEnvironment({
-            NODE_ENV: 'development',
-            PROVISIONING_DIRECTORY_PATH: AUTHUP_PROVISIONING_DIRECTORY,
-            CLIENT_SYSTEM_ENABLED: 'true',
-            CLIENT_SYSTEM_SECRET: 'start123',
-            CLIENT_SYSTEM_SECRET_RESET: 'true',
-            USER_ADMIN_PASSWORD: 'start123',
-            USER_ADMIN_PASSWORD_RESET: 'true',
-            ...resolvedDatabaseEnv,
-        })
-        .withCopyContentToContainer([
-            {
-                content: buildAuthupProvisioningModule(permissionNames),
-                target: AUTHUP_PROVISIONING_TARGET,
-            },
-        ])
-        .withWaitStrategy(Wait.forHttp('/', AUTHUP_PORT).forStatusCode(200))
-        .withStartupTimeout(STARTUP_TIMEOUT)
-        .start();
+    const logs: string[] = [];
+
+    builder = builder.withLogConsumer((stream) => {
+        stream.on('data', (line: Buffer | string) => {
+            logs.push(`${line}`.trimEnd());
+            if (logs.length > AUTHUP_LOG_TAIL) {
+                logs.shift();
+            }
+        });
+    });
+
+    let container: StartedTestContainer;
+    try {
+        container = await builder
+            .withEnvironment({
+                NODE_ENV: 'development',
+                PROVISIONING_DIRECTORY_PATH: AUTHUP_PROVISIONING_DIRECTORY,
+                CLIENT_SYSTEM_ENABLED: 'true',
+                CLIENT_SYSTEM_SECRET: 'start123',
+                CLIENT_SYSTEM_SECRET_RESET: 'true',
+                USER_ADMIN_PASSWORD: 'start123',
+                USER_ADMIN_PASSWORD_RESET: 'true',
+                ...resolvedDatabaseEnv,
+            })
+            .withCopyContentToContainer([
+                {
+                    content: buildAuthupProvisioningModule(permissionNames),
+                    target: AUTHUP_PROVISIONING_TARGET,
+                },
+            ])
+            .withWaitStrategy(Wait.forHttp('/', AUTHUP_PORT).forStatusCode(200))
+            .withStartupTimeout(STARTUP_TIMEOUT)
+            .start();
+    } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        throw new Error(
+            `The Authup container (${AUTHUP_IMAGE}) did not become ready: ${message}\n` +
+            `--- last ${logs.length} Authup log lines ---\n${logs.join('\n')}`,
+            { cause: e },
+        );
+    }
 
     containers.push(container);
 
