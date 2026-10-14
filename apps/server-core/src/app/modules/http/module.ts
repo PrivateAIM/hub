@@ -10,6 +10,7 @@ import type { IModule, ModuleDependency } from 'orkos';
 import type { Server } from 'node:http';
 import { App, serve } from 'routup';
 import {
+    AUTHUP_CLIENT_MODULE_NAME,
     AuthupClientInjectionKey,
     EnvironmentName,
     LoggerInjectionKey,
@@ -43,12 +44,18 @@ export class HTTPModule implements IModule {
      * accident of graph depth (`telemetryClient` depends on `config` alone,
      * while `http` waits on `analysis`) — which would break silently if either
      * module's dependencies changed.
+     *
+     * `authupClient` is declared OPTIONAL for the same reason: this module
+     * `tryResolve`s the Authup client to mount the authorization middleware
+     * (HTTP and socket), and that middleware fails CLOSED without one — every
+     * route answers 401, every socket is refused, with no startup error.
      */
     readonly dependencies: (string | ModuleDependency)[] = [
         'config',
         'database',
         'analysis',
         { name: 'telemetryClient', optional: true },
+        { name: AUTHUP_CLIENT_MODULE_NAME, optional: true },
     ];
 
     private options: HTTPModuleOptions;
