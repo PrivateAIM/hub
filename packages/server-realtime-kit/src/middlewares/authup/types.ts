@@ -13,6 +13,5 @@ export type AuthorizationMiddlewareRegistrationOptions = {
     tokenVerifier: TokenVerifier,
     authupClient?: IClient,
     baseURL?: string,
-    fakeAbilities?: boolean,
     logger?: Logger,
 };

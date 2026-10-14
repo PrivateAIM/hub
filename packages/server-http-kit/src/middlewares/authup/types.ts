@@ -10,11 +10,14 @@ import type { Client as RedisClient } from 'redis-extension';
 import type { Client as AuthupClient } from '@authup/core-http-kit';
 
 export type AuthorizationMiddlewareRegistrationOptions = {
+    /**
+     * Required to authenticate anything: without it the middleware attaches
+     * no identity, so every `ForceLoggedInMiddleware` route answers 401.
+     */
     authupClient?: AuthupClient,
     redisClient?: RedisClient,
     tokenVerifier?: ITokenVerifier,
 
-    dryRun?: boolean,
 
     /**
      * Namespace prefixed onto the cookie-fallback token lookup

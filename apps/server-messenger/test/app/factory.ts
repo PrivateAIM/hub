@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { LoggerModule } from '@privateaim/server-kit';
+import { AuthupClientModule, AuthupHookModule, LoggerModule } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
 import { ConfigModule } from '../../src/app/modules/config/index.ts';
 import { WakeupModule } from '../../src/app/modules/wakeup/index.ts';
@@ -29,6 +29,8 @@ export function createTestApplication(): TestHTTPApplication {
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
+        new AuthupHookModule(),
+        new AuthupClientModule(),
         createTestDatabaseModule(),
         new WakeupModule(),
         new HTTPModule(),

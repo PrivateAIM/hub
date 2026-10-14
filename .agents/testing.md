@@ -94,9 +94,14 @@ Each test application wires the same DI modules as production but uses `createTe
 
 ## Testcontainers & Always-On Authup
 
-The HTTP-facing services (`server-core`, `server-storage`, `server-telemetry`) run
-their suites against a **real Authup instance** and a **real database**, and the
-authorization middleware **actually enforces** permissions (no `dryRun`). Each
+The HTTP-facing services (`server-core`, `server-storage`, `server-telemetry`,
+`server-messenger`) run their suites against a **real Authup instance** and a
+**real database**, and the authorization middleware **actually enforces**
+permissions (`dryRun` and the no-Authup fake identity are gone from the kits
+entirely — without Authup a request gets no identity and answers 401).
+server-messenger provisions **no** permission names (it authorizes by identity
+only) and uses `createRestrictedAccessToken()` to mint distinct users for its
+mailbox-isolation spec. Each
 dependency is provided one of two ways, decided by env:
 
 | Dependency | External (used as-is)             | Otherwise (testcontainer)          |

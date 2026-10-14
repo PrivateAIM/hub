@@ -68,7 +68,6 @@ export class HTTPModule implements IModule {
                 redisClient: redisResult.success ?
                     redisResult.data :
                     undefined,
-                dryRun: isTestEnvironment,
                 cookiePrefix: config.cookiePrefix,
                 tokenVerifier: createAuthupTokenVerifier({
                     baseURL: config.authupURL,

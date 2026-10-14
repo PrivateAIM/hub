@@ -53,6 +53,29 @@ for existing databases that used local time. Beta.68 quotes newly serialized
 strings; Hub's text transformer reads both these and legacy unquoted messenger
 payloads, so no Hub data migration is needed.
 
+## server-messenger authenticates against Authup
+
+**Breaking.** server-messenger now verifies every REST request and socket
+connection against Authup, like the other services. Before, its REST surface
+never registered an Authup client and attached one fixed master-realm user to
+**every** request: no token was needed, and every caller read and acknowledged
+the same mailbox. Treat any message stored by an affected version as exposed.
+
+What an operator must do:
+
+- Grant the messenger's service client (`CLIENT_ID`, default `system`)
+  `permission_read`, with the same `realmScope` guidance as in
+  [Authup upgrade to beta.68](#authup-upgrade-to-beta-68) — every authenticated
+  request reads the authorization catalog. The built-in `system` client already
+  has it.
+- Make sure `AUTHUP_URL`, `CLIENT_ID` and `CLIENT_SECRET` are set for the
+  messenger. Every Hub service now fails closed without Authup: no identity is
+  attached, so every authenticated route answers 401 and every socket
+  connection is refused. The previous no-Authup fallback (a fixed master-realm
+  user, plus a `dryRun` mode that granted every permission) is removed.
+- Callers (nodes) must send a bearer token on every request, including the
+  `GET /messages/stream` SSE stream.
+
 ## Authup upgrade to beta.69
 
 Hub now requires Authup `1.0.0-beta.69`, a security release. Read the

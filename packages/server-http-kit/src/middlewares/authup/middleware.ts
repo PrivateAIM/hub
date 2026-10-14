@@ -10,20 +10,18 @@ import { useRequestCookie } from '@routup/basic/cookie';
 import type { App } from 'routup';
 import { defineCoreHandler } from 'routup';
 import type { AuthorizationMiddlewareRegistrationOptions } from './types.ts';
-import { applyTokenVerificationData, createFakeTokenVerificationData, resolveAccessTokenCookieName } from './utils.ts';
+import { applyTokenVerificationData, resolveAccessTokenCookieName } from './utils.ts';
 
 export function mountAuthorizationMiddleware(
     app: App,
     options: AuthorizationMiddlewareRegistrationOptions,
 ) {
-    if (!options.authupClient) {
-        const data = createFakeTokenVerificationData();
-
-        app.use(defineCoreHandler(async (event) => {
-            await applyTokenVerificationData(event, data, options.dryRun, options.authupClient);
-            return event.next();
-        }));
-
+    // Fail closed. Without an Authup client no request can be verified, so
+    // none is attached an identity and `ForceLoggedInMiddleware` answers 401.
+    // There used to be a fallback that attached a fixed master-realm user to
+    // EVERY request instead — server-messenger ran on it in production.
+    const { authupClient } = options;
+    if (!authupClient) {
         return;
     }
 
@@ -42,7 +40,7 @@ export function mountAuthorizationMiddleware(
             });
 
             if (data) {
-                await applyTokenVerificationData(event, data, options.dryRun, options.authupClient);
+                await applyTokenVerificationData(event, data, authupClient);
             }
         } catch (err) {
             return event.next(err);

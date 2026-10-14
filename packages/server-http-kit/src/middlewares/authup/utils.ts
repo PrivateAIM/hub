@@ -6,15 +6,11 @@
  */
 
 import { unwrapOAuth2Scope } from '@authup/specs';
-import type { IPermissionProvider } from '@authup/access';
-import { PermissionEvaluator, PermissionMemoryProvider } from '@authup/access';
-import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { IClient } from '@authup/core-http-kit';
 import { createAuthupPermissionEvaluator, resolveAuthupPolicySubject } from '@privateaim/server-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import type { IAppEvent } from 'routup';
 import { RequestPermissionChecker, setRequestEnv } from '../../request/index.ts';
-import { FakePermissionProvider } from './permission-provider.ts';
 
 type TokenVerificationDataMinimal = Pick<
     TokenVerificationData,
@@ -37,49 +33,24 @@ export function resolveAccessTokenCookieName(prefix?: string): string {
     return `${prefix ?? ''}access_token`;
 }
 
-export function createFakeTokenVerificationData(): TokenVerificationDataMinimal {
-    return {
-        realm_id: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
-        realm_name: REALM_MASTER_NAME,
-
-        sub_kind: 'user',
-        sub: 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee',
-
-        permissions: [],
-    };
-}
-
 export async function applyTokenVerificationData(
     event: IAppEvent,
     data: TokenVerificationDataMinimal,
-    fakeAbilities?: boolean,
-    authupClient?: IClient,
+    authupClient: IClient,
 ) {
-    let repository : IPermissionProvider;
-    if (fakeAbilities) {
-        repository = new FakePermissionProvider();
-    } else {
-        repository = new PermissionMemoryProvider([]);
-    }
-
     const scopes = unwrapOAuth2Scope(data.scope || []);
 
-    const permissionEvaluator = authupClient && !fakeAbilities ?
-        await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject({
-            scopes,
-            grants: data.permissions,
-            identity: {
-                id: data.sub,
-                type: data.sub_kind,
-                realmId: data.realm_id,
-                realmName: data.realm_name,
-                clientId: data.sub_kind === 'client' ? data.sub : null,
-            },
-        })) : new PermissionEvaluator({
-            provider: repository,
-            realmId: null,
-            clientId:null,
-        });
+    const permissionEvaluator = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject({
+        scopes,
+        grants: data.permissions,
+        identity: {
+            id: data.sub,
+            type: data.sub_kind,
+            realmId: data.realm_id,
+            realmName: data.realm_name,
+            clientId: data.sub_kind === 'client' ? data.sub : null,
+        },
+    }));
     const requestPermissionChecker = new RequestPermissionChecker(permissionEvaluator);
     setRequestEnv(event, 'permissionChecker', requestPermissionChecker);
 

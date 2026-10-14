@@ -11,6 +11,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
     test: {
         globalSetup: ['test/setup'],
+        setupFiles: ['reflect-metadata', '@privateaim/server-test-kit/setup'],
         include: ['test/unit/**/*.spec.ts'],
     },
     plugins: [swc.vite()],
