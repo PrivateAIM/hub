@@ -30,13 +30,16 @@ request; there is no fallback to permission names. Catalogs are not cached acros
 requests. Existing token-introspection caching and socket-session lifetimes still
 apply, so changes to grants are visible when those are refreshed.
 
-Grants are only evaluated for tokens carrying the `global` scope, as in Authup
-itself. A token issued without it (e.g. a custom login client registered without
-`global`) still authenticates, but every **permission** check denies with 403.
-The gate withholds the identity from the permission evaluator only: paths that
-authorize by identity rather than by permission — a node or analysis client
+Scope restricts what a caller can do, not who it is. Grants are only evaluated
+for tokens carrying the `global` scope; a token issued without it (e.g. a custom
+login client registered without `global`) still authenticates and keeps its
+identity, but is evaluated with **no grants**, so every permission check denies
+with 403. Policies that read the identity still see the real caller, and paths
+that authorize by identity rather than by permission — a node or analysis client
 reading its own credentials, the messenger mailbox, bucket ownership, realm
-socket rooms — still honour such a token.
+socket rooms — still honour such a token. (Authup itself currently drops the
+identity for such a token; a change to match this behaviour is being proposed
+upstream.)
 client-ui requests `global openid`, and Authup's client-credentials and password
 grants always issue `global`.
 

@@ -85,16 +85,17 @@ describe('Authup authorization catalog', () => {
             await expect(evaluator.preEvaluate({ name: 'node_update' })).resolves.toBeUndefined();
         });
 
-        // authup withholds the identity unless the token carries `global`;
-        // hub used to pass it unconditionally, so a narrowly-scoped token was
+        // Scope restricts what the caller can do, never who it is: a token
+        // without `global` keeps its identity but gets NO grants. Hub used to
+        // pass the grants unconditionally, so a narrowly-scoped token was
         // evaluated with its full grants.
-        it('withholds the identity and grants for a token without global scope', async () => {
+        it('keeps the identity but withholds the grants for a token without global scope', async () => {
             const subject = resolveAuthupPolicySubject({
-                scopes: ['openid'], 
-                identity, 
-                grants, 
+                scopes: ['openid'],
+                identity,
+                grants,
             });
-            expect(subject).toEqual({});
+            expect(subject).toEqual({ identity, grants: [] });
 
             const evaluator = await createAuthupPermissionEvaluator(client(), subject);
             // A permission DENIAL specifically (answered 403), not just any
@@ -103,12 +104,51 @@ describe('Authup authorization catalog', () => {
             expect(isPermissionError(error)).toBe(true);
         });
 
-        it('withholds the identity for a token without any scope', () => {
+        it('keeps the identity for a token without any scope', () => {
             expect(resolveAuthupPolicySubject({
-                scopes: [], 
-                identity, 
-                grants, 
-            })).toEqual({});
+                scopes: [],
+                identity,
+                grants,
+            })).toEqual({ identity, grants: [] });
+        });
+
+        // A definition whose only policy READS the identity (no binding
+        // policy) must evaluate against the real caller. Had the identity been
+        // removed along with the grants, the identity policy would see nobody
+        // and deny a user the definition explicitly admits.
+        it('evaluates an identity-only policy against the real identity of a non-global token', async () => {
+            const identityCatalog: AuthorizationCatalog = {
+                permissions: [{
+                    name: 'user_only',
+                    realm_id: null,
+                    client_id: null,
+                    decision_strategy: null,
+                    policies: ['users'],
+                }],
+                policies: { users: { type: 'identity', types: ['user'] } },
+            };
+            const identityClient = new Client({
+                baseURL: 'http://authup.test',
+                transport: new MemoryTransport({ fetch: () => ({ status: 200, body: identityCatalog }) }),
+            });
+
+            const subject = resolveAuthupPolicySubject({
+                scopes: ['openid'],
+                identity,
+                grants: [],
+            });
+            const evaluator = await createAuthupPermissionEvaluator(identityClient, subject);
+            await expect(evaluator.evaluate({ name: 'user_only' })).resolves.toBeUndefined();
+
+            // Negative control: the same definition denies a client identity,
+            // so the pass above is the identity being read, not a vacuous allow.
+            const clientEvaluator = await createAuthupPermissionEvaluator(identityClient, resolveAuthupPolicySubject({
+                scopes: ['openid'],
+                identity: { ...identity, type: 'client' as const },
+                grants: [],
+            }));
+            const error = await clientEvaluator.evaluate({ name: 'user_only' }).then(() => undefined, (e: unknown) => e);
+            expect(isPermissionError(error)).toBe(true);
         });
     });
 });
