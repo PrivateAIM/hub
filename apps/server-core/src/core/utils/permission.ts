@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { PolicyData } from '@authup/access';
 import { isPermissionError } from '@authup/access';
 import { isPermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
@@ -21,16 +22,23 @@ export function isPermissionDenial(error: unknown): boolean {
 
 /**
  * Ask whether the actor holds `name`, for code that branches on the answer
- * rather than failing on it.
+ * rather than failing on it. With `data` (the resource as ATTRIBUTES) the
+ * full evaluation runs, so attribute policies on the grant are enforced;
+ * without it only the pre-gate does.
  *
  * Only a permission denial reads as `false`. Every other error propagates:
  * swallowing it would turn an outage of the authorization path into a quiet
  * "not authorized" — or, where a caller falls back to another grant, into
  * that fallback being taken for the wrong reason.
  */
-export async function holdsPermission(actor: ActorContext, name: string): Promise<boolean> {
+export async function holdsPermission(actor: ActorContext, name: string, data?: PolicyData): Promise<boolean> {
     try {
-        await actor.permissionEvaluator.preEvaluate({ name });
+        if (data) {
+            await actor.permissionEvaluator.evaluate({ name, data });
+        } else {
+            await actor.permissionEvaluator.preEvaluate({ name });
+        }
+
         return true;
     } catch (error) {
         if (isPermissionDenial(error)) {

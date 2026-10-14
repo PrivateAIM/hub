@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { BuiltInPolicyType } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Analysis, AnalysisNode, Node } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
@@ -179,6 +180,11 @@ describe('AnalysisClientCredentialService', () => {
 
         const credentials = await service.getCredentials(ANALYSIS_ID, actor);
         expect(credentials.secret).toBe('the-secret');
+
+        // fully evaluated against the analysis, so attribute policies on the
+        // grant apply to the secret read as they do to setCredentials
+        const [call] = actor.permissionEvaluator.evaluateCalls;
+        expect(call?.data?.get(BuiltInPolicyType.ATTRIBUTES)).toMatchObject({ id: ANALYSIS_ID });
     });
 
     it('should reject when the analysis has no client provisioned', async () => {

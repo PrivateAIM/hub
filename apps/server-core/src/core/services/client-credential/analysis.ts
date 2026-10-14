@@ -137,7 +137,11 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
         // A permission is not a reach: like setCredentials and the node
         // credential service, a manager must also be permitted to write the
         // analysis' realm, or one realm's manager reads another realm's secret.
-        if (!await holdsPermission(actor, PermissionName.ANALYSIS_UPDATE)) {
+        if (!await holdsPermission(
+            actor,
+            PermissionName.ANALYSIS_UPDATE,
+            new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
+        )) {
             return false;
         }
 
