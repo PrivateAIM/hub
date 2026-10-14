@@ -101,6 +101,14 @@ half, until then the Hub-side guard is what stops it. Any
 token-verifier cache (Redis `token:*` keys) may hold entries for such strings —
 flush it once after upgrading.
 
+## Attaching nodes to a project requires `project_update`
+
+**Breaking for some roles.** Adding a node to a project (`POST /project-nodes`)
+and removing one (`DELETE /project-nodes/:id`) both require `project_update`.
+Previously, adding required `project_create` **and** `project_update`. Holding
+only `project_create` now creates a project but cannot attach nodes to it; grant
+`project_update` to every role that creates projects with nodes.
+
 ## Authup upgrade to beta.69
 
 Hub now requires Authup `1.0.0-beta.69`, a security release. Read the

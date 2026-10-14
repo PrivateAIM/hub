@@ -159,29 +159,17 @@ describe('ProjectNodeService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it.each([
-            PermissionName.PROJECT_CREATE,
-            PermissionName.PROJECT_UPDATE,
-        ])('should let the project creator attach nodes holding only %s', async (permission) => {
-            const result = await service.create(
-                { projectId, nodeId },
-                createPermissionActor({
-                    realm: { id: 'realm-1', name: 'realm-1' },
-                    identity: { id: CREATOR_ID, type: 'user' },
-                    permissions: [permission],
-                }),
-            );
-
-            expect(result.id).toBeDefined();
-        });
-
-        it('should require PROJECT_UPDATE to attach nodes to a project the actor did not create', async () => {
+        it('should require PROJECT_UPDATE to attach nodes, even for the project creator', async () => {
             const realm = { id: 'realm-1', name: 'realm-1' };
 
             await expect(
                 service.create(
                     { projectId, nodeId },
-                    createPermissionActor({ realm, permissions: [PermissionName.PROJECT_CREATE] }),
+                    createPermissionActor({
+                        realm,
+                        identity: { id: CREATOR_ID, type: 'user' },
+                        permissions: [PermissionName.PROJECT_CREATE],
+                    }),
                 ),
             ).rejects.toThrow(PermissionDeniedError);
 

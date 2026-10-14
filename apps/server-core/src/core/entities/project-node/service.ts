@@ -67,25 +67,11 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     async create(data: Partial<ProjectNode>, actor: ActorContext): Promise<ProjectNode> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionEvaluator.preEvaluateOneOf({
-            name: [
-                PermissionName.PROJECT_CREATE,
-                PermissionName.PROJECT_UPDATE,
-            ],
-        });
+        // Attaching a node changes the project's composition — an update,
+        // the same rule `delete` applies. PROJECT_CREATE alone is not enough.
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
 
         await this.repository.validateJoinColumns(validated);
-
-        // PROJECT_CREATE covers attaching nodes to a project the actor set up
-        // itself (the create form attaches them one by one right after the
-        // project). Attaching to anyone else's project changes an existing
-        // project — an update, the same rule `delete` applies.
-        const { project } = validated;
-        const isCreator = !!actor.identity &&
-            [project.userId, project.robotId, project.clientId].includes(actor.identity.id);
-        if (!isCreator) {
-            await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
-        }
 
         validated.projectRealmId = validated.project.realmId;
         validated.nodeRealmId = validated.node.realmId;
