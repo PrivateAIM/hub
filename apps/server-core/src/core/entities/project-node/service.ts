@@ -67,8 +67,6 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     async create(data: Partial<ProjectNode>, actor: ActorContext): Promise<ProjectNode> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        // Either suffices: attaching a node is part of creating a project as
-        // well as of editing one.
         await actor.permissionEvaluator.preEvaluateOneOf({
             name: [
                 PermissionName.PROJECT_CREATE,
@@ -77,6 +75,17 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
         });
 
         await this.repository.validateJoinColumns(validated);
+
+        // PROJECT_CREATE covers attaching nodes to a project the actor set up
+        // itself (the create form attaches them one by one right after the
+        // project). Attaching to anyone else's project changes an existing
+        // project — an update, the same rule `delete` applies.
+        const { project } = validated;
+        const isCreator = !!actor.identity &&
+            [project.userId, project.robotId, project.clientId].includes(actor.identity.id);
+        if (!isCreator) {
+            await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
+        }
 
         validated.projectRealmId = validated.project.realmId;
         validated.nodeRealmId = validated.node.realmId;
@@ -124,8 +133,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
 
     async delete(id: string, actor: ActorContext): Promise<ProjectNode> {
         // Removing a node from a project changes an EXISTING project, which is
-        // an update. PROJECT_CREATE alone must not suffice — unlike `create`,
-        // where attaching nodes is part of setting a project up.
+        // an update; PROJECT_CREATE alone must not suffice.
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
 
         const entity = await this.repository.findOneBy({ id });
