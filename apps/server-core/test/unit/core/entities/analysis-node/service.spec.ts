@@ -13,6 +13,8 @@ import type {
     ProjectNode,
 } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
+import { PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import {
     beforeEach,
     describe,
@@ -23,6 +25,7 @@ import { AnalysisNodeService } from '../../../../../src/core/entities/analysis-n
 import {
     FakeEntityRepository,
     createAllowAllActor,
+    createPermissionActor,
 } from '../../helpers/index.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from './fake-metadata-recalculator.ts';
 import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
@@ -182,6 +185,43 @@ describe('AnalysisNodeService', () => {
             );
 
             expect(recalculator.getCallCount()).toBe(0);
+        });
+
+        // A missing right is a denial (403), not a malformed request (400).
+        it.each([
+            ['approvalStatus without ANALYSIS_APPROVE', { approvalStatus: AnalysisNodeApprovalStatus.APPROVED }, PermissionName.ANALYSIS_UPDATE],
+            ['executionStatus without ANALYSIS_UPDATE', { executionStatus: ProcessStatus.EXECUTING }, PermissionName.ANALYSIS_APPROVE],
+        ] as const)('should deny setting %s', async (_label, data, permission) => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-1',
+            });
+            repository.seed(node);
+
+            await expect(service.update(
+                node.id,
+                data,
+                createPermissionActor({ realm: { id: 'realm-1', name: 'realm-1' }, permissions: [permission] }),
+            )).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should deny an approval from the analysis realm alone', async () => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+            });
+            repository.seed(node);
+
+            await expect(service.update(
+                node.id,
+                { approvalStatus: AnalysisNodeApprovalStatus.APPROVED },
+                createPermissionActor({
+                    realm: { id: 'realm-1', name: 'realm-1' },
+                    permissions: [PermissionName.ANALYSIS_APPROVE],
+                }),
+            )).rejects.toThrow(PermissionDeniedError);
         });
     });
 

@@ -20,3 +20,10 @@ export type DecodeQueryOptions<RECORD extends ObjectLiteral = ObjectLiteral> = {
      */
     parameters?: QueryParameter[],
 };
+
+export type LogFilters = {
+    /** VictoriaLogs labels, keyed by their final (prefix-stripped) name. */
+    labels: Record<string, string>,
+    /** The raw `time` filter, when `extractTime` was requested. */
+    time?: string,
+};

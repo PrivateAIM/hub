@@ -51,6 +51,18 @@ request; there is no fallback to permission names. Catalogs are not cached acros
 requests. Existing token-introspection caching and socket-session lifetimes still
 apply, so changes to grants are visible when those are refreshed.
 
+Scope restricts what a caller can do, not who it is. Grants are only evaluated
+for tokens carrying the `global` scope; a token issued without it (e.g. a custom
+login client registered without `global`) still authenticates and keeps its
+identity, but is evaluated with **no grants**, so every permission check denies
+with 403. Policies that read the identity still see the real caller, and paths
+that authorize by identity rather than by permission — a node or analysis client
+reading its own credentials, the messenger mailbox, bucket ownership, realm
+socket rooms — still honour such a token. Authup applies the same rule since
+authup#3723.
+client-ui requests `global openid`, and Authup's client-credentials and password
+grants always issue `global`.
+
 This preserves policy trees and grant realm scopes at the evaluator boundary.
 Existing endpoints that only perform a permission pre-check still perform a
 pre-check: this upgrade does not add row-policy checks or collection filtering to
@@ -67,6 +79,56 @@ pins database timestamps to UTC. Follow the
 for existing databases that used local time. Beta.68 quotes newly serialized
 strings; Hub's text transformer reads both these and legacy unquoted messenger
 payloads, so no Hub data migration is needed.
+
+## server-messenger authenticates against Authup
+
+**Breaking.** server-messenger now verifies every REST request and socket
+connection against Authup, like the other services. Before, its REST surface
+never registered an Authup client and attached one fixed master-realm user to
+**every** request: no token was needed, and every caller read and acknowledged
+the same mailbox. Treat any message stored by an affected version as exposed.
+
+What an operator must do:
+
+- Grant the messenger's service client (`CLIENT_ID`, default `system`)
+  `permission_read`, with the same `realmScope` guidance as in
+  [Authup upgrade to beta.68](#authup-upgrade-to-beta-68) — every authenticated
+  request reads the authorization catalog. The built-in `system` client already
+  has it.
+- Make sure `AUTHUP_URL`, `CLIENT_ID` and `CLIENT_SECRET` are set for the
+  messenger. Every Hub service now fails closed without Authup: no identity is
+  attached, so every authenticated route answers 401 and every socket
+  connection is refused. The previous no-Authup fallback (a fixed master-realm
+  user, plus a `dryRun` mode that granted every permission) is removed.
+- Callers (nodes) must send a bearer token on every request, including the
+  `GET /messages/stream` SSE stream.
+
+## Malformed bearer tokens no longer authenticate
+
+**Security fix, no operator action required in Hub.** Authup up to
+`1.0.0-beta.69` falls back to the token in the introspection request's own
+`Authorization` header when the submitted `token` fails its validator (shorter
+than 16 or longer than 2048 characters). Hub's token verifier sends that header
+with the service's **own** credentials, so a malformed bearer — `Bearer x`, an
+oversized string, or a garbage `access_token` cookie — was introspected as the
+Hub service client (`active`, `global` scope, its grants) and every Hub service
+acted on it as that client.
+
+Every Hub service now refuses a credential that is not structurally a compact
+JWS within those bounds **before** introspecting it, answering 401 (sockets:
+connection refused). The fallback itself is fixed upstream in authup#3724;
+upgrading Authup to the first release after `1.0.0-beta.69` closes the upstream
+half, until then the Hub-side guard is what stops it. Any
+token-verifier cache (Redis `token:*` keys) may hold entries for such strings —
+flush it once after upgrading.
+
+## Attaching nodes to a project requires `project_update`
+
+**Breaking for some roles.** Adding a node to a project (`POST /project-nodes`)
+and removing one (`DELETE /project-nodes/:id`) both require `project_update`.
+Previously, adding required `project_create` **and** `project_update`. Holding
+only `project_create` now creates a project but cannot attach nodes to it; grant
+`project_update` to every role that creates projects with nodes.
 
 ## Authup upgrade to beta.69
 

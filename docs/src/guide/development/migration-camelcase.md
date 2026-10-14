@@ -155,7 +155,7 @@ Five server-core permission checks hand a whole `Analysis` entity to
 `@authup/access` as an attribute bag:
 
 ```ts
-await actor.permissionChecker.check({
+await actor.permissionEvaluator.evaluate({
     name: PermissionName.ANALYSIS_UPDATE,
     data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
 });

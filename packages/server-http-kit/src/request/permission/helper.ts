@@ -5,20 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IPermissionEvaluator } from '@authup/access';
 import type { IAppEvent } from 'routup';
 import { BadRequestError } from '@privateaim/errors';
-import { setRequestEnv, useRequestEnv } from '../env';
-import type { RequestPermissionChecker } from './module';
+import { useRequestEnv } from '../env';
 
-export function setRequestPermissionChecker(event: IAppEvent, checker: RequestPermissionChecker) {
-    setRequestEnv(event, 'permissionChecker', checker);
-}
-
-export function useRequestPermissionChecker(event: IAppEvent) : RequestPermissionChecker {
-    const checker = useRequestEnv(event, 'permissionChecker');
-    if (!checker) {
-        throw new BadRequestError('The request permission checker is not initialized.');
+/**
+ * The request's evaluator is stored as-is. Whether it carries the policy
+ * identity is decided once, when it is built (`resolveAuthupPolicySubject`),
+ * so — unlike authup's own `RequestPermissionEvaluator`, which re-injects the
+ * identity per call — there is nothing left for a per-request wrapper to add.
+ */
+export function useRequestPermissionEvaluator(event: IAppEvent) : IPermissionEvaluator {
+    const evaluator = useRequestEnv(event, 'permissionEvaluator');
+    if (!evaluator) {
+        throw new BadRequestError('The request permission evaluator is not initialized.');
     }
 
-    return checker;
+    return evaluator;
 }

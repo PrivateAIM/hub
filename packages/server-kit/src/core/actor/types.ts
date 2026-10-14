@@ -5,17 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PermissionEvaluationContext } from '@authup/access';
-
-export interface IPermissionChecker {
-    preCheck(ctx: PermissionEvaluationContext): Promise<void>;
-    check(ctx: PermissionEvaluationContext): Promise<void>;
-    preCheckOneOf(ctx: PermissionEvaluationContext): Promise<void>;
-    checkOneOf(ctx: PermissionEvaluationContext): Promise<void>;
-}
+import type { IPermissionEvaluator } from '@authup/access';
 
 export type ActorContext = {
-    permissionChecker: IPermissionChecker;
+    permissionEvaluator: IPermissionEvaluator;
     realm?: { id: string; name: string };
     identity?: {
         id: string;

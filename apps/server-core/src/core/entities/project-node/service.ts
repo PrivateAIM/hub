@@ -67,12 +67,9 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     async create(data: Partial<ProjectNode>, actor: ActorContext): Promise<ProjectNode> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionChecker.preCheck({
-            name: [
-                PermissionName.PROJECT_CREATE,
-                PermissionName.PROJECT_UPDATE,
-            ],
-        });
+        // Attaching a node changes the project's composition — an update,
+        // the same rule `delete` applies. PROJECT_CREATE alone is not enough.
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
 
         await this.repository.validateJoinColumns(validated);
 
@@ -103,7 +100,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     async update(id: string, data: Partial<ProjectNode>, actor: ActorContext): Promise<ProjectNode> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.PROJECT_APPROVE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_APPROVE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
@@ -121,12 +118,9 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     }
 
     async delete(id: string, actor: ActorContext): Promise<ProjectNode> {
-        await actor.permissionChecker.preCheck({
-            name: [
-                PermissionName.PROJECT_CREATE,
-                PermissionName.PROJECT_UPDATE,
-            ],
-        });
+        // Removing a node from a project changes an EXISTING project, which is
+        // an update; PROJECT_CREATE alone must not suffice.
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {

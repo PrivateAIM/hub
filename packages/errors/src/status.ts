@@ -16,9 +16,16 @@ import { ErrorCode } from './constants.ts';
 export const ERROR_CODE_TO_STATUS: Readonly<Partial<Record<`${ErrorCode}`, number>>> = {
     // 401
     [ErrorCode.IDENTITY_UNAUTHORIZED]: 401,
+    // RFC 6750 §3.1 — a resource request whose bearer is expired or otherwise
+    // unusable. Mirrors `@authup/errors`.
+    [ErrorCode.JWT_INVALID]: 401,
+    [ErrorCode.JWT_INACTIVE]: 401,
+    [ErrorCode.JWT_EXPIRED]: 401,
 
     // 403
     [ErrorCode.PERMISSION_DENIED]: 403,
+    [ErrorCode.PERMISSION_EVALUATION_FAILED]: 403,
+    [ErrorCode.PERMISSION_NOT_FOUND]: 403,
 
     // 404
     [ErrorCode.ENTITY_NOT_FOUND]: 404,

@@ -60,15 +60,14 @@ Pure business logic. No imports from `typeorm`, `routup`, or other infrastructur
 
 **Shared base types** (from `@privateaim/server-kit`):
 - `IEntityRepository<T>` — Generic repository port (findMany, findOneById, save, remove, etc.)
-- `AbstractEntityService` — Realm helpers (`isActorMasterRealmMember`, `getActorRealmId`)
-- `ActorContext` — Permission checker + realm + identity, decoupled from HTTP
+- `AbstractEntityService` — Realm helper (`getActorRealmId`)
+- `ActorContext` — Permission evaluator + realm + identity, decoupled from HTTP
 - `ValidatorGroup` — Domain-level validation groups (not HTTP-specific)
-- `IPermissionChecker` — Permission evaluation interface (preCheck, check, preCheckOneOf, checkOneOf)
 
 ### Test Architecture
 
 - Unit tests are grouped by domain under `test/unit/core/entities/<domain>/` and `test/unit/core/services/`.
-- Shared test fakes and helpers are imported from `@privateaim/server-test-kit` (`FakeEntityRepository`, `FakePermissionChecker`, actor factories).
+- Shared test fakes and helpers are imported from `@privateaim/server-test-kit` (`FakeEntityRepository`, `FakePermissionEvaluator` re-exported from `@authup/server-test-kit`, actor factories returning `FakeActorContext`).
 - Domain-specific fakes (e.g. `FakeNodeRepository`, `FakeRegistryManager`) are colocated beside the tests that use them.
 
 **Services** (`core/services/`):
@@ -88,7 +87,6 @@ Implementations that connect domain logic to external systems.
 - `subscribers/<name>.ts` — TypeORM event subscribers (domain event publishing)
 - `migrations/` — PostgreSQL and MySQL migration files
 - `error/` — Database error types (`DatabaseConflictError`)
-- `query/` — Realm-scoped query helpers
 
 **HTTP** (`adapters/http/`):
 - `controllers/entities/<name>/module.ts` — Thin controllers (extract request → delegate to service → send response)
@@ -134,7 +132,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
     async create(data: Partial<Node>, actor: ActorContext): Promise<Node> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
-        await actor.permissionChecker.preCheck({ name: PermissionName.NODE_CREATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.NODE_CREATE });
         await this.repository.validateJoinColumns(validated);
         // ... business logic ...
         return this.repository.save(entity, { data: actor.metadata });
@@ -225,7 +223,7 @@ export function createControllers(container: IContainer) {
 // adapters/http/request/helpers/actor.ts
 export function buildActorContext(req: Request): ActorContext {
     return {
-        permissionChecker: useRequestPermissionChecker(req),
+        permissionEvaluator: useRequestPermissionEvaluator(req),
         realm: useRequestIdentityRealm(req),
         identity: ...,
         metadata: { requestPath, requestMethod, actorId, ... },
@@ -248,7 +246,8 @@ Implementation classes live in `app/aggregators/` and `app/components/`.
 All services integrate with **Authup** (OAuth2 identity provider):
 - `@authup/server-adapter` middleware validates tokens on incoming requests
 - `@authup/access` handles per-realm permission checks via `IPermissionEvaluator`
-- Two-phase permission: `preCheck` (fast fail) then `check` (with PolicyData attributes)
+- `ActorContext.permissionEvaluator` IS authup's `IPermissionEvaluator` — hub has no port of its own (plan 016)
+- Two-phase permission: `preEvaluate` (fast fail) then `evaluate` (with PolicyData attributes)
 
 ### Authorization catalog (Authup beta.68)
 
@@ -256,12 +255,18 @@ HTTP and socket middleware use the service Authup client to fetch `GET /authoriz
 once per authenticated request/connection, then `createAuthupPermissionEvaluator`
 (`server-kit/src/authup/authorization.ts`) combines it with the caller's complete
 introspection grants and identity. Do not flatten grants to permission names: that
-loses definition policies, junction policies and realm reach. The credential needs
+loses definition policies, junction policies and realm reach. Scope restricts what a
+caller can do, not who it is: `resolveAuthupPolicySubject` always places the identity and
+places its grants only for a token scoped `global` (`[]` otherwise), so the binding policy
+denies every permission (403) while identity-reading policies — and hub's identity-based
+checks (credential ownership, the messenger mailbox, bucket ownership, socket rooms) — still
+see the real caller. Authup applies the same rule since authup#3723 (`useRequestPolicyGrants`).
+The credential needs
 `permission_read` at `ownOrNull` or wider. Fetch failures propagate; no cross-request
 catalog cache or name-only fallback is installed. Token-verifier caching and socket
 connection lifetimes remain unchanged.
 
-The evaluator enforces the data a call supplies. A service using only `preCheck`
+The evaluator enforces the data a call supplies. A service using only `preEvaluate`
 still has only a pre-gate; this is not the collection `compile()`/row-check migration
 in plan 016. The Vue store handles batch verdict fetching and expiry;
 `store.permissionRevision` must be watched by custom async navigation resolvers.

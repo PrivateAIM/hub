@@ -9,6 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type { Node, Project, ProjectNode } from '@privateaim/core-kit';
 import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
 import {
     beforeEach,
     describe,
@@ -22,8 +23,11 @@ import {
     createDenyAllActor,
     createMasterRealmActor,
     createNonMasterRealmActor,
+    createPermissionActor,
 } from '../../helpers/index.ts';
 import { FakeProjectRepository } from '../project/fake-repository.ts';
+
+const CREATOR_ID = randomUUID();
 
 function createFakeProjectNodeRepository(projectRealmId: string, nodeRealmId: string) {
     const repo = new FakeEntityRepository<ProjectNode>();
@@ -37,6 +41,7 @@ function createFakeProjectNodeRepository(projectRealmId: string, nodeRealmId: st
                 id: data.projectId,
                 realmId: projectRealmId,
                 nodes: 0,
+                userId: CREATOR_ID,
             } as Project;
         }
 
@@ -152,6 +157,27 @@ describe('ProjectNodeService', () => {
                     createDenyAllActor(),
                 ),
             ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should require PROJECT_UPDATE to attach nodes, even for the project creator', async () => {
+            const realm = { id: 'realm-1', name: 'realm-1' };
+
+            await expect(
+                service.create(
+                    { projectId, nodeId },
+                    createPermissionActor({
+                        realm,
+                        identity: { id: CREATOR_ID, type: 'user' },
+                        permissions: [PermissionName.PROJECT_CREATE],
+                    }),
+                ),
+            ).rejects.toThrow(PermissionDeniedError);
+
+            const result = await service.create(
+                { projectId, nodeId },
+                createPermissionActor({ realm, permissions: [PermissionName.PROJECT_UPDATE] }),
+            );
+            expect(result.id).toBeDefined();
         });
 
         it('should throw PermissionDeniedError when actor cannot write to project realm', async () => {
@@ -281,6 +307,38 @@ describe('ProjectNodeService', () => {
             await expect(
                 service.delete(pn.id, createDenyAllActor()),
             ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should delete when the actor holds PROJECT_UPDATE', async () => {
+            const pn = createTestProjectNode({ projectId });
+            repository.seed(pn);
+
+            const result = await service.delete(
+                pn.id,
+                createPermissionActor({
+                    realm: { id: 'realm-1', name: 'realm-1' },
+                    permissions: [PermissionName.PROJECT_UPDATE],
+                }),
+            );
+            expect(result.id).toBe(pn.id);
+        });
+
+        // Removing a node changes an existing project: PROJECT_CREATE alone
+        // must not detach nodes from projects the actor cannot update.
+        it('should deny delete when the actor holds only PROJECT_CREATE', async () => {
+            const pn = createTestProjectNode({ projectId });
+            repository.seed(pn);
+
+            await expect(
+                service.delete(
+                    pn.id,
+                    createPermissionActor({
+                        realm: { id: 'realm-1', name: 'realm-1' },
+                        permissions: [PermissionName.PROJECT_CREATE],
+                    }),
+                ),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {

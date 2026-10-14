@@ -10,6 +10,7 @@ import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { holdsPermission } from '../../utils/index.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type { IRegistryRepository } from '../../entities/registry/types.ts';
 import type { IRegistryProjectRepository } from '../../entities/registry-project/types.ts';
@@ -100,23 +101,14 @@ export class NodeRegistryCredentialService extends AbstractEntityService impleme
             return true;
         }
 
-        const holds = async (name: PermissionName): Promise<boolean> => {
-            try {
-                await actor.permissionChecker.preCheck({ name });
-                return true;
-            } catch {
-                return false;
-            }
-        };
-
         // Realm-scoped: NODE_UPDATE never reaches another realm's node.
         if (
             isRealmResourceWritable(actor.realm, node.realmId) &&
-            await holds(PermissionName.NODE_UPDATE)
+            await holdsPermission(actor, PermissionName.NODE_UPDATE)
         ) {
             return true;
         }
 
-        return holds(PermissionName.REGISTRY_MANAGE);
+        return holdsPermission(actor, PermissionName.REGISTRY_MANAGE);
     }
 }

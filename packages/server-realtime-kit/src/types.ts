@@ -19,7 +19,7 @@ export type SocketIdentity = {
     realmName: string
 };
 export type SocketData = {
-    permissionChecker?: IPermissionEvaluator,
+    permissionEvaluator?: IPermissionEvaluator,
 
     identity?: SocketIdentity,
 

@@ -5,22 +5,35 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenCreator } from '@authup/core-http-kit';
+import type {
+    ITokenVerifierCache,
+    TokenVerificationData,
+    TokenVerifyOptions,
+} from '@authup/server-adapter-kit';
 import {
-    type ITokenVerifierCache,
     MemoryTokenVerifierCache,
     RedisTokenVerifierCache,
     TokenVerifier,
 } from '@authup/server-adapter-kit';
-import type { Client as RedisClient } from 'redis-extension';
+import { assertIntrospectableToken } from '@privateaim/server-kit';
+import type { AuthTokenVerifierCreateContext } from './types.ts';
 
-type AuthTokenVerifierCreateContext = {
-    baseURL?: string,
-    creator: TokenCreator,
-    redisClient?: RedisClient,
-};
+/**
+ * Refuses a credential that is not structurally a token before it reaches
+ * introspection — see `isIntrospectableToken` for the credential confusion
+ * this closes (authup#3724: a malformed token was reported as the calling
+ * service's own client). Lives on the verifier every service builds, so every
+ * credential source — header, cookie fallback, socket handshake — is covered
+ * from one place.
+ */
+export class IntrospectableTokenVerifier extends TokenVerifier {
+    override async verify(token: string, options?: TokenVerifyOptions): Promise<TokenVerificationData> {
+        assertIntrospectableToken(token);
+        return super.verify(token, options);
+    }
+}
 
-export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext) {
+export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext): IntrospectableTokenVerifier {
     let cache : ITokenVerifierCache;
     if (ctx.redisClient) {
         cache = new RedisTokenVerifierCache(ctx.redisClient);
@@ -28,7 +41,7 @@ export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext) {
         cache = new MemoryTokenVerifierCache();
     }
 
-    return new TokenVerifier({
+    return new IntrospectableTokenVerifier({
         baseURL: ctx.baseURL,
         creator: ctx.creator,
         cache,

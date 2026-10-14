@@ -27,14 +27,14 @@ import type { FiltersBuildInput } from '@rapiq/core';
 import type { IAppEvent } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ForceLoggedInMiddleware, useRequestIdentityRealm } from '@privateaim/server-http-kit';
-import { describeQuerySchema } from '@privateaim/server-kit';
+import { collectRootFilterValues, describeQuerySchema } from '@privateaim/server-kit';
 import { ValidupError, buildErrorMessageForAttribute } from 'validup';
 import { defineIssueItem } from '@ebec/core';
 import {
     AnalysisEntity,
     NodeEntity,
 } from '../../../../database/index.ts';
-import { analysisNodeLogSchema, collectRootFilterValues, decodeQuery } from '../../../../../core/index.ts';
+import { analysisNodeLogSchema, decodeQuery } from '../../../../../core/index.ts';
 
 type AnalysisNodeLogControllerContext = {
     telemetryClient?: TelemetryClient;

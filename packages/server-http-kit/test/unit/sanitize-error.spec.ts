@@ -5,7 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isBadRequestError, isHubError, isInternalError } from '@privateaim/errors';
+import { AuthorizationCatalogStaleError, PermissionError } from '@authup/access';
+import { AuthupError } from '@authup/errors';
+import { JWTError } from '@authup/specs';
+import type { HubError } from '@privateaim/errors';
+import {
+    ErrorCode as HubErrorCode,
+    httpStatusFromCode,
+    isBadRequestError,
+    isHubError,
+    isInternalError,
+} from '@privateaim/errors';
 import { defineIssueItem } from '@ebec/core';
 import {
     CodecError,
@@ -18,6 +28,11 @@ import {
 import { ValidupError } from 'validup';
 import { describe, expect, it } from 'vitest';
 import { sanitizeError } from '../../src/core';
+
+/** What the error middleware answers. */
+function statusOf(error: HubError): number {
+    return error.status ?? httpStatusFromCode(error.code);
+}
 
 describe('core/error/sanitize', () => {
     it('should map a rapiq parse error to a bad request error', () => {
@@ -160,5 +175,56 @@ describe('core/error/sanitize', () => {
 
         expect(isInternalError(output)).toBeTruthy();
         expect(output.message).toEqual('boom');
+    });
+    /**
+     * An authup `PermissionError` is neither a HubError nor an HTTPError. With
+     * issues (the common `evaluationFailed` shape) it used to satisfy validup's
+     * shape fallback and answer 400; without issues (`deniedAll`) it fell
+     * through to the internal branch and answered 500. Either way a denial
+     * never produced 403.
+     */
+    it.each([
+        ['evaluationFailed with issues', PermissionError.evaluationFailed('node_create', [
+            defineIssueItem({ path: [], message: 'The permission node_create was not granted.' }),
+        ])],
+        ['evaluationFailed without issues', PermissionError.evaluationFailed('node_create')],
+        ['deniedAll', PermissionError.deniedAll(['node_create', 'node_update'])],
+    ])('should answer an authup permission error (%s) with 403', (_label, input) => {
+        const output = sanitizeError(input);
+
+        expect(isHubError(output)).toBeTruthy();
+        expect(output.code).toEqual(input.code);
+        expect(statusOf(output)).toEqual(403);
+    });
+
+    it('should keep the issues of an authup permission error', () => {
+        const issue = defineIssueItem({ path: [], message: 'The permission node_create was not granted.' });
+        const output = sanitizeError(PermissionError.evaluationFailed('node_create', [issue]));
+
+        expect(output.code).toEqual(HubErrorCode.PERMISSION_EVALUATION_FAILED);
+        expect(output.issues).toHaveLength(1);
+        expect(output.issues[0]).toMatchObject({ message: issue.message });
+    });
+
+    it('should answer a stale authorization catalog as an internal error', () => {
+        const output = sanitizeError(new AuthorizationCatalogStaleError('stale'));
+
+        expect(isInternalError(output)).toBeTruthy();
+        expect(statusOf(output)).toEqual(500);
+    });
+
+    /**
+     * Every other authup error keeps authup's code AND status — including
+     * codes hub's own table does not know, which used to collapse to 400/500.
+     */
+    it.each([
+        ['a dead bearer', JWTError.expired(), 401],
+        ['a throttle', new AuthupError({ code: 'login_attempt_throttled' }), 429],
+        ['an upstream failure', new AuthupError({ code: 'upstream_error' }), 502],
+    ])('should answer %s with authup\'s status', (_label, input, status) => {
+        const output = sanitizeError(input);
+
+        expect(output.code).toEqual(input.code);
+        expect(statusOf(output)).toEqual(status);
     });
 });

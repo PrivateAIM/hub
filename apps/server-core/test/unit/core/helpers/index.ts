@@ -6,3 +6,5 @@
  */
 
 export * from '@privateaim/server-test-kit';
+export * from './fake-actor.ts';
+export * from './types.ts';

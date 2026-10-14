@@ -21,7 +21,7 @@ import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 ```typescript
 import {
     useRequestIdentityRealm,
-    useRequestPermissionChecker,
+    useRequestPermissionEvaluator, // the request's authup IPermissionEvaluator
 } from '@privateaim/server-http-kit';
 ```
 

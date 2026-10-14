@@ -60,7 +60,7 @@ export class AnalysisClientPermissionService {
      * analysis must not be configuration-locked, and a client must exist.
      */
     protected async assertWritable(analysis: Analysis, actor: ActorContext): Promise<void> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
         // The attribute bag is keyed by this entity's PROPERTY names, which are
         // camelCase since #1806 — while the attribute policies that match on them
         // live in Authup's database. Harmless today (introspection yields
@@ -69,7 +69,7 @@ export class AnalysisClientPermissionService {
         // matching once attribute policies are enabled, and a denylist-shaped one
         // then fails OPEN. See docs/src/guide/development/migration-camelcase.md
         // -> "Authup attribute policies".
-        await actor.permissionChecker.check({
+        await actor.permissionEvaluator.evaluate({
             name: PermissionName.ANALYSIS_UPDATE,
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
         });
@@ -92,7 +92,7 @@ export class AnalysisClientPermissionService {
 
         // Viewing the capability assignments exposes the analysis' security
         // configuration, so it requires the same permission as changing it.
-        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
 
         if (!analysis.clientId) {
             return { data: [], meta: { total: 0 } };

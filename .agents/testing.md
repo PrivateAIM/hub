@@ -94,9 +94,14 @@ Each test application wires the same DI modules as production but uses `createTe
 
 ## Testcontainers & Always-On Authup
 
-The HTTP-facing services (`server-core`, `server-storage`, `server-telemetry`) run
-their suites against a **real Authup instance** and a **real database**, and the
-authorization middleware **actually enforces** permissions (no `dryRun`). Each
+The HTTP-facing services (`server-core`, `server-storage`, `server-telemetry`,
+`server-messenger`) run their suites against a **real Authup instance** and a
+**real database**, and the authorization middleware **actually enforces**
+permissions (`dryRun` and the no-Authup fake identity are gone from the kits
+entirely — without Authup a request gets no identity and answers 401).
+server-messenger provisions **no** permission names (it authorizes by identity
+only) and uses `createRestrictedAccessToken()` to mint distinct users for its
+mailbox-isolation spec. Each
 dependency is provided one of two ways, decided by env:
 
 | Dependency | External (used as-is)             | Otherwise (testcontainer)          |
@@ -107,9 +112,16 @@ dependency is provided one of two ways, decided by env:
 The shared helpers live in `@privateaim/server-test-kit`
 (`src/testcontainers/`, `src/authup-token.ts`, `src/setup.ts`):
 
-- `provideDatabase(project)` — start a PostgreSQL container when no `DB_TYPE` is set,
-  else use the configured database. Publishes the connection to the workers via
-  vitest `provide`.
+- `provideDatabase(project, suite)` — start a PostgreSQL container when no `DB_TYPE` is set,
+  else use the configured server. On mysql/postgres the suite gets its **own**
+  database, `<DB_DATABASE>_<suite>` (`app_core`, `app_storage`, …), dropped and
+  re-created once here in global setup, then published to the workers via vitest
+  `provide`. All four service suites run concurrently against CI's one database
+  server; sharing `app` made every worker's check-then-create `createDatabase`
+  race the other suites (`Key (datname)=(app) already exists`). Workers therefore
+  never create the suite database — only server-core's per-worker
+  `app_core_<pool>` copies, which no other process can name. SQLite is unaffected
+  (in-memory per worker).
 - `provideAuthup(project, permissionNames)` — start an Authup container (unless
   `AUTHUP_URL` is set), provisioned with exactly the permission names the calling
   service checks. Each service passes its own set (`server-storage` 3, `server-telemetry`
@@ -169,7 +181,7 @@ code under test actually talks to, and do not migrate one layer into another.
 
 | Layer | Seam | Used for | Needs Docker |
 |---|---|---|---|
-| **Port fakes** | The domain port interface (`IEntityRepository`, `IPermissionChecker`, …) | Entity/business services in `core/` | no |
+| **Port fakes** | The domain port interface (`IEntityRepository`, `IPermissionEvaluator`, …) | Entity/business services in `core/` | no |
 | **Transport-level FakeClient** | hapic's `MemoryTransport`, under a real client | Anything that CONSUMES an HTTP client: client-vue components, worker components | no |
 | **A real docker daemon** | dockerode against the local socket | The two worker specs that pack or build an image | **yes** |
 | **Testcontainers** | The real process | HTTP integration suites for server-core / storage / telemetry, with real Authup enforcement | **yes** |
@@ -250,9 +262,10 @@ npm run test:psql
 Generic test fakes shared across all services live in `packages/server-test-kit/`:
 
 - `FakeEntityRepository<T>` — In-memory `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
-- `FakePermissionChecker` — `IPermissionChecker` with call recording (`getCalls()`, `wasMethodCalled()`)
-- `createAllowAllActor()` — `ActorContext` with master realm that permits all operations
-- `createDenyAllActor()` — `ActorContext` with non-master realm that throws `ForbiddenError`
+- `FakePermissionEvaluator` — authup's `IPermissionEvaluator` fake, re-exported from `@authup/server-test-kit`: public call arrays (`preEvaluateCalls`, `preEvaluateOneOfCalls`, `evaluateCalls`, `evaluateOneOfCalls`, `compileCalls`), `setBehavior` / `deny` / `denyAll`, `compile()` defaulting to `post`
+- `FakeActorContext` — `ActorContext` whose `permissionEvaluator` is the fake, so specs read the call arrays without a cast
+- `createAllowAllActor()` — `FakeActorContext` with master realm that permits all operations
+- `createDenyAllActor()` — `FakeActorContext` with non-master realm whose evaluator throws `PermissionDeniedError`
 - `createMasterRealmActor()` / `createNonMasterRealmActor()` — Realm-specific actor factories
 
 ### Test directory layout (domain-grouped)
@@ -437,8 +450,8 @@ Existing fakes to reuse:
 
 **Shared (`@privateaim/server-test-kit`):**
 - `FakeEntityRepository<T>` — `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
-- `FakePermissionChecker` — `IPermissionChecker` with `getCalls()`, `wasMethodCalled()`
-- `createAllowAllActor()` / `createDenyAllActor()` — `ActorContext` fakes for permission testing
+- `FakePermissionEvaluator` (from `@authup/server-test-kit`) — call arrays + `setBehavior`/`deny`/`denyAll`; the hub deny factory passes `PermissionDeniedError` to `denyAll`, since authup's default is `PermissionError.denied`
+- `createAllowAllActor()` / `createDenyAllActor()` — `FakeActorContext` fakes for permission testing
 - `createMasterRealmActor()` / `createNonMasterRealmActor()` — realm-scoped actor fakes
 - `createFakeAuthupClient({ handlers, fallback, baseURL })` / `FakeAuthupClient` — a REAL `AuthupClient` on a `MemoryTransport`, with `requests` and `fakeAuthupResponse(status, body)`. Use this for anything talking to authup. Deliberately **not** `@authup/core-http-kit/testing`'s `createFakeClient`: that one overrides `request()` and hard-codes a 200, so it can never drive the `isClientErrorWithStatusCode(e, 404)` branches that `AnalysisClientService` and `NodeClientService` depend on.
 

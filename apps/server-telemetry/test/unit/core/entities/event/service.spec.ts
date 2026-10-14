@@ -15,7 +15,6 @@ import {
     it,
 } from 'vitest';
 import { EventService } from '../../../../../src/core/entities/event/service.ts';
-import type { FakePermissionChecker } from '@privateaim/server-test-kit';
 import { FakeEventRepository } from './fake-repository.ts';
 import {
     createAllowAllActor,
@@ -73,7 +72,7 @@ describe('EventService', () => {
             const actor = createAllowAllActor();
             await service.getMany({}, actor);
 
-            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheckOneOf')).toBe(true);
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls.length).toBeGreaterThan(0);
         });
 
         it('should throw PermissionDeniedError when actor lacks permission', async () => {

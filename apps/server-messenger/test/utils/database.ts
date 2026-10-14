@@ -6,7 +6,6 @@
  */
 
 import {
-    createDatabase,
     setDataSource,
     synchronizeDatabaseSchema,
     unsetDataSource,
@@ -47,11 +46,6 @@ export class TestDatabase {
         }
 
         const options = await this.getOptions();
-        await createDatabase({
-            options,
-            ifNotExist: true,
-            synchronize: false,
-        });
 
         const dataSource = new DataSource(options);
         await dataSource.initialize();

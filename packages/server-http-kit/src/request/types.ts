@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RequestPermissionChecker } from './permission';
+import type { IPermissionEvaluator } from '@authup/access';
 
 export type RequestIdentity = {
     id: string;
@@ -16,7 +16,7 @@ export type RequestIdentity = {
 };
 
 export type RequestEnv = {
-    permissionChecker?: RequestPermissionChecker,
+    permissionEvaluator?: IPermissionEvaluator,
 
     identity?: RequestIdentity,
 

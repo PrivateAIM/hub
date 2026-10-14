@@ -8,7 +8,6 @@
 import { createURLCodec } from '@rapiq/codec-url';
 import type {
     ICondition,
-    IFilter,
     IQuery,
     ObjectLiteral,
     Schema,
@@ -16,11 +15,12 @@ import type {
 import {
     Query,
     SchemaRegistry,
-    isFilters,
     isObject,
 } from '@rapiq/core';
 import { eventSchema } from '../entities/event/schema.ts';
-import type { DecodeQueryOptions } from './types.ts';
+import { BadRequestError } from '@privateaim/errors';
+import { collectRootFilterValues } from '@privateaim/server-kit';
+import type { DecodeQueryOptions, LogFilters } from './types.ts';
 
 /**
  * Registry of every entity schema — the server-side allow-list layer.
@@ -91,29 +91,30 @@ export function decodeQueryOpen(input: unknown): IQuery {
 }
 
 /**
- * Flatten the (equality-style) leaf filters of a decoded query into a
- * `field -> string value` map. Nested compound groups are walked; the last
- * value wins per field.
+ * Turn a decoded log query into VictoriaLogs labels. A filter key may carry a
+ * prefix (`labels.refId`), which is stripped, so the uniqueness
+ * `collectRootFilterValues` guarantees for raw keys has to be re-checked on
+ * the FINAL names: `labels.refId` and `x.refId` would otherwise collapse to
+ * one label, last-wins — on the delete path, B's logs for a filter matching
+ * nothing.
  */
-export function collectRootFilterValues(query: IQuery): Record<string, string> {
-    const out: Record<string, string> = {};
+export function collectLogFilters(query: IQuery, options: { extractTime?: boolean } = {}): LogFilters {
+    const output: LogFilters = { labels: {} };
 
-    const visit = (conditions: readonly ICondition[]) => {
-        for (const condition of conditions) {
-            if (isFilters(condition)) {
-                visit(condition.value);
-                continue;
-            }
-
-            // A non-compound condition is a leaf `Filter` (carries a field).
-            const leaf = condition as IFilter;
-            out[leaf.field] = `${leaf.value}`;
+    for (const [key, value] of Object.entries(collectRootFilterValues(query))) {
+        if (options.extractTime && key === 'time') {
+            output.time = value;
+            continue;
         }
-    };
 
-    if (isFilters(query.filters)) {
-        visit(query.filters.value);
+        const index = key.indexOf('.');
+        const label = index === -1 ? key : key.substring(index + 1);
+        if (Object.hasOwn(output.labels, label)) {
+            throw new BadRequestError(`The filter label '${label}' may only be specified once.`);
+        }
+
+        output.labels[label] = value;
     }
 
-    return out;
+    return output;
 }

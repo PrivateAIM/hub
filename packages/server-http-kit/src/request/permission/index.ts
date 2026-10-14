@@ -6,4 +6,3 @@
  */
 
 export * from './helper';
-export * from './module';

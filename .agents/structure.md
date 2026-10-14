@@ -47,8 +47,8 @@ Shared libraries, located in `packages/`.
 
 | Package                  | Purpose                                    |
 |--------------------------|--------------------------------------------|
-| `server-kit`             | Logging (Winston), auth helpers, AMQP messaging, Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup), `describeQuerySchema()` + `RECORD_QUERY_PARAMETERS` for the response `meta.schema` |
-| `server-test-kit`        | Shared test fakes (FakeEntityRepository, FakePermissionChecker, actor factories) |
+| `server-kit`             | Logging (Winston), auth helpers, AMQP messaging, Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup), `describeQuerySchema()` + `RECORD_QUERY_PARAMETERS` for the response `meta.schema`, `collectRootFilterValues()` for the log endpoints |
+| `server-test-kit`        | Shared test fakes (FakeEntityRepository, FakePermissionEvaluator via `@authup/server-test-kit`, actor factories) |
 | `server-db-kit`          | TypeORM utilities, database setup, migrations; options builder pinned to UTC (`pinTimezone`), `withDataSourceLock` for boot passes |
 | `server-http-kit`        | HTTP route/controller decorators for Routup |
 | `server-realtime-kit`    | Socket.io server helpers                   |
@@ -115,8 +115,7 @@ apps/server-core/src/
 │   │   ├── project/           # Project, ProjectNode
 │   │   └── registry/          # Registry, RegistryProject
 │   │   ├── migrations/            # postgres/ and mysql/
-│   │   ├── error/                 # Database error types
-│   │   └── query/                 # Realm query helpers
+│   │   └── error/                 # Database error types
 │   ├── http/
 │   │   ├── controllers/
 │   │   │   ├── entities/<entity>/module.ts  # Thin controllers

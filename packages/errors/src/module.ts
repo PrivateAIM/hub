@@ -18,12 +18,20 @@ export const HUB_ERROR_INSTANCE = Symbol.for('@privateaim/errors/HubError');
 export class HubError extends BaseError {
     public readonly data?: Record<string, any>;
 
+    public readonly status?: number;
+
     constructor(input?: HubErrorInput) {
         super(input);
         markInstanceof(this, HUB_ERROR_INSTANCE);
 
-        if (input && typeof input !== 'string' && input.data) {
-            this.data = input.data;
+        if (input && typeof input !== 'string') {
+            if (input.data) {
+                this.data = input.data;
+            }
+
+            if (typeof input.status === 'number') {
+                this.status = input.status;
+            }
         }
     }
 

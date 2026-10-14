@@ -13,20 +13,25 @@ import {
     it,
 } from 'vitest';
 import { WakeupEventName } from '@privateaim/messenger-kit';
+import { createAdminAccessToken } from '@privateaim/server-test-kit';
 import { createTestApplication } from '../../../app/factory.ts';
 import type { TestHTTPApplication } from '../../../app/http.ts';
-
-// the identity injected by the fake auth path (no Authup in tests)
-const SELF_ID = 'd94b2f28-29e3-4ced-b8f1-6923a01dc1ee';
+import { resolveTokenSubject } from '../../../utils/index.ts';
 
 describe('adapters/http/message', () => {
     let app: TestHTTPApplication;
+    let adminToken: string;
+    // the admin/master user the authenticated test client acts as
+    let SELF_ID: string;
 
     beforeAll(async () => {
         app = createTestApplication();
         await app.setup();
 
-        // drain the fixed fake identity's mailbox until empty so the round-trip
+        adminToken = await createAdminAccessToken();
+        SELF_ID = await resolveTokenSubject(adminToken);
+
+        // drain the admin identity's mailbox until empty so the round-trip
         // is deterministic on the shared/persistent CI database (backlog may exceed one page)
         for (;;) {
             const leftover = await app.client.message.pull({ limit: 100 });
@@ -64,7 +69,12 @@ describe('adapters/http/message', () => {
     });
 
     it('should open an SSE stream and emit a messagePending wakeup on connect', async () => {
-        const res = await fetch(`${app.baseURL}messages/stream`, { headers: { accept: 'text/event-stream' } });
+        const res = await fetch(`${app.baseURL}messages/stream`, {
+            headers: {
+                accept: 'text/event-stream',
+                authorization: `Bearer ${adminToken}`,
+            },
+        });
 
         expect(res.status).toBe(200);
         expect(res.headers.get('content-type')).toContain('text/event-stream');

@@ -12,14 +12,14 @@ import {
     it,
 } from 'vitest';
 import type { ActorContext } from '@privateaim/server-kit';
-import { FakePermissionChecker } from '@privateaim/server-test-kit';
+import { FakePermissionEvaluator } from '@privateaim/server-test-kit';
 import { MessageService } from '../../../../../src/core/entities/message/service.ts';
 import type { IMessageWakeup } from '../../../../../src/core/services/wakeup/index.ts';
 import { FakeMessageRepository } from './fake-repository.ts';
 
 function actorFor(id: string, type: 'user' | 'robot' | 'client' = 'client'): ActorContext {
     return {
-        permissionChecker: new FakePermissionChecker(),
+        permissionEvaluator: new FakePermissionEvaluator(),
         realm: { id: 'realm-1', name: 'master' },
         identity: { id, type },
         metadata: {},

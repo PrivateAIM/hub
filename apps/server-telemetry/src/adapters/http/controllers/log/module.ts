@@ -24,10 +24,10 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { ForceLoggedInMiddleware, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, useRequestPermissionEvaluator } from '@privateaim/server-http-kit';
 import type { IAppEvent } from 'routup';
 import type { LogStore } from '../../../../core/services/log-store/types.ts';
-import { collectRootFilterValues, decodeQueryOpen } from '../../../../core/query/index.ts';
+import { collectLogFilters, decodeQueryOpen } from '../../../../core/query/index.ts';
 
 @DTags('logs')
 @DController('/logs')
@@ -43,8 +43,8 @@ export class LogController {
         @DBody() body: LogInput,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Log>> {
-        const permissionChecker = useRequestPermissionChecker(event);
-        await permissionChecker.preCheck({ name: PermissionName.LOG_CREATE });
+        const permissionEvaluator = useRequestPermissionEvaluator(event);
+        await permissionEvaluator.preEvaluate({ name: PermissionName.LOG_CREATE });
 
         const validator = new LogValidator();
         const data = await validator.run(body);
@@ -66,8 +66,8 @@ export class LogController {
     async getMany(
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<Log>> {
-        const permissionChecker = useRequestPermissionChecker(event);
-        await permissionChecker.preCheckOneOf({
+        const permissionEvaluator = useRequestPermissionEvaluator(event);
+        await permissionEvaluator.preEvaluateOneOf({
             name: [
                 PermissionName.LOG_READ,
                 PermissionName.LOG_DELETE,
@@ -76,12 +76,7 @@ export class LogController {
 
         const decoded = decodeQueryOpen(useRequestQuery(event));
 
-        const labels: Record<string, string> = {};
-        for (const [key, value] of Object.entries(collectRootFilterValues(decoded))) {
-            const index = key.indexOf('.');
-            const nextKey = index === -1 ? key : key.substring(index + 1);
-            labels[nextKey] = value;
-        }
+        const { labels } = collectLogFilters(decoded);
 
         const labelKeys = Object.keys(labels);
         if (labelKeys.length === 0) {
@@ -114,25 +109,17 @@ export class LogController {
     async deleteMany(
         @DContext() event: IAppEvent,
     ) {
-        const permissionChecker = useRequestPermissionChecker(event);
-        await permissionChecker.preCheck({ name: PermissionName.LOG_DELETE });
+        const permissionEvaluator = useRequestPermissionEvaluator(event);
+        await permissionEvaluator.preEvaluate({ name: PermissionName.LOG_DELETE });
+
+        const { labels, time } = collectLogFilters(decodeQueryOpen(useRequestQuery(event)), { extractTime: true });
 
         let start : number | undefined;
-        const labels : Record<string, string> = {};
-
-        for (const [key, value] of Object.entries(collectRootFilterValues(decodeQueryOpen(useRequestQuery(event))))) {
-            if (key === 'time') {
-                const parsed = Number(value);
-                if (!Number.isFinite(parsed)) {
-                    throw new BadRequestError('Filter time must be a finite unix timestamp.');
-                }
-                start = parsed;
-                continue;
+        if (typeof time !== 'undefined') {
+            start = Number(time);
+            if (!Number.isFinite(start)) {
+                throw new BadRequestError('Filter time must be a finite unix timestamp.');
             }
-
-            const index = key.indexOf('.');
-            const nextKey = index === -1 ? key : key.substring(index + 1);
-            labels[nextKey] = value;
         }
 
         const labelKeys = Object.keys(labels);

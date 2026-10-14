@@ -8,6 +8,7 @@
 import { defineSchema } from '@rapiq/core';
 import type { Registry } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
+import { createRootOnlyFieldsGate } from '../../query/fields.ts';
 
 export const registrySchema = defineSchema<Registry>({
     name: DomainType.REGISTRY,
@@ -23,6 +24,9 @@ export const registrySchema = defineSchema<Registry>({
     fields: {
         default: ['id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt'],
         allowed: ['id', 'name', 'host', 'accountName', 'createdAt', 'updatedAt', 'accountSecret'],
+        // A select:false credential, gated by the service on its own
+        // endpoint only; never served through a relation fieldset.
+        validate: createRootOnlyFieldsGate(['accountSecret' satisfies keyof Registry]),
     },
     filters: { allowed: ['id', 'name'], indexed: true },
     sorts: { allowed: ['id', 'updatedAt', 'createdAt'], indexed: true },

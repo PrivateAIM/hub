@@ -15,30 +15,30 @@ import type {
     Socket,
 } from '../../types';
 import type { AuthorizationMiddlewareRegistrationOptions } from './types';
-import { applyTokenVerificationData, createFakeTokenVerificationData } from './utils';
+import { applyTokenVerificationData } from './utils';
 
 export function createAuthorizationMiddleware(
     options: AuthorizationMiddlewareRegistrationOptions,
 ) : Middleware {
-    if (!options.baseURL) {
-        const data = createFakeTokenVerificationData();
-
-        return async (socket, next) => {
-            try {
-                await applyTokenVerificationData(socket, data, options.fakeAbilities);
-                next();
-            } catch (e) {
-                next(e as Error);
-            }
-        };
+    // Fail closed. Without Authup no connection can be verified, so none is
+    // attached an identity and the guard in `mountAuthorizationMiddleware`
+    // rejects it as unauthenticated. There used to be a fallback that attached
+    // a fixed master-realm user instead.
+    const { authupClient } = options;
+    if (!options.baseURL || !authupClient) {
+        return (_socket, next) => next();
     }
 
+    const { tokenVerifier } = options;
+
     return createMiddleware({
-        tokenVerifier: options.tokenVerifier,
+        // Built with `createAuthupTokenVerifier`, which refuses malformed
+        // tokens before introspection.
+        tokenVerifier,
         tokenVerifierHandler: (
             socket: Socket,
             data,
-        ) => applyTokenVerificationData(socket, data, options.fakeAbilities, options.authupClient),
+        ) => applyTokenVerificationData(socket, data, authupClient),
     });
 }
 

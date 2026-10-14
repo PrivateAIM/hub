@@ -7,7 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { createDatabase, setDataSource } from 'typeorm-extension';
+import { setDataSource } from 'typeorm-extension';
 import { DataSource } from 'typeorm';
 import {
     DataSourceOptionsBuilder,
@@ -33,11 +33,6 @@ export function createTestDatabaseModule(): IModule {
                 });
             }
 
-            await createDatabase({
-                options,
-                ifNotExist: true,
-                synchronize: false,
-            });
 
             const dataSource = new DataSource(options);
             await dataSource.initialize();

@@ -16,7 +16,6 @@ import {
     it,
 } from 'vitest';
 import { RegistryProjectService } from '../../../../../src/core/entities/registry-project/service.ts';
-import type { FakePermissionChecker } from '../../helpers/index.ts';
 import {
     FakeEntityRepository,
     createAllowAllActor,
@@ -102,7 +101,7 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor();
             await service.getMany({}, actor);
 
-            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
+            expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
         });
     });
 
@@ -128,7 +127,7 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor();
             await service.getOne('rp-1', actor);
 
-            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
+            expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
         });
 
         it('should allow node-client to access own registry project secret', async () => {
@@ -152,6 +151,28 @@ describe('RegistryProjectService', () => {
 
             const result = await service.getOne(registryProjectId, actor);
             expect(result.id).toBe(registryProjectId);
+        });
+
+        it('should not mistake a failing permission check for a denial', async () => {
+            // Only a denial may fall through to the node-client fallback; an
+            // infrastructure failure must surface instead of being read as
+            // "not permitted" and answered by the fallback.
+            const registryProjectId = 'rp-1';
+            const clientId = randomUUID();
+
+            repository.seed(createTestRegistryProject({ id: registryProjectId, accountSecret: 'secret' }));
+            nodeRepository.seed({
+                id: randomUUID(),
+                clientId,
+                registryProjectId,
+            } as Node);
+
+            const failure = new Error('catalog unreachable');
+            const actor = createDenyAllActor();
+            actor.identity = { id: clientId, type: 'client' };
+            actor.permissionEvaluator.denyAll(failure);
+
+            await expect(service.getOne(registryProjectId, actor)).rejects.toBe(failure);
         });
     });
 

@@ -6,9 +6,10 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IModule } from 'orkos';
+import type { IModule, ModuleDependency } from 'orkos';
 import { App, serve } from 'routup';
 import {
+    AUTHUP_CLIENT_MODULE_NAME,
     AuthupClientInjectionKey,
     EnvironmentName,
     LoggerInjectionKey,
@@ -29,7 +30,20 @@ import { HTTPInjectionKey } from './constants.ts';
 export class HTTPModule implements IModule {
     readonly name = 'http';
 
-    readonly dependencies: string[] = ['config', 'database', 'victoriaLogs'];
+    /**
+     * `authupClient` is OPTIONAL but declared: this module `tryResolve`s the Authup
+     * client to mount the authorization middleware (HTTP and socket), and that
+     * middleware fails CLOSED without one - every route answers 401, every
+     * socket is refused. Undeclared, `authupClient` was set up first only by
+     * accident of graph depth, so a dependency change elsewhere could have
+     * flipped the order and locked every caller out without a startup error.
+     */
+    readonly dependencies: (string | ModuleDependency)[] = [
+        'config',
+        'database',
+        'victoriaLogs',
+        { name: AUTHUP_CLIENT_MODULE_NAME, optional: true },
+    ];
 
     private instance: HTTPServer | undefined;
 

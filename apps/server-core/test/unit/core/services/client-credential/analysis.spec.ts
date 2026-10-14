@@ -6,57 +6,33 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { BuiltInPolicyType } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Analysis, AnalysisNode, Node } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
 import type { ActorContext } from '@privateaim/server-kit';
 import { createAllowAllActor } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { AnalysisClientCredentialService } from '../../../../../src/core/services/client-credential/index.ts';
-import type {
-    IAnalysisNodeRepository,
-    IAnalysisRepository,
-    INodeRepository,
-} from '../../../../../src/core/index.ts';
+import { FakeAnalysisNodeRepository } from '../../entities/analysis-node/fake-repository.ts';
+import { FakeAnalysisRepository } from '../../entities/analysis/fake-repository.ts';
+import { FakeNodeRepository } from '../../entities/node/fake-repository.ts';
+import { createPermissionActor } from '../../helpers/index.ts';
 import { FakeClientCredentialStore } from './fake-credential-store.ts';
 
-function createAnalysisRepository(analyses: Partial<Analysis>[]): IAnalysisRepository {
-    return { findOneById: async (id: string) => analyses.find((a) => a.id === id) ?? null } as unknown as IAnalysisRepository;
-}
-
-function createNodeRepository(nodes: Partial<Node>[]): INodeRepository {
-    return {
-        findOneBy: async (where: Record<string, any>) => nodes.find(
-            (n) => n.clientId === where.clientId,
-        ) ?? null,
-    } as unknown as INodeRepository;
-}
-
-function createAnalysisNodeRepository(analysisNodes: Partial<AnalysisNode>[]): IAnalysisNodeRepository {
-    return {
-        findOneBy: async (where: Record<string, any>) => analysisNodes.find(
-            (an) => an.analysisId === where.analysisId && an.nodeId === where.nodeId,
-        ) ?? null,
-    } as unknown as IAnalysisNodeRepository;
-}
-
 function nodeClientActor(clientId: string): ActorContext {
-    return {
-        realm: { name: 'node-realm' },
+    // A node client has no analysis-management permission.
+    return createPermissionActor({
+        realm: { id: randomUUID(), name: 'node-realm' },
         identity: { type: 'client', id: clientId },
-        // A node client has no analysis-management permission.
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    });
 }
 
 function userActor(): ActorContext {
-    return {
-        realm: { name: 'some-realm' },
-        identity: { type: 'user', id: randomUUID() },
-        // A plain user without ANALYSIS_UPDATE.
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    // A plain user without ANALYSIS_UPDATE.
+    return createPermissionActor({ realm: { id: randomUUID(), name: 'some-realm' } });
 }
 
 /**
@@ -64,11 +40,7 @@ function userActor(): ActorContext {
  * realm membership alone never grants access.
  */
 function masterRealmWithoutPermissionActor(): ActorContext {
-    return {
-        realm: { name: REALM_MASTER_NAME },
-        identity: { type: 'user', id: randomUUID() },
-        permissionChecker: { preCheck: async () => { throw new Error('forbidden'); } },
-    } as unknown as ActorContext;
+    return createPermissionActor({ realm: { id: randomUUID(), name: REALM_MASTER_NAME } });
 }
 
 const ANALYSIS_ID = randomUUID();
@@ -80,11 +52,20 @@ function buildService(opts: {
     analysisNodes?: Partial<AnalysisNode>[];
     secret?: string | null;
 }) {
+    const repository = new FakeAnalysisRepository();
+    if (opts.analysis) repository.seed(repository.create(opts.analysis));
+
+    const nodeRepository = new FakeNodeRepository();
+    nodeRepository.seed((opts.nodes || []).map((node) => nodeRepository.create(node)));
+
+    const analysisNodeRepository = new FakeAnalysisNodeRepository();
+    analysisNodeRepository.seed((opts.analysisNodes || []).map((entity) => analysisNodeRepository.create(entity)));
+
     const reader = new FakeClientCredentialStore(opts.secret);
     const service = new AnalysisClientCredentialService({
-        repository: createAnalysisRepository(opts.analysis ? [opts.analysis] : []),
-        nodeRepository: createNodeRepository(opts.nodes || []),
-        analysisNodeRepository: createAnalysisNodeRepository(opts.analysisNodes || []),
+        repository,
+        nodeRepository,
+        analysisNodeRepository,
         credentialStore: reader,
     });
     return { service, reader };
@@ -170,6 +151,40 @@ describe('AnalysisClientCredentialService', () => {
         await expect(
             service.getCredentials(ANALYSIS_ID, userActor()),
         ).rejects.toThrow(PermissionDeniedError);
+    });
+
+    it('should deny a manager of another realm', async () => {
+        // ANALYSIS_UPDATE alone is a permission, not a reach: a manager of
+        // realm B must not read realm A's analysis client secret.
+        const { service, reader } = buildService({ analysis: baseAnalysis() });
+
+        const actor = createPermissionActor({
+            realm: { id: randomUUID(), name: 'other-realm' },
+            permissions: [PermissionName.ANALYSIS_UPDATE],
+        });
+
+        await expect(
+            service.getCredentials(ANALYSIS_ID, actor),
+        ).rejects.toThrow(PermissionDeniedError);
+        expect(reader.calls).toHaveLength(0);
+    });
+
+    it('should return credentials for a manager of the analysis realm', async () => {
+        const realmId = randomUUID();
+        const { service } = buildService({ analysis: baseAnalysis({ realmId }) });
+
+        const actor = createPermissionActor({
+            realm: { id: realmId, name: 'analysis-realm' },
+            permissions: [PermissionName.ANALYSIS_UPDATE],
+        });
+
+        const credentials = await service.getCredentials(ANALYSIS_ID, actor);
+        expect(credentials.secret).toBe('the-secret');
+
+        // fully evaluated against the analysis, so attribute policies on the
+        // grant apply to the secret read as they do to setCredentials
+        const [call] = actor.permissionEvaluator.evaluateCalls;
+        expect(call?.data?.get(BuiltInPolicyType.ATTRIBUTES)).toMatchObject({ id: ANALYSIS_ID });
     });
 
     it('should reject when the analysis has no client provisioned', async () => {

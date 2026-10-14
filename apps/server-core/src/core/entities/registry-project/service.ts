@@ -15,6 +15,7 @@ import {
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { holdsPermission } from '../../utils/index.ts';
 import { eq } from '@rapiq/core';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IRegistryManager } from '../node/types.ts';
@@ -84,12 +85,11 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     private async checkSecretFieldAccess(entities: RegistryProject[], actor: ActorContext): Promise<void> {
-        try {
-            await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        if (await holdsPermission(actor, PermissionName.REGISTRY_MANAGE)) {
             return;
-        } catch {
-            // permission not granted — check node-client condition
         }
+
+        // permission not granted — check node-client condition
 
         if (
             actor.identity &&
@@ -111,7 +111,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     async create(data: Partial<RegistryProject>, actor: ActorContext): Promise<RegistryProject> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
 
         await this.repository.validateJoinColumns(validated);
 
@@ -129,7 +129,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     async update(id: string, data: Partial<RegistryProject>, actor: ActorContext): Promise<RegistryProject> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
@@ -163,7 +163,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async delete(id: string, actor: ActorContext): Promise<RegistryProject> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {

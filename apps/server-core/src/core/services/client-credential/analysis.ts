@@ -12,6 +12,7 @@ import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { holdsPermission } from '../../utils/index.ts';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
@@ -31,8 +32,9 @@ type AnalysisClientCredentialServiceContext = {
 /**
  * Hands the credentials of an analysis' dedicated client to the parties allowed
  * to run it on the node side (plan 010, phase 3 — mechanism A, the pull path).
- * Authorization is fail-closed: only a master-realm member or the node that
- * actually runs the analysis may read the secret.
+ * Authorization is fail-closed: only a manager (ANALYSIS_UPDATE) of the
+ * analysis' realm or the node that actually runs the analysis may read the
+ * secret.
  */
 export class AnalysisClientCredentialService extends AbstractEntityService implements IAnalysisClientCredentialService {
     protected repository: IAnalysisRepository;
@@ -79,7 +81,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
     ): Promise<ClientCredentials> {
         // Writing is a manager action (ANALYSIS_UPDATE), not the read path's
         // master-or-assigned-node rule: the running analysis never rotates.
-        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
 
         const analysis = await this.repository.findOneById(analysisId);
         if (!analysis) {
@@ -94,7 +96,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
         // matching once attribute policies are enabled, and a denylist-shaped one
         // then fails OPEN. See docs/src/guide/development/migration-camelcase.md
         // -> "Authup attribute policies".
-        await actor.permissionChecker.check({
+        await actor.permissionEvaluator.evaluate({
             name: PermissionName.ANALYSIS_UPDATE,
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
         });
@@ -113,8 +115,8 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
     /**
      * Fail-closed: the client of a node that is assigned to this analysis with
      * an APPROVED analysis-node link may always read (the referenced identity);
-     * any other caller must actually hold {@link PermissionName.ANALYSIS_UPDATE}.
-     * Being a master-realm member is, by itself, not sufficient: membership is
+     * any other caller must actually hold {@link PermissionName.ANALYSIS_UPDATE}
+     * and be permitted to write the analysis' realm. Being a master-realm member is, by itself, not sufficient: membership is
      * not a permission.
      */
     protected async isAuthorized(analysis: Analysis, actor: ActorContext): Promise<boolean> {
@@ -132,11 +134,17 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             }
         }
 
-        try {
-            await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
-            return true;
-        } catch {
+        // A permission is not a reach: like setCredentials and the node
+        // credential service, a manager must also be permitted to write the
+        // analysis' realm, or one realm's manager reads another realm's secret.
+        if (!await holdsPermission(
+            actor,
+            PermissionName.ANALYSIS_UPDATE,
+            new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
+        )) {
             return false;
         }
+
+        return isRealmResourceWritable(actor.realm, analysis.realmId);
     }
 }

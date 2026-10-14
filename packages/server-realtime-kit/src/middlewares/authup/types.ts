@@ -7,12 +7,11 @@
 
 import type { IClient } from '@authup/core-http-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { TokenVerifier } from '@authup/server-adapter-kit';
+import type { ITokenVerifier } from '@authup/server-adapter-kit';
 
 export type AuthorizationMiddlewareRegistrationOptions = {
-    tokenVerifier: TokenVerifier,
+    tokenVerifier: ITokenVerifier,
     authupClient?: IClient,
     baseURL?: string,
-    fakeAbilities?: boolean,
     logger?: Logger,
 };

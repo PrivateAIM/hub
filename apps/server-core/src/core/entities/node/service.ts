@@ -65,7 +65,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
     async create(data: Partial<Node>, actor: ActorContext): Promise<Node> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.NODE_CREATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.NODE_CREATE });
 
         await this.repository.validateJoinColumns(validated);
 
@@ -93,7 +93,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
     async update(id: string, data: Partial<Node>, actor: ActorContext): Promise<Node> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.NODE_UPDATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.NODE_UPDATE });
 
         await this.repository.validateJoinColumns(validated);
 
@@ -134,7 +134,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
     }
 
     async delete(id: string, actor: ActorContext): Promise<Node> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.NODE_DELETE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.NODE_DELETE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {

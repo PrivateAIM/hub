@@ -12,6 +12,11 @@ export enum ErrorCode {
 
     // Identity Auth
     IDENTITY_UNAUTHORIZED = 'identity_unauthorized',
+    // Adopted verbatim from authup's `JWTError` vocabulary, so a dead bearer
+    // keeps its code across the boundary.
+    JWT_INVALID = 'invalid_token',
+    JWT_INACTIVE = 'inactive_token',
+    JWT_EXPIRED = 'expired_token',
 
     // Entity Codes
     ENTITY_NOT_FOUND = 'entity_not_found',
@@ -20,6 +25,10 @@ export enum ErrorCode {
 
     // Permission Codes
     PERMISSION_DENIED = 'permission_denied',
+    // Adopted verbatim from authup's `PermissionError` vocabulary, so an
+    // evaluator denial keeps its code across the boundary.
+    PERMISSION_EVALUATION_FAILED = 'permission_evaluation_failed',
+    PERMISSION_NOT_FOUND = 'permission_not_found',
 
     // Storage Codes
     STORAGE_INSUFFICIENT = 'storage_insufficient',

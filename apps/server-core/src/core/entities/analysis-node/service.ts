@@ -17,6 +17,7 @@ import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { holdsPermission } from '../../utils/index.ts';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisNodeSchema } from './schema.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
@@ -72,7 +73,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
     async create(data: Partial<AnalysisNode>, actor: ActorContext): Promise<AnalysisNode> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
 
         await this.repository.validateJoinColumns(validated);
 
@@ -140,20 +141,8 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             throw new PermissionDeniedError('You are neither part of the node nor analysis realm.');
         }
 
-        let canUpdate = false;
-        try {
-            await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
-            canUpdate = true;
-        } catch {
-            // do nothing
-        }
-        let canApprove = false;
-        try {
-            await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_APPROVE });
-            canApprove = true;
-        } catch {
-            // do nothing
-        }
+        const canUpdate = await holdsPermission(actor, PermissionName.ANALYSIS_UPDATE);
+        const canApprove = await holdsPermission(actor, PermissionName.ANALYSIS_APPROVE);
 
         if (!canUpdate && !canApprove) {
             throw new PermissionDeniedError();
@@ -164,7 +153,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             isPropertySet(validated, 'comment')
         ) {
             if (!isAuthorityOfNode || !canApprove) {
-                throw new BadRequestError(
+                throw new PermissionDeniedError(
                     'You are either no authority of the node or you don\'t have the required permissions.',
                 );
             }
@@ -172,7 +161,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         if (isPropertySet(validated, 'executionStatus')) {
             if (!isAuthorityOfNode || !canUpdate) {
-                throw new BadRequestError(
+                throw new PermissionDeniedError(
                     'You are either no authority of the node or you don\'t have the required permissions.',
                 );
             }
@@ -188,7 +177,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
     }
 
     async delete(id: string, actor: ActorContext): Promise<AnalysisNode> {
-        await actor.permissionChecker.preCheckOneOf({
+        await actor.permissionEvaluator.preEvaluateOneOf({
             name: [
                 PermissionName.ANALYSIS_UPDATE,
                 PermissionName.ANALYSIS_APPROVE,

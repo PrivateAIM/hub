@@ -5,16 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TokenVerifier } from '@authup/server-adapter-kit';
+import type { ITokenVerifier } from '@authup/server-adapter-kit';
 import type { Client as RedisClient } from 'redis-extension';
-import type { Client as AuthupClient } from '@authup/core-http-kit';
+import type { Client as AuthupClient, TokenCreator } from '@authup/core-http-kit';
+
+export type AuthTokenVerifierCreateContext = {
+    baseURL?: string,
+    creator: TokenCreator,
+    redisClient?: RedisClient,
+};
 
 export type AuthorizationMiddlewareRegistrationOptions = {
+    /**
+     * Required to authenticate anything: without it the middleware attaches
+     * no identity, so every `ForceLoggedInMiddleware` route answers 401.
+     */
     authupClient?: AuthupClient,
     redisClient?: RedisClient,
-    tokenVerifier?: TokenVerifier,
+    /**
+     * Build it with `createAuthupTokenVerifier`, which refuses malformed
+     * tokens before introspection.
+     */
+    tokenVerifier: ITokenVerifier,
 
-    dryRun?: boolean,
 
     /**
      * Namespace prefixed onto the cookie-fallback token lookup

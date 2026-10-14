@@ -44,6 +44,8 @@ export function createApplication() {
                 }),
             ],
         })
+        .withAuthupHook()
+        .withAuthupClient()
         .withDatabase()
         .withSweeper()
         .withWakeup()

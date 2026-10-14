@@ -48,7 +48,7 @@ All services integrate with **Authup** (OAuth2 identity provider):
 
 - Token validation via `@authup/server-adapter` middleware
 - Per-realm permission checks via `@authup/access`
-- Two-phase permission model: `preCheck` (fast fail) then `check` (with policy attributes)
+- Two-phase permission model: `preEvaluate` (fast fail) then `evaluate` (with policy attributes)
 
 ## Domain Events & Messaging
 

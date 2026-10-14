@@ -48,7 +48,7 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
     }
 
     async delete(id: string, actor: ActorContext): Promise<MasterImageGroup> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.MASTER_IMAGE_GROUP_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.MASTER_IMAGE_GROUP_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {

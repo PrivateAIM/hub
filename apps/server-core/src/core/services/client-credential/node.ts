@@ -9,6 +9,7 @@ import type { Node } from '@privateaim/core-kit';
 import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
+import { holdsPermission } from '../../utils/index.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type {
     ClientCredentials,
@@ -95,9 +96,7 @@ export class NodeClientCredentialService implements INodeClientCredentialService
             return true;
         }
 
-        try {
-            await actor.permissionChecker.preCheck({ name: PermissionName.NODE_UPDATE });
-        } catch {
+        if (!await holdsPermission(actor, PermissionName.NODE_UPDATE)) {
             return false;
         }
 
