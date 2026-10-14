@@ -147,8 +147,17 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
             }
 
             // Otherwise the consumer died mid-handling (crash, consumer
-            // timeout), so the redelivery counts as a failed attempt.
-            await this.retry(routing, payload);
+            // timeout), so the redelivery counts as a failed attempt. Held in
+            // flight through the backoff, so a reset during it is not retried twice.
+            // ponytail: a reset between the retry publish and the ack still
+            // duplicates the command; at-least-once until a claim exists (F9/F10).
+            this.inFlight.add(payload.id);
+
+            try {
+                await this.retry(routing, payload);
+            } finally {
+                this.inFlight.delete(payload.id);
+            }
 
             return;
         }

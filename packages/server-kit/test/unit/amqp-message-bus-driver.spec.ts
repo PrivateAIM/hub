@@ -115,6 +115,17 @@ describe('src/message-bus/driver/amqp', () => {
         expect(driver.published).toHaveLength(1);
     });
 
+    it('should not retry a redelivery twice when the channel resets during its backoff', async () => {
+        const driver = new TestDriver();
+        const message = createMessage(work);
+
+        const retrying = driver.run(work, message, () => {}, true);
+        await driver.run(work, message, () => {}, true);
+        await retrying;
+
+        expect(driver.published).toHaveLength(1);
+    });
+
     it('should drop a work message once its attempts are exhausted', async () => {
         const driver = new TestDriver(3);
 
