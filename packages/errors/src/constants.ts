@@ -12,6 +12,11 @@ export enum ErrorCode {
 
     // Identity Auth
     IDENTITY_UNAUTHORIZED = 'identity_unauthorized',
+    // Adopted verbatim from authup's `JWTError` vocabulary, so a dead bearer
+    // keeps its code across the boundary.
+    JWT_INVALID = 'invalid_token',
+    JWT_INACTIVE = 'inactive_token',
+    JWT_EXPIRED = 'expired_token',
 
     // Entity Codes
     ENTITY_NOT_FOUND = 'entity_not_found',

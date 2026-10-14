@@ -6,6 +6,8 @@
  */
 
 import { AuthorizationCatalogStaleError, PermissionError } from '@authup/access';
+import { AuthupError } from '@authup/errors';
+import { JWTError } from '@authup/specs';
 import {
     ErrorCode as HubErrorCode,
     httpStatusFromCode,
@@ -205,5 +207,30 @@ describe('core/error/sanitize', () => {
 
         expect(isInternalError(output)).toBeTruthy();
         expect(httpStatusFromCode(output.code)).toEqual(500);
+    });
+    /**
+     * The auth middleware forwards a dead bearer's `JWTError` via
+     * `event.next(err)`. It is an `AuthupError`, so before the generic authup
+     * branch it reached the internal branch and answered 500 instead of 401.
+     */
+    it.each([
+        ['expired', JWTError.expired()],
+        ['invalid', JWTError.invalid()],
+        ['not active before', JWTError.notActiveBefore()],
+    ])('should answer a dead bearer (%s) with 401', (_label, input) => {
+        const output = sanitizeError(input);
+
+        expect(output.code).toEqual(input.code);
+        expect(httpStatusFromCode(output.code)).toEqual(401);
+    });
+
+    it('should re-derive the code of an authup error hub does not know from its authup status', () => {
+        // `invalid_client` is 401 upstream; hub has no such code, so a verbatim
+        // copy would resolve to hub's 400 fallback.
+        const output = sanitizeError(new AuthupError({ code: 'invalid_client', message: 'bad client' }));
+
+        expect(output.code).toEqual(HubErrorCode.IDENTITY_UNAUTHORIZED);
+        expect(httpStatusFromCode(output.code)).toEqual(401);
+        expect(output.message).toEqual('bad client');
     });
 });

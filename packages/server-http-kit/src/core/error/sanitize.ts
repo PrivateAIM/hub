@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isAuthorizationCatalogStaleError, isPermissionError } from '@authup/access';
+import { isAuthorizationCatalogStaleError } from '@authup/access';
+import { httpStatusFromCode as authupHttpStatusFromCode, isAuthupError } from '@authup/errors';
 import { isObject } from '@authup/kit';
 import {
     BadRequestError,
@@ -15,6 +16,7 @@ import {
     InternalError,
     StorageInsufficientError,
     codeFromHttpStatus,
+    httpStatusFromCode,
     isHubError,
 } from '@privateaim/errors';
 import { isHTTPError } from '@ebec/http';
@@ -27,8 +29,9 @@ import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'v
  *
  * 1. HubError instance                 → returned as-is
  * 2. EntityRelationLookupError         → EntityRelationInvalidError
- * 3. authup PermissionError          → HubError keeping its permission_* code (403)
- * 4. stale authorization catalog       → InternalError
+ * 3. stale authorization catalog       → InternalError
+ * 4. any other authup error            → HubError with authup's status
+ *    (permission_* → 403, invalid/inactive/expired_token → 401)
  * 5. rapiq decode error                → BadRequestError carrying its parse trace
  *    (ParseError covers the per-parameter subclasses, CodecError an unresolvable
  *    codec stamp — both are triggered by wire input; Adapter/Build/Merge/Schema
@@ -53,30 +56,39 @@ export function sanitizeError(input: unknown): HubError {
         });
     }
 
-    // An evaluator denial. ABOVE the validup branch for the same reason as the
-    // rapiq branch below: `evaluationFailed` carries the failed policy's issues,
-    // so the validup shape fallback claimed it and the denial answered 400;
-    // `deniedAll` (no issues) fell through to the internal branch and answered
-    // 500. The authup code is kept verbatim — every `permission_*` code maps to
-    // 403 in `ERROR_CODE_TO_STATUS`, as it does upstream in `@authup/errors`.
-    if (isPermissionError(input)) {
-        return new HubError({
-            code: input.code,
-            message: input.message,
-            stack: input.stack,
-            issues: input.issues,
-        });
-    }
-
     // The catalog this request fetched predates a grant its token carries — a
     // definition or junction row created between the catalog read and the
     // introspection. Not the caller's fault and not a denial, so neither 4xx
-    // fits; a retry (which refetches the catalog) resolves it. Answered 500 so
-    // it is logged as a server error rather than hidden behind a client status.
+    // fits. Answered 500 so it is logged as a server error rather than hidden
+    // behind a client status. Checked BEFORE the generic authup branch: it is a
+    // marker-only `AuthupError` with no code of its own, which that branch would
+    // resolve to the 400 fallback.
     if (isAuthorizationCatalogStaleError(input)) {
         return new InternalError({
             message: input.message,
             stack: input.stack,
+        });
+    }
+
+    // Any other authup error — an evaluator denial (`permission_*`), a dead
+    // bearer forwarded by the auth middleware (`JWTError`: `invalid_token`,
+    // `inactive_token`, `expired_token`), … — answers the status authup itself
+    // assigns it. ABOVE the validup branch for the same reason as the rapiq
+    // branch below: `evaluationFailed` carries the failed policy's issues, so
+    // the validup shape fallback claimed it and the denial answered 400, while
+    // an issue-free authup error fell through to the internal branch and
+    // answered 500. The code is kept verbatim when hub's own table resolves it
+    // to the same status; otherwise it is re-derived from authup's status, so
+    // hub can never answer a different status than authup would.
+    if (isAuthupError(input)) {
+        const status = authupHttpStatusFromCode(input.code);
+        return new HubError({
+            code: httpStatusFromCode(input.code) === status ?
+                input.code :
+                codeFromHttpStatus(status),
+            message: input.message,
+            stack: input.stack,
+            issues: input.issues,
         });
     }
 
