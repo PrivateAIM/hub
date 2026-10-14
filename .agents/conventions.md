@@ -84,12 +84,17 @@ entry: ['src/index.ts', 'src/testing/index.ts']
 Built with **tsdown** (JS) + **tsc** (typecheck gate):
 
 ```bash
-npm run build:js      # tsdown (bundle: false, preserves directory structure)
+npm run build:js      # tsdown (unbundle: true, preserves directory structure)
 npm run build:types   # tsc --noEmit -p tsconfig.build.json  (TYPECHECK ONLY)
 npm run build         # rimraf dist/ + both above
 ```
 
-Config: `tsdown.config.ts` per service — `entry: ['src/**/*.ts']`, `format: 'esm'`, `bundle: false`, `dts: false`, `sourcemap: true`.
+Config: `tsdown.config.ts` per service — `entry: ['src/**/*.ts']`, `format: 'esm'`, `unbundle: true`, `dts: false`, `sourcemap: true`.
+
+> tsdown 0.23 removed `bundle`. A leftover `bundle: false` is **silently ignored** (the config is not
+> type-checked by any `build:types`), so the build still succeeds but emits hashed shared chunks and
+> inlines any import the service does not declare in its own `package.json` into
+> `dist/node_modules/` — a second module instance. Declare every runtime import directly.
 
 Output: ESM files (`dist/**/*.mjs`) preserving source directory structure. CLI entry points at `dist/cli/index.mjs`.
 

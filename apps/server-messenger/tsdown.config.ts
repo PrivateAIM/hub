@@ -3,7 +3,7 @@ import { defineConfig } from 'tsdown';
 export default defineConfig({
     entry: ['src/**/*.ts'],
     format: 'esm',
-    bundle: false,
+    unbundle: true,
     dts: false,
     sourcemap: true,
     shims: true,

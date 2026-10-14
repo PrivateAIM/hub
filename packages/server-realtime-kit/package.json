@@ -38,11 +38,11 @@
     },
     "devDependencies": {
         "redis-extension": "^2.0.4",
-        "socket.io": "^4.8.3"
+        "socket.io": "^4.8.4"
     },
     "peerDependencies": {
         "redis-extension": "^2.0.4",
-        "socket.io": "^4.8.3"
+        "socket.io": "^4.8.4"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
