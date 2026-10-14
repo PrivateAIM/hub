@@ -14,12 +14,49 @@ import {
 } from 'vitest';
 import path from 'node:path';
 import fs from 'node:fs';
+import type { Readable } from 'node:stream';
+import type { ComponentHandlerContext } from '@privateaim/server-kit';
+import type { BucketComponentEventMap } from '@privateaim/server-storage-kit';
+import { BucketCommand, BucketEvent } from '@privateaim/server-storage-kit';
 import { createAdminAuthorizationHeader } from '@privateaim/server-test-kit';
 import {
     createTestSuite,
 } from '../../utils/index.ts';
 import { createTestBucket } from '../../utils/domains/index.ts';
 import { toBucketName } from '../../../src/core/utils/bucket-name.ts';
+import type { IStorageAdapter } from '../../../src/core/storage/types.ts';
+import { BucketClearHandler } from '../../../src/app/components/bucket/handlers/clear/index.ts';
+
+/**
+ * Delegates to a real adapter, but fails object removal like an unreachable backend.
+ */
+class FailingRemoveStorageAdapter implements IStorageAdapter {
+    protected inner: IStorageAdapter;
+
+    constructor(inner: IStorageAdapter) {
+        this.inner = inner;
+    }
+
+    bucketExists(name: string) { return this.inner.bucketExists(name); }
+
+    makeBucket(name: string, region?: string) { return this.inner.makeBucket(name, region); }
+
+    removeBucket(name: string) { return this.inner.removeBucket(name); }
+
+    putObject(bucket: string, key: string, data: Buffer | Readable, size?: number) {
+        return this.inner.putObject(bucket, key, data, size);
+    }
+
+    getObject(bucket: string, key: string) { return this.inner.getObject(bucket, key); }
+
+    removeObject(bucket: string, key: string) { return this.inner.removeObject(bucket, key); }
+
+    async removeObjects(): Promise<void> {
+        throw new Error('storage unavailable');
+    }
+
+    listObjects(bucket: string, prefix?: string) { return this.inner.listObjects(bucket, prefix); }
+}
 
 describe('bucket HTTP endpoints', () => {
     const suite = createTestSuite();
@@ -254,6 +291,35 @@ describe('bucket HTTP endpoints', () => {
     });
 
     describe('POST /buckets/:id/clear', () => {
+        function createClearContext() {
+            const emitted: string[] = [];
+            const context: ComponentHandlerContext<BucketComponentEventMap, BucketCommand.CLEAR> = {
+                key: BucketCommand.CLEAR,
+                metadata: {},
+                handle: async (key) => { emitted.push(key); },
+            };
+            return { context, emitted };
+        }
+
+        it('should rethrow a transient failure (bus retry) and keep the files', async () => {
+            const handler = new BucketClearHandler({ storage: new FailingRemoveStorageAdapter(suite.storage()) });
+            const { context, emitted } = createClearContext();
+
+            await expect(handler.handle({ id: bucketId }, context)).rejects.toThrow('storage unavailable');
+            expect(emitted).toContain(BucketEvent.CLEARING_FAILED);
+
+            const files = await suite.client().bucketFile.getMany({ filters: { bucketId } });
+            expect(files.data.length).toBeGreaterThanOrEqual(1);
+        });
+
+        it('should not rethrow for a missing bucket (no retry)', async () => {
+            const handler = new BucketClearHandler({ storage: suite.storage() });
+            const { context, emitted } = createClearContext();
+
+            await expect(handler.handle({ id: '00000000-0000-0000-0000-000000000000' }, context)).resolves.toBeUndefined();
+            expect(emitted).toContain(BucketEvent.CLEARING_FAILED);
+        });
+
         it('should remove all files and stored objects but keep the bucket', async () => {
             const client = suite.client();
             const bucketName = toBucketName(bucketId);

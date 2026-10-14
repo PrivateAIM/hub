@@ -8,6 +8,7 @@
 import { faker } from '@faker-js/faker';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import type { BucketClearingFinishedEventPayload } from '@privateaim/server-storage-kit';
+import { BucketEvent } from '@privateaim/server-storage-kit';
 import {
     afterAll,
     beforeAll,
@@ -23,6 +24,7 @@ import {
     ProjectEntity,
 } from '../../../../src/adapters/database/index.ts';
 import { StorageBucketClearingFinishedHandler } from '../../../../src/app/aggregators/storage/bucket/handlers/clearing_finished.ts';
+import { StorageBucketDeletionFinishedHandler } from '../../../../src/app/aggregators/storage/bucket/handlers/deletion_finished.ts';
 import { ComponentsInjectionKey } from '../../../../src/app/modules/components/index.ts';
 import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index.ts';
 import { createTestDatabaseApplication } from '../../../app';
@@ -113,5 +115,27 @@ describe('storage bucket aggregator', () => {
         await handler.handle(createPayload(bucket, []));
 
         expect(await findFileIds(bucket.bucketId)).toEqual(files.map((file) => file.id).sort());
+    });
+
+    it('should detach the analysis bucket on a deletion without task (storage HTTP delete)', async () => {
+        const deleted = await createBucketWithFiles();
+        const kept = await createBucketWithFiles();
+
+        const deletionHandler = new StorageBucketDeletionFinishedHandler({
+            dataSource,
+            taskManager: suite.container.resolve(ComponentsInjectionKey.TaskManager),
+        });
+        const { fileIds, ...bucket } = createPayload(deleted.bucket, []);
+        expect(fileIds).toEqual([]);
+
+        await deletionHandler.handle(bucket, {
+            key: BucketEvent.DELETION_FINISHED,
+            metadata: {},
+            handle: async () => {},
+        });
+
+        const repository = dataSource.getRepository(AnalysisBucketEntity);
+        expect(await repository.findOneBy({ id: deleted.bucket.id })).toBeNull();
+        expect(await repository.findOneBy({ id: kept.bucket.id })).not.toBeNull();
     });
 });

@@ -47,6 +47,8 @@ export class BucketCallerAdapter implements IBucketCaller {
         const output = await caller.callAndWait(BucketCommand.DELETE, { id }, {});
 
         if (output.deletionFinished) {
+            // in-process run: forward to the bus, so server-core drops its analysis bucket row too.
+            await this.eventCaller?.call(BucketEvent.DELETION_FINISHED, output.deletionFinished, {});
             return output.deletionFinished;
         }
 

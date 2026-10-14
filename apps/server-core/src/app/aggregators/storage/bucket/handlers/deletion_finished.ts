@@ -8,7 +8,6 @@ import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 import { AnalysisBucketEntity } from '../../../../../adapters/database/index.ts';
-import { TaskType } from '../../../../../core/domains/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
 
 export class StorageBucketDeletionFinishedHandler extends BaseAggregatorHandler<
@@ -16,23 +15,17 @@ export class StorageBucketDeletionFinishedHandler extends BaseAggregatorHandler<
     BucketEvent.DELETION_FINISHED
 > {
     async handle(bucket: Bucket, context: ComponentHandlerContext<BucketComponentEventMap, BucketEvent.DELETION_FINISHED>): Promise<void> {
-        const task = await this.resolveTask(context);
-        if (!task) {
+        // releases the pending task (if core triggered the delete); the row is
+        // matched by bucket id alone, so a delete issued over storage's HTTP API
+        // (no task) detaches the analysis bucket as well.
+        await this.resolveTask(context);
+
+        const analysisBucketRepository = this.dataSource.getRepository(AnalysisBucketEntity);
+        const analysisBucket = await analysisBucketRepository.findOneBy({ bucketId: bucket.id });
+        if (!analysisBucket) {
             return;
         }
 
-        if (task.type === TaskType.ANALYSIS_BUCKET_DELETE) {
-            const analysisBucketRepository = this.dataSource.getRepository(AnalysisBucketEntity);
-            const analysisBucket = await analysisBucketRepository.findOneBy({
-                analysisId: task.data.analysisId,
-                bucketId: bucket.id,
-            });
-
-            if (!analysisBucket) {
-                return;
-            }
-
-            await analysisBucketRepository.remove(analysisBucket);
-        }
+        await analysisBucketRepository.remove(analysisBucket);
     }
 }

@@ -58,6 +58,12 @@ export class BucketClearHandler implements ComponentHandler<
                     error: e,
                 },
             );
+
+            // clear is idempotent: rethrow so the bus retries a transient failure
+            // (bounded, plan 018); a missing bucket stays missing, so no retry.
+            if (!(e instanceof EntityNotFoundError)) {
+                throw e;
+            }
         }
     }
 
