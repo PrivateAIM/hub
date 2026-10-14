@@ -258,7 +258,9 @@ introspection grants and identity. Do not flatten grants to permission names: th
 loses definition policies, junction policies and realm reach. The identity and its
 grants are placed only for a token scoped `global` (`resolveAuthupPolicySubject`, mirroring
 authup's `useRequestPolicyIdentity`); any other token authenticates but every permission
-carrying the binding policy denies. The credential needs
+carrying the binding policy denies. The gate covers the permission evaluator ONLY — the
+request identity is still attached, so identity-based checks (credential ownership, the
+messenger mailbox, bucket ownership, socket rooms) still honour a non-`global` token. The credential needs
 `permission_read` at `ownOrNull` or wider. Fetch failures propagate; no cross-request
 catalog cache or name-only fallback is installed. Token-verifier caching and socket
 connection lifetimes remain unchanged.

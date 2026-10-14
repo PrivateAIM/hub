@@ -32,7 +32,11 @@ apply, so changes to grants are visible when those are refreshed.
 
 Grants are only evaluated for tokens carrying the `global` scope, as in Authup
 itself. A token issued without it (e.g. a custom login client registered without
-`global`) still authenticates, but every permission check denies with 403.
+`global`) still authenticates, but every **permission** check denies with 403.
+The gate withholds the identity from the permission evaluator only: paths that
+authorize by identity rather than by permission — a node or analysis client
+reading its own credentials, the messenger mailbox, bucket ownership, realm
+socket rooms — still honour such a token.
 client-ui requests `global openid`, and Authup's client-credentials and password
 grants always issue `global`.
 

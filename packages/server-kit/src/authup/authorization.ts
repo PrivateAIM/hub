@@ -21,9 +21,12 @@ import type { AuthupPolicySubject, AuthupPolicySubjectInput } from './types.ts';
  * Without an identity the evaluator binds no grant, so every permission
  * whose definition carries the binding policy (authup attaches it to every
  * permission by default) denies. A token minted without `global` therefore
- * authenticates but authorizes nothing — exactly as it does against authup
- * itself. Grants are withheld together with the identity: the evaluator
- * refuses grants that belong to nobody.
+ * fails every PERMISSION check, as it does against authup itself. It still
+ * authenticates, though, and the request identity is still attached — so
+ * hub's identity-based paths (client/node ownership of credentials, the
+ * messenger mailbox, bucket ownership, realm socket rooms) still honour it.
+ * Grants are withheld together with the identity: the evaluator refuses
+ * grants that belong to nobody.
  */
 export function resolveAuthupPolicySubject(input: AuthupPolicySubjectInput): AuthupPolicySubject {
     if (!input.scopes.includes(ScopeName.GLOBAL)) {
