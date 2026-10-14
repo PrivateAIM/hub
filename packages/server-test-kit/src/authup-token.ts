@@ -44,3 +44,77 @@ export async function createAdminAccessToken(baseURL = process.env.AUTHUP_URL): 
 export async function createAdminAuthorizationHeader(baseURL?: string): Promise<string> {
     return `Bearer ${await createAdminAccessToken(baseURL)}`;
 }
+
+/**
+ * Mint an access token for a freshly created master-realm user that holds
+ * EXACTLY `permissionNames` (default: none), so a suite can exercise a real
+ * authorization DENIAL — the admin token resolves every provisioned
+ * permission and can never be refused.
+ *
+ * The user is created through Authup's management API with the admin token,
+ * under a random name so repeated calls (and parallel spec files sharing one
+ * Authup) never collide. Each requested permission must already exist, i.e.
+ * be part of the suite's provisioned set.
+ */
+export async function createRestrictedAccessToken(
+    permissionNames: string[] = [],
+    baseURL = process.env.AUTHUP_URL,
+): Promise<string> {
+    if (!baseURL) {
+        throw new Error('The AUTHUP_URL is not configured — cannot mint a restricted access token.');
+    }
+
+    const adminToken = await createAdminAccessToken(baseURL);
+    const request = async <T>(method: string, path: string, body?: Record<string, any>): Promise<T> => {
+        const response = await fetch(new URL(path, baseURL), {
+            method,
+            headers: {
+                'content-type': 'application/json',
+                authorization: `Bearer ${adminToken}`,
+            },
+            body: body ? JSON.stringify(body) : undefined,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Authup ${method} ${path} failed (${response.status}): ${await response.text()}`);
+        }
+
+        return response.json();
+    };
+
+    const name = `restricted-${Math.random().toString(36).slice(2, 10)}`;
+    const password = 'start123start';
+
+    const { data: user } = await request<{ data: { id: string } }>('POST', 'users', {
+        name,
+        email: `${name}@example.com`,
+        password,
+        active: true,
+    });
+
+    for (const permissionName of permissionNames) {
+        const { data: permissions } = await request<{ data: { id: string }[] }>(
+            'GET',
+            `permissions?filter[name]=${encodeURIComponent(permissionName)}`,
+        );
+        if (permissions.length === 0) {
+            throw new Error(`The permission ${permissionName} is not provisioned — cannot grant it to ${name}.`);
+        }
+
+        await request('POST', 'user-permissions', {
+            userId: user.id,
+            permissionId: permissions[0].id,
+        });
+    }
+
+    const tokenCreator = createAuthupUserTokenCreator({
+        baseURL,
+        name,
+        password,
+        realm: 'master',
+    });
+
+    const response = await tokenCreator();
+
+    return response.access_token;
+}

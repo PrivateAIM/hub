@@ -20,6 +20,10 @@ export enum ErrorCode {
 
     // Permission Codes
     PERMISSION_DENIED = 'permission_denied',
+    // Adopted verbatim from authup's `PermissionError` vocabulary, so an
+    // evaluator denial keeps its code across the boundary.
+    PERMISSION_EVALUATION_FAILED = 'permission_evaluation_failed',
+    PERMISSION_NOT_FOUND = 'permission_not_found',
 
     // Storage Codes
     STORAGE_INSUFFICIENT = 'storage_insufficient',

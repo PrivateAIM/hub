@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isAuthorizationCatalogStaleError, isPermissionError } from '@authup/access';
 import { isObject } from '@authup/kit';
 import {
     BadRequestError,
@@ -26,14 +27,16 @@ import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'v
  *
  * 1. HubError instance                 → returned as-is
  * 2. EntityRelationLookupError         → EntityRelationInvalidError
- * 3. rapiq decode error                → BadRequestError carrying its parse trace
+ * 3. authup PermissionError          → HubError keeping its permission_* code (403)
+ * 4. stale authorization catalog       → InternalError
+ * 5. rapiq decode error                → BadRequestError carrying its parse trace
  *    (ParseError covers the per-parameter subclasses, CodecError an unresolvable
  *    codec stamp — both are triggered by wire input; Adapter/Build/Merge/Schema
  *    errors stay internal)
- * 4. validup Issue error               → BadRequestError carrying issues
- * 5. foreign @ebec/http HTTPError      → HubError with the closest semantic code
- * 6. driver error w/ a recognised code → EntityConflictError or StorageInsufficientError
- * 7. anything else                     → InternalError
+ * 6. validup Issue error               → BadRequestError carrying issues
+ * 7. foreign @ebec/http HTTPError      → HubError with the closest semantic code
+ * 8. driver error w/ a recognised code → EntityConflictError or StorageInsufficientError
+ * 9. anything else                     → InternalError
  *
  * The HTTP-status concern is handled separately by `httpStatusFromCode` in
  * the adapter — this function only assigns a semantic `code`.
@@ -45,6 +48,33 @@ export function sanitizeError(input: unknown): HubError {
 
     if (input instanceof EntityRelationLookupError) {
         return new EntityRelationInvalidError({
+            message: input.message,
+            stack: input.stack,
+        });
+    }
+
+    // An evaluator denial. ABOVE the validup branch for the same reason as the
+    // rapiq branch below: `evaluationFailed` carries the failed policy's issues,
+    // so the validup shape fallback claimed it and the denial answered 400;
+    // `deniedAll` (no issues) fell through to the internal branch and answered
+    // 500. The authup code is kept verbatim — every `permission_*` code maps to
+    // 403 in `ERROR_CODE_TO_STATUS`, as it does upstream in `@authup/errors`.
+    if (isPermissionError(input)) {
+        return new HubError({
+            code: input.code,
+            message: input.message,
+            stack: input.stack,
+            issues: input.issues,
+        });
+    }
+
+    // The catalog this request fetched predates a grant its token carries — a
+    // definition or junction row created between the catalog read and the
+    // introspection. Not the caller's fault and not a denial, so neither 4xx
+    // fits; a retry (which refetches the catalog) resolves it. Answered 500 so
+    // it is logged as a server error rather than hidden behind a client status.
+    if (isAuthorizationCatalogStaleError(input)) {
+        return new InternalError({
             message: input.message,
             stack: input.stack,
         });

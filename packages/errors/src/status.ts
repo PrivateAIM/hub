@@ -19,6 +19,8 @@ export const ERROR_CODE_TO_STATUS: Readonly<Partial<Record<`${ErrorCode}`, numbe
 
     // 403
     [ErrorCode.PERMISSION_DENIED]: 403,
+    [ErrorCode.PERMISSION_EVALUATION_FAILED]: 403,
+    [ErrorCode.PERMISSION_NOT_FOUND]: 403,
 
     // 404
     [ErrorCode.ENTITY_NOT_FOUND]: 404,

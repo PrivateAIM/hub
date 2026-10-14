@@ -5,7 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isBadRequestError, isHubError, isInternalError } from '@privateaim/errors';
+import { AuthorizationCatalogStaleError, PermissionError } from '@authup/access';
+import {
+    ErrorCode as HubErrorCode,
+    httpStatusFromCode,
+    isBadRequestError,
+    isHubError,
+    isInternalError,
+} from '@privateaim/errors';
 import { defineIssueItem } from '@ebec/core';
 import {
     CodecError,
@@ -160,5 +167,43 @@ describe('core/error/sanitize', () => {
 
         expect(isInternalError(output)).toBeTruthy();
         expect(output.message).toEqual('boom');
+    });
+    /**
+     * An authup `PermissionError` is neither a HubError nor an HTTPError. With
+     * issues (the common `evaluationFailed` shape) it used to satisfy validup's
+     * shape fallback and answer 400; without issues (`deniedAll`) it fell
+     * through to the internal branch and answered 500. Either way a denial
+     * never produced 403.
+     */
+    it.each([
+        ['evaluationFailed with issues', PermissionError.evaluationFailed('node_create', [
+            defineIssueItem({ path: [], message: 'The permission node_create was not granted.' }),
+        ])],
+        ['evaluationFailed without issues', PermissionError.evaluationFailed('node_create')],
+        ['deniedAll', PermissionError.deniedAll(['node_create', 'node_update'])],
+        ['denied', PermissionError.denied('node_create')],
+        ['notFound', PermissionError.notFound('node_create')],
+    ])('should answer an authup permission error (%s) with 403', (_label, input) => {
+        const output = sanitizeError(input);
+
+        expect(isHubError(output)).toBeTruthy();
+        expect(output.code).toEqual(input.code);
+        expect(httpStatusFromCode(output.code)).toEqual(403);
+    });
+
+    it('should keep the issues of an authup permission error', () => {
+        const issue = defineIssueItem({ path: [], message: 'The permission node_create was not granted.' });
+        const output = sanitizeError(PermissionError.evaluationFailed('node_create', [issue]));
+
+        expect(output.code).toEqual(HubErrorCode.PERMISSION_EVALUATION_FAILED);
+        expect(output.issues).toHaveLength(1);
+        expect(output.issues[0]).toMatchObject({ message: issue.message });
+    });
+
+    it('should answer a stale authorization catalog as an internal error', () => {
+        const output = sanitizeError(new AuthorizationCatalogStaleError('stale'));
+
+        expect(isInternalError(output)).toBeTruthy();
+        expect(httpStatusFromCode(output.code)).toEqual(500);
     });
 });

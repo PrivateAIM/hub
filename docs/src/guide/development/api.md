@@ -216,6 +216,9 @@ Every failure answers with the same flat object — never the `{ data, meta }` e
 - `code` is the semantic error code; `statusCode` is what it maps to. Branch on `code`, not on the
   message.
 - `issues` is **always present**, as an array — empty when the failure carries no structured detail.
+- An authorization denial answers **403** with one of `permission_denied`,
+  `permission_evaluation_failed` or `permission_not_found` (the last two are Authup's evaluator
+  codes, passed through verbatim). Before this was fixed, an evaluator denial answered 400 or 500.
 
 ### Reading `issues`
 
