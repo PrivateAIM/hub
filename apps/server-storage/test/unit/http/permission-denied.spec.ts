@@ -44,6 +44,15 @@ describe('authorization denial status', () => {
         body: JSON.stringify(createTestBucket()),
     });
 
+    // Credential confusion: a malformed bearer used to be introspected as the
+    // storage service's own client (authup falls back to the request's
+    // inherited `Authorization` header) and could create a bucket as it.
+    it('answers 401 for a malformed bearer instead of acting as the service client', async () => {
+        const response = await createBucket('not-a-token');
+
+        expect(response.status).toBe(401);
+    });
+
     it('answers 403 for an identity holding no permission', async () => {
         const response = await createBucket(await createRestrictedAccessToken());
 

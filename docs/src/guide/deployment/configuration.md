@@ -83,6 +83,24 @@ What an operator must do:
 - Callers (nodes) must send a bearer token on every request, including the
   `GET /messages/stream` SSE stream.
 
+## Malformed bearer tokens no longer authenticate
+
+**Security fix, no operator action required in Hub.** Authup up to
+`1.0.0-beta.69` falls back to the token in the introspection request's own
+`Authorization` header when the submitted `token` fails its validator (shorter
+than 16 or longer than 2048 characters). Hub's token verifier sends that header
+with the service's **own** credentials, so a malformed bearer — `Bearer x`, an
+oversized string, or a garbage `access_token` cookie — was introspected as the
+Hub service client (`active`, `global` scope, its grants) and every Hub service
+acted on it as that client.
+
+Every Hub service now refuses a credential that is not structurally a compact
+JWS within those bounds **before** introspecting it, answering 401 (sockets:
+connection refused). Upgrading Authup to the release that fixes the fallback
+closes the upstream half; until then the Hub-side guard is what stops it. Any
+token-verifier cache (Redis `token:*` keys) may hold entries for such strings —
+flush it once after upgrading.
+
 ## Authup upgrade to beta.69
 
 Hub now requires Authup `1.0.0-beta.69`, a security release. Read the

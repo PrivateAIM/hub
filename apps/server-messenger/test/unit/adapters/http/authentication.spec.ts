@@ -57,6 +57,30 @@ describe('adapters/http/message authentication', () => {
         expect(response.status).toBe(200);
     });
 
+    /**
+     * Credential confusion: authup's introspection falls back to the token in
+     * the request's own `Authorization` header when the body `token` fails its
+     * validator (too short, too long), and hub's verifier inherits its own
+     * service credentials onto that header — so a malformed bearer was
+     * reported as the hub `system` client and answered 200.
+     */
+    it.each([
+        ['a short garbage bearer', 'not-a-token'],
+        ['an oversized bearer', 'x'.repeat(4096)],
+        ['a JWS-shaped bearer shorter than 16 characters', 'a.b.c'],
+        ['a JWS-shaped bearer longer than 2048 characters', `aaaa.bbbb.${'c'.repeat(2100)}`],
+    ])('answers 401 for %s', async (_label, token) => {
+        const response = await fetch(`${app.baseURL}messages`, { headers: { authorization: `Bearer ${token}` } });
+
+        expect(response.status).toBe(401);
+    });
+
+    it('answers 401 for a garbage token in the cookie fallback', async () => {
+        const response = await fetch(`${app.baseURL}messages`, { headers: { cookie: 'access_token=not-a-token' } });
+
+        expect(response.status).toBe(401);
+    });
+
     it('delivers to the recipient only, not to every caller', async () => {
         const alice = app.createClient(aliceToken);
         const bob = app.createClient(bobToken);

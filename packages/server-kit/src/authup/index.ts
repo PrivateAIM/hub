@@ -9,4 +9,5 @@ export * from './client';
 export * from './client-hook';
 export * from './token-creator';
 export * from './authorization.ts';
+export * from './token-shape.ts';
 export * from './types.ts';
