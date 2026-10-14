@@ -6,7 +6,7 @@
  */
 
 import type { AuthorizationCatalog } from '@authup/access';
-import { BuiltInPolicyType, definePolicyData } from '@authup/access';
+import { BuiltInPolicyType, definePolicyData, isPermissionError } from '@authup/access';
 import { Client } from '@authup/core-http-kit';
 import { MemoryTransport } from 'hapic';
 import { describe, expect, it } from 'vitest';
@@ -55,8 +55,9 @@ describe('Authup authorization catalog', () => {
             [BuiltInPolicyType.ATTRIBUTES]: { name },
         });
         await expect(evaluator.evaluate({ name: 'node_update', data: data('00000000-0000-4000-8000-000000000002', 'allowed') })).resolves.toBeUndefined();
-        await expect(evaluator.evaluate({ name: 'node_update', data: data('00000000-0000-4000-8000-000000000003', 'allowed') })).rejects.toThrow();
-        await expect(evaluator.evaluate({ name: 'node_update', data: data('00000000-0000-4000-8000-000000000002', 'denied') })).rejects.toThrow();
+        const denial = (promise: Promise<void>) => promise.then(() => undefined, (e: unknown) => e);
+        expect(isPermissionError(await denial(evaluator.evaluate({ name: 'node_update', data: data('00000000-0000-4000-8000-000000000003', 'allowed') })))).toBe(true);
+        expect(isPermissionError(await denial(evaluator.evaluate({ name: 'node_update', data: data('00000000-0000-4000-8000-000000000002', 'denied') })))).toBe(true);
         expect(requests).toBe(1);
     });
 
@@ -96,7 +97,10 @@ describe('Authup authorization catalog', () => {
             expect(subject).toEqual({});
 
             const evaluator = await createAuthupPermissionEvaluator(client(), subject);
-            await expect(evaluator.preEvaluate({ name: 'node_update' })).rejects.toThrow();
+            // A permission DENIAL specifically (answered 403), not just any
+            // throw: a TypeError or validation error here would answer 500.
+            const error = await evaluator.preEvaluate({ name: 'node_update' }).then(() => undefined, (e: unknown) => e);
+            expect(isPermissionError(error)).toBe(true);
         });
 
         it('withholds the identity for a token without any scope', () => {

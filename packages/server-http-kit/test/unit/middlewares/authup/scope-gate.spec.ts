@@ -6,6 +6,7 @@
  */
 
 import type { AuthorizationCatalog } from '@authup/access';
+import { isPermissionError } from '@authup/access';
 import { Client } from '@authup/core-http-kit';
 import type { ITokenVerifier, TokenVerificationData } from '@authup/server-adapter-kit';
 import { MemoryTransport } from 'hapic';
@@ -57,8 +58,11 @@ async function requestWithScope(scope: string): Promise<number> {
         try {
             await useRequestPermissionEvaluator(event).preEvaluate({ name: 'node_update' });
             return { granted: true };
-        } catch {
-            event.response.status = 403;
+        } catch (e) {
+            // Only a permission DENIAL answers 403. Anything else (a TypeError,
+            // a validation error, a stale catalog) would answer 500 in
+            // production, so it must not pass for the gate working.
+            event.response.status = isPermissionError(e) ? 403 : 500;
             return { granted: false };
         }
     }));
