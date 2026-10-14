@@ -9,6 +9,7 @@ import type { DataSourceOptions } from 'typeorm';
 import {
     CodeTransformation,
     isCodeTransformation,
+    pinTimezone,
     readDataSourceOptionsFromEnv,
     transformFilePath,
 } from 'typeorm-extension';
@@ -108,6 +109,13 @@ export class DataSourceOptionsBuilder {
             } as DataSourceOptions);
         }
 
-        return options;
+        // `created_at` / `updated_at` are zone-less: the database stamps them
+        // in its SESSION timezone and the driver reads them in the PROCESS
+        // timezone, while a bound `Date` (the messenger's expiry sweep) is
+        // written in the process timezone too. All three halves are pinned to UTC, on
+        // every path that builds options (boot, migration CLI, tests). A
+        // setting contradicting the pin throws an `OptionsError` here rather
+        // than being half applied. better-sqlite3 passes through unchanged.
+        return pinTimezone(options, 'UTC');
     }
 }
