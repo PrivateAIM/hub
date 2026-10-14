@@ -115,8 +115,7 @@ apps/server-core/src/
 │   │   ├── project/           # Project, ProjectNode
 │   │   └── registry/          # Registry, RegistryProject
 │   │   ├── migrations/            # postgres/ and mysql/
-│   │   ├── error/                 # Database error types
-│   │   └── query/                 # Realm query helpers
+│   │   └── error/                 # Database error types
 │   ├── http/
 │   │   ├── controllers/
 │   │   │   ├── entities/<entity>/module.ts  # Thin controllers

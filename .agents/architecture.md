@@ -60,7 +60,7 @@ Pure business logic. No imports from `typeorm`, `routup`, or other infrastructur
 
 **Shared base types** (from `@privateaim/server-kit`):
 - `IEntityRepository<T>` — Generic repository port (findMany, findOneById, save, remove, etc.)
-- `AbstractEntityService` — Realm helpers (`isActorMasterRealmMember`, `getActorRealmId`)
+- `AbstractEntityService` — Realm helper (`getActorRealmId`)
 - `ActorContext` — Permission checker + realm + identity, decoupled from HTTP
 - `ValidatorGroup` — Domain-level validation groups (not HTTP-specific)
 - `IPermissionChecker` — Permission evaluation interface (preCheck, check, preCheckOneOf, checkOneOf)
@@ -88,7 +88,6 @@ Implementations that connect domain logic to external systems.
 - `subscribers/<name>.ts` — TypeORM event subscribers (domain event publishing)
 - `migrations/` — PostgreSQL and MySQL migration files
 - `error/` — Database error types (`DatabaseConflictError`)
-- `query/` — Realm-scoped query helpers
 
 **HTTP** (`adapters/http/`):
 - `controllers/entities/<name>/module.ts` — Thin controllers (extract request → delegate to service → send response)
