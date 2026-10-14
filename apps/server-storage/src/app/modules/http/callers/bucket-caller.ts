@@ -7,16 +7,24 @@
 
 import type { Bucket } from '@privateaim/storage-kit';
 import { BadRequestError } from '@privateaim/errors';
+import type { MessageBusDispatchComponentCaller } from '@privateaim/server-kit';
 import { DirectComponentCaller } from '@privateaim/server-kit';
-import { BucketCommand } from '@privateaim/server-storage-kit';
+import type { BucketComponentEventMap } from '@privateaim/server-storage-kit';
+import { BucketCommand, BucketEvent } from '@privateaim/server-storage-kit';
 import type { IBucketCaller } from '../../../../core/entities/index.ts';
 import type { BucketComponent } from '../../../components/bucket/module.ts';
 
 export class BucketCallerAdapter implements IBucketCaller {
     protected component: BucketComponent;
 
-    constructor(component: BucketComponent) {
+    protected eventCaller?: MessageBusDispatchComponentCaller<BucketComponentEventMap>;
+
+    constructor(
+        component: BucketComponent,
+        eventCaller?: MessageBusDispatchComponentCaller<BucketComponentEventMap>,
+    ) {
         this.component = component;
+        this.eventCaller = eventCaller;
     }
 
     async create(data: Record<string, any>): Promise<Bucket> {
@@ -39,6 +47,8 @@ export class BucketCallerAdapter implements IBucketCaller {
         const output = await caller.callAndWait(BucketCommand.DELETE, { id }, {});
 
         if (output.deletionFinished) {
+            // in-process run: forward to the bus, so server-core drops its analysis bucket row too.
+            await this.eventCaller?.call(BucketEvent.DELETION_FINISHED, output.deletionFinished, {});
             return output.deletionFinished;
         }
 
@@ -47,5 +57,25 @@ export class BucketCallerAdapter implements IBucketCaller {
         }
 
         throw new BadRequestError('Bucket could not be deleted.');
+    }
+
+    async clear(id: string): Promise<Bucket> {
+        const caller = new DirectComponentCaller(this.component);
+        const output = await caller.callAndWait(BucketCommand.CLEAR, { id }, {});
+
+        if (output.clearingFinished) {
+            // in-process run: forward to the bus, so server-core drops its file mirror rows too.
+            await this.eventCaller?.call(BucketEvent.CLEARING_FINISHED, output.clearingFinished, {});
+            // HTTP callers get the bare bucket; fileIds is bus-only
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { fileIds, ...bucket } = output.clearingFinished;
+            return bucket;
+        }
+
+        if (output.clearingFailed) {
+            throw output.clearingFailed.error;
+        }
+
+        throw new BadRequestError('Bucket could not be cleared.');
     }
 }

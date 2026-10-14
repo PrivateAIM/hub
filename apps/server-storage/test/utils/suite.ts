@@ -10,6 +10,8 @@ import { inject } from 'vitest';
 import type { APIClient } from '@privateaim/storage-kit';
 import type { TestHTTPApplication } from '../app/http.ts';
 import { createTestApplication } from '../app/factory.ts';
+import type { IStorageAdapter } from '../../src/core/storage/types.ts';
+import { StorageInjectionKey } from '../../src/app/modules/storage/constants.ts';
 
 class TestSuite {
     protected app: TestHTTPApplication;
@@ -24,6 +26,10 @@ class TestSuite {
 
     client() : APIClient {
         return this.app.client;
+    }
+
+    storage() : IStorageAdapter {
+        return this.app.container.resolve(StorageInjectionKey);
     }
 
     async up() {

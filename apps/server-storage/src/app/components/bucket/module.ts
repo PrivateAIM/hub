@@ -16,7 +16,7 @@ import {
     BucketCommand,
 } from '@privateaim/server-storage-kit';
 import type { IStorageAdapter } from '../../../core/storage/types.ts';
-import { BucketCreateHandler, BucketDeleteHandler } from './handlers/index.ts';
+import { BucketClearHandler, BucketCreateHandler, BucketDeleteHandler } from './handlers/index.ts';
 
 export class BucketComponent extends BaseComponent<BucketComponentEventMap> {
     constructor(ctx: { storage: IStorageAdapter; logger?: Logger }) {
@@ -24,6 +24,7 @@ export class BucketComponent extends BaseComponent<BucketComponentEventMap> {
 
         this.mount(BucketCommand.CREATE, new BucketCreateHandler({ storage: ctx.storage, logger: ctx.logger }));
         this.mount(BucketCommand.DELETE, new BucketDeleteHandler({ storage: ctx.storage, logger: ctx.logger }));
+        this.mount(BucketCommand.CLEAR, new BucketClearHandler({ storage: ctx.storage, logger: ctx.logger }));
     }
 
     async start() {

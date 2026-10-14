@@ -241,4 +241,58 @@ describe('AnalysisStorageManager', () => {
             await expect(storageManager.remove('nonexistent')).rejects.toThrow(BadRequestError);
         });
     });
+    describe('clear', () => {
+        it('should clear the requested bucket without creating a task', async () => {
+            const analysis = createFullAnalysis();
+            repository.seed(analysis);
+            bucketRepository.seed(createTestBucket({
+                analysisId: 'analysis-1',
+                type: AnalysisBucketType.TEMP,
+                bucketId: 'ext-temp',
+            }));
+
+            await storageManager.clear(analysis, { type: AnalysisBucketType.TEMP });
+
+            expect(taskManager.getCallCount()).toBe(0);
+            const clearCalls = caller.getCallsFor('callClear');
+            expect(clearCalls).toHaveLength(1);
+            expect(clearCalls[0].data).toEqual({ id: 'ext-temp' });
+        });
+
+        it('should skip non-existing buckets', async () => {
+            const analysis = createFullAnalysis();
+            repository.seed(analysis);
+
+            await storageManager.clear(analysis, { type: AnalysisBucketType.TEMP });
+
+            expect(caller.getCallCount()).toBe(0);
+        });
+
+        it('should only clear the requested type', async () => {
+            const analysis = createFullAnalysis();
+            repository.seed(analysis);
+            bucketRepository.seed([
+                createTestBucket({
+                    id: 'bucket-code',
+                    analysisId: 'analysis-1',
+                    type: AnalysisBucketType.CODE,
+                    bucketId: 'ext-code',
+                }),
+                createTestBucket({
+                    id: 'bucket-temp',
+                    analysisId: 'analysis-1',
+                    type: AnalysisBucketType.TEMP,
+                    bucketId: 'ext-temp',
+                }),
+            ]);
+
+            await storageManager.clear(analysis, { type: AnalysisBucketType.TEMP });
+
+            expect(caller.getCallsFor('callClear').map((c) => c.data)).toEqual([{ id: 'ext-temp' }]);
+        });
+
+        it('should throw for missing entity', async () => {
+            await expect(storageManager.clear('nonexistent')).rejects.toThrow(BadRequestError);
+        });
+    });
 });

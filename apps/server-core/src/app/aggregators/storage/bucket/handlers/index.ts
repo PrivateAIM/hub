@@ -7,3 +7,4 @@
 
 export * from './creation_finished.ts';
 export * from './deletion_finished.ts';
+export * from './clearing_finished.ts';

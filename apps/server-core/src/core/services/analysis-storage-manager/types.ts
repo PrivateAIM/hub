@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucketType } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucketType } from '@privateaim/core-kit';
 
 /**
  * Port for managing storage buckets.
@@ -19,6 +19,7 @@ export interface IBucketCaller {
         refId?: string 
     }, meta?: { correlationId?: string }): Promise<void>;
     callDelete(data: { id: string }, meta?: { correlationId?: string }): Promise<void>;
+    callClear(data: { id: string }, meta?: { correlationId?: string }): Promise<void>;
 }
 
 /**
@@ -36,3 +37,16 @@ export type AnalysisStorageMangerCheckOptions = {
 export type AnalysisStorageMangerRemoveOptions = {
     type?: `${AnalysisBucketType}`;
 };
+
+export type AnalysisStorageMangerClearOptions = {
+    type?: `${AnalysisBucketType}`;
+};
+
+export interface IAnalysisStorageManager {
+    check(input: string | Analysis, options?: AnalysisStorageMangerCheckOptions): Promise<Analysis>;
+    remove(input: string | Analysis, options?: AnalysisStorageMangerRemoveOptions): Promise<Analysis>;
+    /**
+     * Empty the analysis' buckets (files removed, buckets kept).
+     */
+    clear(input: string | Analysis, options?: AnalysisStorageMangerClearOptions): Promise<Analysis>;
+}

@@ -132,6 +132,23 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         return this.caller.delete(entity.id);
     }
 
+    async clear(id: string, actor: ActorContext): Promise<Bucket> {
+        const entity = await this.repository.findOneByIdOrName(id);
+        if (!entity) {
+            throw new EntityNotFoundError({ entity: 'bucket' });
+        }
+
+        if (!this.isOwnedByActor(entity, actor)) {
+            await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_DELETE });
+
+            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
+                throw new PermissionDeniedError();
+            }
+        }
+
+        return this.caller.clear(entity.id);
+    }
+
     private isOwnedByActor(entity: Bucket, actor: ActorContext): boolean {
         if (!actor.identity) return false;
         return entity.actorType === actor.identity.type &&

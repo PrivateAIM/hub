@@ -298,6 +298,7 @@ Base URL: `http://localhost:4001`
 | `POST` | `/buckets` | Create bucket | record, `meta: {}` |
 | `POST` | `/buckets/:id` | Update bucket | record, `meta: {}` |
 | `DELETE` | `/buckets/:id` | Delete bucket | record, `meta: {}` |
+| `POST` | `/buckets/:id/clear` | Empty a bucket (remove every file, keep the bucket) | record, `meta: {}` |
 | `POST` | `/buckets/:id/upload` | Upload files to a bucket | collection, no `schema` |
 | `GET` | `/buckets/:id/stream` | Stream the bucket contents as a tar | flat (binary) |
 

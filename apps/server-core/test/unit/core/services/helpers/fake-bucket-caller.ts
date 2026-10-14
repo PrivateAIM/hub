@@ -14,8 +14,10 @@ type BucketCallerCreateData = {
     refId?: string 
 };
 
+type BucketCallerMethod = 'callCreate' | 'callDelete' | 'callClear';
+
 type BucketCallerCall = {
-    method: 'callCreate' | 'callDelete';
+    method: BucketCallerMethod;
     data: BucketCallerCreateData | { id: string };
     meta?: { correlationId?: string };
 };
@@ -39,6 +41,14 @@ export class FakeBucketCaller implements IBucketCaller {
         });
     }
 
+    async callClear(data: { id: string }, meta?: { correlationId?: string }): Promise<void> {
+        this.calls.push({
+            method: 'callClear',
+            data,
+            meta,
+        });
+    }
+
     getCalls(): BucketCallerCall[] {
         return [...this.calls];
     }
@@ -47,7 +57,7 @@ export class FakeBucketCaller implements IBucketCaller {
         return this.calls.length;
     }
 
-    getCallsFor(method: 'callCreate' | 'callDelete'): BucketCallerCall[] {
+    getCallsFor(method: BucketCallerMethod): BucketCallerCall[] {
         return this.calls.filter((c) => c.method === method);
     }
 
