@@ -102,9 +102,19 @@ export class MasterImageService extends AbstractEntityService implements IMaster
 
                 // persist STARTING before dispatching, or a fast worker event
                 // could be overwritten by this save.
+                const { buildStatus } = entity;
                 entity.buildStatus = ProcessStatus.STARTING;
                 await this.repository.save(entity);
-                await this.builderCaller.callExecute({ id: entity.id });
+
+                try {
+                    await this.builderCaller.callExecute({ id: entity.id });
+                } catch (e) {
+                    // nothing was dispatched, so no worker event will move STARTING on.
+                    entity.buildStatus = buildStatus;
+                    await this.repository.save(entity);
+
+                    throw e;
+                }
 
                 return entity;
             }

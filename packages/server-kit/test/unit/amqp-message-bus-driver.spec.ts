@@ -97,6 +97,24 @@ describe('src/message-bus/driver/amqp', () => {
         expect(driver.published[0].metadata.attempt).toBe(3);
     });
 
+    it('should skip a redelivery of a message this process is still handling', async () => {
+        const driver = new TestDriver();
+        const message = createMessage(work);
+
+        const { promise, resolve } = Promise.withResolvers<void>();
+        const running = driver.run(work, message, () => promise);
+
+        await driver.run(work, message, () => {}, true);
+        expect(driver.published).toHaveLength(0);
+
+        resolve();
+        await running;
+
+        // once finished, a redelivery is a crashed attempt again
+        await driver.run(work, message, () => {}, true);
+        expect(driver.published).toHaveLength(1);
+    });
+
     it('should drop a work message once its attempts are exhausted', async () => {
         const driver = new TestDriver(3);
 

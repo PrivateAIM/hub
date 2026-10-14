@@ -59,6 +59,11 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
 
     protected retryDelay: number;
 
+    /**
+     * Ids of WORK messages whose handler is still running in this process.
+     */
+    protected inFlight = new Set<string>();
+
     constructor(options: AmqpMessageBusDriverOptions) {
         this.connectionString = options.connectionString;
         this.logger = options.logger;
@@ -77,12 +82,16 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
     async publish(routing: MessageBusRouting, message: MessageBusPayload): Promise<boolean> {
         const exchange = this.resolveExchange(routing);
 
-        return exchange.publish(routing.key, serializeMessageBusPayload(message), {
+        // Resolves once the broker confirmed the message (a rejection throws);
+        // amqplib's boolean only reports write-buffer backpressure.
+        await exchange.publish(routing.key, serializeMessageBusPayload(message), {
             type: message.type,
             messageId: message.id,
             persistent: message.metadata.persistent ??
                 routing.type === MessageBusRoutingType.WORK,
         });
+
+        return true;
     }
 
     async consume(
@@ -128,18 +137,30 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
             return;
         }
 
-        // A redelivery means a consumer died mid-handling (crash, lost
-        // connection, consumer timeout), so it counts as a failed attempt.
         if (input.fields.redelivered) {
+            // The channel was reset (reconnect) while this process is still
+            // handling the message: the original run is alive, so drop the copy.
+            if (this.inFlight.has(payload.id)) {
+                this.logger?.debug(`Message ${payload.type} (${payload.id}) in ${routing.key} is still being handled.`);
+
+                return;
+            }
+
+            // Otherwise the consumer died mid-handling (crash, consumer
+            // timeout), so the redelivery counts as a failed attempt.
             await this.retry(routing, payload);
 
             return;
         }
 
+        this.inFlight.add(payload.id);
+
         try {
             await handler(payload);
         } catch {
             await this.retry(routing, payload);
+        } finally {
+            this.inFlight.delete(payload.id);
         }
     }
 

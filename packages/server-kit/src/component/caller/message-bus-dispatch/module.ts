@@ -53,7 +53,7 @@ export class MessageBusDispatchComponentCaller<
         );
 
         if (!published && this.logger) {
-            this.logger.warn(`Message ${type} in ${this.options.routing.key} could not be published (no consumer or backpressure).`);
+            this.logger.warn(`Message ${type} in ${this.options.routing.key} was not delivered to any consumer.`);
         }
     }
 }
