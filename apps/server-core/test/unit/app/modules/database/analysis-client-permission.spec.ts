@@ -16,7 +16,8 @@ import {
     fakeAuthupResponse,
 } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
-import { AnalysisClientPermissionService } from '../../../../../src/app/modules/database/analysis-client-permission.ts';
+import { AuthupClientPermissionStore } from '../../../../../src/app/modules/database/analysis-client-permission.ts';
+import { AnalysisClientPermissionService } from '../../../../../src/core/services/analysis-client-permission/index.ts';
 import type { IAnalysisRepository } from '../../../../../src/core/index.ts';
 
 // Driven through a REAL `AuthupClient` on an in-memory transport. Each handler
@@ -71,7 +72,7 @@ describe('AnalysisClientPermissionService', () => {
                 },
             });
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
@@ -91,7 +92,7 @@ describe('AnalysisClientPermissionService', () => {
             const analysis = createAnalysis({ clientId: null });
             const authup = createFakeAuthupClient();
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
@@ -113,7 +114,7 @@ describe('AnalysisClientPermissionService', () => {
                 },
             });
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
@@ -131,7 +132,7 @@ describe('AnalysisClientPermissionService', () => {
             const analysis = createAnalysis();
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(APPROVE_PERMISSION) } });
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
@@ -145,7 +146,7 @@ describe('AnalysisClientPermissionService', () => {
             const analysis = createAnalysis({ configurationLocked: true });
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION) } });
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
@@ -158,7 +159,7 @@ describe('AnalysisClientPermissionService', () => {
             const analysis = createAnalysis({ clientId: null });
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION) } });
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
@@ -171,7 +172,7 @@ describe('AnalysisClientPermissionService', () => {
             const analysis = createAnalysis();
             const authup = createFakeAuthupClient();
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
@@ -184,7 +185,7 @@ describe('AnalysisClientPermissionService', () => {
             const analysis = createAnalysis();
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION) } });
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
@@ -197,7 +198,7 @@ describe('AnalysisClientPermissionService', () => {
         it('should 404 for an unknown analysis', async () => {
             const authup = createFakeAuthupClient();
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([]),
             });
 
@@ -224,7 +225,7 @@ describe('AnalysisClientPermissionService', () => {
                 },
             });
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 
@@ -244,7 +245,7 @@ describe('AnalysisClientPermissionService', () => {
             const analysis = createAnalysis({ clientId: 'client-1' });
             const authup = createFakeAuthupClient({ handlers: { 'GET /client-permissions': () => ({ data: [], meta: { total: 0 } }) } });
             const service = new AnalysisClientPermissionService({
-                authup,
+                store: new AuthupClientPermissionStore(authup),
                 analysisRepository: createAnalysisRepository([analysis]),
             });
 

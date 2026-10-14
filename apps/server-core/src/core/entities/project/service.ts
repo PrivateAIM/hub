@@ -81,20 +81,16 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
                     validated.userId = actor.identity.id;
                     break;
                 }
-                case 'robot': {
-                    validated.robotId = actor.identity.id;
-                    break;
-                }
                 case 'client': {
                     validated.clientId = actor.identity.id;
                     break;
                 }
                 default: {
-                    throw new BadRequestError('Only client-, user- or robot-accounts are permitted to create a project');
+                    throw new BadRequestError('Only client- or user-accounts are permitted to create a project');
                 }
             }
         } else {
-            throw new BadRequestError('Only client-, user- or robot-accounts are permitted to create a project');
+            throw new BadRequestError('Only client- or user-accounts are permitted to create a project');
         }
 
         const entity = this.repository.create(validated);

@@ -38,7 +38,8 @@ import { ProjectNodeController } from '../../../adapters/http/controllers/entiti
 import { AnalysisNodeController } from '../../../adapters/http/controllers/entities/analysis-node/module.ts';
 import { AnalysisNodeEventController } from '../../../adapters/http/controllers/entities/analysis-node-event/module.ts';
 import { AnalysisClientPermissionController } from '../../../adapters/http/controllers/entities/analysis-client-permission/module.ts';
-import { AnalysisClientPermissionService } from '../database/analysis-client-permission.ts';
+import { AuthupClientPermissionStore } from '../database/analysis-client-permission.ts';
+import { AnalysisClientPermissionService } from '../../../core/services/analysis-client-permission/index.ts';
 import { AnalysisClientCredentialController } from '../../../adapters/http/controllers/entities/analysis-client-credential/module.ts';
 import { NodeClientCredentialController } from '../../../adapters/http/controllers/entities/node-client-credential/module.ts';
 import { NodeRegistryCredentialController } from '../../../adapters/http/controllers/entities/node-registry-credential/module.ts';
@@ -163,7 +164,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const authupResult = container.tryResolve(AuthupClientInjectionKey);
     if (authupResult.success) {
         const analysisClientPermissionService = new AnalysisClientPermissionService({
-            authup: authupResult.data,
+            store: new AuthupClientPermissionStore(authupResult.data),
             analysisRepository,
         });
         controllers.push(new AnalysisClientPermissionController({ service: analysisClientPermissionService }));

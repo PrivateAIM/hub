@@ -17,7 +17,7 @@ import { MessageService } from '../../../../../src/core/entities/message/service
 import type { IMessageWakeup } from '../../../../../src/core/services/wakeup/index.ts';
 import { FakeMessageRepository } from './fake-repository.ts';
 
-function actorFor(id: string, type: 'user' | 'robot' | 'client' = 'client'): ActorContext {
+function actorFor(id: string, type: 'user' | 'client' = 'client'): ActorContext {
     return {
         permissionEvaluator: new FakePermissionEvaluator(),
         realm: { id: 'realm-1', name: 'master' },

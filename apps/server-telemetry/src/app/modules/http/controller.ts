@@ -10,6 +10,7 @@ import { EventController } from '../../../adapters/http/controllers/event/module
 import { LogController } from '../../../adapters/http/controllers/log/module.ts';
 import { RootController } from '../../../adapters/http/controllers/root/index.ts';
 import { EventService } from '../../../core/entities/event/service.ts';
+import { LogService } from '../../../core/services/log/service.ts';
 import type { LogStore } from '../../../core/services/log-store/types.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { LogStoreInjectionKey } from '../victoria-logs/constants.ts';
@@ -30,7 +31,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     ];
 
     if (logStore) {
-        controllers.push(new LogController({ logStore }));
+        controllers.push(new LogController({ service: new LogService({ store: logStore }) }));
     }
 
     return controllers;

@@ -12,7 +12,7 @@ export type ActorContext = {
     realm?: { id: string; name: string };
     identity?: {
         id: string;
-        type: 'user' | 'robot' | 'client';
+        type: 'user' | 'client';
         realmId?: string;
         attributes?: Record<string, any>;
     };

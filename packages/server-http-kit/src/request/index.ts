@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './actor';
 export * from './permission';
 export * from './env';
 export * from './identity';

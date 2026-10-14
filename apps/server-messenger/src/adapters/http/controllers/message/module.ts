@@ -13,7 +13,7 @@ import type {
     SendMessageRequest,
 } from '@privateaim/messenger-kit';
 import { WakeupEventName } from '@privateaim/messenger-kit';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import {
     DBody,
     DContext,
@@ -27,7 +27,6 @@ import type { IAppEvent } from 'routup';
 import { createEventStream } from 'routup';
 import type { IMessageService } from '../../../../core/entities/index.ts';
 import type { IMessageWakeup } from '../../../../core/services/wakeup/index.ts';
-import { buildActorContext } from '../../request/index.ts';
 
 type MessageControllerContext = {
     service: IMessageService;

@@ -80,16 +80,12 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
                 validated.userId = actor.identity.id;
                 break;
             }
-            case 'robot': {
-                validated.robotId = actor.identity.id;
-                break;
-            }
             case 'client': {
                 validated.clientId = actor.identity.id;
                 break;
             }
             default: {
-                throw new BadRequestError('Only client-, user- or robot-accounts are permitted.');
+                throw new BadRequestError('Only client- or user-accounts are permitted.');
             }
         }
 

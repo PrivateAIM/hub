@@ -24,11 +24,10 @@ import {
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IAnalysisService } from '../../../../../core/index.ts';
 import { analysisSchema } from '../../../../../core/index.ts';
-import { buildActorContext } from '../../../request/index.ts';
 
 type AnalysisControllerContext = {
     service: IAnalysisService;

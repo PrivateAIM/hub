@@ -26,7 +26,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import type { IAppEvent } from 'routup';
 import {
     getRequestAcceptableEncoding,
@@ -38,7 +38,6 @@ import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileRepository, IBucketFileService } from '../../../../core/entities/index.ts';
 import { bucketFileSchema } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
-import { buildActorContext } from '../../request/index.ts';
 
 type BucketFileControllerContext = {
     service: IBucketFileService;

@@ -18,18 +18,17 @@ import {
     DTags,
 } from '@routup/decorators';
 import type { IAppEvent } from 'routup';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
-import type { AnalysisClientPermissionService } from '../../../../../app/modules/database/analysis-client-permission.ts';
-import { buildActorContext } from '../../../request/index.ts';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
+import type { IAnalysisClientPermissionService } from '../../../../../core/services/analysis-client-permission/index.ts';
 
 type AnalysisClientPermissionControllerContext = {
-    service: AnalysisClientPermissionService;
+    service: IAnalysisClientPermissionService;
 };
 
 @DTags('analysis')
 @DController('/analyses')
 export class AnalysisClientPermissionController {
-    protected service: AnalysisClientPermissionService;
+    protected service: IAnalysisClientPermissionService;
 
     constructor(ctx: AnalysisClientPermissionControllerContext) {
         this.service = ctx.service;

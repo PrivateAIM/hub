@@ -9,7 +9,7 @@ import type { IPermissionEvaluator } from '@authup/access';
 
 export type RequestIdentity = {
     id: string;
-    type: 'user' | 'client' | 'robot',
+    type: 'user' | 'client',
     realmId: string,
     realmName: string
     attributes?: Record<string, any>,

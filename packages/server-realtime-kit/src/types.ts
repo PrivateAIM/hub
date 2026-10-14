@@ -14,7 +14,7 @@ import type {
 
 export type SocketIdentity = {
     id: string;
-    type: 'user' | 'client' | 'robot',
+    type: 'user' | 'client',
     realmId: string,
     realmName: string
 };

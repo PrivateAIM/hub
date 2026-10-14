@@ -12,8 +12,6 @@ export function buildConnectedEventNameForIdentity(socket: Pick<SocketIdentity, 
     switch (socket.type) {
         case 'client':
             return STCConnectionEventName.CLIENT_CONNECTED;
-        case 'robot':
-            return STCConnectionEventName.ROBOT_CONNECTED;
         case 'user':
         default:
             return STCConnectionEventName.USER_CONNECTED;
@@ -24,34 +22,19 @@ export function buildDisconnectedEventNameForIdentity(socket: Pick<SocketIdentit
     switch (socket.type) {
         case 'client':
             return STCConnectionEventName.CLIENT_DISCONNECTED;
-        case 'robot':
-            return STCConnectionEventName.ROBOT_DISCONNECTED;
         case 'user':
         default:
             return STCConnectionEventName.USER_DISCONNECTED;
     }
 }
 
-export function buildSubscriptionRoomForIdentity(socket: Pick<SocketIdentity, 'type' | 'id'>) {
-    switch (socket.type) {
-        case 'client':
-            return `client-connection-subscription:${socket.id}`;
-        case 'robot':
-            return `robot-connection-subscription:${socket.id}`;
-        case 'user':
-        default:
-            return `user-connection-subscription:${socket.id}`;
-    }
+// Keyed by the party kind verbatim: a wire party may name a kind no socket
+// identity has (e.g. `robot`), which must land in its own (empty) room
+// rather than fall through to another kind's.
+export function buildSubscriptionRoomForIdentity(party: { type: string, id: string }) {
+    return `${party.type}-connection-subscription:${party.id}`;
 }
 
-export function buildConnectionRoomForIdentity(socket: Pick<SocketIdentity, 'type' | 'id'>) {
-    switch (socket.type) {
-        case 'client':
-            return `client-connection:${socket.id}`;
-        case 'robot':
-            return `robot-connection:${socket.id}`;
-        case 'user':
-        default:
-            return `user-connection:${socket.id}`;
-    }
+export function buildConnectionRoomForIdentity(party: { type: string, id: string }) {
+    return `${party.type}-connection:${party.id}`;
 }
