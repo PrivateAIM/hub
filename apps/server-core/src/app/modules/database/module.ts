@@ -19,6 +19,7 @@ import {
     setDataSource,
     synchronizeDatabaseSchema,
 } from 'typeorm-extension';
+import { withDataSourceLock } from '@privateaim/server-db-kit';
 import {
     AnalysisBucketFileSubscriber,
     AnalysisBucketSubscriber,
@@ -36,7 +37,7 @@ import {
 import { NodeClientService } from './node-client.ts';
 import { AnalysisClientService } from './analysis-client.ts';
 import { DataSourceOptionsBuilder } from './options.ts';
-import { DatabaseInjectionKey } from './constants.ts';
+import { DatabaseInjectionKey, MIGRATION_DATABASE_LOCK } from './constants.ts';
 import { registerRepositories } from './register.ts';
 import { DataSource } from 'typeorm';
 
@@ -77,7 +78,11 @@ export class DatabaseModule implements IModule {
             setDataSource(dataSource);
 
             if (!check.schema) {
-                await synchronizeDatabaseSchema(dataSource);
+                await withDataSourceLock(
+                    dataSource,
+                    MIGRATION_DATABASE_LOCK,
+                    () => synchronizeDatabaseSchema(dataSource),
+                );
             }
 
             container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
