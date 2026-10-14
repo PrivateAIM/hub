@@ -26,6 +26,7 @@ export const analysisSchema = defineSchema<Analysis>({
         ['buildStatus'],
         ['executionStatus'],
         ['configurationLocked'],
+        ['clientId'],
         ['createdAt'],
         ['updatedAt'],
     ],
@@ -38,7 +39,7 @@ export const analysisSchema = defineSchema<Analysis>({
     // the indexed-filters invariant requires every allowed key to lead a real
     // index. Nothing in client-vue/client-ui ever filtered on it.
     filters: {
-        allowed: ['id', 'name', 'displayName', 'projectId', 'realmId', 'buildStatus', 'executionStatus', 'configurationLocked'],
+        allowed: ['id', 'name', 'displayName', 'projectId', 'realmId', 'buildStatus', 'executionStatus', 'configurationLocked', 'clientId'],
         indexed: true,
     },
     relations: { allowed: ['project', 'masterImage'] },

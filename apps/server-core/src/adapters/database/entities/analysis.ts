@@ -250,6 +250,7 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
         name: 'client_id', 
         type: 'uuid', 
