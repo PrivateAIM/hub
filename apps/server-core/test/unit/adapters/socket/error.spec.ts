@@ -15,11 +15,11 @@ import { describe, expect, it } from 'vitest';
 import { buildSocketSubscribeError } from '../../../../src/adapters/socket/error.ts';
 
 describe('adapters/socket/error', () => {
-    it('should answer a denial with a 403 permission denied error', () => {
+    it('should answer an authup or hub permission denial with a 403 permission denied error', () => {
         for (const denial of [PermissionError.evaluationFailed('foo'), new PermissionDeniedError()]) {
             const error = buildSocketSubscribeError(denial);
             expect(error).toBeInstanceOf(PermissionDeniedError);
-            expect(httpStatusFromCode((error as PermissionDeniedError).code)).toBe(403);
+            expect(httpStatusFromCode(error.code)).toBe(403);
         }
     });
 

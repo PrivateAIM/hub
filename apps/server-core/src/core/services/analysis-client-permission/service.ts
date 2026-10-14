@@ -62,14 +62,12 @@ export class AnalysisClientPermissionService implements IAnalysisClientPermissio
      */
     protected async assertWritable(analysis: Analysis, actor: ActorContext): Promise<void> {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
-        // The attribute bag is keyed by this entity's PROPERTY names, which are
-        // camelCase since #1806 — while the attribute policies that match on them
-        // live in Authup's database. Harmless today (introspection yields
-        // policy-free grants, so this bag is never read), but a deployed policy
-        // still matching `realm_id`/`configuration_locked` silently stops
-        // matching once attribute policies are enabled, and a denylist-shaped one
-        // then fails OPEN. See docs/src/guide/development/migration-camelcase.md
-        // -> "Authup attribute policies".
+        // The attribute bag is keyed by the entity's camelCase property names
+        // (#1806), but the policies matching on them live in Authup's database.
+        // A deployed policy still matching `realm_id`/`configuration_locked`
+        // silently stops matching, and a denylist-shaped one then fails OPEN.
+        // See docs/src/guide/development/migration-camelcase.md ->
+        // "Authup attribute policies".
         await actor.permissionEvaluator.evaluate({
             name: PermissionName.ANALYSIS_UPDATE,
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),

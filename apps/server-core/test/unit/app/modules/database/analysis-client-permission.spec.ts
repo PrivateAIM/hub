@@ -9,8 +9,9 @@ import { randomUUID } from 'node:crypto';
 import type { Analysis } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import type { FakeAuthupClient } from '@privateaim/server-test-kit';
 import {
-    createAllowAllActor, 
+    createAllowAllActor,
     createDenyAllActor, 
     createFakeAuthupClient, 
     fakeAuthupResponse,
@@ -37,6 +38,13 @@ function createAnalysis(overrides: Partial<Analysis> = {}): Partial<Analysis> {
         configurationLocked: false,
         ...overrides,
     };
+}
+
+function createService(authup: FakeAuthupClient, analyses: Partial<Analysis>[]): AnalysisClientPermissionService {
+    return new AnalysisClientPermissionService({
+        store: new AuthupClientPermissionStore(authup),
+        analysisRepository: createAnalysisRepository(analyses),
+    });
 }
 
 const STORAGE_PERMISSION = { id: 'perm-storage', name: PermissionName.ANALYSIS_SELF_STORAGE_USE };
@@ -71,10 +79,7 @@ describe('AnalysisClientPermissionService', () => {
                     }),
                 },
             });
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             const { data } = await service.getMany(analysis.id!, createAllowAllActor());
 
@@ -91,10 +96,7 @@ describe('AnalysisClientPermissionService', () => {
         it('should return empty without calling authup when no client is provisioned', async () => {
             const analysis = createAnalysis({ clientId: null });
             const authup = createFakeAuthupClient();
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             const { data, meta } = await service.getMany(analysis.id!, createAllowAllActor());
 
@@ -113,10 +115,7 @@ describe('AnalysisClientPermissionService', () => {
                     'POST /client-permissions': (req) => ({ data: { id: 'cp-1', ...(req.body as object) }, meta: {} }),
                 },
             });
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             await service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createAllowAllActor());
 
@@ -131,10 +130,7 @@ describe('AnalysisClientPermissionService', () => {
         it('should reject a permission outside the analysis-self family', async () => {
             const analysis = createAnalysis();
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(APPROVE_PERMISSION) } });
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             await expect(
                 service.create(analysis.id!, { permissionId: APPROVE_PERMISSION.id }, createAllowAllActor()),
@@ -145,10 +141,7 @@ describe('AnalysisClientPermissionService', () => {
         it('should reject when the analysis configuration is locked', async () => {
             const analysis = createAnalysis({ configurationLocked: true });
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION) } });
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             await expect(
                 service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createAllowAllActor()),
@@ -158,10 +151,7 @@ describe('AnalysisClientPermissionService', () => {
         it('should reject when the analysis has no client provisioned', async () => {
             const analysis = createAnalysis({ clientId: null });
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION) } });
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             await expect(
                 service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createAllowAllActor()),
@@ -171,10 +161,7 @@ describe('AnalysisClientPermissionService', () => {
         it('should reject without a permissionId', async () => {
             const analysis = createAnalysis();
             const authup = createFakeAuthupClient();
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             await expect(
                 service.create(analysis.id!, {}, createAllowAllActor()),
@@ -184,10 +171,7 @@ describe('AnalysisClientPermissionService', () => {
         it('should deny without permission', async () => {
             const analysis = createAnalysis();
             const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION) } });
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             await expect(
                 service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createDenyAllActor()),
@@ -197,10 +181,7 @@ describe('AnalysisClientPermissionService', () => {
 
         it('should 404 for an unknown analysis', async () => {
             const authup = createFakeAuthupClient();
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([]),
-            });
+            const service = createService(authup, []);
 
             await expect(
                 service.create(randomUUID(), { permissionId: STORAGE_PERMISSION.id }, createAllowAllActor()),
@@ -224,10 +205,7 @@ describe('AnalysisClientPermissionService', () => {
                     'DELETE /client-permissions/:id': (req) => ({ data: { id: req.params.id }, meta: {} }),
                 },
             });
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             await service.delete(analysis.id!, STORAGE_PERMISSION.id, createAllowAllActor());
 
@@ -244,10 +222,7 @@ describe('AnalysisClientPermissionService', () => {
         it('should 404 when no matching client permission exists', async () => {
             const analysis = createAnalysis({ clientId: 'client-1' });
             const authup = createFakeAuthupClient({ handlers: { 'GET /client-permissions': () => ({ data: [], meta: { total: 0 } }) } });
-            const service = new AnalysisClientPermissionService({
-                store: new AuthupClientPermissionStore(authup),
-                analysisRepository: createAnalysisRepository([analysis]),
-            });
+            const service = createService(authup, [analysis]);
 
             await expect(
                 service.delete(analysis.id!, STORAGE_PERMISSION.id, createAllowAllActor()),

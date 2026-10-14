@@ -75,22 +75,19 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             validated.realmId = this.getActorRealmId(actor);
         }
 
-        if (actor.identity) {
-            switch (actor.identity.type) {
-                case 'user': {
-                    validated.userId = actor.identity.id;
-                    break;
-                }
-                case 'client': {
-                    validated.clientId = actor.identity.id;
-                    break;
-                }
-                default: {
-                    throw new BadRequestError('Only client- or user-accounts are permitted to create a project');
-                }
+        // No identity falls through to the default branch, like any other kind.
+        switch (actor.identity?.type) {
+            case 'user': {
+                validated.userId = actor.identity.id;
+                break;
             }
-        } else {
-            throw new BadRequestError('Only client- or user-accounts are permitted to create a project');
+            case 'client': {
+                validated.clientId = actor.identity.id;
+                break;
+            }
+            default: {
+                throw new BadRequestError('Only client- or user-accounts are permitted to create a project');
+            }
         }
 
         const entity = this.repository.create(validated);

@@ -36,7 +36,7 @@ describe('LogService', () => {
             labels: { foo: 'bar' },
         };
 
-        it('should check LOG_CREATE and write', async () => {
+        it('should check LOG_CREATE and write the validated log', async () => {
             const actor = createAllowAllActor();
             const log = await service.create(input, actor);
 
@@ -52,7 +52,7 @@ describe('LogService', () => {
     });
 
     describe('getMany', () => {
-        it('should check LOG_READ or LOG_DELETE', async () => {
+        it('should accept either LOG_READ or LOG_DELETE', async () => {
             const actor = createAllowAllActor();
             await service.getMany({ filter: { foo: 'bar' } }, actor);
 
@@ -60,13 +60,13 @@ describe('LogService', () => {
                 .toEqual([PermissionName.LOG_READ, PermissionName.LOG_DELETE]);
         });
 
-        it('should query by labels and cap the limit', async () => {
+        it('should query by labels and cap the limit at 100', async () => {
             const result = await service.getMany({ filter: { foo: 'bar' }, page: { limit: 500, offset: 2 } }, createAllowAllActor());
 
             expect(result.meta).toEqual({
-                total: 0, 
-                limit: 100, 
-                offset: 2, 
+                total: 0,
+                limit: 100,
+                offset: 2,
             });
             expect(store.queryCalls[0]).toEqual({
                 labels: { foo: 'bar' },
@@ -88,7 +88,7 @@ describe('LogService', () => {
     });
 
     describe('deleteMany', () => {
-        it('should check LOG_DELETE and delete by labels + time', async () => {
+        it('should check LOG_DELETE and delete by labels from the given time', async () => {
             const actor = createAllowAllActor();
             await service.deleteMany({ filter: { foo: 'bar', time: '123' } }, actor);
 
@@ -96,7 +96,7 @@ describe('LogService', () => {
             expect(store.deleteCalls[0]).toEqual({ start: 123, labels: { foo: 'bar' } });
         });
 
-        it('should reject a non-numeric time', async () => {
+        it('should reject a time that is not a number', async () => {
             await expect(service.deleteMany({ filter: { foo: 'bar', time: 'x' } }, createAllowAllActor()))
                 .rejects.toThrow(BadRequestError);
             expect(store.deleteCalls).toHaveLength(0);

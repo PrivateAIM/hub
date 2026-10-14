@@ -237,14 +237,7 @@ const FProjectForm = defineComponent({
                 invalid: $v.$invalid.value,
             });
 
-            const nodeVNode = !canAssignNodes.value ? h(VCAlert, {
-                color: 'neutral',
-                variant: 'soft',
-                size: 'sm',
-                class: 'mb-3',
-            }, () => [
-                'Assigning nodes requires the project_update permission.',
-            ]) : h('div', [
+            const nodeVNode = canAssignNodes.value ? h('div', [
                 h(FNodes, { query: { filters: { hidden: false } } } satisfies ListProps<Node>, {
                     [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<Node>) => [
                         h('label', 'Nodes'),
@@ -289,6 +282,13 @@ const FProjectForm = defineComponent({
                 }, () => [
                     'Chose a arbitrary amount of target nodes.',
                 ]),
+            ]) : h(VCAlert, {
+                color: 'neutral',
+                variant: 'soft',
+                size: 'sm',
+                class: 'mb-3',
+            }, () => [
+                'Assigning nodes requires the project_update permission.',
             ]);
 
             return h(

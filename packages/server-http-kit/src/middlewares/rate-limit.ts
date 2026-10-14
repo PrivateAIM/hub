@@ -16,7 +16,7 @@ export function mountRateLimiterMiddleware(app: App) {
         skip(event: IAppEvent) {
             const identity = useRequestIdentity(event);
 
-            // hub's own service clients (e.g. the worker's `system` client)
+            // Never throttle hub's own service clients, e.g. the worker's `system` client.
             return !!identity &&
                 identity.type === 'client' &&
                 identity.realmName === REALM_MASTER_NAME;

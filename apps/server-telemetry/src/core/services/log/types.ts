@@ -7,6 +7,11 @@
 
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import type { ActorContext } from '@privateaim/server-kit';
+import type { LogStore } from '../log-store/types.ts';
+
+export type LogServiceContext = {
+    store: LogStore,
+};
 
 export type LogServiceGetManyResult = {
     data: Log[],

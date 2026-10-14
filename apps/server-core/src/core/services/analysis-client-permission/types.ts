@@ -16,17 +16,22 @@ export interface IClientPermissionStore {
     /** All assignments of the client, with the permission relation loaded. */
     getManyByClientId(clientId: string): Promise<EntityRepositoryFindManyResult<ClientPermission>>;
 
+    /** The assignment of `permissionId` to the client, or `null` if there is none. */
     findOne(clientId: string, permissionId: string): Promise<ClientPermission | null>;
 
+    /** The permission itself, so its name can be checked before it is assigned. */
     getPermission(permissionId: string): Promise<Pick<Permission, 'id' | 'name'>>;
 
     create(clientId: string, permissionId: string): Promise<ClientPermission>;
 
+    /** Removes an assignment by its own id, not by the permission's. */
     delete(id: string): Promise<void>;
 }
 
 export interface IAnalysisClientPermissionService {
     getMany(analysisId: string, actor: ActorContext): Promise<EntityRepositoryFindManyResult<ClientPermission>>;
+
     create(analysisId: string, data: { permissionId?: string }, actor: ActorContext): Promise<ClientPermission>;
+
     delete(analysisId: string, permissionId: string, actor: ActorContext): Promise<ClientPermission>;
 }

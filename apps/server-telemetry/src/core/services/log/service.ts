@@ -12,44 +12,50 @@ import { LogValidator } from '@privateaim/telemetry-kit';
 import type { ActorContext } from '@privateaim/server-kit';
 import { collectLogFilters, decodeQueryOpen } from '../../query/index.ts';
 import type { LogStore } from '../log-store/types.ts';
-import type { ILogService, LogServiceGetManyResult } from './types.ts';
+import type { ILogService, LogServiceContext, LogServiceGetManyResult } from './types.ts';
+
+/** LOG_DELETE implies read: a delete-only role must still list what it can delete. */
+const READ_PERMISSIONS = [
+    PermissionName.LOG_READ,
+    PermissionName.LOG_DELETE,
+];
+
+/** Page size used when none is requested, and the most a request may ask for. */
+const MAX_LIMIT = 100;
 
 export class LogService implements ILogService {
     protected store: LogStore;
 
-    constructor(ctx: { store: LogStore }) {
+    protected validator: LogValidator;
+
+    constructor(ctx: LogServiceContext) {
         this.store = ctx.store;
+        this.validator = new LogValidator();
     }
 
     async create(data: LogInput, actor: ActorContext): Promise<Log> {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.LOG_CREATE });
 
-        const validator = new LogValidator();
-        return this.store.write(await validator.run(data));
+        const validated = await this.validator.run(data);
+        return this.store.write(validated);
     }
 
     /**
-     * Logs are decoded with `decodeQueryOpen()` — their filters are dynamic
+     * Logs are decoded with `decodeQueryOpen()`: their filters are dynamic
      * VictoriaLogs labels rather than a declared rapiq vocabulary.
      */
     async getMany(query: unknown, actor: ActorContext): Promise<LogServiceGetManyResult> {
-        await actor.permissionEvaluator.preEvaluateOneOf({
-            name: [
-                PermissionName.LOG_READ,
-                PermissionName.LOG_DELETE,
-            ],
-        });
+        await actor.permissionEvaluator.preEvaluateOneOf({ name: READ_PERMISSIONS });
 
         const decoded = decodeQueryOpen(query);
 
         const { labels } = collectLogFilters(decoded);
-        if (Object.keys(labels).length === 0) {
-            throw new BadRequestError('Filter labels must be specified.');
-        }
+        this.assertLabels(labels);
 
-        const limit = decoded.pagination.limit && decoded.pagination.limit > 0 ?
-            Math.min(decoded.pagination.limit, 100) :
-            100;
+        const requestedLimit = decoded.pagination.limit;
+        const limit = requestedLimit && requestedLimit > 0 ?
+            Math.min(requestedLimit, MAX_LIMIT) :
+            MAX_LIMIT;
         const offset = decoded.pagination.offset || 0;
 
         const [data, total] = await this.store.query({
@@ -62,10 +68,10 @@ export class LogService implements ILogService {
         return {
             data,
             meta: {
-                total, 
-                limit, 
-                offset, 
-            }, 
+                total,
+                limit,
+                offset,
+            },
         };
     }
 
@@ -74,7 +80,7 @@ export class LogService implements ILogService {
 
         const { labels, time } = collectLogFilters(decodeQueryOpen(query), { extractTime: true });
 
-        let start : number | undefined;
+        let start: number | undefined;
         if (typeof time !== 'undefined') {
             start = Number(time);
             if (!Number.isFinite(start)) {
@@ -82,10 +88,18 @@ export class LogService implements ILogService {
             }
         }
 
+        this.assertLabels(labels);
+
+        await this.store.delete({ start, labels });
+    }
+
+    /**
+     * Every read and delete must be narrowed by at least one label, so a bare
+     * request can never reach the whole log store.
+     */
+    protected assertLabels(labels: Record<string, unknown>): void {
         if (Object.keys(labels).length === 0) {
             throw new BadRequestError('Filter labels must be specified.');
         }
-
-        await this.store.delete({ start, labels });
     }
 }

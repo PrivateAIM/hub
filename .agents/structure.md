@@ -50,7 +50,7 @@ Shared libraries, located in `packages/`.
 | `server-kit`             | Logging (Winston), auth helpers, AMQP messaging, Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup), `describeQuerySchema()` + `RECORD_QUERY_PARAMETERS` for the response `meta.schema`, `collectRootFilterValues()` for the log endpoints, `scopeReadQuery()` + `appendQueryConditions()` for authorized reads |
 | `server-test-kit`        | Shared test fakes (FakeEntityRepository, FakePermissionEvaluator via `@authup/server-test-kit`, actor factories) |
 | `server-db-kit`          | TypeORM utilities, database setup, migrations; options builder pinned to UTC (`pinTimezone`), `withDataSourceLock` for boot passes |
-| `server-http-kit`        | HTTP route/controller decorators for Routup |
+| `server-http-kit`        | HTTP route/controller decorators for Routup, request helpers incl. the shared `buildActorContext`, rate limiter, `sanitizeError` |
 | `server-realtime-kit`    | Socket.io server helpers                   |
 | `server-telemetry-kit`   | Telemetry/logging utilities                |
 | `server-core-worker-kit` | Worker task type definitions               |
@@ -120,8 +120,7 @@ apps/server-core/src/
 │   │   ├── controllers/
 │   │   │   ├── entities/<entity>/module.ts  # Thin controllers
 │   │   │   └── workflows/         # Non-CRUD workflow controllers
-│   │   └── request/
-│   │       └── helpers/actor.ts   # buildActorContext bridge
+│   │   (buildActorContext comes from @privateaim/server-http-kit)
 │   └── socket/                    # WebSocket handlers
 ├── app/                           # Orchestration & DI wiring
 │   ├── builder.ts                 # ServerCoreApplicationBuilder

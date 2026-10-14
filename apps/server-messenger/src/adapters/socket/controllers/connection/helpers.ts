@@ -7,6 +7,7 @@
 
 import { STCConnectionEventName } from '@privateaim/messenger-kit';
 import type { SocketIdentity } from '@privateaim/server-realtime-kit';
+import type { ConnectionRoomParty } from './types.ts';
 
 export function buildConnectedEventNameForIdentity(socket: Pick<SocketIdentity, 'type' | 'id'>) {
     switch (socket.type) {
@@ -28,13 +29,14 @@ export function buildDisconnectedEventNameForIdentity(socket: Pick<SocketIdentit
     }
 }
 
-// Keyed by the party kind verbatim: a wire party may name a kind no socket
-// identity has (e.g. `robot`), which must land in its own (empty) room
-// rather than fall through to another kind's.
-export function buildSubscriptionRoomForIdentity(party: { type: string, id: string }) {
+// Room names embed the party type verbatim. A recipient whose type no socket
+// identity has (e.g. `robot`) therefore gets its own room, which stays empty,
+// instead of falling through to another type's room.
+
+export function buildSubscriptionRoomForIdentity(party: ConnectionRoomParty) {
     return `${party.type}-connection-subscription:${party.id}`;
 }
 
-export function buildConnectionRoomForIdentity(party: { type: string, id: string }) {
+export function buildConnectionRoomForIdentity(party: ConnectionRoomParty) {
     return `${party.type}-connection:${party.id}`;
 }

@@ -21,7 +21,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { ForceLoggedInMiddleware, buildActorContext  } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import type { IAppEvent } from 'routup';
 import type { ILogService } from '../../../../core/index.ts';
 

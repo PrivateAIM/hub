@@ -16,8 +16,8 @@ async function limitFor(identity?: Pick<RequestIdentity, 'type' | 'realmName'>):
     app.use(defineCoreHandler((event) => {
         if (identity) {
             setRequestIdentity(event, {
-                id: 'a', 
-                realmId: 'b', 
+                id: 'a',
+                realmId: 'b',
                 ...identity,
             });
         }
