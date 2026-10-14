@@ -15,6 +15,7 @@ import {
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { holdsPermission } from '../../utils/index.ts';
 import { eq } from '@rapiq/core';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IRegistryManager } from '../node/types.ts';
@@ -84,12 +85,11 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     private async checkSecretFieldAccess(entities: RegistryProject[], actor: ActorContext): Promise<void> {
-        try {
-            await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        if (await holdsPermission(actor, PermissionName.REGISTRY_MANAGE)) {
             return;
-        } catch {
-            // permission not granted — check node-client condition
         }
+
+        // permission not granted — check node-client condition
 
         if (
             actor.identity &&

@@ -12,6 +12,7 @@ import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
+import { holdsPermission } from '../../utils/index.ts';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
@@ -132,11 +133,6 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             }
         }
 
-        try {
-            await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
-            return true;
-        } catch {
-            return false;
-        }
+        return holdsPermission(actor, PermissionName.ANALYSIS_UPDATE);
     }
 }
