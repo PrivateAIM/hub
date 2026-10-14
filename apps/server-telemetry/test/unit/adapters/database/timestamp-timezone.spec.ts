@@ -45,6 +45,8 @@ type Stamp = {
 describe.skipIf(type !== 'mysql' && type !== 'postgres')('adapters/database (utc timestamps)', () => {
     let admin: DataSource;
     let previousZone: string | undefined;
+    // postgres: the database's own `timezone` setting, if it had one
+    let previousDatabaseZone: string | undefined;
     const previousTZ = process.env.TZ;
 
     async function stamp(options: DataSourceOptions) : Promise<Stamp> {
@@ -84,6 +86,14 @@ describe.skipIf(type !== 'mysql' && type !== 'postgres')('adapters/database (utc
         await admin.initialize();
 
         if (type === 'postgres') {
+            const rows: { setting: string }[] = await admin.query(
+                'SELECT unnest(s.setconfig) AS setting FROM pg_db_role_setting s ' +
+                'JOIN pg_database d ON d.oid = s.setdatabase ' +
+                'WHERE d.datname = current_database() AND s.setrole = 0',
+            );
+            const setting = rows.find((row) => row.setting.toLowerCase().startsWith('timezone='));
+            previousDatabaseZone = setting?.setting.slice('timezone='.length);
+
             await admin.query(`ALTER DATABASE "${env.database}" SET timezone TO 'Pacific/Kiritimati'`);
         } else {
             const [row] = await admin.query('SELECT @@GLOBAL.time_zone AS zone');
@@ -104,7 +114,12 @@ describe.skipIf(type !== 'mysql' && type !== 'postgres')('adapters/database (utc
         }
 
         if (type === 'postgres') {
-            await admin.query(`ALTER DATABASE "${env.database}" RESET timezone`);
+            // restore a setting the database had rather than dropping it
+            if (typeof previousDatabaseZone === 'undefined') {
+                await admin.query(`ALTER DATABASE "${env.database}" RESET timezone`);
+            } else {
+                await admin.query(`ALTER DATABASE "${env.database}" SET timezone TO '${previousDatabaseZone}'`);
+            }
         } else {
             await admin.query(`SET GLOBAL time_zone = '${previousZone ?? 'SYSTEM'}'`);
         }

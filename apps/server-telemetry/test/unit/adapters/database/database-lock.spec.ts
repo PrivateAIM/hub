@@ -65,8 +65,12 @@ describe('withDataSourceLock', () => {
 
         const run = (id: string) => withDataSourceLock(dataSource, name, async () => {
             events.push(`${id}:start`);
-            // a real round-trip on another pooled connection, as a migration makes
-            await dataSource.query('SELECT 1');
+            // a real round-trip on another pooled connection, as a migration
+            // makes. Not on sqlite: `dataSource.query()` creates a runner of
+            // its own, which the no-runner assertion below must not count.
+            if (lockable) {
+                await dataSource.query('SELECT 1');
+            }
             await wait(200);
             events.push(`${id}:end`);
         });

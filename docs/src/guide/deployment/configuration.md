@@ -128,8 +128,13 @@ SHOW timezone;
 SELECT @@global.time_zone, @@system_time_zone;
 ```
 
-If it is not UTC and the historical values matter, convert them once after the
-upgrade, per table and column, with the zone the database used:
+If it is not UTC and the historical values matter, convert them **while no Hub
+service is writing**: stop every replica of the old version, run the conversion,
+then start the new version. Do not convert after the new version has started, or
+during a rolling upgrade where old and new replicas write side by side: the
+statements cannot tell a legacy local-time row from a correct UTC one, so they
+would shift the correct rows too. Convert each table and column once, with the
+zone the database used:
 
 ```sql
 -- PostgreSQL
