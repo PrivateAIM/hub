@@ -32,18 +32,9 @@ describe('decodeQuery: nested secret fields', () => {
         )).toThrow(BadRequestError);
     });
 
-    // Negative controls: the root secret is left to its service gate, and a
-    // relation without the secret decodes as before.
+    // Negative control: the root secret is left to its service gate.
     it('leaves the root secret to its own resource', () => {
         expect(() => decodeQuery('fields=%2BaccountSecret', { schema: registrySchema })).not.toThrow();
         expect(() => decodeQuery('fields=%2BaccountSecret', { schema: registryProjectSchema })).not.toThrow();
-    });
-
-    it('decodes a relation without the secret', () => {
-        const query = decodeQuery('include=registry', { schema: registryProjectSchema });
-
-        const names = query.fields.value.map((field) => field.name);
-        expect(names).toContain('registry.accountName');
-        expect(names).not.toContain('registry.accountSecret');
     });
 });

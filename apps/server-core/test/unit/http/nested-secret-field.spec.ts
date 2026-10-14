@@ -14,16 +14,16 @@ import {
     expect,
     it,
 } from 'vitest';
-import { NodeEntity, RegistryEntity, RegistryProjectEntity } from '../../../src/adapters/database/index.ts';
+import { RegistryEntity, RegistryProjectEntity } from '../../../src/adapters/database/index.ts';
 import { createTestApplication } from '../../app';
 
 /**
  * A `select: false` secret must not be reachable through a relation fieldset.
  * The REGISTRY_MANAGE gates only ever inspected the ROOT fields of their own
  * endpoint, so `include=registry&fields[registry]=+accountSecret` on
- * `/registry-projects` (or the registry/registryProject relations of
- * `/nodes`, and deeper through `node.*` on project- and analysis-nodes)
- * returned the Harbor credentials to any logged-in caller.
+ * `/registry-projects` returned the Harbor credentials to any logged-in caller
+ * (the other relation paths are pinned at decode level in
+ * `core/query/nested-secret-field.spec.ts`).
  */
 describe('nested secret fields', () => {
     const suite = createTestApplication();
@@ -33,7 +33,6 @@ describe('nested secret fields', () => {
     const PROJECT_SECRET = `project-secret-${randomUUID()}`;
     let registryId: string;
     let registryProjectId: string;
-    let nodeId: string;
 
     beforeAll(async () => {
         await suite.setup();
@@ -57,27 +56,25 @@ describe('nested secret fields', () => {
             realmId: randomUUID(),
         });
         registryProjectId = registryProject.id;
-
-        const node = await dataSource.getRepository(NodeEntity).save({
-            name: `node-${randomUUID().slice(0, 8)}`,
-            externalName: `node-ext-${randomUUID().slice(0, 8)}`,
-            realmId: randomUUID(),
-            registryId,
-            registryProjectId,
-        });
-        nodeId = node.id;
     });
 
     afterAll(async () => {
         // Spec files share one database per vitest worker, so leave nothing
         // behind: a stray registry turns the default-registry lookup of every
         // later spec in this worker non-empty (registry/adapter.spec.ts).
-        const { dataSource } = suite;
-        await dataSource.getRepository(NodeEntity).delete({ id: nodeId });
-        await dataSource.getRepository(RegistryProjectEntity).delete({ id: registryProjectId });
-        await dataSource.getRepository(RegistryEntity).delete({ id: registryId });
-
-        await suite.teardown();
+        // Guarded: a `delete({ id: undefined })` after a failed setup would
+        // not be a no-op.
+        try {
+            const { dataSource } = suite;
+            if (registryProjectId) {
+                await dataSource.getRepository(RegistryProjectEntity).delete({ id: registryProjectId });
+            }
+            if (registryId) {
+                await dataSource.getRepository(RegistryEntity).delete({ id: registryId });
+            }
+        } finally {
+            await suite.teardown();
+        }
     });
 
     const get = async (path: string, token: string) => {
@@ -93,24 +90,6 @@ describe('nested secret fields', () => {
 
         expect(response.text).not.toContain(REGISTRY_SECRET);
         expect(response.status).toBe(400);
-    });
-
-    it('rejects registry and registry-project secrets requested through /nodes', async () => {
-        const token = await createRestrictedAccessToken();
-
-        const viaRegistry = await get(
-            `/nodes?filter[id]=${nodeId}&include=registry&fields[registry]=%2BaccountSecret`,
-            token,
-        );
-        expect(viaRegistry.text).not.toContain(REGISTRY_SECRET);
-        expect(viaRegistry.status).toBe(400);
-
-        const viaProject = await get(
-            `/nodes/${nodeId}?include=registryProject&fields[registryProject]=%2BaccountSecret`,
-            token,
-        );
-        expect(viaProject.text).not.toContain(PROJECT_SECRET);
-        expect(viaProject.status).toBe(400);
     });
 
     it('rejects a nested secret even for the admin', async () => {

@@ -67,8 +67,10 @@ export function readDatabaseConnectionEnv(): DatabaseConnection | undefined {
 
 /**
  * Drop and re-create the suite's database. Runs ONCE, in vitest global setup,
- * before any worker exists — so workers never issue a `CREATE DATABASE` and
- * every run starts from an empty schema.
+ * before any worker exists — so workers never race on its `CREATE DATABASE`
+ * and the suite's own database starts every run empty. A database a suite
+ * derives from it per worker (server-core's `<suite db>_<pool id>`) is not
+ * dropped here and keeps its rows across runs.
  */
 export async function recreateDatabase(connection: DatabaseConnection): Promise<void> {
     const options = {

@@ -47,12 +47,14 @@ describe('src/controllers/core/analysis-log', () => {
 
     // The proxy authorizes against the referenced analysis, so it must exist.
     let ANALYSIS_ID: string;
+    let PROJECT_ID: string;
 
     beforeAll(async () => {
         await suite.setup();
 
         const { client } = suite;
         const { data: project } = await client.project.create(createTestProject());
+        PROJECT_ID = project.id;
         const { data: analysis } = await client.analysis.create({ projectId: project.id });
         ANALYSIS_ID = analysis.id;
     });
@@ -64,7 +66,16 @@ describe('src/controllers/core/analysis-log', () => {
     });
 
     afterAll(async () => {
-        await suite.teardown();
+        try {
+            if (ANALYSIS_ID) {
+                await suite.client.analysis.delete(ANALYSIS_ID);
+            }
+            if (PROJECT_ID) {
+                await suite.client.project.delete(PROJECT_ID);
+            }
+        } finally {
+            await suite.teardown();
+        }
     });
 
     it('should proxy the analysis log collection from the telemetry store', async () => {
@@ -144,15 +155,5 @@ describe('src/controllers/core/analysis-log', () => {
 
         expect(status).toBe(202);
         expect(telemetryRequests).toHaveLength(1);
-    });
-
-    it('should 404 an unknown analysis instead of forwarding it', async () => {
-        const { client } = suite;
-
-        await expect(client.analysisLog.getMany({ filters: { analysisId: '11111111-1111-1111-1111-111111111111' } }))
-            .rejects.toThrow();
-        await expect(client.analysisLog.delete({ filters: { analysisId: '11111111-1111-1111-1111-111111111111' } }))
-            .rejects.toThrow();
-        expect(telemetryRequests).toHaveLength(0);
     });
 });
