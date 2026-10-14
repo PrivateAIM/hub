@@ -13,7 +13,7 @@ import {
     BucketCommand,
     BucketTaskMessageBusRouting,
 } from './constants';
-import type { BucketCreateCommandPayload, BucketDeleteCommandPayload } from './handlers';
+import type { BucketClearCommandPayload, BucketCreateCommandPayload, BucketDeleteCommandPayload } from './handlers';
 
 export class BucketComponentCaller extends MessageBusDispatchComponentCaller {
     constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
@@ -26,5 +26,9 @@ export class BucketComponentCaller extends MessageBusDispatchComponentCaller {
 
     async callDelete(payload: BucketDeleteCommandPayload, metadata: ComponentMetadata = {}) {
         return this.call(BucketCommand.DELETE, payload, metadata);
+    }
+
+    async callClear(payload: BucketClearCommandPayload, metadata: ComponentMetadata = {}) {
+        return this.call(BucketCommand.CLEAR, payload, metadata);
     }
 }

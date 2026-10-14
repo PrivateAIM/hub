@@ -15,6 +15,7 @@ export interface IBucketRepository extends IEntityRepository<Bucket> {
 export interface IBucketCaller {
     create(data: Record<string, any>): Promise<Bucket>;
     delete(id: string): Promise<Bucket>;
+    clear(id: string): Promise<Bucket>;
 }
 
 export interface IBucketService {
@@ -23,4 +24,5 @@ export interface IBucketService {
     create(data: Partial<Bucket>, actor: ActorContext): Promise<Bucket>;
     update(id: string, data: Partial<Bucket>, actor: ActorContext): Promise<Bucket>;
     delete(id: string, actor: ActorContext): Promise<Bucket>;
+    clear(id: string, actor: ActorContext): Promise<Bucket>;
 }

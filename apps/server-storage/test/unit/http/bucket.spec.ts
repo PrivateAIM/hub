@@ -19,6 +19,7 @@ import {
     createTestSuite,
 } from '../../utils/index.ts';
 import { createTestBucket } from '../../utils/domains/index.ts';
+import { toBucketName } from '../../../src/core/utils/bucket-name.ts';
 
 describe('bucket HTTP endpoints', () => {
     const suite = createTestSuite();
@@ -249,6 +250,42 @@ describe('bucket HTTP endpoints', () => {
             const body = await response.json();
             expect(body.data.id).toBe(bucketId);
             expect(body.meta).toEqual({});
+        });
+    });
+
+    describe('POST /buckets/:id/clear', () => {
+        it('should remove all files and stored objects but keep the bucket', async () => {
+            const client = suite.client();
+            const bucketName = toBucketName(bucketId);
+
+            const before = await client.bucketFile.getMany({ filters: { bucketId } });
+            expect(before.data.length).toBeGreaterThanOrEqual(1);
+            const keys = before.data.map((file) => file.hash);
+            expect(await suite.storage().listObjects(bucketName)).toEqual(expect.arrayContaining(keys));
+
+            const response = await client.bucket.clear(bucketId);
+            expect(response.data.id).toBe(bucketId);
+            expect(response.data).not.toHaveProperty('fileIds');
+            expect(response.meta).toEqual({});
+
+            const bucket = await client.bucket.getOne(bucketId);
+            expect(bucket.data.id).toBe(bucketId);
+
+            const after = await client.bucketFile.getMany({ filters: { bucketId } });
+            expect(after.data).toEqual([]);
+            expect(after.meta.total).toBe(0);
+
+            const remaining = await suite.storage().listObjects(bucketName);
+            expect(remaining.filter((key) => keys.includes(key))).toEqual([]);
+        });
+
+        it('should return 404 for non-existent bucket', async () => {
+            const response = await fetch(`${getBaseURL()}/buckets/00000000-0000-0000-0000-000000000000/clear`, {
+                method: 'POST',
+                headers: { Authorization: authorization },
+            });
+
+            expect(response.status).toBe(404);
         });
     });
 

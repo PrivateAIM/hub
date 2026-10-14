@@ -9,7 +9,7 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { AnalysisBuilderComponentCaller, AnalysisDistributorComponentCaller } from '@privateaim/server-core-worker-kit';
 import { BucketComponentCaller } from '@privateaim/server-storage-kit';
-import { MessageBusInjectionKey } from '@privateaim/server-kit';
+import { LoggerInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
 import { AnalysisBuilder } from '../../../core/services/analysis-builder/index.ts';
 import { AnalysisConfigurator } from '../../../core/services/analysis-configurator/index.ts';
 import { AnalysisDistributor } from '../../../core/services/analysis-distributor/index.ts';
@@ -38,6 +38,16 @@ export class AnalysisModule implements IModule {
         const messageBusResult = container.tryResolve(MessageBusInjectionKey);
         const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
+        const loggerResult = container.tryResolve(LoggerInjectionKey);
+        const logger = loggerResult.success ? loggerResult.data : undefined;
+
+        const storageManager = new AnalysisStorageManager({
+            repository: analysisRepository,
+            bucketRepository: analysisBucketRepository,
+            caller: new BucketComponentCaller({ messageBus }),
+            taskManager: container.resolve(ComponentsInjectionKey.TaskManager),
+        });
+
         const analysisRecalculator = new AnalysisMetadataRecalculator({ repository: analysisRepository });
         const nodeRecalculator = new AnalysisNodeMetadataRecalculator({
             analysisRepository,
@@ -46,6 +56,8 @@ export class AnalysisModule implements IModule {
                 env: config.env,
                 skipAnalysisApproval: config.skipAnalysisApproval,
             },
+            storageManager,
+            logger,
         });
         const fileRecalculator = new AnalysisFileMetadataRecalculator({
             analysisRepository,
@@ -86,13 +98,6 @@ export class AnalysisModule implements IModule {
                 nodeRecalculator,
                 fileRecalculator,
             }),
-        });
-
-        const storageManager = new AnalysisStorageManager({
-            repository: analysisRepository,
-            bucketRepository: analysisBucketRepository,
-            caller: new BucketComponentCaller({ messageBus }),
-            taskManager: container.resolve(ComponentsInjectionKey.TaskManager),
         });
 
         container.register(AnalysisInjectionKey.StorageManager, { useValue: storageManager });

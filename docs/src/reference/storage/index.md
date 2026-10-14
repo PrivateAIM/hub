@@ -43,6 +43,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `GET` | `/buckets/:id` | Get bucket |
 | `POST` | `/buckets/:id` | Update bucket |
 | `DELETE` | `/buckets/:id` | Delete bucket |
+| `POST` | `/buckets/:id/clear` | Empty a bucket — remove every file, keep the bucket |
 | `POST` | `/buckets/:id/upload` | Upload files into a bucket |
 | `GET` | `/buckets/:id/stream` | Stream the bucket contents as a tar |
 | `GET` | `/bucket-files` | List files |
@@ -72,5 +73,7 @@ See [API Reference](/guide/development/api#response-shapes) for the full contrac
 
 - **BucketEntity** / **BucketFileEntity** — TypeORM entities tracking storage metadata
 - **MinioModule** — creates and registers the S3 client in the DI container
-- **BucketComponent** — AMQP consumer for asynchronous bucket operations
+- **BucketComponent** — AMQP consumer for asynchronous bucket operations: `create`, `delete` and
+  `clear` (removes every object and bucket-file row but keeps the bucket, emitting
+  `clearingStarted` / `clearingFinished` / `clearingFailed`)
 - **Subscribers** — publish domain events on bucket/file changes

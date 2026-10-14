@@ -52,4 +52,4 @@ Once [approved](/guide/user/approval), an analysis goes through:
 
 ## Analysis Buckets
 
-Each analysis can have associated storage buckets for input data, code, and results. Buckets are managed by the [Storage service](/reference/storage/) and provisioned automatically during the configuration phase.
+Each analysis can have associated storage buckets for input data, code, and results. Buckets are managed by the [Storage service](/reference/storage/) and provisioned automatically during the configuration phase. Once every node has finished (executed, failed or stopped), the intermediate (`TEMP`) bucket is emptied: its files are removed, the bucket itself is kept for re-runs.

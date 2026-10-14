@@ -14,6 +14,8 @@ export class FakeBucketCaller implements IBucketCaller {
 
     private deleteCalls: string[] = [];
 
+    private clearCalls: string[] = [];
+
     async create(data: Record<string, any>): Promise<Bucket> {
         this.createCalls.push(data);
         return {
@@ -29,11 +31,20 @@ export class FakeBucketCaller implements IBucketCaller {
         return { id } as Bucket;
     }
 
+    async clear(id: string): Promise<Bucket> {
+        this.clearCalls.push(id);
+        return { id } as Bucket;
+    }
+
     getCreateCalls(): Record<string, any>[] {
         return [...this.createCalls];
     }
 
     getDeleteCalls(): string[] {
         return [...this.deleteCalls];
+    }
+
+    getClearCalls(): string[] {
+        return [...this.clearCalls];
     }
 }

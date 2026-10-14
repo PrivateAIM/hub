@@ -13,7 +13,11 @@ import {
     BaseComponent,
 } from '@privateaim/server-kit';
 import type { BaseAggregatorHandlerContext } from '../../base.ts';
-import { StorageBucketCreationFinishedHandler, StorageBucketDeletionFinishedHandler } from './handlers/index.ts';
+import {
+    StorageBucketClearingFinishedHandler,
+    StorageBucketCreationFinishedHandler,
+    StorageBucketDeletionFinishedHandler,
+} from './handlers/index.ts';
 
 export class StorageBucketAggregator extends BaseComponent<
     BucketComponentEventMap
@@ -23,6 +27,7 @@ export class StorageBucketAggregator extends BaseComponent<
 
         this.mount(BucketEvent.CREATION_FINISHED, new StorageBucketCreationFinishedHandler(ctx));
         this.mount(BucketEvent.DELETION_FINISHED, new StorageBucketDeletionFinishedHandler(ctx));
+        this.mount(BucketEvent.CLEARING_FINISHED, new StorageBucketClearingFinishedHandler(ctx));
     }
 
     async start() : Promise<void> {

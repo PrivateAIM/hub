@@ -34,7 +34,7 @@ const stream = await client.bucketFile.stream(fileId);
 
 ### Response Shapes
 
-Every single-record method (`getOne`, `create`, `update`, `delete`) resolves to the
+Every single-record method (`getOne`, `create`, `update`, `delete`, `clear`) resolves to the
 `{ data, meta }` record envelope — destructure `data` at the call site. `getMany` is unchanged:
 collections were already enveloped.
 
@@ -89,7 +89,7 @@ function doWork(client: IStorageClient) { /* … */ }
 
 | Sub-API | Contract |
 |---|---|
-| `bucket` | `IBucketAPI` (entity verbs plus `upload`/`stream`) |
+| `bucket` | `IBucketAPI` (entity verbs plus `clear`/`upload`/`stream`) |
 | `bucketFile` | `IBucketFileAPI` (entity verbs plus `stream`) |
 
 ## Testing
