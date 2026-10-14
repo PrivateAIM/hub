@@ -15,3 +15,10 @@ import type { ActorContext } from '@privateaim/server-kit';
 export type FakeActorContext = ActorContext & {
     permissionEvaluator: FakePermissionEvaluator;
 };
+
+/** A permission row as Authup's management API lists it. */
+export type AuthupPermissionRow = {
+    id: string,
+    clientId?: string | null,
+    realmId?: string | null,
+};

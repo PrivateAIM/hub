@@ -7,6 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { createAuthupUserTokenCreator } from '@privateaim/server-kit';
+import type { AuthupPermissionRow } from './types.ts';
 
 /**
  * Resolve `path` against an Authup base URL WITHOUT dropping a path prefix.
@@ -20,21 +21,14 @@ export function buildAuthupURL(baseURL: string, path: string): URL {
     return new URL(path.replace(/^\/+/, ''), base);
 }
 
-type AuthupPermissionRow = {
-    id: string,
-    clientId?: string | null,
-    realmId?: string | null,
-};
-
 /**
  * Pick the permission a test user is granted. A name is unique only per
- * (realm, client), so a client-bound or realm-bound duplicate must not be
- * picked in place of the suite's global, client-less permission.
+ * (realm, client), so only the global row — bound to neither — qualifies;
+ * granting a client- or realm-bound duplicate instead would make a spec pass
+ * or fail for the wrong grant.
  */
 export function selectGlobalPermission(rows: AuthupPermissionRow[]): AuthupPermissionRow | undefined {
-    const clientless = rows.filter((row) => !row.clientId);
-
-    return clientless.find((row) => !row.realmId) ?? clientless[0];
+    return rows.find((row) => !row.clientId && !row.realmId);
 }
 
 /**
@@ -129,7 +123,7 @@ export async function createRestrictedAccessToken(
         );
         const permission = selectGlobalPermission(permissions);
         if (!permission) {
-            throw new Error(`The client-less permission ${permissionName} is not provisioned — cannot grant it to ${name}.`);
+            throw new Error(`The global permission ${permissionName} is not provisioned — cannot grant it to ${name}.`);
         }
 
         await request('POST', 'user-permissions', {

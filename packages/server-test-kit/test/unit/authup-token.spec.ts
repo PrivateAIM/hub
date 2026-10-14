@@ -16,31 +16,24 @@ describe('authup-token', () => {
         expect(buildAuthupURL('http://host:3010', 'users').href).toEqual('http://host:3010/users');
     });
 
-    it('should pick the global, client-less permission over bound duplicates', () => {
-        expect(selectGlobalPermission([
-            {
-                id: 'client-bound', 
-                clientId: 'c', 
-                realmId: null, 
-            },
-            {
-                id: 'realm-bound', 
-                clientId: null, 
-                realmId: 'r', 
-            },
-            {
-                id: 'global', 
-                clientId: null, 
-                realmId: null, 
-            },
-        ])?.id).toEqual('global');
-    });
-
-    it('should never pick a client-bound permission', () => {
-        expect(selectGlobalPermission([{
+    it('should only ever pick the global permission', () => {
+        const clientBound = {
             id: 'client-bound', 
             clientId: 'c', 
             realmId: null, 
-        }])).toBeUndefined();
+        };
+        const realmBound = {
+            id: 'realm-bound', 
+            clientId: null, 
+            realmId: 'r', 
+        };
+
+        expect(selectGlobalPermission([clientBound, realmBound, {
+            id: 'global', 
+            clientId: null, 
+            realmId: null, 
+        }])?.id)
+            .toEqual('global');
+        expect(selectGlobalPermission([clientBound, realmBound])).toBeUndefined();
     });
 });
