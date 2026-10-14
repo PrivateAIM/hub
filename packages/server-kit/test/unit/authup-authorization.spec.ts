@@ -71,15 +71,18 @@ describe('Authup authorization catalog', () => {
             baseURL: 'http://authup.test',
             transport: new MemoryTransport({ fetch: () => ({ status: 200, body: catalog }) }),
         });
-        const grants = [{ name: 'node_update', realm_scope: 'any' }];
+        const token = (scope: string, subKind: 'user' | 'client' = 'user') => ({
+            sub: identity.id,
+            sub_kind: subKind,
+            realm_id: identity.realmId,
+            realm_name: identity.realmName,
+            scope,
+            permissions: [{ name: 'node_update', realm_scope: 'any' as const }],
+        });
 
         it('places the identity and its grants for a global-scoped token', async () => {
-            const subject = resolveAuthupPolicySubject({
-                scopes: ['global', 'openid'], 
-                identity, 
-                grants, 
-            });
-            expect(subject.identity).toEqual(identity);
+            const subject = resolveAuthupPolicySubject(token('global openid'));
+            expect(subject.identity).toEqual({ ...identity, clientId: null });
 
             const evaluator = await createAuthupPermissionEvaluator(client(), subject);
             await expect(evaluator.preEvaluate({ name: 'node_update' })).resolves.toBeUndefined();
@@ -90,26 +93,14 @@ describe('Authup authorization catalog', () => {
         // pass the grants unconditionally, so a narrowly-scoped token was
         // evaluated with its full grants.
         it('keeps the identity but withholds the grants for a token without global scope', async () => {
-            const subject = resolveAuthupPolicySubject({
-                scopes: ['openid'],
-                identity,
-                grants,
-            });
-            expect(subject).toEqual({ identity, grants: [] });
+            const subject = resolveAuthupPolicySubject(token('openid'));
+            expect(subject).toEqual({ identity: { ...identity, clientId: null }, grants: [] });
 
             const evaluator = await createAuthupPermissionEvaluator(client(), subject);
             // A permission DENIAL specifically (answered 403), not just any
             // throw: a TypeError or validation error here would answer 500.
             const error = await evaluator.preEvaluate({ name: 'node_update' }).then(() => undefined, (e: unknown) => e);
             expect(isPermissionError(error)).toBe(true);
-        });
-
-        it('keeps the identity for a token without any scope', () => {
-            expect(resolveAuthupPolicySubject({
-                scopes: [],
-                identity,
-                grants,
-            })).toEqual({ identity, grants: [] });
         });
 
         // A definition whose only policy READS the identity (no binding
@@ -132,21 +123,15 @@ describe('Authup authorization catalog', () => {
                 transport: new MemoryTransport({ fetch: () => ({ status: 200, body: identityCatalog }) }),
             });
 
-            const subject = resolveAuthupPolicySubject({
-                scopes: ['openid'],
-                identity,
-                grants: [],
-            });
-            const evaluator = await createAuthupPermissionEvaluator(identityClient, subject);
+            const evaluator = await createAuthupPermissionEvaluator(identityClient, resolveAuthupPolicySubject(token('openid')));
             await expect(evaluator.evaluate({ name: 'user_only' })).resolves.toBeUndefined();
 
             // Negative control: the same definition denies a client identity,
             // so the pass above is the identity being read, not a vacuous allow.
-            const clientEvaluator = await createAuthupPermissionEvaluator(identityClient, resolveAuthupPolicySubject({
-                scopes: ['openid'],
-                identity: { ...identity, type: 'client' as const },
-                grants: [],
-            }));
+            const clientEvaluator = await createAuthupPermissionEvaluator(
+                identityClient,
+                resolveAuthupPolicySubject(token('openid', 'client')),
+            );
             const error = await clientEvaluator.evaluate({ name: 'user_only' }).then(() => undefined, (e: unknown) => e);
             expect(isPermissionError(error)).toBe(true);
         });

@@ -7,7 +7,6 @@
 
 import type { IClient } from '@authup/core-http-kit';
 import { createAuthupPermissionEvaluator, resolveAuthupPolicySubject } from '@privateaim/server-kit';
-import { unwrapOAuth2Scope } from '@authup/specs';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import type { Socket } from '../../types';
 
@@ -33,15 +32,5 @@ export async function applyTokenVerificationData(
         realmName: data.realm_name,
     };
 
-    socket.data.permissionEvaluator = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject({
-        scopes: unwrapOAuth2Scope(data.scope || []),
-        grants: data.permissions,
-        identity: {
-            id: data.sub,
-            type: data.sub_kind,
-            realmId: data.realm_id,
-            realmName: data.realm_name,
-            clientId: data.sub_kind === 'client' ? data.sub : null,
-        },
-    }));
+    socket.data.permissionEvaluator = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject(data));
 }

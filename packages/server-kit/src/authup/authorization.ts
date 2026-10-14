@@ -9,12 +9,14 @@ import type { AuthorizationEvaluatorInput, IPermissionEvaluator } from '@authup/
 import { createAuthorizationEvaluator } from '@authup/access';
 import type { IClient } from '@authup/core-http-kit';
 import { ScopeName } from '@authup/core-kit';
-import type { AuthupPolicySubject, AuthupPolicySubjectInput } from './types.ts';
+import { unwrapOAuth2Scope } from '@authup/specs';
+import type { AuthupPolicySubject, AuthupTokenSubjectData } from './types.ts';
 
 /**
  * What a policy may see for a token: ALWAYS its identity, and its grants only
- * when the token's scopes include `global`. Shared by the HTTP and socket
- * middlewares so hub spells the gate once.
+ * when the token's scopes include `global`. Built straight from the token's
+ * introspection and shared by the HTTP and socket middlewares, so hub spells
+ * both the identity mapping and the gate once.
  *
  * Scope restricts what a caller can do, never who it is. A token without
  * `global` gets its identity placed with an EMPTY grant set, so:
@@ -25,15 +27,20 @@ import type { AuthupPolicySubject, AuthupPolicySubjectInput } from './types.ts';
  * - identity-reading policies (`identity`, realm match, …) still evaluate
  *   against the real caller instead of against nobody.
  *
- * This deliberately DIVERGES from authup's own `useRequestPolicyIdentity`,
- * which removes the identity altogether for a non-`global` token; a change
- * upstream to match this behaviour (withhold capabilities, keep the identity)
- * is being proposed.
+ * Authup applies the same rule since authup#3723 (`useRequestPolicyGrants`).
  */
-export function resolveAuthupPolicySubject(input: AuthupPolicySubjectInput): AuthupPolicySubject {
+export function resolveAuthupPolicySubject(data: AuthupTokenSubjectData): AuthupPolicySubject {
+    const scopes = unwrapOAuth2Scope(data.scope || []);
+
     return {
-        identity: input.identity,
-        grants: input.scopes.includes(ScopeName.GLOBAL) ? input.grants : [],
+        identity: {
+            id: data.sub,
+            type: data.sub_kind,
+            realmId: data.realm_id,
+            realmName: data.realm_name,
+            clientId: data.sub_kind === 'client' ? data.sub : null,
+        },
+        grants: scopes.includes(ScopeName.GLOBAL) ? data.permissions : [],
     };
 }
 

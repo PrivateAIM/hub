@@ -6,12 +6,17 @@
  */
 
 import type { AuthorizationEvaluatorInput } from '@authup/access';
+import type { OAuth2TokenPayload, OAuth2TokenPermission } from '@authup/specs';
 
 export type AuthupPolicySubject = Omit<AuthorizationEvaluatorInput, 'catalog'>;
 
-export type AuthupPolicySubjectInput = Required<AuthupPolicySubject> & {
-    /**
-     * The token's scopes, already unwrapped (`unwrapOAuth2Scope`).
-     */
-    scopes: string[],
+/**
+ * The part of a token's introspection (`TokenVerificationData`) a policy
+ * subject is built from.
+ */
+export type AuthupTokenSubjectData = Pick<
+    OAuth2TokenPayload,
+    'sub' | 'sub_kind' | 'realm_id' | 'realm_name' | 'scope'
+> & {
+    permissions: OAuth2TokenPermission[],
 };

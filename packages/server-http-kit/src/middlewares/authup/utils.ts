@@ -40,17 +40,7 @@ export async function applyTokenVerificationData(
 ) {
     const scopes = unwrapOAuth2Scope(data.scope || []);
 
-    const permissionEvaluator = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject({
-        scopes,
-        grants: data.permissions,
-        identity: {
-            id: data.sub,
-            type: data.sub_kind,
-            realmId: data.realm_id,
-            realmName: data.realm_name,
-            clientId: data.sub_kind === 'client' ? data.sub : null,
-        },
-    }));
+    const permissionEvaluator = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject(data));
     setRequestEnv(event, 'permissionEvaluator', permissionEvaluator);
 
     setRequestEnv(event, 'identity', {
