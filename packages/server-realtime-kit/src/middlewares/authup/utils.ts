@@ -9,7 +9,8 @@ import { PermissionName as AuthupPermissionName, REALM_MASTER_NAME } from '@auth
 import type { PermissionPolicyBinding } from '@authup/access';
 import { PermissionEvaluator, PermissionMemoryProvider } from '@authup/access';
 import type { IClient } from '@authup/core-http-kit';
-import { createAuthupPermissionEvaluator } from '@privateaim/server-kit';
+import { createAuthupPermissionEvaluator, resolveAuthupPolicySubject } from '@privateaim/server-kit';
+import { unwrapOAuth2Scope } from '@authup/specs';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { Socket } from '../../types';
@@ -20,7 +21,8 @@ type TokenVerificationDataMinimal = Pick<
 'realm_id' |
 'realm_name' |
 'sub' |
-'sub_kind'
+'sub_kind' |
+'scope'
 >;
 
 function generateAbilityNames(): string[] {
@@ -63,7 +65,8 @@ export async function applyTokenVerificationData(
     };
 
     socket.data.permissionChecker = authupClient && !fakeAbilities ?
-        await createAuthupPermissionEvaluator(authupClient, {
+        await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject({
+            scopes: unwrapOAuth2Scope(data.scope || []),
             grants: data.permissions,
             identity: {
                 id: data.sub,
@@ -72,5 +75,5 @@ export async function applyTokenVerificationData(
                 realmName: data.realm_name,
                 clientId: data.sub_kind === 'client' ? data.sub : null,
             },
-        }) : new PermissionEvaluator({ provider: new PermissionMemoryProvider(abilities) });
+        })) : new PermissionEvaluator({ provider: new PermissionMemoryProvider(abilities) });
 }

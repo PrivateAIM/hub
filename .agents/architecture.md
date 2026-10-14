@@ -256,7 +256,10 @@ HTTP and socket middleware use the service Authup client to fetch `GET /authoriz
 once per authenticated request/connection, then `createAuthupPermissionEvaluator`
 (`server-kit/src/authup/authorization.ts`) combines it with the caller's complete
 introspection grants and identity. Do not flatten grants to permission names: that
-loses definition policies, junction policies and realm reach. The credential needs
+loses definition policies, junction policies and realm reach. The identity and its
+grants are placed only for a token scoped `global` (`resolveAuthupPolicySubject`, mirroring
+authup's `useRequestPolicyIdentity`); any other token authenticates but every permission
+carrying the binding policy denies. The credential needs
 `permission_read` at `ownOrNull` or wider. Fetch failures propagate; no cross-request
 catalog cache or name-only fallback is installed. Token-verifier caching and socket
 connection lifetimes remain unchanged.

@@ -30,6 +30,12 @@ request; there is no fallback to permission names. Catalogs are not cached acros
 requests. Existing token-introspection caching and socket-session lifetimes still
 apply, so changes to grants are visible when those are refreshed.
 
+Grants are only evaluated for tokens carrying the `global` scope, as in Authup
+itself. A token issued without it (e.g. a custom login client registered without
+`global`) still authenticates, but every permission check denies with 403.
+client-ui requests `global openid`, and Authup's client-credentials and password
+grants always issue `global`.
+
 This preserves policy trees and grant realm scopes at the evaluator boundary.
 Existing endpoints that only perform a permission pre-check still perform a
 pre-check: this upgrade does not add row-policy checks or collection filtering to

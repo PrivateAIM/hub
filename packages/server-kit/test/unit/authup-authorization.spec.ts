@@ -10,7 +10,7 @@ import { BuiltInPolicyType, definePolicyData } from '@authup/access';
 import { Client } from '@authup/core-http-kit';
 import { MemoryTransport } from 'hapic';
 import { describe, expect, it } from 'vitest';
-import { createAuthupPermissionEvaluator } from '../../src/authup/authorization.ts';
+import { createAuthupPermissionEvaluator, resolveAuthupPolicySubject } from '../../src/authup/authorization.ts';
 
 const catalog: AuthorizationCatalog = {
     permissions: [{
@@ -63,5 +63,48 @@ describe('Authup authorization catalog', () => {
     it('fails closed when the catalog cannot be loaded', async () => {
         const client = new Client({ baseURL: 'http://authup.test', transport: new MemoryTransport({ fetch: () => ({ status: 403 }) }) });
         await expect(createAuthupPermissionEvaluator(client, { identity, grants: [] })).rejects.toThrow();
+    });
+
+    describe('policy subject', () => {
+        const client = () => new Client({
+            baseURL: 'http://authup.test',
+            transport: new MemoryTransport({ fetch: () => ({ status: 200, body: catalog }) }),
+        });
+        const grants = [{ name: 'node_update', realm_scope: 'any' }];
+
+        it('places the identity and its grants for a global-scoped token', async () => {
+            const subject = resolveAuthupPolicySubject({
+                scopes: ['global', 'openid'], 
+                identity, 
+                grants, 
+            });
+            expect(subject.identity).toEqual(identity);
+
+            const evaluator = await createAuthupPermissionEvaluator(client(), subject);
+            await expect(evaluator.preEvaluate({ name: 'node_update' })).resolves.toBeUndefined();
+        });
+
+        // authup withholds the identity unless the token carries `global`;
+        // hub used to pass it unconditionally, so a narrowly-scoped token was
+        // evaluated with its full grants.
+        it('withholds the identity and grants for a token without global scope', async () => {
+            const subject = resolveAuthupPolicySubject({
+                scopes: ['openid'], 
+                identity, 
+                grants, 
+            });
+            expect(subject).toEqual({});
+
+            const evaluator = await createAuthupPermissionEvaluator(client(), subject);
+            await expect(evaluator.preEvaluate({ name: 'node_update' })).rejects.toThrow();
+        });
+
+        it('withholds the identity for a token without any scope', () => {
+            expect(resolveAuthupPolicySubject({
+                scopes: [], 
+                identity, 
+                grants, 
+            })).toEqual({});
+        });
     });
 });

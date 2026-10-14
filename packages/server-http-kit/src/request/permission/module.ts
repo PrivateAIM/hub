@@ -5,58 +5,43 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ScopeName } from '@authup/core-kit';
 import type {
     IPermissionEvaluator,
     PermissionEvaluationContext,
 } from '@authup/access';
-import {
-    BuiltInPolicyType,
-    PolicyData,
-} from '@authup/access';
-import type { IAppEvent } from 'routup';
-import { useRequestEnv } from '../env';
-import { useRequestIdentity } from '../identity';
 
+/**
+ * Forwards to the request's evaluator. It used to attach the request identity
+ * as `IDENTITY` policy data for `global`-scoped tokens, but the catalog
+ * evaluator (`createAuthorizationEvaluator`) owns that key: it overwrites it
+ * with the identity it was built for, or deletes it when built without one.
+ * Whether an identity is placed at all is decided once, when the evaluator is
+ * built (`resolveAuthupPolicySubject`).
+ */
 export class RequestPermissionChecker {
-    protected event: IAppEvent;
-
     protected checker: IPermissionEvaluator;
 
-    constructor(event: IAppEvent, checker: IPermissionEvaluator) {
-        this.event = event;
+    constructor(checker: IPermissionEvaluator) {
         this.checker = checker;
     }
 
     // --------------------------------------------------------------
 
     async check(ctx: PermissionEvaluationContext) : Promise<void> {
-        return this.checker.evaluate(this.extendCheckContext(ctx));
+        return this.checker.evaluate(ctx);
     }
 
     async preCheck(ctx: PermissionEvaluationContext) : Promise<void> {
-        return this.checker.preEvaluate(this.extendCheckContext(ctx));
+        return this.checker.preEvaluate(ctx);
     }
 
     // --------------------------------------------------------------
 
     async preCheckOneOf(ctx: PermissionEvaluationContext) : Promise<void> {
-        return this.checker.preEvaluateOneOf(this.extendCheckContext(ctx));
+        return this.checker.preEvaluateOneOf(ctx);
     }
 
     async checkOneOf(ctx: PermissionEvaluationContext) : Promise<void> {
-        return this.checker.evaluateOneOf(this.extendCheckContext(ctx));
-    }
-
-    // --------------------------------------------------------------
-
-    protected extendCheckContext(ctx: PermissionEvaluationContext) {
-        const scopes = useRequestEnv(this.event, 'scopes') || [];
-        if (scopes.includes(ScopeName.GLOBAL)) {
-            ctx.data = ctx.data || new PolicyData();
-            ctx.data.set(BuiltInPolicyType.IDENTITY, useRequestIdentity(this.event));
-        }
-
-        return ctx;
+        return this.checker.evaluateOneOf(ctx);
     }
 }

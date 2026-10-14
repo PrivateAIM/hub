@@ -10,7 +10,7 @@ import type { IPermissionProvider } from '@authup/access';
 import { PermissionEvaluator, PermissionMemoryProvider } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { IClient } from '@authup/core-http-kit';
-import { createAuthupPermissionEvaluator } from '@privateaim/server-kit';
+import { createAuthupPermissionEvaluator, resolveAuthupPolicySubject } from '@privateaim/server-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import type { IAppEvent } from 'routup';
 import { RequestPermissionChecker, setRequestEnv } from '../../request/index.ts';
@@ -62,8 +62,11 @@ export async function applyTokenVerificationData(
         repository = new PermissionMemoryProvider([]);
     }
 
+    const scopes = unwrapOAuth2Scope(data.scope || []);
+
     const permissionEvaluator = authupClient && !fakeAbilities ?
-        await createAuthupPermissionEvaluator(authupClient, {
+        await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject({
+            scopes,
             grants: data.permissions,
             identity: {
                 id: data.sub,
@@ -72,12 +75,12 @@ export async function applyTokenVerificationData(
                 realmName: data.realm_name,
                 clientId: data.sub_kind === 'client' ? data.sub : null,
             },
-        }) : new PermissionEvaluator({
+        })) : new PermissionEvaluator({
             provider: repository,
             realmId: null,
             clientId:null,
         });
-    const requestPermissionChecker = new RequestPermissionChecker(event, permissionEvaluator);
+    const requestPermissionChecker = new RequestPermissionChecker(permissionEvaluator);
     setRequestEnv(event, 'permissionChecker', requestPermissionChecker);
 
     setRequestEnv(event, 'identity', {
@@ -101,5 +104,5 @@ export async function applyTokenVerificationData(
         attributes: { id: data.sub },
     });
 
-    setRequestEnv(event, 'scopes', unwrapOAuth2Scope(data.scope || []));
+    setRequestEnv(event, 'scopes', scopes);
 }
