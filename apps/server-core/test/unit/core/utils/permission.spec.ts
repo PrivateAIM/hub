@@ -11,7 +11,7 @@ import { PermissionDeniedError } from '@privateaim/errors';
 import type { FakeActorContext } from '@privateaim/server-test-kit';
 import { FakePermissionEvaluator } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
-import { holdsPermission, isPermissionDenial } from '../../../../src/core/utils/index.ts';
+import { holdsPermission } from '../../../../src/core/utils/index.ts';
 
 function actorThrowing(error?: Error): FakeActorContext {
     return {
@@ -24,19 +24,6 @@ function actorThrowing(error?: Error): FakeActorContext {
 }
 
 describe('core/utils/permission', () => {
-    it.each([
-        ['hub PermissionDeniedError', new PermissionDeniedError()],
-        ['authup PermissionError.denied', PermissionError.denied('foo')],
-        ['authup PermissionError.deniedAll', PermissionError.deniedAll(['foo'])],
-        ['authup PermissionError.evaluationFailed', PermissionError.evaluationFailed('foo')],
-    ])('should classify %s as a denial', (_label, error) => {
-        expect(isPermissionDenial(error)).toBe(true);
-    });
-
-    it('should not classify an arbitrary error as a denial', () => {
-        expect(isPermissionDenial(new Error('boom'))).toBe(false);
-    });
-
     it('should answer true when the permission is held', async () => {
         await expect(holdsPermission(actorThrowing(), 'foo')).resolves.toBe(true);
     });

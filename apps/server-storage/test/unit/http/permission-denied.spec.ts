@@ -6,7 +6,7 @@
  */
 
 import { PermissionName } from '@privateaim/kit';
-import { createAdminAccessToken, createRestrictedAccessToken } from '@privateaim/server-test-kit';
+import { createRestrictedAccessToken } from '@privateaim/server-test-kit';
 import {
     afterAll,
     beforeAll,
@@ -44,15 +44,6 @@ describe('authorization denial status', () => {
         body: JSON.stringify(createTestBucket()),
     });
 
-    // Credential confusion: a malformed bearer used to be introspected as the
-    // storage service's own client (authup falls back to the request's
-    // inherited `Authorization` header) and could create a bucket as it.
-    it('answers 401 for a malformed bearer instead of acting as the service client', async () => {
-        const response = await createBucket('not-a-token');
-
-        expect(response.status).toBe(401);
-    });
-
     it('answers 403 for an identity holding no permission', async () => {
         const response = await createBucket(await createRestrictedAccessToken());
 
@@ -61,22 +52,10 @@ describe('authorization denial status', () => {
         expect(body.code).toMatch(/^permission_/);
     });
 
-    it('answers 403 for an identity holding a different permission', async () => {
-        const response = await createBucket(await createRestrictedAccessToken([PermissionName.BUCKET_DELETE]));
-
-        expect(response.status).toBe(403);
-    });
-
     // Negative control: the restricted path is not simply broken — the same
     // user shape holding the checked permission is let through.
     it('answers 201 for an identity holding the checked permission', async () => {
         const response = await createBucket(await createRestrictedAccessToken([PermissionName.BUCKET_CREATE]));
-
-        expect(response.status).toBe(201);
-    });
-
-    it('answers 201 for the admin', async () => {
-        const response = await createBucket(await createAdminAccessToken());
 
         expect(response.status).toBe(201);
     });

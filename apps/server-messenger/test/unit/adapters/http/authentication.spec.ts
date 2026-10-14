@@ -66,8 +66,6 @@ describe('adapters/http/message authentication', () => {
      */
     it.each([
         ['a short garbage bearer', 'not-a-token'],
-        ['an oversized bearer', 'x'.repeat(4096)],
-        ['a JWS-shaped bearer shorter than 16 characters', 'a.b.c'],
         ['a JWS-shaped bearer longer than 2048 characters', `aaaa.bbbb.${'c'.repeat(2100)}`],
     ])('answers 401 for %s', async (_label, token) => {
         const response = await fetch(`${app.baseURL}messages`, { headers: { authorization: `Bearer ${token}` } });

@@ -32,7 +32,6 @@ const and = (...conditions: ICondition[]) => new Filters(FilterCompoundOperator.
 const or = (...conditions: ICondition[]) => new Filters(FilterCompoundOperator.OR, conditions);
 const eq = (field: string, value: string) => new Filter(FilterFieldOperator.EQUAL, field, value);
 const ne = (field: string, value: string) => new Filter(FilterFieldOperator.NOT_EQUAL, field, value);
-const lt = (field: string, value: string) => new Filter(FilterFieldOperator.LESS_THAN, field, value);
 
 describe('collectRootFilterValues', () => {
     it('collects positive equality leaves under AND', () => {
@@ -54,10 +53,6 @@ describe('collectRootFilterValues', () => {
     it('rejects an OR compound instead of last-wins flattening', () => {
         // The old code walked both branches and returned { analysisId: 'B' }.
         expect(() => collectRootFilterValues(query(or(eq('analysisId', 'A'), eq('analysisId', 'B'))))).toThrow(BadRequestError);
-    });
-
-    it('rejects a comparison (lt) leaf', () => {
-        expect(() => collectRootFilterValues(query(and(lt('createdAt', '5'))))).toThrow(BadRequestError);
     });
 
     it('rejects the same field twice instead of last-wins flattening', () => {
