@@ -23,24 +23,17 @@ import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
 import { collectRootFilterValues, describeQuerySchema } from '@privateaim/server-kit';
 import { analysisLogSchema, decodeQuery } from '../../../../../core/index.ts';
-import type { IAnalysisLogAccessService } from '../../../../../core/services/analysis-log-access/index.ts';
-import { LogAccessIntent } from '../../../../../core/services/analysis-log-access/index.ts';
-import { buildActorContext } from '../../../request/index.ts';
 
 type AnalysisLogControllerContext = {
-    accessService: IAnalysisLogAccessService;
     telemetryClient?: TelemetryClient;
 };
 
 @DTags('analysis')
 @DController('/analysis-logs')
 export class AnalysisLogController {
-    protected accessService: IAnalysisLogAccessService;
-
     protected telemetryClient?: TelemetryClient;
 
-    constructor(ctx: AnalysisLogControllerContext) {
-        this.accessService = ctx.accessService;
+    constructor(ctx: AnalysisLogControllerContext = {}) {
         this.telemetryClient = ctx.telemetryClient;
     }
 
@@ -55,14 +48,6 @@ export class AnalysisLogController {
         if (!filtersNormalized.analysisId) {
             throw new BadRequestError('The filter analysisId must be defined.');
         }
-
-        // The store is queried with server-core's own credentials and cannot
-        // tell callers apart: authorize against the analysis first.
-        await this.accessService.assertAnalysisLogAccess(
-            filtersNormalized.analysisId,
-            buildActorContext(event),
-            LogAccessIntent.READ,
-        );
 
         const filters : FiltersBuildInput<Log> = {
             labels: {
@@ -112,12 +97,6 @@ export class AnalysisLogController {
         if (!filtersNormalized.analysisId) {
             throw new BadRequestError('The filter analysisId must be defined.');
         }
-
-        await this.accessService.assertAnalysisLogAccess(
-            filtersNormalized.analysisId,
-            buildActorContext(event),
-            LogAccessIntent.DELETE,
-        );
 
         const filters : FiltersBuildInput<Log> = {
             labels: {

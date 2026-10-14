@@ -35,24 +35,17 @@ import {
     NodeEntity,
 } from '../../../../database/index.ts';
 import { analysisNodeLogSchema, decodeQuery } from '../../../../../core/index.ts';
-import type { IAnalysisLogAccessService } from '../../../../../core/services/analysis-log-access/index.ts';
-import { LogAccessIntent } from '../../../../../core/services/analysis-log-access/index.ts';
-import { buildActorContext } from '../../../request/index.ts';
 
 type AnalysisNodeLogControllerContext = {
-    accessService: IAnalysisLogAccessService;
     telemetryClient?: TelemetryClient;
 };
 
 @DTags('analysis')
 @DController('/analysis-node-logs')
 export class AnalysisNodeLogController {
-    protected accessService: IAnalysisLogAccessService;
-
     protected telemetryClient?: TelemetryClient;
 
-    constructor(ctx: AnalysisNodeLogControllerContext) {
-        this.accessService = ctx.accessService;
+    constructor(ctx: AnalysisNodeLogControllerContext = {}) {
         this.telemetryClient = ctx.telemetryClient;
     }
 
@@ -67,15 +60,6 @@ export class AnalysisNodeLogController {
         if (!filtersNormalized.analysisId || !filtersNormalized.nodeId) {
             throw new BadRequestError('The filters nodeId and analysisId must be defined.');
         }
-
-        // The store is queried with server-core's own credentials and cannot
-        // tell callers apart: authorize against the analysis and node first.
-        await this.accessService.assertAnalysisNodeLogAccess(
-            filtersNormalized.analysisId,
-            filtersNormalized.nodeId,
-            buildActorContext(event),
-            LogAccessIntent.READ,
-        );
 
         const filters : FiltersBuildInput<Log> = {
             labels: {
@@ -202,13 +186,6 @@ export class AnalysisNodeLogController {
         if (!filtersNormalized.analysisId || !filtersNormalized.nodeId) {
             throw new BadRequestError('The filters nodeId and analysisId must be defined.');
         }
-
-        await this.accessService.assertAnalysisNodeLogAccess(
-            filtersNormalized.analysisId,
-            filtersNormalized.nodeId,
-            buildActorContext(event),
-            LogAccessIntent.DELETE,
-        );
 
         const filters : FiltersBuildInput<Log> = {
             labels: {

@@ -27,9 +27,7 @@ import {
     RootController,
 } from '../../../adapters/http/controllers/index.ts';
 import { createSocketServer } from '../../../adapters/socket/server.ts';
-import { AnalysisLogAccessService } from '../../../core/services/analysis-log-access/index.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
-import { DatabaseInjectionKey } from '../database/constants.ts';
 import { TelemetryClientInjectionKey } from '../telemetry-client/constants.ts';
 import { createControllers } from './controller.ts';
 import type { HTTPServer } from './constants.ts';
@@ -89,11 +87,6 @@ export class HTTPModule implements IModule {
         const telemetryClientResult = container.tryResolve(TelemetryClientInjectionKey);
         const telemetryClient = telemetryClientResult.success ? telemetryClientResult.data : undefined;
 
-        const analysisLogAccessService = new AnalysisLogAccessService({
-            analysisRepository: container.resolve(DatabaseInjectionKey.AnalysisRepository),
-            nodeRepository: container.resolve(DatabaseInjectionKey.NodeRepository),
-        });
-
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
         const redisResult = container.tryResolve(RedisClientInjectionKey);
 
@@ -128,8 +121,8 @@ export class HTTPModule implements IModule {
                     ...controllers,
 
                     // Telemetry-coupled (DI-wired instances)
-                    new AnalysisLogController({ accessService: analysisLogAccessService, telemetryClient }),
-                    new AnalysisNodeLogController({ accessService: analysisLogAccessService, telemetryClient }),
+                    new AnalysisLogController({ telemetryClient }),
+                    new AnalysisNodeLogController({ telemetryClient }),
 
                     // Workflows
                     RootController,
