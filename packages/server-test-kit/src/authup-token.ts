@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { randomUUID } from 'node:crypto';
 import { createAuthupUserTokenCreator } from '@privateaim/server-kit';
 
 /**
@@ -111,7 +112,7 @@ export async function createRestrictedAccessToken(
         return response.json();
     };
 
-    const name = `restricted-${Math.random().toString(36).slice(2, 10)}`;
+    const name = `restricted-${randomUUID().slice(0, 8)}`;
     const password = 'start123start';
 
     const { data: user } = await request<{ data: { id: string } }>('POST', 'users', {
