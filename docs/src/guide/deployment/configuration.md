@@ -47,6 +47,31 @@ for existing databases that used local time. Beta.68 quotes newly serialized
 strings; Hub's text transformer reads both these and legacy unquoted messenger
 payloads, so no Hub data migration is needed.
 
+## Authup upgrade to beta.69
+
+Hub now requires Authup `1.0.0-beta.69`, a security release. Read the
+[Authup upgrade guide](https://authup.org/guide/deployment/upgrading#security-hardening-that-changes-behaviour)
+before upgrading. Hub needs no code or data changes; these points concern the
+Authup deployment Hub runs against:
+
+- **Tokens are bound to their realm.** On a Redis-backed Authup, drop the
+  `oauth2_token_claims*` keys once after upgrading, or tokens verified before the
+  upgrade keep bypassing the new check until they expire.
+- **Client reads are realm-gated.** Hub's service client creates and reads the
+  per-node and per-analysis Authup clients in the realm of that node or analysis. A Hub client
+  whose `client_*` grants are `own` or `ownOrNull` no longer sees clients in
+  other realms; grant `any` (the built-in `system` client already has it).
+- **HTTP Basic names resolve in the route realm or the master realm.** Hub's
+  Harbor webhook authenticates with the registry client's **id**, which resolves
+  globally, so it is unaffected.
+- **Rate limiting is two-stage.** Behind one NAT address (a clinic or office
+  network) raise `rateLimitAnonymousMax`, and pin Authup's `trustProxy` to the
+  hop count of your proxy.
+- **Some users sign in once more.** Token cookies are now written `SameSite=Lax`,
+  and `Secure` on https. Behind a TLS-terminating proxy, forward
+  `X-Forwarded-Proto` (the [reverse proxy](./reverse-proxy.md) example already
+  does) so server-side cookie writes in client-ui get `Secure` too.
+
 ## Database Variables
 
 Used by `server-core`, `server-storage`, and `server-telemetry`:
