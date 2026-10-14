@@ -29,7 +29,7 @@ import {
  * not operators. Silently flattening such a filter to a bare equality would
  * forward the **inverse** (or an arbitrary last-wins branch) to the log
  * read/delete endpoints, so reject any non-`eq` leaf or non-`and` compound
- * with a 400 instead.
+ * with a 400 instead. The same goes for a field filtered more than once.
  */
 export function collectRootFilterValues(query: IQuery): Record<string, string> {
     const out: Record<string, string> = {};
@@ -53,6 +53,14 @@ export function collectRootFilterValues(query: IQuery): Record<string, string> {
 
             if (condition.operator !== FilterFieldOperator.EQUAL) {
                 throw new BadRequestError(`The filter operator '${condition.operator}' on '${condition.field}' is not supported here; only equality (eq) filters are allowed.`);
+            }
+
+            // A label map holds one value per field, so a repeated field
+            // cannot be forwarded faithfully: `and(eq(f,A), eq(f,B))` matches
+            // nothing, while last-wins would forward `f=B` — and on the delete
+            // path, drop B's logs.
+            if (Object.prototype.hasOwnProperty.call(out, condition.field)) {
+                throw new BadRequestError(`The filter field '${condition.field}' may only be specified once here.`);
             }
 
             out[condition.field] = `${condition.value}`;

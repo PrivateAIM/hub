@@ -60,6 +60,13 @@ describe('collectRootFilterValues', () => {
         expect(() => collectRootFilterValues(query(and(lt('createdAt', '5'))))).toThrow(BadRequestError);
     });
 
+    it('rejects the same field twice instead of last-wins flattening', () => {
+        // and(eq(refId,A), eq(refId,B)) matches nothing (A∧B is empty); the old
+        // code flattened it to { refId: 'B' } and deleted B's logs.
+        expect(() => collectRootFilterValues(query(and(eq('refId', 'A'), eq('refId', 'B'))))).toThrow(BadRequestError);
+        expect(() => collectRootFilterValues(query(and(eq('refId', 'A'), and(eq('refId', 'B')))))).toThrow(BadRequestError);
+    });
+
     it('returns an empty map for a query without a filters group', () => {
         expect(collectRootFilterValues(new Query({}))).toEqual({});
     });
