@@ -33,6 +33,11 @@ describe('RegistryManagerAdapter', () => {
         dataSource = suite.container.resolve(DatabaseInjectionKey.DataSource);
         repository = dataSource.getRepository(RegistryEntity);
         manager = new RegistryManagerAdapter({ dataSource });
+
+        // Spec files run sequentially in one database per vitest worker, and
+        // this spec asserts on the WHOLE table ("no registry exists"), so
+        // start from an empty one rather than trusting every earlier spec.
+        await repository.remove(await repository.find());
     });
 
     afterEach(async () => {

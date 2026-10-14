@@ -69,6 +69,14 @@ describe('nested secret fields', () => {
     });
 
     afterAll(async () => {
+        // Spec files share one database per vitest worker, so leave nothing
+        // behind: a stray registry turns the default-registry lookup of every
+        // later spec in this worker non-empty (registry/adapter.spec.ts).
+        const { dataSource } = suite;
+        await dataSource.getRepository(NodeEntity).delete({ id: nodeId });
+        await dataSource.getRepository(RegistryProjectEntity).delete({ id: registryProjectId });
+        await dataSource.getRepository(RegistryEntity).delete({ id: registryId });
+
         await suite.teardown();
     });
 
