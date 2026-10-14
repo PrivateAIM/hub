@@ -26,14 +26,22 @@ const catalog: AuthorizationCatalog = {
     policies: { binding: { type: 'permissionBinding' } },
 };
 
+// Structurally a compact JWS, so it passes the malformed-bearer guard; the
+// fake verifier never inspects it.
+const TOKEN = 'eyJhbGciOiJub25lIn0.eyJzdWIiOiJ0ZXN0In0.c2lnbmF0dXJl';
+
 class FakeTokenVerifier implements ITokenVerifier {
     protected scope: string;
+
+    public readonly calls: string[] = [];
 
     constructor(scope: string) {
         this.scope = scope;
     }
 
-    async verify(): Promise<TokenVerificationData> {
+    async verify(token: string): Promise<TokenVerificationData> {
+        this.calls.push(token);
+
         return {
             sub: '00000000-0000-4000-8000-000000000001',
             sub_kind: 'user',
@@ -45,14 +53,18 @@ class FakeTokenVerifier implements ITokenVerifier {
     }
 }
 
-async function requestWithScope(scope: string): Promise<number> {
+async function request(
+    scope: string,
+    token: string = TOKEN,
+): Promise<{ status: number, verifier: FakeTokenVerifier }> {
+    const verifier = new FakeTokenVerifier(scope);
     const app = new App();
     mountAuthorizationMiddleware(app, {
         authupClient: new Client({
             baseURL: 'http://authup.test',
             transport: new MemoryTransport({ fetch: () => ({ status: 200, body: catalog }) }),
         }),
-        tokenVerifier: new FakeTokenVerifier(scope),
+        tokenVerifier: verifier,
     });
     app.get('/', defineCoreHandler(async (event) => {
         try {
@@ -67,8 +79,13 @@ async function requestWithScope(scope: string): Promise<number> {
         }
     }));
 
-    const response = await app.fetch(new Request('http://hub.test/', { headers: { authorization: 'Bearer token' } }));
-    return response.status;
+    const response = await app.fetch(new Request('http://hub.test/', { headers: { authorization: `Bearer ${token}` } }));
+    return { status: response.status, verifier };
+}
+
+async function requestWithScope(scope: string): Promise<number> {
+    const { status } = await request(scope);
+    return status;
 }
 
 /**
@@ -83,5 +100,21 @@ describe('authorization middleware scope gate', () => {
 
     it('withholds the grants of a token without global scope', async () => {
         expect(await requestWithScope('openid')).toBe(403);
+    });
+
+    // A malformed bearer is refused before it reaches the verifier: authup's
+    // introspection would otherwise report it as hub's own service client.
+    it('never hands a malformed bearer to the token verifier', async () => {
+        const { status, verifier } = await request('global openid', 'not-a-token');
+
+        expect(verifier.calls).toEqual([]);
+        expect(status).not.toBe(200);
+    });
+
+    // Negative control: a well-formed bearer does reach the verifier.
+    it('hands a well-formed bearer to the token verifier', async () => {
+        const { verifier } = await request('global openid');
+
+        expect(verifier.calls).toEqual([TOKEN]);
     });
 });
