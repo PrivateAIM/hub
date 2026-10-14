@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { buildAuthupURL } from '@privateaim/server-test-kit';
+
 /**
  * Resolve the subject (`sub`) of an access token by introspecting it against
  * the test Authup — the id server-messenger addresses that identity's mailbox
@@ -15,7 +17,7 @@ export async function resolveTokenSubject(token: string, baseURL = process.env.A
         throw new Error('The AUTHUP_URL is not configured — cannot introspect the access token.');
     }
 
-    const response = await fetch(new URL('token/introspect', baseURL), {
+    const response = await fetch(buildAuthupURL(baseURL, 'token/introspect'), {
         method: 'POST',
         headers: {
             'content-type': 'application/json',

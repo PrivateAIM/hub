@@ -8,6 +8,35 @@
 import { createAuthupUserTokenCreator } from '@privateaim/server-kit';
 
 /**
+ * Resolve `path` against an Authup base URL WITHOUT dropping a path prefix.
+ * `new URL('users', 'http://host/auth')` resolves to `http://host/users` — the
+ * last base segment counts as a file name unless the base ends with a slash —
+ * so an `AUTHUP_URL` served under a sub-path would silently miss Authup.
+ */
+export function buildAuthupURL(baseURL: string, path: string): URL {
+    const base = baseURL.endsWith('/') ? baseURL : `${baseURL}/`;
+
+    return new URL(path.replace(/^\/+/, ''), base);
+}
+
+type AuthupPermissionRow = {
+    id: string,
+    clientId?: string | null,
+    realmId?: string | null,
+};
+
+/**
+ * Pick the permission a test user is granted. A name is unique only per
+ * (realm, client), so a client-bound or realm-bound duplicate must not be
+ * picked in place of the suite's global, client-less permission.
+ */
+export function selectGlobalPermission(rows: AuthupPermissionRow[]): AuthupPermissionRow | undefined {
+    const clientless = rows.filter((row) => !row.clientId);
+
+    return clientless.find((row) => !row.realmId) ?? clientless[0];
+}
+
+/**
  * Mint an access token for the `admin`/`master` user against the (test) Authup
  * instance. The admin user holds every provisioned permission, so the token
  * passes the now-enforced authorization middleware for any endpoint.
@@ -66,7 +95,7 @@ export async function createRestrictedAccessToken(
 
     const adminToken = await createAdminAccessToken(baseURL);
     const request = async <T>(method: string, path: string, body?: Record<string, any>): Promise<T> => {
-        const response = await fetch(new URL(path, baseURL), {
+        const response = await fetch(buildAuthupURL(baseURL, path), {
             method,
             headers: {
                 'content-type': 'application/json',
@@ -93,17 +122,18 @@ export async function createRestrictedAccessToken(
     });
 
     for (const permissionName of permissionNames) {
-        const { data: permissions } = await request<{ data: { id: string }[] }>(
+        const { data: permissions } = await request<{ data: AuthupPermissionRow[] }>(
             'GET',
             `permissions?filter[name]=${encodeURIComponent(permissionName)}`,
         );
-        if (permissions.length === 0) {
-            throw new Error(`The permission ${permissionName} is not provisioned — cannot grant it to ${name}.`);
+        const permission = selectGlobalPermission(permissions);
+        if (!permission) {
+            throw new Error(`The client-less permission ${permissionName} is not provisioned — cannot grant it to ${name}.`);
         }
 
         await request('POST', 'user-permissions', {
             userId: user.id,
-            permissionId: permissions[0].id,
+            permissionId: permission.id,
         });
     }
 
