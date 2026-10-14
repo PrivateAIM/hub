@@ -78,17 +78,24 @@ describe('log HTTP endpoints', () => {
 
     describe('GET /logs', () => {
         it('should return collection with label filter', async () => {
-            // VictoriaLogs buffers before writing to disk
-            await wait(1_000);
-
-            const response = await fetch(`${baseURL}/logs?filter[foo]=bar`, {
+            // VictoriaLogs buffers before the entry becomes searchable. Poll
+            // rather than sleep a fixed second: under full-suite parallelism the
+            // flush routinely took longer and this test failed with 0 rows.
+            const query = () => fetch(`${baseURL}/logs?filter[foo]=bar`, {
                 method: 'GET',
                 headers: { Authorization: authorization },
             });
 
+            let response = await query();
+            let body = await response.json();
+            for (let attempt = 0; attempt < 30 && response.status === 200 && body.data?.length === 0; attempt++) {
+                await wait(500);
+                response = await query();
+                body = await response.json();
+            }
+
             expect(response.status).toBe(200);
 
-            const body = await response.json();
             expect(body.data).toBeDefined();
             expect(Array.isArray(body.data)).toBe(true);
             expect(body.data.length).toBeGreaterThanOrEqual(1);
