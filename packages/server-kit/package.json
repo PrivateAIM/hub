@@ -33,6 +33,7 @@
         "@authup/core-kit": "^1.0.0-beta.69",
         "@hapic/oauth2": "^4.0.2",
         "@isaacs/ttlcache": "^2.1.5",
+        "@privateaim/errors": "^0.8.42",
         "@privateaim/kit": "^0.17.0",
         "@rapiq/core": "^2.4.0",
         "@socket.io/redis-emitter": "^5.1.0",

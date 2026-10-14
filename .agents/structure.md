@@ -47,7 +47,7 @@ Shared libraries, located in `packages/`.
 
 | Package                  | Purpose                                    |
 |--------------------------|--------------------------------------------|
-| `server-kit`             | Logging (Winston), auth helpers, AMQP messaging, Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup), `describeQuerySchema()` + `RECORD_QUERY_PARAMETERS` for the response `meta.schema` |
+| `server-kit`             | Logging (Winston), auth helpers, AMQP messaging, Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup), `describeQuerySchema()` + `RECORD_QUERY_PARAMETERS` for the response `meta.schema`, `collectRootFilterValues()` for the log endpoints |
 | `server-test-kit`        | Shared test fakes (FakeEntityRepository, FakePermissionChecker, actor factories) |
 | `server-db-kit`          | TypeORM utilities, database setup, migrations |
 | `server-http-kit`        | HTTP route/controller decorators for Routup |

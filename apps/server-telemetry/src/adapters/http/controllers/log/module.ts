@@ -25,9 +25,10 @@ import {
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import { ForceLoggedInMiddleware, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { collectRootFilterValues } from '@privateaim/server-kit';
 import type { IAppEvent } from 'routup';
 import type { LogStore } from '../../../../core/services/log-store/types.ts';
-import { collectRootFilterValues, decodeQueryOpen } from '../../../../core/query/index.ts';
+import { decodeQueryOpen } from '../../../../core/query/index.ts';
 
 @DTags('logs')
 @DController('/logs')

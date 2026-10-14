@@ -8,7 +8,6 @@
 import { createURLCodec } from '@rapiq/codec-url';
 import type {
     ICondition,
-    IFilter,
     IQuery,
     ObjectLiteral,
     Schema,
@@ -16,7 +15,6 @@ import type {
 import {
     Query,
     SchemaRegistry,
-    isFilters,
     isObject,
 } from '@rapiq/core';
 import { eventSchema } from '../entities/event/schema.ts';
@@ -88,32 +86,4 @@ export function appendQueryConditions(query: IQuery, ...conditions: ICondition[]
 export function decodeQueryOpen(input: unknown): IQuery {
     const normalized = isObject(input) || typeof input === 'string' ? input : {};
     return queryCodec.decode(normalized) ?? new Query({});
-}
-
-/**
- * Flatten the (equality-style) leaf filters of a decoded query into a
- * `field -> string value` map. Nested compound groups are walked; the last
- * value wins per field.
- */
-export function collectRootFilterValues(query: IQuery): Record<string, string> {
-    const out: Record<string, string> = {};
-
-    const visit = (conditions: readonly ICondition[]) => {
-        for (const condition of conditions) {
-            if (isFilters(condition)) {
-                visit(condition.value);
-                continue;
-            }
-
-            // A non-compound condition is a leaf `Filter` (carries a field).
-            const leaf = condition as IFilter;
-            out[leaf.field] = `${leaf.value}`;
-        }
-    };
-
-    if (isFilters(query.filters)) {
-        visit(query.filters.value);
-    }
-
-    return out;
 }

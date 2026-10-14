@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
+import { BadRequestError } from '@privateaim/errors';
 import type { ICondition } from '@rapiq/core';
 import {
     Filter,
@@ -19,9 +19,10 @@ import {
     expect,
     it,
 } from 'vitest';
-import { collectRootFilterValues } from '../../../../src/core/query/index.ts';
+import { collectRootFilterValues } from '../../../src/index.ts';
 
-// The telemetry-backed log controllers forward the collected values as label
+// The log controllers (server-core's analysis-log proxies, server-telemetry's
+// own /logs) forward the collected values as label
 // equalities to the telemetry read/delete endpoints. The rapiq v2 expression
 // dialect can express negation/comparison/OR (which the schema allow-list does
 // not constrain — it only constrains field names), so a crafted filter must be
