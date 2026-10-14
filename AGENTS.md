@@ -183,3 +183,14 @@ introspection grants through `createAuthorizationEvaluator`. See
 for credential requirements and the boundary between pre-checks and row policies.
 The old plan 016 claim that policy-free introspection makes `compile()` a no-op
 no longer describes this wiring; collection filtering is still separate work.
+
+## Authup beta.69 upgrade
+
+All `@authup/*` packages now require beta.69 (a security release: realm-bound
+tokens, two-stage rate limiting, realm-gated client reads, Basic names resolved in
+the route/master realm). No hub code change was needed: hub builds no
+`IdentityPermissionBindingPolicyEvaluator` of its own, the authup aggregators
+read only `id`/`name` off bus payloads (which now drop `select: false` columns),
+and the Harbor webhook authenticates with a client **id**, which still resolves
+globally. Operator-facing consequences are in
+[deployment configuration](docs/src/guide/deployment/configuration.md#authup-upgrade-to-beta-69).

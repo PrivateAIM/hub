@@ -30,7 +30,7 @@
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "dependencies": {
-        "@authup/core-http-kit": "^1.0.0-beta.68",
+        "@authup/core-http-kit": "^1.0.0-beta.69",
         "@hapic/harbor": "^3.0.2",
         "@privateaim/core-http-kit": "^0.17.0",
         "@privateaim/core-kit": "^0.17.0",
