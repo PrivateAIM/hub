@@ -19,6 +19,7 @@ import {
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import type { DataSource } from 'typeorm';
 import { AnalysisEntity } from '../../../../adapters/database/index.ts';
+import { isProcessStatusTerminal } from '../helpers.ts';
 
 export async function handleAnalysisBuilderEvent(
     value: AnalysisBuilderBasePayload,
@@ -35,11 +36,19 @@ export async function handleAnalysisBuilderEvent(
 
     switch (context.key) {
         case AnalysisBuilderEvent.EXECUTION_STARTED: {
+            if (isProcessStatusTerminal(entity.buildStatus)) {
+                return;
+            }
+
             entity.buildStatus = ProcessStatus.STARTED;
             entity.buildProgress = 0;
             break;
         }
         case AnalysisBuilderEvent.EXECUTION_PROGRESS: {
+            if (isProcessStatusTerminal(entity.buildStatus)) {
+                return;
+            }
+
             const temp = value as AnalysisBuilderExecutionProgressPayload;
             if (
                 !entity.buildProgress ||

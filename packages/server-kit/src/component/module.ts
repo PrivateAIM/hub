@@ -114,20 +114,15 @@ export abstract class BaseComponent<
                 childKey,
                 childData,
                 childMetadata,
-            ) => {
-                this.handle(
-                    childKey as Key & string,
-                    childData as EventMap[Key][0],
-                    {
-                        ...metadata,
-                        ...(childMetadata || {}),
-                    } as EventMap[Key][1],
-                    {
-                        ...options,
-                        ...(options || {}),
-                    },
-                );
-            },
+            ) => this.handle(
+                childKey as Key & string,
+                childData as EventMap[Key][0],
+                {
+                    ...metadata,
+                    ...(childMetadata || {}),
+                } as EventMap[Key][1],
+                options,
+            ),
         };
 
         let handler = this.handlers.get(key) as ComponentHandler<EventMap, Key> |

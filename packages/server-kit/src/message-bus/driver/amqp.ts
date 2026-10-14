@@ -15,22 +15,69 @@ import type { IMessageBusDriver } from './types';
 export type AmqpMessageBusDriverOptions = {
     connectionString: string,
     logger?: Logger,
+    /**
+     * Delivery attempts of a WORK message before it is dropped (default: 5).
+     */
+    maxAttempts?: number,
+    /**
+     * Base of the exponential retry backoff in ms (default: 1000, capped at 30s).
+     */
+    retryDelay?: number,
 };
 
+export type AmqpMessageBusDelivery = {
+    content: Buffer,
+    fields: { redelivered: boolean },
+};
+
+/**
+ * Serialize a payload for the wire. An Error's fields are non-enumerable, so
+ * plain JSON.stringify would turn it into `{}` and lose the failure reason.
+ */
+export function serializeMessageBusPayload(payload: MessageBusPayload): string {
+    return JSON.stringify(payload, (_key, value: unknown) => {
+        if (value instanceof Error) {
+            return {
+                name: value.name,
+                message: value.message,
+                ...('code' in value ? { code: value.code } : {}),
+            };
+        }
+
+        return value;
+    });
+}
+
 export class AmqpMessageBusDriver implements IMessageBusDriver {
-    protected client: Client;
+    protected connectionString: string;
+
+    protected clientInstance: Client | undefined;
 
     protected logger?: Logger;
 
+    protected maxAttempts: number;
+
+    protected retryDelay: number;
+
     constructor(options: AmqpMessageBusDriverOptions) {
-        this.client = new Client({ connectionOptions: options.connectionString });
+        this.connectionString = options.connectionString;
         this.logger = options.logger;
+        this.maxAttempts = options.maxAttempts ?? 5;
+        this.retryDelay = options.retryDelay ?? 1000;
+    }
+
+    protected get client(): Client {
+        if (!this.clientInstance) {
+            this.clientInstance = new Client({ connectionOptions: this.connectionString });
+        }
+
+        return this.clientInstance;
     }
 
     async publish(routing: MessageBusRouting, message: MessageBusPayload): Promise<boolean> {
         const exchange = this.resolveExchange(routing);
 
-        return exchange.publish(routing.key, message, {
+        return exchange.publish(routing.key, serializeMessageBusPayload(message), {
             type: message.type,
             messageId: message.id,
             persistent: message.metadata.persistent ??
@@ -45,36 +92,88 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
         const exchange = this.resolveExchange(routing);
 
         return exchange.consume(routing.key, {
-            prefetchCount: routing.type === MessageBusRoutingType.WORK ? 1 : undefined,
+            // Events are applied one at a time as well: aggregator handlers
+            // read-modify-write entities and would otherwise overwrite each other.
+            prefetchCount: 1,
+            // Only reached when the retry re-publish itself fails (broker
+            // unavailable): requeue, so the message comes back as a redelivery.
             requeueOnFailure: routing.type === MessageBusRoutingType.WORK,
-        }, {
-            $any: async (input) => {
-                let payload: unknown;
+        }, { $any: (input) => this.deliver(routing, input, handler) });
+    }
 
-                try {
-                    payload = JSON.parse(input.content.toString('utf-8'));
-                } catch {
-                    if (this.logger) {
-                        this.logger.warn(`Could not parse message in ${routing.key}.`);
-                    }
+    protected async deliver(
+        routing: MessageBusRouting,
+        input: AmqpMessageBusDelivery,
+        handler: (payload: MessageBusPayload) => Promise<void> | void,
+    ): Promise<void> {
+        let payload: unknown;
 
-                    return;
-                }
+        try {
+            payload = JSON.parse(input.content.toString('utf-8'));
+        } catch {
+            this.logger?.warn(`Could not parse message in ${routing.key}.`);
 
-                if (!isMessageBusPayload(payload)) {
-                    return;
-                }
+            return;
+        }
 
-                if (input.fields.redelivered) {
-                    if (this.logger) {
-                        this.logger
-                            .debug(`Queue message ${input.properties.type} in ${routing.key} is not processed again.`);
-                    }
+        if (!isMessageBusPayload(payload)) {
+            this.logger?.warn(`Dropping malformed message in ${routing.key}.`);
 
-                    return;
-                }
+            return;
+        }
 
-                await handler(payload);
+        if (routing.type !== MessageBusRoutingType.WORK) {
+            await handler(payload);
+
+            return;
+        }
+
+        // A redelivery means a consumer died mid-handling (crash, lost
+        // connection, consumer timeout), so it counts as a failed attempt.
+        if (input.fields.redelivered) {
+            await this.retry(routing, payload);
+
+            return;
+        }
+
+        try {
+            await handler(payload);
+        } catch {
+            await this.retry(routing, payload);
+        }
+    }
+
+    /**
+     * Re-publish a WORK message with an incremented attempt counter, or drop it
+     * once the attempts are exhausted. The original is acked afterwards.
+     *
+     * ponytail: exhausted messages are logged and dropped, not parked;
+     * add a dead-letter queue once someone needs to replay them.
+     */
+    protected async retry(routing: MessageBusRouting, payload: MessageBusPayload): Promise<void> {
+        const attempt = (payload.metadata.attempt ?? 1) + 1;
+        if (attempt > this.maxAttempts) {
+            this.logger?.error(
+                `Dropping message ${payload.type} (${payload.id}) in ${routing.key} after ${this.maxAttempts} attempts.`,
+            );
+
+            return;
+        }
+
+        // ponytail: the backoff holds the prefetch slot, fine for seconds;
+        // move to TTL + dead-letter-exchange delay queues for longer delays.
+        const delay = Math.min(this.retryDelay * 2 ** (attempt - 2), 30_000);
+        await new Promise((resolve) => {
+            setTimeout(resolve, delay);
+        });
+
+        this.logger?.warn(`Retrying message ${payload.type} (${payload.id}) in ${routing.key}, attempt ${attempt}.`);
+
+        await this.publish(routing, {
+            ...payload,
+            metadata: {
+                ...payload.metadata,
+                attempt,
             },
         });
     }

@@ -31,26 +31,28 @@ export class MasterImageSynchronizerAggregator extends BaseComponent<MasterImage
     constructor(ctx: MasterImageSynchronizerAggregatorContext) {
         super();
 
-        const handler = (value) => handleMasterImageSynchronizerExecutionFinishedEvent(
-            value,
-            ctx.imageRepository,
-            ctx.groupRepository,
-            ctx.logger,
-        );
-        this.mount(MasterImageSynchronizerEvent.EXECUTION_FINISHED, handler);
-        this.mount('*', async (
-            _payload,
-            context,
-        ) => {
+        const recordEvent = async (name: string) => {
             if (ctx.eventComponentCaller) {
                 await ctx.eventComponentCaller.callCreate({
-                    name: context.key,
+                    name,
                     data: {},
                     refType: DomainType.MASTER_IMAGE,
                     scope: 'synchronizer',
                 });
             }
+        };
+
+        // A specific handler shadows '*', so it records its own telemetry event.
+        this.mount(MasterImageSynchronizerEvent.EXECUTION_FINISHED, async (value, context) => {
+            await handleMasterImageSynchronizerExecutionFinishedEvent(
+                value,
+                ctx.imageRepository,
+                ctx.groupRepository,
+                ctx.logger,
+            );
+            await recordEvent(context.key);
         });
+        this.mount('*', (_payload, context) => recordEvent(context.key));
     }
 
     async start() : Promise<void> {

@@ -36,12 +36,13 @@ export class ComponentsModule implements IModule {
         // Create components
         const config = container.resolve(ConfigInjectionKey);
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
+        const logger = container.resolve(LoggerInjectionKey);
         const registryComponent = new RegistryComponent({
             publicURL: config.publicURL,
             authupClient: authupResult.success ? authupResult.data : undefined,
+            logger,
         });
 
-        const logger = container.resolve(LoggerInjectionKey);
         const messageBusResult = container.tryResolve(MessageBusInjectionKey);
         const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 

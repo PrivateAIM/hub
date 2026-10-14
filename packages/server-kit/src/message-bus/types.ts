@@ -16,6 +16,10 @@ export type MessageBusRouting = {
 export type MessageBusPayloadMetadata = {
     timestamp: number,
     redelivered?: boolean,
+    /**
+     * 1-based delivery attempt of a WORK message, set by the driver on retry.
+     */
+    attempt?: number,
     persistent?: boolean,
     routing: MessageBusRouting
 };

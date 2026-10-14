@@ -18,6 +18,7 @@ import {
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import type { DataSource } from 'typeorm';
 import { AnalysisEntity } from '../../../../adapters/database/index.ts';
+import { isProcessStatusTerminal } from '../helpers.ts';
 
 export async function handleAnalysisDistributorEvent(
     value: AnalysisDistributorBasePayload,
@@ -33,11 +34,19 @@ export async function handleAnalysisDistributorEvent(
 
     switch (context.key) {
         case AnalysisDistributorEvent.EXECUTION_STARTED: {
+            if (isProcessStatusTerminal(entity.distributionStatus)) {
+                return;
+            }
+
             entity.distributionStatus = ProcessStatus.STARTED;
             entity.distributionProgress = 0;
             break;
         }
         case AnalysisDistributorEvent.EXECUTION_PROGRESS: {
+            if (isProcessStatusTerminal(entity.distributionStatus)) {
+                return;
+            }
+
             const temp = value as AnalysisDistributorExecutionProgressPayload;
             if (
                 !entity.distributionProgress ||
