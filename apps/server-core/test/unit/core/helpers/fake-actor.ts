@@ -12,18 +12,23 @@ import { FakePermissionChecker } from '@privateaim/server-test-kit';
 import type { PermissionActorOptions } from './types.ts';
 
 /**
- * Build an actor that holds exactly `permissions`. A check passes only when
- * every requested name is held (all-of, the `preCheck` semantics); anything
- * else throws `PermissionDeniedError`, the error a real denial surfaces as,
- * so code that tells a denial apart from other failures sees the real thing.
+ * Build an actor that holds exactly `permissions`. Like the real evaluator,
+ * `preCheck`/`check` pass only when EVERY requested name is held and the
+ * `*OneOf` methods when ANY is. A refusal throws `PermissionDeniedError`, the
+ * error a real denial surfaces as, so code that tells a denial apart from
+ * other failures sees the real thing.
  */
 export function createPermissionActor(options: PermissionActorOptions): ActorContext {
     const granted = new Set(options.permissions ?? []);
 
     return {
-        permissionChecker: new FakePermissionChecker((ctx) => {
+        permissionChecker: new FakePermissionChecker((ctx, method) => {
             const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
-            if (names.some((name) => !granted.has(name))) {
+            const permitted = method === 'preCheckOneOf' || method === 'checkOneOf' ?
+                names.some((name) => granted.has(name)) :
+                names.every((name) => granted.has(name));
+
+            if (!permitted) {
                 throw new PermissionDeniedError();
             }
         }),

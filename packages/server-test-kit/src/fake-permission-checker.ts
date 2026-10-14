@@ -7,39 +7,35 @@
 
 import type { PermissionEvaluationContext } from '@authup/access';
 import type { IPermissionChecker } from '@privateaim/server-kit';
-
-type PermissionCall = {
-    method: string;
-    ctx: PermissionEvaluationContext;
-};
+import type { PermissionCall, PermissionHandler } from './types.ts';
 
 export class FakePermissionChecker implements IPermissionChecker {
-    private handler: (ctx: PermissionEvaluationContext) => void | Promise<void>;
+    private handler: PermissionHandler;
 
     private calls: PermissionCall[] = [];
 
-    constructor(handler?: (ctx: PermissionEvaluationContext) => void | Promise<void>) {
+    constructor(handler?: PermissionHandler) {
         this.handler = handler ?? (() => { /* allow all */ });
     }
 
     async preCheck(ctx: PermissionEvaluationContext): Promise<void> {
         this.calls.push({ method: 'preCheck', ctx });
-        await this.handler(ctx);
+        await this.handler(ctx, 'preCheck');
     }
 
     async check(ctx: PermissionEvaluationContext): Promise<void> {
         this.calls.push({ method: 'check', ctx });
-        await this.handler(ctx);
+        await this.handler(ctx, 'check');
     }
 
     async preCheckOneOf(ctx: PermissionEvaluationContext): Promise<void> {
         this.calls.push({ method: 'preCheckOneOf', ctx });
-        await this.handler(ctx);
+        await this.handler(ctx, 'preCheckOneOf');
     }
 
     async checkOneOf(ctx: PermissionEvaluationContext): Promise<void> {
         this.calls.push({ method: 'checkOneOf', ctx });
-        await this.handler(ctx);
+        await this.handler(ctx, 'checkOneOf');
     }
 
     // --- Test helpers ---

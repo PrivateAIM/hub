@@ -13,3 +13,4 @@ export * from './fake-entity-repository.ts';
 export * from './query-indexes.ts';
 export * from './fake-permission-checker.ts';
 export * from './testcontainers/index.ts';
+export * from './types.ts';

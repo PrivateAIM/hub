@@ -67,7 +67,9 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     async create(data: Partial<ProjectNode>, actor: ActorContext): Promise<ProjectNode> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionChecker.preCheck({
+        // Either suffices: assigning a node to (or removing it from) a project
+        // is part of creating or editing that project.
+        await actor.permissionChecker.preCheckOneOf({
             name: [
                 PermissionName.PROJECT_CREATE,
                 PermissionName.PROJECT_UPDATE,
@@ -121,7 +123,9 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     }
 
     async delete(id: string, actor: ActorContext): Promise<ProjectNode> {
-        await actor.permissionChecker.preCheck({
+        // Either suffices: assigning a node to (or removing it from) a project
+        // is part of creating or editing that project.
+        await actor.permissionChecker.preCheckOneOf({
             name: [
                 PermissionName.PROJECT_CREATE,
                 PermissionName.PROJECT_UPDATE,
