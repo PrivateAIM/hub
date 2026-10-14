@@ -14,6 +14,27 @@ These variables are shared across all services:
 | `AMQP_URL` | No | RabbitMQ connection URL |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
 
+## Message delivery (RabbitMQ)
+
+When `AMQP_URL` is set, commands to the worker, storage and telemetry services
+(build, distribute, bucket create, …) travel over durable RabbitMQ queues.
+
+- **A failed or interrupted command is retried, up to 5 attempts.** A handler
+  error, or a redelivery after a consumer died mid-command (crash, lost
+  connection, consumer timeout), re-publishes the command with exponential
+  backoff (1s, 2s, 4s, 8s). An exhausted command is dropped with an error log
+  line naming its type and id. Before this, a redelivered command was dropped
+  silently after its first attempt.
+- **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
+  build.** A command is acknowledged only once its handler finishes. If a build
+  outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the
+  channel and redelivers the command. A replica still running it ignores the copy,
+  but a redelivery that lands on another worker replica starts a second build.
+- Worker outcome events (started, progress, finished, failed) are applied one at
+  a time per server-core replica, and a late `started`/`progress` event no longer
+  moves a finished or failed process back to `started`.
+- Failure events carry the error's `name`, `message` and `code` instead of `{}`.
+
 ## Authup upgrade to beta.68
 
 Upgrade the Authup server and all Hub services together. Hub now requires Authup

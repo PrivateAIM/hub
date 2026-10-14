@@ -92,13 +92,15 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
                     );
                 },
             });
-        } catch {
-            this.logger?.info({
+        } catch (e) {
+            this.logger?.error({
                 message: 'Building image failed',
                 command: MasterImageBuilderCommand.EXECUTE,
                 masterImageId: masterImage.id,
                 [LogFlag.REF_ID]: masterImage.id,
             });
+
+            throw e;
         }
 
         await context.handle(

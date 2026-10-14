@@ -10,6 +10,7 @@ import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import type { LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';
 import type { LogStore } from '../../../../../core/services/log-store/types.ts';
+import { isValidupError } from 'validup';
 import { MemoryLogStore } from '../../../../../adapters/telemetry/memory.ts';
 
 export class LogComponentWriteHandler implements ComponentHandler {
@@ -25,7 +26,19 @@ export class LogComponentWriteHandler implements ComponentHandler {
     async handle(
         input: LogWriteCommandPayload,
     ): Promise<void> {
-        const data = await this.validate(input);
+        let data: LogInput;
+        try {
+            data = await this.validate(input);
+        } catch (e) {
+            // An invalid log line stays invalid: drop it instead of letting the
+            // message bus retry it (with backoff) on the shared log queue.
+            // Not logged — this IS the log writer.
+            if (isValidupError(e)) {
+                return;
+            }
+
+            throw e;
+        }
 
         await this.write(data);
     }

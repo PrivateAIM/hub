@@ -40,7 +40,7 @@ export class MessageBusDispatchComponentCaller<
             return;
         }
 
-        await this.messageBus.publish(
+        const published = await this.messageBus.publish(
             buildMessageBusPublishPayload({
                 type,
                 data,
@@ -51,5 +51,9 @@ export class MessageBusDispatchComponentCaller<
             }),
             { logging: this.options.logging ?? true },
         );
+
+        if (!published && this.logger) {
+            this.logger.warn(`Message ${type} in ${this.options.routing.key} was not delivered to any consumer.`);
+        }
     }
 }

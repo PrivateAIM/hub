@@ -146,6 +146,21 @@ describe('MasterImageService', () => {
                 expect(builderCaller.getCalls()[0]).toEqual({ id: 'mi-1' });
             });
 
+            it('should restore buildStatus when the dispatch fails', async () => {
+                repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
+                builderCaller.failWith = new Error('broker unavailable');
+
+                await expect(
+                    service.executeCommand(
+                        MasterImageCommand.BUILD,
+                        { id: 'mi-1' },
+                        createAllowAllActor(),
+                    ),
+                ).rejects.toThrow('broker unavailable');
+
+                expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.EXECUTED);
+            });
+
             it('should throw BadRequestError when id is missing', async () => {
                 await expect(
                     service.executeCommand(

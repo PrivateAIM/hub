@@ -6,6 +6,7 @@
  */
 
 import { BaseComponent } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
 import type { Client as AuthupClient } from '@authup/core-http-kit';
 import { RegistryCommand } from './constants.ts';
 import {
@@ -19,7 +20,11 @@ import {
 import type { RegistryEventMap } from './type.ts';
 
 export class RegistryComponent extends BaseComponent<RegistryEventMap> {
-    constructor(ctx: { publicURL: string; authupClient?: AuthupClient }) {
+    constructor(ctx: {
+        publicURL: string; 
+        authupClient?: AuthupClient; 
+        logger?: Logger 
+    }) {
         super();
 
         this.mount(RegistryCommand.SETUP, new RegistrySetupHandler());
@@ -27,7 +32,11 @@ export class RegistryComponent extends BaseComponent<RegistryEventMap> {
 
         this.mount(RegistryCommand.HOOK_PROCESS, new RegistryHookHandler());
 
-        this.mount(RegistryCommand.PROJECT_LINK, new RegistryProjectLinkHandler({ publicURL: ctx.publicURL, authupClient: ctx.authupClient }));
+        this.mount(RegistryCommand.PROJECT_LINK, new RegistryProjectLinkHandler({
+            publicURL: ctx.publicURL,
+            authupClient: ctx.authupClient,
+            logger: ctx.logger,
+        }));
         this.mount(RegistryCommand.PROJECT_UNLINK, new RegistryProjectUnlinkHandler());
         this.mount(RegistryCommand.PROJECT_RELINK, new RegistryProjectRelinkHandler());
     }

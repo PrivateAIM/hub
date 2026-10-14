@@ -100,9 +100,21 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                     throw new EntityNotFoundError({ entity: 'master-image' });
                 }
 
+                // persist STARTING before dispatching, or a fast worker event
+                // could be overwritten by this save.
+                const { buildStatus } = entity;
                 entity.buildStatus = ProcessStatus.STARTING;
-                await this.builderCaller.callExecute({ id: entity.id });
                 await this.repository.save(entity);
+
+                try {
+                    await this.builderCaller.callExecute({ id: entity.id });
+                } catch (e) {
+                    // nothing was dispatched, so no worker event will move STARTING on.
+                    entity.buildStatus = buildStatus;
+                    await this.repository.save(entity);
+
+                    throw e;
+                }
 
                 return entity;
             }

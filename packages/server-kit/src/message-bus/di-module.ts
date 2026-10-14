@@ -34,6 +34,9 @@ export class MessageBusModule implements IModule {
     }
 
     async setup(container: IContainer): Promise<void> {
+        const loggerResult = container.tryResolve(LoggerInjectionKey);
+        const logger = loggerResult.success ? loggerResult.data : undefined;
+
         let driver: IMessageBusDriver;
 
         if (this.options.driverFactory) {
@@ -45,17 +48,13 @@ export class MessageBusModule implements IModule {
                 undefined;
 
             if (connectionString) {
-                driver = new AmqpMessageBusDriver({ connectionString });
+                driver = new AmqpMessageBusDriver({ connectionString, logger });
             } else {
                 driver = new MemoryMessageBusDriver();
             }
         }
 
-        const loggerResult = container.tryResolve(LoggerInjectionKey);
-        const bus = new MessageBus({
-            driver,
-            logger: loggerResult.success ? loggerResult.data : undefined,
-        });
+        const bus = new MessageBus({ driver, logger });
         container.register(MessageBusInjectionKey, { useValue: bus });
     }
 }

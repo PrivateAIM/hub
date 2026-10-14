@@ -19,6 +19,7 @@ import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import type { DataSource } from 'typeorm';
 import { MasterImageEntity } from '../../../../adapters/database/index.ts';
+import { isProcessStatusTerminal } from '../helpers.ts';
 
 export async function handleMasterImageBuilderEvent(
     value: MasterImageBuilderBasePayload,
@@ -36,11 +37,19 @@ export async function handleMasterImageBuilderEvent(
 
     switch (context.key) {
         case MasterImageBuilderEvent.EXECUTION_STARTED: {
+            if (isProcessStatusTerminal(entity.buildStatus)) {
+                return;
+            }
+
             entity.buildStatus = ProcessStatus.STARTED;
             entity.buildProgress = 0;
             break;
         }
         case MasterImageBuilderEvent.EXECUTION_PROGRESS: {
+            if (isProcessStatusTerminal(entity.buildStatus)) {
+                return;
+            }
+
             const temp = value as MasterImageBuilderExecutionProgressPayload;
 
             if (

@@ -12,8 +12,14 @@ import type {
 export class FakeMasterImageBuilderCaller implements IMasterImageBuilderCaller {
     private calls: Array<{ id: string }> = [];
 
+    failWith: Error | undefined;
+
     async callExecute(data: { id: string }): Promise<void> {
         this.calls.push(data);
+
+        if (this.failWith) {
+            throw this.failWith;
+        }
     }
 
     getCalls(): Array<{ id: string }> {
