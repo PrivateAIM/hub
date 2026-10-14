@@ -21,8 +21,9 @@ import { createTestApplication } from '../../app';
  * A `select: false` secret must not be reachable through a relation fieldset.
  * The REGISTRY_MANAGE gates only ever inspected the ROOT fields of their own
  * endpoint, so `include=registry&fields[registry]=+accountSecret` on
- * `/registry-projects` returned the Harbor credentials to any logged-in caller
- * (the other relation paths are pinned at decode level in
+ * `/registry-projects` returned the Harbor credentials to any logged-in caller.
+ * The registry schemas now keep the field root-only, so the nested request is
+ * answered without it (the other relation paths are pinned at decode level in
  * `core/query/nested-secret-field.spec.ts`).
  */
 describe('nested secret fields', () => {
@@ -82,35 +83,15 @@ describe('nested secret fields', () => {
         return { status: response.status, text: await response.text() };
     };
 
-    it('rejects a registry secret requested through /registry-projects', async () => {
+    it.each([
+        ['a restricted user', createRestrictedAccessToken],
+        // The per-resource gate only reaches the root of its own endpoint, so
+        // the relation path is closed for every caller, not gated per actor.
+        ['the admin', createAdminAccessToken],
+    ])('does not serve a registry secret through /registry-projects to %s', async (_label, createToken) => {
         const response = await get(
             `/registry-projects?filter[id]=${registryProjectId}&include=registry&fields[registry]=%2BaccountSecret`,
-            await createRestrictedAccessToken(),
-        );
-
-        expect(response.text).not.toContain(REGISTRY_SECRET);
-        expect(response.status).toBe(400);
-    });
-
-    it('rejects a nested secret even for the admin', async () => {
-        // A nested secret is never served: the per-resource gate only reaches
-        // the root of its own endpoint, so the relation path is refused for
-        // every caller rather than gated per actor.
-        const response = await get(
-            `/registry-projects?filter[id]=${registryProjectId}&include=registry&fields[registry]=%2BaccountSecret`,
-            await createAdminAccessToken(),
-        );
-
-        expect(response.text).not.toContain(REGISTRY_SECRET);
-        expect(response.status).toBe(400);
-    });
-
-    // Negative controls: the relation itself still resolves, and the root
-    // secret stays available behind its own gate.
-    it('still serves the relation without the secret', async () => {
-        const response = await get(
-            `/registry-projects?filter[id]=${registryProjectId}&include=registry`,
-            await createRestrictedAccessToken(),
+            await createToken(),
         );
 
         expect(response.status).toBe(200);
@@ -118,6 +99,7 @@ describe('nested secret fields', () => {
         expect(response.text).not.toContain(REGISTRY_SECRET);
     });
 
+    // Negative control: the root secret stays available behind its own gate.
     it('still serves the root secret to the admin', async () => {
         const response = await get(
             `/registries/${registryId}?fields=%2BaccountSecret`,

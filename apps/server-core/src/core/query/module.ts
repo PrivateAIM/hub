@@ -6,8 +6,6 @@
  */
 
 import { createURLCodec } from '@rapiq/codec-url';
-import type { Registry, RegistryProject } from '@privateaim/core-kit';
-import { BadRequestError } from '@privateaim/errors';
 import type {
     ICondition,
     IQuery,
@@ -107,45 +105,7 @@ export function decodeQuery<RECORD extends ObjectLiteral = ObjectLiteral>(
         parameters: options.parameters,
     });
 
-    const query = parsed ?? new Query({});
-    assertNoNestedSecretFields(query);
-
-    return query;
-}
-
-/**
- * The `select: false` credential columns, as checked literals. A stale string
- * here would let the nested form through instead of failing, so `satisfies`
- * keeps each pinned to a real property of the entities that carry it.
- */
-export const SECRET_FIELDS: ReadonlySet<string> = new Set([
-    'accountSecret' satisfies keyof Registry & keyof RegistryProject,
-]);
-
-/**
- * Refuse a secret field requested through a relation path
- * (`include=registry&fields[registry]=+accountSecret`, or deeper as
- * `node.registryProject.accountSecret`).
- *
- * The REGISTRY_MANAGE gates live in the registry and registry-project
- * services and only ever see the ROOT fields of their own endpoint; a
- * relation fieldset is decoded through the related schema's allow-list —
- * which permits the secret so its own endpoint can serve it — and the
- * typeorm adapter then selects the column explicitly, bypassing
- * `select: false`. Every entity whose relations reach a registry or a
- * registry project (nodes, registry projects, and project/analysis nodes
- * through `node.*`) therefore served the credentials to any logged-in
- * caller. No client needs the nested form, so it is refused for every
- * actor here, at the one choke point all of them decode through, rather
- * than gated per service.
- */
-function assertNoNestedSecretFields(query: IQuery): void {
-    for (const field of query.fields.value) {
-        const index = field.name.lastIndexOf('.');
-        if (index !== -1 && SECRET_FIELDS.has(field.name.slice(index + 1))) {
-            throw new BadRequestError(`The field ${field.name} can only be requested on its own resource.`);
-        }
-    }
+    return parsed ?? new Query({});
 }
 
 /**
