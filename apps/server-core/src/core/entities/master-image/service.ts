@@ -78,7 +78,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
         data: Record<string, any>,
         actor: ActorContext,
     ): Promise<MasterImage | undefined> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.MASTER_IMAGE_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.MASTER_IMAGE_MANAGE });
 
         switch (command) {
             case MasterImageCommand.SYNC: {
@@ -113,7 +113,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
     }
 
     async delete(id: string, actor: ActorContext): Promise<MasterImage> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.MASTER_IMAGE_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.MASTER_IMAGE_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {

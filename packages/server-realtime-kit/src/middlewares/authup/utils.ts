@@ -33,7 +33,7 @@ export async function applyTokenVerificationData(
         realmName: data.realm_name,
     };
 
-    socket.data.permissionChecker = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject({
+    socket.data.permissionEvaluator = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject({
         scopes: unwrapOAuth2Scope(data.scope || []),
         grants: data.permissions,
         identity: {

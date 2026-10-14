@@ -29,7 +29,7 @@ export function registerAnalysisSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.ANALYSIS, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preEvaluateOneOf({
+                await socket.data.permissionEvaluator.preEvaluateOneOf({
                     name: [
                         PermissionName.ANALYSIS_UPDATE,
                         PermissionName.ANALYSIS_EXECUTION_START,

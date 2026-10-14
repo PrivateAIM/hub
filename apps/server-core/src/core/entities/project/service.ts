@@ -63,7 +63,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
 
         const validated = await this.validator.run(input, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.PROJECT_CREATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_CREATE });
 
         await this.repository.validateJoinColumns(validated);
 
@@ -107,7 +107,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
     async update(id: string, data: Partial<Project>, actor: ActorContext): Promise<Project> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.PROJECT_UPDATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
@@ -126,7 +126,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
     }
 
     async delete(id: string, actor: ActorContext): Promise<Project> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.PROJECT_DELETE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_DELETE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {

@@ -68,7 +68,7 @@ Use robots for:
 Hub uses role-based access control (RBAC) via Authup:
 - **Roles** group related permissions and are assigned to users or robots within a realm
 - **Permissions** are pre-defined actions (e.g., `node_create`, `analysis_update`) checked at the service layer
-- Two-phase permission model: `preCheck` (fast fail) then `check` (with policy attributes)
+- Two-phase permission model: `preEvaluate` (fast fail) then `evaluate` (with policy attributes)
 
 ![Permissions](/images/permissions.png)
 

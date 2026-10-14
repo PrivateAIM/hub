@@ -10,7 +10,7 @@ import type { IClient } from '@authup/core-http-kit';
 import { createAuthupPermissionEvaluator, resolveAuthupPolicySubject } from '@privateaim/server-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import type { IAppEvent } from 'routup';
-import { RequestPermissionChecker, setRequestEnv } from '../../request/index.ts';
+import { setRequestEnv } from '../../request/index.ts';
 
 type TokenVerificationDataMinimal = Pick<
     TokenVerificationData,
@@ -51,8 +51,7 @@ export async function applyTokenVerificationData(
             clientId: data.sub_kind === 'client' ? data.sub : null,
         },
     }));
-    const requestPermissionChecker = new RequestPermissionChecker(permissionEvaluator);
-    setRequestEnv(event, 'permissionChecker', requestPermissionChecker);
+    setRequestEnv(event, 'permissionEvaluator', permissionEvaluator);
 
     setRequestEnv(event, 'identity', {
         id: data.sub,

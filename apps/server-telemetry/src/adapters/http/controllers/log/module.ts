@@ -24,7 +24,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { ForceLoggedInMiddleware, useRequestPermissionChecker } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, useRequestPermissionEvaluator } from '@privateaim/server-http-kit';
 import { collectRootFilterValues } from '@privateaim/server-kit';
 import type { IAppEvent } from 'routup';
 import type { LogStore } from '../../../../core/services/log-store/types.ts';
@@ -44,8 +44,8 @@ export class LogController {
         @DBody() body: LogInput,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Log>> {
-        const permissionChecker = useRequestPermissionChecker(event);
-        await permissionChecker.preCheck({ name: PermissionName.LOG_CREATE });
+        const permissionEvaluator = useRequestPermissionEvaluator(event);
+        await permissionEvaluator.preEvaluate({ name: PermissionName.LOG_CREATE });
 
         const validator = new LogValidator();
         const data = await validator.run(body);
@@ -67,8 +67,8 @@ export class LogController {
     async getMany(
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<Log>> {
-        const permissionChecker = useRequestPermissionChecker(event);
-        await permissionChecker.preCheckOneOf({
+        const permissionEvaluator = useRequestPermissionEvaluator(event);
+        await permissionEvaluator.preEvaluateOneOf({
             name: [
                 PermissionName.LOG_READ,
                 PermissionName.LOG_DELETE,
@@ -115,8 +115,8 @@ export class LogController {
     async deleteMany(
         @DContext() event: IAppEvent,
     ) {
-        const permissionChecker = useRequestPermissionChecker(event);
-        await permissionChecker.preCheck({ name: PermissionName.LOG_DELETE });
+        const permissionEvaluator = useRequestPermissionEvaluator(event);
+        await permissionEvaluator.preEvaluate({ name: PermissionName.LOG_DELETE });
 
         let start : number | undefined;
         const labels : Record<string, string> = {};

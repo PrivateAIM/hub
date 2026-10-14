@@ -28,6 +28,7 @@
     "devDependencies": {
         "@authup/access": "^1.0.0-beta.69",
         "@authup/core-kit": "^1.0.0-beta.69",
+        "@authup/server-test-kit": "^1.0.0-beta.69",
         "@privateaim/core-http-kit": "^0.17.0",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.17.0",
@@ -40,6 +41,7 @@
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.69",
         "@authup/core-kit": "^1.0.0-beta.69",
+        "@authup/server-test-kit": "^1.0.0-beta.69",
         "@privateaim/core-http-kit": "^0.17.0",
         "@privateaim/errors": "^0.8.42",
         "@privateaim/server-kit": "^0.17.0",

@@ -7,24 +7,24 @@
 
 import { randomUUID } from 'node:crypto';
 import { PermissionDeniedError } from '@privateaim/errors';
-import type { ActorContext } from '@privateaim/server-kit';
-import { FakePermissionChecker } from '@privateaim/server-test-kit';
+import type { FakeActorContext } from '@privateaim/server-test-kit';
+import { FakePermissionEvaluator } from '@privateaim/server-test-kit';
 import type { PermissionActorOptions } from './types.ts';
 
 /**
  * Build an actor that holds exactly `permissions`. Like the real evaluator,
- * `preCheck`/`check` pass only when EVERY requested name is held and the
+ * `preEvaluate`/`evaluate` pass only when EVERY requested name is held and the
  * `*OneOf` methods when ANY is. A refusal throws `PermissionDeniedError`, the
  * error a real denial surfaces as, so code that tells a denial apart from
  * other failures sees the real thing.
  */
-export function createPermissionActor(options: PermissionActorOptions): ActorContext {
+export function createPermissionActor(options: PermissionActorOptions): FakeActorContext {
     const granted = new Set(options.permissions ?? []);
 
     return {
-        permissionChecker: new FakePermissionChecker((ctx, method) => {
+        permissionEvaluator: new FakePermissionEvaluator(({ ctx, method }) => {
             const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
-            const permitted = method === 'preCheckOneOf' || method === 'checkOneOf' ?
+            const permitted = method === 'preEvaluateOneOf' || method === 'evaluateOneOf' ?
                 names.some((name) => granted.has(name)) :
                 names.every((name) => granted.has(name));
 

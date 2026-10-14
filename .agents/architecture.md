@@ -61,14 +61,13 @@ Pure business logic. No imports from `typeorm`, `routup`, or other infrastructur
 **Shared base types** (from `@privateaim/server-kit`):
 - `IEntityRepository<T>` — Generic repository port (findMany, findOneById, save, remove, etc.)
 - `AbstractEntityService` — Realm helper (`getActorRealmId`)
-- `ActorContext` — Permission checker + realm + identity, decoupled from HTTP
+- `ActorContext` — Permission evaluator + realm + identity, decoupled from HTTP
 - `ValidatorGroup` — Domain-level validation groups (not HTTP-specific)
-- `IPermissionChecker` — Permission evaluation interface (preCheck, check, preCheckOneOf, checkOneOf)
 
 ### Test Architecture
 
 - Unit tests are grouped by domain under `test/unit/core/entities/<domain>/` and `test/unit/core/services/`.
-- Shared test fakes and helpers are imported from `@privateaim/server-test-kit` (`FakeEntityRepository`, `FakePermissionChecker`, actor factories).
+- Shared test fakes and helpers are imported from `@privateaim/server-test-kit` (`FakeEntityRepository`, `FakePermissionEvaluator` re-exported from `@authup/server-test-kit`, actor factories returning `FakeActorContext`).
 - Domain-specific fakes (e.g. `FakeNodeRepository`, `FakeRegistryManager`) are colocated beside the tests that use them.
 
 **Services** (`core/services/`):
@@ -133,7 +132,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
     async create(data: Partial<Node>, actor: ActorContext): Promise<Node> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
-        await actor.permissionChecker.preCheck({ name: PermissionName.NODE_CREATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.NODE_CREATE });
         await this.repository.validateJoinColumns(validated);
         // ... business logic ...
         return this.repository.save(entity, { data: actor.metadata });
@@ -224,7 +223,7 @@ export function createControllers(container: IContainer) {
 // adapters/http/request/helpers/actor.ts
 export function buildActorContext(req: Request): ActorContext {
     return {
-        permissionChecker: useRequestPermissionChecker(req),
+        permissionEvaluator: useRequestPermissionEvaluator(req),
         realm: useRequestIdentityRealm(req),
         identity: ...,
         metadata: { requestPath, requestMethod, actorId, ... },
@@ -247,7 +246,8 @@ Implementation classes live in `app/aggregators/` and `app/components/`.
 All services integrate with **Authup** (OAuth2 identity provider):
 - `@authup/server-adapter` middleware validates tokens on incoming requests
 - `@authup/access` handles per-realm permission checks via `IPermissionEvaluator`
-- Two-phase permission: `preCheck` (fast fail) then `check` (with PolicyData attributes)
+- `ActorContext.permissionEvaluator` IS authup's `IPermissionEvaluator` — hub has no port of its own (plan 016)
+- Two-phase permission: `preEvaluate` (fast fail) then `evaluate` (with PolicyData attributes)
 
 ### Authorization catalog (Authup beta.68)
 
@@ -263,7 +263,7 @@ carrying the binding policy denies. The credential needs
 catalog cache or name-only fallback is installed. Token-verifier caching and socket
 connection lifetimes remain unchanged.
 
-The evaluator enforces the data a call supplies. A service using only `preCheck`
+The evaluator enforces the data a call supplies. A service using only `preEvaluate`
 still has only a pre-gate; this is not the collection `compile()`/row-check migration
 in plan 016. The Vue store handles batch verdict fetching and expiry;
 `store.permissionRevision` must be watched by custom async navigation resolvers.

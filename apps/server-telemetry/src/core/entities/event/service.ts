@@ -34,7 +34,7 @@ export class EventService extends AbstractEntityService implements IEventService
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Event>> {
-        await actor.permissionChecker.preCheckOneOf({
+        await actor.permissionEvaluator.preEvaluateOneOf({
             name: [
                 PermissionName.EVENT_READ,
                 PermissionName.EVENT_DELETE,
@@ -45,7 +45,7 @@ export class EventService extends AbstractEntityService implements IEventService
     }
 
     async getOne(id: string, actor: ActorContext): Promise<Event> {
-        await actor.permissionChecker.preCheckOneOf({
+        await actor.permissionEvaluator.preEvaluateOneOf({
             name: [
                 PermissionName.EVENT_READ,
                 PermissionName.EVENT_DELETE,
@@ -62,7 +62,7 @@ export class EventService extends AbstractEntityService implements IEventService
     }
 
     async create(data: Partial<Event>, actor: ActorContext): Promise<Event> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.EVENT_CREATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.EVENT_CREATE });
 
         const validated = await this.validator.run(data);
 
@@ -82,7 +82,7 @@ export class EventService extends AbstractEntityService implements IEventService
     }
 
     async delete(id: string, actor: ActorContext): Promise<Event> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.EVENT_DELETE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.EVENT_DELETE });
 
         const entity = await this.repository.findOneById(id);
 

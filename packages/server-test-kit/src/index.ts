@@ -11,6 +11,6 @@ export * from './authup-token.ts';
 export * from './column-naming.ts';
 export * from './fake-entity-repository.ts';
 export * from './query-indexes.ts';
-export * from './fake-permission-checker.ts';
+export * from './fake-permission-evaluator.ts';
 export * from './testcontainers/index.ts';
 export * from './types.ts';

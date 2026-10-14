@@ -98,14 +98,14 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
             .includes(SECRET_FIELD);
 
         if (requestsSecret) {
-            await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+            await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_MANAGE });
         }
     }
 
     async create(data: Partial<Registry>, actor: ActorContext): Promise<Registry> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_MANAGE });
 
         if (validated.host) {
             validated.host = getHostNameFromString(validated.host);
@@ -119,7 +119,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
     async update(id: string, data: Partial<Registry>, actor: ActorContext): Promise<Registry> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_MANAGE });
 
         if (validated.host) {
             validated.host = getHostNameFromString(validated.host);
@@ -136,7 +136,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
     }
 
     async delete(id: string, actor: ActorContext): Promise<Registry> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
@@ -157,7 +157,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         data: { id: string; secret?: string },
         actor: ActorContext,
     ): Promise<void> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.REGISTRY_MANAGE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_MANAGE });
 
         if (!this.registryCaller) {
             throw new BadRequestError('Registry caller is not available.');

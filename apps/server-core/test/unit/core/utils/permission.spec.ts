@@ -8,14 +8,14 @@
 import { randomUUID } from 'node:crypto';
 import { PermissionError } from '@authup/access';
 import { PermissionDeniedError } from '@privateaim/errors';
-import type { ActorContext } from '@privateaim/server-kit';
-import { FakePermissionChecker } from '@privateaim/server-test-kit';
+import type { FakeActorContext } from '@privateaim/server-test-kit';
+import { FakePermissionEvaluator } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { holdsPermission, isPermissionDenial } from '../../../../src/core/utils/index.ts';
 
-function actorThrowing(error?: Error): ActorContext {
+function actorThrowing(error?: Error): FakeActorContext {
     return {
-        permissionChecker: new FakePermissionChecker(() => {
+        permissionEvaluator: new FakePermissionEvaluator(() => {
             if (error) throw error;
         }),
         realm: { id: randomUUID(), name: 'test-realm' },

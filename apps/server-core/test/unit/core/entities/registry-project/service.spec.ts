@@ -18,7 +18,6 @@ import {
 import { RegistryProjectService } from '../../../../../src/core/entities/registry-project/service.ts';
 import {
     FakeEntityRepository,
-    FakePermissionChecker,
     createAllowAllActor,
     createDenyAllActor,
     createMasterRealmActor,
@@ -102,7 +101,7 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor();
             await service.getMany({}, actor);
 
-            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
+            expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
         });
     });
 
@@ -128,7 +127,7 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor();
             await service.getOne('rp-1', actor);
 
-            expect((actor.permissionChecker as FakePermissionChecker).wasMethodCalled('preCheck')).toBe(true);
+            expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
         });
 
         it('should allow node-client to access own registry project secret', async () => {
@@ -171,7 +170,7 @@ describe('RegistryProjectService', () => {
             const failure = new Error('catalog unreachable');
             const actor = createDenyAllActor();
             actor.identity = { id: clientId, type: 'client' };
-            actor.permissionChecker = new FakePermissionChecker(() => { throw failure; });
+            actor.permissionEvaluator.denyAll(failure);
 
             await expect(service.getOne(registryProjectId, actor)).rejects.toBe(failure);
         });

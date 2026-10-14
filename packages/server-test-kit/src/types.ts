@@ -5,21 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PermissionEvaluationContext } from '@authup/access';
-
-export type PermissionMethod = 'preCheck' | 'check' | 'preCheckOneOf' | 'checkOneOf';
-
-export type PermissionCall = {
-    method: PermissionMethod;
-    ctx: PermissionEvaluationContext;
-};
+import type { FakePermissionEvaluator } from '@authup/server-test-kit';
+import type { ActorContext } from '@privateaim/server-kit';
 
 /**
- * Decides one permission call. `method` lets a handler tell the all-of
- * methods (`preCheck`, `check`) apart from the one-of ones, so a fake can
- * hold a partial set of names and still answer like the real evaluator.
+ * An `ActorContext` whose evaluator is known to be the fake, so a spec reads
+ * `actor.permissionEvaluator.preEvaluateCalls` without a cast.
  */
-export type PermissionHandler = (
-    ctx: PermissionEvaluationContext,
-    method: PermissionMethod,
-) => void | Promise<void>;
+export type FakeActorContext = ActorContext & {
+    permissionEvaluator: FakePermissionEvaluator;
+};

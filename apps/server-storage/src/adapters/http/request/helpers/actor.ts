@@ -10,14 +10,14 @@ import { getRequestHeader, getRequestIP } from 'routup';
 import {
     useRequestIdentity,
     useRequestIdentityRealm,
-    useRequestPermissionChecker,
+    useRequestPermissionEvaluator,
 } from '@privateaim/server-http-kit';
 import type { ActorContext, EntityEventMetadata } from '@privateaim/server-kit';
 
 export function buildActorContext(event: IAppEvent): ActorContext {
     const identity = useRequestIdentity(event);
     const realm = useRequestIdentityRealm(event);
-    const permissionChecker = useRequestPermissionChecker(event);
+    const permissionEvaluator = useRequestPermissionEvaluator(event);
 
     // Typed against EntityEventMetadata rather than Record<string, any>: these
     // keys are read back BY NAME in @privateaim/server-telemetry-kit's
@@ -39,7 +39,7 @@ export function buildActorContext(event: IAppEvent): ActorContext {
     }
 
     return {
-        permissionChecker,
+        permissionEvaluator,
         realm,
         identity: identity ?
             {

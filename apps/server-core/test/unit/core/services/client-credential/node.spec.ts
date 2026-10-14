@@ -10,7 +10,7 @@ import type { Node } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { PermissionName } from '@privateaim/kit';
-import { FakePermissionChecker, createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
+import { createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { NodeClientCredentialService } from '../../../../../src/core/services/client-credential/index.ts';
 import { FakeNodeRepository } from '../../entities/node/fake-repository.ts';
@@ -123,7 +123,7 @@ describe('NodeClientCredentialService', () => {
         const { service, reader } = buildService({ node: baseNode() });
         const failure = new Error('catalog unreachable');
         const actor = createDenyAllActor();
-        actor.permissionChecker = new FakePermissionChecker(() => { throw failure; });
+        actor.permissionEvaluator.denyAll(failure);
 
         await expect(service.getCredentials(NODE_ID, actor)).rejects.toBe(failure);
         expect(reader.calls).toHaveLength(0);

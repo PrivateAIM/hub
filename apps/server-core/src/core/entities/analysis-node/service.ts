@@ -73,7 +73,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
     async create(data: Partial<AnalysisNode>, actor: ActorContext): Promise<AnalysisNode> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
 
         await this.repository.validateJoinColumns(validated);
 
@@ -177,7 +177,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
     }
 
     async delete(id: string, actor: ActorContext): Promise<AnalysisNode> {
-        await actor.permissionChecker.preCheckOneOf({
+        await actor.permissionEvaluator.preEvaluateOneOf({
             name: [
                 PermissionName.ANALYSIS_UPDATE,
                 PermissionName.ANALYSIS_APPROVE,

@@ -9,17 +9,17 @@ import type { IAppEvent } from 'routup';
 import {
     useRequestIdentity,
     useRequestIdentityRealm,
-    useRequestPermissionChecker,
+    useRequestPermissionEvaluator,
 } from '@privateaim/server-http-kit';
 import type { ActorContext } from '@privateaim/server-kit';
 
 export function buildActorContext(event: IAppEvent): ActorContext {
     const identity = useRequestIdentity(event);
     const realm = useRequestIdentityRealm(event);
-    const permissionChecker = useRequestPermissionChecker(event);
+    const permissionEvaluator = useRequestPermissionEvaluator(event);
 
     return {
-        permissionChecker,
+        permissionEvaluator,
         realm,
         identity: identity ?
             {

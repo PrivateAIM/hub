@@ -12,7 +12,7 @@ import { MemoryTransport } from 'hapic';
 import { App, defineCoreHandler } from 'routup';
 import { describe, expect, it } from 'vitest';
 import { mountAuthorizationMiddleware } from '../../../../src/middlewares/authup/middleware.ts';
-import { useRequestPermissionChecker } from '../../../../src/request/index.ts';
+import { useRequestPermissionEvaluator } from '../../../../src/request/index.ts';
 
 const catalog: AuthorizationCatalog = {
     permissions: [{
@@ -55,7 +55,7 @@ async function requestWithScope(scope: string): Promise<number> {
     });
     app.get('/', defineCoreHandler(async (event) => {
         try {
-            await useRequestPermissionChecker(event).preCheck({ name: 'node_update' });
+            await useRequestPermissionEvaluator(event).preEvaluate({ name: 'node_update' });
             return { granted: true };
         } catch {
             event.response.status = 403;

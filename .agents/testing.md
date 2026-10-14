@@ -174,7 +174,7 @@ code under test actually talks to, and do not migrate one layer into another.
 
 | Layer | Seam | Used for | Needs Docker |
 |---|---|---|---|
-| **Port fakes** | The domain port interface (`IEntityRepository`, `IPermissionChecker`, …) | Entity/business services in `core/` | no |
+| **Port fakes** | The domain port interface (`IEntityRepository`, `IPermissionEvaluator`, …) | Entity/business services in `core/` | no |
 | **Transport-level FakeClient** | hapic's `MemoryTransport`, under a real client | Anything that CONSUMES an HTTP client: client-vue components, worker components | no |
 | **A real docker daemon** | dockerode against the local socket | The two worker specs that pack or build an image | **yes** |
 | **Testcontainers** | The real process | HTTP integration suites for server-core / storage / telemetry, with real Authup enforcement | **yes** |
@@ -255,9 +255,10 @@ npm run test:psql
 Generic test fakes shared across all services live in `packages/server-test-kit/`:
 
 - `FakeEntityRepository<T>` — In-memory `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
-- `FakePermissionChecker` — `IPermissionChecker` with call recording (`getCalls()`, `wasMethodCalled()`)
-- `createAllowAllActor()` — `ActorContext` with master realm that permits all operations
-- `createDenyAllActor()` — `ActorContext` with non-master realm that throws `ForbiddenError`
+- `FakePermissionEvaluator` — authup's `IPermissionEvaluator` fake, re-exported from `@authup/server-test-kit`: public call arrays (`preEvaluateCalls`, `preEvaluateOneOfCalls`, `evaluateCalls`, `evaluateOneOfCalls`, `compileCalls`), `setBehavior` / `deny` / `denyAll`, `compile()` defaulting to `post`
+- `FakeActorContext` — `ActorContext` whose `permissionEvaluator` is the fake, so specs read the call arrays without a cast
+- `createAllowAllActor()` — `FakeActorContext` with master realm that permits all operations
+- `createDenyAllActor()` — `FakeActorContext` with non-master realm whose evaluator throws `PermissionDeniedError`
 - `createMasterRealmActor()` / `createNonMasterRealmActor()` — Realm-specific actor factories
 
 ### Test directory layout (domain-grouped)
@@ -442,8 +443,8 @@ Existing fakes to reuse:
 
 **Shared (`@privateaim/server-test-kit`):**
 - `FakeEntityRepository<T>` — `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
-- `FakePermissionChecker` — `IPermissionChecker` with `getCalls()`, `wasMethodCalled()`
-- `createAllowAllActor()` / `createDenyAllActor()` — `ActorContext` fakes for permission testing
+- `FakePermissionEvaluator` (from `@authup/server-test-kit`) — call arrays + `setBehavior`/`deny`/`denyAll`; the hub deny factory passes `PermissionDeniedError` to `denyAll`, since authup's default is `PermissionError.denied`
+- `createAllowAllActor()` / `createDenyAllActor()` — `FakeActorContext` fakes for permission testing
 - `createMasterRealmActor()` / `createNonMasterRealmActor()` — realm-scoped actor fakes
 - `createFakeAuthupClient({ handlers, fallback, baseURL })` / `FakeAuthupClient` — a REAL `AuthupClient` on a `MemoryTransport`, with `requests` and `fakeAuthupResponse(status, body)`. Use this for anything talking to authup. Deliberately **not** `@authup/core-http-kit/testing`'s `createFakeClient`: that one overrides `request()` and hard-codes a 200, so it can never drive the `isClientErrorWithStatusCode(e, 404)` branches that `AnalysisClientService` and `NodeClientService` depend on.
 

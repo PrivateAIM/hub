@@ -124,7 +124,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const validated = await this.validator.run(input, { group: ValidatorGroup.CREATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_CREATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_CREATE });
 
         await this.repository.validateJoinColumns(validated);
 
@@ -150,7 +150,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         // matching once attribute policies are enabled, and a denylist-shaped one
         // then fails OPEN. See docs/src/guide/development/migration-camelcase.md
         // -> "Authup attribute policies".
-        await actor.permissionChecker.check({
+        await actor.permissionEvaluator.evaluate({
             name: PermissionName.ANALYSIS_CREATE,
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
         });
@@ -217,7 +217,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
     async update(id: string, data: Partial<Analysis>, actor: ActorContext): Promise<Analysis> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
-        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
 
         await this.repository.validateJoinColumns(validated);
 
@@ -226,7 +226,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        await actor.permissionChecker.check({
+        await actor.permissionEvaluator.evaluate({
             name: PermissionName.ANALYSIS_UPDATE,
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
         });
@@ -259,14 +259,14 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
     }
 
     async delete(id: string, actor: ActorContext): Promise<Analysis> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_DELETE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_DELETE });
 
         const entity = await this.repository.findOneWithProject(id);
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        await actor.permissionChecker.check({
+        await actor.permissionEvaluator.evaluate({
             name: PermissionName.ANALYSIS_DELETE,
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
         });

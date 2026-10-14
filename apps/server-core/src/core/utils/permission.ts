@@ -30,7 +30,7 @@ export function isPermissionDenial(error: unknown): boolean {
  */
 export async function holdsPermission(actor: ActorContext, name: string): Promise<boolean> {
     try {
-        await actor.permissionChecker.preCheck({ name });
+        await actor.permissionEvaluator.preEvaluate({ name });
         return true;
     } catch (error) {
         if (isPermissionDenial(error)) {

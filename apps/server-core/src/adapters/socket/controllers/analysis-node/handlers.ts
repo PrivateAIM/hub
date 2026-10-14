@@ -32,7 +32,7 @@ export function registerAnalysisNodeSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preEvaluateOneOf({
+                await socket.data.permissionEvaluator.preEvaluateOneOf({
                     name: [
                         PermissionName.ANALYSIS_APPROVE,
                     ],
@@ -73,7 +73,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preEvaluateOneOf({
+                await socket.data.permissionEvaluator.preEvaluateOneOf({
                     name: [
                         PermissionName.ANALYSIS_APPROVE,
                     ],
@@ -107,7 +107,7 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preEvaluateOneOf({
+                await socket.data.permissionEvaluator.preEvaluateOneOf({
                     name: [
                         PermissionName.ANALYSIS_UPDATE,
                     ],

@@ -58,7 +58,7 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
             !this.isOwnedByActor(entity, actor) &&
             !this.isBucketOwnedByActor(entity, actor)
         ) {
-            await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_UPDATE });
+            await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_UPDATE });
 
             if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
                 throw new PermissionDeniedError();

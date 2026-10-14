@@ -80,7 +80,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
     ): Promise<ClientCredentials> {
         // Writing is a manager action (ANALYSIS_UPDATE), not the read path's
         // master-or-assigned-node rule: the running analysis never rotates.
-        await actor.permissionChecker.preCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
 
         const analysis = await this.repository.findOneById(analysisId);
         if (!analysis) {
@@ -95,7 +95,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
         // matching once attribute policies are enabled, and a denylist-shaped one
         // then fails OPEN. See docs/src/guide/development/migration-camelcase.md
         // -> "Authup attribute policies".
-        await actor.permissionChecker.check({
+        await actor.permissionEvaluator.evaluate({
             name: PermissionName.ANALYSIS_UPDATE,
             data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
         });

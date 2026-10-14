@@ -34,7 +34,7 @@ export function registerProjectNodeSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preEvaluateOneOf({
+                await socket.data.permissionEvaluator.preEvaluateOneOf({
                     name: [
                         PermissionName.PROJECT_APPROVE,
                     ],
@@ -77,7 +77,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preEvaluateOneOf({
+                await socket.data.permissionEvaluator.preEvaluateOneOf({
                     name: [
                         PermissionName.PROJECT_APPROVE,
                     ],
@@ -117,7 +117,7 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preEvaluateOneOf({
+                await socket.data.permissionEvaluator.preEvaluateOneOf({
                     name: [
                         PermissionName.PROJECT_UPDATE,
                     ],

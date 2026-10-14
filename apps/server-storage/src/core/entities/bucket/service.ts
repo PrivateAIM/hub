@@ -58,7 +58,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
     }
 
     async create(data: Partial<Bucket>, actor: ActorContext): Promise<Bucket> {
-        await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_CREATE });
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_CREATE });
 
         if (!actor.identity) {
             throw new PermissionDeniedError('Only clients, users & robots are permitted to create a bucket.');
@@ -91,7 +91,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         }
 
         if (!this.isOwnedByActor(entity, actor)) {
-            await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_UPDATE });
+            await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_UPDATE });
 
             if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
                 throw new PermissionDeniedError();
@@ -122,7 +122,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         }
 
         if (!this.isOwnedByActor(entity, actor)) {
-            await actor.permissionChecker.preCheck({ name: PermissionName.BUCKET_DELETE });
+            await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_DELETE });
 
             if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
                 throw new PermissionDeniedError();

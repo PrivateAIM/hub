@@ -31,7 +31,7 @@ export function registerAnalysisFileSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.ANALYSIS_BUCKET_FILE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionChecker.preEvaluateOneOf({
+                await socket.data.permissionEvaluator.preEvaluateOneOf({
                     name: [
                         PermissionName.ANALYSIS_UPDATE,
                     ],
