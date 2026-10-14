@@ -118,7 +118,7 @@ export function decodeQuery<RECORD extends ObjectLiteral = ObjectLiteral>(
  * here would let the nested form through instead of failing, so `satisfies`
  * keeps each pinned to a real property of the entities that carry it.
  */
-const SECRET_FIELDS: ReadonlySet<string> = new Set([
+export const SECRET_FIELDS: ReadonlySet<string> = new Set([
     'accountSecret' satisfies keyof Registry & keyof RegistryProject,
 ]);
 
