@@ -6,7 +6,14 @@
  */
 
 import type { ActorContext } from '@privateaim/server-kit';
+import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
+import type { INodeRepository } from '../../entities/node/types.ts';
 import type { LogAccessIntent } from './constants.ts';
+
+export type AnalysisLogAccessServiceContext = {
+    analysisRepository: IAnalysisRepository;
+    nodeRepository: INodeRepository;
+};
 
 /**
  * Authorizes the analysis(-node) log proxies BEFORE they forward to the
@@ -15,7 +22,8 @@ import type { LogAccessIntent } from './constants.ts';
  */
 export interface IAnalysisLogAccessService {
     /**
-     * Throws `EntityNotFoundError` for an unknown analysis and
+     * Throws `BadRequestError` for a non-UUID id, `EntityNotFoundError` for
+     * an unknown analysis and
      * `PermissionDeniedError` when the actor may not access its logs.
      */
     assertAnalysisLogAccess(
@@ -25,7 +33,8 @@ export interface IAnalysisLogAccessService {
     ): Promise<void>;
 
     /**
-     * Throws `EntityNotFoundError` for an unknown analysis or node and
+     * Throws `BadRequestError` for a non-UUID id, `EntityNotFoundError` for
+     * an unknown analysis or node and
      * `PermissionDeniedError` when the actor may not access the logs of that
      * node's run of the analysis.
      */
