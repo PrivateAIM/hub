@@ -33,8 +33,8 @@
         "@privateaim/server-kit": "^0.17.0",
         "@rapiq/core": "^2.4.0",
         "hapic": "^3.0.2",
-        "testcontainers": "^12.1.0",
-        "typeorm": "^1.1.0",
+        "testcontainers": "^12.2.0",
+        "typeorm": "^1.1.2",
         "vitest": "^4.1.11"
     },
     "peerDependencies": {
@@ -45,7 +45,7 @@
         "@privateaim/server-kit": "^0.17.0",
         "@rapiq/core": "^2.4.0",
         "hapic": "^3.0.2",
-        "typeorm": "^1.1.0"
+        "typeorm": "^1.1.2"
     },
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",
