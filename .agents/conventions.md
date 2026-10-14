@@ -220,6 +220,30 @@ export const analysisSchema = z.object({
 });
 ```
 
+## Query Filters
+
+A rapiq filter that needs an **operator** — contains, negation, comparison,
+membership — is built with the typed helpers from `@rapiq/core`, never with a
+hand-built wire-marker string:
+
+```typescript
+import { and, contains, eq, inArray, not } from '@rapiq/core';
+
+// Bad — the v0.9 wire-marker dialect
+{ filters: { name: `~${q}~`, status: '!' + s } }
+
+// Good
+{ filters: and(contains('name', q), not(eq('status', s)), inArray('id', ids)) }
+```
+
+Object-literal equality and array filters (`{ filters: { realmId: [id, null] } }`)
+are current rapiq v2 syntax, not legacy — leave them as they are.
+
+ESLint enforces this (`no-restricted-syntax` in `eslint.config.js`): a string
+literal, `+` concatenation or template literal starting with `~`, `!`, `<` or `>`
+as a value under a `filters` key is an error. It sees only script code, so a
+filter assembled inside a Vue **template** expression is not covered.
+
 ## Database Migrations
 
 Migrations live in `apps/<service>/src/adapters/database/migrations/{mysql,postgres}/`.
