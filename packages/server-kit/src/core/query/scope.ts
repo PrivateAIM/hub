@@ -23,10 +23,10 @@ import type { ScopeReadQueryOptions } from './types.ts';
  *                   to the actor's own realm. An actor without a realm gets
  *                   nothing.
  *
- * ponytail: `post` narrows by realm only and ignores the unlowerable grant
- * policy, so within the actor's realm it can return rows that policy would
- * exclude. Add per-row evaluation (as authup's role/event services do) once
- * deployments attach such policies to read grants.
+ * Deliberate simplification: `post` narrows by realm only and ignores the
+ * unlowerable grant policy, so within the actor's realm it can return rows
+ * that policy would exclude. Add per-row evaluation (as authup's role/event
+ * services do) once deployments attach such policies to read grants.
  */
 export async function scopeReadQuery(
     query: IQuery,
@@ -39,10 +39,10 @@ export async function scopeReadQuery(
         return query;
     }
 
-    // Forwarded only when set, like authup: a named realm column tells
-    // authup the row may not carry a grant policy's fields, which turns
-    // every lowerable grant policy into `post`. The reach itself lowers
-    // onto `realmId` by default.
+    // Forward the realm column only when set, like authup: naming one tells
+    // authup the row may not carry a grant policy's fields, which turns every
+    // lowerable grant policy into `post`. Without it the reach lowers onto
+    // `realmId`.
     const compiled = await actor.permissionEvaluator.compile({
         name: options.names,
         ...(options.realmAttributeName ? { realmAttributeName: options.realmAttributeName } : {}),
@@ -54,11 +54,19 @@ export async function scopeReadQuery(
         case 'conditional':
             return appendQueryConditions(query, compiled.condition);
         case 'deny':
-            return appendQueryConditions(query, inArray('id', []));
-        default:
-            return appendQueryConditions(
-                query,
-                actor.realm ? eq(options.realmAttributeName ?? 'realmId', actor.realm.id) : inArray('id', []),
-            );
+            return appendQueryConditions(query, matchNothing());
+        default: {
+            // `post`: fall back to the actor's own realm.
+            if (!actor.realm) {
+                return appendQueryConditions(query, matchNothing());
+            }
+
+            const realmAttributeName = options.realmAttributeName ?? 'realmId';
+            return appendQueryConditions(query, eq(realmAttributeName, actor.realm.id));
+        }
     }
+}
+
+function matchNothing() {
+    return inArray('id', []);
 }

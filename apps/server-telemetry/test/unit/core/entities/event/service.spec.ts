@@ -59,47 +59,47 @@ describe('EventService', () => {
     });
 
     describe('getMany', () => {
-        const seedRealms = () => repository.seed([
+        const seedEventsAcrossRealms = () => repository.seed([
             createTestEvent({ id: 'e-1', realmId: 'realm-1' }),
             createTestEvent({ id: 'e-2', realmId: 'realm-2' }),
             createTestEvent({ id: 'e-3', realmId: null }),
         ]);
 
-        const ids = (result: { data: Event[] }) => result.data.map((e) => e.id).sort();
+        const sortedIds = (result: { data: Event[] }) => result.data.map((e) => e.id).sort();
 
-        it('should return every realm on an allow verdict', async () => {
-            seedRealms();
+        it('should return events of every realm on an allow verdict', async () => {
+            seedEventsAcrossRealms();
             const actor = createAllowAllActor();
             actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
 
             const result = await service.getMany({}, actor);
-            expect(ids(result)).toEqual(['e-1', 'e-2', 'e-3']);
+            expect(sortedIds(result)).toEqual(['e-1', 'e-2', 'e-3']);
             expect(result.meta.total).toBe(3);
         });
 
-        it('should apply a conditional verdict', async () => {
-            seedRealms();
+        it('should return only matching events on a conditional verdict', async () => {
+            seedEventsAcrossRealms();
             const actor = createAllowAllActor();
             actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-2') });
 
-            expect(ids(await service.getMany({}, actor))).toEqual(['e-2']);
+            expect(sortedIds(await service.getMany({}, actor))).toEqual(['e-2']);
         });
 
-        it('should narrow a post verdict to the actor realm', async () => {
-            seedRealms();
+        it('should return only the actor realm\'s events on a post verdict', async () => {
+            seedEventsAcrossRealms();
 
-            expect(ids(await service.getMany({}, createAllowAllActor('realm-1')))).toEqual(['e-1']);
+            expect(sortedIds(await service.getMany({}, createAllowAllActor('realm-1')))).toEqual(['e-1']);
         });
 
         it('should return nothing on a deny verdict', async () => {
-            seedRealms();
+            seedEventsAcrossRealms();
             const actor = createAllowAllActor();
             actor.permissionEvaluator.setCompileResult({ verdict: 'deny' });
 
-            expect(ids(await service.getMany({}, actor))).toEqual([]);
+            expect(sortedIds(await service.getMany({}, actor))).toEqual([]);
         });
 
-        it('should check permission', async () => {
+        it('should accept either EVENT_READ or EVENT_DELETE as read permission', async () => {
             const actor = createAllowAllActor();
             await service.getMany({}, actor);
 
@@ -125,7 +125,7 @@ describe('EventService', () => {
             expect(result.id).toBe('e-1');
         });
 
-        it('should throw EntityNotFoundError for an entity out of reach', async () => {
+        it('should throw EntityNotFoundError for an entity in another realm', async () => {
             repository.seed(createTestEvent({ id: 'e-1', realmId: 'realm-2' }));
 
             await expect(

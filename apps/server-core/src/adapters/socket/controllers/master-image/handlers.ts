@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
 import {
     DomainEventSubscriptionName,
     DomainType,
@@ -20,6 +20,7 @@ import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
+import { MASTER_IMAGE_READ_PERMISSIONS } from '../../../../core/index.ts';
 import type { Socket } from '../../types.ts';
 
 export function registerMasterImageSocketHandlers(socket: Socket) {
@@ -28,14 +29,9 @@ export function registerMasterImageSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventFullName(DomainType.MASTER_IMAGE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
-            // The same grants the HTTP read requires.
+            // Subscribing requires the same grants as the HTTP read.
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.MASTER_IMAGE_READ,
-                        PermissionName.MASTER_IMAGE_MANAGE,
-                    ],
-                });
+                await socket.data.permissionEvaluator.preEvaluateOneOf({ name: MASTER_IMAGE_READ_PERMISSIONS });
             } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());

@@ -15,8 +15,11 @@ import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { masterImageGroupSchema } from './schema.ts';
 import type { IMasterImageGroupRepository, IMasterImageGroupService } from './types.ts';
 
-/** Global catalog: capability gate only, no realm narrowing. */
-const READ_PERMISSIONS = [
+/**
+ * Master image groups are a global catalog: any one of these grants reads
+ * every group. The grant is checked, but results are not narrowed by realm.
+ */
+export const MASTER_IMAGE_GROUP_READ_PERMISSIONS = [
     PermissionName.MASTER_IMAGE_GROUP_READ,
     PermissionName.MASTER_IMAGE_GROUP_MANAGE,
 ];
@@ -34,11 +37,13 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<MasterImageGroup>> {
-        return this.repository.findMany(await scopeReadQuery(
+        const scoped = await scopeReadQuery(
             decodeQuery(query, { schema: masterImageGroupSchema }),
             actor,
-            { names: READ_PERMISSIONS, compile: false },
-        ));
+            { names: MASTER_IMAGE_GROUP_READ_PERMISSIONS, compile: false },
+        );
+
+        return this.repository.findMany(scoped);
     }
 
     /**
@@ -46,7 +51,7 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
      * selection has to go through `findMany` with an `id` condition appended.
      */
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<MasterImageGroup> {
-        await actor.permissionEvaluator.preEvaluateOneOf({ name: READ_PERMISSIONS });
+        await actor.permissionEvaluator.preEvaluateOneOf({ name: MASTER_IMAGE_GROUP_READ_PERMISSIONS });
 
         const entity = query ?
             await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: masterImageGroupSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :

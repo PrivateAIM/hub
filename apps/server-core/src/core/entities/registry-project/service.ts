@@ -39,8 +39,9 @@ type RegistryProjectServiceContext = {
 const SECRET_FIELD = 'accountSecret' satisfies keyof RegistryProject;
 
 /**
- * REGISTRY_MANAGE reads too: it already governs this row's secret (below),
- * the credentials route and the registry admin UI.
+ * Unlike the global catalogs, registry project reads are narrowed to the
+ * reach of the caller's grant. REGISTRY_MANAGE reads too, because it already
+ * governs the secret column, the credentials route and the registry admin UI.
  */
 export const REGISTRY_PROJECT_READ_PERMISSIONS = [
     PermissionName.REGISTRY_PROJECT_READ,
@@ -48,9 +49,7 @@ export const REGISTRY_PROJECT_READ_PERMISSIONS = [
     PermissionName.REGISTRY_MANAGE,
 ];
 
-/**
- * `include` reaches these entities: each requires its own read grant.
- */
+/** Relations an `include` can join, each guarded by its own read grant. */
 const RELATION_READ_PERMISSIONS = { registry: REGISTRY_READ_PERMISSIONS } satisfies Partial<Record<keyof RegistryProject, string[]>>;
 
 export class RegistryProjectService extends AbstractEntityService implements IRegistryProjectService {
@@ -87,8 +86,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             actor,
         );
 
-        const { data } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
-        const entity = data[0];
+        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
@@ -101,9 +99,9 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     /**
-     * The read scope for list and record alike: pre-gated and narrowed by
-     * the caller's grant. Only when that is refused does a node's own client
-     * fall back to exactly its own project — a grant it holds still applies.
+     * Shared by list and record reads: check the read grant and narrow the
+     * query to its reach. A node's own client without that grant may still
+     * read exactly its own project; if it does hold the grant, the grant wins.
      */
     private async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
         await preEvaluateRelationReads(query, actor, RELATION_READ_PERMISSIONS);
@@ -124,6 +122,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         }
     }
 
+    /** The registry project of the node whose client is calling, if any. */
     private async findOwnNodeProjectId(actor: ActorContext): Promise<string | undefined> {
         if (!actor.identity || actor.identity.type !== 'client' || !this.nodeRepository) {
             return undefined;
@@ -143,8 +142,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             return;
         }
 
-        // permission not granted — check node-client condition
-
+        // Without REGISTRY_MANAGE, a node's client may only see its own project's secret.
         const ids = new Set(entities.map((e) => e.id));
         if (ids.size === 1 && ids.has(await this.findOwnNodeProjectId(actor))) {
             return;

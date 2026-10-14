@@ -24,14 +24,17 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
     findManyCalls: IQuery[] = [];
 
     /**
-     * Applies the query's filters (only) through rapiq's in-memory adapter, so
-     * a service's appended scope narrows the result the way the database would.
-     * ponytail: fields/sorts/pagination are not applied; add when a spec needs them.
+     * Applies the query's filters through rapiq's in-memory adapter, so a
+     * service's appended scope narrows the result the way the database would.
+     *
+     * Deliberate simplification: fields, sorts and pagination are ignored;
+     * apply them here once a spec depends on them.
      */
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<T>> {
         this.findManyCalls.push(query);
-        const matches = compileFilters(query.filters);
-        const data = this.store.filter((e) => matches(e));
+
+        const matchesFilters = compileFilters(query.filters);
+        const data = this.store.filter((entity) => matchesFilters(entity));
 
         return {
             data,

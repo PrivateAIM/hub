@@ -44,7 +44,7 @@ describe('nested secret fields', () => {
         // project has to live there to be listed at all.
         const authupURL = process.env.AUTHUP_URL.replace(/\/+$/, '');
         const headers = { authorization: `Bearer ${await createAdminAccessToken()}` };
-        const realms = await fetch(`${authupURL}/realms?filter[name]=master`, { headers }).then((r) => r.json());
+        const masterRealms = await fetch(`${authupURL}/realms?filter[name]=master`, { headers }).then((r) => r.json());
 
         const { dataSource } = suite;
         const registry = await dataSource.getRepository(RegistryEntity).save({
@@ -61,7 +61,7 @@ describe('nested secret fields', () => {
             registryId,
             accountName: 'robot',
             accountSecret: PROJECT_SECRET,
-            realmId: realms.data[0].id,
+            realmId: masterRealms.data[0].id,
         });
         registryProjectId = registryProject.id;
     });

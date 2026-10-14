@@ -32,19 +32,6 @@ describe('event read permission', () => {
 
     const getEvents = (token: string, suffix = '') => fetch(`${baseURL}/events${suffix}`, { headers: { authorization: `Bearer ${token}` } });
 
-    it('answers 400 for a malformed id', async () => {
-        const response = await getEvents(await createRestrictedAccessToken([PermissionName.EVENT_READ]), '/not-a-uuid');
-
-        expect(response.status).toBe(400);
-    });
-
-    it('answers 403 for an identity holding no read permission', async () => {
-        const response = await getEvents(await createRestrictedAccessToken());
-
-        expect(response.status).toBe(403);
-    });
-
-    // Both events share one refId, so the read is not at the mercy of pagination.
     const createEvent = async (refId: string, realmId?: string): Promise<string> => {
         const response = await fetch(`${baseURL}/events`, {
             method: 'POST',
@@ -65,14 +52,27 @@ describe('event read permission', () => {
         return id;
     };
 
+    it('answers 400 for a malformed id', async () => {
+        const response = await getEvents(await createRestrictedAccessToken([PermissionName.EVENT_READ]), '/not-a-uuid');
+
+        expect(response.status).toBe(400);
+    });
+
+    it('answers 403 for an identity holding no read permission', async () => {
+        const response = await getEvents(await createRestrictedAccessToken());
+
+        expect(response.status).toBe(403);
+    });
+
     it('answers 200 for an identity holding EVENT_READ, with its own realm\'s events only', async () => {
+        // Both events share one refId, so the read is not at the mercy of pagination.
         const refId = randomUUID();
         // Realm omitted: stamped with the admin's master realm, the restricted user's realm.
         const ownId = await createEvent(refId);
         const foreignId = await createEvent(refId, randomUUID());
 
         const token = await createRestrictedAccessToken([PermissionName.EVENT_READ]);
-        const response = await fetch(`${baseURL}/events?filter[refId]=${refId}`, { headers: { authorization: `Bearer ${token}` } });
+        const response = await getEvents(token, `?filter[refId]=${refId}`);
 
         expect(response.status).toBe(200);
         const { data } = await response.json();

@@ -7,10 +7,10 @@
 
 import { FakePermissionEvaluator } from '@authup/server-test-kit';
 import {
-    Query, 
-    eq, 
-    inArray, 
-    isFilter, 
+    Query,
+    eq,
+    inArray,
+    isFilter,
     isFilters,
 } from '@rapiq/core';
 import type { ICondition, IQuery } from '@rapiq/core';
@@ -21,8 +21,8 @@ function createActor(realm?: { id: string, name: string }) {
     return { permissionEvaluator: new FakePermissionEvaluator(), realm };
 }
 
-// The scope appends exactly one condition onto an empty client filter tree.
-function appended(query: IQuery): ICondition | undefined {
+// On a query without client filters, the scope is the only condition in the group.
+function appendedCondition(query: IQuery): ICondition | undefined {
     if (!isFilters(query.filters)) {
         return undefined;
     }
@@ -50,7 +50,7 @@ describe('scopeReadQuery', () => {
         expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
     });
 
-    it('returns the query unchanged on allow', async () => {
+    it('returns the query unchanged on an allow verdict', async () => {
         const actor = createActor({ id: 'r1', name: 'r1' });
         actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
         const query = new Query({});
@@ -60,33 +60,33 @@ describe('scopeReadQuery', () => {
         expect(actor.permissionEvaluator.compileCalls[0]).toEqual({ name: names });
     });
 
-    it('appends the compiled reach on conditional', async () => {
+    it('appends the compiled reach on a conditional verdict', async () => {
         const actor = createActor({ id: 'r1', name: 'r1' });
         const condition = eq('realmId', 'r2');
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition });
 
         const scoped = await scopeReadQuery(new Query({}), actor, { names });
-        expect(appended(scoped)).toEqual(condition);
+        expect(appendedCondition(scoped)).toEqual(condition);
     });
 
-    it('matches nothing on deny', async () => {
+    it('matches nothing on a deny verdict', async () => {
         const actor = createActor({ id: 'r1', name: 'r1' });
         actor.permissionEvaluator.setCompileResult({ verdict: 'deny' });
 
         const scoped = await scopeReadQuery(new Query({}), actor, { names });
-        expect(appended(scoped)).toEqual(inArray('id', []));
+        expect(appendedCondition(scoped)).toEqual(inArray('id', []));
     });
 
-    it('narrows post to the actor realm, on the given column', async () => {
+    it('narrows a post verdict to the actor realm on the given column', async () => {
         const actor = createActor({ id: 'r1', name: 'r1' });
 
         const scoped = await scopeReadQuery(new Query({}), actor, { names, realmAttributeName: 'nodeRealmId' });
-        expect(appended(scoped)).toEqual(eq('nodeRealmId', 'r1'));
+        expect(appendedCondition(scoped)).toEqual(eq('nodeRealmId', 'r1'));
         expect(actor.permissionEvaluator.compileCalls[0]).toEqual({ name: names, realmAttributeName: 'nodeRealmId' });
     });
 
-    it('narrows post to nothing for an actor without a realm', async () => {
+    it('narrows a post verdict to nothing for an actor without a realm', async () => {
         const scoped = await scopeReadQuery(new Query({}), createActor(), { names });
-        expect(appended(scoped)).toEqual(inArray('id', []));
+        expect(appendedCondition(scoped)).toEqual(inArray('id', []));
     });
 });

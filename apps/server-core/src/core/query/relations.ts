@@ -9,19 +9,20 @@ import type { IQuery } from '@rapiq/core';
 import type { ActorContext } from '@privateaim/server-kit';
 
 /**
- * Pre-gate every requested relation with its target's read one-of, so an
- * `include` cannot reach an entity its direct read would refuse.
+ * Check the read grant of every requested relation, so an `include` cannot
+ * reach an entity that a direct read of it would refuse.
  *
- * ponytail: capability only. A realm-scoped target (registryProject) is not
- * narrowed per joined row — that needs a join-condition hook (plan 021).
+ * Deliberate simplification: only the grant is checked. Joined rows of a
+ * realm-scoped target (registryProject) are not narrowed by realm; that needs
+ * a hook on the join condition (plan 021).
  */
 export async function preEvaluateRelationReads(
     query: IQuery,
     actor: ActorContext,
-    readNames: Record<string, string[]>,
+    readPermissionsByRelation: Record<string, string[]>,
 ): Promise<void> {
     for (const relation of query.relations.value) {
-        const names = readNames[relation.name];
+        const names = readPermissionsByRelation[relation.name];
         if (names) {
             await actor.permissionEvaluator.preEvaluateOneOf({ name: names });
         }

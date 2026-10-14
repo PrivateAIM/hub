@@ -26,18 +26,16 @@ import type { INodeRepository, INodeService, IRegistryManager } from './types.ts
 
 /**
  * Nodes are a global catalog: any one of these grants reads every node, in
- * every realm (capability gate only, no realm narrowing).
+ * every realm. The grant is checked, but results are not narrowed by realm.
  */
-const READ_PERMISSIONS = [
+export const NODE_READ_PERMISSIONS = [
     PermissionName.NODE_READ,
     PermissionName.NODE_CREATE,
     PermissionName.NODE_UPDATE,
     PermissionName.NODE_DELETE,
 ];
 
-/**
- * `include` reaches these entities: each requires its own read grant.
- */
+/** Relations an `include` can join, each guarded by its own read grant. */
 const RELATION_READ_PERMISSIONS = {
     registry: REGISTRY_READ_PERMISSIONS,
     registryProject: REGISTRY_PROJECT_READ_PERMISSIONS,
@@ -66,15 +64,17 @@ export class NodeService extends AbstractEntityService implements INodeService {
         const decoded = decodeQuery(query, { schema: nodeSchema });
         await preEvaluateRelationReads(decoded, actor, RELATION_READ_PERMISSIONS);
 
-        return this.repository.findMany(await scopeReadQuery(
+        const scoped = await scopeReadQuery(
             decoded,
             actor,
-            { names: READ_PERMISSIONS, compile: false },
-        ));
+            { names: NODE_READ_PERMISSIONS, compile: false },
+        );
+
+        return this.repository.findMany(scoped);
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Node> {
-        await actor.permissionEvaluator.preEvaluateOneOf({ name: READ_PERMISSIONS });
+        await actor.permissionEvaluator.preEvaluateOneOf({ name: NODE_READ_PERMISSIONS });
 
         let entity: Node | null;
         if (query) {

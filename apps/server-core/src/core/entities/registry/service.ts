@@ -36,7 +36,10 @@ type RegistryServiceContext = {
  */
 const SECRET_FIELD = 'accountSecret' satisfies keyof Registry;
 
-/** Global catalog: capability gate only, no realm narrowing. */
+/**
+ * Registries are a global catalog: any one of these grants reads every
+ * registry. The grant is checked, but results are not narrowed by realm.
+ */
 export const REGISTRY_READ_PERMISSIONS = [
     PermissionName.REGISTRY_READ,
     PermissionName.REGISTRY_MANAGE,

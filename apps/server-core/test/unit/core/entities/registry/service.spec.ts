@@ -83,7 +83,8 @@ describe('RegistryService', () => {
         it('should throw PermissionDeniedError when requesting secret without permission', async () => {
             repository.seed(createTestRegistry());
 
-            // read gate (preEvaluateOneOf) passes, REGISTRY_MANAGE (preEvaluate) is denied
+            // The read gate (preEvaluateOneOf) passes; only the REGISTRY_MANAGE
+            // check guarding the secret (preEvaluate) is denied.
             const actor = createAllowAllActor();
             actor.permissionEvaluator.deny('preEvaluate', new PermissionDeniedError('test'));
 
@@ -92,7 +93,7 @@ describe('RegistryService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should only run the read gate when secret field is not requested', async () => {
+        it('should only run the read gate when the secret field is not requested', async () => {
             repository.seed(createTestRegistry());
 
             const actor = createAllowAllActor();

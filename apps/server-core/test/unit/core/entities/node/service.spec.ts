@@ -100,7 +100,7 @@ describe('NodeService', () => {
             expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
         });
 
-        it('should not narrow to the actor realm', async () => {
+        it('should list nodes from every realm, not just the actor realm', async () => {
             repository.seed([
                 createTestNode({ id: 'n-1', realmId: 'realm-1' }),
                 createTestNode({ id: 'n-2', realmId: 'realm-2' }),

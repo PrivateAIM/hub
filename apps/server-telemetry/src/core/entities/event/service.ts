@@ -20,6 +20,12 @@ import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { eventSchema } from './schema.ts';
 import type { IEventRepository, IEventService } from './types.ts';
 
+/** EVENT_DELETE implies read: a delete-only role must still list what it can delete. */
+const READ_PERMISSIONS = [
+    PermissionName.EVENT_READ,
+    PermissionName.EVENT_DELETE,
+];
+
 type EventServiceContext = {
     repository: IEventRepository;
 };
@@ -36,14 +42,16 @@ export class EventService extends AbstractEntityService implements IEventService
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Event>> {
-        return this.repository.findMany(await this.scopeQuery(decodeQuery(query, { schema: eventSchema }), actor));
+        const decoded = decodeQuery(query, { schema: eventSchema });
+
+        return this.repository.findMany(await this.scopeRead(decoded, actor));
     }
 
     async getOne(id: string, actor: ActorContext): Promise<Event> {
         // Read through the collection's scope, so an event outside the
         // actor's reach answers 404 exactly like a missing one.
-        const query = await this.scopeQuery(new Query({}), actor);
-        const { data } = await this.repository.findMany(appendQueryConditions(query, eq('id', id)));
+        const scoped = await this.scopeRead(new Query({}), actor);
+        const { data } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
 
         if (data.length === 0) {
             throw new EntityNotFoundError({ entity: 'event' });
@@ -52,13 +60,12 @@ export class EventService extends AbstractEntityService implements IEventService
         return data[0];
     }
 
-    protected scopeQuery(query: IQuery, actor: ActorContext): Promise<IQuery> {
-        return scopeReadQuery(query, actor, {
-            names: [
-                PermissionName.EVENT_READ,
-                PermissionName.EVENT_DELETE,
-            ],
-        });
+    /**
+     * The read scope for list and record alike: pre-gated on a read
+     * permission and narrowed to what the caller's grant reaches.
+     */
+    protected scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+        return scopeReadQuery(query, actor, { names: READ_PERMISSIONS });
     }
 
     async create(data: Partial<Event>, actor: ActorContext): Promise<Event> {

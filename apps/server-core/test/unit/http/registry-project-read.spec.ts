@@ -43,7 +43,7 @@ describe('registry-project read authorization', () => {
 
     it.each([
         PermissionName.REGISTRY_PROJECT_READ,
-        // registry admins: the same permission already governs the row's secret
+        // Registry admins may read too: REGISTRY_MANAGE already governs the row's secret.
         PermissionName.REGISTRY_MANAGE,
     ])('answers 200 for an identity holding %s', async (name) => {
         const response = await list(await createRestrictedAccessToken([name]));

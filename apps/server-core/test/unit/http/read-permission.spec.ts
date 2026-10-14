@@ -53,9 +53,9 @@ describe('read permission on global catalogs', () => {
         ['/nodes?include=registry', [PermissionName.NODE_READ], PermissionName.REGISTRY_READ],
         ['/nodes?include=registryProject', [PermissionName.NODE_READ], PermissionName.REGISTRY_PROJECT_READ],
         ['/registry-projects?include=registry', [PermissionName.REGISTRY_PROJECT_READ], PermissionName.REGISTRY_READ],
-    ])('GET %s requires the related read permission', async (path, base, related) => {
-        expect(await status(path, await createRestrictedAccessToken(base))).toBe(403);
-        expect(await status(path, await createRestrictedAccessToken([...base, related]))).toBe(200);
+    ])('GET %s requires the related read permission', async (path, basePermissions, relatedPermission) => {
+        expect(await status(path, await createRestrictedAccessToken(basePermissions))).toBe(403);
+        expect(await status(path, await createRestrictedAccessToken([...basePermissions, relatedPermission]))).toBe(200);
     });
 
     it.each([
