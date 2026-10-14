@@ -92,7 +92,7 @@ describe('nested secret fields', () => {
 
     it.each([
         // Reading the collection itself needs the read grant.
-        ['a restricted user', () => createRestrictedAccessToken([PermissionName.REGISTRY_PROJECT_READ])],
+        ['a restricted user', () => createRestrictedAccessToken([PermissionName.REGISTRY_PROJECT_READ, PermissionName.REGISTRY_READ])],
         // The per-resource gate only reaches the root of its own endpoint, so
         // the relation path is closed for every caller, not gated per actor.
         ['the admin', createAdminAccessToken],

@@ -37,7 +37,7 @@ type RegistryServiceContext = {
 const SECRET_FIELD = 'accountSecret' satisfies keyof Registry;
 
 /** Global catalog: capability gate only, no realm narrowing. */
-const READ_PERMISSIONS = [
+export const REGISTRY_READ_PERMISSIONS = [
     PermissionName.REGISTRY_READ,
     PermissionName.REGISTRY_MANAGE,
 ];
@@ -63,7 +63,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         const scoped = await scopeReadQuery(
             decodeQuery(query, { schema: registrySchema }),
             actor,
-            { names: READ_PERMISSIONS, compile: false },
+            { names: REGISTRY_READ_PERMISSIONS, compile: false },
         );
         await this.checkSecretFieldAccess(query, actor);
 
@@ -71,7 +71,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Registry> {
-        await actor.permissionEvaluator.preEvaluateOneOf({ name: READ_PERMISSIONS });
+        await actor.permissionEvaluator.preEvaluateOneOf({ name: REGISTRY_READ_PERMISSIONS });
 
         if (query) {
             await this.checkSecretFieldAccess(query, actor);

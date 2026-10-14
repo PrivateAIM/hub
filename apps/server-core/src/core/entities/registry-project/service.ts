@@ -15,10 +15,11 @@ import {
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
-import { holdsPermission } from '../../utils/index.ts';
+import { holdsPermission, isPermissionDenial } from '../../utils/index.ts';
 import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { appendQueryConditions, decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
+import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
 import type { IRegistryManager } from '../node/types.ts';
 import type { IRegistryProjectRepository, IRegistryProjectService } from './types.ts';
 import { registryProjectSchema } from './schema.ts';
@@ -41,11 +42,16 @@ const SECRET_FIELD = 'accountSecret' satisfies keyof RegistryProject;
  * REGISTRY_MANAGE reads too: it already governs this row's secret (below),
  * the credentials route and the registry admin UI.
  */
-const READ_PERMISSIONS = [
+export const REGISTRY_PROJECT_READ_PERMISSIONS = [
     PermissionName.REGISTRY_PROJECT_READ,
     PermissionName.REGISTRY_PROJECT_MANAGE,
     PermissionName.REGISTRY_MANAGE,
 ];
+
+/**
+ * `include` reaches these entities: each requires its own read grant.
+ */
+const RELATION_READ_PERMISSIONS = { registry: REGISTRY_READ_PERMISSIONS } satisfies Partial<Record<keyof RegistryProject, string[]>>;
 
 export class RegistryProjectService extends AbstractEntityService implements IRegistryProjectService {
     protected repository: IRegistryProjectRepository;
@@ -95,17 +101,27 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     /**
-     * The read scope for list and record alike. A node's own client holds no
-     * read grant and reaches exactly its own project; everyone else is
-     * pre-gated and narrowed by their grant's reach.
+     * The read scope for list and record alike: pre-gated and narrowed by
+     * the caller's grant. Only when that is refused does a node's own client
+     * fall back to exactly its own project — a grant it holds still applies.
      */
     private async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
-        const ownProjectId = await this.findOwnNodeProjectId(actor);
-        if (ownProjectId) {
+        await preEvaluateRelationReads(query, actor, RELATION_READ_PERMISSIONS);
+
+        try {
+            return await scopeReadQuery(query, actor, { names: REGISTRY_PROJECT_READ_PERMISSIONS });
+        } catch (e) {
+            if (!isPermissionDenial(e)) {
+                throw e;
+            }
+
+            const ownProjectId = await this.findOwnNodeProjectId(actor);
+            if (!ownProjectId) {
+                throw e;
+            }
+
             return appendQueryConditions(query, eq('id', ownProjectId));
         }
-
-        return scopeReadQuery(query, actor, { names: READ_PERMISSIONS });
     }
 
     private async findOwnNodeProjectId(actor: ActorContext): Promise<string | undefined> {

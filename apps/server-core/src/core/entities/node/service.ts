@@ -18,7 +18,9 @@ import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { appendQueryConditions, decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
+import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
+import { REGISTRY_PROJECT_READ_PERMISSIONS } from '../registry-project/service.ts';
 import { nodeSchema } from './schema.ts';
 import type { INodeRepository, INodeService, IRegistryManager } from './types.ts';
 
@@ -32,6 +34,14 @@ const READ_PERMISSIONS = [
     PermissionName.NODE_UPDATE,
     PermissionName.NODE_DELETE,
 ];
+
+/**
+ * `include` reaches these entities: each requires its own read grant.
+ */
+const RELATION_READ_PERMISSIONS = {
+    registry: REGISTRY_READ_PERMISSIONS,
+    registryProject: REGISTRY_PROJECT_READ_PERMISSIONS,
+} satisfies Partial<Record<keyof Node, string[]>>;
 
 type NodeServiceContext = {
     repository: INodeRepository;
@@ -53,8 +63,11 @@ export class NodeService extends AbstractEntityService implements INodeService {
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Node>> {
+        const decoded = decodeQuery(query, { schema: nodeSchema });
+        await preEvaluateRelationReads(decoded, actor, RELATION_READ_PERMISSIONS);
+
         return this.repository.findMany(await scopeReadQuery(
-            decodeQuery(query, { schema: nodeSchema }),
+            decoded,
             actor,
             { names: READ_PERMISSIONS, compile: false },
         ));
@@ -63,14 +76,16 @@ export class NodeService extends AbstractEntityService implements INodeService {
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Node> {
         await actor.permissionEvaluator.preEvaluateOneOf({ name: READ_PERMISSIONS });
 
-        const entity = query ?
-            await this.repository.findMany(
-                appendQueryConditions(
-                    decodeQuery(query, { schema: nodeSchema, parameters: ['fields', 'relations'] }),
-                    eq('id', id),
-                ),
-            ).then((r) => r.data[0]) :
-            await this.repository.findOneById(id);
+        let entity: Node | null;
+        if (query) {
+            const decoded = decodeQuery(query, { schema: nodeSchema, parameters: ['fields', 'relations'] });
+            await preEvaluateRelationReads(decoded, actor, RELATION_READ_PERMISSIONS);
+
+            entity = await this.repository.findMany(appendQueryConditions(decoded, eq('id', id)))
+                .then((r) => r.data[0]);
+        } else {
+            entity = await this.repository.findOneById(id);
+        }
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'node' });

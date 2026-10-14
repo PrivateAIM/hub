@@ -47,4 +47,21 @@ describe('read permission on global catalogs', () => {
         expect(await status(path, await createRestrictedAccessToken([]))).toBe(403);
         expect(await status(path, await createRestrictedAccessToken([permissionName]))).toBe(200);
     });
+
+    // An include must not reach an entity its direct read would refuse.
+    it.each([
+        ['/nodes?include=registry', [PermissionName.NODE_READ], PermissionName.REGISTRY_READ],
+        ['/nodes?include=registryProject', [PermissionName.NODE_READ], PermissionName.REGISTRY_PROJECT_READ],
+        ['/registry-projects?include=registry', [PermissionName.REGISTRY_PROJECT_READ], PermissionName.REGISTRY_READ],
+    ])('GET %s requires the related read permission', async (path, base, related) => {
+        expect(await status(path, await createRestrictedAccessToken(base))).toBe(403);
+        expect(await status(path, await createRestrictedAccessToken([...base, related]))).toBe(200);
+    });
+
+    it.each([
+        '/registry-projects/not-a-uuid',
+        '/registry-projects?filter[id]=not-a-uuid',
+    ])('GET %s answers 400 for a malformed id', async (path) => {
+        expect(await status(path, await createRestrictedAccessToken([PermissionName.REGISTRY_PROJECT_READ]))).toBe(400);
+    });
 });

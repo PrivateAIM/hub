@@ -257,6 +257,42 @@ describe('RegistryProjectService', () => {
             expect(result.data.map((e) => e.id)).toEqual(['rp-1']);
         });
 
+        it('should apply a read grant a node-client holds instead of narrowing it to its own project', async () => {
+            const clientId = randomUUID();
+
+            repository.seed([
+                createTestRegistryProject({ id: 'rp-1' }),
+                createTestRegistryProject({ id: 'rp-2' }),
+            ]);
+            nodeRepository.seed({
+                id: randomUUID(),
+                clientId,
+                registryProjectId: 'rp-1',
+            } as Node);
+
+            const actor = createAllowAllActor('realm-1');
+            actor.identity = { id: clientId, type: 'client' };
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            const result = await service.getMany({}, actor);
+            expect(result.data.map((e) => e.id).sort()).toEqual(['rp-1', 'rp-2']);
+        });
+
+        it('should require the registry read grant for include=registry', async () => {
+            // Deny ONLY the registry read: the registry-project read itself passes,
+            // so a rejection can only come from the relation gate.
+            const actor = createAllowAllActor('realm-1');
+            actor.permissionEvaluator.setBehavior(({ method, ctx }) => {
+                const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
+                if (method === 'preEvaluateOneOf' && names.includes(PermissionName.REGISTRY_READ)) {
+                    throw new PermissionDeniedError();
+                }
+            });
+
+            await expect(service.getMany({}, actor)).resolves.toBeDefined();
+            await expect(service.getMany({ include: 'registry' }, actor)).rejects.toThrow(PermissionDeniedError);
+        });
+
         it('should not mistake a failing permission check for a denial', async () => {
             // Only a denial may fall through to the node-client fallback; an
             // infrastructure failure must surface instead of being read as

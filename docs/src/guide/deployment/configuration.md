@@ -184,12 +184,20 @@ Before upgrading:
   the storage service, the message broker — get 403 on `/nodes`.
 - A node client still reads its own registry project without a grant: on
   `GET /registry-projects` (narrowed to that one project) and on
-  `GET /registry-projects/:id`.
+  `GET /registry-projects/:id`. A read grant the node client is given applies
+  as for any other caller.
 
-Known gaps: relations requested via `include` (e.g.
-`/nodes?include=registryProject`) are not yet gated by the related entity's read
-permission, and the registry-project realtime room still broadcasts every realm's
-projects to a subscriber holding `registry_manage` or `registry_project_manage`.
+Relations requested via `include` need the related entity's read permission too:
+`/nodes?include=registry` needs `registry_read` (or `registry_manage`),
+`/nodes?include=registryProject` and the registry-project read one-of, and
+`/registry-projects?include=registry` the registry one. A malformed id
+(`GET /events/not-a-uuid`, `filter[id]=not-a-uuid`) answers 400.
+
+Known gaps: projects joined through `include=registryProject` are not narrowed to
+the caller's realm reach; includes within the project/analysis family
+(`include=node`, `include=masterImage`) are not gated yet; and the
+registry-project realtime room still broadcasts every realm's projects to a
+subscriber holding `registry_manage` or `registry_project_manage`.
 
 ## Authup upgrade to beta.69
 

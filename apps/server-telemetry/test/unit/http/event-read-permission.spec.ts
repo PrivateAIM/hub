@@ -30,7 +30,13 @@ describe('event read permission', () => {
         await suite.teardown();
     });
 
-    const getEvents = (token: string) => fetch(`${baseURL}/events`, { headers: { authorization: `Bearer ${token}` } });
+    const getEvents = (token: string, suffix = '') => fetch(`${baseURL}/events${suffix}`, { headers: { authorization: `Bearer ${token}` } });
+
+    it('answers 400 for a malformed id', async () => {
+        const response = await getEvents(await createRestrictedAccessToken([PermissionName.EVENT_READ]), '/not-a-uuid');
+
+        expect(response.status).toBe(400);
+    });
 
     it('answers 403 for an identity holding no read permission', async () => {
         const response = await getEvents(await createRestrictedAccessToken());
