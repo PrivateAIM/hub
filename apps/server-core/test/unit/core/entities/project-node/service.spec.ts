@@ -309,18 +309,36 @@ describe('ProjectNodeService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it.each([
-            PermissionName.PROJECT_CREATE,
-            PermissionName.PROJECT_UPDATE,
-        ])('should delete when the actor holds only %s', async (permission) => {
+        it('should delete when the actor holds PROJECT_UPDATE', async () => {
             const pn = createTestProjectNode({ projectId });
             repository.seed(pn);
 
             const result = await service.delete(
                 pn.id,
-                createPermissionActor({ realm: { id: 'realm-1', name: 'realm-1' }, permissions: [permission] }),
+                createPermissionActor({
+                    realm: { id: 'realm-1', name: 'realm-1' },
+                    permissions: [PermissionName.PROJECT_UPDATE],
+                }),
             );
             expect(result.id).toBe(pn.id);
+        });
+
+        // Removing a node changes an existing project: PROJECT_CREATE alone
+        // must not detach nodes from projects the actor cannot update.
+        it('should deny delete when the actor holds only PROJECT_CREATE', async () => {
+            const pn = createTestProjectNode({ projectId });
+            repository.seed(pn);
+
+            await expect(
+                service.delete(
+                    pn.id,
+                    createPermissionActor({
+                        realm: { id: 'realm-1', name: 'realm-1' },
+                        permissions: [PermissionName.PROJECT_CREATE],
+                    }),
+                ),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
         });
 
         it('should deny delete when the actor holds neither project permission', async () => {

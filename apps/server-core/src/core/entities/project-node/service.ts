@@ -67,8 +67,8 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     async create(data: Partial<ProjectNode>, actor: ActorContext): Promise<ProjectNode> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
-        // Either suffices: assigning a node to (or removing it from) a project
-        // is part of creating or editing that project.
+        // Either suffices: attaching a node is part of creating a project as
+        // well as of editing one.
         await actor.permissionEvaluator.preEvaluateOneOf({
             name: [
                 PermissionName.PROJECT_CREATE,
@@ -123,14 +123,10 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
     }
 
     async delete(id: string, actor: ActorContext): Promise<ProjectNode> {
-        // Either suffices: assigning a node to (or removing it from) a project
-        // is part of creating or editing that project.
-        await actor.permissionEvaluator.preEvaluateOneOf({
-            name: [
-                PermissionName.PROJECT_CREATE,
-                PermissionName.PROJECT_UPDATE,
-            ],
-        });
+        // Removing a node from a project changes an EXISTING project, which is
+        // an update. PROJECT_CREATE alone must not suffice — unlike `create`,
+        // where attaching nodes is part of setting a project up.
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
 
         const entity = await this.repository.findOneBy({ id });
         if (!entity) {
