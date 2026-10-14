@@ -28,16 +28,24 @@ import type { IStorageAdapter } from '../../../src/core/storage/types.ts';
 import { BucketClearHandler } from '../../../src/app/components/bucket/handlers/clear/index.ts';
 
 /**
- * Delegates to a real adapter, but fails object removal like an unreachable backend.
+ * Delegates to a real adapter, but fails one operation like an unreachable backend.
  */
-class FailingRemoveStorageAdapter implements IStorageAdapter {
+class FailingStorageAdapter implements IStorageAdapter {
     protected inner: IStorageAdapter;
 
-    constructor(inner: IStorageAdapter) {
+    protected failOn: 'bucketExists' | 'removeObjects';
+
+    constructor(inner: IStorageAdapter, failOn: 'bucketExists' | 'removeObjects') {
         this.inner = inner;
+        this.failOn = failOn;
     }
 
-    bucketExists(name: string) { return this.inner.bucketExists(name); }
+    async bucketExists(name: string) {
+        if (this.failOn === 'bucketExists') {
+            throw new Error('storage unavailable');
+        }
+        return this.inner.bucketExists(name);
+    }
 
     makeBucket(name: string, region?: string) { return this.inner.makeBucket(name, region); }
 
@@ -51,8 +59,11 @@ class FailingRemoveStorageAdapter implements IStorageAdapter {
 
     removeObject(bucket: string, key: string) { return this.inner.removeObject(bucket, key); }
 
-    async removeObjects(): Promise<void> {
-        throw new Error('storage unavailable');
+    async removeObjects(bucket: string, keys: string[]): Promise<void> {
+        if (this.failOn === 'removeObjects') {
+            throw new Error('storage unavailable');
+        }
+        return this.inner.removeObjects(bucket, keys);
     }
 
     listObjects(bucket: string, prefix?: string) { return this.inner.listObjects(bucket, prefix); }
@@ -301,15 +312,19 @@ describe('bucket HTTP endpoints', () => {
             return { context, emitted };
         }
 
-        it('should rethrow a transient failure (bus retry) and keep the files', async () => {
-            const handler = new BucketClearHandler({ storage: new FailingRemoveStorageAdapter(suite.storage()) });
+        it('should rethrow an unreachable backend (bus retry) before removing anything', async () => {
+            const handler = new BucketClearHandler({ storage: new FailingStorageAdapter(suite.storage(), 'bucketExists') });
             const { context, emitted } = createClearContext();
+            const before = await suite.client().bucketFile.getMany({ filters: { bucketId } });
+            expect(before.data.length).toBeGreaterThanOrEqual(1);
 
             await expect(handler.handle({ id: bucketId }, context)).rejects.toThrow('storage unavailable');
             expect(emitted).toContain(BucketEvent.CLEARING_FAILED);
 
-            const files = await suite.client().bucketFile.getMany({ filters: { bucketId } });
-            expect(files.data.length).toBeGreaterThanOrEqual(1);
+            const after = await suite.client().bucketFile.getMany({ filters: { bucketId } });
+            expect(after.meta.total).toBe(before.meta.total);
+            const keys = before.data.map((file) => file.hash);
+            expect(await suite.storage().listObjects(toBucketName(bucketId))).toEqual(expect.arrayContaining(keys));
         });
 
         it('should not rethrow for a missing bucket (no retry)', async () => {
@@ -343,6 +358,33 @@ describe('bucket HTTP endpoints', () => {
 
             const remaining = await suite.storage().listObjects(bucketName);
             expect(remaining.filter((key) => keys.includes(key))).toEqual([]);
+        });
+
+        it('should still clear the rows when object removal fails (no broken files)', async () => {
+            const filePath = path.join(import.meta.dirname, '../../data/file.json');
+            const formData = new FormData();
+            formData.append('file[0]', new Blob([await fs.promises.readFile(filePath)]), 'clear-leftover.json');
+            await fetch(`${getBaseURL()}/buckets/${bucketId}/upload`, {
+                method: 'POST',
+                headers: { Authorization: authorization },
+                body: formData,
+            });
+
+            const before = await suite.client().bucketFile.getMany({ filters: { bucketId } });
+            expect(before.data.length).toBe(1);
+
+            const handler = new BucketClearHandler({ storage: new FailingStorageAdapter(suite.storage(), 'removeObjects') });
+            const { context, emitted } = createClearContext();
+
+            await expect(handler.handle({ id: bucketId }, context)).resolves.toBeUndefined();
+            expect(emitted).toContain(BucketEvent.CLEARING_FINISHED);
+            expect(emitted).not.toContain(BucketEvent.CLEARING_FAILED);
+
+            const after = await suite.client().bucketFile.getMany({ filters: { bucketId } });
+            expect(after.meta.total).toBe(0);
+
+            // the object is a harmless leftover, removed with the bucket.
+            expect(await suite.storage().listObjects(toBucketName(bucketId))).toContain(before.data[0].hash);
         });
 
         it('should return 404 for non-existent bucket', async () => {

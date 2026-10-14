@@ -95,14 +95,30 @@ export class BucketClearHandler implements ComponentHandler<
         // captured before remove(), which unsets the ids
         const fileIds = files.map((file) => file.id);
 
-        const bucketName = toBucketName(entity.id);
-        if (files.length > 0 && await this.storage.bucketExists(bucketName)) {
-            await this.storage.removeObjects(bucketName, files.map((file) => file.hash));
-        }
-
-        // remove() rather than a raw delete, so the subscriber publishes a domain event per file
         if (files.length > 0) {
+            // probe the backend first: an unreachable one fails (and is retried)
+            // before anything is removed.
+            const bucketName = toBucketName(entity.id);
+            const bucketExists = await this.storage.bucketExists(bucketName);
+
+            // rows before objects: an object without a row is a harmless leftover,
+            // a row without its object is a broken file. remove() (not a raw delete)
+            // runs in one transaction and publishes a domain event per file.
             await fileRepository.remove(files);
+
+            if (bucketExists) {
+                try {
+                    await this.storage.removeObjects(bucketName, files.map((file) => file.hash));
+                } catch (e) {
+                    // the rows are gone, so the clear stands; leftovers go with the bucket delete.
+                    this.logger?.warn({
+                        message: `Cleared bucket, but ${files.length} stored objects could not be removed`,
+                        error: e instanceof Error ? e.message : String(e),
+                        [LogFlag.REF_ID]: entity.id,
+                        [LogFlag.REF_TYPE]: DomainType.BUCKET,
+                    });
+                }
+            }
         }
 
         await context.handle(
