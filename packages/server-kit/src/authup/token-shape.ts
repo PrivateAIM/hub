@@ -34,7 +34,8 @@ const BASE64URL_SEGMENT = /^[A-Za-z0-9_-]+$/;
  * too short, too long or otherwise unparseable was therefore reported as
  * the hub service client itself (`active: true`, `global`, its grants), and
  * cached under the caller's string. Anything that passes this guard also
- * passes authup's validator, so it is introspected as itself.
+ * passes authup's validator, so it is introspected as itself. Fixed upstream
+ * in authup#3724 (the first release after 1.0.0-beta.69).
  */
 export function isIntrospectableToken(token: unknown): token is string {
     if (typeof token !== 'string') {

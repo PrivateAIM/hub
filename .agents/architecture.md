@@ -260,8 +260,8 @@ caller can do, not who it is: `resolveAuthupPolicySubject` always places the ide
 places its grants only for a token scoped `global` (`[]` otherwise), so the binding policy
 denies every permission (403) while identity-reading policies — and hub's identity-based
 checks (credential ownership, the messenger mailbox, bucket ownership, socket rooms) — still
-see the real caller. This diverges from authup's `useRequestPolicyIdentity`, which drops the
-identity; an upstream change to match is being proposed. The credential needs
+see the real caller. Authup applies the same rule since authup#3723 (`useRequestPolicyGrants`).
+The credential needs
 `permission_read` at `ownOrNull` or wider. Fetch failures propagate; no cross-request
 catalog cache or name-only fallback is installed. Token-verifier caching and socket
 connection lifetimes remain unchanged.

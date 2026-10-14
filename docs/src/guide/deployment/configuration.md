@@ -37,9 +37,8 @@ identity, but is evaluated with **no grants**, so every permission check denies
 with 403. Policies that read the identity still see the real caller, and paths
 that authorize by identity rather than by permission — a node or analysis client
 reading its own credentials, the messenger mailbox, bucket ownership, realm
-socket rooms — still honour such a token. (Authup itself currently drops the
-identity for such a token; a change to match this behaviour is being proposed
-upstream.)
+socket rooms — still honour such a token. Authup applies the same rule since
+authup#3723.
 client-ui requests `global openid`, and Authup's client-credentials and password
 grants always issue `global`.
 
@@ -96,8 +95,9 @@ acted on it as that client.
 
 Every Hub service now refuses a credential that is not structurally a compact
 JWS within those bounds **before** introspecting it, answering 401 (sockets:
-connection refused). Upgrading Authup to the release that fixes the fallback
-closes the upstream half; until then the Hub-side guard is what stops it. Any
+connection refused). The fallback itself is fixed upstream in authup#3724;
+upgrading Authup to the first release after `1.0.0-beta.69` closes the upstream
+half, until then the Hub-side guard is what stops it. Any
 token-verifier cache (Redis `token:*` keys) may hold entries for such strings —
 flush it once after upgrading.
 
