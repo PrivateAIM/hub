@@ -6,13 +6,14 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { MessageBus } from './module';
+import type { MessageBus } from 'ergos';
 
 export const MESSAGE_BUS_MODULE_NAME = 'messageBus';
 
 export const MessageBusInjectionKey = new TypedToken<MessageBus>('MessageBus');
 
-export enum MessageBusRoutingType {
-    WORK = 'work',
-    PUB_SUB = 'pubSub',
-}
+/**
+ * Topic exchange of PUB_SUB routings without a namespace. Part of the wire
+ * contract: a different name is a different exchange.
+ */
+export const MESSAGE_BUS_TOPIC_EXCHANGE = 'FLAME';

@@ -30,7 +30,8 @@
     "dependencies": {
         "@privateaim/core-kit": "^0.18.0",
         "@privateaim/kit": "^0.18.0",
-        "@privateaim/server-kit": "^0.18.0"
+        "@privateaim/server-kit": "^0.18.0",
+        "ergos": "file:../../../../tada5hi/ergos"
     },
     "devDependencies": {
         "docken": "^2.0.2"

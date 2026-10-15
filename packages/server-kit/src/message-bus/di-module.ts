@@ -6,18 +6,14 @@
  */
 
 import type { IContainer } from 'eldin';
+import type { IMessageBusDriver } from 'ergos';
+import { MemoryMessageBusDriver, MessageBus } from 'ergos';
+import { AmqpMessageBusDriver } from 'ergos/amqp';
 import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../config/constants';
 import { LOGGER_MODULE_NAME, LoggerInjectionKey } from '../logger/constants';
-import { MESSAGE_BUS_MODULE_NAME, MessageBusInjectionKey } from './constants';
-import { AmqpMessageBusDriver } from './driver/amqp';
-import { MemoryMessageBusDriver } from './driver/memory';
-import type { IMessageBusDriver } from './driver/types';
-import { MessageBus } from './module';
-
-export type MessageBusModuleOptions = {
-    driverFactory?: (container: IContainer) => IMessageBusDriver,
-};
+import { MESSAGE_BUS_MODULE_NAME, MESSAGE_BUS_TOPIC_EXCHANGE, MessageBusInjectionKey } from './constants';
+import type { MessageBusModuleOptions } from './types';
 
 export class MessageBusModule implements IModule {
     readonly name = MESSAGE_BUS_MODULE_NAME;
@@ -28,6 +24,8 @@ export class MessageBusModule implements IModule {
     ];
 
     private options: MessageBusModuleOptions;
+
+    private driver: IMessageBusDriver | undefined;
 
     constructor(options: MessageBusModuleOptions = {}) {
         this.options = options;
@@ -48,13 +46,25 @@ export class MessageBusModule implements IModule {
                 undefined;
 
             if (connectionString) {
-                driver = new AmqpMessageBusDriver({ connectionString, logger });
+                driver = new AmqpMessageBusDriver({
+                    connectionString,
+                    logger,
+                    defaultTopicExchange: MESSAGE_BUS_TOPIC_EXCHANGE,
+                });
             } else {
                 driver = new MemoryMessageBusDriver();
             }
         }
 
+        this.driver = driver;
+
         const bus = new MessageBus({ driver, logger });
         container.register(MessageBusInjectionKey, { useValue: bus });
+    }
+
+    async teardown(): Promise<void> {
+        const { driver } = this;
+        this.driver = undefined;
+        await driver?.close?.();
     }
 }
