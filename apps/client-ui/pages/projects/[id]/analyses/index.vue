@@ -44,6 +44,7 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
             [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionName.ANALYSIS_READ,
                 PermissionName.ANALYSIS_CREATE,
                 PermissionName.ANALYSIS_UPDATE,
                 PermissionName.ANALYSIS_DELETE,

@@ -19,6 +19,7 @@ import { FakeNodeRepository } from '../../../core/entities/node/fake-repository.
 
 const permissions: Record<string, { id: string, name: string }> = {
     [PermissionName.ANALYSIS_UPDATE]: { id: 'perm-analysis-update', name: PermissionName.ANALYSIS_UPDATE },
+    [PermissionName.ANALYSIS_READ]: { id: 'perm-analysis-read', name: PermissionName.ANALYSIS_READ },
     [PermissionName.NODE_READ]: { id: 'perm-node-read', name: PermissionName.NODE_READ },
 };
 
@@ -59,7 +60,7 @@ function grants(authup: ReturnType<typeof createAuthup>) {
 }
 
 describe('syncNodeClientPermissions', () => {
-    it('should grant node_read and analysis_update to every existing node client', async () => {
+    it('should grant node_read, analysis_read and analysis_update to every existing node client', async () => {
         const authup = createAuthup();
         const repository = createRepository([
             {
@@ -87,8 +88,10 @@ describe('syncNodeClientPermissions', () => {
         expect(result).toEqual({ synced: 2, failed: 0 });
         expect(grants(authup)).toEqual([
             { clientId: 'client-1', permissionId: 'perm-analysis-update' },
+            { clientId: 'client-1', permissionId: 'perm-analysis-read' },
             { clientId: 'client-1', permissionId: 'perm-node-read' },
             { clientId: 'client-2', permissionId: 'perm-analysis-update' },
+            { clientId: 'client-2', permissionId: 'perm-analysis-read' },
             { clientId: 'client-2', permissionId: 'perm-node-read' },
         ]);
     });
@@ -114,7 +117,7 @@ describe('syncNodeClientPermissions', () => {
         });
 
         expect(result).toEqual({ synced: 1, failed: 1 });
-        expect(grants(authup).filter((g) => g.clientId === 'client-2')).toHaveLength(2);
+        expect(grants(authup).filter((g) => g.clientId === 'client-2')).toHaveLength(3);
     });
 
     it('should report every node as failed when node_read is not provisioned', async () => {

@@ -10,6 +10,7 @@ import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@pr
 import type {
     Analysis,
     AnalysisBucket,
+    AnalysisNode,
     Node,
     Project,
     ProjectNode,
@@ -33,6 +34,7 @@ import { AnalysisBuilder } from '../../../../../src/core/services/analysis-build
 import { AnalysisConfigurator } from '../../../../../src/core/services/analysis-configurator/module.ts';
 import { AnalysisDistributor } from '../../../../../src/core/services/analysis-distributor/module.ts';
 import { AnalysisStorageManager } from '../../../../../src/core/services/analysis-storage-manager/module.ts';
+import { AnalysisReachService } from '../../../../../src/core/services/analysis-reach/index.ts';
 import {
     FakeEntityRepository,
     createAllowAllActor,
@@ -145,6 +147,11 @@ describe('AnalysisService', () => {
             storageManager,
             recalculator: analysisRecalculator,
             nodeRecalculator,
+            reach: new AnalysisReachService({
+                analysisNodeRepository,
+                analysisRepository,
+                nodeRepository: new FakeEntityRepository<Node>(),
+            }),
         });
     });
 
@@ -155,8 +162,35 @@ describe('AnalysisService', () => {
                 createFullAnalysis({ id: 'a-2' }),
             ]);
 
-            const result = await service.getMany({});
+            const actor = createAllowAllActor();
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            const result = await service.getMany({}, actor);
             expect(result.data).toHaveLength(2);
+        });
+
+        it('should narrow to the own realm and the analyses its nodes take part in', async () => {
+            analysisRepository.seed([
+                createFullAnalysis({ id: 'own', realmId: 'realm-a' }),
+                createFullAnalysis({ id: 'joined', realmId: 'realm-b' }),
+                createFullAnalysis({ id: 'foreign', realmId: 'realm-c' }),
+            ]);
+            analysisNodeRepository.seed({
+                id: 'an-1',
+                analysisId: 'joined',
+                analysisRealmId: 'realm-b',
+                nodeId: 'node-a',
+                nodeRealmId: 'realm-a',
+            } as AnalysisNode);
+
+            const result = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+
+            expect(result.data.map((e) => e.id).sort()).toEqual(['joined', 'own']);
+            expect(result.meta.total).toBe(2);
+        });
+
+        it('should refuse an actor without any analysis read permission', async () => {
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
         });
     });
 
@@ -164,12 +198,26 @@ describe('AnalysisService', () => {
         it('should return entity by ID', async () => {
             analysisRepository.seed(createFullAnalysis());
 
-            const result = await service.getOne('analysis-1');
+            const result = await service.getOne('analysis-1', createNonMasterRealmActor('realm-1'));
             expect(result.id).toBe('analysis-1');
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('nonexistent', createAllowAllActor())).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should answer an analysis out of reach like a missing one', async () => {
+            analysisRepository.seed(createFullAnalysis({ realmId: 'realm-c' }));
+
+            await expect(service.getOne('analysis-1', createNonMasterRealmActor('realm-a')))
+                .rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should not let the master realm read beyond its grant', async () => {
+            analysisRepository.seed(createFullAnalysis({ realmId: 'realm-c' }));
+
+            await expect(service.getOne('analysis-1', createMasterRealmActor('realm-master')))
+                .rejects.toThrow(EntityNotFoundError);
         });
     });
 

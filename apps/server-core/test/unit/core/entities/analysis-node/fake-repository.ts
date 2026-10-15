@@ -30,4 +30,10 @@ export class FakeAnalysisNodeRepository extends FakeEntityRepository<AnalysisNod
     async findManyWithNodeByAnalysis(analysisId: string): Promise<AnalysisNode[]> {
         return super.findManyBy({ analysisId });
     }
+
+    async findAnalysisIds(where: { nodeId: string } | { nodeRealmId: string }): Promise<string[]> {
+        const entities = await super.findManyBy(where);
+
+        return [...new Set(entities.map((entity) => entity.analysisId))];
+    }
 }

@@ -40,6 +40,7 @@ import { AnalysisNodeEventController } from '../../../adapters/http/controllers/
 import { AnalysisClientPermissionController } from '../../../adapters/http/controllers/entities/analysis-client-permission/module.ts';
 import { AuthupClientPermissionStore } from '../database/analysis-client-permission.ts';
 import { AnalysisClientPermissionService } from '../../../core/services/analysis-client-permission/index.ts';
+import { AnalysisReachService } from '../../../core/services/analysis-reach/index.ts';
 import { AnalysisClientCredentialController } from '../../../adapters/http/controllers/entities/analysis-client-credential/module.ts';
 import { NodeClientCredentialController } from '../../../adapters/http/controllers/entities/node-client-credential/module.ts';
 import { NodeRegistryCredentialController } from '../../../adapters/http/controllers/entities/node-registry-credential/module.ts';
@@ -99,6 +100,11 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         registryManager, 
         nodeRepository, 
     });
+    const analysisReachService = new AnalysisReachService({
+        analysisNodeRepository,
+        analysisRepository,
+        nodeRepository,
+    });
     const analysisService = new AnalysisService({
         repository: analysisRepository,
         projectRepository,
@@ -110,6 +116,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         storageManager: container.resolve(AnalysisInjectionKey.StorageManager),
         recalculator: container.resolve(AnalysisInjectionKey.AnalysisRecalculator),
         nodeRecalculator: container.resolve(AnalysisInjectionKey.NodeRecalculator),
+        reach: analysisReachService,
         skipAnalysisApproval: container.resolve(ConfigInjectionKey).skipAnalysisApproval,
     });
     const analysisBucketService = new AnalysisBucketService({ repository: analysisBucketRepository, analysisRepository });
@@ -130,6 +137,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         analysisRepository,
         projectNodeRepository,
         recalculator: container.resolve(AnalysisInjectionKey.NodeRecalculator),
+        reach: analysisReachService,
         skipAnalysisApproval: config.skipAnalysisApproval,
     });
     const analysisNodeEventService = new AnalysisNodeEventService({ repository: analysisNodeEventRepository });

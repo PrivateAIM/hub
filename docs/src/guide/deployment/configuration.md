@@ -244,7 +244,7 @@ before this release carry no realm**, so an `own` grant does not see them;
    provisioned.
 
 **After upgrading:** nothing to do for node clients. server-core re-grants each
-existing node's client its permissions (`analysis_update`, `node_read`) in the
+existing node's client its permissions (`analysis_update`, `analysis_read`, `node_read`) in the
 background — once at start, then hourly — so node-side services (pod
 orchestration, the storage service, the message broker) keep reading `/nodes`.
 Each pass removes any other permission a node client was granted by hand, as
@@ -266,6 +266,59 @@ yielding a client that gets 403 later.
   `include=masterImage`) are not gated yet.
 - The registry-project realtime room still broadcasts every realm's projects to
   a subscriber holding `registry_manage` or `registry_project_manage`.
+
+## Reading analyses requires `analysis_read` and reach
+
+**Breaking for every deployment.** `GET /analyses` and `GET /analysis-nodes`
+(list and record) now need a grant and return only the analyses the caller
+reaches.
+
+**Which permissions allow a read.** `analysis_read`, or any analysis write or
+lifecycle permission: `analysis_create`, `analysis_update`, `analysis_delete`,
+`analysis_approve`, `analysis_execution_start`, `analysis_execution_stop`.
+Holding none of them answers **403**. `analysis_result_read` alone no longer
+lists analyses; pair it with `analysis_read`.
+
+**Which analyses a read returns.**
+
+- **Users** see what their grant's `realm_scope` covers, **plus** every analysis
+  in which a node of their realm takes part (pending or rejected approval
+  included):
+  - `any`: every analysis. The built-in `admin` role and the `system` client
+    hold their grants at `any`.
+  - `own` / `ownOrNull`: analyses of their own realm. Analyses always carry a
+    realm, so the two behave the same here.
+- **The master realm is no longer special.** A master-realm user whose grants
+  are `own` sees only master's own analyses. Give cross-realm roles their
+  analysis grants at `realm_scope: any`.
+- **A node's client** sees exactly the analyses its node takes part in, and an
+  **analysis' client** only its own analysis. Neither gains anything from its
+  realm or from its grants' realm scope. New analysis clients are given
+  `analysis_read`; clients of analyses created before the upgrade are not.
+- **A grant carrying a policy** narrows `GET /analyses` by that policy, but
+  `GET /analysis-nodes` cannot apply it and returns only the rows of
+  analyses the caller's nodes take part in.
+- `GET /analysis-nodes` returns every row of a reachable analysis, so nodes
+  see each other's approval and execution status.
+- A record out of reach answers **404**, like a missing one.
+
+**Before upgrading:**
+
+1. **Add `analysis_read` to your Authup provisioning.** The built-in `admin`
+   role (`*`) only picks up permissions that exist when provisioning runs.
+   Until it exists, every node save fails (creating or editing a node, and
+   assigning its registry), and every existing node client is logged as
+   failed on each hourly re-sync.
+2. Grant `analysis_read` to roles that view analyses without changing them.
+3. Grant the analysis permissions of every role that must see other realms'
+   analyses at `realm_scope: any`.
+4. Make sure the worker's service client (`CLIENT_ID`, default `system`) holds
+   `analysis_read` at `realm_scope: any`; otherwise builds and distributions of
+   other realms' analyses fail with 404. `system` is covered by `*` once the
+   name is provisioned.
+
+**After upgrading:** node clients need nothing. server-core grants each node's
+client `analysis_read` in the background, once at start and then hourly.
 
 ## Authup upgrade to beta.69
 

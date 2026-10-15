@@ -17,7 +17,7 @@ import {
 import { createTestApplication } from '../../app';
 
 /**
- * The global catalogs are readable only with a read grant (or one of the
+ * The global catalogs and the analyses are readable only with a read grant (or one of the
  * entity's write/manage grants); a logged-in caller without one gets 403.
  */
 describe('read permission on global catalogs', () => {
@@ -43,6 +43,9 @@ describe('read permission on global catalogs', () => {
         ['/master-images', PermissionName.MASTER_IMAGE_READ],
         ['/master-image-groups', PermissionName.MASTER_IMAGE_GROUP_READ],
         ['/registries', PermissionName.REGISTRY_READ],
+        // Reach-scoped (plan 021): the grant's realm scope is lowered into the query.
+        ['/analyses', PermissionName.ANALYSIS_READ],
+        ['/analysis-nodes', PermissionName.ANALYSIS_READ],
     ])('GET %s requires %s', async (path, permissionName) => {
         expect(await status(path, await createRestrictedAccessToken([]))).toBe(403);
         expect(await status(path, await createRestrictedAccessToken([permissionName]))).toBe(200);

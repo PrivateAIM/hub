@@ -22,17 +22,20 @@ import {
     it,
 } from 'vitest';
 import { AnalysisNodeService } from '../../../../../src/core/entities/analysis-node/service.ts';
+import { AnalysisReachService } from '../../../../../src/core/services/analysis-reach/index.ts';
 import {
     FakeEntityRepository,
     createAllowAllActor,
+    createNonMasterRealmActor,
     createPermissionActor,
 } from '../../helpers/index.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from './fake-metadata-recalculator.ts';
+import { FakeAnalysisNodeRepository } from './fake-repository.ts';
 import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../../utils/domains/index.ts';
 
 function createFakeAnalysisNodeRepository(projectId: string) {
-    const repo = new FakeEntityRepository<AnalysisNode>();
+    const repo = new FakeAnalysisNodeRepository();
 
     const originalValidateJoinColumns = repo.validateJoinColumns.bind(repo);
     repo.validateJoinColumns = async (data: Partial<AnalysisNode>) => {
@@ -62,8 +65,9 @@ function createFakeAnalysisNodeRepository(projectId: string) {
 }
 
 describe('AnalysisNodeService', () => {
-    let repository: FakeEntityRepository<AnalysisNode>;
+    let repository: FakeAnalysisNodeRepository;
     let analysisRepository: FakeEntityRepository<Analysis>;
+    let nodeRepository: FakeEntityRepository<Node>;
     let recalculator: FakeAnalysisNodeMetadataRecalculator;
     let service: AnalysisNodeService;
     let analysisId: string;
@@ -77,6 +81,7 @@ describe('AnalysisNodeService', () => {
         repository = createFakeAnalysisNodeRepository(projectId);
         const projectNodeRepository = new FakeProjectNodeRepository();
         analysisRepository = new FakeEntityRepository<Analysis>();
+        nodeRepository = new FakeEntityRepository<Node>();
         recalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
 
         projectNodeRepository.seed({
@@ -95,7 +100,80 @@ describe('AnalysisNodeService', () => {
             analysisRepository,
             projectNodeRepository,
             recalculator,
+            reach: new AnalysisReachService({
+                analysisNodeRepository: repository,
+                analysisRepository,
+                nodeRepository,
+            }),
             skipAnalysisApproval: true,
+        });
+    });
+
+    describe('getMany', () => {
+        it('should return every row of a reachable analysis, other nodes\' rows included', async () => {
+            repository.seed([
+                createTestAnalysisNode({
+                    id: 'mine', 
+                    analysisId: 'a-1', 
+                    analysisRealmId: 'realm-b', 
+                    nodeId: 'n-a', 
+                    nodeRealmId: 'realm-a', 
+                }),
+                createTestAnalysisNode({
+                    id: 'peer', 
+                    analysisId: 'a-1', 
+                    analysisRealmId: 'realm-b', 
+                    nodeId: 'n-c', 
+                    nodeRealmId: 'realm-c', 
+                }),
+                createTestAnalysisNode({
+                    id: 'foreign', 
+                    analysisId: 'a-2', 
+                    analysisRealmId: 'realm-c', 
+                    nodeId: 'n-c', 
+                    nodeRealmId: 'realm-c', 
+                }),
+            ]);
+
+            const result = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+
+            expect(result.data.map((e) => e.id).sort()).toEqual(['mine', 'peer']);
+        });
+
+        it('should narrow a node client to its own node\'s analyses, not its realm\'s', async () => {
+            nodeRepository.seed({
+                id: 'n-a', 
+                clientId: 'client-a', 
+                realmId: 'realm-a', 
+            } as Node);
+            repository.seed([
+                createTestAnalysisNode({
+                    id: 'mine', 
+                    analysisId: 'a-1', 
+                    analysisRealmId: 'realm-a', 
+                    nodeId: 'n-a', 
+                    nodeRealmId: 'realm-a', 
+                }),
+                createTestAnalysisNode({
+                    id: 'sibling', 
+                    analysisId: 'a-2', 
+                    analysisRealmId: 'realm-a', 
+                    nodeId: 'n-b', 
+                    nodeRealmId: 'realm-a', 
+                }),
+            ]);
+
+            const actor = createNonMasterRealmActor('realm-a');
+            actor.identity = {
+                id: 'client-a', 
+                type: 'client', 
+                realmId: 'realm-a', 
+            };
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            const result = await service.getMany({}, actor);
+
+            expect(result.data.map((e) => e.id)).toEqual(['mine']);
         });
     });
 

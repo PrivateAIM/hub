@@ -25,6 +25,7 @@ const PERMISSIONS: PermissionName[] = [
     PermissionName.PROJECT_UPDATE,
     PermissionName.PROJECT_DELETE,
     PermissionName.PROJECT_APPROVE,
+    PermissionName.ANALYSIS_READ,
     PermissionName.ANALYSIS_CREATE,
     PermissionName.ANALYSIS_UPDATE,
     PermissionName.ANALYSIS_DELETE,
