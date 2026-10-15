@@ -7,4 +7,5 @@
 
 export * from './constants.ts';
 
+export * from './node-client/index.ts';
 export * from './registry/index.ts';

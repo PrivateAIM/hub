@@ -111,7 +111,7 @@ DI modules, wiring, and infrastructure services.
 - Fluent API: `.withConfig().withDatabase().withHTTP()`
 
 **Aggregators** (`app/aggregators/`): AMQP event consumers
-**Components** (`app/components/`): AMQP task consumers
+**Components** (`app/components/`): AMQP task consumers (`BaseComponent` + a message-bus caller), and background components without a queue that follow authup's `{ start, stop, status }` shape — a pass at start, then a cron (`node-client/`: node-client permission sync)
 
 ## Service Pattern
 

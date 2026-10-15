@@ -14,7 +14,7 @@ import type { NodeClientPermissionSyncContext, NodeClientPermissionSyncResult } 
  * clients of nodes that already exist.
  *
  * A failing node is logged and skipped: one deleted Authup client must not
- * keep the others from their grants, nor keep the hub from booting.
+ * keep the others from their grants.
  */
 export async function syncNodeClientPermissions(
     ctx: NodeClientPermissionSyncContext,

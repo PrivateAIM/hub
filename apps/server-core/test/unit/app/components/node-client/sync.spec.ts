@@ -10,7 +10,7 @@ import { PermissionName } from '@privateaim/kit';
 import { createFakeAuthupClient, fakeAuthupResponse } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { NodeClientService } from '../../../../../src/app/modules/database/node-client.ts';
-import { syncNodeClientPermissions } from '../../../../../src/app/modules/node-client/index.ts';
+import { syncNodeClientPermissions } from '../../../../../src/app/components/node-client/index.ts';
 import { FakeNodeRepository } from '../../../core/entities/node/fake-repository.ts';
 
 // Driven through a REAL AuthupClient on an in-memory transport, so the grant

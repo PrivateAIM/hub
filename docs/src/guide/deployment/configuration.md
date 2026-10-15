@@ -227,15 +227,16 @@ before this release carry no realm**, so an `own` grant does not see them;
    `registry_read` and `master_image_read`; `*` covers them once they are
    provisioned.
 
-**After upgrading:** nothing to do for node clients. On every boot server-core
-re-grants each existing node's client its permissions (`analysis_update`,
-`node_read`), so node-side services — pod orchestration, the storage service,
-the message broker — keep reading `/nodes`. The pass removes any other
-permission a node client was granted by hand, as node saves always have. A node
-whose client cannot be updated is logged as an error and skipped; boot
-continues. If `node_read` is not provisioned in Authup, every node is logged as
-failed — and creating a node fails too, instead of yielding a client that gets
-403 later.
+**After upgrading:** nothing to do for node clients. server-core re-grants each
+existing node's client its permissions (`analysis_update`, `node_read`) in the
+background — once at start, then hourly — so node-side services (pod
+orchestration, the storage service, the message broker) keep reading `/nodes`.
+Each pass removes any other permission a node client was granted by hand, as
+node saves always have. A node whose client cannot be updated is logged as an
+error and retried on the next pass. If `node_read` is not provisioned in Authup,
+every node is logged as failed until it is, and the next pass after provisioning
+grants it without a restart; creating a node fails meanwhile, instead of
+yielding a client that gets 403 later.
 
 **Known gaps:**
 
