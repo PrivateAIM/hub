@@ -29,6 +29,18 @@ import { AnalysisEntity } from './analysis.ts';
 import { NodeEntity } from './node.ts';
 
 @Unique(['nodeId', 'analysisId'])
+// One composite per realm column, paired with the opposite side's id. Each
+// leads with its realm column, so it also anchors that allow-listed filter;
+// the trailing id lets a participation lookup
+// (SELECT analysis_id ... WHERE node_realm_id = ?) answer from the index.
+// A filter combination needs no mirrored (id, realm) index: the planner
+// matches equality conditions in any column order.
+@Index(['nodeRealmId', 'analysisId'])
+@Index(['analysisRealmId', 'nodeId'])
+// Status first, newest first: an approval or execution inbox
+// (sort=approvalStatus,-createdAt).
+@Index(['approvalStatus', 'createdAt'])
+@Index(['executionStatus', 'createdAt'])
 @Entity({ name: 'analysis_nodes' })
 export class AnalysisNodeEntity implements AnalysisNode {
     @PrimaryGeneratedColumn('uuid')
@@ -36,7 +48,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
 
     // ------------------------------------------------------------------
 
-    @Index()
     @Column({
         name: 'approval_status',
         type: 'varchar',
@@ -45,7 +56,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
     })
     approvalStatus: AnalysisNodeApprovalStatus | null;
 
-    @Index()
     @Column({
         name: 'execution_status',
         type: 'varchar',
@@ -105,7 +115,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
     @JoinColumn({ name: 'analysis_id' })
     analysis: AnalysisEntity;
 
-    @Index()
     @Column({ name: 'analysis_realm_id', type: 'uuid' })
     analysisRealmId: Realm['id'];
 
@@ -116,7 +125,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
-    @Index()
     @Column({ name: 'node_realm_id', type: 'uuid' })
     nodeRealmId: Realm['id'];
 }

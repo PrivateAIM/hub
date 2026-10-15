@@ -17,15 +17,17 @@ const schemaMapping = {
 export const analysisNodeSchema = defineSchema<AnalysisNode>({
     name: DomainType.ANALYSIS_NODE,
     strict: true,
-    // `nodeId` anchors through the UNIQUE(nodeId, analysisId) it leads;
-    // `analysisId` sits in its non-leading position and needs its own single.
+    // `nodeId` anchors through the UNIQUE(nodeId, analysisId) it leads,
+    // `analysisId` through its own single, each realm through its
+    // (realm, opposite id) composite; the status composites back
+    // `sort=approvalStatus,-createdAt`.
     indexes: [
         ['nodeId', 'analysisId'],
         ['analysisId'],
-        ['approvalStatus'],
-        ['executionStatus'],
-        ['analysisRealmId'],
-        ['nodeRealmId'],
+        ['analysisRealmId', 'nodeId'],
+        ['nodeRealmId', 'analysisId'],
+        ['approvalStatus', 'createdAt'],
+        ['executionStatus', 'createdAt'],
         ['createdAt'],
         ['updatedAt'],
     ],
@@ -51,7 +53,10 @@ export const analysisNodeSchema = defineSchema<AnalysisNode>({
         indexed: true,
     },
     relations: { allowed: ['node', 'analysis'] },
-    sorts: { allowed: ['createdAt', 'updatedAt'], indexed: true },
+    sorts: {
+        allowed: ['approvalStatus', 'executionStatus', 'createdAt', 'updatedAt'],
+        indexed: true,
+    },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

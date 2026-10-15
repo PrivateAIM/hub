@@ -49,6 +49,8 @@ export class AnalysisBucketFileEntity implements AnalysisBucketFile {
     @Column({ name: 'bucket_id', type: 'uuid' })
     bucketId: string;
 
+    // Storage aggregators resolve the row by the storage file it mirrors.
+    @Index()
     @Column({ name: 'bucket_file_id', type: 'uuid' })
     bucketFileId: string;
 

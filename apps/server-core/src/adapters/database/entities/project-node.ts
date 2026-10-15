@@ -28,12 +28,22 @@ import { ProjectEntity } from './project.ts';
 import { NodeEntity } from './node.ts';
 
 @Unique(['projectId', 'nodeId'])
+// One composite per realm column, paired with the opposite side's id. Each
+// leads with its realm column, so it also anchors that allow-listed filter;
+// the trailing id lets a participation lookup
+// (SELECT project_id ... WHERE node_realm_id = ?) answer from the index.
+// A filter combination needs no mirrored (id, realm) index: the planner
+// matches equality conditions in any column order.
+@Index(['nodeRealmId', 'projectId'])
+@Index(['projectRealmId', 'nodeId'])
+// Status first, newest first: an approval inbox
+// (sort=approvalStatus,-createdAt).
+@Index(['approvalStatus', 'createdAt'])
 @Entity({ name: 'project_nodes' })
 export class ProjectNodeEntity implements ProjectNode {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Index()
     @Column({
         name: 'approval_status',
         type: 'varchar',
@@ -64,7 +74,6 @@ export class ProjectNodeEntity implements ProjectNode {
     @JoinColumn({ name: 'project_id' })
     project: ProjectEntity;
 
-    @Index()
     @Column({ name: 'project_realm_id', type: 'uuid' })
     projectRealmId: Realm['id'];
 
@@ -76,7 +85,6 @@ export class ProjectNodeEntity implements ProjectNode {
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
-    @Index()
     @Column({ name: 'node_realm_id', type: 'uuid' })
     nodeRealmId: string;
 }

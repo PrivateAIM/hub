@@ -29,7 +29,7 @@ export class MessageRepositoryAdapter implements IMessageRepository {
         return this.repository.save(entities);
     }
 
-    async findManyForRecipient(recipient: MessageParty, limit: number): Promise<Message[]> {
+    async findManyForRecipient(recipient: MessageParty, limit: number, now: Date): Promise<Message[]> {
         // select only the public Message fields — `expiresAt` is internal (TTL)
         return this.repository.createQueryBuilder('message')
             .select([
@@ -44,6 +44,8 @@ export class MessageRepositoryAdapter implements IMessageRepository {
             ])
             .where('message.recipientType = :recipientType', { recipientType: recipient.type })
             .andWhere('message.recipientId = :recipientId', { recipientId: recipient.id })
+            // `now` stays a bound Date, as in deleteExpired().
+            .andWhere('message.expiresAt >= :now', { now })
             .orderBy('message.createdAt', 'ASC')
             .addOrderBy('message.id', 'ASC')
             .limit(limit)

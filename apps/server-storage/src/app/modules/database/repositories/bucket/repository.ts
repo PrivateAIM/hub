@@ -27,7 +27,6 @@ export class BucketRepositoryAdapter implements IBucketRepository {
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Bucket>> {
         const qb = this.repository.createQueryBuilder('bucket');
-        qb.groupBy('bucket.id');
 
         const { pagination } = applyQuery(qb, query);
 
