@@ -25,6 +25,16 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   backoff (1s, 2s, 4s, 8s). An exhausted command is dropped with an error log
   line naming its type and id. Before this, a redelivered command was dropped
   silently after its first attempt.
+- **The worker retries only failures that can go away on their own.** A
+  connection error, a 5xx/429 from the core or storage API, GitHub or the
+  registry, or an unreachable or failing docker daemon is retried as above, and
+  the analysis keeps its `started` status meanwhile. Anything else — a broken
+  Dockerfile step, a 4xx, a missing registry — fails the build, distribution or
+  check right away, as before. A retryable failure that persists through the 5th
+  attempt is reported as failed, not dropped. Only a worker that dies on every
+  attempt leaves a build or distribution `started`; server-core fails it once it
+  is 15 minutes stale (see below). An error docker reports inside a build or push
+  stream (e.g. a registry 503 during push) counts as permanent.
 - **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
   build.** A command is acknowledged only once its handler finishes. If a build
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the

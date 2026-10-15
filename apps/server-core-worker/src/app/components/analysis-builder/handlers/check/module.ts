@@ -18,6 +18,7 @@ import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 import type { ImageInspectInfo } from 'dockerode';
 import { isDockerNotFoundError } from '../../../../../adapters/docker/index.ts';
+import { isRetryableFailure } from '../../../helpers.ts';
 
 export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK> {
     protected coreClient: CoreClient;
@@ -44,6 +45,18 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
+            if (isRetryableFailure(e, context.metadata)) {
+                this.logger?.warn({
+                    message: e,
+                    command: AnalysisBuilderCommand.CHECK,
+                    analysisId: value.id,
+                    [LogFlag.REF_ID]: value.id,
+                    retry: true,
+                });
+
+                throw e;
+            }
+
             this.logger?.error({
                 message: e,
                 command: AnalysisBuilderCommand.CHECK,

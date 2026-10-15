@@ -29,6 +29,7 @@ import {
     isDockerDistributionImageMissingError,
 } from '../../../../../adapters/docker/index.ts';
 import { BuilderError } from '../../../analysis-builder/error';
+import { isRetryableFailure } from '../../../helpers.ts';
 
 export class AnalysisDistributorCheckHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK> {
     protected coreClient: CoreClient;
@@ -55,6 +56,18 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(value, context);
         } catch (e) {
+            if (isRetryableFailure(e, context.metadata)) {
+                this.logger?.warn({
+                    message: e,
+                    command: AnalysisDistributorCommand.CHECK,
+                    analysisId: value.id,
+                    [LogFlag.REF_ID]: value.id,
+                    retry: true,
+                });
+
+                throw e;
+            }
+
             this.logger?.error({
                 message: e,
                 command: AnalysisDistributorCommand.CHECK,

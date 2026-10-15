@@ -56,6 +56,11 @@ The worker runs four AMQP task consumers:
 | Master Image Builder | Builds base Docker images from GitHub |
 | Master Image Synchronizer | Syncs master image catalog |
 
+A handler failure that can go away on its own (connection errors, a 5xx/429 from
+an HTTP API, an unreachable docker daemon) is thrown back to the message bus,
+which retries the command with backoff. Every other failure, and a retryable one
+on the last delivery attempt, is reported as the matching `*_FAILED` event.
+
 ## Health Check
 
 The worker exposes a minimal HTTP server for health checking:

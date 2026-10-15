@@ -24,3 +24,16 @@ export const ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS = 5 * 60 * 1000;
  * this is treated as hung, even if it would have finished.
  */
 export const ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS = 2 * 60 * 60 * 1000;
+
+/**
+ * Node socket error codes of a request that never reached its target
+ * (refused, reset — "socket hang up" —, timed out, DNS not (yet) resolvable).
+ */
+export const TRANSIENT_ERROR_CODES = [
+    'ECONNREFUSED',
+    'ECONNRESET',
+    'ETIMEDOUT',
+    'EPIPE',
+    'EAI_AGAIN',
+    'ENOTFOUND',
+];

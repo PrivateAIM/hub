@@ -418,6 +418,15 @@ Background worker executing Docker containers. No database entities — purely q
 - `StorageClientModule` — sets up storage API client via `setStorageClient()`
 - `ComponentsModule` — starts all 4 worker components (analysis-builder, analysis-distributor, master-image-builder, master-image-synchronizer)
 
+**Failure classification:** every check/execute handler rethrows a failure for which
+`isRetryableFailure(e, context.metadata)` (`app/components/helpers.ts`) holds — a transient
+error (`isTransientError`: hapic network error or 5xx/429, dockerode `statusCode` ≥ 500, node
+socket codes, `ENOENT` only on `connect`) before the last attempt (`metadata.attempt` <
+`MESSAGE_BUS_MAX_ATTEMPTS` from server-kit) — so the AMQP driver retries it; everything else
+emits `*_FAILED`. A permanent error misread as transient costs only the backoff. The
+distributor keeps the local analysis image while a retry is pending (it re-tags from it) and
+removes it otherwise. Errors inside a docker build/push stream are permanent.
+
 **Entry point:** Uses `src/index.ts` with `dotenv/config` directly (no citty CLI).
 
 ### server-messenger
