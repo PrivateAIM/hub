@@ -22,7 +22,8 @@ import {
     NodeType,
     ProjectNodeApprovalStatus,
 } from '@privateaim/core-kit';
-import { ProcessStatus } from '@privateaim/kit';
+import { BuiltInPolicyType } from '@authup/access';
+import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import {
     beforeEach,
     describe,
@@ -41,6 +42,7 @@ import {
     createDenyAllActor,
     createMasterRealmActor,
     createNonMasterRealmActor,
+    createScopedActor,
 } from '../../helpers/index.ts';
 import { FakeAnalysisRepository } from './fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from './fake-metadata-recalculator.ts';
@@ -483,7 +485,48 @@ describe('AnalysisService', () => {
         });
     });
 
+    describe('create (reach)', () => {
+        it('should deny creating an analysis in a project of a realm out of reach', async () => {
+            const project = createTestProject({ realmId: 'realm-b' });
+            projectRepository.seed(project);
+
+            const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+            analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
+                await origValidate(data);
+                data.project = project;
+            };
+
+            await expect(service.create(
+                { name: 'test-analysis', projectId: project.id },
+                createScopedActor({ realmId: 'realm-a', realmScope: 'own' }),
+            )).rejects.toThrow(PermissionDeniedError);
+            expect(analysisRepository.getAll()).toHaveLength(0);
+        });
+    });
+
     describe('update', () => {
+        it('should deny an analysis of a realm out of reach', async () => {
+            analysisRepository.seed(createFullAnalysis({ realmId: 'realm-b' }));
+
+            await expect(service.update('analysis-1', { name: 'updated' }, createScopedActor({ realmId: 'realm-a', realmScope: 'own' })))
+                .rejects.toThrow(PermissionDeniedError);
+            expect(analysisRepository.getAll()[0].name).not.toBe('updated');
+        });
+
+        it('should evaluate both the stored and the merged row', async () => {
+            analysisRepository.seed(createFullAnalysis({ realmId: 'realm-a' }));
+
+            const actor = createScopedActor({ realmId: 'realm-a', realmScope: 'own' });
+            await service.update('analysis-1', { name: 'updated' }, actor);
+
+            const names = actor.permissionEvaluator.evaluateCalls
+                .filter((call) => call.name === PermissionName.ANALYSIS_UPDATE)
+                .map((call) => call.data?.get<Analysis>(BuiltInPolicyType.ATTRIBUTES).name);
+            expect(names).toHaveLength(2);
+            expect(names[1]).toBe('updated');
+            expect(names[0]).not.toBe('updated');
+        });
+
         it('should call recalcDebounced after save', async () => {
             analysisRepository.seed(createFullAnalysis());
 
@@ -584,16 +627,17 @@ describe('AnalysisService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should enforce realm writability', async () => {
+        it('should deny an analysis of a realm out of reach', async () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'other-realm' }));
 
-            const actor = createNonMasterRealmActor('realm-1');
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
             await expect(
                 service.delete('analysis-1', actor),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(await analysisRepository.findOneById('analysis-1')).not.toBeNull();
         });
 
-        it('should allow master realm to delete', async () => {
+        it('should let a grant reaching every realm delete', async () => {
             const project = createTestProject({ analyses: 1 });
             projectRepository.seed(project);
             analysisRepository.seed(createFullAnalysis({
@@ -601,7 +645,7 @@ describe('AnalysisService', () => {
                 project,
             }));
 
-            const result = await service.delete('analysis-1', createMasterRealmActor());
+            const result = await service.delete('analysis-1', createScopedActor({ realmId: 'realm-master', realmScope: 'any' }));
             expect(result.id).toBe('analysis-1');
         });
     });
@@ -621,13 +665,44 @@ describe('AnalysisService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should enforce realm writability', async () => {
+        it('should deny an analysis of a realm out of reach', async () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'other-realm' }));
 
-            const actor = createNonMasterRealmActor('realm-1');
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
             await expect(
                 service.executeCommand('analysis-1', AnalysisCommand.STORAGE_CHECK, actor),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(bucketCaller.getCallsFor('callCreate')).toHaveLength(0);
+        });
+
+        it('should deny an actor without the command\'s permission', async () => {
+            analysisRepository.seed(createFullAnalysis());
+
+            await expect(
+                service.executeCommand('analysis-1', AnalysisCommand.STORAGE_CHECK, createDenyAllActor()),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it.each([
+            [AnalysisCommand.BUILD_START, PermissionName.ANALYSIS_EXECUTION_START],
+            [AnalysisCommand.DISTRIBUTION_START, PermissionName.ANALYSIS_EXECUTION_START],
+            [AnalysisCommand.BUILD_CHECK, PermissionName.ANALYSIS_UPDATE],
+            [AnalysisCommand.CONFIGURATION_LOCK, PermissionName.ANALYSIS_UPDATE],
+            [AnalysisCommand.CONFIGURATION_UNLOCK, PermissionName.ANALYSIS_UPDATE],
+            [AnalysisCommand.DISTRIBUTION_CHECK, PermissionName.ANALYSIS_UPDATE],
+            [AnalysisCommand.STORAGE_CHECK, PermissionName.ANALYSIS_UPDATE],
+        ])('should require %s to reach the analysis with %s', async (command, name) => {
+            analysisRepository.seed(createFullAnalysis({ realmId: 'realm-a' }));
+
+            const actor = createScopedActor({ realmId: 'realm-a', realmScope: 'own' });
+            // the dispatched step may refuse on state; only the authorization matters here
+            await service.executeCommand('analysis-1', command, actor).catch(() => undefined);
+
+            expect(actor.permissionEvaluator.preEvaluateCalls.map((call) => call.name)).toEqual([name]);
+            expect(actor.permissionEvaluator.evaluateCalls.map((call) => [
+                call.name,
+                call.data?.get(BuiltInPolicyType.REALM_MATCH),
+            ])).toEqual([[name, 'realm-a']]);
         });
 
         it('should dispatch CONFIGURATION_LOCK to configurator', async () => {

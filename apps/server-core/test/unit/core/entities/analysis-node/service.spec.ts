@@ -14,6 +14,7 @@ import type {
 } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
+import { BuiltInPolicyType } from '@authup/access';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import {
     beforeEach,
@@ -28,6 +29,7 @@ import {
     createAllowAllActor,
     createNonMasterRealmActor,
     createPermissionActor,
+    createScopedActor,
 } from '../../helpers/index.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from './fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeRepository } from './fake-repository.ts';
@@ -178,6 +180,14 @@ describe('AnalysisNodeService', () => {
     });
 
     describe('create', () => {
+        it('should deny an analysis of a realm out of reach', async () => {
+            await expect(service.create(
+                { analysisId, nodeId },
+                createScopedActor({ realmId: 'realm-2', realmScope: 'own' }),
+            )).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(0);
+        });
+
         it('should call recalc after save', async () => {
             const result = await service.create(
                 { analysisId, nodeId },
@@ -297,10 +307,149 @@ describe('AnalysisNodeService', () => {
             await expect(service.update(
                 node.id,
                 { approvalStatus: AnalysisNodeApprovalStatus.APPROVED },
-                createPermissionActor({
-                    realm: { id: 'realm-1', name: 'realm-1' },
-                    permissions: [PermissionName.ANALYSIS_APPROVE],
-                }),
+                createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
+            )).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should deny an execution status from the analysis realm alone', async () => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+            });
+            repository.seed(node);
+
+            await expect(service.update(
+                node.id,
+                { executionStatus: ProcessStatus.EXECUTING },
+                createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
+            )).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should let the node realm set the execution status', async () => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+            });
+            repository.seed(node);
+
+            const result = await service.update(
+                node.id,
+                { executionStatus: ProcessStatus.EXECUTING },
+                createScopedActor({ realmId: 'realm-2', realmScope: 'own' }),
+            );
+
+            expect(result.executionStatus).toBe(ProcessStatus.EXECUTING);
+        });
+
+        it('should deny an actor reaching neither realm', async () => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+            });
+            repository.seed(node);
+
+            await expect(service.update(
+                node.id,
+                { executionProgress: 50 },
+                createScopedActor({ realmId: 'realm-3', realmScope: 'own' }),
+            )).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should evaluate both the stored and the merged row', async () => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-1',
+            });
+            repository.seed(node);
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            await service.update(node.id, { executionStatus: ProcessStatus.EXECUTING }, actor);
+
+            const states = actor.permissionEvaluator.evaluateCalls
+                .map((call) => call.data?.get<AnalysisNode>(BuiltInPolicyType.ATTRIBUTES).executionStatus);
+            expect(states).toContain(null);
+            expect(states).toContain(ProcessStatus.EXECUTING);
+        });
+    });
+
+    describe('update (node client)', () => {
+        const clientId = randomUUID();
+
+        function seedClientNode(node: Partial<Node>) {
+            const row = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+                node: {
+                    id: 'node-1',
+                    type: NodeType.DEFAULT,
+                    realmId: 'realm-2',
+                    clientId,
+                    ...node,
+                } as Node,
+            });
+            repository.seed(row);
+
+            return row;
+        }
+
+        // A node client holds no ANALYSIS_UPDATE (Q1): its binding alone counts.
+        function createClientActor(realmId: string) {
+            return createPermissionActor({
+                realm: { id: realmId, name: realmId },
+                identity: {
+                    id: clientId, 
+                    type: 'client', 
+                    realmId, 
+                },
+                permissions: [],
+            });
+        }
+
+        it('should let the node\'s own client set the execution status without a grant', async () => {
+            const row = seedClientNode({});
+
+            const result = await service.update(
+                row.id,
+                { executionStatus: ProcessStatus.EXECUTING, executionProgress: 10 },
+                createClientActor('realm-2'),
+            );
+
+            expect(result.executionStatus).toBe(ProcessStatus.EXECUTING);
+            expect(result.executionProgress).toBe(10);
+        });
+
+        it('should not let the node\'s own client approve', async () => {
+            const row = seedClientNode({});
+
+            await expect(service.update(
+                row.id,
+                { approvalStatus: AnalysisNodeApprovalStatus.REJECTED },
+                createClientActor('realm-2'),
+            )).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should not bind a client of another realm a node points at', async () => {
+            const row = seedClientNode({ realmId: 'realm-3' });
+
+            await expect(service.update(
+                row.id,
+                { executionStatus: ProcessStatus.EXECUTING },
+                createClientActor('realm-2'),
+            )).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should not bind another node\'s client', async () => {
+            const row = seedClientNode({ clientId: randomUUID() });
+
+            await expect(service.update(
+                row.id,
+                { executionStatus: ProcessStatus.EXECUTING },
+                createClientActor('realm-2'),
             )).rejects.toThrow(PermissionDeniedError);
         });
     });
@@ -395,6 +544,32 @@ describe('AnalysisNodeService', () => {
             await service.delete(node.id, createAllowAllActor());
 
             expect(recalculator.getDebouncedCallCount()).toBe(0);
+        });
+
+        it('should let the node realm detach its own node', async () => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+            });
+            repository.seed(node);
+
+            await service.delete(node.id, createScopedActor({ realmId: 'realm-2', realmScope: 'own' }));
+
+            expect(repository.getAll()).toHaveLength(0);
+        });
+
+        it('should deny an actor reaching neither realm', async () => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+            });
+            repository.seed(node);
+
+            await expect(service.delete(node.id, createScopedActor({ realmId: 'realm-3', realmScope: 'own' })))
+                .rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
         });
     });
 });

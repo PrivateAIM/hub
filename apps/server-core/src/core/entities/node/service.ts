@@ -11,12 +11,11 @@ import {
     PermissionName,
     ValidatorGroup,
     createNanoID,
-    isHex, 
-    isRealmResourceWritable, 
+    isHex,
 } from '@privateaim/kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
+import { AbstractEntityService, assertRecordReach, scopeReadQuery } from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
 import { appendQueryConditions, decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
 import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
@@ -101,13 +100,11 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         await this.repository.validateJoinColumns(validated);
 
-        if (validated.realmId) {
-            if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
-                throw new PermissionDeniedError('You are not permitted to create this node.');
-            }
-        } else {
+        if (!validated.realmId) {
             validated.realmId = this.getActorRealmId(actor);
         }
+
+        await assertRecordReach(actor, PermissionName.NODE_CREATE, { realmId: validated.realmId, attributes: validated });
 
         const entity = this.repository.create(validated);
 
@@ -140,11 +137,10 @@ export class NodeService extends AbstractEntityService implements INodeService {
             throw new EntityNotFoundError({ entity: 'node' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError('You are not permitted to update this node.');
-        }
+        await assertRecordReach(actor, PermissionName.NODE_UPDATE, { realmId: entity.realmId, attributes: entity });
 
         const merged = this.repository.merge(entity, validated);
+        await assertRecordReach(actor, PermissionName.NODE_UPDATE, { realmId: merged.realmId, attributes: merged });
 
         // Only an explicit `registryId: null` disconnects the node. An update
         // that merely omits the field (a rename, a visibility toggle, …) must
@@ -173,9 +169,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
             throw new EntityNotFoundError({ entity: 'node' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError('You are not permitted to delete this node.');
-        }
+        await assertRecordReach(actor, PermissionName.NODE_DELETE, { realmId: entity.realmId, attributes: entity });
 
         await this.unlinkRegistryProject(entity);
 

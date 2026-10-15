@@ -6,28 +6,61 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { BuiltInPolicyType } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { createAllowAllActor } from '@privateaim/server-test-kit';
+import { FakePermissionEvaluator, createAllowAllActor } from '@privateaim/server-test-kit';
 import { PermissionName } from '@privateaim/kit';
 import { describe, expect, it } from 'vitest';
 import { NodeRegistryCredentialService } from '../../../../../src/core/services/registry-credential/index.ts';
 import { FakeNodeRepository } from '../../entities/node/fake-repository.ts';
 import { FakeRegistryProjectRepository } from '../../entities/registry-project/fake-repository.ts';
 import { FakeRegistryRepository } from '../../entities/registry/fake-repository.ts';
-import { createPermissionActor } from '../../helpers/index.ts';
+import { createPermissionActor, createScopedActor } from '../../helpers/index.ts';
 
 /**
- * The node's own OAuth2 client — a client-type identity that holds no
- * management permission, in a non-master realm.
+ * The node's own OAuth2 client — a client-type identity of `realmId` that
+ * holds no management permission.
  */
-function nodeClientActor(clientId: string): ActorContext {
+function nodeClientActor(clientId: string, realmId = 'realm-b'): ActorContext {
     return createPermissionActor({
-        realm: { id: randomUUID(), name: 'node-realm' },
-        identity: { type: 'client', id: clientId },
+        realm: { id: realmId, name: 'node-realm' },
+        identity: {
+            type: 'client', 
+            id: clientId, 
+            realmId, 
+        },
     });
+}
+
+/**
+ * Holds exactly `permissions`, each scoped `own` to `realmId`: an evaluation
+ * naming a `realmMatch` passes only for that realm.
+ */
+function ownRealmGrantActor(realmId: string, permissions: string[]): ActorContext {
+    return {
+        permissionEvaluator: new FakePermissionEvaluator(({ ctx, method }) => {
+            const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
+            const held = method.endsWith('OneOf') ?
+                names.some((name) => permissions.includes(name)) :
+                names.every((name) => permissions.includes(name));
+
+            const reached = !ctx.data?.has(BuiltInPolicyType.REALM_MATCH) ||
+                ctx.data.get(BuiltInPolicyType.REALM_MATCH) === realmId;
+
+            if (!held || !reached) {
+                throw new PermissionDeniedError();
+            }
+        }),
+        realm: { id: realmId, name: 'node-realm' },
+        identity: {
+            id: randomUUID(), 
+            type: 'user', 
+            realmId, 
+        },
+    };
 }
 
 function userActor(): ActorContext {
@@ -44,14 +77,16 @@ function masterRealmWithoutPermissionActor(): ActorContext {
 }
 
 /**
- * A node administrator: holds NODE_UPDATE but NOT REGISTRY_MANAGE, in the same
- * realm as the node.
+ * A node administrator: holds NODE_UPDATE but NOT REGISTRY_MANAGE, reaching
+ * `realmId` only.
  */
 function nodeAdminActor(realmId = 'realm-b'): ActorContext {
-    return createPermissionActor({
-        realm: { id: realmId, name: 'node-realm' },
-        permissions: [PermissionName.NODE_UPDATE],
-    });
+    return ownRealmGrantActor(realmId, [PermissionName.NODE_UPDATE]);
+}
+
+/** A registry manager: holds REGISTRY_MANAGE only, reaching `realmId` only. */
+function registryManagerActor(realmId = 'realm-b'): ActorContext {
+    return ownRealmGrantActor(realmId, [PermissionName.REGISTRY_MANAGE]);
 }
 
 const NODE_ID = randomUUID();
@@ -122,7 +157,7 @@ describe('NodeRegistryCredentialService', () => {
     it('should return the registry credentials for a permitted manager', async () => {
         const service = fullSetup();
 
-        const credentials = await service.getCredentials(NODE_ID, createAllowAllActor());
+        const credentials = await service.getCredentials(NODE_ID, createScopedActor({ realmScope: 'any' }));
 
         expect(credentials).toEqual({
             host: 'registry.example.com',
@@ -159,6 +194,16 @@ describe('NodeRegistryCredentialService', () => {
         ).rejects.toThrow(PermissionDeniedError);
     });
 
+    // `node.clientId` is writable by node managers: pointing a node at a
+    // client of another realm must not hand that client the secret.
+    it('should not bind a client of another realm', async () => {
+        const service = fullSetup();
+
+        await expect(
+            service.getCredentials(NODE_ID, nodeClientActor('node-client-1', 'realm-a')),
+        ).rejects.toThrow(PermissionDeniedError);
+    });
+
     it('should return the credentials for a node administrator of the node\'s realm', async () => {
         // Whoever may update the node already owns the whole lifecycle of that
         // registry project: connecting provisions it, disconnecting destroys it,
@@ -178,6 +223,22 @@ describe('NodeRegistryCredentialService', () => {
 
         await expect(
             service.getCredentials(NODE_ID, nodeAdminActor('other-realm')),
+        ).rejects.toThrow(PermissionDeniedError);
+    });
+
+    it('should return the credentials for a registry manager reaching the node\'s realm', async () => {
+        const service = fullSetup();
+
+        const credentials = await service.getCredentials(NODE_ID, registryManagerActor());
+        expect(credentials.accountSecret).toBe('the-secret');
+    });
+
+    it('should deny a registry manager of a different realm', async () => {
+        // REGISTRY_MANAGE is realm-scoped here too: the node's realm decides.
+        const service = fullSetup();
+
+        await expect(
+            service.getCredentials(NODE_ID, registryManagerActor('other-realm')),
         ).rejects.toThrow(PermissionDeniedError);
     });
 

@@ -7,13 +7,12 @@
 
 import type { ICondition, IQuery } from '@rapiq/core';
 import { and, eq } from '@rapiq/core';
-import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketFileValidator, AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
-import { PermissionName, ValidatorGroup, isRealmResourceWritable } from '@privateaim/kit';
+import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
+import { AbstractEntityService, assertRecordReach, hasUnboundedReach } from '@privateaim/server-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import type {
     AnalysisBucketUploadRemoval,
@@ -143,10 +142,10 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         validated.analysisId = bucket.analysisId;
 
         if (bucket.type === AnalysisBucketType.CODE) {
-            await this.assertOwner(actor, analysis);
+            await this.assertOwner(actor, analysis, validated);
             this.assertUnlocked(analysis);
         } else if (
-            !this.isMaster(actor) &&
+            !await this.isSystem(actor) &&
             !await this.isParticipantUploader(analysis, {
                 realmId: this.getActorRealmId(actor),
                 clientId: actor.identity.type === 'client' ? actor.identity.id : undefined,
@@ -198,14 +197,17 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
-        await this.assertOwner(actor, analysis);
-        this.assertBucketWritable(actor, bucket, analysis);
+        await this.assertOwner(actor, analysis, entity);
+        await this.assertBucketWritable(actor, bucket, analysis);
 
         if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
             throw new BadRequestError('Only a code file can be the root file.');
         }
 
         const merged = this.repository.merge(entity, validated);
+
+        // The grant's policies bind the target state too (authup's evaluateUpdate).
+        await this.assertOwner(actor, analysis, merged);
 
         const saved = await this.repository.save(merged, { data: actor.metadata });
 
@@ -222,8 +224,8 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         // ponytail: a node deleting its OWN result upload needs the plan-021 client binding.
         const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
-        await this.assertOwner(actor, analysis);
-        this.assertBucketWritable(actor, bucket, analysis);
+        await this.assertOwner(actor, analysis, entity);
+        await this.assertBucketWritable(actor, bucket, analysis);
 
         const entityId = entity.id;
 
@@ -242,9 +244,9 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
      * Register a file uploaded directly to storage. The upload reached storage
      * unchecked, so the write rules are applied here.
      *
-     * ponytail: realm-level only — the uploader's ANALYSIS_UPDATE grant and a
-     * master-realm bypass need the uploader resolved through Authup
-     * (plan 021 / plan 012 capability tokens).
+     * ponytail: realm-level only — the uploader's ANALYSIS_UPDATE grant and
+     * reach need its token, which the storage event does not carry
+     * (plan 012 capability tokens).
      */
     async registerUpload(file: BucketFile): Promise<AnalysisBucketUploadResult | null> {
         const bucket = await this.analysisBucketRepository.findOneBy({ bucketId: file.bucketId });
@@ -353,16 +355,15 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         return { bucket, analysis };
     }
 
-    protected isMaster(actor: ActorContext): boolean {
-        return actor.realm?.name === REALM_MASTER_NAME;
+    /** The system: a grant reaching every realm unconditionally (plan 021, Q4). */
+    protected async isSystem(actor: ActorContext): Promise<boolean> {
+        return hasUnboundedReach(actor, PermissionName.ANALYSIS_UPDATE);
     }
 
-    protected async assertOwner(actor: ActorContext, analysis: Analysis): Promise<void> {
-        if (!isRealmResourceWritable(actor.realm, analysis.realmId)) {
-            throw new PermissionDeniedError();
-        }
-
+    /** The analysis' realm writes the file, whichever realm uploaded it (D3). */
+    protected async assertOwner(actor: ActorContext, analysis: Analysis, file: Partial<AnalysisBucketFile>): Promise<void> {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
+        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: analysis.realmId, attributes: file });
     }
 
     protected assertUnlocked(analysis: Analysis): void {
@@ -373,14 +374,14 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
     /**
      * Code files are frozen with the configuration; temp files belong to the
-     * system (master realm) alone.
+     * system alone.
      */
-    protected assertBucketWritable(actor: ActorContext, bucket: AnalysisBucket, analysis: Analysis): void {
+    protected async assertBucketWritable(actor: ActorContext, bucket: AnalysisBucket, analysis: Analysis): Promise<void> {
         if (bucket.type === AnalysisBucketType.CODE) {
             this.assertUnlocked(analysis);
         }
 
-        if (bucket.type === AnalysisBucketType.TEMP && !this.isMaster(actor)) {
+        if (bucket.type === AnalysisBucketType.TEMP && !await this.isSystem(actor)) {
             throw new PermissionDeniedError();
         }
     }

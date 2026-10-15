@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { BuiltInPolicyType } from '@authup/access';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -23,7 +24,7 @@ import {
     createAllowAllActor,
     createDenyAllActor,
     createMasterRealmActor,
-    createNonMasterRealmActor,
+    createScopedActor,
 } from '../../helpers/index.ts';
 import { FakeRegistryManager } from '../node/fake-registry-manager.ts';
 import { FakeRegistryProjectRepository } from './fake-repository.ts';
@@ -74,7 +75,7 @@ function createTestRegistryProject(overrides?: Partial<RegistryProject>): Regist
 }
 
 describe('RegistryProjectService', () => {
-    let repository: FakeEntityRepository<RegistryProject>;
+    let repository: FakeRegistryProjectRepository;
     let registryManager: FakeRegistryManager;
     let nodeRepository: FakeEntityRepository<Node>;
     let service: RegistryProjectService;
@@ -90,13 +91,14 @@ describe('RegistryProjectService', () => {
         });
     });
 
-    /** Seeds a node owning the given registry project and returns its client id. */
-    function seedNodeClient(registryProjectId: string): string {
+    /** Seeds a node of `realmId` owning the given registry project and returns its client id. */
+    function seedNodeClient(registryProjectId: string, realmId = 'realm-1'): string {
         const clientId = randomUUID();
         nodeRepository.seed({
             id: randomUUID(),
             clientId,
             registryProjectId,
+            realmId,
         } as Node);
 
         return clientId;
@@ -138,10 +140,29 @@ describe('RegistryProjectService', () => {
             ]);
 
             const actor = createDenyAllActor();
-            actor.identity = { id: seedNodeClient('rp-1'), type: 'client' };
+            actor.identity = {
+                id: seedNodeClient('rp-1'), 
+                type: 'client', 
+                realmId: 'realm-1', 
+            };
 
             const result = await service.getMany({}, actor);
             expect(result.data.map((e) => e.id)).toEqual(['rp-1']);
+        });
+
+        // `node.clientId` is writable by node managers: a node of another realm
+        // pointing at a client must not hand that client its project.
+        it('should not bind a client to a node of another realm', async () => {
+            repository.seed(createTestRegistryProject({ id: 'rp-1', accountSecret: 'secret' }));
+
+            const actor = createDenyAllActor();
+            actor.identity = {
+                id: seedNodeClient('rp-1', 'realm-2'), 
+                type: 'client', 
+                realmId: 'realm-1', 
+            };
+
+            await expect(service.getMany({}, actor)).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should apply a read grant a node-client holds instead of narrowing it to its own project', async () => {
@@ -267,10 +288,15 @@ describe('RegistryProjectService', () => {
                 id: randomUUID(),
                 clientId,
                 registryProjectId,
+                realmId: 'realm-1',
             } as Node);
 
             const actor = createDenyAllActor();
-            actor.identity = { id: clientId, type: 'client' };
+            actor.identity = {
+                id: clientId, 
+                type: 'client', 
+                realmId: 'realm-1', 
+            };
 
             const result = await service.getOne(registryProjectId, actor);
             expect(result.id).toBe(registryProjectId);
@@ -283,7 +309,11 @@ describe('RegistryProjectService', () => {
             ]);
 
             const actor = createDenyAllActor();
-            actor.identity = { id: seedNodeClient('rp-1'), type: 'client' };
+            actor.identity = {
+                id: seedNodeClient('rp-1'), 
+                type: 'client', 
+                realmId: 'realm-1', 
+            };
 
             await expect(service.getOne('rp-2', actor)).rejects.toThrow(EntityNotFoundError);
         });
@@ -356,6 +386,25 @@ describe('RegistryProjectService', () => {
                 ),
             ).rejects.toThrow(PermissionDeniedError);
         });
+
+        // A project created here carries no realm: a global row.
+        it('should require a grant reaching realm-less rows to create', async () => {
+            const data = {
+                name: 'new-project',
+                type: RegistryProjectType.DEFAULT,
+                externalName: 'ext',
+                registryId: randomUUID(),
+            };
+
+            await expect(
+                service.create(data, createScopedActor({ realmScope: 'own' })),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(0);
+            expect(registryManager.getLinkCalls()).toHaveLength(0);
+
+            await service.create(data, createScopedActor({ realmScope: 'ownOrNull' }));
+            expect(repository.getAll()).toHaveLength(1);
+        });
     });
 
     describe('update', () => {
@@ -387,13 +436,38 @@ describe('RegistryProjectService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should enforce realm writability for non-master realm', async () => {
+        it('should deny updating a project in a realm the grant does not reach', async () => {
             const project = createTestRegistryProject({ realmId: 'other-realm' });
             repository.seed(project);
 
             await expect(
-                service.update(project.id, { name: 'updated-project' }, createNonMasterRealmActor('realm-1')),
+                service.update(project.id, { name: 'updated-project' }, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(registryManager.getLinkCalls()).toHaveLength(0);
+        });
+
+        it('should reach a realm-less project only with an ownOrNull or any grant', async () => {
+            const project = createTestRegistryProject({ realmId: null });
+            repository.seed(project);
+
+            await expect(
+                service.update(project.id, { name: 'updated-project' }, createScopedActor({ realmScope: 'own' })),
+            ).rejects.toThrow(PermissionDeniedError);
+
+            const result = await service.update(project.id, { name: 'updated-project' }, createScopedActor({ realmScope: 'ownOrNull' }));
+            expect(result.name).toBe('updated-project');
+        });
+
+        it('should evaluate both the stored and the merged project', async () => {
+            const project = createTestRegistryProject({ realmId: 'realm-1' });
+            repository.seed(project);
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            await service.update(project.id, { name: 'updated-project' }, actor);
+
+            const names = actor.permissionEvaluator.evaluateCalls
+                .map((call) => call.data?.get<RegistryProject>(BuiltInPolicyType.ATTRIBUTES)?.name);
+            expect(names).toEqual(['test-project', 'updated-project']);
         });
 
         it('should unlink and relink when externalName changes', async () => {
@@ -450,13 +524,14 @@ describe('RegistryProjectService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should enforce realm writability for non-master realm', async () => {
+        it('should deny deleting a project in a realm the grant does not reach', async () => {
             const project = createTestRegistryProject({ realmId: 'other-realm' });
             repository.seed(project);
 
             await expect(
-                service.delete(project.id, createNonMasterRealmActor('realm-1')),
+                service.delete(project.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
         });
 
         it('should unlink project via registryManager on delete', async () => {

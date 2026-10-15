@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { RealmScope } from '@authup/access';
 import type { FakePermissionEvaluator } from '@authup/server-test-kit';
 import type { ActorContext } from '@privateaim/server-kit';
 
@@ -21,4 +22,13 @@ export type AuthupPermissionRow = {
     id: string,
     clientId?: string | null,
     realmId?: string | null,
+};
+
+export type ScopedActorOptions = {
+    /** The actor's realm; random when omitted. */
+    realmId?: string;
+    /** The `realm_scope` every grant of the actor carries. */
+    realmScope: `${RealmScope}`;
+    /** Defaults to a user of `realmId`. */
+    identity?: ActorContext['identity'];
 };

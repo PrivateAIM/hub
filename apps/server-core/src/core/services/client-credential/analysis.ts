@@ -7,12 +7,10 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
-import { BuiltInPolicyType, PolicyData } from '@authup/access';
-import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
+import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
-import { holdsPermission } from '../../utils/index.ts';
+import { AbstractEntityService, assertRecordReach, reachesRecord } from '@privateaim/server-kit';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
@@ -80,7 +78,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
         actor: ActorContext,
     ): Promise<ClientCredentials> {
         // Writing is a manager action (ANALYSIS_UPDATE), not the read path's
-        // master-or-assigned-node rule: the running analysis never rotates.
+        // reach-or-assigned-node rule: the running analysis never rotates.
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
 
         const analysis = await this.repository.findOneById(analysisId);
@@ -96,14 +94,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
         // matching once attribute policies are enabled, and a denylist-shaped one
         // then fails OPEN. See docs/src/guide/development/migration-camelcase.md
         // -> "Authup attribute policies".
-        await actor.permissionEvaluator.evaluate({
-            name: PermissionName.ANALYSIS_UPDATE,
-            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
-        });
-
-        if (!isRealmResourceWritable(actor.realm, analysis.realmId)) {
-            throw new PermissionDeniedError('You are not permitted to write the credentials of this analysis client.');
-        }
+        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: analysis.realmId, attributes: analysis });
 
         if (!analysis.clientId) {
             throw new BadRequestError('The analysis has no client provisioned yet.');
@@ -114,14 +105,17 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
 
     /**
      * Fail-closed: the client of a node that is assigned to this analysis with
-     * an APPROVED analysis-node link may always read (the referenced identity);
-     * any other caller must actually hold {@link PermissionName.ANALYSIS_UPDATE}
-     * and be permitted to write the analysis' realm. Being a master-realm member is, by itself, not sufficient: membership is
-     * not a permission.
+     * an APPROVED analysis-node link may always read (the referenced identity,
+     * bound in its own realm only — `node.clientId` is writable by node
+     * managers and not unique); any other caller must hold
+     * {@link PermissionName.ANALYSIS_UPDATE} reaching the analysis' realm.
      */
     protected async isAuthorized(analysis: Analysis, actor: ActorContext): Promise<boolean> {
-        if (actor.identity && actor.identity.type === 'client') {
-            const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id });
+        if (actor.identity && actor.identity.type === 'client' && actor.identity.realmId) {
+            const node = await this.nodeRepository.findOneBy({
+                clientId: actor.identity.id,
+                realmId: actor.identity.realmId,
+            });
             if (node) {
                 const analysisNode = await this.analysisNodeRepository.findOneBy({
                     analysisId: analysis.id,
@@ -134,17 +128,6 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             }
         }
 
-        // A permission is not a reach: like setCredentials and the node
-        // credential service, a manager must also be permitted to write the
-        // analysis' realm, or one realm's manager reads another realm's secret.
-        if (!await holdsPermission(
-            actor,
-            PermissionName.ANALYSIS_UPDATE,
-            new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
-        )) {
-            return false;
-        }
-
-        return isRealmResourceWritable(actor.realm, analysis.realmId);
+        return reachesRecord(actor, PermissionName.ANALYSIS_UPDATE, { realmId: analysis.realmId, attributes: analysis });
     }
 }

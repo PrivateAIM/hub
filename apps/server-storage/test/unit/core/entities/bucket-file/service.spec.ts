@@ -7,7 +7,9 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Bucket, BucketFile } from '@privateaim/storage-kit';
+import { BuiltInPolicyType } from '@authup/access';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
 import {
     beforeEach,
     describe,
@@ -20,7 +22,7 @@ import {
     createAllowAllActor,
     createDenyAllActor,
     createMasterRealmActor,
-    createNonMasterRealmActor,
+    createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeBucketFileCaller } from './fake-caller.ts';
 
@@ -135,7 +137,7 @@ describe('BucketFileService', () => {
             expect(result.id).toBe(file.id);
         });
 
-        it('should enforce realm writability for non-owner', async () => {
+        it('should throw PermissionDeniedError when the grant does not reach the file realm', async () => {
             const file = createTestBucketFile({
                 actorId: 'other-user',
                 actorType: 'user',
@@ -145,8 +147,41 @@ describe('BucketFileService', () => {
             repository.seed(file);
 
             await expect(
-                service.delete(file.id, createNonMasterRealmActor('realm-1')),
+                service.delete(file.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(caller.getDeleteCalls()).toHaveLength(0);
+            expect(repository.getAll()).toHaveLength(1);
+        });
+
+        it('should delete a file of the own realm with an own-scoped grant', async () => {
+            const file = createTestBucketFile({
+                actorId: 'other-user',
+                actorType: 'user',
+                realmId: 'realm-1',
+                bucket: null,
+            });
+            repository.seed(file);
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            await service.delete(file.id, actor);
+
+            const [call] = actor.permissionEvaluator.evaluateCalls;
+            expect(call.name).toBe(PermissionName.BUCKET_UPDATE);
+            expect(call.data!.get(BuiltInPolicyType.REALM_MATCH)).toBe('realm-1');
+            expect(repository.getAll()).toHaveLength(0);
+        });
+
+        it('should delete a file of another realm with an any-scoped grant', async () => {
+            const file = createTestBucketFile({
+                actorId: 'other-user',
+                actorType: 'user',
+                realmId: 'other-realm',
+                bucket: null,
+            });
+            repository.seed(file);
+
+            await service.delete(file.id, createScopedActor({ realmId: 'realm-1', realmScope: 'any' }));
+            expect(caller.getDeleteCalls()).toEqual([file.id]);
         });
 
         it('should throw PermissionDeniedError when actor lacks permission and is not owner', async () => {

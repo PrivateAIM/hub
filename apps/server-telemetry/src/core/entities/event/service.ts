@@ -7,13 +7,10 @@
 
 import type { Event } from '@privateaim/telemetry-kit';
 import { EventValidator } from '@privateaim/telemetry-kit';
-import {
-    PermissionName,
-    isRealmResourceWritable,
-} from '@privateaim/kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
+import { AbstractEntityService, assertRecordReach, scopeReadQuery } from '@privateaim/server-kit';
 import type { IQuery } from '@rapiq/core';
 import { Query, eq } from '@rapiq/core';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
@@ -75,13 +72,11 @@ export class EventService extends AbstractEntityService implements IEventService
 
         await this.repository.validateJoinColumns(validated);
 
-        if (validated.realmId) {
-            if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
-                throw new PermissionDeniedError('You are not permitted to create this event.');
-            }
-        } else {
+        if (!validated.realmId) {
             validated.realmId = this.getActorRealmId(actor);
         }
+
+        await assertRecordReach(actor, PermissionName.EVENT_CREATE, { realmId: validated.realmId, attributes: validated });
 
         const entity = this.repository.create(validated);
 
@@ -97,11 +92,8 @@ export class EventService extends AbstractEntityService implements IEventService
             throw new EntityNotFoundError({ entity: 'event' });
         }
 
-        if (entity.realmId) {
-            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-                throw new PermissionDeniedError('You are not permitted to delete this event.');
-            }
-        }
+        // A realm-less event is reached only by an `ownOrNull`/`any` grant.
+        await assertRecordReach(actor, PermissionName.EVENT_DELETE, { realmId: entity.realmId ?? null, attributes: entity });
 
         const { id: entityId } = entity;
 

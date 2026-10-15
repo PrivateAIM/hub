@@ -10,9 +10,11 @@ import { Query, eq } from '@rapiq/core';
 import type { Node } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { appendQueryConditions } from '@privateaim/server-kit';
+import { appendQueryConditions, reachesRecord } from '@privateaim/server-kit';
+import { defineIssueItem } from '@ebec/core';
+import { ValidupError, buildErrorMessageForAttribute } from 'validup';
 import { z } from 'zod';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
@@ -36,7 +38,10 @@ const ANALYSIS_NODE_LOG_PERMISSIONS = [PermissionName.ANALYSIS_UPDATE, Permissio
  *   or its own client — once approved.
  * - **Deleting** either is the owner side's alone: ANALYSIS_UPDATE through the
  *   grant's reach, never through participation.
+ * - **Writing** an analysis-node log is the node's own client's, or needs
+ *   ANALYSIS_NODE_LOG_CREATE reaching the node's realm (Q5).
  *
+ * The node's own client needs no capability for its own node's logs (Q1).
  * Out of reach answers 404, like a missing analysis.
  */
 export class AnalysisLogAccessService implements IAnalysisLogAccessService {
@@ -86,6 +91,12 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
             return;
         }
 
+        // Bound by the node itself, not a grant. An unknown node never binds,
+        // so it still answers like a known one below.
+        if (await this.isNodeClientOfApprovedRun(analysisId, nodeId, actor)) {
+            return;
+        }
+
         // The capability first: without it, an unknown node must not answer
         // differently from a known one.
         await actor.permissionEvaluator.preEvaluateOneOf({ name: ANALYSIS_NODE_LOG_PERMISSIONS });
@@ -111,6 +122,45 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
         throw new EntityNotFoundError({ entity: 'analysis' });
     }
 
+    async assertAnalysisNodeLogCreate(analysisId: string, nodeId: string, actor: ActorContext): Promise<void> {
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_NODE_LOG_CREATE });
+
+        const node = await this.nodeRepository.findOneById(nodeId);
+        if (!node) {
+            throw buildAttributeError('nodeId');
+        }
+
+        if (!await this.analysisRepository.findOneById(analysisId)) {
+            throw buildAttributeError('analysisId');
+        }
+
+        if (
+            !isNodeClient(actor, node) &&
+            !await reachesRecord(actor, PermissionName.ANALYSIS_NODE_LOG_CREATE, { realmId: node.realmId, attributes: node })
+        ) {
+            throw new PermissionDeniedError('You are not permitted to write logs of this node.');
+        }
+    }
+
+    protected async isNodeClientOfApprovedRun(analysisId: string, nodeId: string, actor: ActorContext): Promise<boolean> {
+        if (!actor.identity || actor.identity.type !== 'client') {
+            return false;
+        }
+
+        const node = await this.nodeRepository.findOneById(nodeId);
+        if (!node || !isNodeClient(actor, node)) {
+            return false;
+        }
+
+        const row = await this.analysisNodeRepository.findOneBy({
+            analysisId,
+            nodeId,
+            approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+        });
+
+        return !!row;
+    }
+
     protected async findNode(id: string): Promise<Node> {
         const node = await this.nodeRepository.findOneById(id);
         if (!node) {
@@ -129,9 +179,7 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
 }
 
 /**
- * A user of the node's realm, or the node's own client — bound in its own
- * realm only, since `node.clientId` is writable by node managers (as in
- * `AnalysisReachService`).
+ * A user of the node's realm, or the node's own client.
  */
 function isActingAsNode(actor: ActorContext, node: Node): boolean {
     if (!actor.identity) {
@@ -142,7 +190,27 @@ function isActingAsNode(actor: ActorContext, node: Node): boolean {
         return !!actor.realm && actor.realm.id === node.realmId;
     }
 
-    return node.clientId === actor.identity.id && node.realmId === actor.identity.realmId;
+    return isNodeClient(actor, node);
+}
+
+/**
+ * The node's own client, bound in its own realm only, since `node.clientId`
+ * is writable by node managers (as in `AnalysisReachService`).
+ */
+function isNodeClient(actor: ActorContext, node: Node): boolean {
+    return !!actor.identity &&
+        actor.identity.type === 'client' &&
+        node.clientId === actor.identity.id &&
+        node.realmId === actor.identity.realmId;
+}
+
+function buildAttributeError(attribute: string): ValidupError {
+    return new ValidupError([
+        defineIssueItem({
+            path: [attribute],
+            message: buildErrorMessageForAttribute(attribute),
+        }),
+    ]);
 }
 
 /**

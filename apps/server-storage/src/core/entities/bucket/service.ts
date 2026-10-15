@@ -8,10 +8,10 @@
 import type { Bucket } from '@privateaim/storage-kit';
 import { eq } from '@rapiq/core';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import { PermissionName, ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
+import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
+import { AbstractEntityService, assertRecordReach } from '@privateaim/server-kit';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IBucketCaller, IBucketRepository, IBucketService } from './types.ts';
 import { BucketValidator, assertBucketRefPairing } from '@privateaim/storage-kit';
@@ -67,13 +67,11 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
         assertBucketRefPairing(validated);
 
-        if (validated.realmId) {
-            if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
-                throw new PermissionDeniedError('You are not permitted to create this bucket.');
-            }
-        } else {
+        if (!validated.realmId) {
             validated.realmId = this.getActorRealmId(actor);
         }
+
+        await assertRecordReach(actor, PermissionName.BUCKET_CREATE, { realmId: validated.realmId, attributes: validated });
 
         return this.caller.create({
             actorId: actor.identity.id,
@@ -90,15 +88,18 @@ export class BucketService extends AbstractEntityService implements IBucketServi
             throw new EntityNotFoundError({ entity: 'bucket' });
         }
 
-        if (!this.isOwnedByActor(entity, actor)) {
+        const isOwner = this.isOwnedByActor(entity, actor);
+        if (!isOwner) {
             await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_UPDATE });
-
-            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-                throw new PermissionDeniedError();
-            }
+            await assertRecordReach(actor, PermissionName.BUCKET_UPDATE, { realmId: entity.realmId, attributes: entity });
         }
 
         entity = this.repository.merge(entity, validated);
+
+        // Attribute policies bind the target state as well as the stored one.
+        if (!isOwner) {
+            await assertRecordReach(actor, PermissionName.BUCKET_UPDATE, { realmId: entity.realmId, attributes: entity });
+        }
 
         await this.repository.save(entity, { data: actor.metadata });
 
@@ -123,10 +124,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         if (!this.isOwnedByActor(entity, actor)) {
             await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_DELETE });
-
-            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-                throw new PermissionDeniedError();
-            }
+            await assertRecordReach(actor, PermissionName.BUCKET_DELETE, { realmId: entity.realmId, attributes: entity });
         }
 
         return this.caller.delete(entity.id);
@@ -140,10 +138,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         if (!this.isOwnedByActor(entity, actor)) {
             await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_DELETE });
-
-            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-                throw new PermissionDeniedError();
-            }
+            await assertRecordReach(actor, PermissionName.BUCKET_DELETE, { realmId: entity.realmId, attributes: entity });
         }
 
         return this.caller.clear(entity.id);

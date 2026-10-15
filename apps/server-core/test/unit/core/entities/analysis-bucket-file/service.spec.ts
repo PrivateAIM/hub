@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { BuiltInPolicyType } from '@authup/access';
 import type {
     Analysis,
     AnalysisBucket,
@@ -32,6 +33,7 @@ import {
     createDenyAllActor,
     createMasterRealmActor,
     createNonMasterRealmActor,
+    createScopedActor,
 } from '../../helpers/index.ts';
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
@@ -123,6 +125,11 @@ describe('AnalysisBucketFileService', () => {
         return file;
     }
 
+    /** The system: grants reaching every realm unconditionally. */
+    function createSystemActor() {
+        return createScopedActor({ realmId: 'realm-master', realmScope: 'any' });
+    }
+
     function seedAnalysisNode(approvalStatus: AnalysisNodeApprovalStatus | null) {
         analysisNodeRepository.seed({
             id: randomUUID(),
@@ -149,7 +156,7 @@ describe('AnalysisBucketFileService', () => {
 
         it('should deny a code file from a foreign realm', async () => {
             await expect(
-                service.create(createPayload(AnalysisBucketType.CODE), createNonMasterRealmActor(NODE_REALM)),
+                service.create(createPayload(AnalysisBucketType.CODE), createScopedActor({ realmId: NODE_REALM, realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -167,8 +174,8 @@ describe('AnalysisBucketFileService', () => {
             ).rejects.toThrow(BadRequestError);
         });
 
-        it.each([AnalysisBucketType.RESULT, AnalysisBucketType.TEMP])('should let master add a %s file', async (type) => {
-            const result = await service.create(createPayload(type), createMasterRealmActor());
+        it.each([AnalysisBucketType.RESULT, AnalysisBucketType.TEMP])('should let the system add a %s file', async (type) => {
+            const result = await service.create(createPayload(type), createSystemActor());
 
             expect(result.realmId).toBe(OWNER_REALM);
         });
@@ -227,9 +234,15 @@ describe('AnalysisBucketFileService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
+        it.each([AnalysisBucketType.RESULT, AnalysisBucketType.TEMP])('should deny a %s file to a realm-scoped grant without participation', async (type) => {
+            await expect(
+                service.create(createPayload(type), createScopedActor({ realmId: OWNER_REALM, realmScope: 'own' })),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
         it('should reject root on a result file', async () => {
             await expect(
-                service.create(createPayload(AnalysisBucketType.RESULT, true), createMasterRealmActor()),
+                service.create(createPayload(AnalysisBucketType.RESULT, true), createSystemActor()),
             ).rejects.toThrow(BadRequestError);
         });
 
@@ -255,11 +268,23 @@ describe('AnalysisBucketFileService', () => {
             expect(result.root).toBe(true);
         });
 
+        it('should evaluate both the stored and the merged row', async () => {
+            const file = seedFile(AnalysisBucketType.CODE);
+
+            const actor = createScopedActor({ realmId: OWNER_REALM, realmScope: 'own' });
+            await service.update(file.id, { path: 'renamed.py' }, actor);
+
+            expect(actor.permissionEvaluator.evaluateCalls.map((call) => [
+                call.data?.get(BuiltInPolicyType.REALM_MATCH),
+                call.data?.get<AnalysisBucketFile>(BuiltInPolicyType.ATTRIBUTES).path,
+            ])).toEqual([[OWNER_REALM, 'main.py'], [OWNER_REALM, 'renamed.py']]);
+        });
+
         it('should check the analysis realm, not the writer realm', async () => {
             const file = seedFile(AnalysisBucketType.CODE, { realmId: NODE_REALM });
 
             await expect(
-                service.update(file.id, { path: 'x.py' }, createNonMasterRealmActor(NODE_REALM)),
+                service.update(file.id, { path: 'x.py' }, createScopedActor({ realmId: NODE_REALM, realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -319,7 +344,7 @@ describe('AnalysisBucketFileService', () => {
             const file = seedFile(AnalysisBucketType.CODE, { realmId: NODE_REALM });
 
             await expect(
-                service.delete(file.id, createNonMasterRealmActor(NODE_REALM)),
+                service.delete(file.id, createScopedActor({ realmId: NODE_REALM, realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -356,10 +381,19 @@ describe('AnalysisBucketFileService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should let master delete a temp file', async () => {
+        it('should deny a realm-scoped grant of the owner realm a temp file delete', async () => {
             const file = seedFile(AnalysisBucketType.TEMP);
 
-            await service.delete(file.id, createMasterRealmActor());
+            await expect(
+                service.delete(file.id, createScopedActor({ realmId: OWNER_REALM, realmScope: 'own' })),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
+        });
+
+        it('should let the system delete a temp file', async () => {
+            const file = seedFile(AnalysisBucketType.TEMP);
+
+            await service.delete(file.id, createSystemActor());
             expect(repository.getAll()).toHaveLength(0);
         });
 

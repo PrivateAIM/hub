@@ -8,6 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { ValidupError } from 'validup';
 import { PermissionName } from '@privateaim/kit';
 import type { FakeActorContext } from '@privateaim/server-test-kit';
 import {
@@ -21,7 +22,7 @@ import { AnalysisReachService } from '../../../../src/core/services/analysis-rea
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { FakeNodeRepository } from '../entities/node/fake-repository.ts';
-import { createDenyAllActor, createNonMasterRealmActor } from '../helpers/index.ts';
+import { createDenyAllActor, createNonMasterRealmActor, createScopedActor } from '../helpers/index.ts';
 import { createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
 const OWNER_REALM = randomUUID();
@@ -33,19 +34,32 @@ const ANALYSIS_ID = randomUUID();
 const APPROVED_NODE = randomUUID();
 const PENDING_NODE = randomUUID();
 const APPROVED_NODE_CLIENT = randomUUID();
+const PENDING_NODE_CLIENT = randomUUID();
 
 function userOf(realmId: string): FakeActorContext {
     return createNonMasterRealmActor(realmId);
 }
 
-function clientOf(clientId: string, realmId: string): FakeActorContext {
-    const actor = createNonMasterRealmActor(realmId);
+function clientOf(clientId: string, realmId: string, actor = createNonMasterRealmActor(realmId)): FakeActorContext {
     actor.identity = {
         id: clientId, 
         type: 'client', 
         realmId, 
     };
     return actor;
+}
+
+/** A node client: no ANALYSIS_UPDATE/APPROVE, its grants scoped `none` (Q1). */
+function boundClientOf(clientId: string, realmId: string): FakeActorContext {
+    return createScopedActor({
+        realmId,
+        realmScope: 'none',
+        identity: {
+            id: clientId, 
+            type: 'client', 
+            realmId, 
+        },
+    });
 }
 
 describe('AnalysisLogAccessService', () => {
@@ -62,7 +76,11 @@ describe('AnalysisLogAccessService', () => {
                 realmId: APPROVED_REALM, 
                 clientId: APPROVED_NODE_CLIENT, 
             }),
-            nodeRepository.create({ id: PENDING_NODE, realmId: PENDING_REALM }),
+            nodeRepository.create({
+                id: PENDING_NODE,
+                realmId: PENDING_REALM,
+                clientId: PENDING_NODE_CLIENT,
+            }),
         ]);
 
         const analysisNodeRepository = new FakeAnalysisNodeRepository();
@@ -178,6 +196,21 @@ describe('AnalysisLogAccessService', () => {
                 .rejects.toThrow(PermissionDeniedError);
         });
 
+        it('lets the node\'s own client read its approved run without the capability', async () => {
+            const actor = clientOf(APPROVED_NODE_CLIENT, APPROVED_REALM, createDenyAllActor(APPROVED_REALM));
+
+            await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, APPROVED_NODE, actor, LogAccessIntent.READ))
+                .resolves.toBeUndefined();
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls).toHaveLength(0);
+        });
+
+        it('falls back to the capability for the node\'s own client of a pending run', async () => {
+            const actor = clientOf(PENDING_NODE_CLIENT, PENDING_REALM, createDenyAllActor(PENDING_REALM));
+
+            await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, PENDING_NODE, actor, LogAccessIntent.READ))
+                .rejects.toThrow(PermissionDeniedError);
+        });
+
         it('does not count a client bound in another realm', async () => {
             await expect(service.assertAnalysisNodeLogAccess(
                 ANALYSIS_ID,
@@ -204,6 +237,62 @@ describe('AnalysisLogAccessService', () => {
             }
             await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, 'abc', userOf(OWNER_REALM), LogAccessIntent.READ))
                 .rejects.toThrow(BadRequestError);
+        });
+    });
+
+    describe('analysis-node log writes', () => {
+        it('requires ANALYSIS_NODE_LOG_CREATE', async () => {
+            const actor = boundClientOf(APPROVED_NODE_CLIENT, APPROVED_REALM);
+            await service.assertAnalysisNodeLogCreate(ANALYSIS_ID, APPROVED_NODE, actor);
+
+            expect(actor.permissionEvaluator.preEvaluateCalls.map((call) => call.name))
+                .toEqual([PermissionName.ANALYSIS_NODE_LOG_CREATE]);
+
+            const denied = clientOf(APPROVED_NODE_CLIENT, APPROVED_REALM, createDenyAllActor(APPROVED_REALM));
+            await expect(service.assertAnalysisNodeLogCreate(ANALYSIS_ID, APPROVED_NODE, denied))
+                .rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('lets the node\'s own client write by its binding, not its grant\'s reach', async () => {
+            await expect(service.assertAnalysisNodeLogCreate(ANALYSIS_ID, APPROVED_NODE, boundClientOf(APPROVED_NODE_CLIENT, APPROVED_REALM)))
+                .resolves.toBeUndefined();
+        });
+
+        it('does not let a node client write another node\'s logs', async () => {
+            await expect(service.assertAnalysisNodeLogCreate(ANALYSIS_ID, PENDING_NODE, boundClientOf(APPROVED_NODE_CLIENT, APPROVED_REALM)))
+                .rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('does not count a client bound in another realm', async () => {
+            await expect(service.assertAnalysisNodeLogCreate(ANALYSIS_ID, APPROVED_NODE, boundClientOf(APPROVED_NODE_CLIENT, OTHER_REALM)))
+                .rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('lets any other caller write only with a grant reaching the node\'s realm', async () => {
+            await expect(service.assertAnalysisNodeLogCreate(
+                ANALYSIS_ID,
+                APPROVED_NODE,
+                createScopedActor({ realmId: APPROVED_REALM, realmScope: 'own' }),
+            )).resolves.toBeUndefined();
+            await expect(service.assertAnalysisNodeLogCreate(
+                ANALYSIS_ID,
+                APPROVED_NODE,
+                createScopedActor({ realmId: OTHER_REALM, realmScope: 'any' }),
+            )).resolves.toBeUndefined();
+
+            // the analysis' own realm is not the node's
+            await expect(service.assertAnalysisNodeLogCreate(
+                ANALYSIS_ID,
+                APPROVED_NODE,
+                createScopedActor({ realmId: OWNER_REALM, realmScope: 'own' }),
+            )).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('rejects an unknown node or analysis', async () => {
+            const actor = createScopedActor({ realmId: APPROVED_REALM, realmScope: 'own' });
+
+            await expect(service.assertAnalysisNodeLogCreate(ANALYSIS_ID, randomUUID(), actor)).rejects.toThrow(ValidupError);
+            await expect(service.assertAnalysisNodeLogCreate(randomUUID(), APPROVED_NODE, actor)).rejects.toThrow(ValidupError);
         });
     });
 });

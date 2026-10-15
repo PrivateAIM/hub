@@ -8,17 +8,11 @@
 import { eq } from '@rapiq/core';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus, AnalysisNodeValidator, NodeType  } from '@privateaim/core-kit';
-import {
-    PermissionName,
-    ProcessStatus,
-    ValidatorGroup, 
-    isRealmResourceWritable, 
-} from '@privateaim/kit';
+import { PermissionName, ProcessStatus, ValidatorGroup } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
-import { holdsPermission } from '../../utils/index.ts';
+import { AbstractEntityService, assertRecordReach, reachesRecord } from '@privateaim/server-kit';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisNodeSchema } from './schema.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
@@ -100,6 +94,8 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         validated.analysisRealmId = validated.analysis.realmId;
         validated.nodeRealmId = validated.node.realmId;
 
+        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: validated.analysisRealmId, attributes: validated });
+
         if (validated.analysis.configurationLocked) {
             throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
         }
@@ -154,30 +150,9 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             throw new EntityNotFoundError({ entity: 'analysis-node' });
         }
 
-        const isAuthorityOfNode = isRealmResourceWritable(actor.realm, entity.nodeRealmId);
-        const isAuthorityOfAnalysis = isRealmResourceWritable(actor.realm, entity.analysisRealmId);
+        const isNodeClient = await this.isNodeClient(entity, actor);
 
-        if (!isAuthorityOfNode && !isAuthorityOfAnalysis) {
-            throw new PermissionDeniedError('You are neither part of the node nor analysis realm.');
-        }
-
-        const canUpdate = await holdsPermission(actor, PermissionName.ANALYSIS_UPDATE);
-        const canApprove = await holdsPermission(actor, PermissionName.ANALYSIS_APPROVE);
-
-        if (!canUpdate && !canApprove) {
-            throw new PermissionDeniedError();
-        }
-
-        if (
-            isPropertySet(validated, 'approvalStatus') ||
-            isPropertySet(validated, 'comment')
-        ) {
-            if (!isAuthorityOfNode || !canApprove) {
-                throw new PermissionDeniedError(
-                    'You are either no authority of the node or you don\'t have the required permissions.',
-                );
-            }
-        }
+        await this.assertUpdatable(entity, validated, actor, isNodeClient);
 
         // A node approves the built image (hash, size, OS), which does not
         // exist before the build has finished; a rejection is possible any time.
@@ -192,15 +167,10 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             }
         }
 
-        if (isPropertySet(validated, 'executionStatus')) {
-            if (!isAuthorityOfNode || !canUpdate) {
-                throw new PermissionDeniedError(
-                    'You are either no authority of the node or you don\'t have the required permissions.',
-                );
-            }
-        }
-
         const merged = this.repository.merge(entity, validated);
+
+        // The grant's policies bind the target state too (authup's evaluateUpdate).
+        await this.assertUpdatable(merged, validated, actor, isNodeClient);
 
         const saved = await this.repository.save(merged, { data: actor.metadata });
 
@@ -222,9 +192,14 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             throw new EntityNotFoundError({ entity: 'analysis-node' });
         }
 
+        // The analysis' realm, or the node's realm detaching its own node.
         if (
-            !isRealmResourceWritable(actor.realm, entity.nodeRealmId) &&
-            !isRealmResourceWritable(actor.realm, entity.analysisRealmId)
+            !await reachesRecord(actor, PermissionName.ANALYSIS_UPDATE, { realmId: entity.analysisRealmId, attributes: entity }) &&
+            !await reachesRecord(
+                actor,
+                [PermissionName.ANALYSIS_UPDATE, PermissionName.ANALYSIS_APPROVE],
+                { realmId: entity.nodeRealmId, attributes: entity },
+            )
         ) {
             throw new PermissionDeniedError();
         }
@@ -238,5 +213,58 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         await this.recalculator.recalc(entity.analysisId);
 
         return entity;
+    }
+
+    /**
+     * Node-side fields are the node realm's, approval with ANALYSIS_APPROVE and
+     * execution with ANALYSIS_UPDATE — or, for execution, the node's own client
+     * by its binding alone (plan 021, Q1). Anything else needs one of the three.
+     */
+    protected async assertUpdatable(
+        row: AnalysisNode,
+        data: Partial<AnalysisNode>,
+        actor: ActorContext,
+        isNodeClient: boolean,
+    ): Promise<void> {
+        const canApprove = await reachesRecord(actor, PermissionName.ANALYSIS_APPROVE, { realmId: row.nodeRealmId, attributes: row });
+        const canUpdateNode = isNodeClient ||
+            await reachesRecord(actor, PermissionName.ANALYSIS_UPDATE, { realmId: row.nodeRealmId, attributes: row });
+        const canUpdateAnalysis = await reachesRecord(actor, PermissionName.ANALYSIS_UPDATE, { realmId: row.analysisRealmId, attributes: row });
+
+        if (!canApprove && !canUpdateNode && !canUpdateAnalysis) {
+            throw new PermissionDeniedError();
+        }
+
+        if (
+            (isPropertySet(data, 'approvalStatus') || isPropertySet(data, 'comment')) &&
+            !canApprove
+        ) {
+            throw new PermissionDeniedError('You are either no authority of the node or you don\'t have the required permissions.');
+        }
+
+        if (isPropertySet(data, 'executionStatus') && !canUpdateNode) {
+            throw new PermissionDeniedError('You are either no authority of the node or you don\'t have the required permissions.');
+        }
+    }
+
+    /**
+     * The node's own client, bound in its own realm only: `node.clientId` is
+     * writable by node managers and not unique.
+     */
+    protected async isNodeClient(entity: AnalysisNode, actor: ActorContext): Promise<boolean> {
+        if (
+            !actor.identity ||
+            actor.identity.type !== 'client' ||
+            actor.identity.realmId !== entity.nodeRealmId
+        ) {
+            return false;
+        }
+
+        const rows = await this.repository.findManyWithNodeByAnalysis(entity.analysisId);
+        const node = rows.find((row) => row.id === entity.id)?.node;
+
+        return !!node &&
+            node.clientId === actor.identity.id &&
+            node.realmId === actor.identity.realmId;
     }
 }

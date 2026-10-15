@@ -6,6 +6,7 @@
  */
 
 import type { ClientPermission, Permission } from '@authup/core-kit';
+import { REALM_SCOPE } from '@authup/core-kit';
 import type { AuthupClient, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import type { IClientPermissionStore } from '../../../core/services/analysis-client-permission/index.ts';
 
@@ -41,7 +42,13 @@ export class AuthupClientPermissionStore implements IClientPermissionStore {
     }
 
     async create(clientId: string, permissionId: string): Promise<ClientPermission> {
-        const { data } = await this.authup.clientPermission.create({ clientId, permissionId });
+        // Analysis clients reach by binding only (plan 021, D8): a grant scope
+        // would let the client act for every analysis of its realm.
+        const { data } = await this.authup.clientPermission.create({
+            clientId, 
+            permissionId, 
+            realmScope: REALM_SCOPE.NONE, 
+        });
 
         return data;
     }

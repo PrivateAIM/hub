@@ -14,17 +14,15 @@ import {
     NodeType,
     ProjectNodeApprovalStatus,
 } from '@privateaim/core-kit';
-import { BuiltInPolicyType, PolicyData } from '@authup/access';
 import {
     PermissionName,
     ValidatorGroup,
     generateName,
-    isRealmResourceWritable,
 } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
+import { AbstractEntityService, assertRecordReach } from '@privateaim/server-kit';
 import type { IProjectRepository } from '../project/types.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from '../analysis-node/types.ts';
@@ -163,10 +161,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         // matching once attribute policies are enabled, and a denylist-shaped one
         // then fails OPEN. See docs/src/guide/development/migration-camelcase.md
         // -> "Authup attribute policies".
-        await actor.permissionEvaluator.evaluate({
-            name: PermissionName.ANALYSIS_CREATE,
-            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
-        });
+        await assertRecordReach(actor, PermissionName.ANALYSIS_CREATE, { realmId: entity.realmId, attributes: entity });
 
         await this.repository.save(entity, { data: actor.metadata });
 
@@ -239,20 +234,19 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        await actor.permissionEvaluator.evaluate({
-            name: PermissionName.ANALYSIS_UPDATE,
-            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
-        });
-
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: entity.realmId, attributes: entity });
 
         if (isPropertySet(validated, 'masterImageId')) {
             if (validated.masterImageId !== entity.masterImageId) {
                 validated.imageCommandArguments = null;
             }
         }
+
+        // The grant's policies bind the target state too (authup's evaluateUpdate).
+        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, {
+            realmId: entity.realmId,
+            attributes: this.repository.merge({ ...entity }, validated),
+        });
 
         // merged into the locked row, not the copy read above: save() diffs
         // against the database, so that copy's build/distribution status
@@ -287,14 +281,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        await actor.permissionEvaluator.evaluate({
-            name: PermissionName.ANALYSIS_DELETE,
-            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: entity }),
-        });
-
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        await assertRecordReach(actor, PermissionName.ANALYSIS_DELETE, { realmId: entity.realmId, attributes: entity });
 
         const { project } = entity;
         const entityId = entity.id;
@@ -320,14 +307,18 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new BadRequestError('Invalid command.');
         }
 
+        const permissionName = command === AnalysisCommand.BUILD_START || command === AnalysisCommand.DISTRIBUTION_START ?
+            PermissionName.ANALYSIS_EXECUTION_START :
+            PermissionName.ANALYSIS_UPDATE;
+
+        await actor.permissionEvaluator.preEvaluate({ name: permissionName });
+
         let entity = await this.repository.findOneById(id);
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        await assertRecordReach(actor, permissionName, { realmId: entity.realmId, attributes: entity });
 
         const persistCtx = { data: actor.metadata };
 

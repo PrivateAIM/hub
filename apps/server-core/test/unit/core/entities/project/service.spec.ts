@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { randomUUID } from 'node:crypto';
+import { BuiltInPolicyType } from '@authup/access';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { Project } from '@privateaim/core-kit';
 import {
@@ -17,8 +19,7 @@ import { ProjectService } from '../../../../../src/core/entities/project/service
 import {
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
-    createNonMasterRealmActor,
+    createScopedActor,
 } from '../../helpers/index.ts';
 import { FakeProjectRepository } from './fake-repository.ts';
 
@@ -105,6 +106,40 @@ describe('ProjectService', () => {
                 service.create({ name: 'Not A Slug!' }, createAllowAllActor()),
             ).rejects.toThrow(/name is invalid/i);
         });
+
+        it('should create in the actor realm only with a grant reaching it', async () => {
+            const realmId = randomUUID();
+
+            const result = await service.create({}, createScopedActor({ realmId, realmScope: 'own' }));
+            expect(result.realmId).toBe(realmId);
+
+            await expect(
+                service.create({}, createScopedActor({ realmScope: 'none' })),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
+        });
+    });
+
+    describe('update', () => {
+        it('should deny updating a project in a realm the grant does not reach', async () => {
+            repository.seed(createTestProject({ realmId: randomUUID() }));
+
+            await expect(
+                service.update('project-1', { displayName: 'renamed' }, createScopedActor({ realmScope: 'own' })),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should evaluate both the stored and the merged project', async () => {
+            const realmId = randomUUID();
+            repository.seed(createTestProject({ realmId }));
+
+            const actor = createScopedActor({ realmId, realmScope: 'own' });
+            await service.update('project-1', { displayName: 'renamed' }, actor);
+
+            const displayNames = actor.permissionEvaluator.evaluateCalls
+                .map((call) => call.data?.get<Project>(BuiltInPolicyType.ATTRIBUTES)?.displayName);
+            expect(displayNames).toEqual([undefined, 'renamed']);
+        });
     });
 
     describe('delete', () => {
@@ -141,19 +176,19 @@ describe('ProjectService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should enforce realm writability for non-master realm', async () => {
-            repository.seed(createTestProject({ realmId: 'other-realm' }));
+        it('should deny deleting a project in a realm the grant does not reach', async () => {
+            repository.seed(createTestProject({ realmId: randomUUID() }));
 
-            const actor = createNonMasterRealmActor('realm-1');
             await expect(
-                service.delete('project-1', actor),
+                service.delete('project-1', createScopedActor({ realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
         });
 
-        it('should allow master realm to delete any project', async () => {
-            repository.seed(createTestProject({ realmId: 'other-realm' }));
+        it('should delete a project in any realm with an any-scoped grant', async () => {
+            repository.seed(createTestProject({ realmId: randomUUID() }));
 
-            const result = await service.delete('project-1', createMasterRealmActor());
+            const result = await service.delete('project-1', createScopedActor({ realmScope: 'any' }));
             expect(result.id).toBe('project-1');
         });
     });

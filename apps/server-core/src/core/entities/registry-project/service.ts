@@ -9,12 +9,11 @@ import type { Node, RegistryProject } from '@privateaim/core-kit';
 import {
     PermissionName,
     ValidatorGroup,
-    isPropertySet, 
-    isRealmResourceWritable, 
+    isPropertySet,
 } from '@privateaim/kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
+import { AbstractEntityService, assertRecordReach, scopeReadQuery } from '@privateaim/server-kit';
 import { holdsPermission, isPermissionDenial } from '../../utils/index.ts';
 import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
@@ -122,13 +121,17 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         }
     }
 
-    /** The registry project of the node whose client is calling, if any. */
+    /**
+     * The registry project of the node whose client is calling, if any. Bound
+     * in the client's own realm only: `node.clientId` is writable by node
+     * managers and not unique, so another realm must not claim a client.
+     */
     private async findOwnNodeProjectId(actor: ActorContext): Promise<string | undefined> {
-        if (!actor.identity || actor.identity.type !== 'client' || !this.nodeRepository) {
+        if (!actor.identity || actor.identity.type !== 'client' || !actor.identity.realmId || !this.nodeRepository) {
             return undefined;
         }
 
-        const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id });
+        const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id, realmId: actor.identity.realmId });
         return node?.registryProjectId ?? undefined;
     }
 
@@ -160,6 +163,10 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
         const entity = this.repository.create(validated);
 
+        // A project created here carries no realm: a global row, which only
+        // `ownOrNull`/`any` grants reach.
+        await assertRecordReach(actor, PermissionName.REGISTRY_PROJECT_MANAGE, { realmId: entity.realmId, attributes: entity });
+
         const saved = await this.repository.save(entity, { data: actor.metadata });
 
         if (this.registryManager) {
@@ -179,13 +186,12 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        await assertRecordReach(actor, PermissionName.REGISTRY_PROJECT_MANAGE, { realmId: entity.realmId, attributes: entity });
 
         const previousExternalName = entity.externalName;
 
         const merged = this.repository.merge(entity, validated);
+        await assertRecordReach(actor, PermissionName.REGISTRY_PROJECT_MANAGE, { realmId: merged.realmId, attributes: merged });
 
         const saved = await this.repository.save(merged, { data: actor.metadata });
 
@@ -213,9 +219,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        await assertRecordReach(actor, PermissionName.REGISTRY_PROJECT_MANAGE, { realmId: entity.realmId, attributes: entity });
 
         const entityId = entity.id;
 

@@ -9,33 +9,33 @@ import { randomUUID } from 'node:crypto';
 import type { Node } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { PermissionName } from '@privateaim/kit';
 import { createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { NodeClientCredentialService } from '../../../../../src/core/services/client-credential/index.ts';
 import { FakeNodeRepository } from '../../entities/node/fake-repository.ts';
-import { createPermissionActor } from '../../helpers/index.ts';
+import { createPermissionActor, createScopedActor } from '../../helpers/index.ts';
 import { FakeClientCredentialStore } from './fake-credential-store.ts';
 
 /**
- * A logged-in actor that holds NODE_UPDATE but belongs to a specific
- * (non-master) realm — used to exercise the realm-writable gate.
+ * A manager whose grants reach only its own realm — used to exercise the
+ * realm reach of NODE_UPDATE.
  */
 function realmManagerActor(realmId: string): ActorContext {
-    return createPermissionActor({
-        realm: { id: realmId, name: realmId },
-        permissions: [PermissionName.NODE_UPDATE],
-    });
+    return createScopedActor({ realmId, realmScope: 'own' });
 }
 
 /**
- * The node's own OAuth2 client — a client-type identity that holds no
- * management permission.
+ * The node's own OAuth2 client — a client-type identity of `realmId` that
+ * holds no management permission.
  */
-function nodeClientActor(clientId: string): ActorContext {
+function nodeClientActor(clientId: string, realmId = 'realm-b'): ActorContext {
     return createPermissionActor({
-        realm: { id: randomUUID(), name: 'node-realm' },
-        identity: { type: 'client', id: clientId },
+        realm: { id: realmId, name: 'node-realm' },
+        identity: {
+            type: 'client', 
+            id: clientId, 
+            realmId, 
+        },
     });
 }
 
@@ -63,10 +63,10 @@ function baseNode(overrides: Partial<Node> = {}): Partial<Node> {
 }
 
 describe('NodeClientCredentialService', () => {
-    it('should return the credentials of the node client for a master-realm member', async () => {
+    it('should return the credentials of the node client for an any-scoped manager', async () => {
         const { service, reader } = buildService({ node: baseNode() });
 
-        const credentials = await service.getCredentials(NODE_ID, createAllowAllActor());
+        const credentials = await service.getCredentials(NODE_ID, createScopedActor({ realmScope: 'any' }));
 
         expect(credentials).toEqual({
             id: 'node-client-1',
@@ -98,6 +98,26 @@ describe('NodeClientCredentialService', () => {
 
         await expect(
             service.getCredentials(NODE_ID, nodeClientActor('some-other-client')),
+        ).rejects.toThrow(PermissionDeniedError);
+        expect(reader.calls).toHaveLength(0);
+    });
+
+    // `node.clientId` is writable by node managers: pointing a node at a
+    // client of another realm must not hand that client the node.
+    it('should not bind a client of another realm', async () => {
+        const { service, reader } = buildService({ node: baseNode() });
+
+        await expect(
+            service.getCredentials(NODE_ID, nodeClientActor('node-client-1', 'realm-a')),
+        ).rejects.toThrow(PermissionDeniedError);
+        expect(reader.calls).toHaveLength(0);
+    });
+
+    it('should deny a manager holding NODE_UPDATE only as a capability', async () => {
+        const { service, reader } = buildService({ node: baseNode() });
+
+        await expect(
+            service.getCredentials(NODE_ID, createScopedActor({ realmId: 'realm-b', realmScope: 'none' })),
         ).rejects.toThrow(PermissionDeniedError);
         expect(reader.calls).toHaveLength(0);
     });

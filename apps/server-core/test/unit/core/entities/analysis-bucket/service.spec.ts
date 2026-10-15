@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { BuiltInPolicyType } from '@authup/access';
 import type { Analysis, AnalysisBucket, Node } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import {
@@ -28,6 +29,7 @@ import {
     createDenyAllActor,
     createMasterRealmActor,
     createNonMasterRealmActor,
+    createScopedActor,
 } from '../../helpers/index.ts';
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
@@ -260,7 +262,7 @@ describe('AnalysisBucketService', () => {
                     bucketId: randomUUID(), 
                     type: AnalysisBucketType.CODE, 
                 },
-                createNonMasterRealmActor('other-realm'),
+                createScopedActor({ realmId: 'other-realm', realmScope: 'own' }),
             )).rejects.toThrow(PermissionDeniedError);
             expect(repository.getAll()).toHaveLength(0);
         });
@@ -321,12 +323,12 @@ describe('AnalysisBucketService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should enforce realm writability for non-master realm', async () => {
+        it('should deny a bucket of a realm out of reach', async () => {
             const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
-                service.update(bucket.id, {}, createNonMasterRealmActor('realm-1')),
+                service.update(bucket.id, {}, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -339,11 +341,22 @@ describe('AnalysisBucketService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should allow master realm to update any entity', async () => {
+        it('should evaluate both the stored and the merged row', async () => {
+            const bucket = createTestAnalysisBucket();
+            repository.seed(bucket);
+
+            const actor = createScopedActor({ realmId: bucket.realmId, realmScope: 'own' });
+            await service.update(bucket.id, {}, actor);
+
+            expect(actor.permissionEvaluator.evaluateCalls.map((call) => call.data?.get(BuiltInPolicyType.REALM_MATCH)))
+                .toEqual([bucket.realmId, bucket.realmId]);
+        });
+
+        it('should let a grant reaching every realm update any entity', async () => {
             const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
-            const result = await service.update(bucket.id, {}, createMasterRealmActor());
+            const result = await service.update(bucket.id, {}, createScopedActor({ realmId: 'realm-master', realmScope: 'any' }));
             expect(result.id).toBe(bucket.id);
         });
     });
@@ -364,12 +377,12 @@ describe('AnalysisBucketService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should enforce realm writability for non-master realm', async () => {
+        it('should deny a bucket of a realm out of reach', async () => {
             const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
-                service.delete(bucket.id, createNonMasterRealmActor('realm-1')),
+                service.delete(bucket.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -403,11 +416,11 @@ describe('AnalysisBucketService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should allow master realm to delete any entity', async () => {
+        it('should let a grant reaching every realm delete any entity', async () => {
             const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
-            const result = await service.delete(bucket.id, createMasterRealmActor());
+            const result = await service.delete(bucket.id, createScopedActor({ realmId: 'realm-master', realmScope: 'any' }));
             expect(result.id).toBe(bucket.id);
         });
     });

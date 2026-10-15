@@ -11,11 +11,10 @@ import {
     PermissionName,
     ValidatorGroup,
     generateName,
-    isRealmResourceWritable,
 } from '@privateaim/kit';
-import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
+import { AbstractEntityService, assertRecordReach } from '@privateaim/server-kit';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import type { IProjectRepository, IProjectService } from './types.ts';
 import { projectSchema } from './schema.ts';
@@ -67,13 +66,11 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
 
         await this.repository.validateJoinColumns(validated);
 
-        if (validated.realmId) {
-            if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
-                throw new PermissionDeniedError('You are not permitted to create this project.');
-            }
-        } else {
+        if (!validated.realmId) {
             validated.realmId = this.getActorRealmId(actor);
         }
+
+        await assertRecordReach(actor, PermissionName.PROJECT_CREATE, { realmId: validated.realmId, attributes: validated });
 
         // No identity falls through to the default branch, like any other kind.
         switch (actor.identity?.type) {
@@ -107,11 +104,10 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             throw new EntityNotFoundError({ entity: 'project' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        await assertRecordReach(actor, PermissionName.PROJECT_UPDATE, { realmId: entity.realmId, attributes: entity });
 
         const merged = this.repository.merge(entity, validated);
+        await assertRecordReach(actor, PermissionName.PROJECT_UPDATE, { realmId: merged.realmId, attributes: merged });
 
         await this.repository.checkUniqueness(merged, entity);
 
@@ -126,9 +122,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             throw new EntityNotFoundError({ entity: 'project' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        await assertRecordReach(actor, PermissionName.PROJECT_DELETE, { realmId: entity.realmId, attributes: entity });
 
         if (entity.analyses > 0) {
             throw new BadRequestError('The project still has associated analyses.');
