@@ -7,27 +7,37 @@
 
 import { eq } from '@rapiq/core';
 import type { AnalysisBucket } from '@privateaim/core-kit';
-import { ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { AnalysisBucketType, AnalysisBucketValidator } from '@privateaim/core-kit';
+import { PermissionName, ValidatorGroup, isRealmResourceWritable } from '@privateaim/kit';
+import {
+    BadRequestError,
+    EntityConflictError,
+    EntityNotFoundError,
+    PermissionDeniedError,
+} from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisBucketSchema } from './schema.ts';
 import type { IAnalysisBucketRepository, IAnalysisBucketService } from './types.ts';
-import { AnalysisBucketValidator } from '@privateaim/core-kit';
+import type { IAnalysisRepository } from '../analysis/types.ts';
 
 type AnalysisBucketServiceContext = {
     repository: IAnalysisBucketRepository;
+    analysisRepository: IAnalysisRepository;
 };
 
 export class AnalysisBucketService extends AbstractEntityService implements IAnalysisBucketService {
     protected repository: IAnalysisBucketRepository;
+
+    protected analysisRepository: IAnalysisRepository;
 
     protected validator: AnalysisBucketValidator;
 
     constructor(ctx: AnalysisBucketServiceContext) {
         super();
         this.repository = ctx.repository;
+        this.analysisRepository = ctx.analysisRepository;
         this.validator = new AnalysisBucketValidator();
     }
 
@@ -58,6 +68,17 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
 
         validated.realmId = validated.analysis.realmId;
 
+        await this.assertOwner(actor, validated.realmId);
+
+        // one bucket per type and analysis, and a storage bucket bound to one analysis bucket:
+        // consumers resolve a bucket by (analysisId, type) or by bucketId.
+        if (
+            await this.repository.findOneBy({ analysisId: validated.analysisId, type: validated.type }) ||
+            await this.repository.findOneBy({ bucketId: validated.bucketId })
+        ) {
+            throw new EntityConflictError({ entity: 'analysis-bucket' });
+        }
+
         const entity = this.repository.create(validated);
 
         return this.repository.save(entity, { data: actor.metadata });
@@ -69,9 +90,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        await this.assertOwner(actor, entity.realmId);
 
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
@@ -86,8 +105,13 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
+        await this.assertOwner(actor, entity.realmId);
+
+        if (entity.type === AnalysisBucketType.CODE) {
+            const analysis = await this.analysisRepository.findOneById(entity.analysisId);
+            if (analysis?.configurationLocked) {
+                throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
+            }
         }
 
         const entityId = entity.id;
@@ -97,5 +121,13 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
         entity.id = entityId;
 
         return entity;
+    }
+
+    protected async assertOwner(actor: ActorContext, realmId: string): Promise<void> {
+        if (!isRealmResourceWritable(actor.realm, realmId)) {
+            throw new PermissionDeniedError();
+        }
+
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
     }
 }

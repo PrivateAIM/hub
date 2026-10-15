@@ -24,6 +24,7 @@ import {
 import {
     BucketEventMessageBusRouting,
     BucketFileEventMessageBusRouting,
+    BucketFileTaskCaller,
 } from '@privateaim/server-storage-kit';
 import {
     AnalysisBuilderAggregator,
@@ -93,6 +94,7 @@ export class AggregatorsModule implements IModule {
                     dataSource,
                     taskManager,
                     logger,
+                    bucketFileCaller: new BucketFileTaskCaller({ messageBus, logger }),
                 }),
                 {
                     consumeRouting: BucketFileEventMessageBusRouting,

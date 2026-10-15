@@ -6,19 +6,26 @@
  */
 
 import { eq } from '@rapiq/core';
-import type { AnalysisBucketFile } from '@privateaim/core-kit';
-import { ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
+import { REALM_MASTER_NAME } from '@authup/core-kit';
+import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
+import { AnalysisBucketFileValidator, AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
+import { PermissionName, ValidatorGroup, isRealmResourceWritable } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import type { IAnalysisBucketFileRepository, IAnalysisBucketFileService, IAnalysisFileMetadataRecalculator } from './types.ts';
-import { AnalysisBucketFileValidator } from '@privateaim/core-kit';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisBucketFileSchema } from './schema.ts';
+import type { IAnalysisRepository } from '../analysis/types.ts';
+import type { IAnalysisBucketRepository } from '../analysis-bucket/types.ts';
+import type { IAnalysisNodeRepository } from '../analysis-node/types.ts';
 
 type AnalysisBucketFileServiceContext = {
     repository: IAnalysisBucketFileRepository;
     recalculator: IAnalysisFileMetadataRecalculator;
+    analysisRepository: IAnalysisRepository;
+    analysisBucketRepository: IAnalysisBucketRepository;
+    analysisNodeRepository: IAnalysisNodeRepository;
 };
 
 export class AnalysisBucketFileService extends AbstractEntityService implements IAnalysisBucketFileService {
@@ -26,12 +33,21 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
     protected recalculator: IAnalysisFileMetadataRecalculator;
 
+    protected analysisRepository: IAnalysisRepository;
+
+    protected analysisBucketRepository: IAnalysisBucketRepository;
+
+    protected analysisNodeRepository: IAnalysisNodeRepository;
+
     protected validator: AnalysisBucketFileValidator;
 
     constructor(ctx: AnalysisBucketFileServiceContext) {
         super();
         this.repository = ctx.repository;
         this.recalculator = ctx.recalculator;
+        this.analysisRepository = ctx.analysisRepository;
+        this.analysisBucketRepository = ctx.analysisBucketRepository;
+        this.analysisNodeRepository = ctx.analysisNodeRepository;
         this.validator = new AnalysisBucketFileValidator();
     }
 
@@ -64,15 +80,33 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         await this.repository.validateJoinColumns(validated);
 
-        validated.realmId = this.getActorRealmId(actor);
+        const { bucket, analysis } = await this.resolveScope(validated.analysisBucketId);
+        validated.realmId = bucket.realmId;
+        validated.analysisId = bucket.analysisId;
 
-        if (!isRealmResourceWritable(actor.realm, validated.realmId)) {
-            throw new PermissionDeniedError();
+        if (bucket.type === AnalysisBucketType.CODE) {
+            await this.assertOwner(actor, analysis);
+            this.assertUnlocked(analysis);
+        } else if (!this.isMaster(actor)) {
+            // interim participation rule until plan 021: the realm of an approved analysis node.
+            const realmId = this.getActorRealmId(actor);
+            const participant = realmId && await this.analysisNodeRepository.findOneBy({
+                analysisId: analysis.id,
+                nodeRealmId: realmId,
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            });
+            if (!participant) {
+                throw new PermissionDeniedError();
+            }
         }
 
-        // Set analysisId from the related analysisBucket
-        if (validated.analysisBucket?.analysisId) {
-            validated.analysisId = validated.analysisBucket.analysisId;
+        if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
+            throw new BadRequestError('Only a code file can be the root file.');
+        }
+
+        // ponytail: bucketFileId can only be bound to the bucket by asking storage.
+        if (validated.bucketId !== bucket.bucketId) {
+            throw new BadRequestError('The storage bucket does not belong to the analysis bucket.');
         }
 
         switch (actor.identity.type) {
@@ -108,8 +142,12 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
+        const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
+        await this.assertOwner(actor, analysis);
+        this.assertBucketWritable(actor, bucket, analysis);
+
+        if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
+            throw new BadRequestError('Only a code file can be the root file.');
         }
 
         const merged = this.repository.merge(entity, validated);
@@ -127,9 +165,10 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
         }
 
-        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        // ponytail: a node deleting its OWN result upload needs the plan-021 client binding.
+        const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
+        await this.assertOwner(actor, analysis);
+        this.assertBucketWritable(actor, bucket, analysis);
 
         const entityId = entity.id;
 
@@ -142,5 +181,47 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         return entity;
+    }
+
+    protected async resolveScope(analysisBucketId: string): Promise<{ bucket: AnalysisBucket, analysis: Analysis }> {
+        const bucket = await this.analysisBucketRepository.findOneById(analysisBucketId);
+        const analysis = bucket ? await this.analysisRepository.findOneById(bucket.analysisId) : null;
+        if (!bucket || !analysis) {
+            throw new EntityNotFoundError({ entity: 'analysis-bucket' });
+        }
+
+        return { bucket, analysis };
+    }
+
+    protected isMaster(actor: ActorContext): boolean {
+        return actor.realm?.name === REALM_MASTER_NAME;
+    }
+
+    protected async assertOwner(actor: ActorContext, analysis: Analysis): Promise<void> {
+        if (!isRealmResourceWritable(actor.realm, analysis.realmId)) {
+            throw new PermissionDeniedError();
+        }
+
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
+    }
+
+    protected assertUnlocked(analysis: Analysis): void {
+        if (analysis.configurationLocked) {
+            throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
+        }
+    }
+
+    /**
+     * Code files are frozen with the configuration; temp files belong to the
+     * system (master realm) alone.
+     */
+    protected assertBucketWritable(actor: ActorContext, bucket: AnalysisBucket, analysis: Analysis): void {
+        if (bucket.type === AnalysisBucketType.CODE) {
+            this.assertUnlocked(analysis);
+        }
+
+        if (bucket.type === AnalysisBucketType.TEMP && !this.isMaster(actor)) {
+            throw new PermissionDeniedError();
+        }
     }
 }
