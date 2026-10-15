@@ -193,10 +193,10 @@ Services default `realmId` to actor's realm. Explicit `null` required for global
 |---|---|
 | `apps/server-core/src/components/types.ts` — `Component = { start, stop, status }` | `apps/server-core/src/app/components/node-client/types.ts` — `NodeClientComponent`, same shape |
 | `components/oauth2-cleaner/module.ts` — `createOAuth2CleanerComponent()`: one pass at start, then `cron.schedule(…, { noOverlap: true })`; a failing pass is logged, never thrown | `app/components/node-client/module.ts` — `createNodeClientComponent()`: node-client permission sync at start, then hourly |
-| `app/modules/components/module.ts` — starts every component fire-and-forget with `.catch`, stops them in `teardown()` | `app/modules/components/module.ts` — same for its background components, alongside the message-bus consumers |
+| `app/modules/components/module.ts` — starts every component fire-and-forget with `.catch`, stops them in `teardown()` | `app/modules/components/module.ts` — one `components` array holds the message-bus consumers and the background component; each is started fire-and-forget, none is stopped (server-core has no shutdown path calling `teardown()`) |
 
 Differences: hub's components directory also holds `BaseComponent` message-bus
 consumers (`registry/`), which authup does not have; hub's background component
 takes its cross-replica lock as an injected `lock(fn)` (backed by
 `withDataSourceLock`) instead of a `DataSource`, so its spec needs no database;
-hub has no `getHealth()` / worker-health listener reading `status()` yet.
+hub has no `getHealth()` / worker-health listener reading `status()` yet. Because hub's start loop does not `.catch`, the component's `start()` must never reject — `execute()` catches everything.

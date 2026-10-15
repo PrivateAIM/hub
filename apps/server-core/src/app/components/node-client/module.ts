@@ -23,8 +23,9 @@ export function createNodeClientComponent(ctx: NodeClientComponentContext): Node
     let lastSuccessAt: number | undefined;
     let runningSince: number | undefined;
 
-    // A failed pass must never take the process down (start() is
-    // fire-and-forget); the next tick simply retries.
+    // A failed pass must never take the process down: ComponentsModule starts
+    // components fire-and-forget without a catch, so start() must never
+    // reject. The next tick simply retries.
     const execute = async () => {
         runningSince = Date.now();
         try {

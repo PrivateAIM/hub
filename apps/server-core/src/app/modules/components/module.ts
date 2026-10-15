@@ -8,6 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { withDataSourceLock } from '@privateaim/server-db-kit';
+import type { Component } from '@privateaim/server-kit';
 import {
     AuthupClientInjectionKey,
     CacheInjectionKey,
@@ -22,7 +23,6 @@ import { DatabaseInjectionKey } from '../database/constants.ts';
 import { NodeClientService } from '../database/node-client.ts';
 import { NODE_CLIENT_SYNC_DATABASE_LOCK } from '../../components/node-client/constants.ts';
 import { createNodeClientComponent } from '../../components/node-client/module.ts';
-import type { NodeClientComponent } from '../../components/node-client/types.ts';
 import { RegistryComponent } from '../../components/registry/module.ts';
 import { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
 import { RegistryTaskMessageBusRouting } from '../../components/registry/constants.ts';
@@ -32,8 +32,6 @@ export class ComponentsModule implements IModule {
     readonly name = 'components';
 
     readonly dependencies: string[] = ['database'];
-
-    protected backgroundComponents: NodeClientComponent[] = [];
 
     async setup(container: IContainer): Promise<void> {
         // Create TaskManager
@@ -58,8 +56,8 @@ export class ComponentsModule implements IModule {
         const registryComponentCaller = new RegistryComponentCaller(registryComponent, { messageBus });
         container.register(ComponentsInjectionKey.RegistryComponentCaller, { useValue: registryComponentCaller });
 
-        // Start task consumers
-        const components = [
+        // Start task consumers and background components
+        const components: Component[] = [
             new MessageBusWorkerComponentCaller(
                 registryComponent,
                 {
@@ -70,13 +68,10 @@ export class ComponentsModule implements IModule {
             ),
         ];
 
-        components.forEach((c) => c.start());
-
-        // Background components without a queue: without an Authup client
-        // there are no node clients to sync.
+        // Without an Authup client there are no node clients to sync.
         if (authupResult.success) {
             const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
-            this.backgroundComponents.push(createNodeClientComponent({
+            components.push(createNodeClientComponent({
                 lock: (fn) => withDataSourceLock(dataSource, NODE_CLIENT_SYNC_DATABASE_LOCK, fn),
                 repository: container.resolve(DatabaseInjectionKey.NodeRepository),
                 nodeClientService: new NodeClientService(authupResult.data),
@@ -84,19 +79,6 @@ export class ComponentsModule implements IModule {
             }));
         }
 
-        // start() is fire-and-forget, so it must not hold up boot, and a
-        // rejection must be caught here: an unhandled one is fatal.
-        this.backgroundComponents.forEach((component) => {
-            component.start().catch((e) => {
-                logger.error(`Starting a background component failed: ${e instanceof Error ? e.message : String(e)}`);
-            });
-        });
-    }
-
-    async teardown(): Promise<void> {
-        const components = this.backgroundComponents;
-        this.backgroundComponents = [];
-
-        await Promise.all(components.map((component) => component.stop()));
+        components.forEach((c) => c.start());
     }
 }
