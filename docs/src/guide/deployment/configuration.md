@@ -99,7 +99,9 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   storage bucket or file is deleted; a bucket whose link was dropped stays in
   server-storage as a ref-less orphan, which an operator can delete with
   `DELETE /buckets/:id`. A repeated bucket create command now answers with the
-  existing bucket instead of creating another.
+  existing bucket instead of creating another. `POST /buckets` no longer accepts
+  a `refId` (400): only the service owning the referenced resource sets it, over
+  the bus.
 - A lost broker connection is retried every 5 seconds (it was 60).
 - Failure events carry the error's `name`, `message` and `code` instead of `{}`.
 

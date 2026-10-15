@@ -7,7 +7,7 @@
 
 import type { Bucket } from '@privateaim/storage-kit';
 import { eq } from '@rapiq/core';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName, ValidatorGroup, isRealmResourceWritable  } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
@@ -66,6 +66,13 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
         assertBucketRefPairing(validated);
+
+        // a refId names another service's resource, which storage cannot check ownership of:
+        // only the owning service sets it, over the bus. Otherwise a user could squat the
+        // unique (refType, refId, name) of e.g. an analysis bucket, or be handed it back.
+        if (validated.refId) {
+            throw new BadRequestError('refId can only be set by the service owning the referenced resource.');
+        }
 
         if (validated.realmId) {
             if (!isRealmResourceWritable(actor.realm, validated.realmId)) {

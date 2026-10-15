@@ -107,6 +107,18 @@ describe('BucketService', () => {
             expect(caller.getCreateCalls()[0].actorType).toBe('user');
         });
 
+        it('should reject a refId, which only the owning service sets over the bus', async () => {
+            await expect(service.create(
+                {
+                    name: 'new-bucket', 
+                    refType: 'analysis', 
+                    refId: randomUUID(), 
+                },
+                createAllowAllActor('realm-1'),
+            )).rejects.toThrow(BadRequestError);
+            expect(caller.getCreateCalls()).toHaveLength(0);
+        });
+
         it('should throw PermissionDeniedError when actor lacks permission', async () => {
             await expect(
                 service.create({ name: 'new-bucket' }, createDenyAllActor()),
@@ -141,24 +153,6 @@ describe('BucketService', () => {
                     actor,
                 ),
             ).rejects.toThrow(PermissionDeniedError);
-        });
-
-        it('should delegate to caller with both refType and refId set', async () => {
-            const actor = createAllowAllActor('realm-1');
-            const refId = randomUUID();
-
-            await service.create(
-                {
-                    name: 'new-bucket', 
-                    refType: 'analysis', 
-                    refId, 
-                },
-                actor,
-            );
-
-            const call = caller.getCreateCalls()[0];
-            expect(call.refType).toBe('analysis');
-            expect(call.refId).toBe(refId);
         });
 
         it('should delegate to caller with only refType set', async () => {
