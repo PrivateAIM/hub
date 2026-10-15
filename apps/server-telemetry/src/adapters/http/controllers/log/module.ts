@@ -5,15 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@privateaim/errors';
-import { PermissionName } from '@privateaim/kit';
 import type {
     EntityCollectionResponse,
     EntityRecordResponse,
     Log,
     LogInput,
 } from '@privateaim/telemetry-kit';
-import { LogValidator } from '@privateaim/telemetry-kit';
 import {
     DBody,
     DContext,
@@ -24,18 +21,17 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { ForceLoggedInMiddleware, useRequestPermissionEvaluator } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import type { IAppEvent } from 'routup';
-import type { LogStore } from '../../../../core/services/log-store/types.ts';
-import { collectLogFilters, decodeQueryOpen } from '../../../../core/query/index.ts';
+import type { ILogService } from '../../../../core/index.ts';
 
 @DTags('logs')
 @DController('/logs')
 export class LogController {
-    private logStore: LogStore;
+    protected service: ILogService;
 
-    constructor(ctx: { logStore: LogStore }) {
-        this.logStore = ctx.logStore;
+    constructor(ctx: { service: ILogService }) {
+        this.service = ctx.service;
     }
 
     @DPost('', [ForceLoggedInMiddleware])
@@ -43,13 +39,7 @@ export class LogController {
         @DBody() body: LogInput,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Log>> {
-        const permissionEvaluator = useRequestPermissionEvaluator(event);
-        await permissionEvaluator.preEvaluate({ name: PermissionName.LOG_CREATE });
-
-        const validator = new LogValidator();
-        const data = await validator.run(body);
-
-        const entity = await this.logStore.write(data);
+        const entity = await this.service.create(body, buildActorContext(event));
 
         event.response.status = 201;
 
@@ -57,80 +47,21 @@ export class LogController {
     }
 
     /**
-     * The log collection is decoded with `decodeQueryOpen()` — its filters are
-     * dynamic VictoriaLogs labels rather than a declared rapiq vocabulary, so
-     * there is nothing to describe. This is the one collection endpoint that
-     * deliberately carries no `meta.schema`.
+     * The one collection endpoint that deliberately carries no `meta.schema`:
+     * its filters are dynamic VictoriaLogs labels, so there is nothing to describe.
      */
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<Log>> {
-        const permissionEvaluator = useRequestPermissionEvaluator(event);
-        await permissionEvaluator.preEvaluateOneOf({
-            name: [
-                PermissionName.LOG_READ,
-                PermissionName.LOG_DELETE,
-            ],
-        });
-
-        const decoded = decodeQueryOpen(useRequestQuery(event));
-
-        const { labels } = collectLogFilters(decoded);
-
-        const labelKeys = Object.keys(labels);
-        if (labelKeys.length === 0) {
-            throw new BadRequestError('Filter labels must be specified.');
-        }
-
-        const limit = decoded.pagination.limit && decoded.pagination.limit > 0 ?
-            Math.min(decoded.pagination.limit, 100) :
-            100;
-        const offset = decoded.pagination.offset || 0;
-
-        const [entities, total] = await this.logStore.query({
-            labels,
-            limit,
-            offset,
-            sort: 'DESC',
-        });
-
-        return {
-            data: entities,
-            meta: {
-                total,
-                limit,
-                offset,
-            },
-        };
+        return this.service.getMany(useRequestQuery(event), buildActorContext(event));
     }
 
     @DDelete('', [ForceLoggedInMiddleware])
     async deleteMany(
         @DContext() event: IAppEvent,
     ) {
-        const permissionEvaluator = useRequestPermissionEvaluator(event);
-        await permissionEvaluator.preEvaluate({ name: PermissionName.LOG_DELETE });
-
-        const { labels, time } = collectLogFilters(decodeQueryOpen(useRequestQuery(event)), { extractTime: true });
-
-        let start : number | undefined;
-        if (typeof time !== 'undefined') {
-            start = Number(time);
-            if (!Number.isFinite(start)) {
-                throw new BadRequestError('Filter time must be a finite unix timestamp.');
-            }
-        }
-
-        const labelKeys = Object.keys(labels);
-        if (labelKeys.length === 0) {
-            throw new BadRequestError('Filter labels must be specified.');
-        }
-
-        await this.logStore.delete({
-            start,
-            labels,
-        });
+        await this.service.deleteMany(useRequestQuery(event), buildActorContext(event));
 
         event.response.status = 202;
         return null;

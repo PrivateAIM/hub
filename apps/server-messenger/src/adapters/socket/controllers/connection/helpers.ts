@@ -7,13 +7,12 @@
 
 import { STCConnectionEventName } from '@privateaim/messenger-kit';
 import type { SocketIdentity } from '@privateaim/server-realtime-kit';
+import type { ConnectionRoomParty } from './types.ts';
 
 export function buildConnectedEventNameForIdentity(socket: Pick<SocketIdentity, 'type' | 'id'>) {
     switch (socket.type) {
         case 'client':
             return STCConnectionEventName.CLIENT_CONNECTED;
-        case 'robot':
-            return STCConnectionEventName.ROBOT_CONNECTED;
         case 'user':
         default:
             return STCConnectionEventName.USER_CONNECTED;
@@ -24,34 +23,20 @@ export function buildDisconnectedEventNameForIdentity(socket: Pick<SocketIdentit
     switch (socket.type) {
         case 'client':
             return STCConnectionEventName.CLIENT_DISCONNECTED;
-        case 'robot':
-            return STCConnectionEventName.ROBOT_DISCONNECTED;
         case 'user':
         default:
             return STCConnectionEventName.USER_DISCONNECTED;
     }
 }
 
-export function buildSubscriptionRoomForIdentity(socket: Pick<SocketIdentity, 'type' | 'id'>) {
-    switch (socket.type) {
-        case 'client':
-            return `client-connection-subscription:${socket.id}`;
-        case 'robot':
-            return `robot-connection-subscription:${socket.id}`;
-        case 'user':
-        default:
-            return `user-connection-subscription:${socket.id}`;
-    }
+// Room names embed the party type verbatim. A recipient whose type no socket
+// identity has (e.g. `robot`) therefore gets its own room, which stays empty,
+// instead of falling through to another type's room.
+
+export function buildSubscriptionRoomForIdentity(party: ConnectionRoomParty) {
+    return `${party.type}-connection-subscription:${party.id}`;
 }
 
-export function buildConnectionRoomForIdentity(socket: Pick<SocketIdentity, 'type' | 'id'>) {
-    switch (socket.type) {
-        case 'client':
-            return `client-connection:${socket.id}`;
-        case 'robot':
-            return `robot-connection:${socket.id}`;
-        case 'user':
-        default:
-            return `user-connection:${socket.id}`;
-    }
+export function buildConnectionRoomForIdentity(party: ConnectionRoomParty) {
+    return `${party.type}-connection:${party.id}`;
 }

@@ -21,12 +21,11 @@ import type {
     EntityRecordResponse,
     Event,
 } from '@privateaim/telemetry-kit';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IAppEvent } from 'routup';
 import type { IEventService } from '../../../../core/entities/index.ts';
 import { eventSchema } from '../../../../core/entities/index.ts';
-import { buildActorContext } from '../../request/index.ts';
 
 type EventControllerContext = {
     service: IEventService;

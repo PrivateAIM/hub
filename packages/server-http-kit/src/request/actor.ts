@@ -5,14 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ActorContext, EntityEventMetadata } from '@privateaim/server-kit';
 import type { IAppEvent } from 'routup';
 import { getRequestHeader, getRequestIP } from 'routup';
-import {
-    useRequestIdentity,
-    useRequestIdentityRealm,
-    useRequestPermissionEvaluator,
-} from '@privateaim/server-http-kit';
-import type { ActorContext, EntityEventMetadata } from '@privateaim/server-kit';
+import { useRequestIdentity } from './identity';
+import { useRequestIdentityRealm } from './identity-realm';
+import { useRequestPermissionEvaluator } from './permission';
 
 export function buildActorContext(event: IAppEvent): ActorContext {
     const identity = useRequestIdentity(event);
@@ -53,7 +51,7 @@ export function buildActorContext(event: IAppEvent): ActorContext {
     };
 }
 
-function flattenString(input: string | string[] | undefined): string {
+function flattenString(input: string | string[] | null | undefined): string {
     if (typeof input === 'string') {
         return input;
     }

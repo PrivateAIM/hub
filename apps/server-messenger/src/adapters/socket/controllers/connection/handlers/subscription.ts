@@ -51,45 +51,4 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
 
         socket.leave(buildSubscriptionRoomForIdentity({ type: 'user', id: `${target}` }));
     });
-
-    // ----------------------------------------------------------
-
-    socket.on(CTSConnectionEventName.ROBOT_CONNECTIONS, (
-        target,
-        cb,
-    ) => {
-        if (typeof target === 'undefined') {
-            if (typeof cb === 'function') {
-                // todo: custom error class with code
-                cb(new Error('Target is invalid'));
-            }
-            return;
-        }
-
-        const sockets = socket.nsp.adapter.rooms.get(buildConnectionRoomForIdentity({ type: 'robot', id: `${target}` }));
-
-        if (typeof cb === 'function') {
-            cb(null, sockets?.size || 0);
-        }
-    });
-
-    socket.on(CTSConnectionEventName.ROBOT_CONNECTION_SUBSCRIBE, (
-        target,
-    ) => {
-        if (typeof target === 'undefined') {
-            return;
-        }
-
-        socket.join(buildSubscriptionRoomForIdentity({ type: 'robot', id: `${target}` }));
-    });
-
-    socket.on(CTSConnectionEventName.ROBOT_CONNECTION_UNSUBSCRIBE, (
-        target,
-    ) => {
-        if (typeof target === 'undefined') {
-            return;
-        }
-
-        socket.leave(buildSubscriptionRoomForIdentity({ type: 'robot', id: `${target}` }));
-    });
 }

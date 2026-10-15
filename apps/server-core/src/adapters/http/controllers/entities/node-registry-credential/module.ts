@@ -13,12 +13,11 @@ import {
     DTags,
 } from '@routup/decorators';
 import type { IAppEvent } from 'routup';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import type {
     INodeRegistryCredentialService,
     RegistryCredentials,
 } from '../../../../../core/services/registry-credential/index.ts';
-import { buildActorContext } from '../../../request/index.ts';
 
 type NodeRegistryCredentialControllerContext = {
     service: INodeRegistryCredentialService;

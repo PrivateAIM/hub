@@ -13,13 +13,13 @@ import {
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
-import { UnauthorizedError } from '@privateaim/errors';
 import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
 import {
     isSocketAuthenticated,
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
+import { buildSocketSubscribeError } from '../../error.ts';
 import type {
     Socket,
 } from '../../types.ts';
@@ -37,9 +37,9 @@ export function registerRegistryProjectSocketHandlers(socket: Socket) {
                         PermissionName.REGISTRY_PROJECT_MANAGE,
                     ],
                 });
-            } catch {
+            } catch (e) {
                 if (isEventCallback(cb)) {
-                    cb(new UnauthorizedError());
+                    cb(buildSocketSubscribeError(e));
                 }
 
                 return;

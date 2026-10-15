@@ -6,3 +6,4 @@
  */
 
 export * from './log-store/index.ts';
+export * from './log/index.ts';

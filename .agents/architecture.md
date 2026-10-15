@@ -91,7 +91,6 @@ Implementations that connect domain logic to external systems.
 **HTTP** (`adapters/http/`):
 - `controllers/entities/<name>/module.ts` — Thin controllers (extract request → delegate to service → send response)
 - `controllers/workflows/` — Non-CRUD workflow controllers (root, service)
-- `request/helpers/actor.ts` — `buildActorContext(req)` bridge from HTTP to domain
 
 **Socket** (`adapters/socket/`):
 - WebSocket controllers and server setup
@@ -217,19 +216,27 @@ export function createControllers(container: IContainer) {
 
 ## ActorContext Bridge
 
-`ActorContext` decouples services from HTTP. The adapter layer bridges:
+`ActorContext` decouples services from HTTP. Every service's controllers build it
+with the one shared bridge, `buildActorContext(event)` from `@privateaim/server-http-kit`
+(`src/request/actor.ts`) — there are no per-service copies:
 
 ```typescript
-// adapters/http/request/helpers/actor.ts
-export function buildActorContext(req: Request): ActorContext {
+// packages/server-http-kit/src/request/actor.ts
+export function buildActorContext(event: IAppEvent): ActorContext {
     return {
-        permissionEvaluator: useRequestPermissionEvaluator(req),
-        realm: useRequestIdentityRealm(req),
-        identity: ...,
-        metadata: { requestPath, requestMethod, actorId, ... },
+        permissionEvaluator: useRequestPermissionEvaluator(event),
+        realm: useRequestIdentityRealm(event),
+        identity: { id, type, realmId },     // type is 'user' | 'client'
+        metadata: { requestPath, requestMethod, actorId, ... }, // the audit fields
     };
 }
 ```
+
+Authorization decisions live in `core/` services, never in controllers or app
+modules: telemetry's log endpoints go through `LogService`, server-core's analysis
+client permissions through `AnalysisClientPermissionService` behind an
+`IClientPermissionStore` port. Socket subscribe handlers answer a permission denial
+with `PermissionDeniedError` (403) and any other failure with `InternalError`.
 
 ## Domain Events & Messaging
 

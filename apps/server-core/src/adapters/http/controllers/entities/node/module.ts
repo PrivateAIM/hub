@@ -24,11 +24,10 @@ import {
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { INodeService } from '../../../../../core/index.ts';
 import { nodeSchema } from '../../../../../core/index.ts';
-import { buildActorContext } from '../../../request/index.ts';
 
 type NodeControllerContext = {
     service: INodeService;

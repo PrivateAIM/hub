@@ -15,13 +15,12 @@ import {
     DTags,
 } from '@routup/decorators';
 import type { IAppEvent } from 'routup';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import type {
     ClientCredentials,
     ClientCredentialsUpdate,
     INodeClientCredentialService,
 } from '../../../../../core/services/client-credential/index.ts';
-import { buildActorContext } from '../../../request/index.ts';
 
 type NodeClientCredentialControllerContext = {
     service: INodeClientCredentialService;

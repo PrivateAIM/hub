@@ -17,10 +17,9 @@ import {
 
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { IAppEvent } from 'routup';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import type { IRegistryCaller } from '../../../../../core/harbor/types.ts';
 import type { IRegistryService } from '../../../../../core/index.ts';
-import { buildActorContext } from '../../../request/index.ts';
 
 type ServiceControllerContext = {
     registryService: IRegistryService;

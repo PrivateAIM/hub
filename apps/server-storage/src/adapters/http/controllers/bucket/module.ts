@@ -27,7 +27,7 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import type { IAppEvent } from 'routup';
 import {
     sendStream,
@@ -39,7 +39,6 @@ import type { IBucketFileRepository, IBucketService } from '../../../../core/ent
 import { bucketSchema } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
-import { buildActorContext } from '../../request/index.ts';
 import { uploadRequestFilesToBucket } from './upload.ts';
 import { packBucketFiles } from './stream.ts';
 

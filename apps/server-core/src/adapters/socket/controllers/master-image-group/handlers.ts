@@ -14,13 +14,13 @@ import {
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
-import { UnauthorizedError } from '@privateaim/errors';
 import {
     isSocketAuthenticated,
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import { MASTER_IMAGE_GROUP_READ_PERMISSIONS } from '../../../../core/index.ts';
+import { buildSocketSubscribeError } from '../../error.ts';
 import type { Socket } from '../../types.ts';
 
 export function registerMasterImageGroupSocketHandlers(socket: Socket) {
@@ -32,9 +32,9 @@ export function registerMasterImageGroupSocketHandlers(socket: Socket) {
             // Subscribing requires the same grants as the HTTP read.
             try {
                 await socket.data.permissionEvaluator.preEvaluateOneOf({ name: MASTER_IMAGE_GROUP_READ_PERMISSIONS });
-            } catch {
+            } catch (e) {
                 if (isEventCallback(cb)) {
-                    cb(new UnauthorizedError());
+                    cb(buildSocketSubscribeError(e));
                 }
 
                 return;

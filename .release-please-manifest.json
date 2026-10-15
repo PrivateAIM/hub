@@ -6,6 +6,7 @@
     "packages/core-http-kit": "0.17.0",
     "packages/core-kit": "0.17.0",
     "packages/core-realtime-kit": "0.10.26",
+    "packages/errors": "0.8.42",
     "packages/kit": "0.17.0",
     "packages/messenger-kit": "0.16.1",
     "packages/messenger-http-kit": "0.16.1",

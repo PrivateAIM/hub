@@ -14,12 +14,12 @@ import {
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
-import { UnauthorizedError } from '@privateaim/errors';
 import {
     isSocketAuthenticated,
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
+import { buildSocketSubscribeError } from '../../error.ts';
 import type { Socket } from '../../types.ts';
 
 export function registerAnalysisSocketHandlers(socket: Socket) {
@@ -36,9 +36,9 @@ export function registerAnalysisSocketHandlers(socket: Socket) {
                         PermissionName.ANALYSIS_EXECUTION_STOP,
                     ],
                 });
-            } catch {
+            } catch (e) {
                 if (isEventCallback(cb)) {
-                    cb(new UnauthorizedError());
+                    cb(buildSocketSubscribeError(e));
                 }
 
                 return;

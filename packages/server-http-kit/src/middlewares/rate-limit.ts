@@ -16,8 +16,9 @@ export function mountRateLimiterMiddleware(app: App) {
         skip(event: IAppEvent) {
             const identity = useRequestIdentity(event);
 
-            return identity &&
-                identity.type === 'robot' &&
+            // Never throttle hub's own service clients, e.g. the worker's `system` client.
+            return !!identity &&
+                identity.type === 'client' &&
                 identity.realmName === REALM_MASTER_NAME;
         },
         max(event: IAppEvent) {
@@ -26,10 +27,7 @@ export function mountRateLimiterMiddleware(app: App) {
                 return 60 * 100; // 100 req p. sec
             }
 
-            if (
-                identity &&
-                (identity.type === 'robot' || identity.type === 'client')
-            ) {
+            if (identity && identity.type === 'client') {
                 return 60 * 1000; // 1000 req p. sec
             }
 

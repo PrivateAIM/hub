@@ -4,6 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import { usePermissionCheck } from '@authup/client-web-kit';
 import { useFieldValidation } from '@ilingo/validup-vue';
 import { useValidup } from '@validup/vue';
 import type { Severity } from '@validup/vue';
@@ -28,7 +29,7 @@ import type {
 
 import type { MasterImage, Node, Project } from '@privateaim/core-kit';
 import { DomainType, ProjectValidator } from '@privateaim/core-kit';
-import { ValidatorGroup, generateName } from '@privateaim/kit';
+import { PermissionName, ValidatorGroup, generateName } from '@privateaim/kit';
 import { useUpdatedAt } from '../../composables';
 import type {
     ListFooterSlotProps,
@@ -70,6 +71,10 @@ const FProjectForm = defineComponent({
         });
 
         const nodeIds = ref<string[]>([]);
+
+        // Attaching a node changes the project's composition: the server
+        // requires PROJECT_UPDATE for it, on create as well as on edit.
+        const canAssignNodes = usePermissionCheck({ name: PermissionName.PROJECT_UPDATE });
 
         const manager = createEntityManager({
             type: `${DomainType.PROJECT}`,
@@ -232,7 +237,7 @@ const FProjectForm = defineComponent({
                 invalid: $v.$invalid.value,
             });
 
-            const nodeVNode = h('div', [
+            const nodeVNode = canAssignNodes.value ? h('div', [
                 h(FNodes, { query: { filters: { hidden: false } } } satisfies ListProps<Node>, {
                     [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<Node>) => [
                         h('label', 'Nodes'),
@@ -277,6 +282,13 @@ const FProjectForm = defineComponent({
                 }, () => [
                     'Chose a arbitrary amount of target nodes.',
                 ]),
+            ]) : h(VCAlert, {
+                color: 'neutral',
+                variant: 'soft',
+                size: 'sm',
+                class: 'mb-3',
+            }, () => [
+                'Assigning nodes requires the project_update permission.',
             ]);
 
             return h(
