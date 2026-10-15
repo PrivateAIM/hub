@@ -48,7 +48,7 @@ export class NodeController {
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<Node>> {
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query);
+        const { data, meta } = await this.service.getMany(query, buildActorContext(event));
         return { data, meta: { ...meta, schema: describeQuerySchema(nodeSchema) } };
     }
 
@@ -69,7 +69,7 @@ export class NodeController {
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Node>> {
         const query = useRequestQuery(event);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, buildActorContext(event), Object.keys(query).length > 0 ? query : undefined);
 
         return { data: entity, meta: { schema: describeQuerySchema(nodeSchema, RECORD_QUERY_PARAMETERS) } };
     }

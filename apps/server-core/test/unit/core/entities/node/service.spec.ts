@@ -9,6 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type { Node, RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
 import {
     beforeEach,
     describe,
@@ -24,6 +25,13 @@ import {
 } from '../../helpers/index.ts';
 import { FakeNodeRepository } from './fake-repository.ts';
 import { FakeRegistryManager } from './fake-registry-manager.ts';
+
+const READ_PERMISSIONS = [
+    PermissionName.NODE_READ,
+    PermissionName.NODE_CREATE,
+    PermissionName.NODE_UPDATE,
+    PermissionName.NODE_DELETE,
+];
 
 function createTestNode(overrides?: Partial<Node>): Node {
     return {
@@ -84,9 +92,27 @@ describe('NodeService', () => {
                 createTestNode({ id: 'n-2' }),
             ]);
 
-            const result = await service.getMany({});
+            const actor = createAllowAllActor();
+            const result = await service.getMany({}, actor);
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
+            expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
+        });
+
+        it('should list nodes from every realm, not just the actor realm', async () => {
+            repository.seed([
+                createTestNode({ id: 'n-1', realmId: 'realm-1' }),
+                createTestNode({ id: 'n-2', realmId: 'realm-2' }),
+            ]);
+
+            const result = await service.getMany({}, createNonMasterRealmActor());
+            expect(result.data).toHaveLength(2);
+        });
+
+        it('should reject without a read permission', async () => {
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            expect(repository.findManyCalls).toHaveLength(0);
         });
     });
 
@@ -95,12 +121,21 @@ describe('NodeService', () => {
             const node = createTestNode({ id: 'n-1' });
             repository.seed(node);
 
-            const result = await service.getOne('n-1');
+            const actor = createAllowAllActor();
+            const result = await service.getOne('n-1', actor);
             expect(result.id).toBe('n-1');
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
+            expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('nonexistent', createAllowAllActor())).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should reject without a read permission', async () => {
+            repository.seed(createTestNode({ id: 'n-1' }));
+
+            await expect(service.getOne('n-1', createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
         });
     });
 

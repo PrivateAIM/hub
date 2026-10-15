@@ -13,7 +13,7 @@ export interface IMasterImageGroupRepository extends IEntityRepository<MasterIma
 }
 
 export interface IMasterImageGroupService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<MasterImageGroup>>;
-    getOne(id: string, query?: Record<string, any>): Promise<MasterImageGroup>;
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<MasterImageGroup>>;
+    getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<MasterImageGroup>;
     delete(id: string, actor: ActorContext): Promise<MasterImageGroup>;
 }

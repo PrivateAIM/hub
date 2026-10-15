@@ -7,7 +7,6 @@
 
 import { createURLCodec } from '@rapiq/codec-url';
 import type {
-    ICondition,
     IQuery,
     ObjectLiteral,
     Schema,
@@ -64,16 +63,5 @@ export function decodeQuery<RECORD extends ObjectLiteral = ObjectLiteral>(
     return parsed ?? new Query({});
 }
 
-/**
- * Append server-derived conditions onto a decoded query by AND-wrapping its
- * filter tree (non-displaceable scope). Immutable.
- */
-export function appendQueryConditions(query: IQuery, ...conditions: ICondition[]): Query {
-    return new Query({
-        fields: query.fields,
-        filters: query.filters.and(...conditions),
-        relations: query.relations,
-        pagination: query.pagination,
-        sorts: query.sorts,
-    });
-}
+// The shared implementation lives in server-kit; re-exported so call sites keep importing from core.
+export { appendQueryConditions } from '@privateaim/server-kit';

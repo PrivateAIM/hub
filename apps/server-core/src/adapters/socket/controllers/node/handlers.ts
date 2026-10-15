@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionName, buildDomainEventFullName } from '@privateaim/kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
 import {
     DomainEventSubscriptionName,
     DomainType,
@@ -20,6 +20,7 @@ import {
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
+import { NODE_READ_PERMISSIONS } from '../../../../core/index.ts';
 import type { Socket } from '../../types.ts';
 
 export function registerNodeSocketHandlers(socket: Socket) {
@@ -28,12 +29,9 @@ export function registerNodeSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
+            // Subscribing requires the same grants as the HTTP read.
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.NODE_UPDATE,
-                    ],
-                });
+                await socket.data.permissionEvaluator.preEvaluateOneOf({ name: NODE_READ_PERMISSIONS });
             } catch {
                 if (isEventCallback(cb)) {
                     cb(new UnauthorizedError());

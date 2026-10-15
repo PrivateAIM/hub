@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { PermissionName } from '@privateaim/kit';
 import { createAdminAccessToken, createRestrictedAccessToken } from '@privateaim/server-test-kit';
 import {
     afterAll,
@@ -39,6 +40,12 @@ describe('nested secret fields', () => {
         await suite.setup();
         baseURL = suite.client.getBaseURL().replace(/\/+$/, '');
 
+        // The restricted caller's read reach is its own (master) realm, so the
+        // project has to live there to be listed at all.
+        const authupURL = process.env.AUTHUP_URL.replace(/\/+$/, '');
+        const headers = { authorization: `Bearer ${await createAdminAccessToken()}` };
+        const masterRealms = await fetch(`${authupURL}/realms?filter[name]=master`, { headers }).then((r) => r.json());
+
         const { dataSource } = suite;
         const registry = await dataSource.getRepository(RegistryEntity).save({
             name: `registry-${randomUUID().slice(0, 8)}`,
@@ -54,7 +61,7 @@ describe('nested secret fields', () => {
             registryId,
             accountName: 'robot',
             accountSecret: PROJECT_SECRET,
-            realmId: randomUUID(),
+            realmId: masterRealms.data[0].id,
         });
         registryProjectId = registryProject.id;
     });
@@ -84,7 +91,8 @@ describe('nested secret fields', () => {
     };
 
     it.each([
-        ['a restricted user', createRestrictedAccessToken],
+        // Reading the collection itself needs the read grant.
+        ['a restricted user', () => createRestrictedAccessToken([PermissionName.REGISTRY_PROJECT_READ, PermissionName.REGISTRY_READ])],
         // The per-resource gate only reaches the root of its own endpoint, so
         // the relation path is closed for every caller, not gated per actor.
         ['the admin', createAdminAccessToken],

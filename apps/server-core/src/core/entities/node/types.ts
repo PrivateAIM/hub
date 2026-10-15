@@ -26,8 +26,8 @@ export interface IRegistryManager {
 }
 
 export interface INodeService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Node>>;
-    getOne(id: string, query?: Record<string, any>): Promise<Node>;
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Node>>;
+    getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Node>;
     create(data: Partial<Node>, actor: ActorContext): Promise<Node>;
     update(id: string, data: Partial<Node>, actor: ActorContext): Promise<Node>;
     delete(id: string, actor: ActorContext): Promise<Node>;

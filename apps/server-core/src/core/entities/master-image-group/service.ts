@@ -10,10 +10,19 @@ import type { MasterImageGroup } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
+import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { masterImageGroupSchema } from './schema.ts';
 import type { IMasterImageGroupRepository, IMasterImageGroupService } from './types.ts';
+
+/**
+ * Master image groups are a global catalog: any one of these grants reads
+ * every group. The grant is checked, but results are not narrowed by realm.
+ */
+export const MASTER_IMAGE_GROUP_READ_PERMISSIONS = [
+    PermissionName.MASTER_IMAGE_GROUP_READ,
+    PermissionName.MASTER_IMAGE_GROUP_MANAGE,
+];
 
 type MasterImageGroupServiceContext = {
     repository: IMasterImageGroupRepository;
@@ -27,15 +36,23 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
         this.repository = ctx.repository;
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<MasterImageGroup>> {
-        return this.repository.findMany(decodeQuery(query, { schema: masterImageGroupSchema }));
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<MasterImageGroup>> {
+        const scoped = await scopeReadQuery(
+            decodeQuery(query, { schema: masterImageGroupSchema }),
+            actor,
+            { names: MASTER_IMAGE_GROUP_READ_PERMISSIONS, compile: false },
+        );
+
+        return this.repository.findMany(scoped);
     }
 
     /**
      * `findOneById` takes no query, so an actor-supplied `fields`/`relations`
      * selection has to go through `findMany` with an `id` condition appended.
      */
-    async getOne(id: string, query?: Record<string, any>): Promise<MasterImageGroup> {
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<MasterImageGroup> {
+        await actor.permissionEvaluator.preEvaluateOneOf({ name: MASTER_IMAGE_GROUP_READ_PERMISSIONS });
+
         const entity = query ?
             await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: masterImageGroupSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
             await this.repository.findOneById(id);

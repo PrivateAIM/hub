@@ -14,10 +14,12 @@ import {
 } from '@privateaim/kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
-import { holdsPermission } from '../../utils/index.ts';
+import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
+import { holdsPermission, isPermissionDenial } from '../../utils/index.ts';
+import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { appendQueryConditions, decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
+import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
 import type { IRegistryManager } from '../node/types.ts';
 import type { IRegistryProjectRepository, IRegistryProjectService } from './types.ts';
 import { registryProjectSchema } from './schema.ts';
@@ -35,6 +37,20 @@ type RegistryProjectServiceContext = {
  * return false and skips the REGISTRY_MANAGE gate instead of failing.
  */
 const SECRET_FIELD = 'accountSecret' satisfies keyof RegistryProject;
+
+/**
+ * Unlike the global catalogs, registry project reads are narrowed to the
+ * reach of the caller's grant. REGISTRY_MANAGE reads too, because it already
+ * governs the secret column, the credentials route and the registry admin UI.
+ */
+export const REGISTRY_PROJECT_READ_PERMISSIONS = [
+    PermissionName.REGISTRY_PROJECT_READ,
+    PermissionName.REGISTRY_PROJECT_MANAGE,
+    PermissionName.REGISTRY_MANAGE,
+];
+
+/** Relations an `include` can join, each guarded by its own read grant. */
+const RELATION_READ_PERMISSIONS = { registry: REGISTRY_READ_PERMISSIONS } satisfies Partial<Record<keyof RegistryProject, string[]>>;
 
 export class RegistryProjectService extends AbstractEntityService implements IRegistryProjectService {
     protected repository: IRegistryProjectRepository;
@@ -54,7 +70,8 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
-        const result = await this.repository.findMany(decodeQuery(query, { schema: registryProjectSchema }));
+        const scoped = await this.scopeRead(decodeQuery(query, { schema: registryProjectSchema }), actor);
+        const result = await this.repository.findMany(scoped);
 
         if (result.data.some((e) => this.hasSecretField(e))) {
             await this.checkSecretFieldAccess(result.data, actor);
@@ -64,10 +81,12 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<RegistryProject> {
-        const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: registryProjectSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
-            await this.repository.findOneById(id);
+        const scoped = await this.scopeRead(
+            decodeQuery(query, { schema: registryProjectSchema, parameters: ['fields', 'relations'] }),
+            actor,
+        );
 
+        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
@@ -77,6 +96,40 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         }
 
         return entity;
+    }
+
+    /**
+     * Shared by list and record reads: check the read grant and narrow the
+     * query to its reach. A node's own client without that grant may still
+     * read exactly its own project; if it does hold the grant, the grant wins.
+     */
+    private async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+        await preEvaluateRelationReads(query, actor, RELATION_READ_PERMISSIONS);
+
+        try {
+            return await scopeReadQuery(query, actor, { names: REGISTRY_PROJECT_READ_PERMISSIONS });
+        } catch (e) {
+            if (!isPermissionDenial(e)) {
+                throw e;
+            }
+
+            const ownProjectId = await this.findOwnNodeProjectId(actor);
+            if (!ownProjectId) {
+                throw e;
+            }
+
+            return appendQueryConditions(query, eq('id', ownProjectId));
+        }
+    }
+
+    /** The registry project of the node whose client is calling, if any. */
+    private async findOwnNodeProjectId(actor: ActorContext): Promise<string | undefined> {
+        if (!actor.identity || actor.identity.type !== 'client' || !this.nodeRepository) {
+            return undefined;
+        }
+
+        const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id });
+        return node?.registryProjectId ?? undefined;
     }
 
     private hasSecretField(entity: RegistryProject): boolean {
@@ -89,20 +142,10 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             return;
         }
 
-        // permission not granted — check node-client condition
-
-        if (
-            actor.identity &&
-            actor.identity.type === 'client' &&
-            this.nodeRepository
-        ) {
-            const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id });
-            if (node && node.registryProjectId) {
-                const requestedIds = new Set(entities.map((e) => e.id));
-                if (requestedIds.size === 1 && requestedIds.has(node.registryProjectId)) {
-                    return;
-                }
-            }
+        // Without REGISTRY_MANAGE, a node's client may only see its own project's secret.
+        const ids = new Set(entities.map((e) => e.id));
+        if (ids.size === 1 && ids.has(await this.findOwnNodeProjectId(actor))) {
+            return;
         }
 
         throw new PermissionDeniedError();

@@ -18,6 +18,7 @@ import {
 } from '@privateaim/errors';
 import { defineIssueItem } from '@ebec/core';
 import {
+    AdapterError,
     CodecError,
     ErrorCode,
     FiltersParseError,
@@ -128,6 +129,16 @@ describe('core/error/sanitize', () => {
         const output = sanitizeError(input);
 
         expect(isInternalError(output)).toBeTruthy();
+    });
+
+    it('should answer an unbindable operand (malformed uuid) as a bad request', () => {
+        expect(isBadRequestError(sanitizeError(AdapterError.keyValueInvalid('id')))).toBeTruthy();
+        // Any other adapter error is server-authored and stays internal.
+        expect(isInternalError(sanitizeError(AdapterError.operatorUnsupported('regex')))).toBeTruthy();
+    });
+
+    it('should answer the postgres invalid_text_representation backstop as a bad request', () => {
+        expect(isBadRequestError(sanitizeError({ code: '22P02', message: 'invalid input syntax for type uuid' }))).toBeTruthy();
     });
 
     /**

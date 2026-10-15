@@ -13,10 +13,18 @@ import {
 } from '@privateaim/kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
-import { decodeQuery } from '../../query/index.ts';
+import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
+import type { IQuery } from '@rapiq/core';
+import { Query, eq } from '@rapiq/core';
+import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { eventSchema } from './schema.ts';
 import type { IEventRepository, IEventService } from './types.ts';
+
+/** EVENT_DELETE implies read: a delete-only role must still list what it can delete. */
+const READ_PERMISSIONS = [
+    PermissionName.EVENT_READ,
+    PermissionName.EVENT_DELETE,
+];
 
 type EventServiceContext = {
     repository: IEventRepository;
@@ -34,31 +42,30 @@ export class EventService extends AbstractEntityService implements IEventService
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Event>> {
-        await actor.permissionEvaluator.preEvaluateOneOf({
-            name: [
-                PermissionName.EVENT_READ,
-                PermissionName.EVENT_DELETE,
-            ],
-        });
+        const decoded = decodeQuery(query, { schema: eventSchema });
 
-        return this.repository.findMany(decodeQuery(query, { schema: eventSchema }));
+        return this.repository.findMany(await this.scopeRead(decoded, actor));
     }
 
     async getOne(id: string, actor: ActorContext): Promise<Event> {
-        await actor.permissionEvaluator.preEvaluateOneOf({
-            name: [
-                PermissionName.EVENT_READ,
-                PermissionName.EVENT_DELETE,
-            ],
-        });
+        // Read through the collection's scope, so an event outside the
+        // actor's reach answers 404 exactly like a missing one.
+        const scoped = await this.scopeRead(new Query({}), actor);
+        const { data } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
 
-        const entity = await this.repository.findOneById(id);
-
-        if (!entity) {
+        if (data.length === 0) {
             throw new EntityNotFoundError({ entity: 'event' });
         }
 
-        return entity;
+        return data[0];
+    }
+
+    /**
+     * The read scope for list and record alike: pre-gated on a read
+     * permission and narrowed to what the caller's grant reaches.
+     */
+    protected scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+        return scopeReadQuery(query, actor, { names: READ_PERMISSIONS });
     }
 
     async create(data: Partial<Event>, actor: ActorContext): Promise<Event> {

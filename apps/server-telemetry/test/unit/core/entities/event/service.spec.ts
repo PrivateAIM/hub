@@ -8,6 +8,8 @@
 import { randomUUID } from 'node:crypto';
 import type { Event } from '@privateaim/telemetry-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
+import { eq } from '@rapiq/core';
 import {
     beforeEach,
     describe,
@@ -57,22 +59,54 @@ describe('EventService', () => {
     });
 
     describe('getMany', () => {
-        it('should return paginated results', async () => {
-            repository.seed([
-                createTestEvent({ id: 'e-1' }),
-                createTestEvent({ id: 'e-2' }),
-            ]);
+        const seedEventsAcrossRealms = () => repository.seed([
+            createTestEvent({ id: 'e-1', realmId: 'realm-1' }),
+            createTestEvent({ id: 'e-2', realmId: 'realm-2' }),
+            createTestEvent({ id: 'e-3', realmId: null }),
+        ]);
 
-            const result = await service.getMany({}, createAllowAllActor());
-            expect(result.data).toHaveLength(2);
-            expect(result.meta.total).toBe(2);
+        const sortedIds = (result: { data: Event[] }) => result.data.map((e) => e.id).sort();
+
+        it('should return events of every realm on an allow verdict', async () => {
+            seedEventsAcrossRealms();
+            const actor = createAllowAllActor();
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            const result = await service.getMany({}, actor);
+            expect(sortedIds(result)).toEqual(['e-1', 'e-2', 'e-3']);
+            expect(result.meta.total).toBe(3);
         });
 
-        it('should check permission', async () => {
+        it('should return only matching events on a conditional verdict', async () => {
+            seedEventsAcrossRealms();
+            const actor = createAllowAllActor();
+            actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-2') });
+
+            expect(sortedIds(await service.getMany({}, actor))).toEqual(['e-2']);
+        });
+
+        it('should return only the actor realm\'s events on a post verdict', async () => {
+            seedEventsAcrossRealms();
+
+            expect(sortedIds(await service.getMany({}, createAllowAllActor('realm-1')))).toEqual(['e-1']);
+        });
+
+        it('should return nothing on a deny verdict', async () => {
+            seedEventsAcrossRealms();
+            const actor = createAllowAllActor();
+            actor.permissionEvaluator.setCompileResult({ verdict: 'deny' });
+
+            expect(sortedIds(await service.getMany({}, actor))).toEqual([]);
+        });
+
+        it('should accept either EVENT_READ or EVENT_DELETE as read permission', async () => {
             const actor = createAllowAllActor();
             await service.getMany({}, actor);
 
-            expect(actor.permissionEvaluator.preEvaluateOneOfCalls.length).toBeGreaterThan(0);
+            // Pin the one-of: dropping EVENT_DELETE would 403 delete-only roles.
+            const names = [PermissionName.EVENT_READ, PermissionName.EVENT_DELETE];
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0].name).toEqual(names);
+            expect(actor.permissionEvaluator.compileCalls[0].name).toEqual(names);
         });
 
         it('should throw PermissionDeniedError when actor lacks permission', async () => {
@@ -87,8 +121,16 @@ describe('EventService', () => {
             const event = createTestEvent({ id: 'e-1' });
             repository.seed(event);
 
-            const result = await service.getOne('e-1', createAllowAllActor());
+            const result = await service.getOne('e-1', createAllowAllActor('realm-1'));
             expect(result.id).toBe('e-1');
+        });
+
+        it('should throw EntityNotFoundError for an entity in another realm', async () => {
+            repository.seed(createTestEvent({ id: 'e-1', realmId: 'realm-2' }));
+
+            await expect(
+                service.getOne('e-1', createAllowAllActor('realm-1')),
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {

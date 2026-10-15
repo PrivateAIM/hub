@@ -79,6 +79,16 @@ describe('core/event (EntityEventHandler)', () => {
         });
     });
 
+    it('should stamp the audited row\'s realm, and leave a realm-less row realm-less', async () => {
+        // Event reads are realm-scoped: an unstamped event is visible only to
+        // realm-less (ownOrNull / any) grants, i.e. to every realm or to none.
+        await handler.handle(buildContext({ data: { realmId: 'realm-1' } }));
+        expect(publisher.last.realmId).toBe('realm-1');
+
+        await handler.handle(buildContext({ data: { id: 'master-image-1' } }));
+        expect(publisher.last.realmId).toBeUndefined();
+    });
+
     it('should carry an IPv6 request address through unrewritten', async () => {
         await handler.handle(buildContext({
             metadata: {

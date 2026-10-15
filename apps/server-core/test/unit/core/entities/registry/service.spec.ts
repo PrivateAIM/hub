@@ -9,6 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryAPICommand } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
 import {
     beforeEach,
     describe,
@@ -23,6 +24,8 @@ import {
 } from '../../helpers/index.ts';
 import { FakeRegistryRepository } from './fake-repository.ts';
 import { FakeRegistryCaller } from './fake-caller.ts';
+
+const READ_PERMISSIONS = [PermissionName.REGISTRY_READ, PermissionName.REGISTRY_MANAGE];
 
 function createTestRegistry(overrides?: Partial<Registry>): Registry {
     return {
@@ -80,21 +83,30 @@ describe('RegistryService', () => {
         it('should throw PermissionDeniedError when requesting secret without permission', async () => {
             repository.seed(createTestRegistry());
 
+            // The read gate (preEvaluateOneOf) passes; only the REGISTRY_MANAGE
+            // check guarding the secret (preEvaluate) is denied.
+            const actor = createAllowAllActor();
+            actor.permissionEvaluator.deny('preEvaluate', new PermissionDeniedError('test'));
+
             await expect(
-                service.getMany(
-                    { fields: '+accountSecret' },
-                    createDenyAllActor(),
-                ),
+                service.getMany({ fields: '+accountSecret' }, actor),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should not check permission when secret field is not requested', async () => {
+        it('should only run the read gate when the secret field is not requested', async () => {
             repository.seed(createTestRegistry());
 
             const actor = createAllowAllActor();
             await service.getMany({}, actor);
 
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls).toEqual([{ name: READ_PERMISSIONS }]);
             expect(actor.permissionEvaluator.preEvaluateCalls).toHaveLength(0);
+            expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
+        });
+
+        it('should reject without a read permission', async () => {
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            expect(repository.findManyCalls).toHaveLength(0);
         });
     });
 
@@ -103,8 +115,17 @@ describe('RegistryService', () => {
             const registry = createTestRegistry({ id: 'r-1' });
             repository.seed(registry);
 
-            const result = await service.getOne('r-1', createAllowAllActor());
+            const actor = createAllowAllActor();
+            const result = await service.getOne('r-1', actor);
             expect(result.id).toBe('r-1');
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls).toEqual([{ name: READ_PERMISSIONS }]);
+            expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
+        });
+
+        it('should reject without a read permission', async () => {
+            repository.seed(createTestRegistry({ id: 'r-1' }));
+
+            await expect(service.getOne('r-1', createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {

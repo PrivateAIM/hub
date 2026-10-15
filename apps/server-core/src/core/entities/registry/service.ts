@@ -15,7 +15,7 @@ import {
 } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
+import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
 import type { IRegistryCaller } from '../../harbor/types.ts';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
@@ -36,6 +36,15 @@ type RegistryServiceContext = {
  */
 const SECRET_FIELD = 'accountSecret' satisfies keyof Registry;
 
+/**
+ * Registries are a global catalog: any one of these grants reads every
+ * registry. The grant is checked, but results are not narrowed by realm.
+ */
+export const REGISTRY_READ_PERMISSIONS = [
+    PermissionName.REGISTRY_READ,
+    PermissionName.REGISTRY_MANAGE,
+];
+
 export class RegistryService extends AbstractEntityService implements IRegistryService {
     protected repository: IRegistryRepository;
 
@@ -54,12 +63,19 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Registry>> {
+        const scoped = await scopeReadQuery(
+            decodeQuery(query, { schema: registrySchema }),
+            actor,
+            { names: REGISTRY_READ_PERMISSIONS, compile: false },
+        );
         await this.checkSecretFieldAccess(query, actor);
 
-        return this.repository.findMany(decodeQuery(query, { schema: registrySchema }));
+        return this.repository.findMany(scoped);
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Registry> {
+        await actor.permissionEvaluator.preEvaluateOneOf({ name: REGISTRY_READ_PERMISSIONS });
+
         if (query) {
             await this.checkSecretFieldAccess(query, actor);
         }

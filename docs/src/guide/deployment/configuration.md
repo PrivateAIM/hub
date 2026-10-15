@@ -130,6 +130,87 @@ Previously, adding required `project_create` **and** `project_update`. Holding
 only `project_create` now creates a project but cannot attach nodes to it; grant
 `project_update` to every role that creates projects with nodes.
 
+## Reading nodes, master images, registries, registry projects and events requires `*_read`
+
+**Breaking for every deployment.** Listing or reading these entities now needs a
+read grant. Five permission names are new — `node_read`, `master_image_read`,
+`master_image_group_read`, `registry_read`, `registry_project_read` — and the
+existing `event_read` is now realm-scoped.
+
+**Which permissions allow a read.** Each read accepts its read name **or** any of
+the entity's write/manage names, since holding a write implies read:
+
+| Entity | Accepted permissions |
+|---|---|
+| nodes | `node_read`, `node_create`, `node_update`, `node_delete` |
+| master images | `master_image_read`, `master_image_manage` |
+| master image groups | `master_image_group_read`, `master_image_group_manage` |
+| registries | `registry_read`, `registry_manage` |
+| registry projects | `registry_project_read`, `registry_project_manage`, `registry_manage` |
+| events (server-telemetry) | `event_read`, `event_delete` |
+
+A caller holding none of them gets **403** — deliberately, with no fallback. The
+same table also gates:
+
+- **Realtime** — subscribing to node, master-image and master-image-group updates.
+- **Includes** — a relation requested via `include` needs the related entity's
+  permissions: `/nodes?include=registry` and `/registry-projects?include=registry`
+  need a registry one, `/nodes?include=registryProject` a registry-project one.
+
+**Which rows a read returns.**
+
+- **Nodes, master images, master image groups and registries** are global
+  catalogs: the grant is a capability gate only, and every row stays readable
+  across realms.
+- **Registry projects and events** are narrowed by the grant's `realm_scope`:
+  `own` returns the caller's realm, `ownOrNull` adds realm-less rows, `any`
+  returns all. A grant carrying a policy Hub cannot turn into a query falls back
+  to the caller's own realm.
+- **A node client** reads its own registry project without any grant, on both
+  `GET /registry-projects` (narrowed to that one project) and
+  `GET /registry-projects/:id`. A read grant it is given applies as for any
+  other caller.
+- **Record reads** (`GET /<entity>/:id`) apply the same scope, so a row out of
+  reach answers 404 exactly like a missing one. A malformed id
+  (`GET /events/not-a-uuid`, `filter[id]=not-a-uuid`) answers 400.
+
+An audit event belongs to the realm of the row it records (a project event to the
+project's realm). Rows without a realm — master images and groups — produce
+realm-less events, visible to `ownOrNull` and `any` grants only. **Events stored
+before this release carry no realm**, so an `own` grant does not see them;
+`ownOrNull` does (and with it every realm's old events).
+
+**Before upgrading:**
+
+1. **Add the new names to your Authup provisioning first.** The built-in
+   `admin` role (`*`) only picks up permissions that exist when provisioning runs.
+2. Grant `node_read`, `master_image_read` and `master_image_group_read` to
+   every role that creates or edits projects or views analyses — project creation
+   lists nodes and master images.
+3. Grant `registry_read` to roles that manage a node's registry connection
+   (`node_update`) — the node's Registry tab lists `/registries` to pick one.
+4. Make sure the worker's service client (`system`) has `node_read`,
+   `registry_read` and `master_image_read`; `*` covers them once they are
+   provisioned.
+
+**After upgrading:**
+
+1. **Grant every existing node's client `node_read` in Authup.** Otherwise
+   node-side services — pod orchestration, the storage service, the message
+   broker — get 403 on `/nodes`. Hub grants it automatically only when it
+   re-syncs a node's client permissions: when a node is created, or when a node
+   save actually changes a field (a save without changes writes nothing and skips
+   the re-sync).
+
+**Known gaps:**
+
+- Registry projects joined through `include=registryProject` are not narrowed to
+  the caller's realm reach.
+- Includes within the project/analysis family (`include=node`,
+  `include=masterImage`) are not gated yet.
+- The registry-project realtime room still broadcasts every realm's projects to
+  a subscriber holding `registry_manage` or `registry_project_manage`.
+
 ## Authup upgrade to beta.69
 
 Hub now requires Authup `1.0.0-beta.69`, a security release. Read the

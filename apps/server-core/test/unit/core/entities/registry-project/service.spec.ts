@@ -9,6 +9,8 @@ import { randomUUID } from 'node:crypto';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
+import { eq } from '@rapiq/core';
 import {
     beforeEach,
     describe,
@@ -25,6 +27,12 @@ import {
 } from '../../helpers/index.ts';
 import { FakeRegistryManager } from '../node/fake-registry-manager.ts';
 import { FakeRegistryProjectRepository } from './fake-repository.ts';
+
+const READ_PERMISSIONS = [
+    PermissionName.REGISTRY_PROJECT_READ,
+    PermissionName.REGISTRY_PROJECT_MANAGE,
+    PermissionName.REGISTRY_MANAGE,
+];
 
 function createFakeRegistryProjectRepository() {
     const repo = new FakeRegistryProjectRepository();
@@ -82,6 +90,18 @@ describe('RegistryProjectService', () => {
         });
     });
 
+    /** Seeds a node owning the given registry project and returns its client id. */
+    function seedNodeClient(registryProjectId: string): string {
+        const clientId = randomUUID();
+        nodeRepository.seed({
+            id: randomUUID(),
+            clientId,
+            registryProjectId,
+        } as Node);
+
+        return clientId;
+    }
+
     describe('getMany', () => {
         it('should return paginated results', async () => {
             repository.seed([
@@ -89,7 +109,7 @@ describe('RegistryProjectService', () => {
                 createTestRegistryProject({ id: 'rp-2' }),
             ]);
 
-            const result = await service.getMany({}, createAllowAllActor());
+            const result = await service.getMany({}, createAllowAllActor('realm-1'));
             expect(result.data).toHaveLength(2);
         });
 
@@ -98,10 +118,97 @@ describe('RegistryProjectService', () => {
                 createTestRegistryProject({ id: 'rp-1', accountSecret: 'secret123' }),
             ]);
 
-            const actor = createAllowAllActor();
+            const actor = createAllowAllActor('realm-1');
             await service.getMany({}, actor);
 
             expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
+        });
+
+        it('should reject without a read permission', async () => {
+            const actor = createDenyAllActor();
+
+            await expect(service.getMany({}, actor)).rejects.toThrow(PermissionDeniedError);
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toMatchObject({ name: READ_PERMISSIONS });
+        });
+
+        it('should narrow a node-client listing to its own project, secret included', async () => {
+            repository.seed([
+                createTestRegistryProject({ id: 'rp-1', accountSecret: 'secret' }),
+                createTestRegistryProject({ id: 'rp-2', accountSecret: 'other' }),
+            ]);
+
+            const actor = createDenyAllActor();
+            actor.identity = { id: seedNodeClient('rp-1'), type: 'client' };
+
+            const result = await service.getMany({}, actor);
+            expect(result.data.map((e) => e.id)).toEqual(['rp-1']);
+        });
+
+        it('should apply a read grant a node-client holds instead of narrowing it to its own project', async () => {
+            repository.seed([
+                createTestRegistryProject({ id: 'rp-1' }),
+                createTestRegistryProject({ id: 'rp-2' }),
+            ]);
+
+            const actor = createAllowAllActor('realm-1');
+            actor.identity = { id: seedNodeClient('rp-1'), type: 'client' };
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            const result = await service.getMany({}, actor);
+            expect(result.data.map((e) => e.id).sort()).toEqual(['rp-1', 'rp-2']);
+        });
+
+        it('should require the registry read permission for include=registry', async () => {
+            // Deny only the registry read: the registry-project read itself passes,
+            // so a rejection can only come from the relation gate.
+            const actor = createAllowAllActor('realm-1');
+            actor.permissionEvaluator.setBehavior(({ method, ctx }) => {
+                const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
+                if (method === 'preEvaluateOneOf' && names.includes(PermissionName.REGISTRY_READ)) {
+                    throw new PermissionDeniedError();
+                }
+            });
+
+            await expect(service.getMany({}, actor)).resolves.toBeDefined();
+            await expect(service.getMany({ include: 'registry' }, actor)).rejects.toThrow(PermissionDeniedError);
+        });
+
+        describe('by compile verdict', () => {
+            beforeEach(() => {
+                repository.seed([
+                    createTestRegistryProject({ id: 'rp-1', realmId: 'realm-1' }),
+                    createTestRegistryProject({ id: 'rp-2', realmId: 'realm-2' }),
+                ]);
+            });
+
+            it('should return every row on an allow verdict', async () => {
+                const actor = createAllowAllActor('realm-1');
+                actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+                const result = await service.getMany({}, actor);
+                expect(result.data.map((e) => e.id).sort()).toEqual(['rp-1', 'rp-2']);
+            });
+
+            it('should narrow to the compiled condition', async () => {
+                const actor = createAllowAllActor('realm-1');
+                actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-2') });
+
+                const result = await service.getMany({}, actor);
+                expect(result.data.map((e) => e.id)).toEqual(['rp-2']);
+            });
+
+            it('should narrow a post verdict to the actor realm', async () => {
+                const result = await service.getMany({}, createAllowAllActor('realm-1'));
+                expect(result.data.map((e) => e.id)).toEqual(['rp-1']);
+            });
+
+            it('should return nothing on a deny verdict', async () => {
+                const actor = createAllowAllActor('realm-1');
+                actor.permissionEvaluator.setCompileResult({ verdict: 'deny' });
+
+                const result = await service.getMany({}, actor);
+                expect(result.data).toHaveLength(0);
+            });
         });
     });
 
@@ -110,8 +217,24 @@ describe('RegistryProjectService', () => {
             const project = createTestRegistryProject({ id: 'rp-1' });
             repository.seed(project);
 
-            const result = await service.getOne('rp-1', createAllowAllActor());
+            const result = await service.getOne('rp-1', createAllowAllActor('realm-1'));
             expect(result.id).toBe('rp-1');
+        });
+
+        it('should reject without a read permission', async () => {
+            repository.seed(createTestRegistryProject({ id: 'rp-1' }));
+
+            await expect(
+                service.getOne('rp-1', createDenyAllActor('realm-1')),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should answer an out-of-reach row like a missing one', async () => {
+            repository.seed(createTestRegistryProject({ id: 'rp-1', realmId: 'other-realm' }));
+
+            await expect(
+                service.getOne('rp-1', createAllowAllActor('realm-1')),
+            ).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -124,7 +247,7 @@ describe('RegistryProjectService', () => {
             const project = createTestRegistryProject({ id: 'rp-1', accountSecret: 'secret' });
             repository.seed(project);
 
-            const actor = createAllowAllActor();
+            const actor = createAllowAllActor('realm-1');
             await service.getOne('rp-1', actor);
 
             expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
@@ -151,6 +274,18 @@ describe('RegistryProjectService', () => {
 
             const result = await service.getOne(registryProjectId, actor);
             expect(result.id).toBe(registryProjectId);
+        });
+
+        it('should answer a node-client reading another registry project like a missing row', async () => {
+            repository.seed([
+                createTestRegistryProject({ id: 'rp-1' }),
+                createTestRegistryProject({ id: 'rp-2' }),
+            ]);
+
+            const actor = createDenyAllActor();
+            actor.identity = { id: seedNodeClient('rp-1'), type: 'client' };
+
+            await expect(service.getOne('rp-2', actor)).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should not mistake a failing permission check for a denial', async () => {

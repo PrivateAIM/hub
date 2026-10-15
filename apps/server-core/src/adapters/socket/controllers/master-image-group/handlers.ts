@@ -14,16 +14,32 @@ import {
 import {
     isEventCallback,
 } from '@privateaim/core-realtime-kit';
+import { UnauthorizedError } from '@privateaim/errors';
 import {
+    isSocketAuthenticated,
     subscribeSocketRoom,
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
+import { MASTER_IMAGE_GROUP_READ_PERMISSIONS } from '../../../../core/index.ts';
 import type { Socket } from '../../types.ts';
 
 export function registerMasterImageGroupSocketHandlers(socket: Socket) {
+    if (!isSocketAuthenticated(socket)) return;
+
     socket.on(
         buildDomainEventFullName(DomainType.MASTER_IMAGE_GROUP, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
+            // Subscribing requires the same grants as the HTTP read.
+            try {
+                await socket.data.permissionEvaluator.preEvaluateOneOf({ name: MASTER_IMAGE_GROUP_READ_PERMISSIONS });
+            } catch {
+                if (isEventCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
+
+                return;
+            }
+
             subscribeSocketRoom(socket, buildDomainChannelName(DomainType.MASTER_IMAGE_GROUP, target));
 
             if (isEventCallback(cb)) {
@@ -35,7 +51,7 @@ export function registerMasterImageGroupSocketHandlers(socket: Socket) {
     socket.on(
         buildDomainEventFullName(DomainType.MASTER_IMAGE_GROUP, DomainEventSubscriptionName.UNSUBSCRIBE),
         (target) => {
-            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.NODE, target));
+            unsubscribeSocketRoom(socket, buildDomainChannelName(DomainType.MASTER_IMAGE_GROUP, target));
         },
     );
 }

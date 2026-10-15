@@ -41,7 +41,7 @@ export class MasterImageGroupController {
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<MasterImageGroup>> {
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query);
+        const { data, meta } = await this.service.getMany(query, buildActorContext(event));
         return { data, meta: { ...meta, schema: describeQuerySchema(masterImageGroupSchema) } };
     }
 
@@ -51,7 +51,7 @@ export class MasterImageGroupController {
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<MasterImageGroup>> {
         const query = useRequestQuery(event);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, buildActorContext(event), Object.keys(query).length > 0 ? query : undefined);
 
         return {
             data: entity,

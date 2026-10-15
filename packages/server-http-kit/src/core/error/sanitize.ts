@@ -19,7 +19,12 @@ import {
     isHubError,
 } from '@privateaim/errors';
 import { isHTTPError } from '@ebec/http';
-import { CodecError, ParseError } from '@rapiq/core';
+import {
+    AdapterError,
+    CodecError,
+    ParseError,
+    ErrorCode as QueryErrorCode,
+} from '@rapiq/core';
 import { EntityRelationLookupError } from 'typeorm-extension';
 import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'validup';
 
@@ -114,6 +119,18 @@ export function sanitizeError(input: unknown): HubError {
         });
     }
 
+    // `KEY_VALUE_INVALID` is the one AdapterError a client causes: an operand
+    // the adapter cannot bind to its column — a malformed id on a uuid key
+    // (`GET /events/abc`, `filter[id]=abc`), a date that denotes no instant.
+    // The other AdapterError codes describe a server-authored condition and
+    // stay internal. Port of authup's sanitizeError.
+    if (input instanceof AdapterError && input.code === QueryErrorCode.KEY_VALUE_INVALID) {
+        return new BadRequestError({
+            message: input.message,
+            stack: input.stack,
+        });
+    }
+
     if (isValidupError(input)) {
         const paths = input.issues.map((issue) => stringifyPath(issue.path));
         return new BadRequestError({
@@ -148,6 +165,15 @@ export function sanitizeError(input: unknown): HubError {
                     stack: input.stack as string | undefined,
                 });
             }
+            // postgres `invalid_text_representation`: a bound value the column
+            // type cannot parse. Filter operands are refused by the rapiq
+            // adapter first; this is the backstop for any other path (a
+            // repository `findOneBy`) so a malformed id answers 400, not 500.
+            case '22P02':
+                return new BadRequestError({
+                    message: 'A value could not be parsed for its column type.',
+                    stack: input.stack as string | undefined,
+                });
             case 'ER_DISK_FULL':
                 return new StorageInsufficientError({
                     message: 'No database operation possible, due to the lack of free disk space.',

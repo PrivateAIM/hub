@@ -267,9 +267,19 @@ catalog cache or name-only fallback is installed. Token-verifier caching and soc
 connection lifetimes remain unchanged.
 
 The evaluator enforces the data a call supplies. A service using only `preEvaluate`
-still has only a pre-gate; this is not the collection `compile()`/row-check migration
-in plan 016. The Vue store handles batch verdict fetching and expiry;
-`store.permissionRevision` must be watched by custom async navigation resolvers.
+still has only a pre-gate.
+
+Reads that need scoping go through `scopeReadQuery` (`server-kit/src/core/query/scope.ts`):
+
+- It pre-evaluates a one-of of the entity's read and write names; holding none is a 403.
+- It then lowers `compile()` into the query. A `post` verdict narrows to the actor's own
+  realm; `compile: false` skips this step, leaving a capability gate only (the global
+  catalogs).
+- Record reads reuse the scoped query with `eq('id', id)`, so a row out of reach is a 404,
+  the same as a missing one.
+
+The Vue store handles batch verdict fetching and expiry; `store.permissionRevision` must
+be watched by custom async navigation resolvers.
 
 ## Realm Scoping
 
