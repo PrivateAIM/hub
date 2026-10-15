@@ -213,7 +213,7 @@ Modernization and refactoring plans:
     - **Socket subscribe denials answer 403** (`PermissionDeniedError`) instead of 401, and any other failure answers `InternalError` instead of posing as a denial (`adapters/socket/error.ts`). client-vue still ignores subscribe errors.
     - **Authorization lives in core.** telemetry's log endpoints go through a core `LogService`; server-core's analysis client permissions through `AnalysisClientPermissionService` behind an `IClientPermissionStore` port (the Authup adapter stays in `app/modules/database/`).
     - **`FProjectForm` hides the node picker without `project_update`**, which attaching nodes requires since #1932.
-    - **`packages/errors` is registered with release-please** (it was published but never bumped). It joins the linked-versions group, so its next release jumps from 0.8.42 to the group version.
+    - **`packages/errors` is registered with release-please** (it was published but never bumped). Its next release jumps from 0.8.42 to the shared version via the top-level `release-as` (the linked-versions plugin is inert under `include-component-in-tag: false`, see [conventions.md](.agents/conventions.md#release-process)).
 
 ## Commits, Issues & Pull Requests
 
