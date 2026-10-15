@@ -37,6 +37,11 @@ export class BucketAPI extends BaseAPI implements IBucketAPI {
         return response.data;
     }
 
+    async clear(id: Bucket['id']): Promise<EntityRecordResponse<Bucket>> {
+        const response = await this.client.post(`buckets/${id}/clear`);
+        return response.data;
+    }
+
     async update(id: Bucket['id'], data: Partial<BucketCreatePayload>): Promise<EntityRecordResponse<Bucket>> {
         const response = await this.client.post(`buckets/${id}`, nullifyEmptyObjectProperties(data));
         return response.data;

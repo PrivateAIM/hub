@@ -6,8 +6,8 @@
  */
 
 import type { IContainer } from 'eldin';
-import { LoggerInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
-import { BucketFileEventCaller } from '@privateaim/server-storage-kit';
+import { LoggerInjectionKey, MessageBusDispatchComponentCaller, MessageBusInjectionKey } from '@privateaim/server-kit';
+import { BucketEventMessageBusRouting, BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import { BucketController } from '../../../adapters/http/controllers/bucket/module.ts';
 import { BucketFileController } from '../../../adapters/http/controllers/bucket-file/module.ts';
 import { RootController } from '../../../adapters/http/controllers/root/index.ts';
@@ -35,7 +35,14 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const bucketFileComponent = new BucketFileComponent({ storage, logger });
     const bucketFileEventCaller = new BucketFileEventCaller({ messageBus });
 
-    const bucketCaller = new BucketCallerAdapter(bucketComponent);
+    const bucketCaller = new BucketCallerAdapter(
+        bucketComponent,
+        new MessageBusDispatchComponentCaller({
+            messageBus, 
+            logger, 
+            routing: BucketEventMessageBusRouting, 
+        }),
+    );
     const bucketFileCaller = new BucketFileCallerAdapter(bucketFileComponent, bucketFileEventCaller);
 
     const bucketService = new BucketService({

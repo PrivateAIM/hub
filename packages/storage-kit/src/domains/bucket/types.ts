@@ -6,7 +6,7 @@
  */
 
 import type { BucketFile } from '../bucket-file';
-import type { EntityCollectionResponse, IEntityAPI } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse, IEntityAPI } from '../types-base';
 import type { Bucket } from './entity.ts';
 
 export type BucketCreatePayload =    & Pick<Bucket, 'name'> &
@@ -18,6 +18,11 @@ export interface IBucketAPI extends IEntityAPI<Bucket, BucketCreatePayload, Part
      * request creates many bucket files.
      */
     upload(id: Bucket['id'], formData: FormData) : Promise<EntityCollectionResponse<BucketFile>>;
+
+    /**
+     * Empties the bucket (every file and stored object) but keeps it.
+     */
+    clear(id: Bucket['id']) : Promise<EntityRecordResponse<Bucket>>;
 
     getStreamPath(id: Bucket['id']) : string;
     getStreamURL(id: Bucket['id']) : string;

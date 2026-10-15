@@ -10,6 +10,7 @@ import { MessageBusRoutingType } from '@privateaim/server-kit';
 export enum BucketCommand {
     CREATE = 'create',
     DELETE = 'delete',
+    CLEAR = 'clear',
 }
 
 export enum BucketEvent {
@@ -20,6 +21,10 @@ export enum BucketEvent {
     DELETION_FAILED = 'deletionFailed',
     DELETION_STARTED = 'deletionStarted',
     DELETION_FINISHED = 'deletionFinished',
+
+    CLEARING_FAILED = 'clearingFailed',
+    CLEARING_STARTED = 'clearingStarted',
+    CLEARING_FINISHED = 'clearingFinished',
 }
 
 export const BucketEventMessageBusRouting = {

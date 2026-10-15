@@ -125,6 +125,17 @@ export class BucketController {
         };
     }
 
+    @DPost('/:id/clear', [ForceLoggedInMiddleware])
+    async clear(
+        @DPath('id') id: string,
+        @DContext() event: IAppEvent,
+    ): Promise<EntityRecordResponse<Bucket>> {
+        const actor = buildActorContext(event);
+        const entity = await this.service.clear(id, actor);
+        event.response.status = 202;
+        return { data: entity, meta: {} };
+    }
+
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @DPath('id') id: string,

@@ -9,6 +9,9 @@ import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type { ComponentMetadata } from '@privateaim/server-kit';
 import type { BucketCommand, BucketEvent } from './constants';
 import type {
+    BucketClearCommandPayload,
+    BucketClearingFailedEventPayload,
+    BucketClearingFinishedEventPayload,
     BucketCreateCommandPayload,
     BucketCreationFailedEventPayload, 
     BucketCreationFinishedEventPayload,
@@ -20,6 +23,7 @@ import type {
 export type BucketComponentEventMap = ObjectLiteralKeys<{
     [BucketCommand.CREATE]: [BucketCreateCommandPayload, ComponentMetadata],
     [BucketCommand.DELETE]: [BucketDeleteCommandPayload, ComponentMetadata],
+    [BucketCommand.CLEAR]: [BucketClearCommandPayload, ComponentMetadata],
 
     [BucketEvent.CREATION_FAILED]: [BucketCreationFailedEventPayload, ComponentMetadata],
     [BucketEvent.CREATION_STARTED]: [BucketCreateCommandPayload, ComponentMetadata],
@@ -28,4 +32,8 @@ export type BucketComponentEventMap = ObjectLiteralKeys<{
     [BucketEvent.DELETION_FAILED]: [BucketDeletionFailedEventPayload, ComponentMetadata],
     [BucketEvent.DELETION_STARTED]: [BucketDeleteCommandPayload, ComponentMetadata],
     [BucketEvent.DELETION_FINISHED]: [BucketDeletionFinishedEventPayload, ComponentMetadata],
+
+    [BucketEvent.CLEARING_FAILED]: [BucketClearingFailedEventPayload, ComponentMetadata],
+    [BucketEvent.CLEARING_STARTED]: [BucketClearCommandPayload, ComponentMetadata],
+    [BucketEvent.CLEARING_FINISHED]: [BucketClearingFinishedEventPayload, ComponentMetadata],
 }>;

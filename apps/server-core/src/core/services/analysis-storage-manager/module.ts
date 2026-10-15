@@ -11,7 +11,9 @@ import { AnalysisBucketType, DomainType, buildAnalysisBucketName } from '@privat
 import type { IEntityRepository } from '@privateaim/server-kit';
 import type { 
     AnalysisStorageMangerCheckOptions, 
+    AnalysisStorageMangerClearOptions,
     AnalysisStorageMangerRemoveOptions, 
+    IAnalysisStorageManager,
     IBucketCaller, 
     ITaskManager,  
 } from './types.ts';
@@ -23,7 +25,7 @@ type AnalysisStorageManagerContext = {
     taskManager: ITaskManager;
 };
 
-export class AnalysisStorageManager {
+export class AnalysisStorageManager implements IAnalysisStorageManager {
     protected repository: IEntityRepository<Analysis>;
 
     protected bucketRepository: IEntityRepository<AnalysisBucket>;
@@ -98,6 +100,32 @@ export class AnalysisStorageManager {
             );
 
             await this.caller.callDelete({ id: analysisBucket.bucketId }, { correlationId });
+        }
+
+        return entity;
+    }
+
+    async clear(
+        input: string | Analysis,
+        options: AnalysisStorageMangerClearOptions = {},
+    ): Promise<Analysis> {
+        const entity = await this.resolve(input);
+
+        const bucketTypes = options.type ?
+            [options.type] :
+            Object.values(AnalysisBucketType);
+
+        for (const bucketType of bucketTypes) {
+            const analysisBucket = await this.bucketRepository.findOneBy({
+                analysisId: entity.id,
+                type: bucketType,
+            });
+            if (!analysisBucket) {
+                continue;
+            }
+
+            // no task: the CLEARING_FINISHED handler needs no correlation, the bucket id suffices.
+            await this.caller.callClear({ id: analysisBucket.bucketId });
         }
 
         return entity;

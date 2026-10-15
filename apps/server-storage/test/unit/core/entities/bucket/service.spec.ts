@@ -292,4 +292,57 @@ describe('BucketService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
     });
+
+    describe('clear', () => {
+        it('should delegate to caller', async () => {
+            const bucket = createTestBucket();
+            repository.seed(bucket);
+
+            const result = await service.clear(bucket.id, createMasterRealmActor());
+            expect(result.id).toBe(bucket.id);
+            expect(caller.getClearCalls()).toEqual([bucket.id]);
+            expect(caller.getDeleteCalls()).toHaveLength(0);
+        });
+
+        it('should throw EntityNotFoundError for missing entity', async () => {
+            await expect(
+                service.clear('nonexistent', createAllowAllActor()),
+            ).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should skip permission check when actor owns the bucket', async () => {
+            const actorId = randomUUID();
+            const bucket = createTestBucket({
+                actorId,
+                actorType: 'user',
+            });
+            repository.seed(bucket);
+
+            const actor = createDenyAllActor();
+            actor.identity = { id: actorId, type: 'user' };
+
+            const result = await service.clear(bucket.id, actor);
+            expect(result.id).toBe(bucket.id);
+        });
+
+        it('should throw PermissionDeniedError when non-owner lacks permission', async () => {
+            const bucket = createTestBucket();
+            repository.seed(bucket);
+
+            await expect(
+                service.clear(bucket.id, createDenyAllActor()),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(caller.getClearCalls()).toHaveLength(0);
+        });
+
+        it('should enforce realm writability for non-owner', async () => {
+            const bucket = createTestBucket({ realmId: 'other-realm' });
+            repository.seed(bucket);
+
+            await expect(
+                service.clear(bucket.id, createNonMasterRealmActor('realm-1')),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(caller.getClearCalls()).toHaveLength(0);
+        });
+    });
 });

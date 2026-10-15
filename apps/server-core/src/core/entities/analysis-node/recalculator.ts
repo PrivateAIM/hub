@@ -6,9 +6,16 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
-import type { ProcessStatus } from '@privateaim/kit';
-import { EnvironmentName, getMinProcessStatus } from '@privateaim/kit';
+import {
+    AnalysisBucketType,
+    AnalysisNodeApprovalStatus,
+    DomainType,
+    NodeType,
+} from '@privateaim/core-kit';
+import { EnvironmentName, ProcessStatus, getMinProcessStatus } from '@privateaim/kit';
+import type { Logger } from '@privateaim/server-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
+import type { IAnalysisStorageManager } from '../../services/analysis-storage-manager/types.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
 import { AnalysisRecalcQueue, hasAnalysisChanged } from '../utils.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from './types.ts';
@@ -22,7 +29,15 @@ type AnalysisNodeMetadataRecalculatorContext = {
     analysisRepository: IAnalysisRepository;
     analysisNodeRepository: IAnalysisNodeRepository;
     config: AnalysisNodeMetadataRecalculatorConfig;
+    storageManager?: IAnalysisStorageManager;
+    logger?: Logger;
 };
+
+const IDLE_EXECUTION_STATUSES: (`${ProcessStatus}` | null)[] = [
+    ProcessStatus.EXECUTED,
+    ProcessStatus.FAILED,
+    ProcessStatus.STOPPED,
+];
 
 export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRecalculator {
     protected analysisRepository: IAnalysisRepository;
@@ -31,12 +46,18 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
 
     protected config: AnalysisNodeMetadataRecalculatorConfig;
 
+    protected storageManager?: IAnalysisStorageManager;
+
+    protected logger?: Logger;
+
     private queue: AnalysisRecalcQueue;
 
     constructor(ctx: AnalysisNodeMetadataRecalculatorContext) {
         this.analysisRepository = ctx.analysisRepository;
         this.analysisNodeRepository = ctx.analysisNodeRepository;
         this.config = ctx.config;
+        this.storageManager = ctx.storageManager;
+        this.logger = ctx.logger;
         this.queue = new AnalysisRecalcQueue((id) => this.recalc(id));
     }
 
@@ -97,6 +118,27 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
 
         if (hasAnalysisChanged(cloned, entity)) {
             await this.analysisRepository.save(entity);
+        }
+
+        // Every node idle (none pending, none running) -> intermediate files are no longer needed.
+        // Deliberately not getMinProcessStatus(): it skips null and short-circuits on FAILED.
+        if (
+            this.storageManager &&
+            executionStatuses.length > 0 &&
+            executionStatuses.every((status) => IDLE_EXECUTION_STATUSES.includes(status))
+        ) {
+            // ponytail: one bus message per idle recalc (clear is idempotent);
+            // gate on the transition into idle if that volume ever matters.
+            try {
+                await this.storageManager.clear(entity, { type: AnalysisBucketType.TEMP });
+            } catch (e) {
+                // never rethrow: the node writes that triggered this recalc are already committed.
+                this.logger?.error('Temp bucket of analysis could not be cleared', {
+                    [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
+                    [LogFlag.REF_ID]: entity.id,
+                    error: e instanceof Error ? e.message : String(e),
+                });
+            }
         }
 
         return entity;
