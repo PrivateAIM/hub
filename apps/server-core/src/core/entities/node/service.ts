@@ -15,9 +15,14 @@ import {
 } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach, scopeReadQuery } from '@privateaim/server-kit';
+import {
+    AbstractEntityService,
+    appendQueryConditions,
+    assertRecordReach,
+    scopeReadQuery,
+} from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
-import { appendQueryConditions, decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
+import { decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
 import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
 import { REGISTRY_PROJECT_READ_PERMISSIONS } from '../registry-project/service.ts';
 import { nodeSchema } from './schema.ts';

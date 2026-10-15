@@ -24,13 +24,13 @@ import {
 } from 'vitest';
 import { AnalysisNodeService } from '../../../../../src/core/entities/analysis-node/service.ts';
 import { AnalysisReachService } from '../../../../../src/core/services/analysis-reach/index.ts';
+import { createPermissionActor } from '../../helpers/index.ts';
 import {
     FakeEntityRepository,
     createAllowAllActor,
     createNonMasterRealmActor,
-    createPermissionActor,
     createScopedActor,
-} from '../../helpers/index.ts';
+} from '@privateaim/server-test-kit';
 import { FakeAnalysisNodeMetadataRecalculator } from './fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeRepository } from './fake-repository.ts';
 import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
@@ -115,25 +115,25 @@ describe('AnalysisNodeService', () => {
         it('should return every row of a reachable analysis, other nodes\' rows included', async () => {
             repository.seed([
                 createTestAnalysisNode({
-                    id: 'mine', 
-                    analysisId: 'a-1', 
-                    analysisRealmId: 'realm-b', 
-                    nodeId: 'n-a', 
-                    nodeRealmId: 'realm-a', 
+                    id: 'mine',
+                    analysisId: 'a-1',
+                    analysisRealmId: 'realm-b',
+                    nodeId: 'n-a',
+                    nodeRealmId: 'realm-a',
                 }),
                 createTestAnalysisNode({
-                    id: 'peer', 
-                    analysisId: 'a-1', 
-                    analysisRealmId: 'realm-b', 
-                    nodeId: 'n-c', 
-                    nodeRealmId: 'realm-c', 
+                    id: 'peer',
+                    analysisId: 'a-1',
+                    analysisRealmId: 'realm-b',
+                    nodeId: 'n-c',
+                    nodeRealmId: 'realm-c',
                 }),
                 createTestAnalysisNode({
-                    id: 'foreign', 
-                    analysisId: 'a-2', 
-                    analysisRealmId: 'realm-c', 
-                    nodeId: 'n-c', 
-                    nodeRealmId: 'realm-c', 
+                    id: 'foreign',
+                    analysisId: 'a-2',
+                    analysisRealmId: 'realm-c',
+                    nodeId: 'n-c',
+                    nodeRealmId: 'realm-c',
                 }),
             ]);
 
@@ -144,32 +144,32 @@ describe('AnalysisNodeService', () => {
 
         it('should narrow a node client to its own node\'s analyses, not its realm\'s', async () => {
             nodeRepository.seed({
-                id: 'n-a', 
-                clientId: 'client-a', 
-                realmId: 'realm-a', 
+                id: 'n-a',
+                clientId: 'client-a',
+                realmId: 'realm-a',
             } as Node);
             repository.seed([
                 createTestAnalysisNode({
-                    id: 'mine', 
-                    analysisId: 'a-1', 
-                    analysisRealmId: 'realm-a', 
-                    nodeId: 'n-a', 
-                    nodeRealmId: 'realm-a', 
+                    id: 'mine',
+                    analysisId: 'a-1',
+                    analysisRealmId: 'realm-a',
+                    nodeId: 'n-a',
+                    nodeRealmId: 'realm-a',
                 }),
                 createTestAnalysisNode({
-                    id: 'sibling', 
-                    analysisId: 'a-2', 
-                    analysisRealmId: 'realm-a', 
-                    nodeId: 'n-b', 
-                    nodeRealmId: 'realm-a', 
+                    id: 'sibling',
+                    analysisId: 'a-2',
+                    analysisRealmId: 'realm-a',
+                    nodeId: 'n-b',
+                    nodeRealmId: 'realm-a',
                 }),
             ]);
 
             const actor = createNonMasterRealmActor('realm-a');
             actor.identity = {
-                id: 'client-a', 
-                type: 'client', 
-                realmId: 'realm-a', 
+                id: 'client-a',
+                type: 'client',
+                realmId: 'realm-a',
             };
             actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
 
@@ -402,9 +402,9 @@ describe('AnalysisNodeService', () => {
             return createPermissionActor({
                 realm: { id: realmId, name: realmId },
                 identity: {
-                    id: clientId, 
-                    type: 'client', 
-                    realmId, 
+                    id: clientId,
+                    type: 'client',
+                    realmId,
                 },
                 permissions: [],
             });

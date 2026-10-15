@@ -7,23 +7,23 @@
 
 import { BadRequestError } from '@privateaim/errors';
 import { AnalysisError, NodeType  } from '@privateaim/core-kit';
-import type { 
-    Analysis, 
-    AnalysisNode, 
-    Node, 
-    Registry, 
+import type {
+    Analysis,
+    AnalysisNode,
+    Node,
+    Registry,
 } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type { AnalysisDistributorCheckFinishedPayload, AnalysisDistributorExecutionProgressPayload } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
-import { 
-    beforeEach, 
-    describe, 
-    expect, 
-    it, 
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
 } from 'vitest';
 import { AnalysisDistributor } from '../../../../src/core/services/analysis-distributor/module.ts';
-import { FakeEntityRepository } from '../helpers/index.ts';
+import { FakeEntityRepository } from '@privateaim/server-test-kit';
 import { FakeAnalysisDistributorCaller } from './helpers/fake-distributor-caller.ts';
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
@@ -275,9 +275,9 @@ describe('AnalysisDistributor', () => {
             const payload: AnalysisDistributorExecutionProgressPayload = {
                 id: analysis.id,
                 progress: {
-                    current: 1, 
-                    total: 1, 
-                    percent: 40, 
+                    current: 1,
+                    total: 1,
+                    percent: 40,
                 },
             };
             const saved = await distributor.applyEvent(AnalysisDistributorEvent.EXECUTION_PROGRESS, payload);

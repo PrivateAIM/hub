@@ -18,13 +18,13 @@ import {
     it,
 } from 'vitest';
 import { ProjectNodeService } from '../../../../../src/core/entities/project-node/service.ts';
+import { createPermissionActor } from '../../helpers/index.ts';
 import {
     createAllowAllActor,
     createDenyAllActor,
     createMasterRealmActor,
-    createPermissionActor,
     createScopedActor,
-} from '../../helpers/index.ts';
+} from '@privateaim/server-test-kit';
 import { FakeProjectRepository } from '../project/fake-repository.ts';
 import { FakeProjectNodeRepository } from './fake-repository.ts';
 

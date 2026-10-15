@@ -25,7 +25,7 @@ import {
     createDenyAllActor,
     createMasterRealmActor,
     createScopedActor,
-} from '../../helpers/index.ts';
+} from '@privateaim/server-test-kit';
 import { FakeRegistryManager } from '../node/fake-registry-manager.ts';
 import { FakeRegistryProjectRepository } from './fake-repository.ts';
 
@@ -141,9 +141,9 @@ describe('RegistryProjectService', () => {
 
             const actor = createDenyAllActor();
             actor.identity = {
-                id: seedNodeClient('rp-1'), 
-                type: 'client', 
-                realmId: 'realm-1', 
+                id: seedNodeClient('rp-1'),
+                type: 'client',
+                realmId: 'realm-1',
             };
 
             const result = await service.getMany({}, actor);
@@ -157,9 +157,9 @@ describe('RegistryProjectService', () => {
 
             const actor = createDenyAllActor();
             actor.identity = {
-                id: seedNodeClient('rp-1', 'realm-2'), 
-                type: 'client', 
-                realmId: 'realm-1', 
+                id: seedNodeClient('rp-1', 'realm-2'),
+                type: 'client',
+                realmId: 'realm-1',
             };
 
             await expect(service.getMany({}, actor)).rejects.toThrow(PermissionDeniedError);
@@ -293,9 +293,9 @@ describe('RegistryProjectService', () => {
 
             const actor = createDenyAllActor();
             actor.identity = {
-                id: clientId, 
-                type: 'client', 
-                realmId: 'realm-1', 
+                id: clientId,
+                type: 'client',
+                realmId: 'realm-1',
             };
 
             const result = await service.getOne(registryProjectId, actor);
@@ -310,9 +310,9 @@ describe('RegistryProjectService', () => {
 
             const actor = createDenyAllActor();
             actor.identity = {
-                id: seedNodeClient('rp-1'), 
-                type: 'client', 
-                realmId: 'realm-1', 
+                id: seedNodeClient('rp-1'),
+                type: 'client',
+                realmId: 'realm-1',
             };
 
             await expect(service.getOne('rp-2', actor)).rejects.toThrow(EntityNotFoundError);

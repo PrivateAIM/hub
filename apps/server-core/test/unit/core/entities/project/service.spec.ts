@@ -16,11 +16,7 @@ import {
     it,
 } from 'vitest';
 import { ProjectService } from '../../../../../src/core/entities/project/service.ts';
-import {
-    createAllowAllActor,
-    createDenyAllActor,
-    createScopedActor,
-} from '../../helpers/index.ts';
+import { createAllowAllActor, createDenyAllActor, createScopedActor } from '@privateaim/server-test-kit';
 import { FakeProjectRepository } from './fake-repository.ts';
 
 function createTestProject(overrides?: Partial<Project>): Project {

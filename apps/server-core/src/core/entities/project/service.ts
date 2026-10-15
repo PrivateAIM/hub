@@ -14,8 +14,8 @@ import {
 } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import type { IProjectRepository, IProjectService } from './types.ts';
 import { projectSchema } from './schema.ts';
 import { ProjectValidator } from '@privateaim/core-kit';

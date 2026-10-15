@@ -11,8 +11,13 @@ import { NodeType, ProjectNodeApprovalStatus, ProjectNodeValidator  } from '@pri
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach, reachesRecord } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import {
+    AbstractEntityService,
+    appendQueryConditions,
+    assertRecordReach,
+    reachesRecord,
+} from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import type { IProjectRepository } from '../project/types.ts';
 import { projectNodeSchema } from './schema.ts';
 import type { IProjectNodeRepository, IProjectNodeService } from './types.ts';

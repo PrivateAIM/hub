@@ -34,7 +34,7 @@ import {
     createMasterRealmActor,
     createNonMasterRealmActor,
     createScopedActor,
-} from '../../helpers/index.ts';
+} from '@privateaim/server-test-kit';
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
 import { FakeAnalysisBucketFileRepository } from './fake-repository.ts';
@@ -61,9 +61,9 @@ describe('AnalysisBucketFileService', () => {
         recalculator = new FakeAnalysisFileMetadataRecalculator(analysisRepository);
 
         analysis = {
-            id: randomUUID(), 
-            realmId: OWNER_REALM, 
-            configurationLocked: false, 
+            id: randomUUID(),
+            realmId: OWNER_REALM,
+            configurationLocked: false,
         } as Analysis;
         analysisRepository.seed(analysis);
 

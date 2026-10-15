@@ -22,7 +22,7 @@ import { AnalysisReachService } from '../../../../src/core/services/analysis-rea
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { FakeNodeRepository } from '../entities/node/fake-repository.ts';
-import { createDenyAllActor, createNonMasterRealmActor, createScopedActor } from '../helpers/index.ts';
+import { createDenyAllActor, createNonMasterRealmActor, createScopedActor } from '@privateaim/server-test-kit';
 import { createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
 const OWNER_REALM = randomUUID();
@@ -42,9 +42,9 @@ function userOf(realmId: string): FakeActorContext {
 
 function clientOf(clientId: string, realmId: string, actor = createNonMasterRealmActor(realmId)): FakeActorContext {
     actor.identity = {
-        id: clientId, 
-        type: 'client', 
-        realmId, 
+        id: clientId,
+        type: 'client',
+        realmId,
     };
     return actor;
 }
@@ -55,9 +55,9 @@ function boundClientOf(clientId: string, realmId: string): FakeActorContext {
         realmId,
         realmScope: 'none',
         identity: {
-            id: clientId, 
-            type: 'client', 
-            realmId, 
+            id: clientId,
+            type: 'client',
+            realmId,
         },
     });
 }
@@ -72,9 +72,9 @@ describe('AnalysisLogAccessService', () => {
         const nodeRepository = new FakeNodeRepository();
         nodeRepository.seed([
             nodeRepository.create({
-                id: APPROVED_NODE, 
-                realmId: APPROVED_REALM, 
-                clientId: APPROVED_NODE_CLIENT, 
+                id: APPROVED_NODE,
+                realmId: APPROVED_REALM,
+                clientId: APPROVED_NODE_CLIENT,
             }),
             nodeRepository.create({
                 id: PENDING_NODE,
@@ -104,9 +104,9 @@ describe('AnalysisLogAccessService', () => {
             analysisNodeRepository,
             nodeRepository,
             reach: new AnalysisReachService({
-                analysisNodeRepository, 
-                analysisRepository, 
-                nodeRepository, 
+                analysisNodeRepository,
+                analysisRepository,
+                nodeRepository,
             }),
         });
     });

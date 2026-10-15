@@ -15,11 +15,7 @@ import {
     it,
 } from 'vitest';
 import { MasterImageGroupService } from '../../../../../src/core/entities/master-image-group/service.ts';
-import {
-    FakeEntityRepository,
-    createAllowAllActor,
-    createDenyAllActor,
-} from '../../helpers/index.ts';
+import { FakeEntityRepository, createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 
 const READ_PERMISSIONS = [PermissionName.MASTER_IMAGE_GROUP_READ, PermissionName.MASTER_IMAGE_GROUP_MANAGE];
 

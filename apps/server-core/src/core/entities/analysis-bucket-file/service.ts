@@ -14,6 +14,7 @@ import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@pr
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import {
     AbstractEntityService,
+    appendQueryConditions,
     assertRecordReach,
     hasUnboundedReach,
     isPermissionDenial,
@@ -26,7 +27,7 @@ import type {
     IAnalysisBucketFileService,
     IAnalysisFileMetadataRecalculator,
 } from './types.ts';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { decodeQuery } from '../../query/index.ts';
 import { analysisBucketFileSchema } from './schema.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
 import type { IAnalysisBucketRepository } from '../analysis-bucket/types.ts';

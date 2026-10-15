@@ -10,8 +10,8 @@ import type { BucketFile } from '@privateaim/storage-kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import type { IBucketFileCaller, IBucketFileRepository, IBucketFileService } from './types.ts';
 import { bucketFileSchema } from './schema.ts';
 

@@ -12,8 +12,8 @@ import { AnalysisBucketType, AnalysisBucketValidator } from '@privateaim/core-ki
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { BadRequestError, EntityConflictError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import { analysisBucketSchema } from './schema.ts';
 import type { IAnalysisBucketRepository, IAnalysisBucketService } from './types.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';

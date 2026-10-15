@@ -24,7 +24,7 @@ import {
     createMasterRealmActor,
     createNonMasterRealmActor,
     createScopedActor,
-} from '../../helpers/index.ts';
+} from '@privateaim/server-test-kit';
 import { FakeNodeRepository } from './fake-repository.ts';
 import { FakeRegistryManager } from './fake-registry-manager.ts';
 

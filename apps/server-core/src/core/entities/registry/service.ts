@@ -7,18 +7,18 @@
 
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryAPICommand, RegistryValidator  } from '@privateaim/core-kit';
-import { 
-    PermissionName, 
-    ValidatorGroup, 
-    getHostNameFromString, 
-    isObject,  
+import {
+    PermissionName,
+    ValidatorGroup,
+    getHostNameFromString,
+    isObject,
 } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
+import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
 import type { IRegistryCaller } from '../../harbor/types.ts';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { decodeQuery } from '../../query/index.ts';
 import { registrySchema } from './schema.ts';
 import type { IRegistryRepository, IRegistryService } from './types.ts';
 

@@ -10,10 +10,15 @@ import { EventValidator } from '@privateaim/telemetry-kit';
 import { PermissionName } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach, scopeReadQuery } from '@privateaim/server-kit';
+import {
+    AbstractEntityService,
+    appendQueryConditions,
+    assertRecordReach,
+    scopeReadQuery,
+} from '@privateaim/server-kit';
 import type { IQuery } from '@rapiq/core';
 import { Query, eq } from '@rapiq/core';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { decodeQuery } from '../../query/index.ts';
 import { eventSchema } from './schema.ts';
 import type { IEventRepository, IEventService } from './types.ts';
 

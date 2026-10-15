@@ -43,7 +43,7 @@ import {
     createMasterRealmActor,
     createNonMasterRealmActor,
     createScopedActor,
-} from '../../helpers/index.ts';
+} from '@privateaim/server-test-kit';
 import { FakeAnalysisRepository } from './fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from './fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../analysis-node/fake-metadata-recalculator.ts';
@@ -334,9 +334,9 @@ describe('AnalysisService', () => {
 
             const result = await service.create(
                 {
-                    projectId: project.id, 
-                    name: 'my-analysis', 
-                    displayName: 'My Analysis', 
+                    projectId: project.id,
+                    name: 'my-analysis',
+                    displayName: 'My Analysis',
                 },
                 createAllowAllActor(),
             );
@@ -368,9 +368,9 @@ describe('AnalysisService', () => {
                     nodeRealmId: 'node-realm-1',
                     approvalStatus: ProjectNodeApprovalStatus.APPROVED,
                     node: {
-                        id: aggregatorNodeId, 
-                        type: NodeType.AGGREGATOR, 
-                        realmId: 'node-realm-1', 
+                        id: aggregatorNodeId,
+                        type: NodeType.AGGREGATOR,
+                        realmId: 'node-realm-1',
                     } as Node,
                 } as ProjectNode,
                 {
@@ -380,9 +380,9 @@ describe('AnalysisService', () => {
                     nodeRealmId: 'node-realm-2',
                     approvalStatus: ProjectNodeApprovalStatus.APPROVED,
                     node: {
-                        id: defaultNodeId, 
-                        type: NodeType.DEFAULT, 
-                        realmId: 'node-realm-2', 
+                        id: defaultNodeId,
+                        type: NodeType.DEFAULT,
+                        realmId: 'node-realm-2',
                     } as Node,
                 } as ProjectNode,
             ]);
@@ -430,9 +430,9 @@ describe('AnalysisService', () => {
                     nodeRealmId: 'node-realm-1',
                     approvalStatus: ProjectNodeApprovalStatus.APPROVED,
                     node: {
-                        id: approvedNodeId, 
-                        type: NodeType.DEFAULT, 
-                        realmId: 'node-realm-1', 
+                        id: approvedNodeId,
+                        type: NodeType.DEFAULT,
+                        realmId: 'node-realm-1',
                     } as Node,
                 } as ProjectNode,
                 {
@@ -442,9 +442,9 @@ describe('AnalysisService', () => {
                     nodeRealmId: 'node-realm-2',
                     approvalStatus: null,
                     node: {
-                        id: pendingNodeId, 
-                        type: NodeType.DEFAULT, 
-                        realmId: 'node-realm-2', 
+                        id: pendingNodeId,
+                        type: NodeType.DEFAULT,
+                        realmId: 'node-realm-2',
                     } as Node,
                 } as ProjectNode,
             ]);
@@ -583,14 +583,14 @@ describe('AnalysisService', () => {
             project.analyses = 5;
             projectRepository.seed(project);
             analysisRepository.seed(createFullAnalysis({
-                id: 'analysis-1', 
-                project, 
-                projectId: project.id, 
+                id: 'analysis-1',
+                project,
+                projectId: project.id,
             }));
             analysisRepository.seed(createFullAnalysis({
-                id: 'analysis-2', 
-                project, 
-                projectId: project.id, 
+                id: 'analysis-2',
+                project,
+                projectId: project.id,
             }));
 
             const result = await service.delete('analysis-1', createAllowAllActor());

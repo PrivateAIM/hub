@@ -12,8 +12,13 @@ import { PermissionName, ProcessStatus, ValidatorGroup } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach, reachesRecord } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import {
+    AbstractEntityService,
+    appendQueryConditions,
+    assertRecordReach,
+    reachesRecord,
+} from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import { analysisNodeSchema } from './schema.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
 import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';

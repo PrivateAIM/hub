@@ -11,14 +11,14 @@ import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { FakePermissionEvaluator, createAllowAllActor } from '@privateaim/server-test-kit';
+import { FakePermissionEvaluator, createAllowAllActor, createScopedActor  } from '@privateaim/server-test-kit';
 import { PermissionName } from '@privateaim/kit';
 import { describe, expect, it } from 'vitest';
 import { NodeRegistryCredentialService } from '../../../../../src/core/services/registry-credential/index.ts';
 import { FakeNodeRepository } from '../../entities/node/fake-repository.ts';
 import { FakeRegistryProjectRepository } from '../../entities/registry-project/fake-repository.ts';
 import { FakeRegistryRepository } from '../../entities/registry/fake-repository.ts';
-import { createPermissionActor, createScopedActor } from '../../helpers/index.ts';
+import { createPermissionActor } from '../../helpers/index.ts';
 
 /**
  * The node's own OAuth2 client — a client-type identity of `realmId` that
@@ -28,9 +28,9 @@ function nodeClientActor(clientId: string, realmId = 'realm-b'): ActorContext {
     return createPermissionActor({
         realm: { id: realmId, name: 'node-realm' },
         identity: {
-            type: 'client', 
-            id: clientId, 
-            realmId, 
+            type: 'client',
+            id: clientId,
+            realmId,
         },
     });
 }
@@ -56,9 +56,9 @@ function ownRealmGrantActor(realmId: string, permissions: string[]): ActorContex
         }),
         realm: { id: realmId, name: 'node-realm' },
         identity: {
-            id: randomUUID(), 
-            type: 'user', 
-            realmId, 
+            id: randomUUID(),
+            type: 'user',
+            realmId,
         },
     };
 }

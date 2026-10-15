@@ -15,6 +15,7 @@ import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import {
     AbstractEntityService,
+    appendQueryConditions,
     assertRecordReach,
     holdsPermission,
     isPermissionDenial,
@@ -22,7 +23,7 @@ import {
 } from '@privateaim/server-kit';
 import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
-import { appendQueryConditions, decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
+import { decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
 import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
 import type { IRegistryManager } from '../node/types.ts';
 import type { IRegistryProjectRepository, IRegistryProjectService } from './types.ts';

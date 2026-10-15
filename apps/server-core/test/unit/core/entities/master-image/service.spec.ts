@@ -17,10 +17,7 @@ import {
     it,
 } from 'vitest';
 import { MasterImageService } from '../../../../../src/core/entities/master-image/service.ts';
-import {
-    createAllowAllActor,
-    createDenyAllActor,
-} from '../../helpers/index.ts';
+import { createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { FakeMasterImageRepository } from './fake-repository.ts';
 import { FakeMasterImageBuilderCaller } from './fake-builder-caller.ts';
 import { FakeMasterImageSynchronizerCaller } from './fake-synchronizer-caller.ts';

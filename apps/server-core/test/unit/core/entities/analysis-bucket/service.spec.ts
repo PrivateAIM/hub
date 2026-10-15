@@ -30,7 +30,7 @@ import {
     createMasterRealmActor,
     createNonMasterRealmActor,
     createScopedActor,
-} from '../../helpers/index.ts';
+} from '@privateaim/server-test-kit';
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../../utils/domains/index.ts';
@@ -110,27 +110,27 @@ describe('AnalysisBucketService', () => {
         it('should show a pending node\'s realm the CODE bucket only, an approved one every bucket', async () => {
             repository.seed([
                 createTestAnalysisBucket({
-                    id: 'code', 
-                    analysisId: 'a-1', 
-                    realmId: 'realm-b', 
-                    type: AnalysisBucketType.CODE, 
+                    id: 'code',
+                    analysisId: 'a-1',
+                    realmId: 'realm-b',
+                    type: AnalysisBucketType.CODE,
                 }),
                 createTestAnalysisBucket({
-                    id: 'result', 
-                    analysisId: 'a-1', 
-                    realmId: 'realm-b', 
-                    type: AnalysisBucketType.RESULT, 
+                    id: 'result',
+                    analysisId: 'a-1',
+                    realmId: 'realm-b',
+                    type: AnalysisBucketType.RESULT,
                 }),
                 createTestAnalysisBucket({
-                    id: 'temp', 
-                    analysisId: 'a-1', 
-                    realmId: 'realm-b', 
-                    type: AnalysisBucketType.TEMP, 
+                    id: 'temp',
+                    analysisId: 'a-1',
+                    realmId: 'realm-b',
+                    type: AnalysisBucketType.TEMP,
                 }),
                 createTestAnalysisBucket({
-                    id: 'foreign', 
-                    analysisId: 'a-2', 
-                    realmId: 'realm-c', 
+                    id: 'foreign',
+                    analysisId: 'a-2',
+                    realmId: 'realm-c',
                 }),
             ]);
             analysisNodeRepository.seed(createTestAnalysisNode({
@@ -155,22 +155,22 @@ describe('AnalysisBucketService', () => {
         it('should show the owner realm every bucket of its analyses', async () => {
             repository.seed([
                 createTestAnalysisBucket({
-                    id: 'code', 
-                    analysisId: 'a-1', 
-                    realmId: 'realm-a', 
-                    type: AnalysisBucketType.CODE, 
+                    id: 'code',
+                    analysisId: 'a-1',
+                    realmId: 'realm-a',
+                    type: AnalysisBucketType.CODE,
                 }),
                 createTestAnalysisBucket({
-                    id: 'result', 
-                    analysisId: 'a-1', 
-                    realmId: 'realm-a', 
-                    type: AnalysisBucketType.RESULT, 
+                    id: 'result',
+                    analysisId: 'a-1',
+                    realmId: 'realm-a',
+                    type: AnalysisBucketType.RESULT,
                 }),
                 createTestAnalysisBucket({
-                    id: 'foreign', 
-                    analysisId: 'a-2', 
-                    realmId: 'realm-c', 
-                    type: AnalysisBucketType.RESULT, 
+                    id: 'foreign',
+                    analysisId: 'a-2',
+                    realmId: 'realm-c',
+                    type: AnalysisBucketType.RESULT,
                 }),
             ]);
 
@@ -194,15 +194,15 @@ describe('AnalysisBucketService', () => {
 
         it('should answer a RESULT bucket of a pending node\'s analysis like a missing one', async () => {
             repository.seed(createTestAnalysisBucket({
-                id: 'result', 
-                analysisId: 'a-1', 
-                realmId: 'realm-b', 
-                type: AnalysisBucketType.RESULT, 
+                id: 'result',
+                analysisId: 'a-1',
+                realmId: 'realm-b',
+                type: AnalysisBucketType.RESULT,
             }));
             analysisNodeRepository.seed(createTestAnalysisNode({
-                analysisId: 'a-1', 
-                nodeRealmId: 'realm-a', 
-                approvalStatus: null, 
+                analysisId: 'a-1',
+                nodeRealmId: 'realm-a',
+                approvalStatus: null,
             }));
 
             await expect(service.getOne('result', createNonMasterRealmActor('realm-a'))).rejects.toThrow(EntityNotFoundError);
@@ -245,9 +245,9 @@ describe('AnalysisBucketService', () => {
         it('should let the owner realm create', async () => {
             const result = await service.create(
                 {
-                    analysisId: randomUUID(), 
-                    bucketId: randomUUID(), 
-                    type: AnalysisBucketType.CODE, 
+                    analysisId: randomUUID(),
+                    bucketId: randomUUID(),
+                    type: AnalysisBucketType.CODE,
                 },
                 createNonMasterRealmActor('realm-1'),
             );
@@ -258,9 +258,9 @@ describe('AnalysisBucketService', () => {
         it('should deny a foreign realm', async () => {
             await expect(service.create(
                 {
-                    analysisId: randomUUID(), 
-                    bucketId: randomUUID(), 
-                    type: AnalysisBucketType.CODE, 
+                    analysisId: randomUUID(),
+                    bucketId: randomUUID(),
+                    type: AnalysisBucketType.CODE,
                 },
                 createScopedActor({ realmId: 'other-realm', realmScope: 'own' }),
             )).rejects.toThrow(PermissionDeniedError);
@@ -299,9 +299,9 @@ describe('AnalysisBucketService', () => {
         it('should deny without analysis_update', async () => {
             await expect(service.create(
                 {
-                    analysisId: randomUUID(), 
-                    bucketId: randomUUID(), 
-                    type: AnalysisBucketType.CODE, 
+                    analysisId: randomUUID(),
+                    bucketId: randomUUID(),
+                    type: AnalysisBucketType.CODE,
                 },
                 createDenyAllActor('realm-1'),
             )).rejects.toThrow(PermissionDeniedError);
