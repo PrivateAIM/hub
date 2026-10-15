@@ -6,9 +6,9 @@
  */
 import type { EntityType, EventRecord, User } from '@authup/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import { AnalysisEntity, ProjectEntity } from '../../../../adapters/database/index.ts';
+import { AnalysisBucketFileEntity, AnalysisEntity, ProjectEntity } from '../../../../adapters/database/index.ts';
 
-export async function handleAuthupUserEvent(context: EventRecord<EntityType.USER, User>) {
+export async function handleAuthupUserEvent(context: EventRecord<EntityType.USER, Pick<User, 'id'>>) {
     if (!context.data.id) {
         return;
     }
@@ -34,9 +34,15 @@ export async function handleAuthupUserEvent(context: EventRecord<EntityType.USER
 
         await analysisRepository.save(analyses);
 
-        const analysisFileRepository = dataSource.getRepository(AnalysisEntity);
+        // A file belongs to an analysis that outlives its uploader, so it is
+        // detached like the analysis itself, never removed.
+        const analysisFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
         const analysisFiles = await analysisFileRepository.find({ where: { userId: context.data.id } });
 
-        await analysisRepository.remove(analysisFiles);
+        for (const analysisFile of analysisFiles) {
+            analysisFile.userId = null;
+        }
+
+        await analysisFileRepository.save(analysisFiles);
     }
 }
