@@ -6,8 +6,13 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { BaseComponent } from '../../src';
-import type { ComponentHandleOptions } from '../../src';
+import {
+    BaseComponent,
+    MemoryMessageBusDriver,
+    MessageBus,
+    MessageBusWorkerComponentCaller,
+} from '../../src';
+import type { ComponentHandleOptions, MessageBusPayload, MessageBusRouting } from '../../src';
 
 type EventMap = {
     execute: [{ id: string }, Record<string, any>],
@@ -53,5 +58,29 @@ describe('src/component', () => {
 
         await expect(new TestComponent().handle('execute', { id: 'a' }, {}, options))
             .rejects.toThrow('publish failed');
+    });
+
+    it('should not carry the command attempt over to its reply', async () => {
+        const consumeRouting: MessageBusRouting = { type: 'work', key: 'commands' };
+        const publishRouting: MessageBusRouting = { type: 'work', key: 'replies' };
+
+        const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
+        const replies: MessageBusPayload[] = [];
+        await messageBus.consumeAny(publishRouting, (payload) => {
+            replies.push(payload);
+        });
+
+        const caller = new MessageBusWorkerComponentCaller(new TestComponent(), {
+            consumeRouting,
+            publishRouting,
+            messageBus,
+        });
+
+        await caller.call('execute', { id: 'a' }, { attempt: 3, routing: consumeRouting });
+
+        expect(replies).toHaveLength(1);
+        expect(replies[0].type).toBe('executionFinished');
+        expect(replies[0].metadata.attempt).toBeUndefined();
+        expect(replies[0].metadata.routing).toEqual(publishRouting);
     });
 });

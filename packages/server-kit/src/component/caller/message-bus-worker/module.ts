@@ -84,6 +84,8 @@ export class MessageBusWorkerComponentCaller<
                         metadata: {
                             ...(metadata || {}),
                             ...childContext.metadata,
+                            // the command's retry counter must not leak into its reply
+                            attempt: undefined,
                             routing: this.options.publishRouting,
                         },
                     }));
