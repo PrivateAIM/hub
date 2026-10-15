@@ -207,8 +207,10 @@ same table also gates:
   (`GET /events/not-a-uuid`, `filter[id]=not-a-uuid`) answers 400.
 
 An audit event belongs to the realm of the row it records (a project event to the
-project's realm). Rows without a realm — master images and groups — produce
-realm-less events, visible to `ownOrNull` and `any` grants only. **Events stored
+project's realm). Rows without a single `realmId` column — master images and
+groups, registries, and the project-node and analysis-node junctions (which
+carry one realm per side) — produce realm-less events, visible to `ownOrNull`
+and `any` grants only. **Events stored
 before this release carry no realm**, so an `own` grant does not see them;
 `ownOrNull` does (and with it every realm's old events).
 
@@ -225,19 +227,24 @@ before this release carry no realm**, so an `own` grant does not see them;
    `registry_read` and `master_image_read`; `*` covers them once they are
    provisioned.
 
-**After upgrading:**
-
-1. **Grant every existing node's client `node_read` in Authup.** Otherwise
-   node-side services — pod orchestration, the storage service, the message
-   broker — get 403 on `/nodes`. Hub grants it automatically only when it
-   re-syncs a node's client permissions: when a node is created, or when a node
-   save actually changes a field (a save without changes writes nothing and skips
-   the re-sync).
+**After upgrading:** nothing to do for node clients. On every boot server-core
+re-grants each existing node's client its permissions (`analysis_update`,
+`node_read`), so node-side services — pod orchestration, the storage service,
+the message broker — keep reading `/nodes`. The pass removes any other
+permission a node client was granted by hand, as node saves always have. A node
+whose client cannot be updated is logged as an error and skipped; boot
+continues. If `node_read` is not provisioned in Authup, every node is logged as
+failed — and creating a node fails too, instead of yielding a client that gets
+403 later.
 
 **Known gaps:**
 
 - Registry projects joined through `include=registryProject` are not narrowed to
   the caller's realm reach.
+- Nested includes are not gated: `/project-nodes?include=node.registryProject`
+  or `/analysis-nodes?include=node.registry` return the nested rows without the
+  read permissions above, and `/nodes?include=registryProject.registry` checks
+  only the first segment. Secret fields stay excluded.
 - Includes within the project/analysis family (`include=node`,
   `include=masterImage`) are not gated yet.
 - The registry-project realtime room still broadcasts every realm's projects to

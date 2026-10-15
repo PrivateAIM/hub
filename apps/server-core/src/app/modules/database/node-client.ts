@@ -8,18 +8,15 @@
 import type { Client, Permission } from '@authup/core-kit';
 import { ClientAuthMethod } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
-import type { AuthupClient, Logger } from '@privateaim/server-kit';
+import type { AuthupClient } from '@privateaim/server-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { NodeEntity } from '../../../adapters/database/entities/index.ts';
 
 export class NodeClientService {
     protected authup: AuthupClient;
 
-    protected logger?: Logger;
-
-    constructor(authup: AuthupClient, logger?: Logger) {
+    constructor(authup: AuthupClient) {
         this.authup = authup;
-        this.logger = logger;
     }
 
     async dismiss(entity: NodeEntity): Promise<void> {
@@ -66,11 +63,19 @@ export class NodeClientService {
         return client;
     }
 
-    async assignPermissions(client: Client) {
+    /**
+     * Grant the node client exactly the permissions a node needs, removing any
+     * other. Idempotent, so it also runs at boot for every existing node
+     * (see NodeClientModule) to grant permissions a release added.
+     *
+     * Throws when a permission is not provisioned in Authup: a node client
+     * missing it fails against the hub later, far from the cause.
+     */
+    async assignPermissions(clientId: Client['id']) {
         const { data: clientPermissions } = await this.authup
             .clientPermission.getMany({
                 relations: { permission: true },
-                filters: { clientId: client.id },
+                filters: { clientId },
             });
 
         const permissionNames: string[] = [
@@ -113,15 +118,16 @@ export class NodeClientService {
                     throw e;
                 }
 
-                this.logger?.warn(`The node-client permission could not be created, due non existing permission ${permissionName}.`);
+                throw new Error(
+                    `The permission ${permissionName} is not provisioned in Authup, so it cannot be granted to node clients.`,
+                    { cause: e },
+                );
             }
 
-            if (permission) {
-                await this.authup.clientPermission.create({
-                    clientId: client.id,
-                    permissionId: permission.id,
-                });
-            }
+            await this.authup.clientPermission.create({
+                clientId,
+                permissionId: permission.id,
+            });
         }
     }
 }

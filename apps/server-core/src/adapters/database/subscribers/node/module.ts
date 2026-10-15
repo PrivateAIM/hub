@@ -94,7 +94,7 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
             await repository.save(entity);
         }
 
-        await this.nodeClientService.assignPermissions(client);
+        await this.nodeClientService.assignPermissions(client.id);
     }
 
     listenTo(): CallableFunction | string {
