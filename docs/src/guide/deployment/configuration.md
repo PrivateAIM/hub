@@ -62,7 +62,10 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   for 15 minutes, every 5 minutes, and marks it `failed` if the image is not
   there. Running workers send a heartbeat every 5 minutes, so a long build is not
   affected (a step that sends no progress for 2 hours is treated as hung and
-  stops the heartbeat). **Upgrade the workers before server-core.** An old
+  stops the heartbeat). A hung step only makes the process stale: with a single
+  worker replica the re-check queues behind the hung run, so it is recovered
+  only by restarting the worker, running a second worker replica, or RabbitMQ's
+  `consumer_timeout` ending the hung delivery. **Upgrade the workers before server-core.** An old
   worker sends no heartbeat and still decides staleness on its own: with a new
   server-core, the automatic re-check can reach an idle old worker replica,
   which then reports a healthy build or push with one step longer than 15

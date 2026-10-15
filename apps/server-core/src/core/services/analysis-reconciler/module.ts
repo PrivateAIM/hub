@@ -36,6 +36,9 @@ export class AnalysisReconciler implements IAnalysisReconciler {
         for (const analysis of analyses) {
             if (isProcessStatusInProgress(analysis.buildStatus)) {
                 await this.check(this.ctx.builder, analysis, 'build', result);
+                // a distribution requires an EXECUTED build — while the build
+                // is in progress, a distribution check only fails in canCheck.
+                continue;
             }
 
             if (isProcessStatusInProgress(analysis.distributionStatus)) {

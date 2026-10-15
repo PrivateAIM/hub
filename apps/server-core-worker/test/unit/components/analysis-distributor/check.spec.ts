@@ -166,6 +166,39 @@ describe('AnalysisDistributorCheckHandler', () => {
         expect(context.lastEvent().event).toBe(AnalysisDistributorEvent.CHECK_FAILED);
     });
 
+    it.each<[string, Overrides]>([
+        ['the analysis has no nodes', { analysisNodes: [] }],
+        ['no node records resolve', { nodes: [] }],
+        ['the analysis has no registry assigned', { analysis: { registryId: null } }],
+        ['a node has no registry project', {
+            nodes: [{
+                id: NODE_ID,
+                name: 'node-a',
+                registryProject: null,
+            }],
+        }],
+    ])('should report an in-flight distribution status when %s', async (_, overrides) => {
+        // a precondition that never comes back is undecidable like a missing
+        // image: server-core's stale rule must be able to fail the run.
+        const updatedAt = new Date(Date.now() - 5_000).toISOString();
+        const coreClient = createCoreClient({
+            ...overrides,
+            analysis: {
+                ...overrides.analysis,
+                distributionStatus: ProcessStatus.STARTING,
+                updatedAt,
+            },
+        });
+        const docker = new FakeDockerClient();
+        const context = await run(coreClient, docker);
+
+        expect(context.lastEvent()).toMatchObject({
+            event: AnalysisDistributorEvent.CHECK_FINISHED,
+            payload: { status: ProcessStatus.STARTING, checkedAt: updatedAt },
+        });
+        expect(docker.calls).toHaveLength(0);
+    });
+
     it('should report FAILED when the image is missing and no distribution is in flight', async () => {
         const coreClient = createCoreClient();
         const docker = new FakeDockerClient({ distributionError: new FakeDockerError(404) });

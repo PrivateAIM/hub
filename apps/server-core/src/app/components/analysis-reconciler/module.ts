@@ -41,7 +41,7 @@ export function createAnalysisReconcilerComponent(ctx: AnalysisReconcilerCompone
             } else {
                 lastSuccessAt = Date.now();
                 if (checked > 0) {
-                    ctx.logger?.info(`Checked ${checked} stuck analysis processes.`);
+                    ctx.logger?.debug(`Checked ${checked} stuck analysis processes.`);
                 }
             }
         } catch (e) {

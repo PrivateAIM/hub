@@ -23,7 +23,7 @@ import {
     it, 
 } from 'vitest';
 import { AnalysisDistributor } from '../../../../src/core/services/analysis-distributor/module.ts';
-import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/core/services/helpers.ts';
+import { ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS, ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/core/services/helpers.ts';
 import { FakeEntityRepository } from '../helpers/index.ts';
 import { FakeAnalysisDistributorCaller } from './helpers/fake-distributor-caller.ts';
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
@@ -368,7 +368,7 @@ describe('AnalysisDistributor', () => {
         });
 
         it('should stamp updatedAt on EXECUTION_PROGRESS even when the percent is unchanged', async () => {
-            const updatedAt = new Date(Date.now() - 60_000).toISOString();
+            const updatedAt = new Date(Date.now() - 2 * ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS).toISOString();
             const analysis = await createAnalysis({
                 buildStatus: ProcessStatus.EXECUTED,
                 distributionStatus: ProcessStatus.STARTED,
@@ -389,6 +389,54 @@ describe('AnalysisDistributor', () => {
             const entity = await findAnalysis(analysis.id);
             expect(entity.distributionProgress).toBe(40);
             expect(new Date(entity.updatedAt).getTime()).toBeGreaterThan(new Date(updatedAt).getTime());
+        });
+
+        it('should not save an unchanged EXECUTION_PROGRESS on a recently written row', async () => {
+            const updatedAt = new Date(Date.now() - 1000).toISOString();
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
+                updatedAt,
+            });
+
+            const payload: AnalysisDistributorExecutionProgressPayload = {
+                id: analysis.id,
+                progress: {
+                    current: 0,
+                    total: 0,
+                    percent: 40,
+                },
+            };
+            const saved = await distributor.applyEvent(AnalysisDistributorEvent.EXECUTION_PROGRESS, payload);
+
+            expect(saved).toBeNull();
+            expect(await findAnalysis(analysis.id)).toMatchObject({ distributionProgress: 40, updatedAt });
+        });
+
+        it.each([ProcessStatus.FAILED, null])('should not resurrect a %s distribution on a late EXECUTION_FINISHED', async (status) => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: status,
+                distributionProgress: 0,
+            });
+
+            const saved = await distributor.applyEvent(AnalysisDistributorEvent.EXECUTION_FINISHED, { id: analysis.id });
+
+            expect(saved).toBeNull();
+            expect(await findAnalysis(analysis.id)).toMatchObject({ distributionStatus: status, distributionProgress: 0 });
+        });
+
+        it('should mark an in-progress distribution as EXECUTED on EXECUTION_FINISHED', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
+            });
+
+            await distributor.applyEvent(AnalysisDistributorEvent.EXECUTION_FINISHED, { id: analysis.id });
+
+            expect(await findAnalysis(analysis.id)).toMatchObject({ distributionStatus: ProcessStatus.EXECUTED, distributionProgress: 100 });
         });
 
         it('should not modify the entity on CHECK_FINISHED without status', async () => {

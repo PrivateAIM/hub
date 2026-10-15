@@ -14,7 +14,8 @@ import type { Heartbeat } from './types';
  * A long single step (one docker build layer, one push) emits no progress,
  * and server-core would judge the process stale; the beat keeps its row fresh.
  * Beats are skipped once `touch()` (real progress) has not been called for
- * ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS, so a hung stream goes stale.
+ * ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS, so a hung stream goes stale
+ * (see that constant for why stale alone does not recover it).
  *
  * A failed beat is logged, not thrown: the next one retries, and a worker
  * that can no longer publish at all should be judged stale.

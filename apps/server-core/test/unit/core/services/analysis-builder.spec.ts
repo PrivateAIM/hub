@@ -23,7 +23,7 @@ import {
     it, 
 } from 'vitest';
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
-import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/core/services/helpers.ts';
+import { ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS, ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/core/services/helpers.ts';
 import { FakeAnalysisBuilderCaller } from './helpers/fake-builder-caller.ts';
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
@@ -351,7 +351,7 @@ describe('AnalysisBuilder', () => {
         });
 
         it('should stamp updatedAt on EXECUTION_PROGRESS even when the percent is unchanged', async () => {
-            const updatedAt = new Date(Date.now() - 60_000).toISOString();
+            const updatedAt = new Date(Date.now() - 2 * ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS).toISOString();
             const analysis = await createAnalysis({
                 buildStatus: ProcessStatus.STARTED,
                 buildProgress: 40,
@@ -400,6 +400,51 @@ describe('AnalysisBuilder', () => {
 
             // the analysis must be rebuildable again after the reset
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).not.toThrow();
+        });
+
+        it('should not save an unchanged EXECUTION_PROGRESS on a recently written row', async () => {
+            const updatedAt = new Date(Date.now() - 1000).toISOString();
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
+                updatedAt,
+            });
+
+            const payload: AnalysisBuilderExecutionProgressPayload = {
+                id: analysis.id,
+                progress: {
+                    current: 0,
+                    total: 0,
+                    percent: 40,
+                },
+            };
+            const saved = await builder.applyEvent(AnalysisBuilderEvent.EXECUTION_PROGRESS, payload);
+
+            expect(saved).toBeNull();
+            expect(await findAnalysis(analysis.id)).toMatchObject({ buildProgress: 40, updatedAt });
+        });
+
+        it.each([ProcessStatus.FAILED, null])('should not resurrect a %s build on a late EXECUTION_FINISHED', async (status) => {
+            const analysis = await createAnalysis({
+                buildStatus: status,
+                buildProgress: 0,
+            });
+
+            const saved = await builder.applyEvent(AnalysisBuilderEvent.EXECUTION_FINISHED, { id: analysis.id });
+
+            expect(saved).toBeNull();
+            expect(await findAnalysis(analysis.id)).toMatchObject({ buildStatus: status, buildProgress: 0 });
+        });
+
+        it('should mark an in-progress build as EXECUTED on EXECUTION_FINISHED', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
+            });
+
+            await builder.applyEvent(AnalysisBuilderEvent.EXECUTION_FINISHED, { id: analysis.id });
+
+            expect(await findAnalysis(analysis.id)).toMatchObject({ buildStatus: ProcessStatus.EXECUTED, buildProgress: 100 });
         });
 
         it('should not modify the entity on CHECK_FINISHED without status', async () => {

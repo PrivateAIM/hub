@@ -19,6 +19,7 @@ import type {
 import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import {
     isCheckVerdictStale,
+    isProcessHeartbeatDue,
     isProcessStale,
     isProcessStatusInProgress,
     isProcessStatusTerminal,
@@ -128,6 +129,7 @@ export class AnalysisBuilder {
                     }
 
                     const temp = value as AnalysisBuilderExecutionProgressPayload;
+                    const previous = entity.buildProgress;
                     if (
                         !entity.buildProgress ||
                         temp.progress.percent >= entity.buildProgress
@@ -137,8 +139,16 @@ export class AnalysisBuilder {
 
                     // a worker heartbeat repeats the last percent, and typeorm
                     // skips a save that changes nothing — stamp the row so it
-                    // reads as alive to the stale check (F13).
-                    entity.updatedAt = new Date().toISOString();
+                    // reads as alive to the stale check (F13). Throttled, so a
+                    // burst of unchanged progress is not a write per event; a
+                    // percent change bumps updatedAt on its own.
+                    if (entity.buildProgress === previous) {
+                        if (!isProcessHeartbeatDue(entity.updatedAt)) {
+                            return false;
+                        }
+
+                        entity.updatedAt = new Date().toISOString();
+                    }
                     break;
                 }
                 case AnalysisBuilderEvent.CHECK_FAILED: {
@@ -150,6 +160,16 @@ export class AnalysisBuilder {
                     break;
                 }
                 case AnalysisBuilderEvent.EXECUTION_FINISHED: {
+                    // only a run core still considers running may finish. A run
+                    // already declared FAILED (a stale verdict after a worker
+                    // outage — the retried EXECUTE is re-published behind the
+                    // reconciler's CHECKs) or unlocked to null must not be
+                    // resurrected by a late finish.
+                    // ponytail: the full fix is run ids (plan 018).
+                    if (!isProcessStatusInProgress(entity.buildStatus)) {
+                        return false;
+                    }
+
                     const temp = value as AnalysisBuilderExecutionFinishedPayload;
 
                     entity.buildHash = temp.hash ?? null;

@@ -262,10 +262,17 @@ the master-image synchronizer `Object.assign` into the locked row.
 check reports an in-progress (STARTING/STARTED) build/distribution whose image is not there as
 it is; `applyEvent` turns that verdict into FAILED when the locked row is older than
 `ANALYSIS_PROCESS_STALE_THRESHOLD_MS` (15 min, `core/services/helpers.ts`). Running workers keep
-the row fresh: every EXECUTION_PROGRESS stamps `updatedAt` explicitly (typeorm skips a no-op
-save, and a heartbeat repeats the last percent), and the analysis builder/distributor execute
-handlers re-emit their last progress every 5 min — until no real progress arrived for 2 h, so a
-hung docker stream still goes stale. `AnalysisReconciler.reconcile()`
+the row fresh: an EXECUTION_PROGRESS that leaves the percent unchanged stamps `updatedAt`
+explicitly once the row is older than `ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS` (1 min) and is
+otherwise a no-op (typeorm skips a no-op save, and a heartbeat repeats the last percent), and
+the analysis builder/distributor execute handlers re-emit their last progress every 5 min —
+until no real progress arrived for 2 h, so a hung docker stream goes stale. Stale is not
+recovered: with one worker the CHECK waits behind the hung EXECUTE on the same prefetch-1 queue,
+so recovery needs a worker restart, a second worker replica, or RabbitMQ's `consumer_timeout`.
+EXECUTION_FINISHED applies only while the locked row is STARTING/STARTED, so a late finish cannot
+resurrect a run already FAILED or reset to null (full fix: run ids). The distributor check reports
+an in-progress status for permanently missing preconditions (no nodes, no registry, no registry
+project), so the stale rule fails such a run. `AnalysisReconciler.reconcile()`
 (`core/services/analysis-reconciler/`) selects in-progress rows older than the threshold
 (`IAnalysisRepository.findManyInProgressUpdatedBefore`, a `Raw` bound `Date` — the
 timestamp-filter trap) and dispatches the existing check commands; the app component
