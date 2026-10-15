@@ -13,7 +13,14 @@ import { PermissionName, ValidatorGroup, isRealmResourceWritable } from '@privat
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
-import type { IAnalysisBucketFileRepository, IAnalysisBucketFileService, IAnalysisFileMetadataRecalculator } from './types.ts';
+import type { BucketFile } from '@privateaim/storage-kit';
+import type {
+    AnalysisBucketUploadRemoval,
+    AnalysisBucketUploadResult,
+    IAnalysisBucketFileRepository,
+    IAnalysisBucketFileService,
+    IAnalysisFileMetadataRecalculator,
+} from './types.ts';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisBucketFileSchema } from './schema.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
@@ -87,17 +94,14 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         if (bucket.type === AnalysisBucketType.CODE) {
             await this.assertOwner(actor, analysis);
             this.assertUnlocked(analysis);
-        } else if (!this.isMaster(actor)) {
-            // interim participation rule until plan 021: the realm of an approved analysis node.
-            const realmId = this.getActorRealmId(actor);
-            const participant = realmId && await this.analysisNodeRepository.findOneBy({
-                analysisId: analysis.id,
-                nodeRealmId: realmId,
-                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
-            });
-            if (!participant) {
-                throw new PermissionDeniedError();
-            }
+        } else if (
+            !this.isMaster(actor) &&
+            !await this.isParticipantUploader(analysis, {
+                realmId: this.getActorRealmId(actor),
+                clientId: actor.identity.type === 'client' ? actor.identity.id : undefined,
+            })
+        ) {
+            throw new PermissionDeniedError();
         }
 
         if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
@@ -181,6 +185,111 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         return entity;
+    }
+
+    /**
+     * Register a file uploaded directly to storage. The upload reached storage
+     * unchecked, so the write rules are applied here.
+     *
+     * ponytail: realm-level only — the uploader's ANALYSIS_UPDATE grant and a
+     * master-realm bypass need the uploader resolved through Authup
+     * (plan 021 / plan 012 capability tokens).
+     */
+    async registerUpload(file: BucketFile): Promise<AnalysisBucketUploadResult | null> {
+        const bucket = await this.analysisBucketRepository.findOneBy({ bucketId: file.bucketId });
+        if (!bucket) {
+            return null;
+        }
+
+        const rejection = await this.rejectUpload(file, bucket);
+        if (rejection) {
+            return { bucket, rejection };
+        }
+
+        const entity = this.repository.create({
+            path: file.path,
+            analysisBucketId: bucket.id,
+            analysisId: bucket.analysisId,
+            realmId: bucket.realmId,
+            bucketFileId: file.id,
+            bucketId: file.bucketId,
+            ...(file.actorType === 'user' ? { userId: file.actorId } : {}),
+            ...(file.actorType === 'client' ? { clientId: file.actorId } : {}),
+        });
+
+        return { bucket, entity: await this.repository.save(entity) };
+    }
+
+    /**
+     * Mirror a storage-side delete. ponytail: storage lets the uploader delete its
+     * own object and knows nothing of the lock, so a frozen code file can only be
+     * reported, not kept — enforcing it needs a storage-side gate (plan 012).
+     */
+    async unregisterUpload(bucketId: string, bucketFileId: string): Promise<AnalysisBucketUploadRemoval | null> {
+        // bucketFileId alone is caller-supplied on HTTP create, so it is not unique.
+        const entity = await this.repository.findOneBy({ bucketId, bucketFileId });
+        if (!entity) {
+            return null;
+        }
+
+        const bucket = await this.analysisBucketRepository.findOneById(entity.analysisBucketId);
+        const analysis = bucket?.type === AnalysisBucketType.CODE ?
+            await this.analysisRepository.findOneById(entity.analysisId) :
+            null;
+
+        await this.repository.remove(entity);
+
+        if (entity.root) {
+            await this.recalculator.recalc(entity.analysisId);
+        }
+
+        return { entity, frozen: !!analysis?.configurationLocked };
+    }
+
+    protected async rejectUpload(file: BucketFile, bucket: AnalysisBucket): Promise<string | undefined> {
+        if (bucket.type === AnalysisBucketType.CODE) {
+            if (file.realmId !== bucket.realmId) {
+                return 'the uploader is not in the analysis realm';
+            }
+
+            const analysis = await this.analysisRepository.findOneById(bucket.analysisId);
+            return analysis?.configurationLocked ? 'the analysis configuration is locked' : undefined;
+        }
+
+        const analysis = await this.analysisRepository.findOneById(bucket.analysisId);
+        const participant = analysis && await this.isParticipantUploader(analysis, {
+            realmId: file.realmId,
+            clientId: file.actorType === 'client' ? file.actorId : undefined,
+        });
+
+        return participant ? undefined : 'the uploader is neither an approved analysis node nor the analysis client';
+    }
+
+    /**
+     * Interim RESULT/TEMP participation rule until plan 021: the analysis' own
+     * client (it sits in the owner realm, so it participates by binding — D8),
+     * or the realm of an approved analysis node.
+     */
+    protected async isParticipantUploader(
+        analysis: Analysis,
+        uploader: { realmId?: string | null, clientId?: string },
+    ): Promise<boolean> {
+        if (uploader.clientId && analysis.clientId === uploader.clientId) {
+            return true;
+        }
+
+        // typeorm drops an undefined key, which would match any approved node.
+        if (!uploader.realmId) {
+            return false;
+        }
+
+        const participant = await this.analysisNodeRepository.findOneBy({
+            analysisId: analysis.id,
+            nodeRealmId: uploader.realmId,
+            approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+        });
+
+        return !!participant;
     }
 
     protected async resolveScope(analysisBucketId: string): Promise<{ bucket: AnalysisBucket, analysis: Analysis }> {

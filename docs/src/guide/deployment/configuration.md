@@ -155,8 +155,9 @@ against the analysis's realm, not the caller's:
 - Storage still lets an uploader delete its own object, even a code file of a
   locked analysis. server-core logs such a deletion as an error; it cannot
   prevent it.
-- A **result** or **temp** file may be added by the master realm or by the realm
-  of a node whose analysis participation is approved. Only a code file can be
+- A **result** or **temp** file may be added by the master realm, by the realm
+  of a node whose analysis participation is approved, or by the analysis's own
+  client. Only a code file can be
   the root file.
 - Result files are updated and deleted by the analysis realm with
   `analysis_update`; temp files by the master realm only.

@@ -176,6 +176,25 @@ describe('AnalysisBucketFileService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
+        it('should let the analysis client add a result file', async () => {
+            const actor = createNonMasterRealmActor(OWNER_REALM);
+            actor.identity = { id: randomUUID(), type: 'client' };
+            analysis.clientId = actor.identity.id;
+
+            const entity = await service.create(createPayload(AnalysisBucketType.RESULT), actor);
+            expect(entity.clientId).toBe(actor.identity.id);
+        });
+
+        it('should deny another client of the owner realm a result file', async () => {
+            const actor = createNonMasterRealmActor(OWNER_REALM);
+            actor.identity = { id: randomUUID(), type: 'client' };
+            analysis.clientId = randomUUID();
+
+            await expect(
+                service.create(createPayload(AnalysisBucketType.RESULT), actor),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
         it('should deny the owner realm a result file without node participation', async () => {
             await expect(
                 service.create(createPayload(AnalysisBucketType.RESULT), createNonMasterRealmActor(OWNER_REALM)),
@@ -346,6 +365,46 @@ describe('AnalysisBucketFileService', () => {
             await service.delete(file.id, createAllowAllActor());
 
             expect(recalculator.getCallCount()).toBe(0);
+        });
+    });
+
+    describe('unregisterUpload', () => {
+        it('should remove the file and flag a code file of a locked analysis', async () => {
+            const file = seedFile(AnalysisBucketType.CODE);
+            analysis.configurationLocked = true;
+
+            const removal = await service.unregisterUpload(file.bucketId, file.bucketFileId);
+
+            expect(removal?.frozen).toBe(true);
+            expect(repository.getAll()).toHaveLength(0);
+        });
+
+        it.each([AnalysisBucketType.CODE, AnalysisBucketType.RESULT])('should not flag a %s file otherwise', async (type) => {
+            const file = seedFile(type);
+            analysis.configurationLocked = type === AnalysisBucketType.RESULT;
+
+            const removal = await service.unregisterUpload(file.bucketId, file.bucketFileId);
+
+            expect(removal?.frozen).toBe(false);
+        });
+
+        it('should recalculate when the root file is removed', async () => {
+            const file = seedFile(AnalysisBucketType.CODE, { root: true });
+
+            await service.unregisterUpload(file.bucketId, file.bucketFileId);
+
+            expect(recalculator.getCalls()).toEqual([analysis.id]);
+        });
+
+        it('should not remove a file of another storage bucket with the same bucketFileId', async () => {
+            const file = seedFile(AnalysisBucketType.CODE);
+
+            await expect(service.unregisterUpload(randomUUID(), file.bucketFileId)).resolves.toBeNull();
+            expect(repository.getAll()).toHaveLength(1);
+        });
+
+        it('should answer null for an unknown file', async () => {
+            await expect(service.unregisterUpload('unknown', 'unknown')).resolves.toBeNull();
         });
     });
 });

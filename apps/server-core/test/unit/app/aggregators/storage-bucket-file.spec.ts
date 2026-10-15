@@ -27,9 +27,10 @@ import {
     ProjectEntity,
 } from '../../../../src/adapters/database/index.ts';
 import { StorageBucketFileCreationFinishedHandler } from '../../../../src/app/aggregators/storage/bucket-file/handlers/creation_finished.ts';
-import { ComponentsInjectionKey } from '../../../../src/app/modules/components/index.ts';
+import { AnalysisBucketFileService } from '../../../../src/core/index.ts';
 import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index.ts';
 import { createTestDatabaseApplication } from '../../../app';
+import { FakeAnalysisFileMetadataRecalculator } from '../../core/entities/analysis-bucket-file/fake-metadata-recalculator.ts';
 
 class FakeBucketFileCaller extends BucketFileTaskCaller {
     deleted: BucketFileDeleteCommandPayload[] = [];
@@ -49,9 +50,15 @@ describe('storage bucket-file aggregator', () => {
         await suite.setup();
         dataSource = suite.container.resolve(DatabaseInjectionKey.DataSource);
         bucketFileCaller = new FakeBucketFileCaller();
+        const analysisRepository = suite.container.resolve(DatabaseInjectionKey.AnalysisRepository);
         handler = new StorageBucketFileCreationFinishedHandler({
-            dataSource,
-            taskManager: suite.container.resolve(ComponentsInjectionKey.TaskManager),
+            service: new AnalysisBucketFileService({
+                repository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository),
+                recalculator: new FakeAnalysisFileMetadataRecalculator(analysisRepository),
+                analysisRepository,
+                analysisBucketRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
+                analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+            }),
             bucketFileCaller,
         });
     });

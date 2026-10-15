@@ -8,18 +8,17 @@
 import {
     type BucketFileComponentEventMap,
     BucketFileEvent,
-    type BucketFileTaskCaller,
 } from '@privateaim/server-storage-kit';
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
-import type { BaseAggregatorHandlerContext } from '../../base.ts';
+import type { StorageBucketFileAggregatorContext } from './types.ts';
 import { StorageBucketFileCreationFinishedHandler, StorageBucketFileDeletionFinishedHandler } from './handlers/index.ts';
 
 export class StorageBucketFileAggregator extends BaseComponent<
     BucketFileComponentEventMap
 > {
-    constructor(ctx: BaseAggregatorHandlerContext & { bucketFileCaller?: BucketFileTaskCaller }) {
+    constructor(ctx: StorageBucketFileAggregatorContext) {
         super();
 
         this.mount(BucketFileEvent.CREATION_FINISHED, new StorageBucketFileCreationFinishedHandler(ctx));

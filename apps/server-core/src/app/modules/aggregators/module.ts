@@ -35,13 +35,15 @@ import {
     StorageBucketFileAggregator,
     createAuthupAggregator,
 } from '../../aggregators/index.ts';
+import { AnalysisBucketFileService } from '../../../core/index.ts';
+import { AnalysisInjectionKey } from '../analysis/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { ComponentsInjectionKey } from '../components/constants.ts';
 
 export class AggregatorsModule implements IModule {
     readonly name = 'aggregators';
 
-    readonly dependencies: string[] = ['database', 'components'];
+    readonly dependencies: string[] = ['database', 'components', 'analysis'];
 
     async setup(container: IContainer): Promise<void> {
         const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
@@ -91,8 +93,13 @@ export class AggregatorsModule implements IModule {
             ),
             new MessageBusWorkerComponentCaller(
                 new StorageBucketFileAggregator({
-                    dataSource,
-                    taskManager,
+                    service: new AnalysisBucketFileService({
+                        repository: container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository),
+                        recalculator: container.resolve(AnalysisInjectionKey.FileRecalculator),
+                        analysisRepository: container.resolve(DatabaseInjectionKey.AnalysisRepository),
+                        analysisBucketRepository: container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
+                        analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                    }),
                     logger,
                     bucketFileCaller: new BucketFileTaskCaller({ messageBus, logger }),
                 }),
