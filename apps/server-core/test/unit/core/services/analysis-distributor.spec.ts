@@ -137,6 +137,14 @@ describe('AnalysisDistributor', () => {
             await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
+        it('should throw when not every node approved the built image', async () => {
+            const analysis = seedBuiltAnalysis({ distributionNodesValid: false });
+            registryRepository.seed(createTestRegistry());
+
+            await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError.nodesApprovalRequired().message);
+            expect(caller.getCallsFor('callExecute')).toHaveLength(0);
+        });
+
         it('should throw when distribution already in progress', async () => {
             const analysis = seedBuiltAnalysis({ distributionStatus: ProcessStatus.STARTING });
 

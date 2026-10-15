@@ -136,7 +136,7 @@ describe('worker analysis aggregators', () => {
         it('should reset build artifacts on CHECK_FINISHED with status FAILED (data loss recovery)', async () => {
             const analysis = await createAnalysis({
                 configurationLocked: true,
-                buildNodesValid: true,
+                distributionNodesValid: true,
                 buildStatus: ProcessStatus.EXECUTED,
                 buildProgress: 100,
                 buildHash: 'sha256:lost',

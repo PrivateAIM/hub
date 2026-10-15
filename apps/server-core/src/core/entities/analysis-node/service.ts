@@ -6,16 +6,17 @@
  */
 
 import { eq } from '@rapiq/core';
-import type { AnalysisNode } from '@privateaim/core-kit';
+import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus, AnalysisNodeValidator, NodeType  } from '@privateaim/core-kit';
 import {
     PermissionName,
+    ProcessStatus,
     ValidatorGroup, 
     isRealmResourceWritable, 
 } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import { holdsPermission } from '../../utils/index.ts';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
@@ -25,6 +26,7 @@ import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository, IAnaly
 
 type AnalysisNodeServiceContext = {
     repository: IAnalysisNodeRepository;
+    analysisRepository: IEntityRepository<Analysis>;
     projectNodeRepository: IProjectNodeRepository;
     recalculator: IAnalysisNodeMetadataRecalculator;
     skipAnalysisApproval?: boolean;
@@ -32,6 +34,8 @@ type AnalysisNodeServiceContext = {
 
 export class AnalysisNodeService extends AbstractEntityService implements IAnalysisNodeService {
     protected repository: IAnalysisNodeRepository;
+
+    protected analysisRepository: IEntityRepository<Analysis>;
 
     protected projectNodeRepository: IProjectNodeRepository;
 
@@ -44,6 +48,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
     constructor(ctx: AnalysisNodeServiceContext) {
         super();
         this.repository = ctx.repository;
+        this.analysisRepository = ctx.analysisRepository;
         this.projectNodeRepository = ctx.projectNodeRepository;
         this.recalculator = ctx.recalculator;
         this.skipAnalysisApproval = ctx.skipAnalysisApproval ?? false;
@@ -156,6 +161,19 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
                 throw new PermissionDeniedError(
                     'You are either no authority of the node or you don\'t have the required permissions.',
                 );
+            }
+        }
+
+        // A node approves the built image (hash, size, OS), which does not
+        // exist before the build has finished; a rejection is possible any time.
+        // Only a change to approved is checked: clients re-send the full record.
+        if (
+            validated.approvalStatus === AnalysisNodeApprovalStatus.APPROVED &&
+            entity.approvalStatus !== AnalysisNodeApprovalStatus.APPROVED
+        ) {
+            const analysis = await this.analysisRepository.findOneById(entity.analysisId);
+            if (!analysis || analysis.buildStatus !== ProcessStatus.EXECUTED) {
+                throw new BadRequestError('The analysis can only be approved once its image is built.');
             }
         }
 

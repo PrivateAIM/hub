@@ -192,6 +192,7 @@ export default defineComponent({
                 <FAnalysisNodeApprovalCommand
                     :entity-id="entity.id"
                     :approval-status="entity.approvalStatus"
+                    :analysis-build-status="entity.analysis?.buildStatus"
                     :with-icon="true"
                     :element-type="'button'"
                     :command="'approve'"
@@ -201,6 +202,7 @@ export default defineComponent({
                 <FAnalysisNodeApprovalCommand
                     :entity-id="entity.id"
                     :approval-status="entity.approvalStatus"
+                    :analysis-build-status="entity.analysis?.buildStatus"
                     :with-icon="true"
                     :element-type="'button'"
                     :command="'reject'"

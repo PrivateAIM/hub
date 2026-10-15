@@ -125,7 +125,7 @@ export function createTestAnalysis(overrides: Partial<Analysis> = {}) : Analysis
         configurationNodeAggregatorValid: false,
         configurationNodesValid: false,
         buildStatus: null,
-        buildNodesValid: false,
+        distributionNodesValid: false,
         buildProgress: null,
         buildHash: null,
         buildOs: null,

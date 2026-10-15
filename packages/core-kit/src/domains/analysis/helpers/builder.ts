@@ -20,10 +20,6 @@ export class AnalysisBuilderCommandChecker {
             throw AnalysisError.configurationNotLocked();
         }
 
-        if (!entity.buildNodesValid) {
-            throw AnalysisError.nodesApprovalRequired();
-        }
-
         if (!entity.buildStatus) {
             return;
         }

@@ -6,17 +6,18 @@
  */
 
 import { EntityNotFoundError } from '@privateaim/errors';
-import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisBuilderCommandChecker } from '@privateaim/core-kit';
+import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
+import { AnalysisBuilderCommandChecker, NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import type { EntityPersistContext, IEntityRepository } from '@privateaim/server-kit';
+import type { IEntityRepository } from '@privateaim/server-kit';
 import type { IAnalysisMetadataRecalculator } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
-import type { IAnalysisBuilderCaller } from './types.ts';
+import type { AnalysisBuilderStartOptions, IAnalysisBuilderCaller } from './types.ts';
 
 type AnalysisBuilderContext = {
     repository: IEntityRepository<Analysis>;
+    analysisNodeRepository: IEntityRepository<AnalysisNode>;
     caller: IAnalysisBuilderCaller;
     analysisRecalculator: IAnalysisMetadataRecalculator;
     nodeRecalculator: IAnalysisNodeMetadataRecalculator;
@@ -25,6 +26,8 @@ type AnalysisBuilderContext = {
 
 export class AnalysisBuilder {
     protected repository: IEntityRepository<Analysis>;
+
+    protected analysisNodeRepository: IEntityRepository<AnalysisNode>;
 
     protected caller: IAnalysisBuilderCaller;
 
@@ -36,25 +39,31 @@ export class AnalysisBuilder {
 
     constructor(ctx: AnalysisBuilderContext) {
         this.repository = ctx.repository;
+        this.analysisNodeRepository = ctx.analysisNodeRepository;
         this.caller = ctx.caller;
         this.analysisRecalculator = ctx.analysisRecalculator;
         this.nodeRecalculator = ctx.nodeRecalculator;
         this.fileRecalculator = ctx.fileRecalculator;
     }
 
-    async start(input: string | Analysis, persistCtx?: EntityPersistContext) {
+    async start(input: string | Analysis, options: AnalysisBuilderStartOptions = {}) {
         const entityId = typeof input === 'string' ? input : input.id;
 
         await this.analysisRecalculator.recalc(entityId);
         await this.nodeRecalculator.recalc(entityId);
-        const entity = await this.fileRecalculator.recalc(entityId);
+        let entity = await this.fileRecalculator.recalc(entityId);
 
         AnalysisBuilderCommandChecker.canStart(entity);
+
+        if (!options.ignoreApproval) {
+            await this.resetApprovals(entityId);
+            entity = await this.nodeRecalculator.recalc(entityId);
+        }
 
         entity.buildStatus = ProcessStatus.STARTING;
         entity.buildProgress = null;
 
-        await this.repository.save(entity, persistCtx);
+        await this.repository.save(entity, options.persistCtx);
         await this.caller.callExecute({ id: entity.id });
 
         return entity;
@@ -65,6 +74,26 @@ export class AnalysisBuilder {
         AnalysisBuilderCommandChecker.canCheck(entity);
         await this.caller.callCheck({ id: entity.id });
         return entity;
+    }
+
+    /**
+     * Nodes approve the built image, not the code, so an approval given for a
+     * previous image must not let a new one through distribution.
+     */
+    protected async resetApprovals(analysisId: string) {
+        const analysisNodes = await this.analysisNodeRepository.findManyBy({ analysisId });
+
+        for (const analysisNode of analysisNodes) {
+            if (
+                (analysisNode.node && analysisNode.node.type === NodeType.AGGREGATOR) ||
+                analysisNode.approvalStatus === null
+            ) {
+                continue;
+            }
+
+            analysisNode.approvalStatus = null;
+            await this.analysisNodeRepository.save(analysisNode);
+        }
     }
 
     protected async resolve(input: string | Analysis): Promise<Analysis> {

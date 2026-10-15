@@ -108,7 +108,7 @@ describe('analysis metadata: node recalc', () => {
         const { data: updated } = await client.analysis.getOne(analysis.id);
         expect(updated.nodes).toBe(2);
         expect(updated.nodesApproved).toBeGreaterThanOrEqual(1);
-        expect(updated.buildNodesValid).toBe(true);
+        expect(updated.distributionNodesValid).toBe(true);
         expect(updated.configurationNodeDefaultValid).toBe(true);
         expect(updated.configurationNodeAggregatorValid).toBe(true);
         expect(updated.configurationNodesValid).toBe(true);

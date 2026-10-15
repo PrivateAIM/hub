@@ -15,24 +15,26 @@ Projects represent collaborative research efforts. When a user creates a project
 
 ## Analysis Approval
 
-Analyses are distributed computations within a project. When a user submits an analysis for execution:
+Analyses are distributed computations within a project. Every node an analysis runs on decides for itself whether the analysis may run there. A node approves the **built image**, not just the code:
 
-1. The analysis enters a **pending** state
-2. An administrator reviews the analysis configuration (code, selected nodes, master image)
-3. The administrator **approves** or **rejects** the analysis
-4. Approved analyses are queued for execution by the worker service
+1. The analysis owner locks the configuration and builds the image. The build does **not** wait for approvals.
+2. Once the build has finished, each node's operators review the image (hash, size, OS) together with the code and **approve** or **reject** it. Approving before the build has finished is refused.
+3. Distribution starts only after **every** node has approved. Aggregator nodes are approved automatically.
+
+Starting a new build resets every node's approval (and rejection), because the new image needs a fresh decision. Unlocking the configuration resets them as well.
 
 ![Analysis review](/images/hub_analysis_review.png)
 
 ## Analysis Execution Flow
 
-Once approved, an analysis goes through:
+An analysis goes through:
 
 1. **Configure** — storage buckets are provisioned, configuration is locked
 2. **Build** — the worker builds a Docker image from the analysis code and master image
-3. **Distribute** — the container image is pushed to target node registries
-4. **Execute** — nodes pull and run the container against their local data
-5. **Complete** — results are collected and stored
+3. **Approve** — every node approves the built image
+4. **Distribute** — the container image is pushed to target node registries
+5. **Execute** — nodes pull and run the container against their local data
+6. **Complete** — results are collected and stored
 
 ## Skipping Approval (Development)
 

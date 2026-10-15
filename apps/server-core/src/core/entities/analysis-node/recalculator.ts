@@ -104,7 +104,7 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
         const ignoreApproval = this.config.skipAnalysisApproval ||
             this.config.env === EnvironmentName.TEST;
 
-        entity.buildNodesValid = entity.nodes > 0 &&
+        entity.distributionNodesValid = entity.nodes > 0 &&
             (ignoreApproval || entity.nodes === entity.nodesApproved);
 
         entity.executionStatus = getMinProcessStatus(executionStatuses);

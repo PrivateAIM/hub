@@ -13,7 +13,7 @@ import type {
     ProjectNode,
 } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
-import { PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import {
     beforeEach,
@@ -63,6 +63,7 @@ function createFakeAnalysisNodeRepository(projectId: string) {
 
 describe('AnalysisNodeService', () => {
     let repository: FakeEntityRepository<AnalysisNode>;
+    let analysisRepository: FakeEntityRepository<Analysis>;
     let recalculator: FakeAnalysisNodeMetadataRecalculator;
     let service: AnalysisNodeService;
     let analysisId: string;
@@ -75,7 +76,7 @@ describe('AnalysisNodeService', () => {
 
         repository = createFakeAnalysisNodeRepository(projectId);
         const projectNodeRepository = new FakeProjectNodeRepository();
-        const analysisRepository = new FakeEntityRepository<Analysis>();
+        analysisRepository = new FakeEntityRepository<Analysis>();
         recalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
 
         projectNodeRepository.seed({
@@ -91,6 +92,7 @@ describe('AnalysisNodeService', () => {
 
         service = new AnalysisNodeService({
             repository,
+            analysisRepository,
             projectNodeRepository,
             recalculator,
             skipAnalysisApproval: true,
@@ -222,6 +224,70 @@ describe('AnalysisNodeService', () => {
                     permissions: [PermissionName.ANALYSIS_APPROVE],
                 }),
             )).rejects.toThrow(PermissionDeniedError);
+        });
+    });
+
+    describe('approval', () => {
+        async function seedNode(buildStatus: Analysis['buildStatus']) {
+            const analysis = await analysisRepository.findOneById(analysisId);
+            await analysisRepository.save({ ...analysis!, buildStatus });
+
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-1',
+                approvalStatus: null,
+            });
+            repository.seed(node);
+
+            return node;
+        }
+
+        it('should reject an approval before the image is built', async () => {
+            const node = await seedNode(ProcessStatus.STARTED);
+
+            await expect(service.update(
+                node.id,
+                { approvalStatus: AnalysisNodeApprovalStatus.APPROVED },
+                createAllowAllActor(),
+            )).rejects.toThrow(BadRequestError);
+        });
+
+        it('should accept an approval once the image is built', async () => {
+            const node = await seedNode(ProcessStatus.EXECUTED);
+
+            const result = await service.update(
+                node.id,
+                { approvalStatus: AnalysisNodeApprovalStatus.APPROVED },
+                createAllowAllActor(),
+            );
+
+            expect(result.approvalStatus).toBe(AnalysisNodeApprovalStatus.APPROVED);
+        });
+
+        it('should accept re-sending an approval the node already holds', async () => {
+            const node = await seedNode(null);
+            await repository.save({ ...node, approvalStatus: AnalysisNodeApprovalStatus.APPROVED });
+
+            const result = await service.update(
+                node.id,
+                { approvalStatus: AnalysisNodeApprovalStatus.APPROVED, executionStatus: ProcessStatus.STARTED },
+                createAllowAllActor(),
+            );
+
+            expect(result.executionStatus).toBe(ProcessStatus.STARTED);
+        });
+
+        it('should accept a rejection before the image is built', async () => {
+            const node = await seedNode(null);
+
+            const result = await service.update(
+                node.id,
+                { approvalStatus: AnalysisNodeApprovalStatus.REJECTED },
+                createAllowAllActor(),
+            );
+
+            expect(result.approvalStatus).toBe(AnalysisNodeApprovalStatus.REJECTED);
         });
     });
 

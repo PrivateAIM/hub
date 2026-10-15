@@ -18,6 +18,7 @@ import type { Analysis } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
+import FAnalysisDistributionNodesStep from './FAnalysisDistributionNodesStep.vue';
 import { FProgressBar } from '../../utility';
 import { resolveTextColorClass } from '../../../core';
 
@@ -26,6 +27,7 @@ export default defineComponent({
         FProgressBar,
         FProcessStatus,
         FAnalysisCommand,
+        FAnalysisDistributionNodesStep,
     },
     props: {
         entity: {
@@ -96,6 +98,39 @@ export default defineComponent({
                     :progress="progress"
                     show-text
                 />
+
+                <hr>
+
+                <div>
+                    <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
+                        <VCIcon name="fa6-solid:list-check" />
+                        <span>Requirements</span>
+                    </div>
+                    <FAnalysisDistributionNodesStep :entity="entity">
+                        <template #default="{passed, message}">
+                            <div class="flex flex-row gap-1">
+                                <div>
+                                    <strong
+                                        :title="message"
+                                    >
+                                        Node(s) Approval
+                                    </strong>
+                                </div>
+                                <div>
+                                    <span
+                                        :class="{
+                                            'text-success-600': passed,
+                                            'text-error-600': !passed,
+                                        }"
+                                    >
+                                        <VCIcon :name="passed ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
+                                    </span>
+                                </div>
+                            </div>
+                        </template>
+                    </FAnalysisDistributionNodesStep>
+                </div>
+
                 <div class="mt-auto">
                     <div class="flex flex-row gap-1">
                         <div>

@@ -18,14 +18,12 @@ import { computed, defineComponent } from 'vue';
 import type { Analysis } from '@privateaim/core-kit';
 import FProcessStatus from '../../FProcessStatus.vue';
 import { FAnalysisCommand } from '../FAnalysisCommand';
-import FAnalysisBuildNodesStep from './FAnalysisBuildNodesStep.vue';
 import { FProgressBar } from '../../utility';
 import { resolveTextColorClass } from '../../../core';
 
 export default defineComponent({
     components: {
         FProgressBar,
-        FAnalysisBuildNodesStep,
         FProcessStatus,
         FAnalysisCommand,
     },
@@ -129,89 +127,55 @@ export default defineComponent({
                     show-text
                 />
 
-                <hr>
+                <template v-if="entity.buildOs || entity.buildHash || size">
+                    <hr>
 
-                <div class="flex flex-col">
                     <div>
                         <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
-                            <VCIcon name="fa6-solid:list-check" />
-                            <span>Requirements</span>
+                            <VCIcon name="fa6-solid:circle-info" />
+                            <span>Info</span>
                         </div>
-                        <FAnalysisBuildNodesStep :entity="entity">
-                            <template #default="{passed, message}">
-                                <div class="flex flex-row gap-1">
-                                    <div>
-                                        <strong
-                                            :title="message"
-                                        >
-                                            Node(s) Approval
-                                        </strong>
-                                    </div>
-                                    <div>
-                                        <span
-                                            :class="{
-                                                'text-success-600': passed,
-                                                'text-error-600': !passed,
-                                            }"
-                                        >
-                                            <VCIcon :name="passed ? 'fa6-solid:check' : 'fa6-solid:xmark'" />
-                                        </span>
-                                    </div>
+                        <div class="flex flex-col">
+                            <div
+                                v-if="entity.buildOs"
+                                class="flex flex-row gap-1"
+                            >
+                                <div>
+                                    <strong>OS</strong>
                                 </div>
-                            </template>
-                        </FAnalysisBuildNodesStep>
+                                <div>
+                                    {{ entity.buildOs }}
+                                    <VCIcon
+                                        v-if="buildOsIcon"
+                                        :name="buildOsIcon"
+                                    />
+                                </div>
+                            </div>
+                            <div
+                                v-if="entity.buildHash"
+                                class="flex flex-row gap-1"
+                            >
+                                <div>
+                                    <strong>Hash</strong>
+                                </div>
+                                <div style="word-break: break-all;">
+                                    {{ entity.buildHash }}
+                                </div>
+                            </div>
+                            <div
+                                v-if="size"
+                                class="flex flex-row gap-1"
+                            >
+                                <div>
+                                    <strong>Size</strong>
+                                </div>
+                                <div>
+                                    {{ size }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <template v-if="entity.buildOs || entity.buildHash || size">
-                        <hr>
-
-                        <div>
-                            <div class="flex flex-row items-center gap-1 text-fg-muted text-xs mb-1">
-                                <VCIcon name="fa6-solid:circle-info" />
-                                <span>Info</span>
-                            </div>
-                            <div class="flex flex-col">
-                                <div
-                                    v-if="entity.buildOs"
-                                    class="flex flex-row gap-1"
-                                >
-                                    <div>
-                                        <strong>OS</strong>
-                                    </div>
-                                    <div>
-                                        {{ entity.buildOs }}
-                                        <VCIcon
-                                            v-if="buildOsIcon"
-                                            :name="buildOsIcon"
-                                        />
-                                    </div>
-                                </div>
-                                <div
-                                    v-if="entity.buildHash"
-                                    class="flex flex-row gap-1"
-                                >
-                                    <div>
-                                        <strong>Hash</strong>
-                                    </div>
-                                    <div style="word-break: break-all;">
-                                        {{ entity.buildHash }}
-                                    </div>
-                                </div>
-                                <div
-                                    v-if="size"
-                                    class="flex flex-row gap-1"
-                                >
-                                    <div>
-                                        <strong>Size</strong>
-                                    </div>
-                                    <div>
-                                        {{ size }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </div>
+                </template>
 
                 <div class="mt-auto">
                     <div class="flex flex-row gap-1 ">

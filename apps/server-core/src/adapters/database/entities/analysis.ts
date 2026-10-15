@@ -139,11 +139,11 @@ export class AnalysisEntity implements Analysis {
     // ------------------------------------------------------------------
 
     @Column({
-        name: 'build_nodes_valid', 
+        name: 'distribution_nodes_valid', 
         type: 'boolean', 
         default: false, 
     })
-    buildNodesValid: boolean;
+    distributionNodesValid: boolean;
 
     @Index()
     @Column({

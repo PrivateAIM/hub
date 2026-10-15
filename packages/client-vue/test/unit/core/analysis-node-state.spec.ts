@@ -12,6 +12,7 @@ import {
     ANALYSIS_NODE_LANE_BUDGET,
     buildAnalysisNodeApprovalDistribution,
     buildAnalysisNodeExecutionDistribution,
+    isAnalysisNodeApprovalCommandDisabled,
     isAnalysisNodeException,
     partitionAnalysisNodeLanes,
     resolveAnalysisNodeApprovalState,
@@ -119,5 +120,47 @@ describe('core/analysis-node-state', () => {
             { key: 'running', count: 1 },
             { key: 'waiting', count: 1 },
         ]);
+    });
+
+    describe('isAnalysisNodeApprovalCommandDisabled', () => {
+        // A node approves the built image: the server answers an approval
+        // before the build finished with 400, so the button mirrors it.
+        it('should disable approve until the image is built', () => {
+            expect(isAnalysisNodeApprovalCommandDisabled({
+                command: 'approve',
+                approvalStatus: null,
+                analysisBuildStatus: null,
+            })).toBe(true);
+            expect(isAnalysisNodeApprovalCommandDisabled({
+                command: 'approve',
+                approvalStatus: null,
+                analysisBuildStatus: ProcessStatus.STARTED,
+            })).toBe(true);
+            expect(isAnalysisNodeApprovalCommandDisabled({
+                command: 'approve',
+                approvalStatus: null,
+                analysisBuildStatus: ProcessStatus.EXECUTED,
+            })).toBe(false);
+        });
+
+        it('should not gate approve when the build status is unknown', () => {
+            expect(isAnalysisNodeApprovalCommandDisabled({ command: 'approve', approvalStatus: null })).toBe(false);
+        });
+
+        it('should disable a command that would not change the status', () => {
+            expect(isAnalysisNodeApprovalCommandDisabled({
+                command: 'approve',
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+                analysisBuildStatus: ProcessStatus.EXECUTED,
+            })).toBe(true);
+            expect(isAnalysisNodeApprovalCommandDisabled({
+                command: 'reject',
+                approvalStatus: AnalysisNodeApprovalStatus.REJECTED,
+            })).toBe(true);
+            expect(isAnalysisNodeApprovalCommandDisabled({
+                command: 'reject',
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            })).toBe(false);
+        });
     });
 });

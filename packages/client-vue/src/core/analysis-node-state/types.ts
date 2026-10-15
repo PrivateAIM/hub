@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisNode } from '@privateaim/core-kit';
+import type { AnalysisNode, AnalysisNodeApprovalCommand } from '@privateaim/core-kit';
+import type { ProcessStatus } from '@privateaim/kit';
 
 export type AnalysisNodeExecutionState = 'done' | 'running' | 'waiting' | 'failed';
 
@@ -33,4 +34,14 @@ export type AnalysisNodeLanePartition = {
      * should lead with the state distribution summary.
      */
     summarized: boolean
+};
+
+export type AnalysisNodeApprovalCommandInput = {
+    command: `${AnalysisNodeApprovalCommand}`,
+    approvalStatus: AnalysisNode['approvalStatus'] | undefined,
+    /**
+     * Build status of the node's analysis; `undefined` when the caller has
+     * not loaded the analysis, which leaves the approval ungated.
+     */
+    analysisBuildStatus?: `${ProcessStatus}` | null
 };

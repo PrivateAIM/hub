@@ -23,6 +23,11 @@ export class AnalysisDistributorCommandChecker {
             throw new AnalysisError('The analysis is not built yet.');
         }
 
+        // nodes approve the built image, so approval gates distribution, not the build.
+        if (!entity.distributionNodesValid) {
+            throw AnalysisError.nodesApprovalRequired();
+        }
+
         // we haven't started distribution yet.
         if (!entity.distributionStatus) {
             return;

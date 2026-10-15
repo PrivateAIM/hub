@@ -6,9 +6,10 @@
  */
 
 import type { AnalysisNode } from '@privateaim/core-kit';
-import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
+import { AnalysisNodeApprovalCommand, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type {
+    AnalysisNodeApprovalCommandInput,
     AnalysisNodeApprovalState,
     AnalysisNodeExecutionState,
     AnalysisNodeLanePartition,
@@ -128,4 +129,35 @@ export function buildAnalysisNodeExecutionDistribution(
     nodes: AnalysisNode[],
 ) : AnalysisNodeStateCount<AnalysisNodeExecutionState>[] {
     return countBy(nodes, resolveAnalysisNodeExecutionState, ['done', 'running', 'waiting', 'failed']);
+}
+
+/**
+ * A node approves the built image, so an approval is refused (400) until the
+ * analysis build has finished; a command that would not change the status is
+ * disabled as well.
+ */
+export function isAnalysisNodeApprovalCommandDisabled(
+    input: AnalysisNodeApprovalCommandInput,
+) : boolean {
+    if (
+        input.command === AnalysisNodeApprovalCommand.APPROVE &&
+        typeof input.analysisBuildStatus !== 'undefined' &&
+        input.analysisBuildStatus !== ProcessStatus.EXECUTED
+    ) {
+        return true;
+    }
+
+    if (input.approvalStatus) {
+        if (
+            input.approvalStatus === AnalysisNodeApprovalStatus.APPROVED &&
+            input.command === AnalysisNodeApprovalCommand.APPROVE
+        ) {
+            return true;
+        }
+
+        return input.approvalStatus === AnalysisNodeApprovalStatus.REJECTED &&
+            input.command === AnalysisNodeApprovalCommand.REJECT;
+    }
+
+    return input.command === AnalysisNodeApprovalCommand.REJECT;
 }
