@@ -26,7 +26,7 @@ import { useRequestQuery } from '@routup/basic/query';
 import type { FiltersBuildInput } from '@rapiq/core';
 import type { IAppEvent } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ForceLoggedInMiddleware, useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext, useRequestIdentityRealm } from '@privateaim/server-http-kit';
 import { collectRootFilterValues, describeQuerySchema } from '@privateaim/server-kit';
 import { ValidupError, buildErrorMessageForAttribute } from 'validup';
 import { defineIssueItem } from '@ebec/core';
@@ -37,7 +37,6 @@ import {
 import { analysisNodeLogSchema, decodeQuery } from '../../../../../core/index.ts';
 import type { IAnalysisLogAccessService } from '../../../../../core/services/analysis-log-access/index.ts';
 import { LogAccessIntent } from '../../../../../core/services/analysis-log-access/index.ts';
-import { buildActorContext } from '../../../request/index.ts';
 
 type AnalysisNodeLogControllerContext = {
     accessService: IAnalysisLogAccessService;

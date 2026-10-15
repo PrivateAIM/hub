@@ -20,12 +20,11 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { FiltersBuildInput } from '@rapiq/core';
 import type { IAppEvent } from 'routup';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import { collectRootFilterValues, describeQuerySchema } from '@privateaim/server-kit';
 import { analysisLogSchema, decodeQuery } from '../../../../../core/index.ts';
 import type { IAnalysisLogAccessService } from '../../../../../core/services/analysis-log-access/index.ts';
 import { LogAccessIntent } from '../../../../../core/services/analysis-log-access/index.ts';
-import { buildActorContext } from '../../../request/index.ts';
 
 type AnalysisLogControllerContext = {
     accessService: IAnalysisLogAccessService;

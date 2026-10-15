@@ -7,12 +7,16 @@
 
 import type { ActorContext } from '@privateaim/server-kit';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
+import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
+import type { IAnalysisReachService } from '../analysis-reach/types.ts';
 import type { LogAccessIntent } from './constants.ts';
 
 export type AnalysisLogAccessServiceContext = {
     analysisRepository: IAnalysisRepository;
+    analysisNodeRepository: IAnalysisNodeRepository;
     nodeRepository: INodeRepository;
+    reach: IAnalysisReachService;
 };
 
 /**
@@ -22,9 +26,9 @@ export type AnalysisLogAccessServiceContext = {
  */
 export interface IAnalysisLogAccessService {
     /**
-     * Throws `BadRequestError` for a non-UUID id, `EntityNotFoundError` for
-     * an unknown analysis and
-     * `PermissionDeniedError` when the actor may not access its logs.
+     * Throws `BadRequestError` for a non-UUID id, `PermissionDeniedError`
+     * when the actor lacks the capability and `EntityNotFoundError` for an
+     * analysis that is unknown or out of reach.
      */
     assertAnalysisLogAccess(
         analysisId: string,
@@ -33,10 +37,9 @@ export interface IAnalysisLogAccessService {
     ): Promise<void>;
 
     /**
-     * Throws `BadRequestError` for a non-UUID id, `EntityNotFoundError` for
-     * an unknown analysis or node and
-     * `PermissionDeniedError` when the actor may not access the logs of that
-     * node's run of the analysis.
+     * Throws `BadRequestError` for a non-UUID id, `PermissionDeniedError`
+     * when the actor lacks the capability and `EntityNotFoundError` for an
+     * analysis or node that is unknown, or a node run out of reach.
      */
     assertAnalysisNodeLogAccess(
         analysisId: string,

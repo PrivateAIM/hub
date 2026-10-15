@@ -200,6 +200,31 @@ describe('AnalysisReachService', () => {
         expect(actor.permissionEvaluator.compileCalls[0].name).toEqual([PermissionName.ANALYSIS_RESULT_READ]);
     });
 
+    it('should leave participation out for grant-only reach', async () => {
+        const actor = createNonMasterRealmActor('realm-a');
+        actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-a') });
+
+        await expect(service.resolve(actor, ANALYSIS, { grantOnly: true })).resolves.toEqual(eq('realmId', 'realm-a'));
+    });
+
+    it('should give a bound client no grant-only reach, whatever its grant', async () => {
+        nodeRepository.seed({
+            id: 'n-a1',
+            clientId: 'client-n-a1',
+            realmId: 'realm-a',
+        } as Node);
+
+        const actor = createNonMasterRealmActor('realm-a');
+        actor.identity = {
+            id: 'client-n-a1',
+            type: 'client',
+            realmId: 'realm-a',
+        };
+        actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+        await expect(service.resolve(actor, ANALYSIS, { grantOnly: true })).resolves.toEqual(inArray('id', []));
+    });
+
     it('should reach a node client by its node alone, whatever its grant', async () => {
         nodeRepository.seed({
             id: 'n-a1', 

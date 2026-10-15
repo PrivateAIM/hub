@@ -29,6 +29,11 @@ export type AnalysisReachOptions = {
     names?: string[];
     /** Count only participation through an approved node (RESULT/TEMP, D2). */
     approvedOnly?: boolean;
+    /**
+     * Reach through the grant alone — no participation, and nothing for a
+     * node's or analysis' own client (D3: deleting logs is the owner side's).
+     */
+    grantOnly?: boolean;
 };
 
 export interface IAnalysisReachService {

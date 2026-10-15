@@ -32,6 +32,9 @@ export default defineComponent({
         const httpClient = injectCoreHTTPClient();
 
         const busy = ref(false);
+        // Set once the server refuses the logs (403/404: out of the caller's
+        // reach), which also stops the auto-refresh from retrying.
+        const denied = ref(false);
         const total = ref(0);
         const data : Ref<Log[]> = ref([]);
 
@@ -71,6 +74,8 @@ export default defineComponent({
 
             try {
                 await load();
+            } catch {
+                denied.value = true;
             } finally {
                 busy.value = false;
             }
@@ -81,6 +86,10 @@ export default defineComponent({
         // while auto-refreshing). `preserve` keeps the scroll position sensible:
         // following the newest entries at the bottom, staying put otherwise.
         const reload = async () => {
+            if (denied.value) {
+                return;
+            }
+
             busy.value = true;
 
             try {
@@ -89,6 +98,8 @@ export default defineComponent({
                 await preserve(() => {
                     data.value = next;
                 });
+            } catch {
+                denied.value = true;
             } finally {
                 busy.value = false;
             }
@@ -97,6 +108,7 @@ export default defineComponent({
         return {
             data,
             busy,
+            denied,
             meta: computed(() => ({ total: total.value })),
             load,
             reload,
@@ -114,6 +126,7 @@ export default defineComponent({
                 />
                 <div class="ms-auto">
                     <FLogsRefresh
+                        v-if="!denied"
                         :busy="busy"
                         @refresh="reload"
                     />

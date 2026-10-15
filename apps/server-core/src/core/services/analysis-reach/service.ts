@@ -62,7 +62,7 @@ export class AnalysisReachService implements IAnalysisReachService {
 
         const binding = await this.resolveClientBinding(actor, target, approval);
         if (binding) {
-            return binding;
+            return options.grantOnly ? matchNothing() : binding;
         }
 
         const compiled = await actor.permissionEvaluator.compile({ name: names });
@@ -84,7 +84,7 @@ export class AnalysisReachService implements IAnalysisReachService {
                     matchNothing();
         }
 
-        if (!actor.identity || actor.identity.type !== 'user' || !actor.realm) {
+        if (options.grantOnly || !actor.identity || actor.identity.type !== 'user' || !actor.realm) {
             return grant;
         }
 
