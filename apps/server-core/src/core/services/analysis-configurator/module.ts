@@ -9,13 +9,13 @@ import { EntityNotFoundError } from '@privateaim/errors';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisConfiguratorCommandChecker, NodeType } from '@privateaim/core-kit';
 import type { IEntityRepository } from '@privateaim/server-kit';
-import type { IAnalysisMetadataRecalculator } from '../../entities/analysis/types.ts';
+import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
 import type { AnalysisConfiguratorLockOptions, AnalysisConfiguratorUnlockOptions } from './types.ts';
 
 type AnalysisConfiguratorContext = {
-    repository: IEntityRepository<Analysis>;
+    repository: IAnalysisRepository;
     analysisNodeRepository: IEntityRepository<AnalysisNode>;
     analysisRecalculator: IAnalysisMetadataRecalculator;
     nodeRecalculator: IAnalysisNodeMetadataRecalculator;
@@ -23,7 +23,7 @@ type AnalysisConfiguratorContext = {
 };
 
 export class AnalysisConfigurator {
-    protected repository: IEntityRepository<Analysis>;
+    protected repository: IAnalysisRepository;
 
     protected analysisNodeRepository: IEntityRepository<AnalysisNode>;
 
@@ -49,13 +49,19 @@ export class AnalysisConfigurator {
 
         await this.analysisRecalculator.recalc(entityId);
         await this.nodeRecalculator.recalc(entityId);
-        const entity = await this.fileRecalculator.recalc(entityId);
+        await this.fileRecalculator.recalc(entityId);
 
-        AnalysisConfiguratorCommandChecker.canLock(entity);
+        // on the locked row: a concurrent transition may have moved it since the recalcs
+        const entity = await this.repository.updateLocked(entityId, (locked) => {
+            AnalysisConfiguratorCommandChecker.canLock(locked);
 
-        entity.configurationLocked = true;
+            locked.configurationLocked = true;
+            return true;
+        }, options.persistCtx);
 
-        await this.repository.save(entity, options.persistCtx);
+        if (!entity) {
+            throw new EntityNotFoundError({ entity: 'analysis' });
+        }
 
         return entity;
     }
@@ -85,10 +91,19 @@ export class AnalysisConfigurator {
             await this.analysisNodeRepository.save(analysisNode);
         }
 
-        entity.configurationLocked = false;
-        entity.buildStatus = null;
+        // checked again on the locked row: a concurrent build start (another
+        // replica) may have committed STARTING since the read above.
+        const unlocked = await this.repository.updateLocked(entity.id, (locked) => {
+            AnalysisConfiguratorCommandChecker.canUnlock(locked);
 
-        await this.repository.save(entity, options.persistCtx);
+            locked.configurationLocked = false;
+            locked.buildStatus = null;
+            return true;
+        }, options.persistCtx);
+
+        if (!unlocked) {
+            throw new EntityNotFoundError({ entity: 'analysis' });
+        }
 
         return this.nodeRecalculator.recalc(entity.id);
     }

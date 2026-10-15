@@ -17,3 +17,29 @@ export function isProcessStatusTerminal(status: `${ProcessStatus}` | null | unde
         status === ProcessStatus.FAILED ||
         status === ProcessStatus.STOPPED;
 }
+
+/**
+ * A check verdict judges the snapshot the worker read. If the row has been
+ * written since (a new start, a finished run), the verdict is about a past
+ * state and must not overwrite the present one — e.g. a FAILED for an
+ * orphaned build arriving after a rebuild was started.
+ *
+ * Any write bumps `updatedAt`, not only a status transition — a node-progress
+ * recalc or an approval during the check drops the verdict too, silently.
+ * Accepted: a dropped verdict leaves the row as it was; the check is re-run.
+ *
+ * Without `checkedAt` (a worker from before this field, during a rolling
+ * upgrade) the verdict is applied as before.
+ *
+ * Both values come from the same `updated_at` column through the same
+ * transformer, so an untouched row compares equal at whatever precision the
+ * column stores (mysql may truncate fractional seconds — on both sides);
+ * equal counts as fresh.
+ */
+export function isCheckVerdictStale(checkedAt: string | undefined, updatedAt: string): boolean {
+    if (!checkedAt) {
+        return false;
+    }
+
+    return new Date(updatedAt).getTime() > new Date(checkedAt).getTime();
+}

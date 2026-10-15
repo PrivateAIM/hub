@@ -9,14 +9,13 @@ import { EntityNotFoundError } from '@privateaim/errors';
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBuilderCommandChecker, NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import type { IEntityRepository } from '@privateaim/server-kit';
-import type { IAnalysisMetadataRecalculator } from '../../entities/analysis/types.ts';
+import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
 import type { AnalysisBuilderStartOptions, IAnalysisBuilderCaller } from './types.ts';
 
 type AnalysisBuilderContext = {
-    repository: IEntityRepository<Analysis>;
+    repository: IAnalysisRepository;
     analysisNodeRepository: IAnalysisNodeRepository;
     caller: IAnalysisBuilderCaller;
     analysisRecalculator: IAnalysisMetadataRecalculator;
@@ -25,7 +24,7 @@ type AnalysisBuilderContext = {
 };
 
 export class AnalysisBuilder {
-    protected repository: IEntityRepository<Analysis>;
+    protected repository: IAnalysisRepository;
 
     protected analysisNodeRepository: IAnalysisNodeRepository;
 
@@ -51,22 +50,33 @@ export class AnalysisBuilder {
 
         await this.analysisRecalculator.recalc(entityId);
         await this.nodeRecalculator.recalc(entityId);
-        let entity = await this.fileRecalculator.recalc(entityId);
+        const entity = await this.fileRecalculator.recalc(entityId);
 
+        // early, so approvals are not reset for a build that cannot start
         AnalysisBuilderCommandChecker.canStart(entity);
 
         if (!options.ignoreApproval) {
             await this.resetApprovals(entityId);
-            entity = await this.nodeRecalculator.recalc(entityId);
+            await this.nodeRecalculator.recalc(entityId);
         }
 
-        entity.buildStatus = ProcessStatus.STARTING;
-        entity.buildProgress = null;
+        // checked again on the locked row: a concurrent start (another
+        // replica) may have moved the status since the read above.
+        const started = await this.repository.updateLocked(entityId, (locked) => {
+            AnalysisBuilderCommandChecker.canStart(locked);
 
-        await this.repository.save(entity, options.persistCtx);
-        await this.caller.callExecute({ id: entity.id });
+            locked.buildStatus = ProcessStatus.STARTING;
+            locked.buildProgress = null;
+            return true;
+        }, options.persistCtx);
 
-        return entity;
+        if (!started) {
+            throw new EntityNotFoundError({ entity: 'analysis' });
+        }
+
+        await this.caller.callExecute({ id: started.id });
+
+        return started;
     }
 
     async check(input: string | Analysis) {

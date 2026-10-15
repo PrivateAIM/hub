@@ -41,6 +41,12 @@ export type AnalysisBuilderCheckPayload = AnalysisBuilderBasePayload;
 export type AnalysisBuilderCheckFinishedPayload = AnalysisBuilderBasePayload & {
     status?: `${ProcessStatus}`,
     /**
+     * `updatedAt` of the analysis snapshot the verdict was made on, so a
+     * verdict about an older state can be told apart and dropped. Optional:
+     * absent from workers predating it.
+     */
+    checkedAt?: string,
+    /**
      * sha
      */
     hash?: string,

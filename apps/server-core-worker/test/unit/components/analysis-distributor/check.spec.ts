@@ -216,6 +216,14 @@ describe('AnalysisDistributorCheckHandler', () => {
         expect(context.eventsOf(AnalysisDistributorEvent.CHECK_FINISHED)).toHaveLength(0);
     });
 
+    it('should stamp the verdict with the snapshot it judged', async () => {
+        const updatedAt = new Date(Date.now() - 5_000).toISOString();
+
+        const context = await run(createCoreClient({ analysis: { updatedAt } }), new FakeDockerClient());
+
+        expect(context.lastEvent().payload.checkedAt).toBe(updatedAt);
+    });
+
     it('should emit CHECK_STARTED before doing any work', async () => {
         const coreClient = createCoreClient();
         const docker = new FakeDockerClient();

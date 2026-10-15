@@ -8,6 +8,7 @@
 import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
 import type { MasterImageSynchronizerGroup, MasterImageSynchronizerImage } from '@privateaim/server-core-worker-kit';
 import type { IEntityRepository } from '@privateaim/server-kit';
+import type { IMasterImageRepository } from '../../../entities/master-image/types.ts';
 import type {
     MasterImageSynchronizerExecuteContext,
     MasterImageSynchronizerExecuteResult,
@@ -15,12 +16,12 @@ import type {
 } from './types.ts';
 
 type MasterImageSynchronizerContext = {
-    imageRepository: IEntityRepository<MasterImage>;
+    imageRepository: IMasterImageRepository;
     groupRepository: IEntityRepository<MasterImageGroup>;
 };
 
 export class MasterImageSynchronizerService {
-    protected imageRepository: IEntityRepository<MasterImage>;
+    protected imageRepository: IMasterImageRepository;
 
     protected groupRepository: IEntityRepository<MasterImageGroup>;
 
@@ -49,6 +50,8 @@ export class MasterImageSynchronizerService {
             deleted: [],
         };
 
+        const updates = new Map<string, Partial<MasterImage>>();
+
         const virtualPaths = input.map((entity) => entity.virtualPath);
         result.deleted = entities
             .filter((image) => !virtualPaths.includes(image.virtualPath));
@@ -76,6 +79,7 @@ export class MasterImageSynchronizerService {
                 result.created.push(this.imageRepository.create(data));
             } else {
                 result.updated.push(this.imageRepository.merge(entities[index], data));
+                updates.set(entities[index].id, data);
             }
         }
 
@@ -83,8 +87,14 @@ export class MasterImageSynchronizerService {
             await this.imageRepository.save(entity);
         }
 
-        for (const entity of result.updated) {
-            await this.imageRepository.save(entity);
+        // merged into the locked row, not saved from the copy read above:
+        // that copy's buildStatus would be written back over a concurrent
+        // build transition (save() diffs against the database).
+        for (const [id, data] of updates) {
+            await this.imageRepository.updateLocked(id, (locked) => {
+                Object.assign(locked, data);
+                return true;
+            });
         }
 
         for (const entity of result.deleted) {

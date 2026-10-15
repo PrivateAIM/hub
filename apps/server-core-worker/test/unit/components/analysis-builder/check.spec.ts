@@ -80,6 +80,25 @@ describe('AnalysisBuilderCheckHandler', () => {
         expect(docker.calls[0].name).toContain(ANALYSIS_ID);
     });
 
+    it('should stamp the verdict with the snapshot it judged', async () => {
+        const updatedAt = new Date(Date.now() - 5_000).toISOString();
+
+        const found = await run(
+            createCoreClient({ updatedAt }),
+            new FakeDockerClient({
+                inspectInfo: {
+                    Id: 'sha256:abc', 
+                    Os: 'linux', 
+                    Size: 1, 
+                }, 
+            }),
+        );
+        expect(found.lastEvent().payload.checkedAt).toBe(updatedAt);
+
+        const missing = await run(createCoreClient({ updatedAt }), new FakeDockerClient({ inspectError: IMAGE_MISSING }));
+        expect(missing.lastEvent().payload.checkedAt).toBe(updatedAt);
+    });
+
     it('should report FAILED when the image is absent and no build ever ran', async () => {
         const docker = new FakeDockerClient({ inspectError: IMAGE_MISSING });
 

@@ -17,7 +17,7 @@ import type { Logger } from '@privateaim/server-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { IAnalysisStorageManager } from '../../services/analysis-storage-manager/types.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
-import { AnalysisRecalcQueue, hasAnalysisChanged } from '../utils.ts';
+import { AnalysisRecalcQueue, saveAnalysisPatch } from '../utils.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from './types.ts';
 
 type AnalysisNodeMetadataRecalculatorConfig = {
@@ -62,14 +62,12 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
     }
 
     async recalc(analysisId: string): Promise<Analysis> {
-        const entity = await this.analysisRepository.findOneById(analysisId);
-        if (!entity) {
+        const read = await this.analysisRepository.findOneById(analysisId);
+        if (!read) {
             throw new Error(`Analysis ${analysisId} not found`);
         }
 
-        const cloned = { ...entity };
-
-        const analysisNodes = await this.analysisNodeRepository.findManyWithNodeByAnalysis(entity.id);
+        const analysisNodes = await this.analysisNodeRepository.findManyWithNodeByAnalysis(read.id);
 
         let nodes = 0;
         let nodesApproved = 0;
@@ -98,27 +96,21 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
             }
         }
 
-        entity.nodes = nodes;
-        entity.nodesApproved = nodesApproved;
-
         const ignoreApproval = this.config.skipAnalysisApproval ||
             this.config.env === EnvironmentName.TEST;
 
-        entity.distributionNodesValid = entity.nodes > 0 &&
-            (ignoreApproval || entity.nodes === entity.nodesApproved);
-
-        entity.executionStatus = getMinProcessStatus(executionStatuses);
-        entity.executionProgress = executionProgress > 0 && nodes > 0 ?
-            Math.floor(executionProgress / nodes) :
-            0;
-
-        entity.configurationNodeAggregatorValid = hasAggregator;
-        entity.configurationNodeDefaultValid = hasDefault;
-        entity.configurationNodesValid = hasAggregator && hasDefault;
-
-        if (hasAnalysisChanged(cloned, entity)) {
-            await this.analysisRepository.save(entity);
-        }
+        const entity = await saveAnalysisPatch(this.analysisRepository, read, {
+            nodes,
+            nodesApproved,
+            distributionNodesValid: nodes > 0 && (ignoreApproval || nodes === nodesApproved),
+            executionStatus: getMinProcessStatus(executionStatuses),
+            executionProgress: executionProgress > 0 && nodes > 0 ?
+                Math.floor(executionProgress / nodes) :
+                0,
+            configurationNodeAggregatorValid: hasAggregator,
+            configurationNodeDefaultValid: hasDefault,
+            configurationNodesValid: hasAggregator && hasDefault,
+        });
 
         // Every node idle (none pending, none running) -> intermediate files are no longer needed.
         // Deliberately not getMinProcessStatus(): it skips null and short-circuits on FAILED.

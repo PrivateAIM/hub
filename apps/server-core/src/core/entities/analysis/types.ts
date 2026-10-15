@@ -6,11 +6,23 @@
  */
 
 import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityPersistContext,
+    EntityRepositoryFindManyResult,
+    IEntityRepository,
+} from '@privateaim/server-kit';
 
 export interface IAnalysisRepository extends IEntityRepository<Analysis> {
     findOneWithProject(id: string): Promise<Analysis | null>;
     countByProject(projectId: string): Promise<number>;
+    /**
+     * Read the row under a write lock, let `fn` check and mutate it, and save
+     * it when `fn` returns true — atomically across replicas. Resolves the
+     * saved row, or null when it is missing or `fn` returned false; a throw
+     * in `fn` rolls back.
+     */
+    updateLocked(id: string, fn: (entity: Analysis) => boolean, ctx?: EntityPersistContext): Promise<Analysis | null>;
 }
 
 export interface IAnalysisMetadataRecalculator {

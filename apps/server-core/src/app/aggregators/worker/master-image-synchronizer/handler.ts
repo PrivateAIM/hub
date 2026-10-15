@@ -5,16 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
+import type { MasterImageGroup } from '@privateaim/core-kit';
 import type {
     MasterImageSynchronizerExecutionFinishedPayload,
 } from '@privateaim/server-core-worker-kit';
 import type { IEntityRepository, Logger } from '@privateaim/server-kit';
+import type { IMasterImageRepository } from '../../../../core/entities/master-image/types.ts';
 import { MasterImageSynchronizerService } from '../../../../core/services/master-image/index.ts';
 
 export async function handleMasterImageSynchronizerExecutionFinishedEvent(
     value: MasterImageSynchronizerExecutionFinishedPayload,
-    imageRepository: IEntityRepository<MasterImage>,
+    imageRepository: IMasterImageRepository,
     groupRepository: IEntityRepository<MasterImageGroup>,
     logger?: Logger,
 ) {

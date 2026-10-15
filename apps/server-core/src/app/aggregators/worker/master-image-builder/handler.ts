@@ -18,7 +18,7 @@ import {
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import type { DataSource } from 'typeorm';
-import { MasterImageEntity } from '../../../../adapters/database/index.ts';
+import { MasterImageEntity, updateLockedEntity } from '../../../../adapters/database/index.ts';
 import { isProcessStatusTerminal } from '../helpers.ts';
 
 export async function handleMasterImageBuilderEvent(
@@ -27,57 +27,58 @@ export async function handleMasterImageBuilderEvent(
     dataSource: DataSource,
     eventComponentCaller?: EventComponentCaller,
 ) {
-    const repository = dataSource.getRepository(MasterImageEntity);
+    // the whole read-check-mutate-save runs on the locked row, so a terminal
+    // status is checked against the row as it is now, not as it was read
+    // before a concurrent handler (another replica) committed.
+    const saved = await updateLockedEntity(dataSource, MasterImageEntity, { id: value.id }, (entity) => {
+        switch (context.key) {
+            case MasterImageBuilderEvent.EXECUTION_STARTED: {
+                if (isProcessStatusTerminal(entity.buildStatus)) {
+                    return false;
+                }
 
-    const entity = await repository.findOneBy({ id: value.id });
+                entity.buildStatus = ProcessStatus.STARTED;
+                entity.buildProgress = 0;
+                break;
+            }
+            case MasterImageBuilderEvent.EXECUTION_PROGRESS: {
+                if (isProcessStatusTerminal(entity.buildStatus)) {
+                    return false;
+                }
 
-    if (!entity) {
+                const temp = value as MasterImageBuilderExecutionProgressPayload;
+
+                if (
+                    !entity.buildProgress ||
+                    temp.progress.percent > entity.buildProgress
+                ) {
+                    entity.buildProgress = Math.min(temp.progress.percent, 100);
+                }
+                break;
+            }
+            case MasterImageBuilderEvent.EXECUTION_FAILED: {
+                entity.buildStatus = ProcessStatus.FAILED;
+                break;
+            }
+            case MasterImageBuilderEvent.EXECUTION_FINISHED: {
+                entity.buildStatus = ProcessStatus.EXECUTED;
+                entity.buildProgress = 100;
+            }
+        }
+
+        return true;
+    });
+
+    if (!saved) {
         return;
     }
-
-    switch (context.key) {
-        case MasterImageBuilderEvent.EXECUTION_STARTED: {
-            if (isProcessStatusTerminal(entity.buildStatus)) {
-                return;
-            }
-
-            entity.buildStatus = ProcessStatus.STARTED;
-            entity.buildProgress = 0;
-            break;
-        }
-        case MasterImageBuilderEvent.EXECUTION_PROGRESS: {
-            if (isProcessStatusTerminal(entity.buildStatus)) {
-                return;
-            }
-
-            const temp = value as MasterImageBuilderExecutionProgressPayload;
-
-            if (
-                !entity.buildProgress ||
-                temp.progress.percent > entity.buildProgress
-            ) {
-                entity.buildProgress = Math.min(temp.progress.percent, 100);
-            }
-            break;
-        }
-        case MasterImageBuilderEvent.EXECUTION_FAILED: {
-            entity.buildStatus = ProcessStatus.FAILED;
-            break;
-        }
-        case MasterImageBuilderEvent.EXECUTION_FINISHED: {
-            entity.buildStatus = ProcessStatus.EXECUTED;
-            entity.buildProgress = 100;
-        }
-    }
-
-    await repository.save(entity);
 
     if (eventComponentCaller) {
         await eventComponentCaller.callCreate({
             name: context.key,
             data: {},
             refType: DomainType.MASTER_IMAGE,
-            refId: entity.id,
+            refId: saved.id,
             scope: 'builder',
         });
     }

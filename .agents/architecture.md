@@ -246,6 +246,18 @@ AMQP consumers are wired via two DI modules:
 - **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregator handlers receive `DataSource` and `TaskManager` via constructor DI.
 - **ComponentsModule** (`app/modules/components/`) — Registers `TaskManager`, `RegistryComponentCaller` in the container. Starts task consumer workers (registry).
 
+**Process-status transitions are row-locked.** Any read-check-mutate-save of a
+`buildStatus`/`distributionStatus` (command starts, configuration lock/unlock, the master-image rollback,
+the worker aggregators) goes through `updateLockedEntity` (`adapters/database/locked-update.ts`)
+— `core/` reaches it as `IAnalysisRepository` / `IMasterImageRepository` `.updateLocked(id, fn)`.
+It holds the row with `SELECT … FOR UPDATE` and saves through the transaction manager, so
+subscribers still publish; never replace it with `repository.update()`. `fn` is synchronous
+and returns `true` to save; dispatch to the worker only after it resolves. A CHECK_FINISHED
+verdict whose `checkedAt` predates the locked row's `updatedAt` is dropped — any write
+counts. Every other writer of these rows must not `save()` a copy read earlier either: the
+recalculators apply their derived fields via `saveAnalysisPatch`; `AnalysisService.update` and
+the master-image synchronizer `Object.assign` into the locked row.
+
 Implementation classes live in `app/aggregators/` and `app/components/`.
 
 ## Authentication — Authup

@@ -84,6 +84,19 @@ describe('AnalysisNodeMetadataRecalculator', () => {
         ]);
     });
 
+    it('should not write back a build status that changed after its read', async () => {
+        seedNodes([ProcessStatus.EXECUTED, ProcessStatus.STARTED]);
+
+        // the build finishes between the recalc's read and its write
+        analysisRepository.beforeLockedUpdate = async () => {
+            await analysisRepository.save({ ...analysisRepository.getAll()[0], buildStatus: ProcessStatus.EXECUTED });
+        };
+
+        await createRecalculator().recalc('analysis-1');
+
+        expect(analysisRepository.getAll()[0]).toMatchObject({ buildStatus: ProcessStatus.EXECUTED, nodes: 2 });
+    });
+
     it('should clear the temp bucket when every node executed', async () => {
         seedNodes([ProcessStatus.EXECUTED, ProcessStatus.EXECUTED]);
 

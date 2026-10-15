@@ -449,6 +449,24 @@ describe('AnalysisService', () => {
             expect(analysisRecalculator.getDebouncedCalls()[0]).toBe('analysis-1');
         });
 
+        it('should not write a stale build status back over a concurrent transition', async () => {
+            analysisRepository.seed(createFullAnalysis({ buildStatus: ProcessStatus.STARTED }));
+
+            // the build finishes while the update still holds its earlier read
+            analysisRepository.afterUnlockedRead = async (id) => {
+                analysisRepository.afterUnlockedRead = undefined;
+                const row = await analysisRepository.findOneById(id);
+                await analysisRepository.save({ ...row, buildStatus: ProcessStatus.EXECUTED });
+            };
+
+            await service.update('analysis-1', { name: 'updated' }, createAllowAllActor());
+
+            expect(analysisRepository.getAll()[0]).toMatchObject({
+                name: 'updated',
+                buildStatus: ProcessStatus.EXECUTED,
+            });
+        });
+
         it('should not use immediate recalc on update', async () => {
             analysisRepository.seed(createFullAnalysis());
 

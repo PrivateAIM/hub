@@ -7,4 +7,5 @@
 
 export * from './entities/index.ts';
 export * from './error/index.ts';
+export * from './locked-update.ts';
 export * from './subscribers/index.ts';

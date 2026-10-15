@@ -6,7 +6,6 @@
  */
 
 import { EntityNotFoundError } from '@privateaim/errors';
-import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisError, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { 
@@ -16,8 +15,8 @@ import {
     it, 
 } from 'vitest';
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
-import { FakeEntityRepository } from '../helpers/index.ts';
 import { FakeAnalysisBuilderCaller } from './helpers/fake-builder-caller.ts';
+import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
@@ -25,7 +24,7 @@ import { FakeAnalysisFileMetadataRecalculator } from '../entities/analysis-bucke
 import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
 describe('AnalysisBuilder', () => {
-    let repository: FakeEntityRepository<Analysis>;
+    let repository: FakeAnalysisRepository;
     let analysisNodeRepository: FakeAnalysisNodeRepository;
     let caller: FakeAnalysisBuilderCaller;
     let analysisRecalculator: FakeAnalysisMetadataRecalculator;
@@ -34,7 +33,7 @@ describe('AnalysisBuilder', () => {
     let builder: AnalysisBuilder;
 
     beforeEach(() => {
-        repository = new FakeEntityRepository<Analysis>();
+        repository = new FakeAnalysisRepository();
         analysisNodeRepository = new FakeAnalysisNodeRepository();
         analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
         nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
@@ -175,6 +174,19 @@ describe('AnalysisBuilder', () => {
 
             const result = await builder.start(analysis);
             expect(result.buildStatus).toBe(ProcessStatus.STARTING);
+        });
+
+        it('should re-check canStart on the locked row, so a concurrent start does not dispatch twice', async () => {
+            const analysis = createFullAnalysis({ configurationLocked: true });
+            repository.seed(analysis);
+
+            // another replica's start commits between this start's early read and its lock
+            repository.beforeLockedUpdate = async () => {
+                await repository.save({ ...repository.getAll()[0], buildStatus: ProcessStatus.STARTING });
+            };
+
+            await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
+            expect(caller.getCallsFor('callExecute')).toHaveLength(0);
         });
 
         it('should throw when build already in progress', async () => {

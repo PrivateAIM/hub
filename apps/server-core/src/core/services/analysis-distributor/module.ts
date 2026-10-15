@@ -5,18 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { Analysis, AnalysisNode, Registry } from '@privateaim/core-kit';
 import { AnalysisDistributorCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type { EntityPersistContext, IEntityRepository } from '@privateaim/server-kit';
-import type { IAnalysisMetadataRecalculator } from '../../entities/analysis/types.ts';
+import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
 import type { IAnalysisDistributorCaller } from './types.ts';
 
 type AnalysisDistributorContext = {
-    repository: IEntityRepository<Analysis>;
+    repository: IAnalysisRepository;
     analysisNodeRepository: IEntityRepository<AnalysisNode>;
     registryRepository: IEntityRepository<Registry>;
     caller: IAnalysisDistributorCaller;
@@ -26,7 +26,7 @@ type AnalysisDistributorContext = {
 };
 
 export class AnalysisDistributor {
-    protected repository: IEntityRepository<Analysis>;
+    protected repository: IAnalysisRepository;
 
     protected analysisNodeRepository: IEntityRepository<AnalysisNode>;
 
@@ -62,12 +62,23 @@ export class AnalysisDistributor {
         await this.assignRegistry(entity);
         await this.checkNodes(entity);
 
-        entity.distributionStatus = ProcessStatus.STARTING;
+        // checked again on the locked row: a concurrent start (another
+        // replica) may have moved the status since the read above.
+        const started = await this.repository.updateLocked(entityId, (locked) => {
+            AnalysisDistributorCommandChecker.canStart(locked);
 
-        await this.repository.save(entity, persistCtx);
-        await this.caller.callExecute({ id: entity.id });
+            locked.registryId ??= entity.registryId;
+            locked.distributionStatus = ProcessStatus.STARTING;
+            return true;
+        }, persistCtx);
 
-        return entity;
+        if (!started) {
+            throw new EntityNotFoundError({ entity: 'analysis' });
+        }
+
+        await this.caller.callExecute({ id: started.id });
+
+        return started;
     }
 
     async check(input: string | Analysis) {

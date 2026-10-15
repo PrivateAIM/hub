@@ -30,6 +30,8 @@ export const MASTER_IMAGE_READ_PERMISSIONS = [
     PermissionName.MASTER_IMAGE_MANAGE,
 ];
 
+const MASTER_IMAGE_BUILD_CLAIM_STALE_MS = 15 * 60 * 1000;
+
 type MasterImageServiceContext = {
     repository: IMasterImageRepository;
     synchronizerCaller: IMasterImageSynchronizerCaller;
@@ -112,23 +114,45 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                     throw new BadRequestError('A valid master image id is required.');
                 }
 
-                const entity = await this.repository.findOneBy({ id });
+                // persist STARTING before dispatching, or a fast worker event
+                // could be overwritten by this save.
+                let previous: MasterImage['buildStatus'] = null;
+                const entity = await this.repository.updateLocked(id, (locked) => {
+                    // one STARTING owner at a time, so the rollback below can
+                    // only revert its own claim. A claim older than the
+                    // threshold is presumed dead (no worker event moved it on)
+                    // and may be taken over — master images have no check
+                    // command to recover it otherwise.
+                    // ponytail: age-based, until the reconciler (plan 018 F14) exists.
+                    if (
+                        locked.buildStatus === ProcessStatus.STARTING &&
+                        Date.now() - new Date(locked.updatedAt).getTime() < MASTER_IMAGE_BUILD_CLAIM_STALE_MS
+                    ) {
+                        throw new BadRequestError('The master image build is already starting.');
+                    }
+
+                    previous = locked.buildStatus;
+                    locked.buildStatus = ProcessStatus.STARTING;
+                    return true;
+                });
                 if (!entity) {
                     throw new EntityNotFoundError({ entity: 'master-image' });
                 }
 
-                // persist STARTING before dispatching, or a fast worker event
-                // could be overwritten by this save.
-                const { buildStatus } = entity;
-                entity.buildStatus = ProcessStatus.STARTING;
-                await this.repository.save(entity);
-
                 try {
                     await this.builderCaller.callExecute({ id: entity.id });
                 } catch (e) {
-                    // nothing was dispatched, so no worker event will move STARTING on.
-                    entity.buildStatus = buildStatus;
-                    await this.repository.save(entity);
+                    // presumably nothing was dispatched, so no worker event will
+                    // move STARTING on — but a publish can fail after the broker
+                    // took the message, so revert only a row still STARTING.
+                    await this.repository.updateLocked(id, (locked) => {
+                        if (locked.buildStatus !== ProcessStatus.STARTING) {
+                            return false;
+                        }
+
+                        locked.buildStatus = previous;
+                        return true;
+                    });
 
                     throw e;
                 }

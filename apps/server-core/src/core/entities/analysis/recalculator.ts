@@ -6,7 +6,7 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisRecalcQueue, hasAnalysisChanged } from '../utils.ts';
+import { AnalysisRecalcQueue, saveAnalysisPatch } from '../utils.ts';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from './types.ts';
 
 export class AnalysisMetadataRecalculator implements IAnalysisMetadataRecalculator {
@@ -25,14 +25,7 @@ export class AnalysisMetadataRecalculator implements IAnalysisMetadataRecalculat
             throw new Error(`Analysis ${analysisId} not found`);
         }
 
-        const cloned = { ...entity };
-        entity.configurationImageValid = !!entity.masterImageId;
-
-        if (hasAnalysisChanged(cloned, entity)) {
-            await this.repository.save(entity);
-        }
-
-        return entity;
+        return saveAnalysisPatch(this.repository, entity, { configurationImageValid: !!entity.masterImageId });
     }
 
     recalcDebounced(analysisId: string): Promise<void> {
