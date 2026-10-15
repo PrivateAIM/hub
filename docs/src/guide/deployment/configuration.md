@@ -319,6 +319,17 @@ lists analyses; pair it with `analysis_read`.
     further, never widen it. Without it, result files are left out of
     listings (not refused) and a result file answers 404.
 - A record out of reach answers **404**, like a missing one.
+- **Logs** (`/analysis-logs`, `/analysis-node-logs`) used to need only a login,
+  because server-core reads and deletes them with its own credentials:
+  - **Analysis logs** are read with the read permissions above, by the reach
+    of the grant plus realms and node clients whose node is **approved**.
+  - **A node's logs** are read with `analysis_update` or `analysis_approve`, by
+    the reach of the grant (every node), or by that node itself (its realm's
+    users or its client) once approved. A node does not see other nodes' logs.
+  - **Deleting** either needs `analysis_update` through the reach of the grant;
+    taking part as a node never allows it.
+  - A malformed `analysisId`/`nodeId` answers **400**.
+  - `POST /analysis-node-logs` is unchanged.
 
 **Before upgrading:**
 

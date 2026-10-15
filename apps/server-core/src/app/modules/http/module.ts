@@ -27,7 +27,10 @@ import {
     RootController,
 } from '../../../adapters/http/controllers/index.ts';
 import { createSocketServer } from '../../../adapters/socket/server.ts';
+import { AnalysisLogAccessService } from '../../../core/services/analysis-log-access/index.ts';
+import { AnalysisReachService } from '../../../core/services/analysis-reach/index.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
+import { DatabaseInjectionKey } from '../database/constants.ts';
 import { TelemetryClientInjectionKey } from '../telemetry-client/constants.ts';
 import { createControllers } from './controller.ts';
 import type { HTTPServer } from './constants.ts';
@@ -87,6 +90,20 @@ export class HTTPModule implements IModule {
         const telemetryClientResult = container.tryResolve(TelemetryClientInjectionKey);
         const telemetryClient = telemetryClientResult.success ? telemetryClientResult.data : undefined;
 
+        const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
+        const analysisNodeRepository = container.resolve(DatabaseInjectionKey.AnalysisNodeRepository);
+        const nodeRepository = container.resolve(DatabaseInjectionKey.NodeRepository);
+        const analysisLogAccessService = new AnalysisLogAccessService({
+            analysisRepository,
+            analysisNodeRepository,
+            nodeRepository,
+            reach: new AnalysisReachService({
+                analysisNodeRepository, 
+                analysisRepository, 
+                nodeRepository, 
+            }),
+        });
+
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
         const redisResult = container.tryResolve(RedisClientInjectionKey);
 
@@ -121,8 +138,8 @@ export class HTTPModule implements IModule {
                     ...controllers,
 
                     // Telemetry-coupled (DI-wired instances)
-                    new AnalysisLogController({ telemetryClient }),
-                    new AnalysisNodeLogController({ telemetryClient }),
+                    new AnalysisLogController({ accessService: analysisLogAccessService, telemetryClient }),
+                    new AnalysisNodeLogController({ accessService: analysisLogAccessService, telemetryClient }),
 
                     // Workflows
                     RootController,

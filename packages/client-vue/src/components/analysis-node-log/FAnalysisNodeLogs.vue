@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
 import type { Log } from '@privateaim/telemetry-kit';
 import type { Ref } from 'vue';
 import {
@@ -30,6 +31,20 @@ export default defineComponent({
         const httpClient = injectCoreHTTPClient();
 
         const busy = ref(false);
+        // Set once the server refuses the logs (403/404: out of the caller's
+        // reach), which also stops the auto-refresh from retrying.
+        const denied = ref(false);
+
+        // A refusal shows no logs; any other failure stays retryable.
+        const refuse = (e: unknown) => {
+            if (!isClientErrorWithStatusCode(e, [403, 404])) {
+                throw e;
+            }
+
+            denied.value = true;
+            data.value = [];
+            total.value = 0;
+        };
         const total = ref(0);
         const data : Ref<Log[]> = ref([]);
 
@@ -72,6 +87,8 @@ export default defineComponent({
 
             try {
                 await load();
+            } catch (e) {
+                refuse(e);
             } finally {
                 busy.value = false;
             }
@@ -82,6 +99,10 @@ export default defineComponent({
         // while auto-refreshing). `preserve` keeps the scroll position sensible:
         // following the newest entries at the bottom, staying put otherwise.
         const reload = async () => {
+            if (denied.value) {
+                return;
+            }
+
             busy.value = true;
 
             try {
@@ -90,6 +111,8 @@ export default defineComponent({
                 await preserve(() => {
                     data.value = next;
                 });
+            } catch (e) {
+                refuse(e);
             } finally {
                 busy.value = false;
             }
@@ -98,6 +121,7 @@ export default defineComponent({
         return {
             data,
             busy,
+            denied,
             meta: computed(() => ({ total: total.value })),
             load,
             reload,
@@ -115,6 +139,7 @@ export default defineComponent({
                 />
                 <div class="ms-auto">
                     <FLogsRefresh
+                        v-if="!denied"
                         :busy="busy"
                         @refresh="reload"
                     />
