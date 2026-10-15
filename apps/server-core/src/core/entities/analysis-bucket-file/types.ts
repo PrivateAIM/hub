@@ -5,8 +5,27 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis, AnalysisBucketFile } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type { BucketFile } from '@privateaim/storage-kit';
+
+/**
+ * Outcome of registering a file uploaded directly to storage:
+ * `entity` when registered, `rejection` (a reason) when refused.
+ */
+export type AnalysisBucketUploadResult = {
+    bucket: AnalysisBucket;
+    entity?: AnalysisBucketFile;
+    rejection?: string;
+};
+
+export type AnalysisBucketUploadRemoval = {
+    entity: AnalysisBucketFile;
+    /**
+     * A code file of a locked analysis was removed.
+     */
+    frozen: boolean;
+};
 
 export interface IAnalysisBucketFileRepository extends IEntityRepository<AnalysisBucketFile> {
     findRootCodeFile(analysisId: string): Promise<AnalysisBucketFile | null>;
@@ -23,4 +42,6 @@ export interface IAnalysisBucketFileService {
     create(data: Partial<AnalysisBucketFile>, actor: ActorContext): Promise<AnalysisBucketFile>;
     update(id: string, data: Partial<AnalysisBucketFile>, actor: ActorContext): Promise<AnalysisBucketFile>;
     delete(id: string, actor: ActorContext): Promise<AnalysisBucketFile>;
+    registerUpload(file: BucketFile): Promise<AnalysisBucketUploadResult | null>;
+    unregisterUpload(bucketId: string, bucketFileId: string): Promise<AnalysisBucketUploadRemoval | null>;
 }

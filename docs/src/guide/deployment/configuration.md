@@ -130,6 +130,38 @@ Previously, adding required `project_create` **and** `project_update`. Holding
 only `project_create` now creates a project but cannot attach nodes to it; grant
 `project_update` to every role that creates projects with nodes.
 
+## Writing analysis buckets and files requires `analysis_update`
+
+**Breaking for some roles.** Analysis buckets and their files are authorized
+against the analysis's realm, not the caller's:
+
+- Creating, updating or deleting an analysis bucket, and adding, updating or
+  deleting a **code** file, require `analysis_update` in the analysis's realm
+  (or the master realm). Grant it to every role that uploads analysis code.
+- Code files are frozen once the analysis configuration is locked: a write
+  answers 400, and so does deleting the code bucket.
+- An analysis has at most one bucket per type, and a storage bucket backs at
+  most one analysis bucket (a second one answers 409).
+- Uploads made directly to server-storage are checked when server-core
+  registers them: a code file must come from the analysis's realm while
+  unlocked, a result or temp file from the realm of an approved analysis node
+  or from the analysis's own client. A rejected upload is not registered. A
+  rejected **code** upload is also deleted from storage (an unregistered code
+  object would break every later build), so server-storage must consume the
+  `storageBucketFileTasks` queue (it does from this release on); a rejected
+  result or temp upload stays in storage, so a misjudged uploader never costs
+  result data. This check is realm-level only, and master-realm uploads through
+  storage are rejected too; upload through a node or the owner realm.
+- Storage still lets an uploader delete its own object, even a code file of a
+  locked analysis. server-core logs such a deletion as an error; it cannot
+  prevent it.
+- A **result** or **temp** file may be added by the master realm, by the realm
+  of a node whose analysis participation is approved, or by the analysis's own
+  client. Only a code file can be
+  the root file.
+- Result files are updated and deleted by the analysis realm with
+  `analysis_update`; temp files by the master realm only.
+
 ## Reading nodes, master images, registries, registry projects and events requires `*_read`
 
 **Breaking for every deployment.** Listing or reading these entities now needs a

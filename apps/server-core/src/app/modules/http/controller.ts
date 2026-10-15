@@ -112,10 +112,13 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         nodeRecalculator: container.resolve(AnalysisInjectionKey.NodeRecalculator),
         skipAnalysisApproval: container.resolve(ConfigInjectionKey).skipAnalysisApproval,
     });
-    const analysisBucketService = new AnalysisBucketService({ repository: analysisBucketRepository });
+    const analysisBucketService = new AnalysisBucketService({ repository: analysisBucketRepository, analysisRepository });
     const analysisBucketFileService = new AnalysisBucketFileService({
         repository: analysisBucketFileRepository,
         recalculator: container.resolve(AnalysisInjectionKey.FileRecalculator),
+        analysisRepository,
+        analysisBucketRepository,
+        analysisNodeRepository,
     });
     const projectNodeService = new ProjectNodeService({
         repository: projectNodeRepository,

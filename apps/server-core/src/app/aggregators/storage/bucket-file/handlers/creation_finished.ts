@@ -4,50 +4,47 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { BucketFileComponentEventMap, BucketFileEvent } from '@privateaim/server-storage-kit';
+import { AnalysisBucketType, DomainType } from '@privateaim/core-kit';
+import type { ComponentHandler, Logger } from '@privateaim/server-kit';
+import type { BucketFileComponentEventMap, BucketFileTaskCaller } from '@privateaim/server-storage-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
-import {
-    AnalysisBucketEntity,
-    AnalysisBucketFileEntity,
-} from '../../../../../adapters/database/index.ts';
-import { BaseAggregatorHandler } from '../../../base.ts';
+import { LogFlag } from '@privateaim/telemetry-kit';
+import type { IAnalysisBucketFileService } from '../../../../../core/index.ts';
+import type { StorageBucketFileAggregatorContext } from '../types.ts';
 
-export class StorageBucketFileCreationFinishedHandler extends BaseAggregatorHandler<
-    BucketFileComponentEventMap,
-    BucketFileEvent.CREATION_FINISHED
-> {
+export class StorageBucketFileCreationFinishedHandler implements ComponentHandler<BucketFileComponentEventMap> {
+    protected service: IAnalysisBucketFileService;
+
+    protected bucketFileCaller?: BucketFileTaskCaller;
+
+    protected logger?: Logger;
+
+    constructor(ctx: StorageBucketFileAggregatorContext) {
+        this.service = ctx.service;
+        this.bucketFileCaller = ctx.bucketFileCaller;
+        this.logger = ctx.logger;
+    }
+
     async handle(data: BucketFile): Promise<void> {
-        const analysisBucketRepository = this.dataSource.getRepository(AnalysisBucketEntity);
-        const analysisBucket = await analysisBucketRepository.findOneBy({ bucketId: data.bucketId });
-
-        if (!analysisBucket) {
+        const result = await this.service.registerUpload(data);
+        if (!result) {
             this.logger?.debug(`Can not associate ${data.path} to an analysis bucket`);
             return;
         }
 
-        // todo: check if analysis is locked.
-
-        const analysisBucketFileRepository = this.dataSource.getRepository(AnalysisBucketFileEntity);
-        const analysisBucketFile = analysisBucketFileRepository.create({
-            path: data.path,
-            analysisBucketId: analysisBucket.id,
-            analysisId: analysisBucket.analysisId,
-            realmId: analysisBucket.realmId,
-            bucketFileId: data.id,
-            bucketId: data.bucketId,
-        });
-
-        switch (data.actorType) {
-            case 'user': {
-                analysisBucketFile.userId = data.actorId;
-                break;
-            }
-            case 'robot': {
-                analysisBucketFile.robotId = data.actorId;
-                break;
-            }
+        if (!result.rejection) {
+            return;
         }
 
-        await analysisBucketFileRepository.save(analysisBucketFile);
+        this.logger?.warn(`File ${data.path} not registered: ${result.rejection}`, {
+            [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
+            [LogFlag.REF_ID]: result.bucket.analysisId,
+        });
+
+        // An unregistered object in a code bucket breaks every later build, so it is removed.
+        // RESULT/TEMP objects are kept: a misjudged uploader must not cost result data.
+        if (result.bucket.type === AnalysisBucketType.CODE) {
+            await this.bucketFileCaller?.callDelete({ id: data.id });
+        }
     }
 }

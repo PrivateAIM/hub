@@ -8,7 +8,12 @@
 import { randomUUID } from 'node:crypto';
 import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import {
+    BadRequestError,
+    EntityConflictError,
+    EntityNotFoundError,
+    PermissionDeniedError,
+} from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -19,9 +24,11 @@ import { AnalysisBucketService } from '../../../../../src/core/entities/analysis
 import {
     FakeEntityRepository,
     createAllowAllActor,
+    createDenyAllActor,
     createMasterRealmActor,
     createNonMasterRealmActor,
 } from '../../helpers/index.ts';
+import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 
 function createFakeAnalysisBucketRepository() {
     const repo = new FakeEntityRepository<AnalysisBucket>();
@@ -56,11 +63,13 @@ function createTestAnalysisBucket(overrides?: Partial<AnalysisBucket>): Analysis
 
 describe('AnalysisBucketService', () => {
     let repository: FakeEntityRepository<AnalysisBucket>;
+    let analysisRepository: FakeAnalysisRepository;
     let service: AnalysisBucketService;
 
     beforeEach(() => {
         repository = createFakeAnalysisBucketRepository();
-        service = new AnalysisBucketService({ repository });
+        analysisRepository = new FakeAnalysisRepository();
+        service = new AnalysisBucketService({ repository, analysisRepository });
     });
 
     describe('getMany', () => {
@@ -122,6 +131,71 @@ describe('AnalysisBucketService', () => {
 
             expect(result.realmId).toBe('realm-1');
         });
+
+        it('should let the owner realm create', async () => {
+            const result = await service.create(
+                {
+                    analysisId: randomUUID(), 
+                    bucketId: randomUUID(), 
+                    type: AnalysisBucketType.CODE, 
+                },
+                createNonMasterRealmActor('realm-1'),
+            );
+
+            expect(result.realmId).toBe('realm-1');
+        });
+
+        it('should deny a foreign realm', async () => {
+            await expect(service.create(
+                {
+                    analysisId: randomUUID(), 
+                    bucketId: randomUUID(), 
+                    type: AnalysisBucketType.CODE, 
+                },
+                createNonMasterRealmActor('other-realm'),
+            )).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(0);
+        });
+
+        it('should reject a second bucket of the same type for an analysis', async () => {
+            const existing = createTestAnalysisBucket({ type: AnalysisBucketType.CODE });
+            repository.seed(existing);
+
+            await expect(service.create(
+                {
+                    analysisId: existing.analysisId,
+                    bucketId: randomUUID(),
+                    type: AnalysisBucketType.CODE,
+                },
+                createAllowAllActor(),
+            )).rejects.toThrow(EntityConflictError);
+            expect(repository.getAll()).toHaveLength(1);
+        });
+
+        it('should reject a storage bucket already bound to an analysis bucket', async () => {
+            const existing = createTestAnalysisBucket({ type: AnalysisBucketType.RESULT });
+            repository.seed(existing);
+
+            await expect(service.create(
+                {
+                    analysisId: randomUUID(),
+                    bucketId: existing.bucketId,
+                    type: AnalysisBucketType.RESULT,
+                },
+                createAllowAllActor(),
+            )).rejects.toThrow(EntityConflictError);
+        });
+
+        it('should deny without analysis_update', async () => {
+            await expect(service.create(
+                {
+                    analysisId: randomUUID(), 
+                    bucketId: randomUUID(), 
+                    type: AnalysisBucketType.CODE, 
+                },
+                createDenyAllActor('realm-1'),
+            )).rejects.toThrow(PermissionDeniedError);
+        });
     });
 
     describe('update', () => {
@@ -145,6 +219,15 @@ describe('AnalysisBucketService', () => {
 
             await expect(
                 service.update(bucket.id, {}, createNonMasterRealmActor('realm-1')),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should deny the owner realm without analysis_update', async () => {
+            const bucket = createTestAnalysisBucket();
+            repository.seed(bucket);
+
+            await expect(
+                service.update(bucket.id, {}, createDenyAllActor('realm-1')),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -180,6 +263,36 @@ describe('AnalysisBucketService', () => {
             await expect(
                 service.delete(bucket.id, createNonMasterRealmActor('realm-1')),
             ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should deny the owner realm without analysis_update', async () => {
+            const bucket = createTestAnalysisBucket();
+            repository.seed(bucket);
+
+            await expect(
+                service.delete(bucket.id, createDenyAllActor('realm-1')),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
+        });
+
+        it('should reject deleting a code bucket once the configuration is locked', async () => {
+            const bucket = createTestAnalysisBucket({ type: AnalysisBucketType.CODE });
+            repository.seed(bucket);
+            analysisRepository.seed({ id: bucket.analysisId, configurationLocked: true } as Analysis);
+
+            await expect(
+                service.delete(bucket.id, createMasterRealmActor()),
+            ).rejects.toThrow(BadRequestError);
+            expect(repository.getAll()).toHaveLength(1);
+        });
+
+        it('should delete a result bucket of a locked analysis', async () => {
+            const bucket = createTestAnalysisBucket({ type: AnalysisBucketType.RESULT });
+            repository.seed(bucket);
+            analysisRepository.seed({ id: bucket.analysisId, configurationLocked: true } as Analysis);
+
+            await service.delete(bucket.id, createMasterRealmActor());
+            expect(repository.getAll()).toHaveLength(0);
         });
 
         it('should allow master realm to delete any entity', async () => {
