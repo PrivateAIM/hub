@@ -97,7 +97,6 @@ class MyAppBuilder extends BaseApplicationBuilder {
 | `RedisModule` | Redis client registration |
 | `MessageBusModule` | AMQP connection and queue management |
 | `AuthupModule` | Authup middleware and token validation |
-| `CacheModule` | Redis-backed caching |
 | `EntityEventModule` | Domain event dispatching |
 
 ## Dependencies
