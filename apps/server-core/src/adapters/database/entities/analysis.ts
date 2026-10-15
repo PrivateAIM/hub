@@ -284,6 +284,9 @@ export class AnalysisEntity implements Analysis {
 
     // ------------------------------------------------------------------
 
+    // Backs the SET NULL cascade when a catalog sync removes a master image
+    // (postgres keeps no implicit index on foreign key columns).
+    @Index()
     @Column({
         name: 'master_image_id', 
         nullable: true, 

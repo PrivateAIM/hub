@@ -29,6 +29,10 @@ import { AnalysisEntity } from './analysis.ts';
 import { NodeEntity } from './node.ts';
 
 @Unique(['nodeId', 'analysisId'])
+// Leads with nodeRealmId, so it also serves the allow-listed `nodeRealmId`
+// filter; the trailing analysisId lets a participation lookup
+// (SELECT analysis_id ... WHERE node_realm_id = ?) answer from the index.
+@Index(['nodeRealmId', 'analysisId'])
 @Entity({ name: 'analysis_nodes' })
 export class AnalysisNodeEntity implements AnalysisNode {
     @PrimaryGeneratedColumn('uuid')
@@ -116,7 +120,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
-    @Index()
     @Column({ name: 'node_realm_id', type: 'uuid' })
     nodeRealmId: Realm['id'];
 }
