@@ -13,7 +13,7 @@ import type { NodeClientService } from '../../../../../../src/app/modules/databa
 
 type DismissCall = { entity: Record<string, any> };
 type AssignCall = { entity: Record<string, any> };
-type AssignPermissionsCall = { client: Client };
+type AssignPermissionsCall = { clientId: string };
 
 class FakeNodeClientService {
     private dismissCalls: DismissCall[] = [];
@@ -35,8 +35,8 @@ class FakeNodeClientService {
         return { id: this.nextClientId } as Client;
     }
 
-    async assignPermissions(client: Client): Promise<void> {
-        this.assignPermissionsCalls.push({ client });
+    async assignPermissions(clientId: string): Promise<void> {
+        this.assignPermissionsCalls.push({ clientId });
     }
 
     getDismissCalls(): DismissCall[] {
@@ -135,7 +135,7 @@ describe('NodeSubscriber', () => {
             await subscriber.afterInsert(event as any);
 
             expect(nodeClientService.getAssignPermissionsCalls()).toHaveLength(1);
-            expect(nodeClientService.getAssignPermissionsCalls()[0].client.id).toBe('client-1');
+            expect(nodeClientService.getAssignPermissionsCalls()[0].clientId).toBe('client-1');
         });
 
         it('should not throw when nodeClientService is not set', async () => {
@@ -165,7 +165,7 @@ describe('NodeSubscriber', () => {
             await subscriber.afterUpdate(event as any);
 
             expect(nodeClientService.getAssignPermissionsCalls()).toHaveLength(1);
-            expect(nodeClientService.getAssignPermissionsCalls()[0].client.id).toBe('client-1');
+            expect(nodeClientService.getAssignPermissionsCalls()[0].clientId).toBe('client-1');
         });
 
         it('should save entity when clientId changes', async () => {

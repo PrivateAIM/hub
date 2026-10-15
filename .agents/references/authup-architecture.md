@@ -186,3 +186,17 @@ export function buildActorContext(req: Request): ActorContext {
 | Junction | Inherited | project-node, analysis-node |
 
 Services default `realmId` to actor's realm. Explicit `null` required for global entities. Access control is policy-driven, no master realm bypass.
+
+## Background Components
+
+| authup | Hub |
+|---|---|
+| `apps/server-core/src/components/types.ts` — `Component = { start, stop, status }` | `apps/server-core/src/app/components/node-client/types.ts` — `NodeClientComponent`, same shape |
+| `components/oauth2-cleaner/module.ts` — `createOAuth2CleanerComponent()`: one pass at start, then `cron.schedule(…, { noOverlap: true })`; a failing pass is logged, never thrown | `app/components/node-client/module.ts` — `createNodeClientComponent()`: node-client permission sync at start, then hourly |
+| `app/modules/components/module.ts` — starts every component fire-and-forget with `.catch`, stops them in `teardown()` | `app/modules/components/module.ts` — one `components` property holds the message-bus consumers and the background component; each is started fire-and-forget, and `teardown()` calls the optional `Component.stop` (server-kit) on each and clears the list. The message-bus consumers have no `stop` — the bus cannot cancel a consumer |
+
+Differences: hub's components directory also holds `BaseComponent` message-bus
+consumers (`registry/`), which authup does not have; hub's background component
+takes its cross-replica lock as an injected `lock(fn)` (backed by
+`withDataSourceLock`) instead of a `DataSource`, so its spec needs no database;
+hub has no `getHealth()` / worker-health listener reading `status()` yet. Because hub's start loop does not `.catch`, the component's `start()` must never reject — `execute()` catches everything.

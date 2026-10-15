@@ -715,7 +715,7 @@ app/modules/<name>/
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | `entityEvent`?, `authupClient`? | `DataSource`, 13 repo adapters, `RegistryManager` |
-| ComponentsModule | `components` | `database` | `TaskManager`, `RegistryComponentCaller` |
+| ComponentsModule | `components` | `database` | `TaskManager`, `RegistryComponentCaller`; starts the registry consumer and the node-client background component |
 | AnalysisModule | `analysis` | `database`, `components` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
 | AggregatorsModule | `aggregators` | `database`, `components` | nothing (starts AMQP event consumers) |
