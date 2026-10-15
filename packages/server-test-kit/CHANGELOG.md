@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* reading nodes, master images, master image groups, registries and registry projects requires the new *_read permissions, and event_read is now realm-scoped. Provision the names in Authup before upgrading, grant them to user roles, and grant node_read to existing node clients. See docs/src/guide/deployment/configuration.md.
+* every Hub service requires Authup. Without an Authup client, authenticated routes answer 401 and socket connections are refused; the fake master-realm identity and the dryRun / fakeAbilities options of @privateaim/server-http-kit and @privateaim/server-realtime-kit are removed. server-messenger's service client (CLIENT_ID) needs permission_read, since every request reads the authorization catalog, and callers must send a bearer token.
+
+### Features
+
+* align hub with authup's permission evaluator and close authorization gaps ([#1932](https://github.com/PrivateAIM/hub/issues/1932)) ([ec2d560](https://github.com/PrivateAIM/hub/commit/ec2d56054e96c470ba1495fd90441c7f8d837636))
+* **deps:** bump authup to v1.0.0-beta.69 ([#1923](https://github.com/PrivateAIM/hub/issues/1923)) ([09f55fa](https://github.com/PrivateAIM/hub/commit/09f55fa3ee0c01285ce16472aecbddfcd9738afe))
+* require read permissions for catalogs, registry projects and events ([#1940](https://github.com/PrivateAIM/hub/issues/1940)) ([476cb60](https://github.com/PrivateAIM/hub/commit/476cb60c14eb84a4731cd902404827637195e873))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group with 30 updates ([#1931](https://github.com/PrivateAIM/hub/issues/1931)) ([bee4598](https://github.com/PrivateAIM/hub/commit/bee45988faa2fb11c7ecd46a27360009a03eda66))
+* **server-test-kit:** wait for the real mysql server before starting authup ([#1936](https://github.com/PrivateAIM/hub/issues/1936)) ([03bb068](https://github.com/PrivateAIM/hub/commit/03bb0683d0bb24cfd1926e889a862f87dd7237f3))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/errors bumped from ^0.8.42 to ^0.18.0
+    * @privateaim/server-kit bumped from ^0.17.0 to ^0.18.0
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/errors bumped from ^0.8.42 to ^0.18.0
+    * @privateaim/server-kit bumped from ^0.17.0 to ^0.18.0
+
 ## [0.17.0](https://github.com/PrivateAIM/hub/compare/v0.16.1...v0.17.0) (2026-09-25)
 
 

@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
+
+
+### Features
+
+* **deps:** bump authup to v1.0.0-beta.69 ([#1923](https://github.com/PrivateAIM/hub/issues/1923)) ([09f55fa](https://github.com/PrivateAIM/hub/commit/09f55fa3ee0c01285ce16472aecbddfcd9738afe))
+
+
+### Bug Fixes
+
+* **deps:** bump dotenv from 17.4.2 to 18.0.7 in the majorprod group ([#1942](https://github.com/PrivateAIM/hub/issues/1942)) ([a68562a](https://github.com/PrivateAIM/hub/commit/a68562a09178dcbf79f2b3b3158e1d22cb088a91))
+* **deps:** bump the minorandpatch group with 30 updates ([#1931](https://github.com/PrivateAIM/hub/issues/1931)) ([bee4598](https://github.com/PrivateAIM/hub/commit/bee45988faa2fb11c7ecd46a27360009a03eda66))
+* **server-kit,server-core,server-core-worker:** bounded command retries and awaited result events (plan 018, phase 1) ([#1935](https://github.com/PrivateAIM/hub/issues/1935)) ([54c4174](https://github.com/PrivateAIM/hub/commit/54c417400910c67a3bbddcbadcf24516814a14ab))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-http-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/core-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/server-core-worker-kit bumped from ^0.14.1 to ^0.18.0
+    * @privateaim/server-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/server-telemetry-kit bumped from ^0.16.1 to ^0.18.0
+    * @privateaim/storage-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/telemetry-kit bumped from ^0.17.0 to ^0.18.0
+
 ## [0.17.0](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.17.0) (2026-09-25)
 
 
