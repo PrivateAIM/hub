@@ -17,11 +17,7 @@ import {
     it,
 } from 'vitest';
 import { RegistryService } from '../../../../../src/core/entities/registry/service.ts';
-import {
-    FakeEntityRepository,
-    createAllowAllActor,
-    createDenyAllActor,
-} from '../../helpers/index.ts';
+import { FakeEntityRepository, createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { FakeRegistryRepository } from './fake-repository.ts';
 import { FakeRegistryCaller } from './fake-caller.ts';
 

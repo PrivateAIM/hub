@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { BuiltInPolicyType } from '@authup/access';
 import type { Node, Project, ProjectNode } from '@privateaim/core-kit';
 import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -17,20 +18,20 @@ import {
     it,
 } from 'vitest';
 import { ProjectNodeService } from '../../../../../src/core/entities/project-node/service.ts';
+import { createPermissionActor } from '../../helpers/index.ts';
 import {
-    FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
     createMasterRealmActor,
-    createNonMasterRealmActor,
-    createPermissionActor,
-} from '../../helpers/index.ts';
+    createScopedActor,
+} from '@privateaim/server-test-kit';
 import { FakeProjectRepository } from '../project/fake-repository.ts';
+import { FakeProjectNodeRepository } from './fake-repository.ts';
 
 const CREATOR_ID = randomUUID();
 
 function createFakeProjectNodeRepository(projectRealmId: string, nodeRealmId: string) {
-    const repo = new FakeEntityRepository<ProjectNode>();
+    const repo = new FakeProjectNodeRepository();
 
     const originalValidateJoinColumns = repo.validateJoinColumns.bind(repo);
     repo.validateJoinColumns = async (data: Partial<ProjectNode>) => {
@@ -74,7 +75,7 @@ function createTestProjectNode(overrides?: Partial<ProjectNode>): ProjectNode {
 }
 
 describe('ProjectNodeService', () => {
-    let repository: FakeEntityRepository<ProjectNode>;
+    let repository: FakeProjectNodeRepository;
     let projectRepository: FakeProjectRepository;
     let service: ProjectNodeService;
     let projectId: string;
@@ -180,11 +181,9 @@ describe('ProjectNodeService', () => {
             expect(result.id).toBeDefined();
         });
 
-        it('should throw PermissionDeniedError when actor cannot write to project realm', async () => {
-            const foreignRepo = createFakeProjectNodeRepository('other-realm', 'realm-1');
-
+        it('should deny attaching when the grant does not reach the project realm', async () => {
             const foreignService = new ProjectNodeService({
-                repository: foreignRepo,
+                repository: createFakeProjectNodeRepository('other-realm', 'realm-1'),
                 projectRepository,
                 skipProjectApproval: false,
             });
@@ -192,9 +191,23 @@ describe('ProjectNodeService', () => {
             await expect(
                 foreignService.create(
                     { projectId, nodeId },
-                    createNonMasterRealmActor('realm-1'),
+                    createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
                 ),
             ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should attach a node of another realm when the grant reaches the project realm', async () => {
+            const foreignService = new ProjectNodeService({
+                repository: createFakeProjectNodeRepository('realm-1', 'other-realm'),
+                projectRepository,
+                skipProjectApproval: false,
+            });
+
+            const result = await foreignService.create(
+                { projectId, nodeId },
+                createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
+            );
+            expect(result.nodeRealmId).toBe('other-realm');
         });
 
         it('should auto-approve when skipProjectApproval is true', async () => {
@@ -276,13 +289,31 @@ describe('ProjectNodeService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should enforce node realm writability', async () => {
-            const pn = createTestProjectNode({ nodeRealmId: 'other-realm' });
+        // Approval is the node's decision: reaching the project realm is not enough.
+        it('should deny approving when the grant does not reach the node realm', async () => {
+            const pn = createTestProjectNode({ nodeRealmId: 'other-realm', projectRealmId: 'realm-1' });
             repository.seed(pn);
 
             await expect(
-                service.update(pn.id, {}, createNonMasterRealmActor('realm-1')),
+                service.update(
+                    pn.id,
+                    { approvalStatus: ProjectNodeApprovalStatus.APPROVED },
+                    createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
+                ),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()[0].approvalStatus).toBeNull();
+        });
+
+        it('should evaluate both the stored and the merged row', async () => {
+            const pn = createTestProjectNode({ nodeRealmId: 'realm-1' });
+            repository.seed(pn);
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            await service.update(pn.id, { approvalStatus: ProjectNodeApprovalStatus.APPROVED }, actor);
+
+            const statuses = actor.permissionEvaluator.evaluateCalls
+                .map((call) => call.data?.get<ProjectNode>(BuiltInPolicyType.ATTRIBUTES)?.approvalStatus);
+            expect(statuses).toEqual([null, ProjectNodeApprovalStatus.APPROVED]);
         });
     });
 
@@ -347,7 +378,7 @@ describe('ProjectNodeService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw PermissionDeniedError when not authority of node or project realm', async () => {
+        it('should deny delete when the grant reaches neither the node nor the project realm', async () => {
             const pn = createTestProjectNode({
                 nodeRealmId: 'other-realm',
                 projectRealmId: 'another-realm',
@@ -355,11 +386,12 @@ describe('ProjectNodeService', () => {
             repository.seed(pn);
 
             await expect(
-                service.delete(pn.id, createNonMasterRealmActor('realm-1')),
+                service.delete(pn.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
         });
 
-        it('should allow delete when actor is authority of node realm', async () => {
+        it('should allow delete when the grant reaches the node realm', async () => {
             const pn = createTestProjectNode({
                 projectId,
                 nodeRealmId: 'realm-1',
@@ -367,7 +399,19 @@ describe('ProjectNodeService', () => {
             });
             repository.seed(pn);
 
-            const result = await service.delete(pn.id, createNonMasterRealmActor('realm-1'));
+            const result = await service.delete(pn.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' }));
+            expect(result.id).toBe(pn.id);
+        });
+
+        it('should allow delete when the grant reaches the project realm', async () => {
+            const pn = createTestProjectNode({
+                projectId,
+                nodeRealmId: 'other-realm',
+                projectRealmId: 'realm-1',
+            });
+            repository.seed(pn);
+
+            const result = await service.delete(pn.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' }));
             expect(result.id).toBe(pn.id);
         });
 

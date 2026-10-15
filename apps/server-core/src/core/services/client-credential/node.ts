@@ -6,10 +6,10 @@
  */
 
 import type { Node } from '@privateaim/core-kit';
-import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
+import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { holdsPermission } from '../../utils/index.ts';
+import { reachesRecord } from '@privateaim/server-kit';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type {
     ClientCredentials,
@@ -26,9 +26,8 @@ type NodeClientCredentialServiceContext = {
 /**
  * Hands the credentials of a node's dedicated client to the parties allowed to
  * manage the node. Fail-closed: the node's own client may always manage its own
- * credentials (the referenced identity); any other caller must hold NODE_UPDATE
- * and be permitted to write the node's realm (which a master-realm member always
- * is).
+ * credentials (the referenced identity); any other caller needs a NODE_UPDATE
+ * grant reaching the node's realm.
  */
 export class NodeClientCredentialService implements INodeClientCredentialService {
     protected repository: INodeRepository;
@@ -82,24 +81,21 @@ export class NodeClientCredentialService implements INodeClientCredentialService
 
     /**
      * Fail-closed: the node's own client may always manage its own credentials
-     * (the referenced identity); any other caller must actually hold NODE_UPDATE
-     * and be permitted to write the node's realm. Being a master-realm member
-     * is, by itself, not sufficient: membership is not a permission.
+     * (the referenced identity, bound in its own realm — `node.clientId` is
+     * writable by node managers and not unique); any other caller needs a
+     * NODE_UPDATE grant whose realm scope reaches the node's realm.
      */
     private async isAuthorized(node: Node, actor: ActorContext): Promise<boolean> {
         if (
             actor.identity &&
             actor.identity.type === 'client' &&
             !!node.clientId &&
-            node.clientId === actor.identity.id
+            node.clientId === actor.identity.id &&
+            node.realmId === actor.identity.realmId
         ) {
             return true;
         }
 
-        if (!await holdsPermission(actor, PermissionName.NODE_UPDATE)) {
-            return false;
-        }
-
-        return isRealmResourceWritable(actor.realm, node.realmId);
+        return reachesRecord(actor, PermissionName.NODE_UPDATE, { realmId: node.realmId, attributes: node });
     }
 }

@@ -6,7 +6,7 @@
  */
 
 import type { Client, Permission } from '@authup/core-kit';
-import { ClientAuthMethod } from '@authup/core-kit';
+import { ClientAuthMethod, REALM_SCOPE } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AuthupClient } from '@privateaim/server-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
@@ -68,6 +68,11 @@ export class NodeClientService {
      * other. Idempotent, so it also runs at boot for every existing node
      * (see NodeClientModule) to grant permissions a release added.
      *
+     * Every grant is scoped `none`: it is a capability only, never realm reach.
+     * The node acts through its binding (`node.clientId`) on its own node and
+     * the analyses it takes part in, not on everything its realm owns. A grant
+     * with any other scope (`own` is authup's default) is replaced.
+     *
      * Throws when a permission is not provisioned in Authup: a node client
      * missing it fails against the hub later, far from the cause.
      */
@@ -79,20 +84,23 @@ export class NodeClientService {
             });
 
         const permissionNames: string[] = [
-            // todo: remove this permission, node should be permissionless
-            PermissionName.ANALYSIS_UPDATE,
             // Node-side services read the analyses their node takes part in.
             PermissionName.ANALYSIS_READ,
             // Node-side services read /nodes to look up their own node and peers' public keys.
             PermissionName.NODE_READ,
+            // The node writes the logs of its own analysis runs.
+            PermissionName.ANALYSIS_NODE_LOG_CREATE,
         ];
         const permissionNamesAssigned: string[] = [];
 
         const relationsToDelete: string[] = [];
         for (const clientPermission of clientPermissions) {
-            const index = permissionNames.indexOf(clientPermission.permission.name);
-            if (index === -1) {
+            if (
+                !permissionNames.includes(clientPermission.permission.name) ||
+                clientPermission.realmScope !== REALM_SCOPE.NONE
+            ) {
                 relationsToDelete.push(clientPermission.id);
+                continue;
             }
 
             permissionNamesAssigned.push(clientPermission.permission.name);
@@ -129,6 +137,7 @@ export class NodeClientService {
             await this.authup.clientPermission.create({
                 clientId,
                 permissionId: permission.id,
+                realmScope: REALM_SCOPE.NONE,
             });
         }
     }

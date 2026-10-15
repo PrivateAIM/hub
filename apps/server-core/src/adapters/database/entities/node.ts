@@ -87,7 +87,9 @@ export class NodeEntity implements Node {
     @JoinColumn({ name: 'registry_project_id' })
     registryProject: RegistryProject | null;
 
-    @Index()
+    // Server-assigned (NodeClientService) and unique: the node's client is
+    // its identity, so no two nodes may claim one (plan 021, D8).
+    @Index({ unique: true })
     @Column({
         name: 'client_id',
         type: 'uuid',

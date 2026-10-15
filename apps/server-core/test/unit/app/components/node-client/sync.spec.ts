@@ -14,13 +14,20 @@ import { syncNodeClientPermissions } from '../../../../../src/app/components/nod
 import { FakeNodeRepository } from '../../../core/entities/node/fake-repository.ts';
 
 // Driven through a REAL AuthupClient on an in-memory transport, so the grant
-// requests travel the hapic pipeline. Authup holds no permissions for any
-// client yet, so every node needs both grants.
+// requests travel the hapic pipeline. Unless a test seeds `existing`, Authup
+// holds no permissions for any client yet, so every node needs every grant.
 
 const permissions: Record<string, { id: string, name: string }> = {
     [PermissionName.ANALYSIS_UPDATE]: { id: 'perm-analysis-update', name: PermissionName.ANALYSIS_UPDATE },
     [PermissionName.ANALYSIS_READ]: { id: 'perm-analysis-read', name: PermissionName.ANALYSIS_READ },
     [PermissionName.NODE_READ]: { id: 'perm-node-read', name: PermissionName.NODE_READ },
+    [PermissionName.ANALYSIS_NODE_LOG_CREATE]: { id: 'perm-node-log-create', name: PermissionName.ANALYSIS_NODE_LOG_CREATE },
+};
+
+type ExistingGrant = {
+    id: string, 
+    permission: { name: string }, 
+    realmScope: string 
 };
 
 function createRepository(nodes: Partial<Node>[]) {
@@ -29,10 +36,17 @@ function createRepository(nodes: Partial<Node>[]) {
     return repository;
 }
 
-function createAuthup(options: { missing?: string[], failingClients?: string[] } = {}) {
+function createAuthup(options: {
+    missing?: string[], 
+    failingClients?: string[], 
+    existing?: ExistingGrant[] 
+} = {}) {
+    const existing = options.existing ?? [];
+
     return createFakeAuthupClient({
         handlers: {
-            'GET /client-permissions': () => ({ data: [], meta: { total: 0 } }),
+            'GET /client-permissions': () => ({ data: existing, meta: { total: existing.length } }),
+            'DELETE /client-permissions/:id': (req) => ({ data: { id: req.params.id }, meta: {} }),
             'GET /permissions/:id': (req) => {
                 const permission = permissions[req.params.id];
                 if (!permission || options.missing?.includes(req.params.id)) {
@@ -56,11 +70,21 @@ function createAuthup(options: { missing?: string[], failingClients?: string[] }
 function grants(authup: ReturnType<typeof createAuthup>) {
     return authup.requests
         .filter((req) => req.method === 'POST')
-        .map((req) => req.body as { clientId: string, permissionId: string });
+        .map((req) => req.body as {
+            clientId: string, 
+            permissionId: string, 
+            realmScope?: string 
+        });
+}
+
+function revocations(authup: ReturnType<typeof createAuthup>) {
+    return authup.requests
+        .filter((req) => req.method === 'DELETE')
+        .map((req) => req.params.id);
 }
 
 describe('syncNodeClientPermissions', () => {
-    it('should grant node_read, analysis_read and analysis_update to every existing node client', async () => {
+    it('should grant analysis_read, node_read and analysis_node_log_create, scoped none, to every existing node client', async () => {
         const authup = createAuthup();
         const repository = createRepository([
             {
@@ -86,14 +110,23 @@ describe('syncNodeClientPermissions', () => {
         });
 
         expect(result).toEqual({ synced: 2, failed: 0 });
-        expect(grants(authup)).toEqual([
-            { clientId: 'client-1', permissionId: 'perm-analysis-update' },
-            { clientId: 'client-1', permissionId: 'perm-analysis-read' },
-            { clientId: 'client-1', permissionId: 'perm-node-read' },
-            { clientId: 'client-2', permissionId: 'perm-analysis-update' },
-            { clientId: 'client-2', permissionId: 'perm-analysis-read' },
-            { clientId: 'client-2', permissionId: 'perm-node-read' },
-        ]);
+        expect(grants(authup)).toEqual(['client-1', 'client-2'].flatMap((clientId) => [
+            {
+                clientId, 
+                permissionId: 'perm-analysis-read', 
+                realmScope: 'none', 
+            },
+            {
+                clientId, 
+                permissionId: 'perm-node-read', 
+                realmScope: 'none', 
+            },
+            {
+                clientId, 
+                permissionId: 'perm-node-log-create', 
+                realmScope: 'none', 
+            },
+        ]));
     });
 
     it('should skip a failing node and still sync the others', async () => {
@@ -140,6 +173,75 @@ describe('syncNodeClientPermissions', () => {
 });
 
 describe('NodeClientService.assignPermissions', () => {
+    it('should revoke analysis_update and replace grants scoped other than none', async () => {
+        const authup = createAuthup({
+            existing: [
+                {
+                    id: 'cp-update', 
+                    permission: { name: PermissionName.ANALYSIS_UPDATE }, 
+                    realmScope: 'none', 
+                },
+                {
+                    id: 'cp-read', 
+                    permission: { name: PermissionName.ANALYSIS_READ }, 
+                    realmScope: 'own', 
+                },
+                {
+                    id: 'cp-node', 
+                    permission: { name: PermissionName.NODE_READ }, 
+                    realmScope: 'none', 
+                },
+                {
+                    id: 'cp-log', 
+                    permission: { name: PermissionName.ANALYSIS_NODE_LOG_CREATE }, 
+                    realmScope: 'any', 
+                },
+            ],
+        });
+
+        await new NodeClientService(authup).assignPermissions('client-1');
+
+        expect(revocations(authup)).toEqual(['cp-update', 'cp-read', 'cp-log']);
+        expect(grants(authup)).toEqual([
+            {
+                clientId: 'client-1', 
+                permissionId: 'perm-analysis-read', 
+                realmScope: 'none', 
+            },
+            {
+                clientId: 'client-1', 
+                permissionId: 'perm-node-log-create', 
+                realmScope: 'none', 
+            },
+        ]);
+    });
+
+    it('should change nothing when every grant is in place and scoped none', async () => {
+        const authup = createAuthup({
+            existing: [
+                {
+                    id: 'cp-read', 
+                    permission: { name: PermissionName.ANALYSIS_READ }, 
+                    realmScope: 'none', 
+                },
+                {
+                    id: 'cp-node', 
+                    permission: { name: PermissionName.NODE_READ }, 
+                    realmScope: 'none', 
+                },
+                {
+                    id: 'cp-log', 
+                    permission: { name: PermissionName.ANALYSIS_NODE_LOG_CREATE }, 
+                    realmScope: 'none', 
+                },
+            ],
+        });
+
+        await new NodeClientService(authup).assignPermissions('client-1');
+
+        expect(authup.requests.map((req) => req.method)).toEqual(['GET']);
+    });
+
     it('should throw when a permission is not provisioned in Authup', async () => {
         const authup = createAuthup({ missing: [PermissionName.NODE_READ] });
         const service = new NodeClientService(authup);

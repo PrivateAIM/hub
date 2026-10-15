@@ -162,6 +162,25 @@ describe('AnalysisClientService', () => {
             expect(created).toHaveLength(3);
         });
 
+        it('should grant them without realm reach: the client reaches its analysis by binding', async () => {
+            const authup = createFakeAuthupClient({
+                handlers: {
+                    'GET /client-permissions': () => ({ data: [], meta: { total: 0 } }),
+                    'GET /permissions/:name': (req) => ({
+                        data: { id: `perm-${req.params.name}`, name: req.params.name },
+                        meta: {},
+                    }),
+                    'POST /client-permissions': (req) => ({ data: { id: 'cp-1', ...(req.body as object) }, meta: {} }),
+                },
+            });
+            const service = new AnalysisClientService(authup);
+
+            await service.assignDefaultPermissions({ id: 'client-1' } as Client);
+
+            const scopes = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.realmScope);
+            expect(scopes).toEqual(['none', 'none', 'none']);
+        });
+
         it('should additively add only the missing permission and never delete', async () => {
             const authup = createFakeAuthupClient({
                 handlers: {

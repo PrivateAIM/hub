@@ -8,18 +8,18 @@
 import { BadRequestError } from '@privateaim/errors';
 import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import {
-    AnalysisBucketType, 
-    DomainType, 
+    AnalysisBucketType,
+    DomainType,
     buildAnalysisBucketName,
 } from '@privateaim/core-kit';
-import { 
-    beforeEach, 
-    describe, 
-    expect, 
-    it, 
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
 } from 'vitest';
 import { AnalysisStorageManager } from '../../../../src/core/services/analysis-storage-manager/module.ts';
-import { FakeEntityRepository } from '../helpers/index.ts';
+import { FakeEntityRepository } from '@privateaim/server-test-kit';
 import { FakeBucketCaller } from './helpers/fake-bucket-caller.ts';
 import { createFullAnalysis } from '../../../utils/domains/index.ts';
 

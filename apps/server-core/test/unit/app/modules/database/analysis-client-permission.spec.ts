@@ -14,6 +14,7 @@ import {
     createAllowAllActor,
     createDenyAllActor, 
     createFakeAuthupClient, 
+    createScopedActor,
     fakeAuthupResponse,
 } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
@@ -104,6 +105,16 @@ describe('AnalysisClientPermissionService', () => {
             expect(meta.total).toBe(0);
             expect(authup.requests).toHaveLength(0);
         });
+
+        it('should deny an analysis of a realm out of reach', async () => {
+            const analysis = createAnalysis();
+            const authup = createFakeAuthupClient();
+            const service = createService(authup, [analysis]);
+
+            await expect(service.getMany(analysis.id!, createScopedActor({ realmScope: 'own' })))
+                .rejects.toThrow(PermissionDeniedError);
+            expect(authup.requests).toHaveLength(0);
+        });
     });
 
     describe('create', () => {
@@ -124,6 +135,7 @@ describe('AnalysisClientPermissionService', () => {
             expect(created[0].body).toMatchObject({
                 clientId: 'client-1',
                 permissionId: STORAGE_PERMISSION.id,
+                realmScope: 'none',
             });
         });
 
@@ -179,6 +191,35 @@ describe('AnalysisClientPermissionService', () => {
             expect(authup.requests.filter((request) => request.method === 'POST')).toHaveLength(0);
         });
 
+        it('should deny an analysis of a realm out of reach', async () => {
+            const analysis = createAnalysis();
+            const authup = createFakeAuthupClient({ handlers: { 'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION) } });
+            const service = createService(authup, [analysis]);
+
+            await expect(
+                service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createScopedActor({ realmScope: 'own' })),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(authup.requests).toHaveLength(0);
+        });
+
+        it('should let a manager of the analysis realm grant a self-capability', async () => {
+            const analysis = createAnalysis();
+            const authup = createFakeAuthupClient({
+                handlers: {
+                    'GET /permissions/:id': permissionHandler(STORAGE_PERMISSION),
+                    'POST /client-permissions': () => ({ data: { id: 'cp-1' }, meta: {} }),
+                },
+            });
+            const service = createService(authup, [analysis]);
+
+            await service.create(
+                analysis.id!,
+                { permissionId: STORAGE_PERMISSION.id },
+                createScopedActor({ realmId: analysis.realmId, realmScope: 'own' }),
+            );
+            expect(authup.requests.filter((request) => request.method === 'POST')).toHaveLength(1);
+        });
+
         it('should 404 for an unknown analysis', async () => {
             const authup = createFakeAuthupClient();
             const service = createService(authup, []);
@@ -228,6 +269,17 @@ describe('AnalysisClientPermissionService', () => {
                 service.delete(analysis.id!, STORAGE_PERMISSION.id, createAllowAllActor()),
             ).rejects.toThrow(EntityNotFoundError);
             expect(authup.requests.filter((request) => request.method === 'DELETE')).toHaveLength(0);
+        });
+
+        it('should deny an analysis of a realm out of reach', async () => {
+            const analysis = createAnalysis();
+            const authup = createFakeAuthupClient();
+            const service = createService(authup, [analysis]);
+
+            await expect(
+                service.delete(analysis.id!, STORAGE_PERMISSION.id, createScopedActor({ realmScope: 'own' })),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(authup.requests).toHaveLength(0);
         });
     });
 });

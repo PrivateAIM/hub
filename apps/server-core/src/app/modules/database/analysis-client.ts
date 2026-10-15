@@ -6,7 +6,7 @@
  */
 
 import type { Client, Permission } from '@authup/core-kit';
-import { ClientAuthMethod } from '@authup/core-kit';
+import { ClientAuthMethod, REALM_SCOPE } from '@authup/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { AuthupClient, Logger } from '@privateaim/server-kit';
 import { isClientErrorWithStatusCode } from 'hapic';
@@ -17,6 +17,9 @@ import type { AnalysisEntity } from '../../../adapters/database/entities/index.t
  * running analysis act on the node side under its own (restricted) identity.
  * Assigned once, additively, on creation — admins refine the set per analysis
  * later (plan 010, phase 2), so this service never removes permissions.
+ *
+ * Scoped `none`: an analysis client reaches its own analysis by binding
+ * (plan 021, D8), never through its realm, so its grants are capabilities only.
  */
 const DEFAULT_PERMISSION_NAMES: string[] = [
     // Reads its own analysis only: the reach binds an analysis client to it.
@@ -117,6 +120,7 @@ export class AnalysisClientService {
                 await this.authup.clientPermission.create({
                     clientId: client.id,
                     permissionId: permission.id,
+                    realmScope: REALM_SCOPE.NONE,
                 });
             }
         }

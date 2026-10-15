@@ -6,11 +6,10 @@
  */
 
 import type { Node } from '@privateaim/core-kit';
-import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
+import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
-import { holdsPermission } from '../../utils/index.ts';
+import { AbstractEntityService, reachesRecord } from '@privateaim/server-kit';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type { IRegistryRepository } from '../../entities/registry/types.ts';
 import type { IRegistryProjectRepository } from '../../entities/registry-project/types.ts';
@@ -79,36 +78,32 @@ export class NodeRegistryCredentialService extends AbstractEntityService impleme
     /**
      * Fail-closed, with three ways in:
      *
-     * - the node's own client (the referenced identity) reading its own credentials;
-     * - a node administrator of the node's realm — {@link PermissionName.NODE_UPDATE}
+     * - the node's own client (the referenced identity, bound in its own realm —
+     *   `node.clientId` is writable by node managers and not unique) reading its
+     *   own credentials;
+     * - a node administrator whose grant reaches the node's realm — {@link PermissionName.NODE_UPDATE}
      *   already owns the whole lifecycle of that registry project (connecting
      *   provisions it, disconnecting destroys it, reconnecting rotates the robot
      *   account), and the secret is scoped to that one project, so withholding it
      *   from the caller who may rotate it protects nothing;
      * - {@link PermissionName.REGISTRY_MANAGE}, which gates this same secret on
-     *   the registry-project endpoint.
-     *
-     * Being a master-realm member is, by itself, not sufficient: membership is
-     * not a permission.
+     *   the registry-project endpoint — likewise reaching the node's realm.
      */
     protected async isAuthorized(node: Node, actor: ActorContext): Promise<boolean> {
         if (
             actor.identity &&
             actor.identity.type === 'client' &&
             !!node.clientId &&
-            node.clientId === actor.identity.id
+            node.clientId === actor.identity.id &&
+            node.realmId === actor.identity.realmId
         ) {
             return true;
         }
 
-        // Realm-scoped: NODE_UPDATE never reaches another realm's node.
-        if (
-            isRealmResourceWritable(actor.realm, node.realmId) &&
-            await holdsPermission(actor, PermissionName.NODE_UPDATE)
-        ) {
-            return true;
-        }
-
-        return holdsPermission(actor, PermissionName.REGISTRY_MANAGE);
+        return reachesRecord(
+            actor,
+            [PermissionName.NODE_UPDATE, PermissionName.REGISTRY_MANAGE],
+            { realmId: node.realmId, attributes: node },
+        );
     }
 }

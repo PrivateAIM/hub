@@ -9,16 +9,11 @@ import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
 import type { AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisBucketValidator } from '@privateaim/core-kit';
-import { PermissionName, ValidatorGroup, isRealmResourceWritable } from '@privateaim/kit';
-import {
-    BadRequestError,
-    EntityConflictError,
-    EntityNotFoundError,
-    PermissionDeniedError,
-} from '@privateaim/errors';
+import { PermissionName, ValidatorGroup } from '@privateaim/kit';
+import { BadRequestError, EntityConflictError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import { analysisBucketSchema } from './schema.ts';
 import type { IAnalysisBucketRepository, IAnalysisBucketService } from './types.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
@@ -95,7 +90,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
 
         validated.realmId = validated.analysis.realmId;
 
-        await this.assertOwner(actor, validated.realmId);
+        await this.assertOwner(actor, validated);
 
         // one bucket per type and analysis, and a storage bucket bound to one analysis bucket:
         // consumers resolve a bucket by (analysisId, type) or by bucketId.
@@ -117,11 +112,14 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
-        await this.assertOwner(actor, entity.realmId);
+        await this.assertOwner(actor, entity);
 
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
         const merged = this.repository.merge(entity, validated);
+
+        // The grant's policies bind the target state too (authup's evaluateUpdate).
+        await this.assertOwner(actor, merged);
 
         return this.repository.save(merged, { data: actor.metadata });
     }
@@ -132,7 +130,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
-        await this.assertOwner(actor, entity.realmId);
+        await this.assertOwner(actor, entity);
 
         if (entity.type === AnalysisBucketType.CODE) {
             const analysis = await this.analysisRepository.findOneById(entity.analysisId);
@@ -150,11 +148,9 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
         return entity;
     }
 
-    protected async assertOwner(actor: ActorContext, realmId: string): Promise<void> {
-        if (!isRealmResourceWritable(actor.realm, realmId)) {
-            throw new PermissionDeniedError();
-        }
-
+    /** The bucket's realm is its analysis' (stamped on create). */
+    protected async assertOwner(actor: ActorContext, bucket: Partial<AnalysisBucket>): Promise<void> {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
+        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: bucket.realmId, attributes: bucket });
     }
 }

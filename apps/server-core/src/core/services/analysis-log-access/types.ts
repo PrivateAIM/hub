@@ -47,4 +47,12 @@ export interface IAnalysisLogAccessService {
         actor: ActorContext,
         intent: `${LogAccessIntent}`,
     ): Promise<void>;
+
+    /**
+     * Throws `PermissionDeniedError` when the actor lacks
+     * ANALYSIS_NODE_LOG_CREATE or is neither the node's own client nor
+     * reaches the node's realm, and a `ValidupError` for an unknown node or
+     * analysis.
+     */
+    assertAnalysisNodeLogCreate(analysisId: string, nodeId: string, actor: ActorContext): Promise<void>;
 }

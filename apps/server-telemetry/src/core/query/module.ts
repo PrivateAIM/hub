@@ -104,5 +104,3 @@ export function collectLogFilters(query: IQuery, options: { extractTime?: boolea
     return output;
 }
 
-// The shared implementation lives in server-kit; re-exported so call sites keep importing from core.
-export { appendQueryConditions } from '@privateaim/server-kit';

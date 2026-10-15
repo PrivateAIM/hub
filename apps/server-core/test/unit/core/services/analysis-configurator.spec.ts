@@ -9,14 +9,14 @@ import { EntityNotFoundError } from '@privateaim/errors';
 import type { AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisError, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import { 
-    beforeEach, 
-    describe, 
-    expect, 
-    it, 
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
 } from 'vitest';
 import { AnalysisConfigurator } from '../../../../src/core/services/analysis-configurator/module.ts';
-import { FakeEntityRepository } from '../helpers/index.ts';
+import { FakeEntityRepository } from '@privateaim/server-test-kit';
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
