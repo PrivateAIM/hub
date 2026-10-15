@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentHandler } from '@privateaim/server-kit';
+import type { ComponentHandler, Logger } from '@privateaim/server-kit';
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import type { LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';
@@ -18,9 +18,16 @@ export class LogComponentWriteHandler implements ComponentHandler {
 
     protected store : LogStore;
 
-    constructor(logStore?: LogStore) {
+    protected logger?: Logger;
+
+    /**
+     * The logger must not write through the log queue (telemetry's own logger
+     * writes to a MemoryLogStore), or a dropped line would enqueue another.
+     */
+    constructor(logStore?: LogStore, logger?: Logger) {
         this.validator = new LogValidator();
         this.store = logStore ?? new MemoryLogStore();
+        this.logger = logger;
     }
 
     async handle(
@@ -40,7 +47,15 @@ export class LogComponentWriteHandler implements ComponentHandler {
             throw e;
         }
 
-        await this.write(data);
+        try {
+            await this.write(data);
+        } catch (e) {
+            // Drop instead of retrying: a retry holds the queue's single
+            // prefetch slot through its backoff, so a store outage would cut
+            // throughput to a few lines a minute and pile up every service's
+            // log lines in the broker. A lost log line is the cheaper failure.
+            this.logger?.warn(`Dropping log line, the log store rejected it: ${e instanceof Error ? e.message : String(e)}`);
+        }
     }
 
     async validate(input: LogWriteCommandPayload) : Promise<LogInput> {

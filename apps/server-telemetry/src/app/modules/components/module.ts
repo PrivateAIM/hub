@@ -59,7 +59,7 @@ export class ComponentsModule implements IModule {
                 },
             ),
             new MessageBusWorkerComponentCaller(
-                new LogComponent({ logStore }),
+                new LogComponent({ logStore, logger }),
                 {
                     consumeRouting: LogTaskMessageBusRouting,
                     publishRouting: LogEventMessageBusRouting,
