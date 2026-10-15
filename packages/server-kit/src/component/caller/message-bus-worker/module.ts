@@ -90,7 +90,9 @@ export class MessageBusWorkerComponentCaller<
                         },
                     }));
                 } else if (this.logger) {
-                    this.logger.warn(
+                    // No publishRouting means no one subscribes to this component's
+                    // events (e.g. telemetry event/log ingestion), so dropping is expected.
+                    this.logger.debug(
                         `Component ${this.component.constructor.name} event ${childContext.key} could not be handled.`,
                     );
                 }

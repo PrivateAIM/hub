@@ -9,11 +9,6 @@ import { MessageBusRoutingType } from '@privateaim/server-kit';
 
 export { RegistryCommand, RegistryHookEvent } from '../../../core/domains/index.ts';
 
-export const RegistryEventMessageBusRouting = {
-    type: MessageBusRoutingType.PUB_SUB,
-    key: 'registryEvents',
-};
-
 export const RegistryTaskMessageBusRouting = {
     type: MessageBusRoutingType.WORK,
     key: 'registryCommands',

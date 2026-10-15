@@ -10,9 +10,7 @@ import type { IModule } from 'orkos';
 import type { Component } from '@privateaim/server-kit';
 import { LoggerInjectionKey, MessageBusInjectionKey, MessageBusWorkerComponentCaller } from '@privateaim/server-kit';
 import {
-    EventEventMessageBusRouting,
     EventTaskMessageBusRouting,
-    LogEventMessageBusRouting,
     LogTaskMessageBusRouting,
 } from '@privateaim/server-telemetry-kit';
 import type { LogStore } from '../../../core/services/log-store/types.ts';
@@ -53,7 +51,6 @@ export class ComponentsModule implements IModule {
                 }),
                 {
                     consumeRouting: EventTaskMessageBusRouting,
-                    publishRouting: EventEventMessageBusRouting,
                     messageBus,
                     logger,
                 },
@@ -62,7 +59,6 @@ export class ComponentsModule implements IModule {
                 new LogComponent({ logStore, logger }),
                 {
                     consumeRouting: LogTaskMessageBusRouting,
-                    publishRouting: LogEventMessageBusRouting,
                     messageBus,
                     logger,
                 },

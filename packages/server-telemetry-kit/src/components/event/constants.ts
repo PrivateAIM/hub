@@ -18,11 +18,6 @@ export enum EventCommand {
     CLEAN = 'clean',
 }
 
-export const EventEventMessageBusRouting = {
-    type: MessageBusRoutingType.PUB_SUB,
-    key: 'telemetryEventEvents',
-};
-
 export const EventTaskMessageBusRouting = {
     type: MessageBusRoutingType.WORK,
     key: 'telemetryEventTasks',
