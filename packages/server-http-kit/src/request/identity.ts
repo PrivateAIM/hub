@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { UnauthorizedError } from '@privateaim/errors';
 import type { IAppEvent } from 'routup';
 import type { RequestIdentity } from './types';
@@ -26,8 +25,4 @@ export function useRequestIdentityOrFail(event: IAppEvent) : RequestIdentity {
     }
 
     return identity;
-}
-
-export function isRequestIdentityMasterRealmMember(input: RequestIdentity) : boolean {
-    return input.realmName === REALM_MASTER_NAME;
 }

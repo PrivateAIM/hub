@@ -7,10 +7,10 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 import type { ClientPermission } from '@authup/core-kit';
-import { BuiltInPolicyType, PolicyData } from '@authup/access';
-import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
+import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { assertRecordReach } from '@privateaim/server-kit';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisClientPermissionService, IClientPermissionStore } from './types.ts';
 
@@ -56,9 +56,9 @@ export class AnalysisClientPermissionService implements IAnalysisClientPermissio
     }
 
     /**
-     * Gate writes: the actor must hold ANALYSIS_UPDATE (globally and for this
-     * analysis' attributes), be allowed to write the analysis' realm, the
-     * analysis must not be configuration-locked, and a client must exist.
+     * Gate writes: the actor must hold ANALYSIS_UPDATE reaching this analysis
+     * (its realm and attributes), the analysis must not be
+     * configuration-locked, and a client must exist.
      */
     protected async assertWritable(analysis: Analysis, actor: ActorContext): Promise<void> {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
@@ -68,14 +68,7 @@ export class AnalysisClientPermissionService implements IAnalysisClientPermissio
         // silently stops matching, and a denylist-shaped one then fails OPEN.
         // See docs/src/guide/development/migration-camelcase.md ->
         // "Authup attribute policies".
-        await actor.permissionEvaluator.evaluate({
-            name: PermissionName.ANALYSIS_UPDATE,
-            data: new PolicyData({ [BuiltInPolicyType.ATTRIBUTES]: analysis }),
-        });
-
-        if (!isRealmResourceWritable(actor.realm, analysis.realmId)) {
-            throw new PermissionDeniedError();
-        }
+        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: analysis.realmId, attributes: analysis });
 
         if (analysis.configurationLocked) {
             throw new BadRequestError('The capabilities cannot be changed while the analysis configuration is locked.');
@@ -92,6 +85,7 @@ export class AnalysisClientPermissionService implements IAnalysisClientPermissio
         // Viewing the capability assignments exposes the analysis' security
         // configuration, so it requires the same permission as changing it.
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
+        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: analysis.realmId, attributes: analysis });
 
         if (!analysis.clientId) {
             return { data: [], meta: { total: 0 } };

@@ -29,6 +29,29 @@ function createTestPublishContext() {
     };
 }
 
+function createPublisherWithFailingHandlers() {
+    const received : string[] = [];
+    const publisher = new EntityEventPublisher();
+
+    publisher.register({
+        async handle() {
+            throw new Error('first');
+        },
+    });
+    publisher.register({
+        async handle() {
+            throw new Error('second');
+        },
+    });
+    publisher.register({
+        async handle() {
+            received.push('last');
+        },
+    });
+
+    return { publisher, received };
+}
+
 describe('src/entity-event/publisher', () => {
     it('should call all registered handlers on publish', async () => {
         const handler1: IEntityEventHandler = { handle: vi.fn() };
@@ -110,6 +133,21 @@ describe('src/entity-event/publisher', () => {
         await publisher.safePublish(createTestPublishContext());
 
         expect(errorMock).toHaveBeenCalled();
+    });
+
+    it('should run every handler when an earlier one fails and reject with the first error', async () => {
+        // A redis outage (first handler) must not drop the audit event (last handler).
+        const { publisher, received } = createPublisherWithFailingHandlers();
+
+        await expect(publisher.publish(createTestPublishContext())).rejects.toThrow('first');
+        expect(received).toEqual(['last']);
+    });
+
+    it('should reach every handler through safePublish when an earlier one fails', async () => {
+        const { publisher, received } = createPublisherWithFailingHandlers();
+
+        await publisher.safePublish(createTestPublishContext());
+        expect(received).toEqual(['last']);
     });
 
     it('should propagate handler errors in publish', async () => {

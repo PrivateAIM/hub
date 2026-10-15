@@ -334,9 +334,19 @@ be watched by custom async navigation resolvers.
 
 ## Realm Scoping
 
-Entities are scoped to realms via `realmId`. The `isRealmResourceWritable()` helper enforces:
-- Master realm members can access all resources
-- Other users can only access resources in their own realm
+Entities are scoped to realms via `realmId`. There is no master-realm bypass (plan 021, D5):
+reach comes from each grant's `realm_scope` (`any` / `ownOrNull` / `own` / `none`).
+
+- **Writes on one record** (create with its target realm, update, delete, commands):
+  `assertRecordReach` / `reachesRecord` (`server-kit/src/core/authorization/`) evaluate with
+  `PolicyData({ realmMatch: record.realmId ?? null, attributes })`. The `realmMatch` key is what
+  applies the scope; `attributes` alone apply none. Out of reach → 403. Updates check the stored
+  and the merged row.
+- **Reads** lower `compile()` into the query (`scopeReadQuery`, `AnalysisReachService`).
+- **"Reaches every realm"** (the old "master"/"system" checks) is `hasUnboundedReach`: the
+  compiled verdict is `allow`.
+- Node and analysis clients reach by **binding** (`node.clientId` / `analysis.clientId`, in the
+  client's own realm); their grants are scoped `none`.
 
 ## Key Domain Entities
 

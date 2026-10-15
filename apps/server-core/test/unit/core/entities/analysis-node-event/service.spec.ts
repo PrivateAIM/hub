@@ -21,7 +21,7 @@ import {
     createAllowAllActor,
     createDenyAllActor,
     createNonMasterRealmActor,
-} from '../../helpers/index.ts';
+} from '@privateaim/server-test-kit';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
 
 function createTestAnalysisNodeEvent(overrides?: Partial<AnalysisNodeEvent>): AnalysisNodeEvent {

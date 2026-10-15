@@ -41,6 +41,8 @@ export enum PermissionName {
     ANALYSIS_EXECUTION_STOP = 'analysis_execution_stop',
     ANALYSIS_DELETE = 'analysis_delete',
     ANALYSIS_RESULT_READ = 'analysis_result_read', // todo: this is maybe not required anymore
+    /** A node writing its own run's logs (`POST /analysis-node-logs`); node clients hold it. */
+    ANALYSIS_NODE_LOG_CREATE = 'analysis_node_log_create',
 
     ANALYSIS_SELF_MESSAGE_BROKER_USE = 'analysis_self_message_broker_use',
     ANALYSIS_SELF_STORAGE_USE = 'analysis_self_storage_use',

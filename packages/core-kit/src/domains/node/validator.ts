@@ -58,12 +58,6 @@ export class NodeValidator extends TypedContainer<Node> {
         );
 
         this.mount(
-            'clientId',
-            { optional: true },
-            createValidator(z.uuid().nullable()),
-        );
-
-        this.mount(
             'realmId',
             { group: ValidatorGroup.CREATE, optional: true },
             createValidator(z.uuid().nullable()),

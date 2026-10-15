@@ -32,6 +32,7 @@ const PERMISSIONS: PermissionName[] = [
     PermissionName.ANALYSIS_APPROVE,
     PermissionName.ANALYSIS_EXECUTION_START,
     PermissionName.ANALYSIS_EXECUTION_STOP,
+    PermissionName.ANALYSIS_NODE_LOG_CREATE,
     PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE,
     PermissionName.ANALYSIS_SELF_STORAGE_USE,
     PermissionName.MASTER_IMAGE_READ,

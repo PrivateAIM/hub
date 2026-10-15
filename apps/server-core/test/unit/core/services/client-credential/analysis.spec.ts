@@ -13,7 +13,7 @@ import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import type { ActorContext } from '@privateaim/server-kit';
-import { createAllowAllActor } from '@privateaim/server-test-kit';
+import { createAllowAllActor, createScopedActor } from '@privateaim/server-test-kit';
 import { describe, expect, it } from 'vitest';
 import { AnalysisClientCredentialService } from '../../../../../src/core/services/client-credential/index.ts';
 import { FakeAnalysisNodeRepository } from '../../entities/analysis-node/fake-repository.ts';
@@ -22,11 +22,17 @@ import { FakeNodeRepository } from '../../entities/node/fake-repository.ts';
 import { createPermissionActor } from '../../helpers/index.ts';
 import { FakeClientCredentialStore } from './fake-credential-store.ts';
 
-function nodeClientActor(clientId: string): ActorContext {
+const NODE_REALM_ID = randomUUID();
+
+function nodeClientActor(clientId: string, realmId = NODE_REALM_ID): ActorContext {
     // A node client has no analysis-management permission.
     return createPermissionActor({
-        realm: { id: randomUUID(), name: 'node-realm' },
-        identity: { type: 'client', id: clientId },
+        realm: { id: realmId, name: 'node-realm' },
+        identity: {
+            type: 'client', 
+            id: clientId, 
+            realmId, 
+        },
     });
 }
 
@@ -109,7 +115,11 @@ describe('AnalysisClientCredentialService', () => {
     it('should return credentials for the client of an approved, assigned node', async () => {
         const { service } = buildService({
             analysis: baseAnalysis(),
-            nodes: [{ id: NODE_ID, clientId: 'node-client-1' }],
+            nodes: [{
+                id: NODE_ID, 
+                clientId: 'node-client-1', 
+                realmId: NODE_REALM_ID, 
+            }],
             analysisNodes: [{
                 analysisId: ANALYSIS_ID,
                 nodeId: NODE_ID,
@@ -121,10 +131,37 @@ describe('AnalysisClientCredentialService', () => {
         expect(credentials.secret).toBe('the-secret');
     });
 
+    it('should not bind a client of another realm a node points at', async () => {
+        // `node.clientId` is writable by node managers: another realm's node
+        // naming a client must not make that client the node's.
+        const { service, reader } = buildService({
+            analysis: baseAnalysis(),
+            nodes: [{
+                id: NODE_ID, 
+                clientId: 'node-client-1', 
+                realmId: NODE_REALM_ID, 
+            }],
+            analysisNodes: [{
+                analysisId: ANALYSIS_ID,
+                nodeId: NODE_ID,
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            }],
+        });
+
+        await expect(
+            service.getCredentials(ANALYSIS_ID, nodeClientActor('node-client-1', randomUUID())),
+        ).rejects.toThrow(PermissionDeniedError);
+        expect(reader.calls).toHaveLength(0);
+    });
+
     it('should deny a node that is assigned but not approved', async () => {
         const { service } = buildService({
             analysis: baseAnalysis(),
-            nodes: [{ id: NODE_ID, clientId: 'node-client-1' }],
+            nodes: [{
+                id: NODE_ID, 
+                clientId: 'node-client-1', 
+                realmId: NODE_REALM_ID, 
+            }],
             analysisNodes: [{
                 analysisId: ANALYSIS_ID,
                 nodeId: NODE_ID,
@@ -158,13 +195,8 @@ describe('AnalysisClientCredentialService', () => {
         // realm B must not read realm A's analysis client secret.
         const { service, reader } = buildService({ analysis: baseAnalysis() });
 
-        const actor = createPermissionActor({
-            realm: { id: randomUUID(), name: 'other-realm' },
-            permissions: [PermissionName.ANALYSIS_UPDATE],
-        });
-
         await expect(
-            service.getCredentials(ANALYSIS_ID, actor),
+            service.getCredentials(ANALYSIS_ID, createScopedActor({ realmScope: 'own' })),
         ).rejects.toThrow(PermissionDeniedError);
         expect(reader.calls).toHaveLength(0);
     });
@@ -173,10 +205,7 @@ describe('AnalysisClientCredentialService', () => {
         const realmId = randomUUID();
         const { service } = buildService({ analysis: baseAnalysis({ realmId }) });
 
-        const actor = createPermissionActor({
-            realm: { id: realmId, name: 'analysis-realm' },
-            permissions: [PermissionName.ANALYSIS_UPDATE],
-        });
+        const actor = createScopedActor({ realmId, realmScope: 'own' });
 
         const credentials = await service.getCredentials(ANALYSIS_ID, actor);
         expect(credentials.secret).toBe('the-secret');
@@ -184,6 +213,8 @@ describe('AnalysisClientCredentialService', () => {
         // fully evaluated against the analysis, so attribute policies on the
         // grant apply to the secret read as they do to setCredentials
         const [call] = actor.permissionEvaluator.evaluateCalls;
+        expect(call?.name).toBe(PermissionName.ANALYSIS_UPDATE);
+        expect(call?.data?.get(BuiltInPolicyType.REALM_MATCH)).toBe(realmId);
         expect(call?.data?.get(BuiltInPolicyType.ATTRIBUTES)).toMatchObject({ id: ANALYSIS_ID });
     });
 
@@ -223,11 +254,24 @@ describe('AnalysisClientCredentialService', () => {
             expect(credentials.secret).toBe('generated-secret');
         });
 
+        it('should deny a manager of another realm', async () => {
+            const { service, reader } = buildService({ analysis: baseAnalysis() });
+
+            await expect(
+                service.setCredentials(ANALYSIS_ID, undefined, createScopedActor({ realmScope: 'own' })),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(reader.writes).toHaveLength(0);
+        });
+
         it('should deny a node client that may only read', async () => {
             // The read path allows an approved assigned node; writing must not.
             const { service, reader } = buildService({
                 analysis: baseAnalysis(),
-                nodes: [{ id: NODE_ID, clientId: 'node-client-1' }],
+                nodes: [{
+                    id: NODE_ID, 
+                    clientId: 'node-client-1', 
+                    realmId: NODE_REALM_ID, 
+                }],
                 analysisNodes: [{
                     analysisId: ANALYSIS_ID,
                     nodeId: NODE_ID,

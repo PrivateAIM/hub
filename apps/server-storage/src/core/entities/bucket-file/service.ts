@@ -7,11 +7,11 @@
 
 import { eq } from '@rapiq/core';
 import type { BucketFile } from '@privateaim/storage-kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import { PermissionName, isRealmResourceWritable } from '@privateaim/kit';
+import { EntityNotFoundError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import type { IBucketFileCaller, IBucketFileRepository, IBucketFileService } from './types.ts';
 import { bucketFileSchema } from './schema.ts';
 
@@ -59,10 +59,7 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
             !this.isBucketOwnedByActor(entity, actor)
         ) {
             await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_UPDATE });
-
-            if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
-                throw new PermissionDeniedError();
-            }
+            await assertRecordReach(actor, PermissionName.BUCKET_UPDATE, { realmId: entity.realmId, attributes: entity });
         }
 
         await this.caller.delete(entity.id);

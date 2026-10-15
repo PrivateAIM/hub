@@ -11,8 +11,8 @@ import { MasterImageCommand } from '@privateaim/core-kit';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import { masterImageSchema } from './schema.ts';
 import type {
     IMasterImageBuilderCaller,
@@ -51,9 +51,9 @@ export class MasterImageService extends AbstractEntityService implements IMaster
     protected builderCaller: IMasterImageBuilderCaller;
 
     protected masterImagesConfig: {
-        owner: string; 
-        repository: string; 
-        branch: string 
+        owner: string;
+        repository: string;
+        branch: string
     };
 
     constructor(ctx: MasterImageServiceContext) {

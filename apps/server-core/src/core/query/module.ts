@@ -107,5 +107,3 @@ export function decodeQuery<RECORD extends ObjectLiteral = ObjectLiteral>(
     return parsed ?? new Query({});
 }
 
-// The shared implementation lives in server-kit; re-exported so call sites keep importing from core.
-export { appendQueryConditions } from '@privateaim/server-kit';

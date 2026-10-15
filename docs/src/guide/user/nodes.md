@@ -77,7 +77,7 @@ secret) are read from the Registry tab. Three callers may read them:
 - a **node administrator of the node's realm** (`node_update`) — that permission
   already governs the whole lifecycle of the registry project, since connecting
   provisions it and reconnecting rotates the robot account;
-- a registry administrator (`registry_manage`).
+- a registry administrator (`registry_manage`) whose grant reaches the node's realm.
 
 Master-realm membership alone grants nothing — it is not a permission.
 

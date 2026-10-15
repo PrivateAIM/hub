@@ -9,10 +9,9 @@ import { pickRecord } from '@authup/kit';
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import { AnalysisNodeLogValidator, DomainType  } from '@privateaim/core-kit';
 import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
-import { isRealmResourceWritable } from '@privateaim/kit';
 import type { Log, LogLevel, ITelemetryClient as TelemetryClient } from '@privateaim/telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
-import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError } from '@privateaim/errors';
 import {
     DBody,
     DContext,
@@ -25,15 +24,8 @@ import {
 import { useRequestQuery } from '@routup/basic/query';
 import type { FiltersBuildInput } from '@rapiq/core';
 import type { IAppEvent } from 'routup';
-import { useDataSource } from 'typeorm-extension';
-import { ForceLoggedInMiddleware, buildActorContext, useRequestIdentityRealm } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import { collectRootFilterValues, describeQuerySchema } from '@privateaim/server-kit';
-import { ValidupError, buildErrorMessageForAttribute } from 'validup';
-import { defineIssueItem } from '@ebec/core';
-import {
-    AnalysisEntity,
-    NodeEntity,
-} from '../../../../database/index.ts';
 import { analysisNodeLogSchema, decodeQuery } from '../../../../../core/index.ts';
 import type { IAnalysisLogAccessService } from '../../../../../core/services/analysis-log-access/index.ts';
 import { LogAccessIntent } from '../../../../../core/services/analysis-log-access/index.ts';
@@ -119,37 +111,7 @@ export class AnalysisNodeLogController {
         const validator = new AnalysisNodeLogValidator();
         const data = await validator.run(body, { group: 'create' });
 
-        const dataSource = await useDataSource();
-        const nodeRepository = dataSource.getRepository(NodeEntity);
-        const node = await nodeRepository.findOneBy({ id: data.nodeId });
-        if (!node) {
-            throw new ValidupError([
-                defineIssueItem({
-                    path: ['nodeId'],
-                    message: buildErrorMessageForAttribute('nodeId'),
-                }),
-            ]);
-        }
-
-        data.nodeRealmId = node.realmId;
-
-        const analysisRepository = dataSource.getRepository(AnalysisEntity);
-        const analysis = await analysisRepository.findOneBy({ id: data.analysisId });
-        if (!analysis) {
-            throw new ValidupError([
-                defineIssueItem({
-                    path: ['analysisId'],
-                    message: buildErrorMessageForAttribute('analysisId'),
-                }),
-            ]);
-        }
-
-        data.analysisRealmId = analysis.realmId;
-
-        const isAuthorityOfNode = isRealmResourceWritable(useRequestIdentityRealm(event), data.nodeRealmId);
-        if (!isAuthorityOfNode) {
-            throw new PermissionDeniedError('You are not an actor of the node realm.');
-        }
+        await this.accessService.assertAnalysisNodeLogCreate(data.analysisId, data.nodeId, buildActorContext(event));
 
         const labels : Record<string, string> = {};
         const labelsRaw = {

@@ -66,14 +66,23 @@ export class EntityEventPublisher implements IEntityEventPublisher {
             destinations,
         };
 
-        const handlers = this.handlers.values();
-        while (true) {
-            const handler = handlers.next();
-            if (handler.done) {
-                return;
+        // A failing handler (the redis bus being down) must not keep the
+        // later ones (the telemetry audit bridge) from running.
+        let error : unknown;
+        let failed = false;
+        for (const handler of this.handlers) {
+            try {
+                await handler.handle(consumeContext);
+            } catch (e) {
+                if (!failed) {
+                    failed = true;
+                    error = e;
+                }
             }
+        }
 
-            await (handler.value as IEntityEventHandler).handle(consumeContext);
+        if (failed) {
+            throw error;
         }
     }
 }
