@@ -1,6 +1,51 @@
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
+ * Release-window consolidation of three unreleased migrations (see
+ * conventions.md#database-migrations), squashed under the earliest timestamp.
+ * Every change it makes:
+ *
+ * 1. adds the `analyses (client_id)` index backing the `clientId` filter;
+ * 2. adds the `analysis_bucket_files (bucket_file_id)` lookup index, the
+ *    realm/id composites and status/created_at sort composites on
+ *    `analysis_nodes` and `project_nodes` (replacing the single-column realm
+ *    and status indexes), and explicit `master_image_id` indexes on
+ *    `analyses` and `projects`;
+ * 3. renames `analyses.build_nodes_valid` to `distribution_nodes_valid`.
+ *
+ * The parts are independent; up() runs them in order 1-2-3 and down() in
+ * reverse, exactly as the three original migrations did.
+ *
+ * ## Part 1 — index `analyses.client_id` (was AddAnalysisClientIdIndex1788500000000)
+ *
+ * Adds the single-column index on `analyses.client_id` that backs the new
+ * `clientId` entry in the analysis rapiq schema (`indexes` + `filters.allowed`).
+ *
+ * Analysis containers authenticate to the node services (storage service,
+ * pod orchestration) with client-credentials tokens issued by the global
+ * Authup. Those tokens carry the Hub-managed Authup client's UUID
+ * (`client_id` / `sub`), not the analysis id, so a node service holding such
+ * a token needs to resolve "which analysis does this client belong to". The
+ * Hub already stores that id on the analysis, but until now the schema did
+ * not allow filtering on it, forcing node services to page through
+ * `/analysis-nodes` and match client-side. With `filter[clientId]` on
+ * `/analyses` (and `filter[analysis.clientId]` on `/analysis-nodes` through
+ * `schemaMapping`) that lookup becomes a single indexed query.
+ *
+ * The schema is `strict` with `filters.indexed: true` (anchor mode): every
+ * allow-listed filter key must LEAD a real database index, otherwise the
+ * parse-time index policy rejects a query the allow-list itself advertises
+ * (see 1788400000000-AlignAnalysesConstraintNamesAndAddQueryIndexes). The
+ * index is named by typeorm's DefaultNamingStrategy for table `analyses` and
+ * column `client_id` (never hand-written), so the entity's `@Index()` and the
+ * migrated schema agree and the drift gate stays quiet.
+ *
+ * `client_id` carries no foreign key, so InnoDB maintains no implicit index
+ * on it that this one could displace — down() is a plain DROP INDEX, unlike
+ * the FK-backed columns in 1788400000000 that had to be renamed back.
+ *
+ * ## Part 2 — lookup, sort and foreign key indexes (was AddLookupSortAndForeignKeyIndexes1788600000000)
+ *
  * Adds indexes for lookups that run outside the rapiq allow-lists, composite
  * lookup and sort indexes on the node junctions, and makes
  * the foreign key indexes on `master_image_id` explicit. Every change it makes:
@@ -46,11 +91,30 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * Index names are typeorm's DefaultNamingStrategy output (taken from
  * `migration generate`), so the entity metadata and the migrated schema agree
  * and the drift gate stays quiet.
+ *
+ * ## Part 3 — rename `analyses.build_nodes_valid` (was RenameBuildNodesValidToDistributionNodesValid1788700000000)
+ *
+ * Renames `analyses.build_nodes_valid` to `distribution_nodes_valid`.
+ *
+ * Node approval used to gate the build, so a node approved the code. It now
+ * gates the distribution instead: a node approves the built image (hash,
+ * size, OS), every build start resets the approvals, and an approval is only
+ * accepted once the build has finished. The aggregate keeps its meaning —
+ * every node approved — and only moves to the step it gates, so the column is
+ * renamed in place and every stored value stays valid.
+ *
+ * The column carries no index or constraint, so the rename touches nothing else.
  */
-export class AddLookupSortAndForeignKeyIndexes1788600000000 implements MigrationInterface {
-    name = 'AddLookupSortAndForeignKeyIndexes1788600000000';
+export class AddClientIdLookupSortAndForeignKeyIndexesAndRenameBuildNodesValid1788500000000 implements MigrationInterface {
+    name = 'AddClientIdLookupSortAndForeignKeyIndexesAndRenameBuildNodesValid1788500000000';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        // Part 1
+        await queryRunner.query(`
+            CREATE INDEX \`IDX_a1746738896e31d23df2792506\` ON \`analyses\` (\`client_id\`)
+        `);
+
+        // Part 2
         await queryRunner.query(`
             CREATE INDEX \`IDX_0f9188fff4b6692bb0a727d91c\` ON \`analysis_bucket_files\` (\`bucket_file_id\`)
         `);
@@ -102,9 +166,20 @@ export class AddLookupSortAndForeignKeyIndexes1788600000000 implements Migration
         await queryRunner.query(`
             DROP INDEX \`IDX_578ed64bdd3475f4ce55bb5454\` ON \`project_nodes\`
         `);
+
+        // Part 3
+        await queryRunner.query(`
+            ALTER TABLE \`analyses\` RENAME COLUMN \`build_nodes_valid\` TO \`distribution_nodes_valid\`
+        `);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
+        // Part 3
+        await queryRunner.query(`
+            ALTER TABLE \`analyses\` RENAME COLUMN \`distribution_nodes_valid\` TO \`build_nodes_valid\`
+        `);
+
+        // Part 2
         await queryRunner.query(`
             CREATE INDEX \`IDX_578ed64bdd3475f4ce55bb5454\` ON \`project_nodes\` (\`approval_status\`)
         `);
@@ -155,6 +230,11 @@ export class AddLookupSortAndForeignKeyIndexes1788600000000 implements Migration
         `);
         await queryRunner.query(`
             DROP INDEX \`IDX_0f9188fff4b6692bb0a727d91c\` ON \`analysis_bucket_files\`
+        `);
+
+        // Part 1
+        await queryRunner.query(`
+            DROP INDEX \`IDX_a1746738896e31d23df2792506\` ON \`analyses\`
         `);
     }
 }
