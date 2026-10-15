@@ -14,4 +14,9 @@ export class FakeAnalysisBucketFileRepository extends FakeEntityRepository<Analy
         const all = await this.findManyBy({ analysisId });
         return all.find((f) => f.root) ?? null;
     }
+
+    async findManyByBucketFiles(bucketId: string, bucketFileIds: string[]): Promise<AnalysisBucketFile[]> {
+        const all = await this.findManyBy({ bucketId });
+        return all.filter((f) => bucketFileIds.includes(f.bucketFileId));
+    }
 }

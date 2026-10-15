@@ -9,18 +9,12 @@ import { faker } from '@faker-js/faker';
 import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisError } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
-import type {
-    AnalysisBuilderEventMap,
-    AnalysisBuilderExecutionProgressPayload,
-    AnalysisDistributorEventMap,
-    MasterImageBuilderEventMap,
-} from '@privateaim/server-core-worker-kit';
+import type { AnalysisBuilderExecutionProgressPayload } from '@privateaim/server-core-worker-kit';
 import {
     AnalysisBuilderEvent,
     AnalysisDistributorEvent,
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
-import type { ComponentEventMap, ComponentHandlerContext } from '@privateaim/server-kit';
 import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
 import type { DataSource, EntityTarget, ObjectLiteral } from 'typeorm';
 import {
@@ -31,11 +25,10 @@ import {
     it,
 } from 'vitest';
 import { AnalysisEntity, MasterImageEntity, ProjectEntity } from '../../../../src/adapters/database/index.ts';
-import { handleAnalysisBuilderEvent } from '../../../../src/app/aggregators/worker/analysis-builder/handler.ts';
-import { handleAnalysisDistributorEvent } from '../../../../src/app/aggregators/worker/analysis-distributor/handler.ts';
-import { handleMasterImageBuilderEvent } from '../../../../src/app/aggregators/worker/master-image-builder/handler.ts';
+import { AnalysisInjectionKey } from '../../../../src/app/modules/analysis/index.ts';
 import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index.ts';
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
+import { MasterImageBuilderService } from '../../../../src/core/services/master-image/index.ts';
 import { createTestDatabaseApplication } from '../../../app/index.ts';
 import { FakeAnalysisBuilderCaller } from '../../core/services/helpers/fake-builder-caller.ts';
 import { FakeAnalysisMetadataRecalculator } from '../../core/entities/analysis/fake-metadata-recalculator.ts';
@@ -48,17 +41,6 @@ const type = readDataSourceOptionsFromEnv()?.type;
 const lockable = type === 'mysql' || type === 'postgres';
 
 const CONCURRENCY = 5;
-
-function createContext<
-    EventMap extends ComponentEventMap,
-    Key extends keyof EventMap & string = keyof EventMap & string,
->(key: Key): ComponentHandlerContext<EventMap, Key> {
-    return {
-        key,
-        metadata: {},
-        handle: async () => {},
-    };
-}
 
 /**
  * Holds every start at its last pre-lock read until all of them got there,
@@ -220,19 +202,17 @@ describe('status transition row lock', () => {
         await commitWhileRunning(AnalysisEntity, analysis.id, {
             buildStatus: ProcessStatus.EXECUTED,
             buildProgress: 100,
-        }, () => handleAnalysisBuilderEvent(
+        }, () => suite.container.resolve(AnalysisInjectionKey.Builder).applyEvent(
+            AnalysisBuilderEvent.EXECUTION_PROGRESS,
             createProgressPayload(analysis.id),
-            createContext<AnalysisBuilderEventMap>(AnalysisBuilderEvent.EXECUTION_PROGRESS),
-            dataSource,
         ));
 
         await commitWhileRunning(AnalysisEntity, analysis.id, {
             distributionStatus: ProcessStatus.EXECUTED,
             distributionProgress: 100,
-        }, () => handleAnalysisDistributorEvent(
+        }, () => suite.container.resolve(AnalysisInjectionKey.Distributor).applyEvent(
+            AnalysisDistributorEvent.EXECUTION_PROGRESS,
             createProgressPayload(analysis.id),
-            createContext<AnalysisDistributorEventMap>(AnalysisDistributorEvent.EXECUTION_PROGRESS),
-            dataSource,
         ));
 
         expect(await repository.findOneByOrFail({ id: analysis.id })).toMatchObject({
@@ -254,13 +234,15 @@ describe('status transition row lock', () => {
             buildProgress: 20,
         }));
 
+        const imageRepository = suite.container.resolve(DatabaseInjectionKey.MasterImageRepository);
+        const service = new MasterImageBuilderService({ imageRepository });
+
         await commitWhileRunning(MasterImageEntity, image.id, {
             buildStatus: ProcessStatus.EXECUTED,
             buildProgress: 100,
-        }, () => handleMasterImageBuilderEvent(
+        }, () => service.applyEvent(
+            MasterImageBuilderEvent.EXECUTION_PROGRESS,
             createProgressPayload(image.id),
-            createContext<MasterImageBuilderEventMap, MasterImageBuilderEvent>(MasterImageBuilderEvent.EXECUTION_PROGRESS),
-            dataSource,
         ));
 
         expect(await repository.findOneByOrFail({ id: image.id })).toMatchObject({

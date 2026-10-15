@@ -74,8 +74,16 @@ export class ProjectRepositoryAdapter implements IProjectRepository {
         return this.repository.save(entity as ProjectEntity, ctx);
     }
 
+    async saveMany(entities: Project[], ctx?: EntityPersistContext): Promise<Project[]> {
+        return this.repository.save(entities as ProjectEntity[], ctx);
+    }
+
     async remove(entity: Project, ctx?: EntityPersistContext): Promise<void> {
         await this.repository.remove(entity as ProjectEntity, ctx);
+    }
+
+    async removeMany(entities: Project[], ctx?: EntityPersistContext): Promise<void> {
+        await this.repository.remove(entities as ProjectEntity[], ctx);
     }
 
     async validateJoinColumns(data: Partial<Project>): Promise<void> {

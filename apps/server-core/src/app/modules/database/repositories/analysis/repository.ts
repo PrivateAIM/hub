@@ -89,6 +89,10 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
         await this.repository.remove(entity as AnalysisEntity, ctx);
     }
 
+    async removeMany(entities: Analysis[], ctx?: EntityPersistContext): Promise<void> {
+        await this.repository.remove(entities as AnalysisEntity[], ctx);
+    }
+
     async validateJoinColumns(data: Partial<Analysis>): Promise<void> {
         await validateEntityJoinColumns(data, {
             dataSource: this.dataSource,

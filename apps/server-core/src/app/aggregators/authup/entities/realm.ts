@@ -5,44 +5,33 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    EntityType, 
-    EventRecord, 
+    EntityType,
+    EventRecord,
     Realm,
 } from '@authup/core-kit';
-import { useDataSource } from 'typeorm-extension';
-import {
-    AnalysisEntity,
-    NodeEntity,
-    ProjectEntity,
-    RegistryProjectEntity,
-} from '../../../../adapters/database/index.ts';
+import type { AuthupAggregatorRepositories } from '../types.ts';
 
-export async function handleAuthupRealmEvent(context: EventRecord<EntityType.REALM, Realm>) {
+export async function handleAuthupRealmEvent(
+    context: EventRecord<EntityType.REALM, Realm>,
+    repositories: AuthupAggregatorRepositories,
+) {
     if (!context.data.id) {
         return;
     }
 
     if (context.event === 'deleted') {
-        const dataSource = await useDataSource();
+        const where = { realmId: context.data.id };
 
-        const projectRepository = dataSource.getRepository(ProjectEntity);
-        const projects = await projectRepository.find({ where: { realmId: context.data.id } });
+        const projects = await repositories.projectRepository.findManyBy(where);
+        await repositories.projectRepository.removeMany(projects);
 
-        await projectRepository.remove(projects);
+        const registryProjects = await repositories.registryProjectRepository.findManyBy(where);
+        await repositories.registryProjectRepository.removeMany(registryProjects);
 
-        const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
-        const registryProjects = await registryProjectRepository.find({ where: { realmId: context.data.id } });
+        const nodes = await repositories.nodeRepository.findManyBy(where);
+        await repositories.nodeRepository.removeMany(nodes);
 
-        await registryProjectRepository.remove(registryProjects);
-
-        const nodeRepository = dataSource.getRepository(NodeEntity);
-        const nodes = await nodeRepository.find({ where: { realmId: context.data.id } });
-
-        await nodeRepository.remove(nodes);
-
-        const analysisRepository = dataSource.getRepository(AnalysisEntity);
-        const analyses = await analysisRepository.find({ where: { realmId: context.data.id } });
-
-        await analysisRepository.remove(analyses);
+        const analyses = await repositories.analysisRepository.findManyBy(where);
+        await repositories.analysisRepository.removeMany(analyses);
     }
 }

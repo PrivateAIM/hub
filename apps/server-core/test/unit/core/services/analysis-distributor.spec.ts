@@ -14,6 +14,8 @@ import type {
     Registry, 
 } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
+import type { AnalysisDistributorCheckFinishedPayload, AnalysisDistributorExecutionProgressPayload } from '@privateaim/server-core-worker-kit';
+import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import { 
     beforeEach, 
     describe, 
@@ -251,6 +253,137 @@ describe('AnalysisDistributor', () => {
 
             expect(result.id).toBe('analysis-1');
             expect(caller.getCallsFor('callCheck')).toHaveLength(1);
+        });
+    });
+
+    describe('applyEvent', () => {
+        function createAnalysis(overrides: Partial<Analysis> = {}): Analysis {
+            return repository.seed(createFullAnalysis(overrides));
+        }
+
+        async function findAnalysis(id: string): Promise<Analysis> {
+            return repository.findOneById(id);
+        }
+
+        it('should ignore a late EXECUTION_PROGRESS for an executed distribution', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.EXECUTED,
+                distributionProgress: 100,
+            });
+
+            const payload: AnalysisDistributorExecutionProgressPayload = {
+                id: analysis.id,
+                progress: {
+                    current: 1, 
+                    total: 1, 
+                    percent: 40, 
+                },
+            };
+            const saved = await distributor.applyEvent(AnalysisDistributorEvent.EXECUTION_PROGRESS, payload);
+
+            expect(saved).toBeNull();
+            expect(await findAnalysis(analysis.id)).toMatchObject({
+                distributionStatus: ProcessStatus.EXECUTED,
+                distributionProgress: 100,
+            });
+        });
+
+        it('should mark the distribution as EXECUTED on CHECK_FINISHED with status EXECUTED', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
+            });
+
+            const payload: AnalysisDistributorCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.EXECUTED,
+            };
+
+            await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.distributionStatus).toBe(ProcessStatus.EXECUTED);
+            expect(entity.distributionProgress).toBe(100);
+        });
+
+        it('should mark the distribution as FAILED on CHECK_FINISHED with status FAILED', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
+            });
+
+            const payload: AnalysisDistributorCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.FAILED,
+            };
+
+            await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.distributionStatus).toBe(ProcessStatus.FAILED);
+            expect(entity.distributionProgress).toBe(0);
+        });
+
+        it('should keep progress on CHECK_FINISHED with in-progress status', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
+            });
+
+            const payload: AnalysisDistributorCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.STARTED,
+            };
+
+            await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.distributionStatus).toBe(ProcessStatus.STARTED);
+            expect(entity.distributionProgress).toBe(40);
+        });
+
+        it('should not modify the entity on CHECK_FINISHED without status', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTING,
+            });
+
+            const payload: AnalysisDistributorCheckFinishedPayload = { id: analysis.id };
+
+            await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.distributionStatus).toBe(ProcessStatus.STARTING);
+        });
+
+        it('should not mark the distribution as FAILED on CHECK_FAILED', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+                distributionProgress: 40,
+            });
+
+            await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FAILED, { id: analysis.id });
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.distributionStatus).toBe(ProcessStatus.STARTED);
+            expect(entity.distributionProgress).toBe(40);
+        });
+
+        it('should mark the distribution as FAILED on EXECUTION_FAILED', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTED,
+            });
+
+            await distributor.applyEvent(AnalysisDistributorEvent.EXECUTION_FAILED, { id: analysis.id });
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.distributionStatus).toBe(ProcessStatus.FAILED);
         });
     });
 });

@@ -6,10 +6,19 @@
  */
 
 import type { Node, RegistryProject } from '@privateaim/core-kit';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityPersistContext,
+    EntityRepositoryFindManyResult,
+    IEntityRepository,
+} from '@privateaim/server-kit';
 
 export interface INodeRepository extends IEntityRepository<Node> {
     findOneWithExternalName(id: string): Promise<Node | null>;
+    /**
+     * Remove all entities in one transaction: all or nothing.
+     */
+    removeMany(entities: Node[], ctx?: EntityPersistContext): Promise<void>;
 }
 
 export interface IRegistryManager {

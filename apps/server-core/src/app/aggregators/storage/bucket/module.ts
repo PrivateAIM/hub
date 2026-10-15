@@ -12,7 +12,7 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
-import type { BaseAggregatorHandlerContext } from '../../base.ts';
+import type { StorageBucketAggregatorContext } from './types.ts';
 import {
     StorageBucketClearingFinishedHandler,
     StorageBucketCreationFinishedHandler,
@@ -22,7 +22,7 @@ import {
 export class StorageBucketAggregator extends BaseComponent<
     BucketComponentEventMap
 > {
-    constructor(ctx: BaseAggregatorHandlerContext) {
+    constructor(ctx: StorageBucketAggregatorContext) {
         super();
 
         this.mount(BucketEvent.CREATION_FINISHED, new StorageBucketCreationFinishedHandler(ctx));

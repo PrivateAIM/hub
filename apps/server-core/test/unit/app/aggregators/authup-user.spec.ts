@@ -24,6 +24,7 @@ import {
     ProjectEntity,
 } from '../../../../src/adapters/database/index.ts';
 import { handleAuthupUserEvent } from '../../../../src/app/aggregators/authup/entities/user.ts';
+import type { AuthupAggregatorRepositories } from '../../../../src/app/aggregators/authup/types.ts';
 import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index.ts';
 import { createTestDatabaseApplication } from '../../../app';
 
@@ -38,10 +39,18 @@ function createDeletedEvent(userId: string): EventRecord<EntityType.USER, Pick<U
 describe('authup user aggregator', () => {
     const suite = createTestDatabaseApplication();
     let dataSource: DataSource;
+    let repositories: AuthupAggregatorRepositories;
 
     beforeAll(async () => {
         await suite.setup();
         dataSource = suite.container.resolve(DatabaseInjectionKey.DataSource);
+        repositories = {
+            analysisRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisRepository),
+            analysisBucketFileRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository),
+            nodeRepository: suite.container.resolve(DatabaseInjectionKey.NodeRepository),
+            projectRepository: suite.container.resolve(DatabaseInjectionKey.ProjectRepository),
+            registryProjectRepository: suite.container.resolve(DatabaseInjectionKey.RegistryProjectRepository),
+        };
     });
 
     afterAll(async () => {
@@ -95,7 +104,7 @@ describe('authup user aggregator', () => {
             file, 
         } = await createOwnedAnalysis(userId);
 
-        await handleAuthupUserEvent(createDeletedEvent(userId));
+        await handleAuthupUserEvent(createDeletedEvent(userId), repositories);
 
         const projectAfter = await dataSource.getRepository(ProjectEntity).findOneBy({ id: project.id });
         expect(projectAfter?.userId).toBeNull();
@@ -114,7 +123,7 @@ describe('authup user aggregator', () => {
         const userId = faker.string.uuid();
         const { analysis, file } = await createOwnedAnalysis(userId);
 
-        await handleAuthupUserEvent(createDeletedEvent(faker.string.uuid()));
+        await handleAuthupUserEvent(createDeletedEvent(faker.string.uuid()), repositories);
 
         const analysisAfter = await dataSource.getRepository(AnalysisEntity).findOneBy({ id: analysis.id });
         expect(analysisAfter?.userId).toEqual(userId);

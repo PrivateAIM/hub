@@ -8,14 +8,15 @@
 import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import { BaseComponent } from '@privateaim/server-kit';
-import type { DataSource } from 'typeorm';
-import { handleAnalysisDistributorEvent } from './handler.ts';
+import type { AnalysisDistributorAggregatorContext } from './types.ts';
 
 export class AnalysisDistributorAggregator extends BaseComponent<AnalysisDistributorEventMap> {
-    constructor(ctx: { dataSource: DataSource }) {
+    constructor(ctx: AnalysisDistributorAggregatorContext) {
         super();
 
-        const handler = (value, context) => handleAnalysisDistributorEvent(value, context, ctx.dataSource);
+        const handler = async (value, context) => {
+            await ctx.distributor.applyEvent(context.key, value);
+        };
 
         this.mount(AnalysisDistributorEvent.EXECUTION_STARTED, handler);
         this.mount(AnalysisDistributorEvent.EXECUTION_PROGRESS, handler);

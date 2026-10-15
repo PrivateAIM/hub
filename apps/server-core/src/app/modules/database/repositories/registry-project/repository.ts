@@ -82,6 +82,10 @@ export class RegistryProjectRepositoryAdapter implements IRegistryProjectReposit
         await this.repository.remove(entity as RegistryProjectEntity, ctx);
     }
 
+    async removeMany(entities: RegistryProject[], ctx?: EntityPersistContext): Promise<void> {
+        await this.repository.remove(entities as RegistryProjectEntity[], ctx);
+    }
+
     async validateJoinColumns(data: Partial<RegistryProject>): Promise<void> {
         await validateEntityJoinColumns(data, {
             dataSource: this.dataSource,

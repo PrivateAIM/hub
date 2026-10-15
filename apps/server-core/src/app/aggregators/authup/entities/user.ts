@@ -5,44 +5,41 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type { EntityType, EventRecord, User } from '@authup/core-kit';
-import { useDataSource } from 'typeorm-extension';
-import { AnalysisBucketFileEntity, AnalysisEntity, ProjectEntity } from '../../../../adapters/database/index.ts';
+import type { AuthupAggregatorRepositories } from '../types.ts';
 
-export async function handleAuthupUserEvent(context: EventRecord<EntityType.USER, Pick<User, 'id'>>) {
+export async function handleAuthupUserEvent(
+    context: EventRecord<EntityType.USER, Pick<User, 'id'>>,
+    repositories: AuthupAggregatorRepositories,
+) {
     if (!context.data.id) {
         return;
     }
 
     if (context.event === 'deleted') {
-        const dataSource = await useDataSource();
+        const where = { userId: context.data.id };
 
-        const projectRepository = dataSource.getRepository(ProjectEntity);
-        const projects = await projectRepository.find({ where: { userId: context.data.id } });
-
+        const projects = await repositories.projectRepository.findManyBy(where);
         for (const project of projects) {
             project.userId = null;
         }
+        await repositories.projectRepository.saveMany(projects);
 
-        await projectRepository.save(projects);
-
-        const analysisRepository = dataSource.getRepository(AnalysisEntity);
-        const analyses = await analysisRepository.find({ where: { userId: context.data.id } });
-
+        // on the locked row: a full-copy save would write a stale status back
+        // over one a concurrent worker event committed meanwhile.
+        const analyses = await repositories.analysisRepository.findManyBy(where);
         for (const analysis of analyses) {
-            analysis.userId = null;
+            await repositories.analysisRepository.updateLocked(analysis.id, (locked) => {
+                locked.userId = null;
+                return true;
+            });
         }
-
-        await analysisRepository.save(analyses);
 
         // A file belongs to an analysis that outlives its uploader, so it is
         // detached like the analysis itself, never removed.
-        const analysisFileRepository = dataSource.getRepository(AnalysisBucketFileEntity);
-        const analysisFiles = await analysisFileRepository.find({ where: { userId: context.data.id } });
-
+        const analysisFiles = await repositories.analysisBucketFileRepository.findManyBy(where);
         for (const analysisFile of analysisFiles) {
             analysisFile.userId = null;
         }
-
-        await analysisFileRepository.save(analysisFiles);
+        await repositories.analysisBucketFileRepository.saveMany(analysisFiles);
     }
 }

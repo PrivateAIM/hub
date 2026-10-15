@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { DomainType } from '@privateaim/core-kit';
 import type { MasterImageBuilderEventMap } from '@privateaim/server-core-worker-kit';
 import {
     MasterImageBuilderEvent,
@@ -12,17 +13,28 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
-import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
-import type { DataSource } from 'typeorm';
-import {
-    handleMasterImageBuilderEvent,
-} from './handler.ts';
+import type { MasterImageBuilderAggregatorContext } from './types.ts';
 
 export class MasterImageBuilderAggregator extends BaseComponent<MasterImageBuilderEventMap> {
-    constructor(ctx: { dataSource: DataSource; eventComponentCaller?: EventComponentCaller }) {
+    constructor(ctx: MasterImageBuilderAggregatorContext) {
         super();
 
-        const handler = (value, context) => handleMasterImageBuilderEvent(value, context, ctx.dataSource, ctx.eventComponentCaller);
+        const handler = async (value, context) => {
+            const saved = await ctx.service.applyEvent(context.key, value);
+            if (!saved) {
+                return;
+            }
+
+            if (ctx.eventComponentCaller) {
+                await ctx.eventComponentCaller.callCreate({
+                    name: context.key,
+                    data: {},
+                    refType: DomainType.MASTER_IMAGE,
+                    refId: saved.id,
+                    scope: 'builder',
+                });
+            }
+        };
 
         this.mount(MasterImageBuilderEvent.EXECUTION_PROGRESS, handler);
         this.mount(MasterImageBuilderEvent.EXECUTION_STARTED, handler);

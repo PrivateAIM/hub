@@ -6,22 +6,14 @@
  */
 
 import { EntityType } from '@authup/core-kit';
-import type { Component, Logger } from '@privateaim/server-kit';
+import type { Component } from '@privateaim/server-kit';
 import { EnvironmentName } from '@privateaim/server-kit';
-import type { Client as RedisClient } from 'redis-extension';
-import type { IRegistryCaller } from '../../../core/harbor/types.ts';
 import {
     handleAuthupRealmEvent,
     handleAuthupRobotEvent,
     handleAuthupUserEvent,
 } from './entities/index.ts';
-
-type AuthupAggregatorContext = {
-    env: string;
-    registryComponentCaller?: IRegistryCaller;
-    redisSubscribeClient?: RedisClient;
-    logger?: Logger;
-};
+import type { AuthupAggregatorContext } from './types.ts';
 
 export function createAuthupAggregator(ctx: AuthupAggregatorContext) : Component {
     if (!ctx.redisSubscribeClient || ctx.env === EnvironmentName.TEST) {
@@ -49,15 +41,15 @@ export function createAuthupAggregator(ctx: AuthupAggregatorContext) : Component
 
                 switch (event.type) {
                     case EntityType.REALM: {
-                        await handleAuthupRealmEvent(event);
+                        await handleAuthupRealmEvent(event, ctx);
                         break;
                     }
                     case EntityType.CLIENT: {
-                        await handleAuthupRobotEvent(event, ctx?.registryComponentCaller);
+                        await handleAuthupRobotEvent(event, ctx, ctx.registryComponentCaller);
                         break;
                     }
                     case EntityType.USER: {
-                        await handleAuthupUserEvent(event);
+                        await handleAuthupUserEvent(event, ctx);
                         break;
                     }
                 }
