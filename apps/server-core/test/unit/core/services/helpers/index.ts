@@ -8,4 +8,3 @@
 export * from './fake-bucket-caller.ts';
 export * from './fake-builder-caller.ts';
 export * from './fake-distributor-caller.ts';
-export * from './fake-task-manager.ts';

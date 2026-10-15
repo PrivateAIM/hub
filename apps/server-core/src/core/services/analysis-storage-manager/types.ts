@@ -17,17 +17,9 @@ export interface IBucketCaller {
         realmId: string; 
         refType?: string; 
         refId?: string 
-    }, meta?: { correlationId?: string }): Promise<void>;
-    callDelete(data: { id: string }, meta?: { correlationId?: string }): Promise<void>;
-    callClear(data: { id: string }, meta?: { correlationId?: string }): Promise<void>;
-}
-
-/**
- * Port for managing async tasks.
- * Implemented by TaskManager in app layer.
- */
-export interface ITaskManager {
-    create(type: string, data: Record<string, any>): Promise<string>;
+    }): Promise<void>;
+    callDelete(data: { id: string }): Promise<void>;
+    callClear(data: { id: string }): Promise<void>;
 }
 
 export type AnalysisStorageMangerCheckOptions = {

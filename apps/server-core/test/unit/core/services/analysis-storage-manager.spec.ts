@@ -21,7 +21,6 @@ import {
 import { AnalysisStorageManager } from '../../../../src/core/services/analysis-storage-manager/module.ts';
 import { FakeEntityRepository } from '../helpers/index.ts';
 import { FakeBucketCaller } from './helpers/fake-bucket-caller.ts';
-import { FakeTaskManager } from './helpers/fake-task-manager.ts';
 import { createFullAnalysis } from '../../../utils/domains/index.ts';
 
 function createTestBucket(overrides?: Partial<AnalysisBucket>): AnalysisBucket {
@@ -42,19 +41,16 @@ describe('AnalysisStorageManager', () => {
     let repository: FakeEntityRepository<Analysis>;
     let bucketRepository: FakeEntityRepository<AnalysisBucket>;
     let caller: FakeBucketCaller;
-    let taskManager: FakeTaskManager;
     let storageManager: AnalysisStorageManager;
 
     beforeEach(() => {
         repository = new FakeEntityRepository<Analysis>();
         bucketRepository = new FakeEntityRepository<AnalysisBucket>();
         caller = new FakeBucketCaller();
-        taskManager = new FakeTaskManager();
         storageManager = new AnalysisStorageManager({
             repository,
             bucketRepository,
             caller,
-            taskManager,
         });
     });
 
@@ -66,7 +62,6 @@ describe('AnalysisStorageManager', () => {
             await storageManager.check(analysis);
 
             const bucketTypes = Object.values(AnalysisBucketType);
-            expect(taskManager.getCallCount()).toBe(bucketTypes.length);
             expect(caller.getCallsFor('callCreate')).toHaveLength(bucketTypes.length);
         });
 
@@ -86,31 +81,6 @@ describe('AnalysisStorageManager', () => {
             });
         });
 
-        it('should create task with correct type and data', async () => {
-            const analysis = createFullAnalysis();
-            repository.seed(analysis);
-
-            await storageManager.check(analysis, { type: AnalysisBucketType.CODE });
-
-            const taskCalls = taskManager.getCallsFor('analysisBucketCreate');
-            expect(taskCalls).toHaveLength(1);
-            expect(taskCalls[0].data).toEqual({
-                analysisId: 'analysis-1',
-                bucketType: AnalysisBucketType.CODE,
-            });
-        });
-
-        it('should pass correlationId from taskManager to caller', async () => {
-            const analysis = createFullAnalysis();
-            repository.seed(analysis);
-
-            await storageManager.check(analysis, { type: AnalysisBucketType.CODE });
-
-            const taskCalls = taskManager.getCalls();
-            const createCalls = caller.getCallsFor('callCreate');
-            expect(createCalls[0].meta!.correlationId).toBe(taskCalls[0].correlationId);
-        });
-
         it('should skip existing buckets', async () => {
             const analysis = createFullAnalysis();
             repository.seed(analysis);
@@ -121,7 +91,6 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.check(analysis, { type: AnalysisBucketType.CODE });
 
-            expect(taskManager.getCallCount()).toBe(0);
             expect(caller.getCallCount()).toBe(0);
         });
 
@@ -136,7 +105,6 @@ describe('AnalysisStorageManager', () => {
             await storageManager.check(analysis);
 
             // CODE exists, so only RESULT and TEMP should be created
-            expect(taskManager.getCallCount()).toBe(2);
             expect(caller.getCallsFor('callCreate')).toHaveLength(2);
         });
 
@@ -155,7 +123,7 @@ describe('AnalysisStorageManager', () => {
     });
 
     describe('remove', () => {
-        it('should remove existing buckets and create tasks', async () => {
+        it('should remove existing buckets', async () => {
             const analysis = createFullAnalysis();
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
@@ -167,26 +135,9 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.remove(analysis, { type: AnalysisBucketType.CODE });
 
-            expect(taskManager.getCallsFor('analysisBucketDelete')).toHaveLength(1);
             const deleteCalls = caller.getCallsFor('callDelete');
             expect(deleteCalls).toHaveLength(1);
             expect(deleteCalls[0].data).toEqual({ id: 'ext-code' });
-        });
-
-        it('should pass correlationId from taskManager to caller', async () => {
-            const analysis = createFullAnalysis();
-            repository.seed(analysis);
-            bucketRepository.seed(createTestBucket({
-                analysisId: 'analysis-1',
-                type: AnalysisBucketType.CODE,
-                bucketId: 'ext-code',
-            }));
-
-            await storageManager.remove(analysis, { type: AnalysisBucketType.CODE });
-
-            const taskCalls = taskManager.getCalls();
-            const deleteCalls = caller.getCallsFor('callDelete');
-            expect(deleteCalls[0].meta!.correlationId).toBe(taskCalls[0].correlationId);
         });
 
         it('should skip non-existing buckets', async () => {
@@ -195,7 +146,6 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.remove(analysis, { type: AnalysisBucketType.CODE });
 
-            expect(taskManager.getCallCount()).toBe(0);
             expect(caller.getCallCount()).toBe(0);
         });
 
@@ -225,7 +175,6 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.remove(analysis);
 
-            expect(taskManager.getCallsFor('analysisBucketDelete')).toHaveLength(3);
             expect(caller.getCallsFor('callDelete')).toHaveLength(3);
         });
 
@@ -242,7 +191,7 @@ describe('AnalysisStorageManager', () => {
         });
     });
     describe('clear', () => {
-        it('should clear the requested bucket without creating a task', async () => {
+        it('should clear the requested bucket', async () => {
             const analysis = createFullAnalysis();
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
@@ -253,7 +202,6 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.clear(analysis, { type: AnalysisBucketType.TEMP });
 
-            expect(taskManager.getCallCount()).toBe(0);
             const clearCalls = caller.getCallsFor('callClear');
             expect(clearCalls).toHaveLength(1);
             expect(clearCalls[0].data).toEqual({ id: 'ext-temp' });

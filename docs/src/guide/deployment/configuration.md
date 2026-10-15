@@ -43,6 +43,15 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   worker publishes its events to these queues, where they wait for the upgraded
   server-core. An upgraded server-core consumes only the queues, so it would miss
   events from a worker that still publishes the old way.
+- **Upgrading server-core across the `TaskManager` removal: stop the old
+  replicas before new ones serve traffic.** An old server-core links a storage
+  bucket only to a create *it* issued, and it can keep the `storageBucketEvents`
+  consumer slot until it disconnects. A bucket created by a new replica while an
+  old one holds that slot stays unlinked, and the analysis has no bucket. If old
+  and new replicas did overlap, run the storage check
+  (`POST /analyses/:id/command` with `{ "command": "storageCheck" }`) for every
+  analysis created during the overlap. Old replies are fine in the other
+  direction: a new server-core links every bucket created by an old one.
 - **Before upgrading again after a rollback, delete these six queues.** They are
   durable, so a rollback leaves them on the broker, and the older version
   neither reads nor removes them. The next upgrade would apply whatever they

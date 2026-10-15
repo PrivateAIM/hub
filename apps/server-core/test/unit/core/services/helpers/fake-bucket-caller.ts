@@ -19,34 +19,21 @@ type BucketCallerMethod = 'callCreate' | 'callDelete' | 'callClear';
 type BucketCallerCall = {
     method: BucketCallerMethod;
     data: BucketCallerCreateData | { id: string };
-    meta?: { correlationId?: string };
 };
 
 export class FakeBucketCaller implements IBucketCaller {
     private calls: BucketCallerCall[] = [];
 
-    async callCreate(data: BucketCallerCreateData, meta?: { correlationId?: string }): Promise<void> {
-        this.calls.push({
-            method: 'callCreate', 
-            data, 
-            meta, 
-        });
+    async callCreate(data: BucketCallerCreateData): Promise<void> {
+        this.calls.push({ method: 'callCreate', data });
     }
 
-    async callDelete(data: { id: string }, meta?: { correlationId?: string }): Promise<void> {
-        this.calls.push({
-            method: 'callDelete', 
-            data, 
-            meta, 
-        });
+    async callDelete(data: { id: string }): Promise<void> {
+        this.calls.push({ method: 'callDelete', data });
     }
 
-    async callClear(data: { id: string }, meta?: { correlationId?: string }): Promise<void> {
-        this.calls.push({
-            method: 'callClear',
-            data,
-            meta,
-        });
+    async callClear(data: { id: string }): Promise<void> {
+        this.calls.push({ method: 'callClear', data });
     }
 
     getCalls(): BucketCallerCall[] {

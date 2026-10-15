@@ -11,14 +11,11 @@ import { withDataSourceLock } from '@privateaim/server-db-kit';
 import type { Component } from '@privateaim/server-kit';
 import {
     AuthupClientInjectionKey,
-    CacheInjectionKey,
     LoggerInjectionKey,
     MessageBusInjectionKey,
     MessageBusWorkerComponentCaller,
-    TaskManager,
 } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
-import type { TaskMap } from '../../../core/domains/index.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { NodeClientService } from '../database/node-client.ts';
 import { NODE_CLIENT_SYNC_DATABASE_LOCK } from '../../components/node-client/constants.ts';
@@ -36,11 +33,6 @@ export class ComponentsModule implements IModule {
     protected components: Component[] = [];
 
     async setup(container: IContainer): Promise<void> {
-        // Create TaskManager
-        const cache = container.resolve(CacheInjectionKey);
-        const taskManager = new TaskManager<TaskMap>(cache);
-        container.register(ComponentsInjectionKey.TaskManager, { useValue: taskManager });
-
         // Create components
         const config = container.resolve(ConfigInjectionKey);
         const authupResult = container.tryResolve(AuthupClientInjectionKey);

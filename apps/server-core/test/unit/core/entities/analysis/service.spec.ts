@@ -52,7 +52,6 @@ import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
 import { FakeAnalysisBuilderCaller } from '../../services/helpers/fake-builder-caller.ts';
 import { FakeAnalysisDistributorCaller } from '../../services/helpers/fake-distributor-caller.ts';
 import { FakeBucketCaller } from '../../services/helpers/fake-bucket-caller.ts';
-import { FakeTaskManager } from '../../services/helpers/fake-task-manager.ts';
 import { createFullAnalysis } from '../../../../utils/domains/index.ts';
 
 function createTestProject(overrides?: Partial<Project>): Project {
@@ -84,7 +83,6 @@ describe('AnalysisService', () => {
     let builderCaller: FakeAnalysisBuilderCaller;
     let distributorCaller: FakeAnalysisDistributorCaller;
     let bucketCaller: FakeBucketCaller;
-    let taskManager: FakeTaskManager;
     let analysisRecalculator: FakeAnalysisMetadataRecalculator;
     let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
 
@@ -95,7 +93,6 @@ describe('AnalysisService', () => {
         builderCaller = new FakeAnalysisBuilderCaller();
         distributorCaller = new FakeAnalysisDistributorCaller();
         bucketCaller = new FakeBucketCaller();
-        taskManager = new FakeTaskManager();
 
         analysisNodeRepository = new FakeAnalysisNodeRepository();
         const registryRepository = new FakeEntityRepository<Registry>();
@@ -133,7 +130,6 @@ describe('AnalysisService', () => {
             repository: analysisRepository,
             bucketRepository,
             caller: bucketCaller,
-            taskManager,
         });
 
         service = new AnalysisService({
@@ -238,7 +234,7 @@ describe('AnalysisService', () => {
             );
 
             expect(result.id).toBeDefined();
-            expect(taskManager.getCallCount()).toBeGreaterThan(0);
+            expect(bucketCaller.getCallsFor('callCreate').length).toBeGreaterThan(0);
         });
 
         it('should call recalcDebounced after save', async () => {
@@ -727,7 +723,7 @@ describe('AnalysisService', () => {
                 createAllowAllActor(),
             );
 
-            expect(taskManager.getCallCount()).toBeGreaterThan(0);
+            expect(bucketCaller.getCallsFor('callCreate').length).toBeGreaterThan(0);
         });
     });
 });

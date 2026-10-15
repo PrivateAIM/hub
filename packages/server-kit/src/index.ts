@@ -17,6 +17,5 @@ export * from './entity-event';
 export * from './logger';
 export * from './message-bus';
 export * from './redis';
-export * from './task-manager';
 export * from './type';
 export * from './utils';

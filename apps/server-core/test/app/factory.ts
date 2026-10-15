@@ -8,17 +8,12 @@
 import {
     AuthupClientModule,
     AuthupHookModule,
-    CacheInjectionKey,
-    CacheModule,
     LoggerModule,
-    TaskManager,
 } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
 import { createFakeClient } from '@privateaim/telemetry-kit/testing';
 import type { FakeHandlerMap } from '@privateaim/telemetry-kit/testing';
-import type { TaskMap } from '../../src/core/domains/index.ts';
 import { ConfigModule } from '../../src/app/modules/config/index.ts';
-import { ComponentsInjectionKey } from '../../src/app/modules/components/index.ts';
 import { AnalysisModule } from '../../src/app/modules/analysis/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';
 import { TelemetryClientInjectionKey } from '../../src/app/modules/telemetry-client/index.ts';
@@ -26,19 +21,6 @@ import { TelemetryClientInjectionKey } from '../../src/app/modules/telemetry-cli
 import { TestApplication } from './module.ts';
 import { TestHTTPApplication } from './http.ts';
 import { createTestDatabaseModule } from './database.ts';
-
-function createTestComponentsModule(): IModule {
-    return {
-        name: 'components',
-        dependencies: ['database'],
-
-        async setup(container): Promise<void> {
-            const cache = container.resolve(CacheInjectionKey);
-            const taskManager = new TaskManager<TaskMap>(cache);
-            container.register(ComponentsInjectionKey.TaskManager, { useValue: taskManager });
-        },
-    };
-}
 
 /**
  * Registers a transport-level fake under `TelemetryClientInjectionKey`, so the
@@ -78,11 +60,9 @@ export function createTestApplication(options: TestApplicationOptions = {}): Tes
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
-        new CacheModule(),
         new AuthupHookModule(),
         new AuthupClientModule(),
         createTestDatabaseModule(),
-        createTestComponentsModule(),
         new AnalysisModule(),
     ];
 
@@ -99,9 +79,7 @@ export function createTestDatabaseApplication(): TestApplication {
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
-        new CacheModule(),
         createTestDatabaseModule(),
-        createTestComponentsModule(),
         new AnalysisModule(),
     ];
 

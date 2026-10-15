@@ -13,7 +13,6 @@ import {
     it,
 } from 'vitest';
 import { DatabaseInjectionKey } from '../../../src/app/modules/database/index.ts';
-import { ComponentsInjectionKey } from '../../../src/app/modules/components/index.ts';
 import { AnalysisInjectionKey } from '../../../src/app/modules/analysis/index.ts';
 import { AnalysisBuilder } from '../../../src/core/services/analysis-builder/module.ts';
 import { AnalysisConfigurator } from '../../../src/core/services/analysis-configurator/module.ts';
@@ -54,13 +53,6 @@ describe('DI module wiring', () => {
             const result = suite.container.tryResolve(key);
             expect(result.success, `Failed to resolve ${String(key.id)}`).toBe(true);
         }
-    });
-
-    // --- Components module registers TaskManager and callers ---
-
-    it('should resolve TaskManager', () => {
-        const result = suite.container.tryResolve(ComponentsInjectionKey.TaskManager);
-        expect(result.success).toBe(true);
     });
 
     // --- Analysis module registers all 4 pipeline services ---

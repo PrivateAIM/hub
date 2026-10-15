@@ -15,14 +15,12 @@ import type {
     AnalysisStorageMangerRemoveOptions, 
     IAnalysisStorageManager,
     IBucketCaller, 
-    ITaskManager,  
 } from './types.ts';
 
 type AnalysisStorageManagerContext = {
     repository: IEntityRepository<Analysis>;
     bucketRepository: IEntityRepository<AnalysisBucket>;
     caller: IBucketCaller;
-    taskManager: ITaskManager;
 };
 
 export class AnalysisStorageManager implements IAnalysisStorageManager {
@@ -32,13 +30,10 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
 
     protected caller: IBucketCaller;
 
-    protected taskManager: ITaskManager;
-
     constructor(ctx: AnalysisStorageManagerContext) {
         this.repository = ctx.repository;
         this.bucketRepository = ctx.bucketRepository;
         this.caller = ctx.caller;
-        this.taskManager = ctx.taskManager;
     }
 
     async check(
@@ -60,17 +55,12 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 continue;
             }
 
-            const correlationId = await this.taskManager.create(
-                'analysisBucketCreate',
-                { analysisId: entity.id, bucketType },
-            );
-
             await this.caller.callCreate({
                 name: buildAnalysisBucketName(bucketType, entity.id),
                 realmId: entity.realmId,
                 refType: DomainType.ANALYSIS,
                 refId: entity.id,
-            }, { correlationId });
+            });
         }
         return entity;
     }
@@ -94,12 +84,7 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 continue;
             }
 
-            const correlationId = await this.taskManager.create(
-                'analysisBucketDelete',
-                { analysisId: analysisBucket.analysisId },
-            );
-
-            await this.caller.callDelete({ id: analysisBucket.bucketId }, { correlationId });
+            await this.caller.callDelete({ id: analysisBucket.bucketId });
         }
 
         return entity;
@@ -124,7 +109,6 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 continue;
             }
 
-            // no task: the CLEARING_FINISHED handler needs no correlation, the bucket id suffices.
             await this.caller.callClear({ id: analysisBucket.bucketId });
         }
 

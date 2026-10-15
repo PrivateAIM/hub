@@ -575,8 +575,8 @@ src/
 
 - **Entity services** (`core/entities/<name>/service.ts`): Own validation (`this.validator.run(data, { group: ValidatorGroup.CREATE })`), receive repos via constructor injection
 - **Port interfaces** (`core/entities/<name>/types.ts`): `IXRepository extends IEntityRepository<T>`, `IXService`
-- **Business services** (`core/services/`): Accept all dependencies via constructor (repositories, callers, task managers)
-- **Service port interfaces** (`core/services/types.ts`): `IAnalysisBuilderCaller`, `IBucketCaller`, `ITaskManager`, etc.
+- **Business services** (`core/services/`): Accept all dependencies via constructor (repositories, callers)
+- **Service port interfaces** (`core/services/types.ts`): `IAnalysisBuilderCaller`, `IBucketCaller`, etc.
 - **No TypeORM, no routup** imports anywhere in `core/`. Use container DI via injection keys.
 
 ### Controller Conventions
@@ -717,10 +717,10 @@ app/modules/<name>/
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | `entityEvent`?, `authupClient`? | `DataSource`, 13 repo adapters, `RegistryManager` |
-| ComponentsModule | `components` | `database` | `TaskManager`, `RegistryComponentCaller`; starts the registry consumer and the node-client background component |
-| AnalysisModule | `analysis` | `database`, `components` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
+| ComponentsModule | `components` | `database` | `RegistryComponentCaller`; starts the registry consumer and the node-client background component |
+| AnalysisModule | `analysis` | `database` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
-| AggregatorsModule | `aggregators` | `database`, `components` | nothing (starts AMQP event consumers) |
+| AggregatorsModule | `aggregators` | `database`, `components`, `analysis` | nothing (starts AMQP event consumers) |
 | HTTPModule | `http` | `config`, `database`, `analysis`, `telemetryClient`? | `App`, `Server`, `Router` |
 | TelemetryClientModule | `telemetryClient` | `config`, `authupHook`? | `TelemetryClient` |
 

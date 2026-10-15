@@ -5,15 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Logger } from '@privateaim/server-kit';
 import type {
     IAnalysisBucketFileRepository,
     IAnalysisBucketRepository,
     IAnalysisRepository,
 } from '../../../../core/index.ts';
-import type { BaseAggregatorHandlerContext } from '../../base.ts';
+import type { IBucketCaller } from '../../../../core/services/index.ts';
 
-export type StorageBucketAggregatorContext = BaseAggregatorHandlerContext & {
+export type StorageBucketAggregatorContext = {
     analysisRepository: IAnalysisRepository;
     analysisBucketRepository: IAnalysisBucketRepository;
     analysisBucketFileRepository: IAnalysisBucketFileRepository;
+    bucketCaller: IBucketCaller;
+    logger?: Logger;
 };

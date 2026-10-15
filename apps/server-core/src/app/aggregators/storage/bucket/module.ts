@@ -15,6 +15,7 @@ import {
 import type { StorageBucketAggregatorContext } from './types.ts';
 import {
     StorageBucketClearingFinishedHandler,
+    StorageBucketCreationFailedHandler,
     StorageBucketCreationFinishedHandler,
     StorageBucketDeletionFinishedHandler,
 } from './handlers/index.ts';
@@ -25,6 +26,7 @@ export class StorageBucketAggregator extends BaseComponent<
     constructor(ctx: StorageBucketAggregatorContext) {
         super();
 
+        this.mount(BucketEvent.CREATION_FAILED, new StorageBucketCreationFailedHandler(ctx));
         this.mount(BucketEvent.CREATION_FINISHED, new StorageBucketCreationFinishedHandler(ctx));
         this.mount(BucketEvent.DELETION_FINISHED, new StorageBucketDeletionFinishedHandler(ctx));
         this.mount(BucketEvent.CLEARING_FINISHED, new StorageBucketClearingFinishedHandler(ctx));
