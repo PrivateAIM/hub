@@ -13,8 +13,13 @@ import {
 } from '@privateaim/kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach, scopeReadQuery } from '@privateaim/server-kit';
-import { holdsPermission, isPermissionDenial } from '../../utils/index.ts';
+import {
+    AbstractEntityService,
+    assertRecordReach,
+    holdsPermission,
+    isPermissionDenial,
+    scopeReadQuery,
+} from '@privateaim/server-kit';
 import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
 import { appendQueryConditions, decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';

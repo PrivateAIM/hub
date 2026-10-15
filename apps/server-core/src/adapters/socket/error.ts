@@ -7,7 +7,7 @@
 
 import type { HubError } from '@privateaim/errors';
 import { InternalError, PermissionDeniedError } from '@privateaim/errors';
-import { isPermissionDenial } from '../../core/utils/permission.ts';
+import { isPermissionDenial } from '@privateaim/server-kit';
 
 /**
  * The error a subscribe handler acks with when its permission check fails.

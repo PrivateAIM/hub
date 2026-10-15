@@ -12,7 +12,12 @@ import { AnalysisBucketFileValidator, AnalysisBucketType, AnalysisNodeApprovalSt
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach, hasUnboundedReach } from '@privateaim/server-kit';
+import {
+    AbstractEntityService,
+    assertRecordReach,
+    hasUnboundedReach,
+    isPermissionDenial,
+} from '@privateaim/server-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import type {
     AnalysisBucketUploadRemoval,
@@ -28,7 +33,6 @@ import type { IAnalysisBucketRepository } from '../analysis-bucket/types.ts';
 import type { IAnalysisNodeRepository } from '../analysis-node/types.ts';
 import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
 import { buildAnalysisBucketTypeReach } from '../../services/analysis-reach/index.ts';
-import { isPermissionDenial } from '../../utils/index.ts';
 
 type AnalysisBucketFileServiceContext = {
     repository: IAnalysisBucketFileRepository;
