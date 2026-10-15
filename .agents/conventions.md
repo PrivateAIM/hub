@@ -552,9 +552,7 @@ Adding `REF_TYPE`/`REF_ID` also makes a log visible on the matching entity view 
 
 Automated via **release-please** (Google) for versioning + **monoship** (`tada5hi/monoship@v2`) for npm publishing. Every package shares one version and one `v<version>` tag.
 
-**Lockstep comes from the top-level `"release-as"` in `release-please-config.json`, not from the `linked-versions` plugin.** That plugin finds its group through `strategy.getComponent()`, which returns `''` under `"include-component-in-tag": false`, so the group is always empty and each package bumps on its own commits (googleapis/release-please#1750; the fix, #1749, is unmerged). That is how the manifest drifted to six different versions between 0.10.0 and 0.17.0. authup has the same setup and the same workaround.
-
-**Before each release, set `"release-as"` to the next version** — work out the bump from the unreleased commits (a `!`/`BREAKING CHANGE` is a minor bump while pre-1.0, `bump-minor-pre-major`; everything else a patch, `bump-patch-for-minor-pre-major`) and commit it to master; release-please then regenerates the release PR with every package at that version. A stale value is not harmless: release-please would keep proposing the already-released version. The `linked-versions` plugin stays configured, inert, so the group is ready if upstream ever fixes it.
+**The `linked-versions` plugin does not link anything** under `"include-component-in-tag": false`: it finds its group through `strategy.getComponent()`, which returns `''` there, so each package bumps on its own commits (googleapis/release-please#1750, fix #1749 unmerged). To keep every package on one version, give each package without a bump-worthy commit since the last release a touch commit before releasing (the `version-bump` skill does this).
 
 ## Hexagonal Architecture (all services)
 
