@@ -23,6 +23,7 @@ import {
 import { AnalysisDistributor } from '../../../../src/core/services/analysis-distributor/module.ts';
 import { FakeEntityRepository } from '../helpers/index.ts';
 import { FakeAnalysisDistributorCaller } from './helpers/fake-distributor-caller.ts';
+import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
 import { FakeAnalysisFileMetadataRecalculator } from '../entities/analysis-bucket-file/fake-metadata-recalculator.ts';
@@ -42,7 +43,7 @@ function createTestRegistry(overrides?: Partial<Registry>): Registry {
 }
 
 describe('AnalysisDistributor', () => {
-    let repository: FakeEntityRepository<Analysis>;
+    let repository: FakeAnalysisRepository;
     let analysisNodeRepository: FakeEntityRepository<AnalysisNode>;
     let registryRepository: FakeEntityRepository<Registry>;
     let caller: FakeAnalysisDistributorCaller;
@@ -52,7 +53,7 @@ describe('AnalysisDistributor', () => {
     let distributor: AnalysisDistributor;
 
     beforeEach(() => {
-        repository = new FakeEntityRepository<Analysis>();
+        repository = new FakeAnalysisRepository();
         analysisNodeRepository = new FakeEntityRepository<AnalysisNode>();
         registryRepository = new FakeEntityRepository<Registry>();
         caller = new FakeAnalysisDistributorCaller();
@@ -117,7 +118,7 @@ describe('AnalysisDistributor', () => {
         });
 
         it('should auto-assign first registry when registryId is null', async () => {
-            const analysis = seedBuiltAnalysis({ registryId: null as unknown as string });
+            const analysis = seedBuiltAnalysis({ registryId: null });
             registryRepository.seed(createTestRegistry({ id: 'auto-registry' }));
             analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
@@ -126,7 +127,7 @@ describe('AnalysisDistributor', () => {
         });
 
         it('should throw when no registries exist and registryId is null', async () => {
-            const analysis = seedBuiltAnalysis({ registryId: null as unknown as string });
+            const analysis = seedBuiltAnalysis({ registryId: null });
 
             await expect(distributor.start(analysis)).rejects.toThrow(BadRequestError);
         });
@@ -149,6 +150,33 @@ describe('AnalysisDistributor', () => {
             const analysis = seedBuiltAnalysis({ distributionStatus: ProcessStatus.STARTING });
 
             await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError);
+        });
+
+        it('should re-check canStart on the locked row, so a concurrent start does not dispatch twice', async () => {
+            const analysis = seedBuiltAnalysis();
+            registryRepository.seed(createTestRegistry());
+            analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
+
+            // another replica's start commits between this start's early read and its lock
+            repository.beforeLockedUpdate = async () => {
+                await repository.save({ ...repository.getAll()[0], distributionStatus: ProcessStatus.STARTING });
+            };
+
+            await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError);
+            expect(caller.getCallsFor('callExecute')).toHaveLength(0);
+        });
+
+        it('should persist the auto-assigned registry with the STARTING transition', async () => {
+            seedBuiltAnalysis({ registryId: null });
+            registryRepository.seed(createTestRegistry({ id: 'auto-registry' }));
+            analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
+
+            await distributor.start('analysis-1');
+
+            expect(await repository.findOneById('analysis-1')).toMatchObject({
+                registryId: 'auto-registry',
+                distributionStatus: ProcessStatus.STARTING,
+            });
         });
 
         it('should allow retry when distribution FAILED', async () => {

@@ -235,23 +235,31 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new PermissionDeniedError();
         }
 
-        if (
-            entity.registryId &&
-            validated.registryId &&
-            entity.registryId !== validated.registryId
-        ) {
-            throw new BadRequestError('The registry can not be changed after it is specified.');
-        }
-
         if (isPropertySet(validated, 'masterImageId')) {
             if (validated.masterImageId !== entity.masterImageId) {
                 validated.imageCommandArguments = null;
             }
         }
 
-        const merged = this.repository.merge(entity, validated);
+        // merged into the locked row, not the copy read above: save() diffs
+        // against the database, so that copy's build/distribution status
+        // would be written back over a transition committed meanwhile.
+        const saved = await this.repository.updateLocked(id, (locked) => {
+            // on the locked row: a distribution start may have assigned one meanwhile
+            if (
+                locked.registryId &&
+                validated.registryId &&
+                locked.registryId !== validated.registryId
+            ) {
+                throw new BadRequestError('The registry can not be changed after it is specified.');
+            }
 
-        const saved = await this.repository.save(merged, { data: actor.metadata });
+            Object.assign(locked, validated);
+            return true;
+        }, { data: actor.metadata });
+        if (!saved) {
+            throw new EntityNotFoundError({ entity: 'analysis' });
+        }
 
         await this.recalculator.recalcDebounced(saved.id);
 

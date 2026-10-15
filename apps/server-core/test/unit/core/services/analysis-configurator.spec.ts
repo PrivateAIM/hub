@@ -6,7 +6,7 @@
  */
 
 import { EntityNotFoundError } from '@privateaim/errors';
-import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
+import type { AnalysisNode } from '@privateaim/core-kit';
 import { AnalysisError, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { 
@@ -17,13 +17,14 @@ import {
 } from 'vitest';
 import { AnalysisConfigurator } from '../../../../src/core/services/analysis-configurator/module.ts';
 import { FakeEntityRepository } from '../helpers/index.ts';
+import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
 import { FakeAnalysisFileMetadataRecalculator } from '../entities/analysis-bucket-file/fake-metadata-recalculator.ts';
 import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
 describe('AnalysisConfigurator', () => {
-    let repository: FakeEntityRepository<Analysis>;
+    let repository: FakeAnalysisRepository;
     let analysisNodeRepository: FakeEntityRepository<AnalysisNode>;
     let analysisRecalculator: FakeAnalysisMetadataRecalculator;
     let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
@@ -31,7 +32,7 @@ describe('AnalysisConfigurator', () => {
     let configurator: AnalysisConfigurator;
 
     beforeEach(() => {
-        repository = new FakeEntityRepository<Analysis>();
+        repository = new FakeAnalysisRepository();
         analysisNodeRepository = new FakeEntityRepository<AnalysisNode>();
         analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
         nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
@@ -125,6 +126,25 @@ describe('AnalysisConfigurator', () => {
 
             expect(result.configurationLocked).toBe(false);
             expect(result.buildStatus).toBeNull();
+        });
+
+        it('should re-check canUnlock on the locked row, so a concurrent build start is not overwritten', async () => {
+            const analysis = createFullAnalysis({
+                configurationLocked: true,
+                buildStatus: ProcessStatus.FAILED,
+            });
+            repository.seed(analysis);
+
+            // another replica's build start commits between this unlock's read and its lock
+            repository.beforeLockedUpdate = async () => {
+                await repository.save({ ...repository.getAll()[0], buildStatus: ProcessStatus.STARTING });
+            };
+
+            await expect(configurator.unlock(analysis)).rejects.toThrow(AnalysisError);
+            expect(repository.getAll()[0]).toMatchObject({
+                configurationLocked: true,
+                buildStatus: ProcessStatus.STARTING,
+            });
         });
 
         it('should resolve entity by string ID', async () => {

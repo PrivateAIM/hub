@@ -12,6 +12,7 @@ import {
     validateEntityJoinColumns,
 } from 'typeorm-extension';
 import { MasterImageEntity } from '../../../../../adapters/database/entities/master-image.ts';
+import { updateLockedEntity } from '../../../../../adapters/database/locked-update.ts';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
@@ -70,6 +71,10 @@ export class MasterImageRepositoryAdapter implements IMasterImageRepository {
 
     async save(entity: MasterImage, ctx?: EntityPersistContext): Promise<MasterImage> {
         return this.repository.save(entity as MasterImageEntity, ctx);
+    }
+
+    async updateLocked(id: string, fn: (entity: MasterImage) => boolean, ctx?: EntityPersistContext): Promise<MasterImage | null> {
+        return updateLockedEntity(this.dataSource, MasterImageEntity, { id }, fn, ctx);
     }
 
     async remove(entity: MasterImage, ctx?: EntityPersistContext): Promise<void> {

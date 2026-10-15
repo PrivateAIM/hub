@@ -6,10 +6,21 @@
  */
 
 import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityPersistContext,
+    EntityRepositoryFindManyResult,
+    IEntityRepository,
+} from '@privateaim/server-kit';
 
 export interface IMasterImageRepository extends IEntityRepository<MasterImage> {
-
+    /**
+     * Read the row under a write lock, let `fn` check and mutate it, and save
+     * it when `fn` returns true — atomically across replicas. Resolves the
+     * saved row, or null when it is missing or `fn` returned false; a throw
+     * in `fn` rolls back.
+     */
+    updateLocked(id: string, fn: (entity: MasterImage) => boolean, ctx?: EntityPersistContext): Promise<MasterImage | null>;
 }
 
 /**

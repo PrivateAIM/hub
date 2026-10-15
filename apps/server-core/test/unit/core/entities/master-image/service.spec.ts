@@ -18,10 +18,10 @@ import {
 } from 'vitest';
 import { MasterImageService } from '../../../../../src/core/entities/master-image/service.ts';
 import {
-    FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
 } from '../../helpers/index.ts';
+import { FakeMasterImageRepository } from './fake-repository.ts';
 import { FakeMasterImageBuilderCaller } from './fake-builder-caller.ts';
 import { FakeMasterImageSynchronizerCaller } from './fake-synchronizer-caller.ts';
 
@@ -53,13 +53,13 @@ const masterImagesConfig = {
 };
 
 describe('MasterImageService', () => {
-    let repository: FakeEntityRepository<MasterImage>;
+    let repository: FakeMasterImageRepository;
     let synchronizerCaller: FakeMasterImageSynchronizerCaller;
     let builderCaller: FakeMasterImageBuilderCaller;
     let service: MasterImageService;
 
     beforeEach(() => {
-        repository = new FakeEntityRepository<MasterImage>();
+        repository = new FakeMasterImageRepository();
         synchronizerCaller = new FakeMasterImageSynchronizerCaller();
         builderCaller = new FakeMasterImageBuilderCaller();
         service = new MasterImageService({
@@ -178,6 +178,25 @@ describe('MasterImageService', () => {
                 ).rejects.toThrow('broker unavailable');
 
                 expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.EXECUTED);
+            });
+
+            it('should not revert a status a worker event already advanced', async () => {
+                repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
+                builderCaller.failWith = new Error('publish confirm timed out');
+                // the broker took the message after all, and the worker already reported
+                builderCaller.onExecute = async () => {
+                    await repository.save({ ...repository.getAll()[0], buildStatus: ProcessStatus.STARTED });
+                };
+
+                await expect(
+                    service.executeCommand(
+                        MasterImageCommand.BUILD,
+                        { id: 'mi-1' },
+                        createAllowAllActor(),
+                    ),
+                ).rejects.toThrow('publish confirm timed out');
+
+                expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.STARTED);
             });
 
             it('should throw BadRequestError when id is missing', async () => {

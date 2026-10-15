@@ -24,7 +24,13 @@ export type AnalysisDistributorExecutionProgressPayload = AnalysisDistributorBas
 export type AnalysisDistributorCheckPayload = AnalysisDistributorBasePayload;
 
 export type AnalysisDistributorCheckFinishedPayload = AnalysisDistributorBasePayload & {
-    status?: `${ProcessStatus}`
+    status?: `${ProcessStatus}`,
+    /**
+     * `updatedAt` of the analysis snapshot the verdict was made on, so a
+     * verdict about an older state can be told apart and dropped. Optional:
+     * absent from workers predating it.
+     */
+    checkedAt?: string,
 };
 
 export type AnalysisDistributorEventMap = ObjectLiteralKeys<{

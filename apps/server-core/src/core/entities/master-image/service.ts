@@ -112,23 +112,32 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                     throw new BadRequestError('A valid master image id is required.');
                 }
 
-                const entity = await this.repository.findOneBy({ id });
+                // persist STARTING before dispatching, or a fast worker event
+                // could be overwritten by this save.
+                let previous: MasterImage['buildStatus'] = null;
+                const entity = await this.repository.updateLocked(id, (locked) => {
+                    previous = locked.buildStatus;
+                    locked.buildStatus = ProcessStatus.STARTING;
+                    return true;
+                });
                 if (!entity) {
                     throw new EntityNotFoundError({ entity: 'master-image' });
                 }
 
-                // persist STARTING before dispatching, or a fast worker event
-                // could be overwritten by this save.
-                const { buildStatus } = entity;
-                entity.buildStatus = ProcessStatus.STARTING;
-                await this.repository.save(entity);
-
                 try {
                     await this.builderCaller.callExecute({ id: entity.id });
                 } catch (e) {
-                    // nothing was dispatched, so no worker event will move STARTING on.
-                    entity.buildStatus = buildStatus;
-                    await this.repository.save(entity);
+                    // presumably nothing was dispatched, so no worker event will
+                    // move STARTING on — but a publish can fail after the broker
+                    // took the message, so revert only a row still STARTING.
+                    await this.repository.updateLocked(id, (locked) => {
+                        if (locked.buildStatus !== ProcessStatus.STARTING) {
+                            return false;
+                        }
+
+                        locked.buildStatus = previous;
+                        return true;
+                    });
 
                     throw e;
                 }

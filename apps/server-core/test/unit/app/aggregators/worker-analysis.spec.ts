@@ -76,6 +76,10 @@ describe('worker analysis aggregators', () => {
         return dataSource.getRepository(AnalysisEntity).findOneByOrFail({ id });
     }
 
+    function before(updatedAt: string): string {
+        return new Date(Date.parse(updatedAt) - 60_000).toISOString();
+    }
+
     describe('analysis-builder', () => {
         it('should apply build metadata on CHECK_FINISHED with status EXECUTED', async () => {
             const analysis = await createAnalysis({
@@ -202,6 +206,45 @@ describe('worker analysis aggregators', () => {
             expect(entity.buildProgress).toBe(40);
         });
 
+        it('should ignore a CHECK_FINISHED verdict about an older snapshot', async () => {
+            // the check read the row while it was STARTED; a rebuild has since moved it on
+            const analysis = await findAnalysis((await createAnalysis({ buildStatus: ProcessStatus.STARTING })).id);
+
+            const payload: AnalysisBuilderCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.FAILED,
+                checkedAt: before(analysis.updatedAt),
+            };
+
+            await handleAnalysisBuilderEvent(
+                payload,
+                createContext<AnalysisBuilderEventMap>(AnalysisBuilderEvent.CHECK_FINISHED),
+                dataSource,
+            );
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildStatus).toBe(ProcessStatus.STARTING);
+        });
+
+        it('should apply a CHECK_FINISHED verdict about the current snapshot', async () => {
+            const analysis = await findAnalysis((await createAnalysis({ buildStatus: ProcessStatus.STARTING })).id);
+
+            const payload: AnalysisBuilderCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.FAILED,
+                checkedAt: analysis.updatedAt,
+            };
+
+            await handleAnalysisBuilderEvent(
+                payload,
+                createContext<AnalysisBuilderEventMap>(AnalysisBuilderEvent.CHECK_FINISHED),
+                dataSource,
+            );
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
+        });
+
         it('should mark the build as FAILED on EXECUTION_FAILED', async () => {
             const analysis = await createAnalysis({ buildStatus: ProcessStatus.STARTED });
 
@@ -320,6 +363,50 @@ describe('worker analysis aggregators', () => {
             const entity = await findAnalysis(analysis.id);
             expect(entity.distributionStatus).toBe(ProcessStatus.STARTED);
             expect(entity.distributionProgress).toBe(40);
+        });
+
+        it('should ignore a CHECK_FINISHED verdict about an older snapshot', async () => {
+            const analysis = await findAnalysis((await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTING,
+            })).id);
+
+            const payload: AnalysisDistributorCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.FAILED,
+                checkedAt: before(analysis.updatedAt),
+            };
+
+            await handleAnalysisDistributorEvent(
+                payload,
+                createContext<AnalysisDistributorEventMap>(AnalysisDistributorEvent.CHECK_FINISHED),
+                dataSource,
+            );
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.distributionStatus).toBe(ProcessStatus.STARTING);
+        });
+
+        it('should apply a CHECK_FINISHED verdict about the current snapshot', async () => {
+            const analysis = await findAnalysis((await createAnalysis({
+                buildStatus: ProcessStatus.EXECUTED,
+                distributionStatus: ProcessStatus.STARTING,
+            })).id);
+
+            const payload: AnalysisDistributorCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.FAILED,
+                checkedAt: analysis.updatedAt,
+            };
+
+            await handleAnalysisDistributorEvent(
+                payload,
+                createContext<AnalysisDistributorEventMap>(AnalysisDistributorEvent.CHECK_FINISHED),
+                dataSource,
+            );
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.distributionStatus).toBe(ProcessStatus.FAILED);
         });
 
         it('should mark the distribution as FAILED on EXECUTION_FAILED', async () => {

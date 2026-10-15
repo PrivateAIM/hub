@@ -7,7 +7,7 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 import type { IAnalysisRepository } from '../analysis/types.ts';
-import { AnalysisRecalcQueue, hasAnalysisChanged } from '../utils.ts';
+import { AnalysisRecalcQueue, saveAnalysisPatch } from '../utils.ts';
 import type { IAnalysisBucketFileRepository, IAnalysisFileMetadataRecalculator } from './types.ts';
 
 type AnalysisFileMetadataRecalculatorContext = {
@@ -34,16 +34,9 @@ export class AnalysisFileMetadataRecalculator implements IAnalysisFileMetadataRe
             throw new Error(`Analysis ${analysisId} not found`);
         }
 
-        const cloned = { ...entity };
-
         const rootFile = await this.bucketFileRepository.findRootCodeFile(entity.id);
-        entity.configurationEntrypointValid = !!rootFile;
 
-        if (hasAnalysisChanged(cloned, entity)) {
-            await this.analysisRepository.save(entity);
-        }
-
-        return entity;
+        return saveAnalysisPatch(this.analysisRepository, entity, { configurationEntrypointValid: !!rootFile });
     }
 
     recalcDebounced(analysisId: string): Promise<void> {

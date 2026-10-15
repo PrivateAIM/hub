@@ -14,8 +14,16 @@ export class FakeMasterImageBuilderCaller implements IMasterImageBuilderCaller {
 
     failWith: Error | undefined;
 
+    /**
+     * Runs before `failWith` is thrown — e.g. a worker event that arrives
+     * although the publish reported a failure.
+     */
+    onExecute: (() => Promise<void>) | undefined;
+
     async callExecute(data: { id: string }): Promise<void> {
         this.calls.push(data);
+
+        await this.onExecute?.();
 
         if (this.failWith) {
             throw this.failWith;

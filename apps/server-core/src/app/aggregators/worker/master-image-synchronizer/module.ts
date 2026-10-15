@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage, MasterImageGroup } from '@privateaim/core-kit';
+import type { MasterImageGroup } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-worker-kit';
 import {
     MasterImageSynchronizerEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { IEntityRepository, Logger } from '@privateaim/server-kit';
+import type { IMasterImageRepository } from '../../../../core/entities/master-image/types.ts';
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
@@ -21,7 +22,7 @@ import {
 } from './handler.ts';
 
 type MasterImageSynchronizerAggregatorContext = {
-    imageRepository: IEntityRepository<MasterImage>;
+    imageRepository: IMasterImageRepository;
     groupRepository: IEntityRepository<MasterImageGroup>;
     eventComponentCaller?: EventComponentCaller;
     logger?: Logger;

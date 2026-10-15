@@ -12,6 +12,7 @@ import {
 } from 'typeorm-extension';
 import type { IQuery } from '@rapiq/core';
 import { AnalysisEntity } from '../../../../../adapters/database/entities/analysis.ts';
+import { updateLockedEntity } from '../../../../../adapters/database/locked-update.ts';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
@@ -78,6 +79,10 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
 
     async save(entity: Analysis, ctx?: EntityPersistContext): Promise<Analysis> {
         return this.repository.save(entity as AnalysisEntity, ctx);
+    }
+
+    async updateLocked(id: string, fn: (entity: Analysis) => boolean, ctx?: EntityPersistContext): Promise<Analysis | null> {
+        return updateLockedEntity(this.dataSource, AnalysisEntity, { id }, fn, ctx);
     }
 
     async remove(entity: Analysis, ctx?: EntityPersistContext): Promise<void> {

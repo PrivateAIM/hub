@@ -17,73 +17,71 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import type { DataSource } from 'typeorm';
-import { AnalysisEntity } from '../../../../adapters/database/index.ts';
-import { isProcessStatusTerminal } from '../helpers.ts';
+import { AnalysisEntity, updateLockedEntity } from '../../../../adapters/database/index.ts';
+import { isCheckVerdictStale, isProcessStatusTerminal } from '../helpers.ts';
 
 export async function handleAnalysisDistributorEvent(
     value: AnalysisDistributorBasePayload,
     context: ComponentHandlerContext<AnalysisDistributorEventMap>,
     dataSource: DataSource,
 ) {
-    const repository = dataSource.getRepository(AnalysisEntity);
-    const entity = await repository.findOneBy({ id: value.id });
+    // the whole read-check-mutate-save runs on the locked row, so a terminal
+    // status is checked against the row as it is now, not as it was read
+    // before a concurrent handler (another replica) committed.
+    await updateLockedEntity(dataSource, AnalysisEntity, { id: value.id }, (entity) => {
+        switch (context.key) {
+            case AnalysisDistributorEvent.EXECUTION_STARTED: {
+                if (isProcessStatusTerminal(entity.distributionStatus)) {
+                    return false;
+                }
 
-    if (!entity) {
-        return;
-    }
-
-    switch (context.key) {
-        case AnalysisDistributorEvent.EXECUTION_STARTED: {
-            if (isProcessStatusTerminal(entity.distributionStatus)) {
-                return;
-            }
-
-            entity.distributionStatus = ProcessStatus.STARTED;
-            entity.distributionProgress = 0;
-            break;
-        }
-        case AnalysisDistributorEvent.EXECUTION_PROGRESS: {
-            if (isProcessStatusTerminal(entity.distributionStatus)) {
-                return;
-            }
-
-            const temp = value as AnalysisDistributorExecutionProgressPayload;
-            if (
-                !entity.distributionProgress ||
-                temp.progress.percent >= entity.distributionProgress
-            ) {
-                entity.distributionProgress = Math.min(temp.progress.percent, 100);
-            }
-            break;
-        }
-        case AnalysisDistributorEvent.CHECK_FAILED: {
-            // failure of the check itself says nothing about the distribution outcome
-            return;
-        }
-        case AnalysisDistributorEvent.EXECUTION_FAILED: {
-            entity.distributionStatus = ProcessStatus.FAILED;
-            break;
-        }
-        case AnalysisDistributorEvent.EXECUTION_FINISHED: {
-            entity.distributionStatus = ProcessStatus.EXECUTED;
-            entity.distributionProgress = 100;
-            break;
-        }
-        case AnalysisDistributorEvent.CHECK_FINISHED: {
-            const temp = value as AnalysisDistributorCheckFinishedPayload;
-            if (!temp.status) {
-                return;
-            }
-
-            entity.distributionStatus = temp.status;
-
-            if (temp.status === ProcessStatus.EXECUTED) {
-                entity.distributionProgress = 100;
-            } else if (temp.status === ProcessStatus.FAILED) {
+                entity.distributionStatus = ProcessStatus.STARTED;
                 entity.distributionProgress = 0;
+                break;
+            }
+            case AnalysisDistributorEvent.EXECUTION_PROGRESS: {
+                if (isProcessStatusTerminal(entity.distributionStatus)) {
+                    return false;
+                }
+
+                const temp = value as AnalysisDistributorExecutionProgressPayload;
+                if (
+                    !entity.distributionProgress ||
+                    temp.progress.percent >= entity.distributionProgress
+                ) {
+                    entity.distributionProgress = Math.min(temp.progress.percent, 100);
+                }
+                break;
+            }
+            case AnalysisDistributorEvent.CHECK_FAILED: {
+                // failure of the check itself says nothing about the distribution outcome
+                return false;
+            }
+            case AnalysisDistributorEvent.EXECUTION_FAILED: {
+                entity.distributionStatus = ProcessStatus.FAILED;
+                break;
+            }
+            case AnalysisDistributorEvent.EXECUTION_FINISHED: {
+                entity.distributionStatus = ProcessStatus.EXECUTED;
+                entity.distributionProgress = 100;
+                break;
+            }
+            case AnalysisDistributorEvent.CHECK_FINISHED: {
+                const temp = value as AnalysisDistributorCheckFinishedPayload;
+                if (!temp.status || isCheckVerdictStale(temp.checkedAt, entity.updatedAt)) {
+                    return false;
+                }
+
+                entity.distributionStatus = temp.status;
+
+                if (temp.status === ProcessStatus.EXECUTED) {
+                    entity.distributionProgress = 100;
+                } else if (temp.status === ProcessStatus.FAILED) {
+                    entity.distributionProgress = 0;
+                }
             }
         }
-    }
 
-    await repository.save(entity);
+        return true;
+    });
 }

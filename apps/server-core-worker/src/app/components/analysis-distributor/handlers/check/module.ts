@@ -200,6 +200,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
             {
                 ...value,
                 status,
+                checkedAt: analysis.updatedAt,
             },
         );
     }

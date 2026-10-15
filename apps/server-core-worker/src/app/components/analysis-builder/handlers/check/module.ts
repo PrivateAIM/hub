@@ -94,6 +94,7 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
                 {
                     ...value,
                     status: ProcessStatus.EXECUTED,
+                    checkedAt: analysis.updatedAt,
                     hash: imageInfo.Id,
                     os: imageInfo.Os,
                     size: imageInfo.Size,
@@ -135,6 +136,7 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
             {
                 ...value,
                 status,
+                checkedAt: analysis.updatedAt,
             },
         );
     }

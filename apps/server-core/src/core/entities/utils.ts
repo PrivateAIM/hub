@@ -7,6 +7,7 @@
 
 import type { Analysis } from '@privateaim/core-kit';
 import { isEqual } from 'smob';
+import type { IAnalysisRepository } from './analysis/types.ts';
 
 export class AnalysisRecalcQueue {
     private promises = new Map<string, Promise<void>>();
@@ -65,4 +66,29 @@ export function hasAnalysisChanged(a: Analysis, b: Analysis): boolean {
     }
 
     return false;
+}
+
+/**
+ * Persist recalculated metadata by applying `patch` to the locked row, not by
+ * saving the copy it was computed from: save() diffs against the database, so
+ * that copy's build/distribution status — read before a concurrent transition
+ * committed — would be written back over it.
+ */
+export async function saveAnalysisPatch(
+    repository: IAnalysisRepository,
+    entity: Analysis,
+    patch: Partial<Analysis>,
+): Promise<Analysis> {
+    const cloned = { ...entity };
+    Object.assign(entity, patch);
+    if (!hasAnalysisChanged(cloned, entity)) {
+        return entity;
+    }
+
+    const saved = await repository.updateLocked(entity.id, (locked) => {
+        Object.assign(locked, patch);
+        return true;
+    });
+
+    return saved ?? entity;
 }
