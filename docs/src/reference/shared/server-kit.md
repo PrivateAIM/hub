@@ -82,7 +82,6 @@ class MyAppBuilder extends BaseApplicationBuilder {
 | `message-bus` | AMQP message bus module and utilities |
 | `redis` | Redis module and connection helpers |
 | `authup` | Authup authentication middleware module |
-| `cache` | Cache module (Redis-backed) |
 | `config` | Configuration reading via `envix` |
 | `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema`; `collectRootFilterValues()` — flattens an `and`-of-`eq` filter tree into label equalities for the log endpoints and rejects any other operator with a 400 |
 | `entity-event` | Entity event pub/sub system |
