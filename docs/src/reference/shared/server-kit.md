@@ -19,11 +19,29 @@ const logger = useLogger();
 logger.info('Service started');
 ```
 
-### Message Bus (AMQP)
+### Message Bus
+
+The message bus, its drivers, components and callers live in
+[`ergos`](https://github.com/tada5hi/ergos), a standalone library shared with Authup.
+server-kit only wires it into the DI container: `MessageBusModule` registers ergos's
+`MessageBus` under `MessageBusInjectionKey`, with the AMQP driver (`ergos/amqp`, topic
+exchange `MESSAGE_BUS_TOPIC_EXCHANGE` = `FLAME`) when a RabbitMQ connection string is
+configured and the in-process memory driver otherwise. Its `teardown()` closes the
+connection.
 
 ```typescript
-import { MessageBusModule } from '@privateaim/server-kit';
+import { MessageBusInjectionKey, MessageBusModule } from '@privateaim/server-kit';
+import { Component, MessageBusWorkerComponentCaller, defineScheduledComponent } from 'ergos';
 ```
+
+::: warning Breaking change
+`BaseComponent`, the component callers, `ComponentError`, `MessageBus`, the message bus
+drivers, payload helpers and routing types, and the `Aggregator` type are no longer
+exported by server-kit, and no aliases remain. Import them from `ergos`; renamed on the
+way: `BaseComponent` → `Component`, `Component` (type) → `IComponent`, `ComponentCaller`
+→ `IComponentCaller`, `buildMessageBusPublishPayload` → `buildMessageBusPayload`.
+`CompoundComponentCaller` was removed without replacement.
+:::
 
 ### Redis
 
@@ -79,15 +97,13 @@ class MyAppBuilder extends BaseApplicationBuilder {
 |--------|-------------|
 | `app` | `BaseApplicationBuilder`, `Application` base class |
 | `logger` | Winston logger setup and `LoggerModule` |
-| `message-bus` | AMQP message bus module and utilities |
+| `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `ergos` message bus |
 | `redis` | Redis module and connection helpers |
 | `authup` | Authup authentication middleware module |
 | `cache` | Cache module (Redis-backed) |
 | `config` | Configuration reading via `envix` |
 | `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema`; `collectRootFilterValues()` — flattens an `and`-of-`eq` filter tree into label equalities for the log endpoints and rejects any other operator with a 400 |
 | `entity-event` | Entity event pub/sub system |
-| `aggregator` | AMQP event aggregator base classes |
-| `component` | AMQP task consumer component base classes |
 | `constants` | Module names, injection keys |
 
 ### Shared DI Modules
@@ -96,7 +112,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 |-------------|---------|
 | `LoggerModule` | Winston logger with optional telemetry transport |
 | `RedisModule` | Redis client registration |
-| `MessageBusModule` | AMQP connection and queue management |
+| `MessageBusModule` | Registers the `ergos` message bus (AMQP or memory driver), closes it on teardown |
 | `AuthupModule` | Authup middleware and token validation |
 | `CacheModule` | Redis-backed caching |
 | `EntityEventModule` | Domain event dispatching |
@@ -110,3 +126,5 @@ class MyAppBuilder extends BaseApplicationBuilder {
 - `orkos` — Module system (`IModule`)
 - `eldin` — DI container (`TypedToken`)
 - `envix` — Environment variable reading
+- `ergos` — Message bus, components and callers
+- `amqp-extension` — peer dependency of the AMQP driver (`ergos/amqp`), which `MessageBusModule` imports

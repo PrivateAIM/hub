@@ -704,7 +704,8 @@ app/modules/<name>/
 - **Injection keys** use `TypedToken<T>` from `eldin` — one constant per token, co-located with the module that registers it
 - **Types/interfaces** always live in `types.ts`, never inline in `module.ts`
 - **Module names** are string constants in `ModuleName` enum (`packages/server-kit/src/services/module-names.ts`)
-- **Shared modules** (logger, redis, amqp, authup, cache, entity-event, queue-router) live in `packages/server-kit/src/services/<name>/`
+- **Shared modules** (logger, redis, message-bus, authup, cache, entity-event) live in `packages/server-kit/src/<name>/`. `message-bus/` holds only the DI module + injection key: the bus, its drivers, components and callers come from [`ergos`](https://github.com/tada5hi/ergos)
+- **Every module that starts components stops them** — `ComponentsModule` (and server-core's `AggregatorsModule`) keep what they started and `await` each `stop()` in `teardown()`; a scheduled job is `defineScheduledComponent` (ergos), never a hand-rolled `node-cron` task or `setInterval`
 - **Per-service modules** (database, minio, victoria-logs, etc.) live in `apps/<service>/src/app/modules/<name>/`
 - Each service has `app/builder.ts` (`ServiceXApplicationBuilder extends BaseApplicationBuilder`) with `withConfig()`, `withDatabase()`, `withHTTP()`
 - Each service has `app/factory.ts` with `createApplication()` using the builder
@@ -717,10 +718,10 @@ app/modules/<name>/
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | `entityEvent`?, `authupClient`? | `DataSource`, 13 repo adapters, `RegistryManager` |
-| ComponentsModule | `components` | `database`, `analysis` | `RegistryComponentCaller`; starts the registry consumer and the node-client and analysis-reconciler background components |
+| ComponentsModule | `components` | `database`, `analysis` | `RegistryComponentCaller` (queue-only dispatch); starts the registry consumer and the node-client and analysis-reconciler scheduled components, stops them on teardown |
 | AnalysisModule | `analysis` | `database` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
-| AggregatorsModule | `aggregators` | `database`, `components`, `analysis` | nothing (starts AMQP event consumers) |
+| AggregatorsModule | `aggregators` | `database`, `components`, `analysis` | nothing (starts AMQP event consumers, stops them on teardown) |
 | HTTPModule | `http` | `config`, `database`, `analysis`, `telemetryClient`? | `App`, `Server`, `Router` |
 | TelemetryClientModule | `telemetryClient` | `config`, `authupHook`? | `TelemetryClient` |
 
@@ -734,7 +735,7 @@ sets up when that one is absent.
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | `entityEvent`? | `DataSource` |
 | VictoriaLogsModule | `victoriaLogs` | `config` | `VictoriaLogsClient`, `LogStore` |
-| ComponentsModule | `components` | `database`, `victoriaLogs` | nothing (starts event + log consumers) |
+| ComponentsModule | `components` | `database`, `victoriaLogs` | nothing (starts event + log consumers and the event-cleaner scheduled component, stops them on teardown) |
 | HTTPModule | `http` | `config`, `database`, `victoriaLogs` | `Server`, `Router` |
 
 ### server-storage Module Inventory
@@ -744,7 +745,7 @@ sets up when that one is absent.
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | `entityEvent`? | `DataSource` |
 | StorageModule | `storage` | `config` | `IStorageAdapter` (`MinioStorageAdapter` or `FsStorageAdapter`) |
-| ComponentsModule | `components` | `storage`, `database` | nothing (starts bucket + bucket-file consumers) |
+| ComponentsModule | `components` | `storage`, `database` | nothing (starts bucket + bucket-file consumers, stops them on teardown) |
 | HTTPModule | `http` | `config`, `database`, `storage` | `Server`, `Router` |
 
 The storage backend is a **port**, not a hard-wired MinIO client: `StorageModule`
@@ -759,7 +760,7 @@ picks `MinioStorageAdapter` or `FsStorageAdapter` from config and registers it u
 | CoreClientModule | `coreClient` | `config`, `authupHook`? | nothing (calls `setCoreClient()`) |
 | StorageClientModule | `storageClient` | `config`, `authupHook`? | nothing (calls `setStorageClient()`) |
 | DockerModule | `docker` | none | `DockerInjectionKey` (dockerode client) |
-| ComponentsModule | `components` | `coreClient`, `storageClient`, `docker` | nothing (starts 4 worker components) |
+| ComponentsModule | `components` | `coreClient`, `storageClient`, `docker` | nothing (starts 4 worker components, stops them on teardown) |
 | HTTPModule | `http` | `config` | `Server` (health-check only) |
 
 ### server-messenger Module Inventory
@@ -769,7 +770,7 @@ picks `MinioStorageAdapter` or `FsStorageAdapter` from config and registers it u
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | none | `DataSource`, `MessageRepository` |
 | WakeupModule | `wakeup` | `config`, `redis`? | `WakeupInjectionKey` |
-| SweeperModule | `sweeper` | `database` | nothing (expires stored messages) |
+| SweeperModule | `sweeper` | `database` | nothing (scheduled component expiring stored messages; started in `setup`, stopped in `teardown`) |
 | HTTPModule | `http` | `config`, `database`, `wakeup` | `Server`, `SocketServer` |
 
 server-messenger is **no longer** the database-less relay this table used to describe:

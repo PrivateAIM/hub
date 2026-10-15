@@ -191,12 +191,12 @@ Services default `realmId` to actor's realm. Explicit `null` required for global
 
 | authup | Hub |
 |---|---|
-| `apps/server-core/src/components/types.ts` — `Component = { start, stop, status }` | `apps/server-core/src/app/components/node-client/types.ts` — `NodeClientComponent`, same shape |
-| `components/oauth2-cleaner/module.ts` — `createOAuth2CleanerComponent()`: one pass at start, then `cron.schedule(…, { noOverlap: true })`; a failing pass is logged, never thrown | `app/components/node-client/module.ts` — `createNodeClientComponent()`: node-client permission sync at start, then hourly |
-| `app/modules/components/module.ts` — starts every component fire-and-forget with `.catch`, stops them in `teardown()` | `app/modules/components/module.ts` — one `components` property holds the message-bus consumers and the background component; each is started fire-and-forget, and `teardown()` calls the optional `Component.stop` (server-kit) on each and clears the list. The message-bus consumers have no `stop` — the bus cannot cancel a consumer |
+| `apps/server-core/src/components/types.ts` — `Component = { start, stop, status }` (plan 023 phase D replaces it with ergos's `IComponent`) | `IComponent` from [`ergos`](https://github.com/tada5hi/ergos) — the same shape, now shared |
+| `components/oauth2-cleaner/module.ts` — `createOAuth2CleanerComponent()`: one pass at start, then `cron.schedule(…, { noOverlap: true })`; a failing pass is logged, never thrown | `app/components/node-client/module.ts` — `createNodeClientComponent()` returns ergos's `defineScheduledComponent(…)`: node-client permission sync at start, then hourly (same for `analysis-reconciler/`, telemetry's `event-cleaner/`, messenger's sweeper) |
+| `app/modules/components/module.ts` — starts every component fire-and-forget with `.catch`, stops them in `teardown()` | `app/modules/components/module.ts` — one `components` property holds the message-bus consumers and the scheduled components; all are started fire-and-forget (`Promise.allSettled`), and `teardown()` awaits those starts, then `stop()`s each (a consumer's `stop()` cancels it on the bus) |
 
-Differences: hub's components directory also holds `BaseComponent` message-bus
+Differences: hub's components directory also holds ergos `Component` message-bus
 consumers (`registry/`), which authup does not have; hub's background component
 takes its cross-replica lock as an injected `lock(fn)` (backed by
 `withDataSourceLock`) instead of a `DataSource`, so its spec needs no database;
-hub has no `getHealth()` / worker-health listener reading `status()` yet. Because hub's start loop does not `.catch`, the component's `start()` must never reject — `execute()` catches everything.
+hub has no `getHealth()` / worker-health listener reading `status()` yet. Because hub's start loop does not `.catch`, the component's `start()` must never reject — `defineScheduledComponent` guarantees that.

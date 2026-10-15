@@ -359,6 +359,15 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
   `writable/master-images/`, which `master-images.spec.ts` deletes wholesale
   before cloning the catalogue — hence `fileParallelism: false` in that package's
   `test/vitest.config.ts`. Do not re-enable it without decoupling the fixture.
+- Components, callers and the bus come from `ergos`, whose own suite covers their
+  semantics (retry, ordering, unknown commands, `stop()` during a pass). Hub specs
+  pin only hub wiring. A caller spec builds a real `MessageBus` on ergos's
+  `MemoryMessageBusDriver` and puts a fake `IComponent` behind a
+  `MessageBusWorkerComponentCaller` (`apps/server-core/test/unit/components/registry/caller.spec.ts`).
+  A scheduled-component spec (`test/unit/app/components/{node-client,analysis-reconciler}/`,
+  server-telemetry's `event-cleaner.spec.ts`) asserts through `status()` and **must
+  `stop()` the component in `afterEach`**: a cron task left running keeps the vitest
+  worker alive, so the suite hangs instead of failing.
 - `createTestApplication({ telemetryHandlers })` (server-core) opts in to a faked
   telemetry client, which is the only way to exercise `AnalysisLogController` /
   `AnalysisNodeLogController` without a live telemetry service.

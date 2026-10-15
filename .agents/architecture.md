@@ -111,7 +111,7 @@ DI modules, wiring, and infrastructure services.
 - Fluent API: `.withConfig().withDatabase().withHTTP()`
 
 **Aggregators** (`app/aggregators/`): AMQP event consumers
-**Components** (`app/components/`): AMQP task consumers (`BaseComponent` + a message-bus caller), and background components without a queue that follow authup's `{ start, stop, status }` shape — a pass at start, then a cron (`node-client/`: node-client permission sync)
+**Components** (`app/components/`): everything here implements `IComponent { start, stop, status }` from [`ergos`](https://github.com/tada5hi/ergos) (shared with authup). Two shapes: AMQP task consumers — an ergos `Component` (key → handler map) behind a `MessageBusWorkerComponentCaller` — and scheduled background jobs built with `defineScheduledComponent({ name, schedule, run })`: a pass at start, then a cron (`node-client/`: node-client permission sync, `analysis-reconciler/`). A `run` that throws is logged and does not count as a success; `start()` never rejects. Every `ComponentsModule` stops what it started in `teardown()`
 
 ## Service Pattern
 
@@ -244,7 +244,15 @@ TypeORM subscribers in `adapters/database/subscribers/` (grouped by domain: `ana
 
 AMQP consumers are wired via two DI modules:
 - **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregators depend only on core services and repository ports (resolved from `AnalysisInjectionKey` / `DatabaseInjectionKey`), never on a `DataSource`: the worker status rules (event → status transition, `isProcessStatusTerminal`, `isCheckVerdictStale`) live in core as `AnalysisBuilder.applyEvent` / `AnalysisDistributor.applyEvent` / `MasterImageBuilderService.applyEvent`, while the storage-bucket and authup handlers keep their orchestration in app over the ports. Storage-bucket replies are correlated by the bucket itself (`refType`/`refId` + `parseAnalysisBucketName(name)`), not by a task store.
-- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor).
+- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container: a `MessageBusDispatchComponentCaller` on `registryCommands`, queue-only (plan 018 F17), so with AMQP a registry command runs on whichever replica consumes that queue, not inside the HTTP request. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor). Both modules start their components fire-and-forget; `teardown()` awaits those starts, then `stop()`s each.
+
+**The bus is ergos's `MessageBus`.** server-kit's `MessageBusModule` registers it under
+`MessageBusInjectionKey` with ergos's `AmqpMessageBusDriver` (`ergos/amqp`, topic exchange
+`MESSAGE_BUS_TOPIC_EXCHANGE` = `FLAME`) when a RabbitMQ connection string is configured, else
+the in-process `MemoryMessageBusDriver`; its `teardown()` closes the driver. WORK routings are
+retried by amqp-extension (counter in the `x-attempt` header, 5 attempts, exponential backoff
+capped at 30s, then dropped) with an in-process redelivery guard; delivery is at-least-once.
+Hub-specific policy stays in hub: the routings, `ordered` reply queues and the exchange name.
 
 **Process-status transitions are row-locked.** Any read-check-mutate-save of a
 `buildStatus`/`distributionStatus` (command starts, configuration lock/unlock, the master-image rollback,
@@ -359,13 +367,15 @@ Manages log aggregation via VictoriaLogs and event tracking via TypeORM.
 **Service-specific modules:**
 - `VictoriaLogsModule` — registers VictoriaLogs client + `LogStore` in container
 - `ComponentsModule` — resolves `EventRepository` from the container and starts
-  EventComponent + LogComponent via `QueueWorkerComponentCaller`
+  EventComponent + LogComponent via `MessageBusWorkerComponentCaller` (ergos), plus the
+  event cleaner; `teardown()` stops all three
 
-**Event retention sweep:** `EventComponentCleanerHandler` (once at start, then daily
-at 01:00) drops every `expiring` row whose `expiresAt` has passed. The window is
+**Event retention sweep:** `createEventCleanerComponent` (`app/components/event-cleaner/`,
+an ergos scheduled component: once at start, then daily at 01:00; no longer an
+`EventCommand`, so a failing first pass is logged instead of failing boot) drops every `expiring` row whose `expiresAt` has passed. The window is
 stamped at **ingest** by `EventComponentCreateHandler` from `EVENT_RETENTION_DAYS`
 (default 7 days; `0` keeps rows forever) — publishers no longer stamp, and an
-explicit `expiresAt`, or `expiring: false`, from the publisher wins. The handler owns only the
+explicit `expiresAt`, or `expiring: false`, from the publisher wins. The component owns only the
 schedule: the sweep itself is `IEventRepository.deleteExpired(now, { batchSize })`,
 so nothing in `app/components/` reaches for a `DataSource`.
 
@@ -402,7 +412,7 @@ common `IStorageAdapter` port.
   or `FsStorageAdapter` (local filesystem). Controllers and components depend on the
   port, not on a MinIO client.
 - `ComponentsModule` — resolves the storage adapter from the container, starts the
-  bucket + bucket-file consumers via `QueueWorkerComponentCaller`
+  bucket + bucket-file consumers via `MessageBusWorkerComponentCaller` (ergos)
 
 ### server-core-worker
 
@@ -441,7 +451,7 @@ decommission (plan 013 phase 5).
 - `WakeupModule` — redis pub/sub when redis is present (cross-instance), else an
   in-process fallback; emits the payload-free `messagePending` into the recipient's
   local socket room
-- `SweeperModule` — 60s timer deleting messages past their absolute `expiresAt`,
+- `SweeperModule` — an ergos scheduled component (`'* * * * *'`, `runOnStart: false`) deleting messages past their absolute `expiresAt`,
   via the same batched `deleteExpired(now, { batchSize })` shape as the telemetry
   event sweep (`MESSAGE_SWEEP_BATCH_SIZE`, 1000). The id select uses `Raw`, not
   `LessThan`: `expires_at` is a datetime column behind a `string`-typed property,
