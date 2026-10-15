@@ -7,5 +7,6 @@
 
 export * from './constants.ts';
 
+export * from './analysis-reconciler/index.ts';
 export * from './node-client/index.ts';
 export * from './registry/index.ts';

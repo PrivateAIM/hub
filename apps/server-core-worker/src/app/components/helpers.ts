@@ -5,25 +5,42 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from './constants';
+import type { Logger } from '@privateaim/server-kit';
+import { ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS, ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS } from './constants';
+import type { Heartbeat } from './types';
 
 /**
- * Determine if an in-progress analysis process (build/distribution) is stale,
- * i.e. its entity has not been updated for longer than the given threshold.
- * Progress events touch the entity, so a recently updated row means the
- * process is still alive.
+ * Run `beat` on an interval until `stop()` is called.
+ * A long single step (one docker build layer, one push) emits no progress,
+ * and server-core would judge the process stale; the beat keeps its row fresh.
+ * Beats are skipped once `touch()` (real progress) has not been called for
+ * ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS, so a hung stream goes stale
+ * (see that constant for why stale alone does not recover it).
  *
- * @param updatedAt
- * @param thresholdMs
+ * A failed beat is logged, not thrown: the next one retries, and a worker
+ * that can no longer publish at all should be judged stale.
  */
-export function isAnalysisProcessStale(
-    updatedAt: Date | string,
-    thresholdMs: number = ANALYSIS_PROCESS_STALE_THRESHOLD_MS,
-): boolean {
-    const updatedAtMs = new Date(updatedAt).getTime();
-    if (Number.isNaN(updatedAtMs)) {
-        return false;
-    }
+export function startHeartbeat(
+    beat: () => unknown,
+    logger?: Logger,
+    intervalMs: number = ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS,
+    maxSilenceMs: number = ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS,
+): Heartbeat {
+    let touchedAt = Date.now();
+    const timer = setInterval(() => {
+        if (Date.now() - touchedAt > maxSilenceMs) {
+            return;
+        }
 
-    return Date.now() - updatedAtMs > thresholdMs;
+        Promise.resolve()
+            .then(beat)
+            .catch((e) => logger?.warn({ message: 'Heartbeat failed', error: e }));
+    }, intervalMs);
+
+    return {
+        touch: () => {
+            touchedAt = Date.now();
+        },
+        stop: () => clearInterval(timer),
+    };
 }

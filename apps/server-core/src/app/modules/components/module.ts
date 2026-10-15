@@ -15,6 +15,9 @@ import {
     MessageBusInjectionKey,
     MessageBusWorkerComponentCaller,
 } from '@privateaim/server-kit';
+import { AnalysisReconciler } from '../../../core/services/analysis-reconciler/index.ts';
+import { createAnalysisReconcilerComponent } from '../../components/analysis-reconciler/module.ts';
+import { AnalysisInjectionKey } from '../analysis/constants.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { NodeClientService } from '../database/node-client.ts';
@@ -28,7 +31,7 @@ import { ComponentsInjectionKey } from './constants.ts';
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['database'];
+    readonly dependencies: string[] = ['database', 'analysis'];
 
     protected components: Component[] = [];
 
@@ -61,6 +64,16 @@ export class ComponentsModule implements IModule {
                 },
             ),
         ];
+
+        this.components.push(createAnalysisReconcilerComponent({
+            reconciler: new AnalysisReconciler({
+                repository: container.resolve(DatabaseInjectionKey.AnalysisRepository),
+                builder: container.resolve(AnalysisInjectionKey.Builder),
+                distributor: container.resolve(AnalysisInjectionKey.Distributor),
+                logger,
+            }),
+            logger,
+        }));
 
         // Without an Authup client there are no node clients to sync.
         if (authupResult.success) {

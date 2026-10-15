@@ -21,7 +21,7 @@ import type { ComponentHandler, ComponentHandlerContext, Logger } from '@private
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import { getManyAll } from '@privateaim/core-http-kit';
 import type { IStorageClient as StorageClient } from '@privateaim/storage-kit';
-import type { Client as DockerClient, ModemStreamWaitOptions  } from 'docken';
+import type { Client as DockerClient, ModemStreamWaitOptions, Progress } from 'docken';
 import { waitForStream } from 'docken';
 import type { Container } from 'dockerode';
 import stream from 'node:stream';
@@ -33,6 +33,7 @@ import {
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
 import { createBuildContext, generateDockerFileContent } from '../../helpers';
+import { startHeartbeat } from '../../../helpers.ts';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -59,9 +60,22 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         value: AnalysisBuilderExecutePayload,
         context: ComponentHandlerContext<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE>,
     ): Promise<void> {
+        let progress: Progress = {
+            percent: 0,
+            current: 0,
+            total: 0,
+        };
+        const heartbeat = startHeartbeat(() => context.handle(
+            AnalysisBuilderEvent.EXECUTION_PROGRESS,
+            { progress, id: value.id },
+        ), this.logger);
+
         try {
             // todo: check if image exists, otherwise local queue task
-            await this.handleInternal(value, context);
+            await this.handleInternal(value, context, (next) => {
+                progress = next;
+                heartbeat.touch();
+            });
         } catch (e) {
             this.logger?.error({
                 message: e,
@@ -81,12 +95,15 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
             );
 
             await cleanupDockerImage(this.docker, value.id);
+        } finally {
+            heartbeat.stop();
         }
     }
 
     async handleInternal(
         value: AnalysisBuilderExecutePayload,
         context: ComponentHandlerContext<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE>,
+        onProgress?: (progress: Progress) => void,
     ): Promise<void> {
         await context.handle(
             AnalysisBuilderEvent.EXECUTION_STARTED,
@@ -100,6 +117,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         try {
             await this.buildImage(analysis, {
                 onBuilding: async (progress) => {
+                    onProgress?.(progress);
                     await context.handle(
                         AnalysisBuilderEvent.EXECUTION_PROGRESS,
                         {

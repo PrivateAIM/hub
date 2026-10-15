@@ -24,6 +24,11 @@ export interface IAnalysisRepository extends IEntityRepository<Analysis> {
      */
     updateLocked(id: string, fn: (entity: Analysis) => boolean, ctx?: EntityPersistContext): Promise<Analysis | null>;
     /**
+     * Analyses whose build or distribution is STARTING/STARTED and whose row
+     * was last written before `updatedBefore`.
+     */
+    findManyInProgressUpdatedBefore(updatedBefore: Date): Promise<Analysis[]>;
+    /**
      * Remove all entities in one transaction: all or nothing.
      */
     removeMany(entities: Analysis[], ctx?: EntityPersistContext): Promise<void>;

@@ -87,6 +87,27 @@ The Core API follows the [hexagonal architecture](/getting-started/architecture)
 - **AMQP task consumers** for registry and analysis metadata processing
 - **TypeORM subscribers** publishing domain events on entity changes
 
+## Stuck Builds and Distributions
+
+A build or distribution that stays `starting`/`started` while its analysis has not been
+written for 15 minutes is treated as orphaned (e.g. the worker died mid-run). Every 5 minutes —
+and once at start — server-core re-runs the build/distribution check for such analyses. If the
+image is not there, the check result marks the process `failed`, so it can be started again.
+A running worker keeps its analysis fresh with progress events and a 5-minute heartbeat, so a
+long build or push is not mistaken for a stuck one; a worker progress event that changes nothing
+writes the analysis at most once a minute. The heartbeat stops once a single step has sent no
+progress for 2 hours, so a hung build or push makes its analysis stale. That alone does not recover
+it: with a single worker, the check waits behind the hung run in the same queue, so recovery needs a
+worker restart, a second worker replica, or RabbitMQ's `consumer_timeout` ending the hung delivery.
+
+A distribution whose check can never decide — its analysis has no nodes, no registry, or a node
+without a registry project — is reported as still running, so it is failed once stale like a
+missing image. A late finish from the worker does not revive a build or distribution that was
+already marked `failed` (or reset): only a process still `starting`/`started` can finish.
+
+Master-image builds are not covered: they have no check command, and starting a new build takes
+over one that has been stale for 15 minutes.
+
 ## Approval Workflows
 
 By default, projects and analyses require administrator approval before execution. This can be disabled for development:

@@ -6,7 +6,9 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import type { DataSource, Repository } from 'typeorm';
+import { In, Raw } from 'typeorm';
 import {
     validateEntityJoinColumns,
 } from 'typeorm-extension';
@@ -59,6 +61,23 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
 
     async countByProject(projectId: string): Promise<number> {
         return this.repository.countBy({ projectId });
+    }
+
+    async findManyInProgressUpdatedBefore(updatedBefore: Date): Promise<Analysis[]> {
+        const inProgress = In([ProcessStatus.STARTING, ProcessStatus.STARTED]);
+        // Raw, not LessThan: `updatedAt` is typed as an ISO string, but the
+        // bind must stay a Date — MySQL truncates an ISO string's trailing
+        // `Z` when casting it to a datetime (timestamp-filter trap).
+        const updatedAt = Raw((alias) => `${alias} < :updatedBefore`, { updatedBefore });
+
+        // ponytail: unbounded — only rows stuck past the stale threshold match,
+        // a handful at most. Page it if that ever stops being true.
+        return this.repository.find({
+            where: [
+                { buildStatus: inProgress, updatedAt },
+                { distributionStatus: inProgress, updatedAt },
+            ],
+        });
     }
 
     async findOneBy(where: Record<string, any>): Promise<Analysis | null> {
