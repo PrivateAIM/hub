@@ -4,23 +4,22 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import type { ComponentHandler } from '@privateaim/server-kit';
 import type {
     BucketClearingFinishedEventPayload,
     BucketComponentEventMap,
     BucketEvent,
 } from '@privateaim/server-storage-kit';
 import type { IAnalysisBucketFileRepository } from '../../../../../core/index.ts';
-import { BaseAggregatorHandler } from '../../../base.ts';
 import type { StorageBucketAggregatorContext } from '../types.ts';
 
-export class StorageBucketClearingFinishedHandler extends BaseAggregatorHandler<
+export class StorageBucketClearingFinishedHandler implements ComponentHandler<
     BucketComponentEventMap,
     BucketEvent.CLEARING_FINISHED
 > {
     protected repository: IAnalysisBucketFileRepository;
 
     constructor(ctx: StorageBucketAggregatorContext) {
-        super(ctx);
         this.repository = ctx.analysisBucketFileRepository;
     }
 

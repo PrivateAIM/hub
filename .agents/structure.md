@@ -129,7 +129,7 @@ apps/server-core/src/
 │   ├── modules/
 │   │   ├── analysis/              # AnalysisModule (builder, configurator, distributor, storage)
 │   │   ├── aggregators/            # AggregatorsModule (starts AMQP event consumers)
-│   │   ├── components/            # ComponentsModule (TaskManager, callers, task consumers)
+│   │   ├── components/            # ComponentsModule (callers, task consumers)
 │   │   ├── config/                # ConfigModule (env, paths)
 │   │   ├── database/              # DatabaseModule (DataSource, repos, subscribers, node-client)
 │   │   │   ├── repositories/<entity>/  # Repository adapters

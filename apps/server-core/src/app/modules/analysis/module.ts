@@ -18,14 +18,13 @@ import { AnalysisMetadataRecalculator } from '../../../core/entities/analysis/re
 import { AnalysisNodeMetadataRecalculator } from '../../../core/entities/analysis-node/recalculator.ts';
 import { AnalysisFileMetadataRecalculator } from '../../../core/entities/analysis-bucket-file/recalculator.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
-import { ComponentsInjectionKey } from '../components/constants.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { AnalysisInjectionKey } from './constants.ts';
 
 export class AnalysisModule implements IModule {
     readonly name = 'analysis';
 
-    readonly dependencies: string[] = ['database', 'components'];
+    readonly dependencies: string[] = ['database'];
 
     async setup(container: IContainer): Promise<void> {
         const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
@@ -45,7 +44,6 @@ export class AnalysisModule implements IModule {
             repository: analysisRepository,
             bucketRepository: analysisBucketRepository,
             caller: new BucketComponentCaller({ messageBus }),
-            taskManager: container.resolve(ComponentsInjectionKey.TaskManager),
         });
 
         const analysisRecalculator = new AnalysisMetadataRecalculator({ repository: analysisRepository });

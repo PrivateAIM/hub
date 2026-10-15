@@ -22,6 +22,7 @@ import {
     MasterImageSynchronizerEventMessageBusRouting,
 } from '@privateaim/server-core-worker-kit';
 import {
+    BucketComponentCaller,
     BucketEventMessageBusRouting,
     BucketFileEventMessageBusRouting,
     BucketFileTaskCaller,
@@ -51,7 +52,6 @@ export class AggregatorsModule implements IModule {
         const analysisBucketRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketRepository);
         const analysisBucketFileRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository);
         const masterImageRepository = container.resolve(DatabaseInjectionKey.MasterImageRepository);
-        const taskManager = container.resolve(ComponentsInjectionKey.TaskManager);
         const registryComponentCaller = container.resolve(ComponentsInjectionKey.RegistryComponentCaller);
         const logger = container.resolve(LoggerInjectionKey);
         const messageBusResult = container.tryResolve(MessageBusInjectionKey);
@@ -93,7 +93,7 @@ export class AggregatorsModule implements IModule {
                     analysisRepository,
                     analysisBucketRepository,
                     analysisBucketFileRepository,
-                    taskManager,
+                    bucketCaller: new BucketComponentCaller({ messageBus }),
                     logger,
                 }),
                 {

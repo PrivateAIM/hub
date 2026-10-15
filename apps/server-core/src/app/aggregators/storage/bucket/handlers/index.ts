@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './creation_failed.ts';
 export * from './creation_finished.ts';
 export * from './deletion_finished.ts';
 export * from './clearing_finished.ts';

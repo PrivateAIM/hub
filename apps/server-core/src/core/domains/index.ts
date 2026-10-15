@@ -6,4 +6,3 @@
  */
 
 export * from './registry/index.ts';
-export * from './task/index.ts';

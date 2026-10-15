@@ -56,6 +56,9 @@ export class BucketCreateHandler implements ComponentHandler<
                 {
                     id: value.id,
                     error: e,
+                    refType: value.refType,
+                    refId: value.refId,
+                    name: value.name,
                 },
             );
         }

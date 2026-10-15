@@ -19,7 +19,6 @@ import { AnalysisNodeMetadataRecalculator } from '../../../../../src/core/entiti
 import { AnalysisStorageManager } from '../../../../../src/core/services/analysis-storage-manager/module.ts';
 import { createFullAnalysis, createTestAnalysisNode } from '../../../../utils/domains/index.ts';
 import { FakeBucketCaller } from '../../services/helpers/fake-bucket-caller.ts';
-import { FakeTaskManager } from '../../services/helpers/fake-task-manager.ts';
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from './fake-repository.ts';
 
@@ -57,7 +56,6 @@ describe('AnalysisNodeMetadataRecalculator', () => {
                 repository: analysisRepository,
                 bucketRepository,
                 caller: bucketCaller,
-                taskManager: new FakeTaskManager(),
             }),
         });
     }

@@ -11,7 +11,13 @@ export type BucketCreateCommandPayload = Partial<Bucket>;
 
 export type BucketCreationFailedEventPayload = {
     id: string,
-    error: Error
+    error: Error,
+    /**
+     * Echoed from the command, so the requester can attribute the failure.
+     */
+    refType?: string | null,
+    refId?: string | null,
+    name?: string,
 };
 
 export type BucketCreationFinishedEventPayload = Bucket;
