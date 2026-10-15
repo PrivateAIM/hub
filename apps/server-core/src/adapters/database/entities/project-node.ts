@@ -27,20 +27,15 @@ import type { Realm } from '@authup/core-kit';
 import { ProjectEntity } from './project.ts';
 import { NodeEntity } from './node.ts';
 
-// Each side of the junction (node, project) is indexed by its id and by its
-// realm, each paired with the opposite side's realm or id, so a lookup or
-// filter combination from either side is served by one index, and the
-// participation lookups (SELECT project_id ... WHERE node_realm_id = ?)
-// answer from the index alone. Every leading column is also an allow-listed
-// filter key, so no single-column index is needed for these four columns.
-// typeorm hashes an index name from the SORTED column list, so each mirrored
-// pair would collide: the index whose columns are not in alphabetical order
-// carries an explicit name, hashed the same way from its columns in order.
 @Unique(['projectId', 'nodeId'])
-@Index('IDX_33c0a5c703084f4e180cdf1e3e', ['projectId', 'nodeRealmId'])
-@Index(['nodeId', 'projectRealmId'])
-@Index('IDX_50158b286a9565a3596a9323b9', ['projectRealmId', 'nodeId'])
+// One composite per realm column, paired with the opposite side's id. Each
+// leads with its realm column, so it also anchors that allow-listed filter;
+// the trailing id lets a participation lookup
+// (SELECT project_id ... WHERE node_realm_id = ?) answer from the index.
+// A filter combination needs no mirrored (id, realm) index: the planner
+// matches equality conditions in any column order.
 @Index(['nodeRealmId', 'projectId'])
+@Index(['projectRealmId', 'nodeId'])
 // Status first, newest first: an approval inbox
 // (sort=approvalStatus,-createdAt).
 @Index(['approvalStatus', 'createdAt'])
@@ -82,6 +77,7 @@ export class ProjectNodeEntity implements ProjectNode {
     @Column({ name: 'project_realm_id', type: 'uuid' })
     projectRealmId: Realm['id'];
 
+    @Index()
     @Column({ name: 'node_id' })
     nodeId: Node['id'];
 

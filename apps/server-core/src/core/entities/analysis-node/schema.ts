@@ -17,13 +17,13 @@ const schemaMapping = {
 export const analysisNodeSchema = defineSchema<AnalysisNode>({
     name: DomainType.ANALYSIS_NODE,
     strict: true,
-    // Each node/analysis id and realm leads a composite paired with the
-    // opposite side, so a filter combination from either side is backed by
-    // one index; the status composites back `sort=approvalStatus,-createdAt`.
+    // `nodeId` anchors through the UNIQUE(nodeId, analysisId) it leads,
+    // `analysisId` through its own single, each realm through its
+    // (realm, opposite id) composite; the status composites back
+    // `sort=approvalStatus,-createdAt`.
     indexes: [
         ['nodeId', 'analysisId'],
-        ['nodeId', 'analysisRealmId'],
-        ['analysisId', 'nodeRealmId'],
+        ['analysisId'],
         ['analysisRealmId', 'nodeId'],
         ['nodeRealmId', 'analysisId'],
         ['approvalStatus', 'createdAt'],

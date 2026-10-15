@@ -28,20 +28,15 @@ import type { ProcessStatus } from '@privateaim/kit';
 import { AnalysisEntity } from './analysis.ts';
 import { NodeEntity } from './node.ts';
 
-// Each side of the junction (node, analysis) is indexed by its id and by its
-// realm, each paired with the opposite side's realm or id, so a lookup or
-// filter combination from either side is served by one index, and the
-// participation lookups (SELECT analysis_id ... WHERE node_realm_id = ?)
-// answer from the index alone. Every leading column is also an allow-listed
-// filter key, so no single-column index is needed for these four columns.
-// typeorm hashes an index name from the SORTED column list, so each mirrored
-// pair would collide: the index whose columns are not in alphabetical order
-// carries an explicit name, hashed the same way from its columns in order.
 @Unique(['nodeId', 'analysisId'])
-@Index('IDX_c0a83a2c9e8f5b096e0587230a', ['nodeId', 'analysisRealmId'])
-@Index(['analysisId', 'nodeRealmId'])
+// One composite per realm column, paired with the opposite side's id. Each
+// leads with its realm column, so it also anchors that allow-listed filter;
+// the trailing id lets a participation lookup
+// (SELECT analysis_id ... WHERE node_realm_id = ?) answer from the index.
+// A filter combination needs no mirrored (id, realm) index: the planner
+// matches equality conditions in any column order.
+@Index(['nodeRealmId', 'analysisId'])
 @Index(['analysisRealmId', 'nodeId'])
-@Index('IDX_5816ce1cf851f5fc1421faa346', ['nodeRealmId', 'analysisId'])
 // Status first, newest first: an approval or execution inbox
 // (sort=approvalStatus,-createdAt).
 @Index(['approvalStatus', 'createdAt'])
@@ -112,6 +107,7 @@ export class AnalysisNodeEntity implements AnalysisNode {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({ name: 'analysis_id' })
     analysisId: Analysis['id'];
 

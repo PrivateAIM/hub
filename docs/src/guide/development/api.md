@@ -185,9 +185,11 @@ Mutations (`POST`, `DELETE`) describe nothing — their `meta` is exactly `{}`.
   all its members sortable: the node junctions' status-then-age order,
   `GET /analysis-nodes?sort=approvalStatus,-createdAt` (also `executionStatus`) and
   `GET /project-nodes?sort=approvalStatus,-createdAt`. Any other key combination is dropped.
-  Filters are not limited this way: under anchor mode any combination binds once one key
-  leads a declared sequence, and on the node junctions every id/realm pairing across the two
-  sides (e.g. `nodeId` + `projectRealmId`) has its own composite index.
+  Filters are not limited this way, and their key order does not matter: under anchor mode
+  any combination binds once one key leads a declared sequence, and the database matches
+  equality conditions against a composite index in any order (`nodeId` + `projectRealmId` is
+  served by `(projectRealmId, nodeId)`). Sort order, by contrast, is the meaning of the sort,
+  so only the declared column order binds.
 
 ### Endpoints without capability discovery
 
