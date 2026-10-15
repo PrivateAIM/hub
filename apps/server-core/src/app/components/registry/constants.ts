@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from '@privateaim/server-kit';
+import { MessageBusRoutingType } from 'ergos';
 
 export { RegistryCommand, RegistryHookEvent } from '../../../core/domains/index.ts';
 

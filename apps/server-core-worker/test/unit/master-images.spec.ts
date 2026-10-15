@@ -10,7 +10,7 @@ import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-wo
 import {
     MasterImageSynchronizerCommand,
 } from '@privateaim/server-core-worker-kit';
-import { DirectComponentCaller } from '@privateaim/server-kit';
+import { DirectComponentCaller } from 'ergos';
 import { MasterImageSynchronizerComponent } from '../../src/app/components/index.ts';
 
 describe('components > master-images', () => {

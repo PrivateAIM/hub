@@ -7,7 +7,7 @@
 
 import type { MasterImageCommandArgument } from '@privateaim/core-kit';
 import type { ObjectLiteralKeys } from '@privateaim/kit';
-import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { ComponentMetadata } from 'ergos';
 import type { MasterImageSynchronizerCommand, MasterImageSynchronizerEvent } from './constants';
 
 export type MasterImageSynchronizerImage = {

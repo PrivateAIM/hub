@@ -6,13 +6,13 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import { BaseComponent } from '@privateaim/server-kit';
+import { Component } from 'ergos';
 import type { EventComponentEventMap } from '@privateaim/server-telemetry-kit';
 import { EventCommand } from '@privateaim/server-telemetry-kit';
 import type { IEventRepository } from '../../../core/entities/index.ts';
 import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers/index.ts';
 
-export class EventComponent extends BaseComponent<EventComponentEventMap> {
+export class EventComponent extends Component<EventComponentEventMap> {
     constructor(ctx: {
         repository: IEventRepository, 
         logger?: Logger, 

@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component, Logger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
+import type { IComponent } from 'ergos';
 import type { IAnalysisReconciler } from '../../../core/services/analysis-reconciler/index.ts';
 
 export type AnalysisReconcilerComponentContext = {
@@ -13,7 +14,7 @@ export type AnalysisReconcilerComponentContext = {
     logger?: Logger,
 };
 
-export type AnalysisReconcilerComponent = Component & {
+export type AnalysisReconcilerComponent = IComponent & {
     start: () => Promise<void>,
     stop: () => Promise<void>,
     /**

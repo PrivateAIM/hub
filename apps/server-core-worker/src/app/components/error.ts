@@ -5,11 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentErrorOptions } from '@privateaim/server-kit';
-import { ComponentError } from '@privateaim/server-kit';
 import { ErrorCode } from '@privateaim/server-core-worker-kit';
+import type { ComponentErrorOptions } from './types';
 
-export class BaseError extends ComponentError {
+export class BaseError extends Error {
+    public readonly code?: string | null;
+
+    constructor(input: ComponentErrorOptions) {
+        super(input.message, { cause: input.cause });
+
+        this.code = input.code;
+    }
+
     // --------------------------------------------------------------------
 
     static notFound(

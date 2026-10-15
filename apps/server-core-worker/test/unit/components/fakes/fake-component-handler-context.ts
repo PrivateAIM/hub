@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { ComponentMetadata } from 'ergos';
 
 export type FakeEmittedEvent = {
     event: string,

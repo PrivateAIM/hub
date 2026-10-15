@@ -7,13 +7,13 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { Component } from '@privateaim/server-kit';
+import type { IComponent } from 'ergos';
 import {
     LoggerConsoleTransport,
     MessageBusInjectionKey,
-    MessageBusWorkerComponentCaller,
     createLogger,
 } from '@privateaim/server-kit';
+import { MessageBusWorkerComponentCaller } from 'ergos';
 import {
     AnalysisBuilderEventMessageBusRouting,
     AnalysisBuilderTaskMessageBusRouting,
@@ -42,6 +42,8 @@ export class ComponentsModule implements IModule {
     readonly name = 'components';
 
     readonly dependencies: string[] = ['coreClient', 'storageClient', 'docker'];
+
+    protected components: IComponent<any>[] = [];
 
     async setup(container: IContainer): Promise<void> {
         const coreClient = container.resolve(CoreClientInjectionKey);
@@ -113,7 +115,7 @@ export class ComponentsModule implements IModule {
             ],
         });
 
-        const components: Component<any>[] = [
+        this.components = [
             new MessageBusWorkerComponentCaller(
                 new AnalysisBuilderComponent({
                     coreClient,
@@ -165,7 +167,13 @@ export class ComponentsModule implements IModule {
             ),
         ];
 
-        const promises = components.map((c) => c.start());
-        await Promise.all(promises);
+        await Promise.all(this.components.map((c) => c.start()));
+    }
+
+    async teardown(): Promise<void> {
+        const { components } = this;
+        this.components = [];
+
+        await Promise.all(components.map((c) => c.stop()));
     }
 }

@@ -6,9 +6,7 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'ergos';
 import type { BucketFileComponentEventMap } from '@privateaim/server-storage-kit';
 import {
     BucketFileCommand,
@@ -16,7 +14,7 @@ import {
 import type { IStorageAdapter } from '../../../core/storage/types.ts';
 import { BucketFileCreateHandler, BucketFileDeleteHandler } from './handlers/index.ts';
 
-export class BucketFileComponent extends BaseComponent<BucketFileComponentEventMap> {
+export class BucketFileComponent extends Component<BucketFileComponentEventMap> {
     constructor(ctx: { storage: IStorageAdapter; logger?: Logger }) {
         super();
 

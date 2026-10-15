@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { ComponentHandler } from '@privateaim/server-kit';
+import type { ComponentHandler } from 'ergos';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 import type { IAnalysisBucketRepository } from '../../../../../core/index.ts';

@@ -6,7 +6,8 @@
  */
 
 import type { IContainer } from 'eldin';
-import { LoggerInjectionKey, MessageBusDispatchComponentCaller, MessageBusInjectionKey } from '@privateaim/server-kit';
+import { LoggerInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
+import { MessageBusDispatchComponentCaller } from 'ergos';
 import { BucketEventMessageBusRouting, BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import { BucketController } from '../../../adapters/http/controllers/bucket/module.ts';
 import { BucketFileController } from '../../../adapters/http/controllers/bucket-file/module.ts';

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DirectComponentCaller } from '@privateaim/server-kit';
+import { DirectComponentCaller } from 'ergos';
 import {
     BucketFileCommand,
     BucketFileEvent,

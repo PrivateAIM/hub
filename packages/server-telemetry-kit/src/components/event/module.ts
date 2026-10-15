@@ -5,10 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from '@privateaim/server-kit';
-import {
-    MessageBusDispatchComponentCaller,
-} from '@privateaim/server-kit';
+import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from 'ergos';
+import { MessageBusDispatchComponentCaller } from 'ergos';
 import type { EventCreateCommandPayload } from './handlers';
 import { EventCommand, EventTaskMessageBusRouting } from './constants';
 

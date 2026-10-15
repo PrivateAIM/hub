@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { DomainType, parseAnalysisBucketName } from '@privateaim/core-kit';
-import type { ComponentHandler, Logger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
+import type { ComponentHandler } from 'ergos';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';

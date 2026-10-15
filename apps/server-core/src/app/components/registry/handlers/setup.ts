@@ -13,10 +13,7 @@ import {
     generateRegistryProjectId,
 } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import {
-    type ComponentHandler, 
-    type ComponentHandlerContext,
-} from '@privateaim/server-kit';
+import { type ComponentHandler, type ComponentHandlerContext } from 'ergos';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../adapters/database/index.ts';
 import { RegistryCommand } from '../constants.ts';
 import type { RegistryEventMap, RegistrySetupPayload } from '../type.ts';

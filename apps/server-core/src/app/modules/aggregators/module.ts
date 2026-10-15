@@ -7,13 +7,14 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
+import type { IComponent } from 'ergos';
 import {
     ConfigInjectionKey,
     LoggerInjectionKey,
     MessageBusInjectionKey,
-    MessageBusWorkerComponentCaller,
     RedisSubscribeClientInjectionKey,
 } from '@privateaim/server-kit';
+import { MessageBusWorkerComponentCaller } from 'ergos';
 import { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import {
     AnalysisBuilderEventMessageBusRouting,
@@ -48,6 +49,10 @@ export class AggregatorsModule implements IModule {
 
     readonly dependencies: string[] = ['database', 'components', 'analysis'];
 
+    protected aggregators: IComponent<any>[] = [];
+
+    protected starting: Promise<unknown> | undefined;
+
     async setup(container: IContainer): Promise<void> {
         const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
         const analysisBucketRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketRepository);
@@ -61,7 +66,7 @@ export class AggregatorsModule implements IModule {
 
         const config = container.resolve(ConfigInjectionKey);
 
-        const aggregators = [
+        this.aggregators = [
             createAuthupAggregator({
                 env: config.env,
                 registryComponentCaller,
@@ -152,6 +157,15 @@ export class AggregatorsModule implements IModule {
             ),
         ];
 
-        aggregators.forEach((a) => a.start());
+        this.starting = Promise.allSettled(this.aggregators.map((a) => a.start()));
+    }
+
+    async teardown(): Promise<void> {
+        const { aggregators, starting } = this;
+        this.aggregators = [];
+        this.starting = undefined;
+
+        await starting;
+        await Promise.all(aggregators.map((a) => a.stop()));
     }
 }

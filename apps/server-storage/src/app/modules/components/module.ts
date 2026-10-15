@@ -7,8 +7,9 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { Component } from '@privateaim/server-kit';
-import { LoggerInjectionKey, MessageBusInjectionKey, MessageBusWorkerComponentCaller } from '@privateaim/server-kit';
+import type { IComponent } from 'ergos';
+import { LoggerInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
+import { MessageBusWorkerComponentCaller } from 'ergos';
 import {
     BucketEventMessageBusRouting,
     BucketFileEventMessageBusRouting,
@@ -24,6 +25,8 @@ export class ComponentsModule implements IModule {
 
     readonly dependencies: string[] = ['storage', 'database'];
 
+    protected components: IComponent<any>[] = [];
+
     async setup(container: IContainer): Promise<void> {
         const storage = container.resolve(StorageInjectionKey);
 
@@ -32,7 +35,7 @@ export class ComponentsModule implements IModule {
         const messageBusResult = container.tryResolve(MessageBusInjectionKey);
         const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
-        const components : Component<any>[] = [
+        this.components = [
             new MessageBusWorkerComponentCaller(new BucketComponent({ storage, logger }), {
                 consumeRouting: BucketTaskMessageBusRouting,
                 publishRouting: BucketEventMessageBusRouting,
@@ -47,7 +50,13 @@ export class ComponentsModule implements IModule {
             }),
         ];
 
-        const promises = components.map((c) => c.start());
-        await Promise.all(promises);
+        await Promise.all(this.components.map((c) => c.start()));
+    }
+
+    async teardown(): Promise<void> {
+        const { components } = this;
+        this.components = [];
+
+        await Promise.all(components.map((c) => c.stop()));
     }
 }

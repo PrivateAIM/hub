@@ -13,9 +13,7 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type { IEntityRepository, Logger } from '@privateaim/server-kit';
 import type { IMasterImageRepository } from '../../../../core/entities/master-image/types.ts';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'ergos';
 import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import {
     handleMasterImageSynchronizerExecutionFinishedEvent,
@@ -28,7 +26,7 @@ type MasterImageSynchronizerAggregatorContext = {
     logger?: Logger;
 };
 
-export class MasterImageSynchronizerAggregator extends BaseComponent<MasterImageSynchronizerEventMap> {
+export class MasterImageSynchronizerAggregator extends Component<MasterImageSynchronizerEventMap> {
     constructor(ctx: MasterImageSynchronizerAggregatorContext) {
         super();
 

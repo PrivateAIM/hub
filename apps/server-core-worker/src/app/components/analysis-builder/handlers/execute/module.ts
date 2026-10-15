@@ -17,7 +17,8 @@ import {
     AnalysisBuilderEventMessageBusRouting,
 } from '@privateaim/server-core-worker-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
-import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext } from 'ergos';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import { getManyAll } from '@privateaim/core-http-kit';
 import type { IStorageClient as StorageClient } from '@privateaim/storage-kit';

@@ -9,12 +9,10 @@ import type { AnalysisBuilderEventMap } from '@privateaim/server-core-worker-kit
 import {
     AnalysisBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'ergos';
 import type { AnalysisBuilderAggregatorContext } from './types.ts';
 
-export class AnalysisBuilderAggregator extends BaseComponent<AnalysisBuilderEventMap> {
+export class AnalysisBuilderAggregator extends Component<AnalysisBuilderEventMap> {
     constructor(ctx: AnalysisBuilderAggregatorContext) {
         super();
 

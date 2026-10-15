@@ -8,7 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
 import type { ReadableStream } from 'node:stream/web';
-import { DirectComponentCaller } from '@privateaim/server-kit';
+import { DirectComponentCaller } from 'ergos';
 import {
     BucketFileCommand,
     type BucketFileCreationFinishedEventPayload,

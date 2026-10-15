@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component, Logger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
+import type { IComponent } from 'ergos';
 import type { INodeRepository } from '../../../core/index.ts';
 import type { NodeClientService } from '../../modules/database/node-client.ts';
 
@@ -27,7 +28,7 @@ export type NodeClientComponentContext = NodeClientPermissionSyncContext & {
     lock: <T>(fn: () => Promise<T>) => Promise<T>,
 };
 
-export type NodeClientComponent = Component & {
+export type NodeClientComponent = IComponent & {
     start: () => Promise<void>,
     stop: () => Promise<void>,
     /**

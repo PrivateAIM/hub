@@ -10,12 +10,10 @@ import type { MasterImageBuilderEventMap } from '@privateaim/server-core-worker-
 import {
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'ergos';
 import type { MasterImageBuilderAggregatorContext } from './types.ts';
 
-export class MasterImageBuilderAggregator extends BaseComponent<MasterImageBuilderEventMap> {
+export class MasterImageBuilderAggregator extends Component<MasterImageBuilderEventMap> {
     constructor(ctx: MasterImageBuilderAggregatorContext) {
         super();
 

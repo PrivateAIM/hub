@@ -9,9 +9,7 @@ import type { AnalysisBuilderEventMap } from '@privateaim/server-core-worker-kit
 import {
     AnalysisBuilderCommand,
 } from '@privateaim/server-core-worker-kit';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'ergos';
 import type { Logger } from '@privateaim/server-kit';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { IStorageClient as StorageClient } from '@privateaim/storage-kit';
@@ -19,7 +17,7 @@ import type { Client as DockerClient } from 'docken';
 
 import { AnalysisBuilderCheckHandler, AnalysisBuilderExecuteHandler } from './handlers';
 
-export class AnalysisBuilderComponent extends BaseComponent<AnalysisBuilderEventMap> {
+export class AnalysisBuilderComponent extends Component<AnalysisBuilderEventMap> {
     constructor(ctx: {
         coreClient: CoreClient;
         storageClient: StorageClient;

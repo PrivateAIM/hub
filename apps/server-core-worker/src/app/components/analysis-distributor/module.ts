@@ -5,9 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'ergos';
 import type { Logger } from '@privateaim/server-kit';
 import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker-kit';
 import {
@@ -17,7 +15,7 @@ import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 import { AnalysisDistributorCheckHandler, AnalysisDistributorExecuteHandler } from './handlers';
 
-export class AnalysisDistributorComponent extends BaseComponent<AnalysisDistributorEventMap> {
+export class AnalysisDistributorComponent extends Component<AnalysisDistributorEventMap> {
     constructor(ctx: {
         coreClient: CoreClient; 
         docker: DockerClient; 

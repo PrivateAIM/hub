@@ -8,13 +8,13 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { withDataSourceLock } from '@privateaim/server-db-kit';
-import type { Component } from '@privateaim/server-kit';
+import type { IComponent } from 'ergos';
 import {
     AuthupClientInjectionKey,
     LoggerInjectionKey,
     MessageBusInjectionKey,
-    MessageBusWorkerComponentCaller,
 } from '@privateaim/server-kit';
+import { MessageBusWorkerComponentCaller } from 'ergos';
 import { AnalysisReconciler } from '../../../core/services/analysis-reconciler/index.ts';
 import { createAnalysisReconcilerComponent } from '../../components/analysis-reconciler/module.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
@@ -33,7 +33,9 @@ export class ComponentsModule implements IModule {
 
     readonly dependencies: string[] = ['database', 'analysis'];
 
-    protected components: Component[] = [];
+    protected components: IComponent[] = [];
+
+    protected starting: Promise<unknown> | undefined;
 
     async setup(container: IContainer): Promise<void> {
         // Create components
@@ -86,15 +88,18 @@ export class ComponentsModule implements IModule {
             }));
         }
 
-        this.components.forEach((c) => c.start());
+        // Fire-and-forget: a background component's first pass must not
+        // block boot. teardown() awaits it before stopping.
+        this.starting = Promise.allSettled(this.components.map((c) => c.start()));
     }
 
     async teardown(): Promise<void> {
-        const { components } = this;
+        const { components, starting } = this;
         this.components = [];
+        this.starting = undefined;
 
-        // The message-bus consumers have no stop(): consumption ends with the
-        // message bus connection.
-        await Promise.all(components.map((c) => c.stop?.()));
+        // A worker caller that is still starting would subscribe after its stop().
+        await starting;
+        await Promise.all(components.map((c) => c.stop()));
     }
 }

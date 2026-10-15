@@ -7,8 +7,8 @@
 
 import type { Bucket } from '@privateaim/storage-kit';
 import { BadRequestError } from '@privateaim/errors';
-import type { MessageBusDispatchComponentCaller } from '@privateaim/server-kit';
-import { DirectComponentCaller } from '@privateaim/server-kit';
+import type { MessageBusDispatchComponentCaller } from 'ergos';
+import { DirectComponentCaller } from 'ergos';
 import type { BucketComponentEventMap } from '@privateaim/server-storage-kit';
 import { BucketCommand, BucketEvent } from '@privateaim/server-storage-kit';
 import type { IBucketCaller } from '../../../../core/entities/index.ts';
