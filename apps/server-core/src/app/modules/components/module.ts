@@ -33,6 +33,8 @@ export class ComponentsModule implements IModule {
 
     readonly dependencies: string[] = ['database'];
 
+    protected components: Component[] = [];
+
     async setup(container: IContainer): Promise<void> {
         // Create TaskManager
         const cache = container.resolve(CacheInjectionKey);
@@ -57,7 +59,7 @@ export class ComponentsModule implements IModule {
         container.register(ComponentsInjectionKey.RegistryComponentCaller, { useValue: registryComponentCaller });
 
         // Start task consumers and background components
-        const components: Component[] = [
+        this.components = [
             new MessageBusWorkerComponentCaller(
                 registryComponent,
                 {
@@ -71,7 +73,7 @@ export class ComponentsModule implements IModule {
         // Without an Authup client there are no node clients to sync.
         if (authupResult.success) {
             const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
-            components.push(createNodeClientComponent({
+            this.components.push(createNodeClientComponent({
                 lock: (fn) => withDataSourceLock(dataSource, NODE_CLIENT_SYNC_DATABASE_LOCK, fn),
                 repository: container.resolve(DatabaseInjectionKey.NodeRepository),
                 nodeClientService: new NodeClientService(authupResult.data),
@@ -79,6 +81,15 @@ export class ComponentsModule implements IModule {
             }));
         }
 
-        components.forEach((c) => c.start());
+        this.components.forEach((c) => c.start());
+    }
+
+    async teardown(): Promise<void> {
+        const { components } = this;
+        this.components = [];
+
+        // The message-bus consumers have no stop(): consumption ends with the
+        // message bus connection.
+        await Promise.all(components.map((c) => c.stop?.()));
     }
 }

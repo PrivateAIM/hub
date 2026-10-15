@@ -16,6 +16,8 @@ export type ComponentMetadata = {
 
 export type ComponentStartFn = () => Promise<void> | void;
 
+export type ComponentStopFn = () => Promise<void> | void;
+
 export type ComponentErrorOptions = {
     code?: string | null,
     message?: string
@@ -59,5 +61,10 @@ export interface Component<
     EventMap extends ComponentEventMap = ComponentEventMap,
 > {
     start: ComponentStartFn,
+    /**
+     * Release what start() acquired (timers, schedules). Optional: a
+     * component without background work has nothing to release.
+     */
+    stop?: ComponentStopFn,
     handle?: ComponentHandlerCallFnForMap<EventMap>
 }
