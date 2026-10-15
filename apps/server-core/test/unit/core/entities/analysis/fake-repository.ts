@@ -6,6 +6,7 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
+import { ProcessStatus } from '@privateaim/kit';
 import type { EntityPersistContext } from '@privateaim/server-kit';
 import type { IAnalysisRepository } from '../../../../../src/core/entities/analysis/types.ts';
 import { FakeEntityRepository } from '@privateaim/server-test-kit';
@@ -37,6 +38,14 @@ export class FakeAnalysisRepository extends FakeEntityRepository<Analysis> imple
 
     async findOneWithProject(id: string): Promise<Analysis | null> {
         return this.findOneById(id);
+    }
+
+    async findManyInProgressUpdatedBefore(updatedBefore: Date): Promise<Analysis[]> {
+        const inProgress = (status: string | null) => status === ProcessStatus.STARTING ||
+            status === ProcessStatus.STARTED;
+
+        return this.getAll().filter((entity) => (inProgress(entity.buildStatus) || inProgress(entity.distributionStatus)) &&
+            new Date(entity.updatedAt).getTime() < updatedBefore.getTime());
     }
 
     async countByProject(projectId: string): Promise<number> {

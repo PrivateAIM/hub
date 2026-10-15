@@ -17,7 +17,12 @@ import type {
     AnalysisBuilderExecutionProgressPayload,
 } from '@privateaim/server-core-worker-kit';
 import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
-import { isCheckVerdictStale, isProcessStatusTerminal } from '../helpers.ts';
+import {
+    isCheckVerdictStale,
+    isProcessStale,
+    isProcessStatusInProgress,
+    isProcessStatusTerminal,
+} from '../helpers.ts';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
@@ -129,6 +134,11 @@ export class AnalysisBuilder {
                     ) {
                         entity.buildProgress = Math.min(temp.progress.percent, 100);
                     }
+
+                    // a worker heartbeat repeats the last percent, and typeorm
+                    // skips a save that changes nothing — stamp the row so it
+                    // reads as alive to the stale check (F13).
+                    entity.updatedAt = new Date().toISOString();
                     break;
                 }
                 case AnalysisBuilderEvent.CHECK_FAILED: {
@@ -155,14 +165,21 @@ export class AnalysisBuilder {
                         return false;
                     }
 
-                    entity.buildStatus = temp.status;
+                    // the worker reports an in-progress status as it sees it;
+                    // whether that process is orphaned is judged here, on the
+                    // locked row (F13).
+                    const status = isProcessStatusInProgress(temp.status) && isProcessStale(entity.updatedAt) ?
+                        ProcessStatus.FAILED :
+                        temp.status;
 
-                    if (temp.status === ProcessStatus.EXECUTED) {
+                    entity.buildStatus = status;
+
+                    if (status === ProcessStatus.EXECUTED) {
                         entity.buildProgress = 100;
                         entity.buildHash = temp.hash ?? entity.buildHash;
                         entity.buildOs = temp.os ?? entity.buildOs;
                         entity.buildSize = temp.size ?? entity.buildSize;
-                    } else if (temp.status === ProcessStatus.FAILED) {
+                    } else if (status === ProcessStatus.FAILED) {
                         // the image is verifiably gone (e.g. docker daemon data loss) —
                         // reset the build artifacts so the build can be retriggered.
                         entity.buildProgress = 0;

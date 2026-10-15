@@ -12,7 +12,6 @@ import type { Client as DockerClient } from 'docken';
 import type { AnalysisDistributorCheckPayload } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorCommand, AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import { describe, expect, it } from 'vitest';
-import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/app/components/constants';
 import { AnalysisDistributorCheckHandler } from '../../../../src/app/components/analysis-distributor/handlers/check/module';
 import { FakeComponentHandlerContext } from '../fakes/fake-component-handler-context';
 import { FakeDockerClient } from '../fakes/fake-docker-client';
@@ -178,30 +177,18 @@ describe('AnalysisDistributorCheckHandler', () => {
         });
     });
 
-    it('should keep an in-flight distribution status when the image is missing but fresh', async () => {
+    it('should keep an in-flight distribution status when the image is missing, however old the row', async () => {
+        // the stale verdict is server-core's (F13): the worker reports what it sees.
         const coreClient = createCoreClient({
             analysis: {
                 distributionStatus: ProcessStatus.STARTED,
-                updatedAt: new Date().toISOString(),
+                updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
             },
         });
         const docker = new FakeDockerClient({ distributionError: new FakeDockerError(404) });
         const context = await run(coreClient, docker);
 
         expect(context.lastEvent().payload.status).toBe(ProcessStatus.STARTED);
-    });
-
-    it('should recover a stale in-flight distribution as FAILED', async () => {
-        const coreClient = createCoreClient({
-            analysis: {
-                distributionStatus: ProcessStatus.STARTED,
-                updatedAt: new Date(Date.now() - ANALYSIS_PROCESS_STALE_THRESHOLD_MS - 1000).toISOString(),
-            },
-        });
-        const docker = new FakeDockerClient({ distributionError: new FakeDockerError(404) });
-        const context = await run(coreClient, docker);
-
-        expect(context.lastEvent().payload.status).toBe(ProcessStatus.FAILED);
     });
 
     it('should fail the check when docker itself is unreachable', async () => {

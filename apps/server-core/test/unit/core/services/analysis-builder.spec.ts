@@ -23,6 +23,7 @@ import {
     it, 
 } from 'vitest';
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
+import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/core/services/helpers.ts';
 import { FakeAnalysisBuilderCaller } from './helpers/fake-builder-caller.ts';
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
@@ -326,6 +327,50 @@ describe('AnalysisBuilder', () => {
             expect(entity.buildHash).toBe('sha256:previous');
             expect(entity.buildOs).toBe('linux');
             expect(entity.buildSize).toBe(512);
+        });
+
+        it('should FAIL a stale in-progress build on CHECK_FINISHED with an in-progress status', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
+                buildHash: 'sha256:previous',
+                updatedAt: new Date(Date.now() - ANALYSIS_PROCESS_STALE_THRESHOLD_MS - 1000).toISOString(),
+            });
+
+            const payload: AnalysisBuilderCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.STARTED,
+            };
+
+            await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
+            expect(entity.buildProgress).toBe(0);
+            expect(entity.buildHash).toBeNull();
+        });
+
+        it('should stamp updatedAt on EXECUTION_PROGRESS even when the percent is unchanged', async () => {
+            const updatedAt = new Date(Date.now() - 60_000).toISOString();
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
+                updatedAt,
+            });
+
+            const payload: AnalysisBuilderExecutionProgressPayload = {
+                id: analysis.id,
+                progress: {
+                    current: 0,
+                    total: 0,
+                    percent: 40,
+                },
+            };
+            await builder.applyEvent(AnalysisBuilderEvent.EXECUTION_PROGRESS, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildProgress).toBe(40);
+            expect(new Date(entity.updatedAt).getTime()).toBeGreaterThan(new Date(updatedAt).getTime());
         });
 
         it('should reset build artifacts on CHECK_FINISHED with status FAILED (data loss recovery)', async () => {

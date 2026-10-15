@@ -20,7 +20,12 @@ import type { EntityPersistContext, IEntityRepository } from '@privateaim/server
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
-import { isCheckVerdictStale, isProcessStatusTerminal } from '../helpers.ts';
+import {
+    isCheckVerdictStale,
+    isProcessStale,
+    isProcessStatusInProgress,
+    isProcessStatusTerminal,
+} from '../helpers.ts';
 import type { IAnalysisDistributorCaller } from './types.ts';
 
 type AnalysisDistributorContext = {
@@ -130,6 +135,11 @@ export class AnalysisDistributor {
                     ) {
                         entity.distributionProgress = Math.min(temp.progress.percent, 100);
                     }
+
+                    // a worker heartbeat repeats the last percent, and typeorm
+                    // skips a save that changes nothing — stamp the row so it
+                    // reads as alive to the stale check (F13).
+                    entity.updatedAt = new Date().toISOString();
                     break;
                 }
                 case AnalysisDistributorEvent.CHECK_FAILED: {
@@ -151,11 +161,18 @@ export class AnalysisDistributor {
                         return false;
                     }
 
-                    entity.distributionStatus = temp.status;
+                    // the worker reports an in-progress status as it sees it;
+                    // whether that process is orphaned is judged here, on the
+                    // locked row (F13).
+                    const status = isProcessStatusInProgress(temp.status) && isProcessStale(entity.updatedAt) ?
+                        ProcessStatus.FAILED :
+                        temp.status;
 
-                    if (temp.status === ProcessStatus.EXECUTED) {
+                    entity.distributionStatus = status;
+
+                    if (status === ProcessStatus.EXECUTED) {
                         entity.distributionProgress = 100;
-                    } else if (temp.status === ProcessStatus.FAILED) {
+                    } else if (status === ProcessStatus.FAILED) {
                         entity.distributionProgress = 0;
                     }
                 }

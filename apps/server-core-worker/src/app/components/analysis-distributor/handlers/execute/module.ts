@@ -19,7 +19,7 @@ import { REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import { getManyAll } from '@privateaim/core-http-kit';
-import type { Client as DockerClient, ModemStreamWaitOptions  } from 'docken';
+import type { Client as DockerClient, ModemStreamWaitOptions, Progress } from 'docken';
 import type { ImagePushOptions } from 'dockerode';
 import { waitForStream } from 'docken';
 import {
@@ -28,6 +28,7 @@ import {
     cleanupDockerImages,
 } from '../../../../../adapters/docker/index.ts';
 import { BuilderError } from '../../../analysis-builder/error';
+import { startHeartbeat } from '../../../helpers.ts';
 
 export class AnalysisDistributorExecuteHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -50,9 +51,22 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         value: AnalysisDistributorExecutePayload,
         context: ComponentHandlerContext<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE>,
     ): Promise<void> {
+        let progress: Progress = {
+            percent: 0,
+            current: 0,
+            total: 0,
+        };
+        const heartbeat = startHeartbeat(() => context.handle(
+            AnalysisDistributorEvent.EXECUTION_PROGRESS,
+            { progress, id: value.id },
+        ), this.logger);
+
         try {
             // todo: check if image exists, otherwise local queue task
-            await this.handleInternal(value, context);
+            await this.handleInternal(value, context, (next) => {
+                progress = next;
+                heartbeat.touch();
+            });
         } catch (e) {
             this.logger?.error({
                 message: e,
@@ -69,12 +83,15 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                     error: e,
                 },
             );
+        } finally {
+            heartbeat.stop();
         }
     }
 
     async handleInternal(
         value: AnalysisDistributorExecutePayload,
         context: ComponentHandlerContext<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE>,
+        onProgress?: (progress: Progress) => void,
     ): Promise<void> {
         await context.handle(
             AnalysisDistributorEvent.EXECUTION_STARTED,
@@ -140,6 +157,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                     push: { authconfig: buildDockerAuthConfigFromRegistry(registry) },
                     stream: {
                         onPushing: async (progress) => {
+                            onProgress?.(progress);
                             await context.handle(
                                 AnalysisDistributorEvent.EXECUTION_PROGRESS,
                                 {

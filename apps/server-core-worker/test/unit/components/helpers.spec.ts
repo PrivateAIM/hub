@@ -1,41 +1,83 @@
 /*
  * Copyright (c) 2026.
- *  Author Peter Placzek (tada5hi)
- *  For the full copyright and license information,
- *  view the LICENSE file that was distributed with this source code.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
  */
 
-import { describe, expect, it } from 'vitest';
-import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../src/app/components/constants';
-import { isAnalysisProcessStale } from '../../../src/app/components/helpers';
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+} from 'vitest';
+import { ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS, ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS } from '../../../src/app/components/constants';
+import { startHeartbeat } from '../../../src/app/components/helpers';
 
-describe('isAnalysisProcessStale', () => {
-    it('should not be stale when updated within the threshold', () => {
-        const updatedAt = new Date(Date.now() - 60 * 1000);
-
-        expect(isAnalysisProcessStale(updatedAt)).toBe(false);
+describe('startHeartbeat', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
     });
 
-    it('should be stale when not updated for longer than the threshold', () => {
-        const updatedAt = new Date(Date.now() - ANALYSIS_PROCESS_STALE_THRESHOLD_MS - 1000);
-
-        expect(isAnalysisProcessStale(updatedAt)).toBe(true);
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
-    it('should accept an ISO string timestamp (HTTP payloads)', () => {
-        const updatedAt = new Date(Date.now() - ANALYSIS_PROCESS_STALE_THRESHOLD_MS - 1000).toISOString();
+    it('should beat on the interval until stopped', async () => {
+        let beats = 0;
+        const { stop } = startHeartbeat(async () => {
+            beats++;
+        });
 
-        expect(isAnalysisProcessStale(updatedAt)).toBe(true);
+        await vi.advanceTimersByTimeAsync(ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS - 1);
+        expect(beats).toBe(0);
+
+        await vi.advanceTimersByTimeAsync(1);
+        expect(beats).toBe(1);
+
+        await vi.advanceTimersByTimeAsync(ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS);
+        expect(beats).toBe(2);
+
+        stop();
+        await vi.advanceTimersByTimeAsync(ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS * 3);
+        expect(beats).toBe(2);
     });
 
-    it('should respect a custom threshold', () => {
-        const updatedAt = new Date(Date.now() - 5 * 1000);
+    it('should keep beating after a failed beat', async () => {
+        let beats = 0;
+        const { stop } = startHeartbeat(async () => {
+            beats++;
+            throw new Error('bus down');
+        });
 
-        expect(isAnalysisProcessStale(updatedAt, 1000)).toBe(true);
-        expect(isAnalysisProcessStale(updatedAt, 60 * 1000)).toBe(false);
+        await vi.advanceTimersByTimeAsync(ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS * 2);
+        expect(beats).toBe(2);
+
+        stop();
     });
 
-    it('should not be stale for an invalid timestamp', () => {
-        expect(isAnalysisProcessStale('not-a-date')).toBe(false);
+    it('should stop beating after the max silence, until touched again', async () => {
+        let beats = 0;
+        const heartbeat = startHeartbeat(async () => {
+            beats++;
+        });
+
+        const perSilence = Math.floor(ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS / ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS);
+        await vi.advanceTimersByTimeAsync(ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS * 2);
+        expect(beats).toBe(perSilence);
+
+        heartbeat.touch();
+        await vi.advanceTimersByTimeAsync(ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS);
+        expect(beats).toBe(perSilence + 1);
+
+        heartbeat.stop();
+    });
+
+    it('should stay below the server-core stale threshold', () => {
+        // server-core's ANALYSIS_PROCESS_STALE_THRESHOLD_MS (15 min); not
+        // imported, the worker does not depend on server-core.
+        expect(ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS * 2).toBeLessThan(15 * 60 * 1000);
     });
 });

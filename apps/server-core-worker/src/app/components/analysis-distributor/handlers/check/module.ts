@@ -28,7 +28,6 @@ import {
     buildDockerImageURL,
     isDockerDistributionImageMissingError,
 } from '../../../../../adapters/docker/index.ts';
-import { isAnalysisProcessStale } from '../../../helpers.ts';
 import { BuilderError } from '../../../analysis-builder/error';
 
 export class AnalysisDistributorCheckHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK> {
@@ -183,11 +182,9 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
                 analysis.distributionStatus === ProcessStatus.STARTED ||
                 analysis.distributionStatus === ProcessStatus.STARTING
             ) {
-                // an in-progress distribution refreshes the entity via progress events;
-                // a long-untouched one is orphaned (e.g. worker died) and recoverable as FAILED.
-                status = isAnalysisProcessStale(analysis.updatedAt) ?
-                    ProcessStatus.FAILED :
-                    analysis.distributionStatus;
+                // the image is not there yet; whether the distribution is orphaned
+                // is server-core's verdict (it compares the row's age when applying).
+                status = analysis.distributionStatus;
             } else {
                 status = ProcessStatus.FAILED;
             }

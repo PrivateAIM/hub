@@ -18,7 +18,6 @@ import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 import type { ImageInspectInfo } from 'dockerode';
 import { isDockerNotFoundError } from '../../../../../adapters/docker/index.ts';
-import { isAnalysisProcessStale } from '../../../helpers.ts';
 
 export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.CHECK> {
     protected coreClient: CoreClient;
@@ -110,11 +109,9 @@ export class AnalysisBuilderCheckHandler implements ComponentHandler<AnalysisBui
             analysis.buildStatus === ProcessStatus.STARTED ||
             analysis.buildStatus === ProcessStatus.STARTING
         ) {
-            // an in-progress build refreshes the entity via progress events;
-            // a long-untouched one is orphaned (e.g. worker died) and recoverable as FAILED.
-            status = isAnalysisProcessStale(analysis.updatedAt) ?
-                ProcessStatus.FAILED :
-                analysis.buildStatus;
+            // the image is not there yet; whether the build is orphaned is
+            // server-core's verdict (it compares the row's age when applying).
+            status = analysis.buildStatus;
         } else if (analysis.buildStatus === ProcessStatus.EXECUTED) {
             // fail-safe: the local image must only exist while no distribution
             // explains its absence (the distributor removes it during/after a run).

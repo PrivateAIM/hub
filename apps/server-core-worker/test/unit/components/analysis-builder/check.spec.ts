@@ -12,7 +12,6 @@ import type { Client as DockerClient } from 'docken';
 import type { AnalysisBuilderCheckPayload } from '@privateaim/server-core-worker-kit';
 import { AnalysisBuilderCommand, AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import { describe, expect, it } from 'vitest';
-import { ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/app/components/constants';
 import { AnalysisBuilderCheckHandler } from '../../../../src/app/components/analysis-builder/handlers/check/module';
 import { FakeComponentHandlerContext } from '../fakes/fake-component-handler-context';
 import { FakeDockerClient } from '../fakes/fake-docker-client';
@@ -110,29 +109,19 @@ describe('AnalysisBuilderCheckHandler', () => {
         });
     });
 
-    it('should keep an in-flight build status when the image is absent but fresh', async () => {
-        const docker = new FakeDockerClient({ inspectError: IMAGE_MISSING });
-
-        const context = await run(
-            createCoreClient({ buildStatus: ProcessStatus.STARTED, updatedAt: new Date().toISOString() }),
-            docker,
-        );
-
-        expect(context.lastEvent().payload.status).toBe(ProcessStatus.STARTED);
-    });
-
-    it('should recover a stale in-flight build as FAILED', async () => {
+    it('should keep an in-flight build status when the image is absent, however old the row', async () => {
+        // the stale verdict is server-core's (F13): the worker reports what it sees.
         const docker = new FakeDockerClient({ inspectError: IMAGE_MISSING });
 
         const context = await run(
             createCoreClient({
                 buildStatus: ProcessStatus.STARTING,
-                updatedAt: new Date(Date.now() - ANALYSIS_PROCESS_STALE_THRESHOLD_MS - 1000).toISOString(),
+                updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
             }),
             docker,
         );
 
-        expect(context.lastEvent().payload.status).toBe(ProcessStatus.FAILED);
+        expect(context.lastEvent().payload.status).toBe(ProcessStatus.STARTING);
     });
 
     it('should FAIL a previously-executed build whose image vanished with no distribution to explain it', async () => {

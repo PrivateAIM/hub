@@ -9,5 +9,6 @@ export * from './analysis-builder/index.ts';
 export * from './analysis-configurator/index.ts';
 export * from './analysis-reach/index.ts';
 export * from './analysis-distributor/index.ts';
+export * from './analysis-reconciler/index.ts';
 export * from './analysis-storage-manager/index.ts';
 export * from './master-image/index.ts';

@@ -57,6 +57,18 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   neither reads nor removes them. The next upgrade would apply whatever they
   still hold: a stale `started`/`progress` event is ignored, but a stale
   `finished`/`failed` event would overwrite the current status.
+- **Stuck builds and distributions are recovered by server-core.** It re-checks
+  every build/distribution that has been `starting`/`started` without an update
+  for 15 minutes, every 5 minutes, and marks it `failed` if the image is not
+  there. Running workers send a heartbeat every 5 minutes, so a long build is not
+  affected (a step that sends no progress for 2 hours is treated as hung and
+  stops the heartbeat). **Upgrade the workers before server-core.** An old
+  worker sends no heartbeat and still decides staleness on its own: with a new
+  server-core, the automatic re-check can reach an idle old worker replica,
+  which then reports a healthy build or push with one step longer than 15
+  minutes as `failed`. A new worker with an old server-core is safe: it reports
+  a stuck process as still running, so it stays stuck until server-core is
+  upgraded too.
 - A lost broker connection is retried every 5 seconds (it was 60).
 - Failure events carry the error's `name`, `message` and `code` instead of `{}`.
 
