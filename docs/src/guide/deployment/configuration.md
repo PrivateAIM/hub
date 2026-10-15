@@ -35,6 +35,14 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   attempt leaves a build or distribution `started`; server-core fails it once it
   is 15 minutes stale (see below). An error docker reports inside a build or push
   stream (e.g. a registry 503 during push) counts as permanent.
+- **Harbor registry commands go through the `registryCommands` queue** (project
+  link/relink/unlink, registry setup/cleanup/delete, webhook processing). They
+  used to run inside server-core's request first and reach the queue only if that
+  call threw. They are now only queued, so they get the same retries, and a
+  Harbor outage no longer fails the request that triggered them. A node's robot
+  account and registry credentials therefore appear shortly after the node is
+  created rather than with the response. Without a message bus, server-core
+  still runs them in-process.
 - **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
   build.** A command is acknowledged only once its handler finishes. If a build
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the
