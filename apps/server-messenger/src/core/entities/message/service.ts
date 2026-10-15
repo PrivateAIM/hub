@@ -88,7 +88,7 @@ export class MessageService implements IMessageService {
         const unsubscribe = this.wakeup.subscribe(recipient, () => signal());
 
         try {
-            let messages = await this.repository.findManyForRecipient(recipient, limit);
+            let messages = await this.repository.findManyForRecipient(recipient, limit, new Date());
             if (messages.length === 0 && waitMs > 0) {
                 // long-poll: park until a message is pending for this recipient or the
                 // budget elapses, then re-query once.
@@ -106,7 +106,7 @@ export class MessageService implements IMessageService {
                         clearTimeout(timer);
                     }
                 }
-                messages = await this.repository.findManyForRecipient(recipient, limit);
+                messages = await this.repository.findManyForRecipient(recipient, limit, new Date());
             }
 
             return { messages };

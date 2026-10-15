@@ -72,14 +72,14 @@ describe('database/message-repository', () => {
             persistInput(recipientB, 'z'),
         ]);
 
-        const forA = await repository.findManyForRecipient({ type: 'client', id: recipientA }, 50);
+        const forA = await repository.findManyForRecipient({ type: 'client', id: recipientA }, 50, new Date());
         expect(forA.map((m) => m.data).sort()).toEqual(['x', 'y']);
 
-        const forB = await repository.findManyForRecipient({ type: 'client', id: recipientB }, 50);
+        const forB = await repository.findManyForRecipient({ type: 'client', id: recipientB }, 50, new Date());
         expect(forB).toHaveLength(1);
 
         await repository.ackByIds({ type: 'client', id: recipientA }, [forA[0].id]);
-        const afterAck = await repository.findManyForRecipient({ type: 'client', id: recipientA }, 50);
+        const afterAck = await repository.findManyForRecipient({ type: 'client', id: recipientA }, 50, new Date());
         expect(afterAck).toHaveLength(1);
         expect(afterAck[0].id).toBe(forA[1].id);
     });
@@ -92,8 +92,19 @@ describe('database/message-repository', () => {
             persistInput(recipient, '3'),
         ]);
 
-        const limited = await repository.findManyForRecipient({ type: 'client', id: recipient }, 2);
+        const limited = await repository.findManyForRecipient({ type: 'client', id: recipient }, 2, new Date());
         expect(limited).toHaveLength(2);
+    });
+
+    it('should not pull an expired message the sweep has not removed yet', async () => {
+        const recipient = randomUUID();
+        await repository.createMany([
+            persistInput(recipient, 'expired', Date.now() - 60_000),
+            persistInput(recipient, 'fresh', Date.now() + 60_000),
+        ]);
+
+        const pulled = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50, new Date());
+        expect(pulled.map((m) => m.data)).toEqual(['fresh']);
     });
 
     it('should sweep expired messages and keep unexpired ones', async () => {
@@ -106,7 +117,7 @@ describe('database/message-repository', () => {
         const removed = await repository.deleteExpired(new Date());
         expect(removed).toBeGreaterThanOrEqual(1);
 
-        const remaining = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50);
+        const remaining = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50, new Date());
         expect(remaining.map((m) => m.data)).toEqual(['fresh']);
     });
 
@@ -125,7 +136,7 @@ describe('database/message-repository', () => {
 
             await repository.deleteExpired(new Date(), { batchSize: 2 });
 
-            const remaining = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50);
+            const remaining = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50, new Date());
             expect(remaining).toHaveLength(0);
         });
 

@@ -30,9 +30,10 @@ export class FakeMessageRepository implements IMessageRepository {
         });
     }
 
-    async findManyForRecipient(recipient: MessageParty, limit: number): Promise<Message[]> {
+    async findManyForRecipient(recipient: MessageParty, limit: number, now: Date): Promise<Message[]> {
         return this.messages
             .filter((message) => message.recipientType === recipient.type && message.recipientId === recipient.id)
+            .filter((message) => new Date(message.expiresAt).getTime() >= now.getTime())
             .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id))
             .slice(0, limit);
     }
