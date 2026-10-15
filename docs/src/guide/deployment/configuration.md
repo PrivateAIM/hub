@@ -38,11 +38,15 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
 - **Harbor registry commands go through the `registryCommands` queue** (project
   link/relink/unlink, registry setup/cleanup/delete, webhook processing). They
   used to run inside server-core's request first and reach the queue only if that
-  call threw. They are now only queued, so they get the same retries, and a
-  Harbor outage no longer fails the request that triggered them. A node's robot
-  account and registry credentials therefore appear shortly after the node is
-  created rather than with the response. Without a message bus, server-core
-  still runs them in-process.
+  call threw. They are now only queued and run by the registry consumer, which
+  retries a command that throws. The Harbor handlers still log a Harbor error and
+  give up rather than throw, so a Harbor outage leaves the project unlinked, as
+  before, until the next link (e.g. a node or registry project update). A node's
+  robot account and registry credentials appear shortly after the node is
+  created rather than with the response. Renaming a registry project's
+  `externalName` is one relink command, so its unlink of the old Harbor project
+  and its link of the new one cannot run out of order. Without a message bus,
+  server-core still runs them in-process.
 - **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
   build.** A command is acknowledged only once its handler finishes. If a build
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the

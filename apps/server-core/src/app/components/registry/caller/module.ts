@@ -16,8 +16,10 @@ import { RegistryTaskMessageBusRouting } from '../constants.ts';
 
 /**
  * With a message bus, a registry command is only dispatched: the registry
- * consumer started by `ComponentsModule` runs it, with the bus's retry and
- * backoff. The component is called in-process only when there is no bus.
+ * consumer started by `ComponentsModule` runs it, and retries a command that
+ * throws (the Harbor handlers log and swallow Harbor errors instead). The
+ * queue is not ordered: two commands for one project must be one command
+ * (PROJECT_RELINK). The component is called in-process only when there is no bus.
  * Never both — a direct call that fell back to the queue on failure turned the
  * queue into an accidental one-shot retry.
  */
