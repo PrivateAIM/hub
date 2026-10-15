@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.16.1...v0.18.0) (2026-10-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* reading nodes, master images, master image groups, registries and registry projects requires the new *_read permissions, and event_read is now realm-scoped. Provision the names in Authup before upgrading, grant them to user roles, and grant node_read to existing node clients. See docs/src/guide/deployment/configuration.md.
+
+### Features
+
+* require read permissions for catalogs, registry projects and events ([#1940](https://github.com/PrivateAIM/hub/issues/1940)) ([476cb60](https://github.com/PrivateAIM/hub/commit/476cb60c14eb84a4731cd902404827637195e873))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/server-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/telemetry-kit bumped from ^0.17.0 to ^0.18.0
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/server-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/telemetry-kit bumped from ^0.17.0 to ^0.18.0
+
 ## [0.16.1](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.16.1) (2026-09-25)
 
 

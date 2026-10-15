@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
+
+
+### Features
+
+* **deps:** bump authup to v1.0.0-beta.69 ([#1923](https://github.com/PrivateAIM/hub/issues/1923)) ([09f55fa](https://github.com/PrivateAIM/hub/commit/09f55fa3ee0c01285ce16472aecbddfcd9738afe))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/telemetry-kit bumped from ^0.17.0 to ^0.18.0
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/telemetry-kit bumped from ^0.17.0 to ^0.18.0
+
 ## [0.17.0](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.17.0) (2026-09-25)
 
 

@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* reading nodes, master images, master image groups, registries and registry projects requires the new *_read permissions, and event_read is now realm-scoped. Provision the names in Authup before upgrading, grant them to user roles, and grant node_read to existing node clients. See docs/src/guide/deployment/configuration.md.
+* reading nodes, master images, master image groups, registries and registry projects requires the new *_read permissions, and event_read is now realm-scoped. Provision the names in Authup before upgrading, grant them to user roles, and grant node_read to existing node clients. See docs/src/guide/deployment/configuration.md.
+* every Hub service requires Authup. Without an Authup client, authenticated routes answer 401 and socket connections are refused; the fake master-realm identity and the dryRun / fakeAbilities options of @privateaim/server-http-kit and @privateaim/server-realtime-kit are removed. server-messenger's service client (CLIENT_ID) needs permission_read, since every request reads the authorization catalog, and callers must send a bearer token.
+
+### Features
+
+* adopt typeorm-extension 4.2.0 (UTC timestamps, boot migration locks) ([#1934](https://github.com/PrivateAIM/hub/issues/1934)) ([eddee85](https://github.com/PrivateAIM/hub/commit/eddee85bb9a63ca96a39d557823a57fefa1fbee5))
+* align hub with authup's permission evaluator and close authorization gaps ([#1932](https://github.com/PrivateAIM/hub/issues/1932)) ([ec2d560](https://github.com/PrivateAIM/hub/commit/ec2d56054e96c470ba1495fd90441c7f8d837636))
+* clear analysis temp bucket once all nodes are idle ([#1860](https://github.com/PrivateAIM/hub/issues/1860)) ([#1939](https://github.com/PrivateAIM/hub/issues/1939)) ([5094f2e](https://github.com/PrivateAIM/hub/commit/5094f2e288a48b1970f439d6c265baf89f0f004d))
+* **deps:** bump authup to v1.0.0-beta.69 ([#1923](https://github.com/PrivateAIM/hub/issues/1923)) ([09f55fa](https://github.com/PrivateAIM/hub/commit/09f55fa3ee0c01285ce16472aecbddfcd9738afe))
+* require read permissions for catalogs, registry projects and events ([#1940](https://github.com/PrivateAIM/hub/issues/1940)) ([476cb60](https://github.com/PrivateAIM/hub/commit/476cb60c14eb84a4731cd902404827637195e873))
+
+
+### Bug Fixes
+
+* **deps:** bump dotenv from 17.4.2 to 18.0.7 in the majorprod group ([#1942](https://github.com/PrivateAIM/hub/issues/1942)) ([a68562a](https://github.com/PrivateAIM/hub/commit/a68562a09178dcbf79f2b3b3158e1d22cb088a91))
+* **deps:** bump the minorandpatch group with 30 updates ([#1931](https://github.com/PrivateAIM/hub/issues/1931)) ([bee4598](https://github.com/PrivateAIM/hub/commit/bee45988faa2fb11c7ecd46a27360009a03eda66))
+* **server-core,server-storage,server-telemetry,server-messenger:** migrate tsdown bundle to unbundle ([0c700d1](https://github.com/PrivateAIM/hub/commit/0c700d13cd9212dd2dcdceb21bd105b1ee54986b))
+* **server-core:** authorize analysis bucket and bucket-file writes ([#1944](https://github.com/PrivateAIM/hub/issues/1944)) ([8fce9bb](https://github.com/PrivateAIM/hub/commit/8fce9bb5f1e3ecc2d97f58cf1a1fb9f063e8f094))
+
+
+### Performance Improvements
+
+* lookup and foreign key indexes, plus fixes found in the index audit ([#1945](https://github.com/PrivateAIM/hub/issues/1945)) ([cf8af59](https://github.com/PrivateAIM/hub/commit/cf8af594aab41a08afc5cf4d6eb1e11ffb9ea731))
+
+
+### Code Refactoring
+
+* one buildActorContext, no robot identity, authorization in core ([#1941](https://github.com/PrivateAIM/hub/issues/1941)) ([ee1bde7](https://github.com/PrivateAIM/hub/commit/ee1bde741f64966e4273fa8548a8405d6c05a6ef))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/errors bumped from ^0.8.42 to ^0.18.0
+    * @privateaim/kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/server-db-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/server-http-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/server-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/server-storage-kit bumped from ^0.14.1 to ^0.18.0
+    * @privateaim/server-telemetry-kit bumped from ^0.16.1 to ^0.18.0
+    * @privateaim/storage-kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/telemetry-kit bumped from ^0.17.0 to ^0.18.0
+  * devDependencies
+    * @privateaim/server-test-kit bumped from ^0.17.0 to ^0.18.0
+
 ## [0.17.0](https://github.com/PrivateAIM/hub/compare/v0.16.1...v0.17.0) (2026-09-25)
 
 

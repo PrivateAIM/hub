@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/storage-kit",
     "type": "module",
-    "version": "0.17.0",
+    "version": "0.18.0",
     "license": "Apache-2.0",
     "description": "",
     "exports": {
@@ -26,14 +26,14 @@
         "url": "https://github.com/tada5hi"
     },
     "dependencies": {
-        "@privateaim/errors": "^0.8.42",
+        "@privateaim/errors": "^0.18.0",
         "@validup/zod": "^2.0.1",
         "validup": "^2.0.1",
         "zod": "^4.5.1"
     },
     "devDependencies": {
         "@authup/core-kit": "^1.0.0-beta.69",
-        "@privateaim/kit": "^0.17.0",
+        "@privateaim/kit": "^0.18.0",
         "@rapiq/codec-url": "^2.4.0",
         "@rapiq/core": "^2.4.0",
         "hapic": "^3.0.2",
@@ -41,7 +41,7 @@
     },
     "peerDependencies": {
         "@authup/core-kit": "^1.0.0-beta.69",
-        "@privateaim/kit": "^0.17.0",
+        "@privateaim/kit": "^0.18.0",
         "@rapiq/codec-url": "^2.4.0",
         "@rapiq/core": "^2.4.0",
         "hapic": "^3.0.2"

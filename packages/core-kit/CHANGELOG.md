@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* the analysis field buildNodesValid is renamed to distributionNodesValid. Approving an analysis node before its analysis is built answers 400.
+
+### Features
+
+* **deps:** bump authup to v1.0.0-beta.69 ([#1923](https://github.com/PrivateAIM/hub/issues/1923)) ([09f55fa](https://github.com/PrivateAIM/hub/commit/09f55fa3ee0c01285ce16472aecbddfcd9738afe))
+
+
+### Bug Fixes
+
+* gate distribution, not the build, on node approval ([#1946](https://github.com/PrivateAIM/hub/issues/1946)) ([67ca4a9](https://github.com/PrivateAIM/hub/commit/67ca4a979896e2c97a101a3b54264e83e73c9c52))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/errors bumped from ^0.8.42 to ^0.18.0
+  * devDependencies
+    * @privateaim/kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/telemetry-kit bumped from ^0.17.0 to ^0.18.0
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.17.0 to ^0.18.0
+    * @privateaim/telemetry-kit bumped from ^0.17.0 to ^0.18.0
+
 ## [0.17.0](https://github.com/PrivateAIM/hub/compare/v0.16.0...v0.17.0) (2026-09-25)
 
 
