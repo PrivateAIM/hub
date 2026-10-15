@@ -165,6 +165,32 @@ describe('MasterImageService', () => {
                 expect(builderCaller.getCalls()[0]).toEqual({ id: 'mi-1' });
             });
 
+            it('should reject a second build while the first is starting', async () => {
+                repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
+                await service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor());
+                // the fake does not stamp updatedAt; a fresh claim is "now"
+                await repository.save({ ...repository.getAll()[0], updatedAt: new Date().toISOString() });
+
+                await expect(
+                    service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor()),
+                ).rejects.toThrow(BadRequestError);
+
+                expect(builderCaller.getCallCount()).toBe(1);
+                expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.STARTING);
+            });
+
+            it('should take over a starting claim older than the stale threshold', async () => {
+                repository.seed(createTestMasterImage({
+                    id: 'mi-1',
+                    buildStatus: ProcessStatus.STARTING,
+                    updatedAt: new Date(Date.now() - 16 * 60 * 1000).toISOString(),
+                }));
+
+                await service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor());
+
+                expect(builderCaller.getCallCount()).toBe(1);
+            });
+
             it('should restore buildStatus when the dispatch fails', async () => {
                 repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
                 builderCaller.failWith = new Error('broker unavailable');
