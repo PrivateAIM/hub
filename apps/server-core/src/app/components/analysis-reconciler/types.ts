@@ -6,20 +6,9 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import type { IComponent } from 'ergos';
 import type { IAnalysisReconciler } from '../../../core/services/analysis-reconciler/index.ts';
 
 export type AnalysisReconcilerComponentContext = {
     reconciler: IAnalysisReconciler,
     logger?: Logger,
-};
-
-export type AnalysisReconcilerComponent = IComponent & {
-    start: () => Promise<void>,
-    stop: () => Promise<void>,
-    /**
-     * Epoch millis of the last pass that completed without an error, and of
-     * the start of the pass in flight; each undefined while there is none.
-     */
-    status: () => { lastSuccessAt?: number, runningSince?: number },
 };

@@ -38,6 +38,7 @@
         "dotenv": "^18.0.7",
         "eldin": "^1.3.0",
         "envix": "^1.5.0",
+        "ergos": "file:../../../../tada5hi/ergos",
         "hapic": "^3.0.2",
         "mysql2": "^3.24.5",
         "orkos": "^1.1.1",

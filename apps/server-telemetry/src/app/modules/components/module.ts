@@ -20,6 +20,7 @@ import type { LogStore } from '../../../core/services/log-store/types.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { EventComponent } from '../../components/event/index.ts';
+import { createEventCleanerComponent } from '../../components/event-cleaner/index.ts';
 import { LogComponent } from '../../components/log/index.ts';
 import { LogStoreInjectionKey } from '../victoria-logs/constants.ts';
 
@@ -49,11 +50,7 @@ export class ComponentsModule implements IModule {
 
         this.components = [
             new MessageBusWorkerComponentCaller(
-                new EventComponent({
-                    repository: eventRepository, 
-                    logger, 
-                    retentionDays: config.eventRetentionDays, 
-                }),
+                new EventComponent({ logger, retentionDays: config.eventRetentionDays }),
                 {
                     consumeRouting: EventTaskMessageBusRouting,
                     publishRouting: EventEventMessageBusRouting,
@@ -70,6 +67,7 @@ export class ComponentsModule implements IModule {
                     logger,
                 },
             ),
+            createEventCleanerComponent({ repository: eventRepository, logger }),
         ];
 
         await Promise.all(this.components.map((c) => c.start()));

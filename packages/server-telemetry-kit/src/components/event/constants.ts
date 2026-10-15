@@ -15,7 +15,6 @@ export enum EventEvent {
 
 export enum EventCommand {
     CREATE = 'create',
-    CLEAN = 'clean',
 }
 
 export const EventEventMessageBusRouting = {

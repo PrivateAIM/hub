@@ -6,18 +6,20 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import type { IComponent } from 'ergos';
 import {
+    afterEach,
     beforeEach,
     describe,
     expect,
     it,
 } from 'vitest';
-import { EventComponentCleanerHandler } from '../../../../src/app/components/event/handlers/cleaner/module.ts';
+import { createEventCleanerComponent } from '../../../../src/app/components/event-cleaner/index.ts';
 import { FakeEventRepository } from '../../core/entities/event/fake-repository.ts';
 
-describe('app/components/event/handlers/cleaner', () => {
+describe('app/components/event-cleaner', () => {
     let repository: FakeEventRepository;
-    let handler: EventComponentCleanerHandler;
+    let component: IComponent;
 
     beforeEach(() => {
         repository = new FakeEventRepository();
@@ -39,13 +41,18 @@ describe('app/components/event/handlers/cleaner', () => {
             },
         ];
 
-        handler = new EventComponentCleanerHandler({ repository });
+        component = createEventCleanerComponent({ repository });
     });
 
-    it('sweeps expired rows through the repository port', async () => {
+    afterEach(async () => {
+        // a cron task left behind would keep the worker alive and hang the run
+        await component.stop();
+    });
+
+    it('sweeps expired rows through the repository port at start', async () => {
         // the cleaner must not reach for the data source itself: the batching,
         // the id-only select and the delete-by-id all live behind the port.
-        await handler.handle();
+        await component.start();
 
         expect(repository.deleteExpiredCalls).toHaveLength(1);
         expect(repository.rows).toHaveLength(2);
@@ -54,9 +61,19 @@ describe('app/components/event/handlers/cleaner', () => {
     it('passes the sweep instant as an ISO-8601 timestamp', async () => {
         // `expiresAt` is a varchar compared lexicographically, so any other
         // stamp format would silently select the wrong rows.
-        await handler.handle();
+        await component.start();
 
         const [call] = repository.deleteExpiredCalls;
         expect(call.now).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    });
+
+    it('reports a clean pass and nothing in flight once stopped', async () => {
+        await component.start();
+        await component.stop();
+
+        const status = component.status();
+        expect(status.lastSuccessAt).toBeTypeOf('number');
+        expect(status.runningSince).toBeUndefined();
+        expect(repository.deleteExpiredCalls).toHaveLength(1);
     });
 });

@@ -57,7 +57,7 @@ describe('controllers/event', () => {
             actorName: 'admin',
             // MUST stay in the future. `expiring: true` makes this row a
             // candidate for the retention sweep, and
-            // `EventComponentCleanerHandler.initialize()` runs that sweep
+            // the event-cleaner component runs that sweep
             // immediately on every application start — so a sibling spec file
             // booting its own app deletes an already-expired row out from
             // under this one, between `create` and `delete`. That raced only

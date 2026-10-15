@@ -19,7 +19,6 @@ import type {
 
 export type EventComponentEventMap = ObjectLiteralKeys<{
     [EventCommand.CREATE]: [EventCreateCommandPayload, ComponentMetadata],
-    [EventCommand.CLEAN]: [EventCreateCommandPayload, ComponentMetadata],
 
     [EventEvent.CREATION_STARTED]: [EventCreateEventPayload, ComponentMetadata],
     [EventEvent.CREATION_FINISHED]: [Event, ComponentMetadata],

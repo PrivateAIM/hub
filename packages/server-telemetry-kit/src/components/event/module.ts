@@ -22,8 +22,4 @@ export class EventComponentCaller extends MessageBusDispatchComponentCaller {
     async callCreate(payload: EventCreateCommandPayload, metadata: ComponentMetadata = {}) {
         return this.call(EventCommand.CREATE, payload, metadata);
     }
-
-    async callClean(payload: EventCreateCommandPayload, metadata: ComponentMetadata = {}) {
-        return this.call(EventCommand.CLEAN, payload, metadata);
-    }
 }
