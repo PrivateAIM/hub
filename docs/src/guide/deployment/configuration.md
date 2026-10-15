@@ -72,6 +72,16 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   minutes as `failed`. A new worker with an old server-core is safe: it reports
   a stuck process as still running, so it stays stuck until server-core is
   upgraded too.
+- **Analysis buckets are deduplicated on upgrade.** server-core now allows one
+  analysis bucket per analysis and type, and server-storage one bucket per
+  `(refType, refId, name)`. Their migrations clean up duplicates a repeated or
+  concurrent bucket create may have left: server-core keeps the oldest link per
+  analysis and type and deletes the newer ones (with their file rows), and
+  server-storage clears `refType`/`refId` on every newer duplicate bucket. No
+  storage bucket or file is deleted; a bucket whose link was dropped stays in
+  server-storage as a ref-less orphan, which an operator can delete with
+  `DELETE /buckets/:id`. A repeated bucket create command now answers with the
+  existing bucket instead of creating another.
 - A lost broker connection is retried every 5 seconds (it was 60).
 - Failure events carry the error's `name`, `message` and `code` instead of `{}`.
 

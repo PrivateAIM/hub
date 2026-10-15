@@ -50,6 +50,8 @@ export class StorageBucketCreationFinishedHandler implements ComponentHandler<
         };
 
         // no lock: BucketEventMessageBusRouting is an ordered (single-active-consumer) WORK queue.
+        // Only an HTTP POST /analysis-buckets can race the save below; it then fails the unique
+        // (analysisId, type), the bus retries, and the retry takes the duplicate branch.
         const analysisBucket = await this.analysisBucketRepository.findOneBy({
             analysisId: parsed.analysisId,
             type: parsed.type,

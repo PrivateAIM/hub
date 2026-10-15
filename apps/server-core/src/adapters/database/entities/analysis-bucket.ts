@@ -26,6 +26,8 @@ import type { Realm } from '@authup/core-kit';
 import { AnalysisEntity } from './analysis.ts';
 
 @Unique(['bucketId', 'analysisId'])
+// one bucket per type and analysis: consumers resolve a bucket by (analysisId, type).
+@Unique(['analysisId', 'type'])
 @Entity({ name: 'analysis_buckets' })
 export class AnalysisBucketEntity implements AnalysisBucket {
     @PrimaryGeneratedColumn('uuid')

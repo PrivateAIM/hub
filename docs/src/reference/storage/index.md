@@ -39,7 +39,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/buckets` | List buckets |
-| `POST` | `/buckets` | Create bucket |
+| `POST` | `/buckets` | Create bucket (idempotent per `refType` + `refId` + `name`, see below) |
 | `GET` | `/buckets/:id` | Get bucket |
 | `POST` | `/buckets/:id` | Update bucket |
 | `DELETE` | `/buckets/:id` | Delete bucket |
@@ -51,6 +51,11 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `DELETE` | `/bucket-files/:id` | Delete file |
 | `GET` | `/bucket-files/:id/stream` | Stream file contents |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
+
+A bucket with a `refType` **and** `refId` is unique per `(refType, refId, name)`. Creating one that
+already exists in the same realm — over HTTP or the `create` bus command — answers with the existing
+bucket instead of a second one; the same triple in another realm fails. Buckets without a ref are not
+deduplicated: they may share a name.
 
 ## Response Shapes
 

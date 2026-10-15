@@ -26,6 +26,8 @@ import { createTestBucket } from '../../utils/domains/index.ts';
 import { toBucketName } from '../../../src/core/utils/bucket-name.ts';
 import type { IStorageAdapter } from '../../../src/core/storage/types.ts';
 import { BucketClearHandler } from '../../../src/app/components/bucket/handlers/clear/index.ts';
+import { BucketCreateHandler } from '../../../src/app/components/bucket/handlers/create/index.ts';
+import { RacingBucketCreateHandler } from './racing-bucket-create-handler.ts';
 
 /**
  * Delegates to a real adapter, but fails one operation like an unreachable backend.
@@ -135,6 +137,63 @@ describe('bucket HTTP endpoints', () => {
             expect(body.data.region).toBe('us-east');
             expect(body.data.createdAt).toBeDefined();
             expect(body.data.updatedAt).toBeDefined();
+        });
+
+        it('should reuse the bucket of a repeated create with the same ref and name', async () => {
+            const input = createTestBucket({ refType: 'analysis', refId: crypto.randomUUID() });
+            const create = () => fetch(`${getBaseURL()}/buckets`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: authorization,
+                },
+                body: JSON.stringify(input),
+            }).then((response) => response.json());
+
+            const first = await create();
+            const second = await create();
+            expect(first.data.id).toBeDefined();
+            expect(second.data.id).toBe(first.data.id);
+        });
+
+        it('should resolve a create that lost the unique race to the existing bucket', async () => {
+            const input = createTestBucket({
+                refType: 'analysis',
+                refId: crypto.randomUUID(),
+                realmId: crypto.randomUUID(),
+            });
+            const finished: string[] = [];
+            const handle = (handler: BucketCreateHandler) => handler.handle({ ...input }, {
+                key: BucketCommand.CREATE,
+                metadata: {},
+                handle: async (...event) => {
+                    if (event[0] === BucketEvent.CREATION_FINISHED) {
+                        finished.push(event[1].id);
+                    }
+                },
+            });
+
+            await handle(new BucketCreateHandler({ storage: suite.storage() }));
+            await handle(new RacingBucketCreateHandler({ storage: suite.storage() }));
+
+            expect(finished).toHaveLength(2);
+            expect(finished[1]).toBe(finished[0]);
+        });
+
+        it('should not dedupe ref-less buckets by name', async () => {
+            const input = createTestBucket();
+            const create = () => fetch(`${getBaseURL()}/buckets`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: authorization,
+                },
+                body: JSON.stringify(input),
+            }).then((response) => response.json());
+
+            const first = await create();
+            const second = await create();
+            expect(first.data.id).not.toBe(second.data.id);
         });
     });
 
