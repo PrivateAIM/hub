@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.privateaim.net"><b>Documentation</b></a> &nbsp;·&nbsp;
+  <a href="https://hub.docs.privateaim.net"><b>Documentation</b></a> &nbsp;·&nbsp;
   <a href="https://github.com/PrivateAIM/hub">Monorepo</a> &nbsp;·&nbsp;
   <a href="https://github.com/PrivateAIM/hub/blob/master/CONTRIBUTING.md">Contributing</a>
 </p>
