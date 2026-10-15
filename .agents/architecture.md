@@ -244,7 +244,7 @@ TypeORM subscribers in `adapters/database/subscribers/` (grouped by domain: `ana
 
 AMQP consumers are wired via two DI modules:
 - **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregators depend only on core services and repository ports (resolved from `AnalysisInjectionKey` / `DatabaseInjectionKey`), never on a `DataSource`: the worker status rules (event → status transition, `isProcessStatusTerminal`, `isCheckVerdictStale`) live in core as `AnalysisBuilder.applyEvent` / `AnalysisDistributor.applyEvent` / `MasterImageBuilderService.applyEvent`, while the storage-bucket and authup handlers keep their orchestration in app over the ports. Storage-bucket replies are correlated by the bucket itself (`refType`/`refId` + `parseAnalysisBucketName(name)`), not by a task store.
-- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container. Starts task consumer workers (registry).
+- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor).
 
 **Process-status transitions are row-locked.** Any read-check-mutate-save of a
 `buildStatus`/`distributionStatus` (command starts, configuration lock/unlock, the master-image rollback,
@@ -257,6 +257,30 @@ verdict whose `checkedAt` predates the locked row's `updatedAt` is dropped — a
 counts. Every other writer of these rows must not `save()` a copy read earlier either: the
 recalculators apply their derived fields via `saveAnalysisPatch`; `AnalysisService.update` and
 the master-image synchronizer `Object.assign` into the locked row.
+
+**Stuck processes are judged and recovered by server-core** (plan 018 F13/F14). The worker's
+check reports an in-progress (STARTING/STARTED) build/distribution whose image is not there as
+it is; `applyEvent` turns that verdict into FAILED when the locked row is older than
+`ANALYSIS_PROCESS_STALE_THRESHOLD_MS` (15 min, `core/services/helpers.ts`). Running workers keep
+the row fresh: an EXECUTION_PROGRESS that leaves the percent unchanged stamps `updatedAt`
+explicitly once the row is older than `ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS` (1 min) and is
+otherwise a no-op (typeorm skips a no-op save, and a heartbeat repeats the last percent), and
+the analysis builder/distributor execute handlers re-emit their last progress every 5 min —
+until no real progress arrived for 2 h, so a hung docker stream goes stale. Stale is not
+recovered: with one worker the CHECK waits behind the hung EXECUTE on the same prefetch-1 queue,
+so recovery needs a worker restart, a second worker replica, or RabbitMQ's `consumer_timeout`.
+EXECUTION_FINISHED applies only while the locked row is STARTING/STARTED, so a late finish cannot
+resurrect a run already FAILED or reset to null (full fix: run ids). The distributor check reports
+an in-progress status for permanently missing preconditions (no nodes, no registry, no registry
+project), so the stale rule fails such a run. `AnalysisReconciler.reconcile()`
+(`core/services/analysis-reconciler/`) selects in-progress rows older than the threshold
+(`IAnalysisRepository.findManyInProgressUpdatedBefore`, a `Raw` bound `Date` — the
+timestamp-filter trap) and dispatches the existing check commands; the app component
+(`app/components/analysis-reconciler/`) runs it at start and every 5 min on every replica,
+without a lock — a duplicate verdict is dropped by `isCheckVerdictStale` (CHECKs carry no TTL, so
+they queue up while no worker consumes). Rollout: workers before server-core — an old worker has no
+heartbeat and judges staleness itself, so the reconciler's checks would fail its long builds. Master images are
+out of scope: they have no check command, and BUILD takes over a 15-min-stale build itself.
 
 Implementation classes live in `app/aggregators/` and `app/components/`.
 

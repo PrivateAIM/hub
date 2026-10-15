@@ -20,7 +20,13 @@ import type { EntityPersistContext, IEntityRepository } from '@privateaim/server
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
-import { isCheckVerdictStale, isProcessStatusTerminal } from '../helpers.ts';
+import {
+    isCheckVerdictStale,
+    isProcessHeartbeatDue,
+    isProcessStale,
+    isProcessStatusInProgress,
+    isProcessStatusTerminal,
+} from '../helpers.ts';
 import type { IAnalysisDistributorCaller } from './types.ts';
 
 type AnalysisDistributorContext = {
@@ -124,11 +130,25 @@ export class AnalysisDistributor {
                     }
 
                     const temp = value as AnalysisDistributorExecutionProgressPayload;
+                    const previous = entity.distributionProgress;
                     if (
                         !entity.distributionProgress ||
                         temp.progress.percent >= entity.distributionProgress
                     ) {
                         entity.distributionProgress = Math.min(temp.progress.percent, 100);
+                    }
+
+                    // a worker heartbeat repeats the last percent, and typeorm
+                    // skips a save that changes nothing — stamp the row so it
+                    // reads as alive to the stale check (F13). Throttled, so a
+                    // burst of unchanged progress is not a write per event; a
+                    // percent change bumps updatedAt on its own.
+                    if (entity.distributionProgress === previous) {
+                        if (!isProcessHeartbeatDue(entity.updatedAt)) {
+                            return false;
+                        }
+
+                        entity.updatedAt = new Date().toISOString();
                     }
                     break;
                 }
@@ -141,6 +161,16 @@ export class AnalysisDistributor {
                     break;
                 }
                 case AnalysisDistributorEvent.EXECUTION_FINISHED: {
+                    // only a run core still considers running may finish. A run
+                    // already declared FAILED (a stale verdict after a worker
+                    // outage — the retried EXECUTE is re-published behind the
+                    // reconciler's CHECKs) or unlocked to null must not be
+                    // resurrected by a late finish.
+                    // ponytail: the full fix is run ids (plan 018).
+                    if (!isProcessStatusInProgress(entity.distributionStatus)) {
+                        return false;
+                    }
+
                     entity.distributionStatus = ProcessStatus.EXECUTED;
                     entity.distributionProgress = 100;
                     break;
@@ -151,11 +181,18 @@ export class AnalysisDistributor {
                         return false;
                     }
 
-                    entity.distributionStatus = temp.status;
+                    // the worker reports an in-progress status as it sees it;
+                    // whether that process is orphaned is judged here, on the
+                    // locked row (F13).
+                    const status = isProcessStatusInProgress(temp.status) && isProcessStale(entity.updatedAt) ?
+                        ProcessStatus.FAILED :
+                        temp.status;
 
-                    if (temp.status === ProcessStatus.EXECUTED) {
+                    entity.distributionStatus = status;
+
+                    if (status === ProcessStatus.EXECUTED) {
                         entity.distributionProgress = 100;
-                    } else if (temp.status === ProcessStatus.FAILED) {
+                    } else if (status === ProcessStatus.FAILED) {
                         entity.distributionProgress = 0;
                     }
                 }

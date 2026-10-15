@@ -28,7 +28,6 @@ import {
     buildDockerImageURL,
     isDockerDistributionImageMissingError,
 } from '../../../../../adapters/docker/index.ts';
-import { isAnalysisProcessStale } from '../../../helpers.ts';
 import { BuilderError } from '../../../analysis-builder/error';
 
 export class AnalysisDistributorCheckHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.CHECK> {
@@ -85,6 +84,25 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
 
         const { data: analysis } = await this.coreClient.analysis.getOne(value.id);
 
+        // A precondition that is permanently missing (no nodes, no registry,
+        // no registry project) can never become a verdict. For an in-progress
+        // distribution, report its status as seen, like a missing image, so
+        // server-core's stale rule can fail it instead of it hanging forever.
+        const inProgressStatus = analysis.distributionStatus === ProcessStatus.STARTED ||
+            analysis.distributionStatus === ProcessStatus.STARTING ?
+            analysis.distributionStatus :
+            undefined;
+        const finishUndecidable = () => context.handle(
+            AnalysisDistributorEvent.CHECK_FINISHED,
+            inProgressStatus ?
+                {
+                    ...value,
+                    status: inProgressStatus,
+                    checkedAt: analysis.updatedAt,
+                } :
+                value,
+        );
+
         // -----------------------------------------------------------------------------------
 
         const analysisNodes = await getManyAll((page) => this.coreClient.analysisNode.getMany({
@@ -93,10 +111,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         }));
 
         if (analysisNodes.length === 0) {
-            await context.handle(
-                AnalysisDistributorEvent.CHECK_FINISHED,
-                value,
-            );
+            await finishUndecidable();
 
             return;
         }
@@ -108,10 +123,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         }));
 
         if (nodes.length === 0) {
-            await context.handle(
-                AnalysisDistributorEvent.CHECK_FINISHED,
-                value,
-            );
+            await finishUndecidable();
 
             return;
         }
@@ -123,6 +135,11 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         // deleted while the analysis is in flight. Fail with a domain error rather
         // than requesting `/registries/null`.
         if (!analysis.registryId) {
+            if (inProgressStatus) {
+                await finishUndecidable();
+                return;
+            }
+
             throw BuilderError.registryNotFound();
         }
 
@@ -136,6 +153,11 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         const checks: { node: Node; registryProject: RegistryProject }[] = [];
         for (const node of nodes) {
             if (!node.registryProject) {
+                if (inProgressStatus) {
+                    await finishUndecidable();
+                    return;
+                }
+
                 throw BuilderError.registryProjectNotFound(
                     `The node ${node.name} has no registry project.`,
                 );
@@ -179,15 +201,10 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
                 throw e;
             }
 
-            if (
-                analysis.distributionStatus === ProcessStatus.STARTED ||
-                analysis.distributionStatus === ProcessStatus.STARTING
-            ) {
-                // an in-progress distribution refreshes the entity via progress events;
-                // a long-untouched one is orphaned (e.g. worker died) and recoverable as FAILED.
-                status = isAnalysisProcessStale(analysis.updatedAt) ?
-                    ProcessStatus.FAILED :
-                    analysis.distributionStatus;
+            if (inProgressStatus) {
+                // the image is not there yet; whether the distribution is orphaned
+                // is server-core's verdict (it compares the row's age when applying).
+                status = inProgressStatus;
             } else {
                 status = ProcessStatus.FAILED;
             }
