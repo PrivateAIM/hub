@@ -6,7 +6,12 @@
  */
 
 import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityPersistContext,
+    EntityRepositoryFindManyResult,
+    IEntityRepository,
+} from '@privateaim/server-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 
 /**
@@ -29,6 +34,19 @@ export type AnalysisBucketUploadRemoval = {
 
 export interface IAnalysisBucketFileRepository extends IEntityRepository<AnalysisBucketFile> {
     findRootCodeFile(analysisId: string): Promise<AnalysisBucketFile | null>;
+    /**
+     * The files of a bucket (storage bucket id) that mirror the given
+     * storage bucket-file ids.
+     */
+    findManyByBucketFiles(bucketId: string, bucketFileIds: string[]): Promise<AnalysisBucketFile[]>;
+    /**
+     * Save all entities in one transaction: all or nothing.
+     */
+    saveMany(entities: AnalysisBucketFile[], ctx?: EntityPersistContext): Promise<AnalysisBucketFile[]>;
+    /**
+     * Remove all entities in one transaction: all or nothing.
+     */
+    removeMany(entities: AnalysisBucketFile[], ctx?: EntityPersistContext): Promise<void>;
 }
 
 export interface IAnalysisFileMetadataRecalculator {

@@ -37,6 +37,7 @@ import {
 } from '../../aggregators/index.ts';
 import { AnalysisBucketFileService } from '../../../core/index.ts';
 import { AnalysisReachService } from '../../../core/services/analysis-reach/index.ts';
+import { MasterImageBuilderService } from '../../../core/services/index.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { ComponentsInjectionKey } from '../components/constants.ts';
@@ -47,7 +48,10 @@ export class AggregatorsModule implements IModule {
     readonly dependencies: string[] = ['database', 'components', 'analysis'];
 
     async setup(container: IContainer): Promise<void> {
-        const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
+        const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
+        const analysisBucketRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketRepository);
+        const analysisBucketFileRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository);
+        const masterImageRepository = container.resolve(DatabaseInjectionKey.MasterImageRepository);
         const taskManager = container.resolve(ComponentsInjectionKey.TaskManager);
         const registryComponentCaller = container.resolve(ComponentsInjectionKey.RegistryComponentCaller);
         const logger = container.resolve(LoggerInjectionKey);
@@ -61,11 +65,16 @@ export class AggregatorsModule implements IModule {
             createAuthupAggregator({
                 env: config.env,
                 registryComponentCaller,
+                analysisRepository,
+                analysisBucketFileRepository,
+                nodeRepository: container.resolve(DatabaseInjectionKey.NodeRepository),
+                projectRepository: container.resolve(DatabaseInjectionKey.ProjectRepository),
+                registryProjectRepository: container.resolve(DatabaseInjectionKey.RegistryProjectRepository),
                 redisSubscribeClient: redisSubResult.success ? redisSubResult.data : undefined,
                 logger,
             }),
             new MessageBusWorkerComponentCaller(
-                new AnalysisBuilderAggregator({ dataSource }),
+                new AnalysisBuilderAggregator({ builder: container.resolve(AnalysisInjectionKey.Builder) }),
                 {
                     consumeRouting: AnalysisBuilderEventMessageBusRouting,
                     messageBus,
@@ -73,7 +82,7 @@ export class AggregatorsModule implements IModule {
                 },
             ),
             new MessageBusWorkerComponentCaller(
-                new AnalysisDistributorAggregator({ dataSource }),
+                new AnalysisDistributorAggregator({ distributor: container.resolve(AnalysisInjectionKey.Distributor) }),
                 {
                     consumeRouting: AnalysisDistributorEventMessageBusRouting,
                     messageBus,
@@ -82,7 +91,9 @@ export class AggregatorsModule implements IModule {
             ),
             new MessageBusWorkerComponentCaller(
                 new StorageBucketAggregator({
-                    dataSource,
+                    analysisRepository,
+                    analysisBucketRepository,
+                    analysisBucketFileRepository,
                     taskManager,
                     logger,
                 }),
@@ -95,14 +106,14 @@ export class AggregatorsModule implements IModule {
             new MessageBusWorkerComponentCaller(
                 new StorageBucketFileAggregator({
                     service: new AnalysisBucketFileService({
-                        repository: container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository),
+                        repository: analysisBucketFileRepository,
                         recalculator: container.resolve(AnalysisInjectionKey.FileRecalculator),
-                        analysisRepository: container.resolve(DatabaseInjectionKey.AnalysisRepository),
-                        analysisBucketRepository: container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
+                        analysisRepository,
+                        analysisBucketRepository,
                         analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
                         reach: new AnalysisReachService({
                             analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
-                            analysisRepository: container.resolve(DatabaseInjectionKey.AnalysisRepository),
+                            analysisRepository,
                             nodeRepository: container.resolve(DatabaseInjectionKey.NodeRepository),
                         }),
                     }),
@@ -117,7 +128,7 @@ export class AggregatorsModule implements IModule {
             ),
             new MessageBusWorkerComponentCaller(
                 new MasterImageBuilderAggregator({
-                    dataSource,
+                    service: new MasterImageBuilderService({ imageRepository: masterImageRepository }),
                     eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
                 }),
                 {
@@ -128,7 +139,7 @@ export class AggregatorsModule implements IModule {
             ),
             new MessageBusWorkerComponentCaller(
                 new MasterImageSynchronizerAggregator({
-                    imageRepository: container.resolve(DatabaseInjectionKey.MasterImageRepository),
+                    imageRepository: masterImageRepository,
                     groupRepository: container.resolve(DatabaseInjectionKey.MasterImageGroupRepository),
                     logger,
                     eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,

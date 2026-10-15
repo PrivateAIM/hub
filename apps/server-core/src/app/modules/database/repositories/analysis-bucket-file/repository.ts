@@ -8,6 +8,7 @@
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
+import { In } from 'typeorm';
 import {
     validateEntityJoinColumns,
 } from 'typeorm-extension';
@@ -72,6 +73,13 @@ export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileR
         });
     }
 
+    async findManyByBucketFiles(bucketId: string, bucketFileIds: string[]): Promise<AnalysisBucketFile[]> {
+        return this.repository.findBy({
+            bucketId,
+            bucketFileId: In(bucketFileIds),
+        });
+    }
+
     create(data: Partial<AnalysisBucketFile>): AnalysisBucketFile {
         return this.repository.create(data) as AnalysisBucketFile;
     }
@@ -84,8 +92,16 @@ export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileR
         return this.repository.save(entity as AnalysisBucketFileEntity, ctx);
     }
 
+    async saveMany(entities: AnalysisBucketFile[], ctx?: EntityPersistContext): Promise<AnalysisBucketFile[]> {
+        return this.repository.save(entities as AnalysisBucketFileEntity[], ctx);
+    }
+
     async remove(entity: AnalysisBucketFile, ctx?: EntityPersistContext): Promise<void> {
         await this.repository.remove(entity as AnalysisBucketFileEntity, ctx);
+    }
+
+    async removeMany(entities: AnalysisBucketFile[], ctx?: EntityPersistContext): Promise<void> {
+        await this.repository.remove(entities as AnalysisBucketFileEntity[], ctx);
     }
 
     async validateJoinColumns(data: Partial<AnalysisBucketFile>): Promise<void> {

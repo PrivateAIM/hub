@@ -13,11 +13,9 @@ import type {
     TaskEntryResolved,
     TaskManager,
 } from '@privateaim/server-kit';
-import type { DataSource } from 'typeorm';
 import type { TaskMap } from '../../core/domains/index.ts';
 
 export type BaseAggregatorHandlerContext = {
-    dataSource: DataSource;
     taskManager: TaskManager<TaskMap>;
     logger?: Logger;
 };
@@ -26,14 +24,11 @@ export abstract class BaseAggregatorHandler<
     EventMap extends ComponentEventMap = ComponentEventMap,
     Key extends keyof EventMap = keyof EventMap,
 > implements ComponentHandler<EventMap> {
-    protected dataSource: DataSource;
-
     protected taskManager: TaskManager<TaskMap>;
 
     protected logger?: Logger;
 
     constructor(ctx: BaseAggregatorHandlerContext) {
-        this.dataSource = ctx.dataSource;
         this.taskManager = ctx.taskManager;
         this.logger = ctx.logger;
     }

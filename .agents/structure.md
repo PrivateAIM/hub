@@ -103,7 +103,8 @@ apps/server-core/src/
 │   │   ├── analysis-configurator/ # Configuration lock/unlock
 │   │   ├── analysis-distributor/  # Distribution orchestration
 │   │   ├── analysis-storage-manager/ # Storage provisioning
-│   │   └── master-image/          # Image catalog sync
+│   │   ├── master-image/          # Image catalog sync + build status rules (builder/)
+│   │   └── helpers.ts             # isProcessStatusTerminal / isCheckVerdictStale
 │   └── domains/                   # Domain type definitions (task types)
 ├── adapters/                      # External system implementations
 │   ├── database/

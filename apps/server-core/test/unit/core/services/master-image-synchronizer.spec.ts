@@ -22,7 +22,13 @@ describe('MasterImageSynchronizerService', () => {
             virtualPath: 'python/base',
             groupVirtualPath: 'python',
             command: 'python',
+            commandArguments: null,
             buildStatus: ProcessStatus.STARTED,
+            buildProgress: null,
+            buildHash: null,
+            buildSize: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         });
 
         // the build finishes while the sync still holds its earlier read
