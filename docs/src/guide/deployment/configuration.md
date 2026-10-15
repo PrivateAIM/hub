@@ -43,6 +43,11 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   worker publishes its events to these queues, where they wait for the upgraded
   server-core. An upgraded server-core consumes only the queues, so it would miss
   events from a worker that still publishes the old way.
+- **Before upgrading again after a rollback, delete these six queues.** They are
+  durable, so a rollback leaves them on the broker, and the older version
+  neither reads nor removes them. The next upgrade would apply whatever they
+  still hold: a stale `started`/`progress` event is ignored, but a stale
+  `finished`/`failed` event would overwrite the current status.
 - A lost broker connection is retried every 5 seconds (it was 60).
 - Failure events carry the error's `name`, `message` and `code` instead of `{}`.
 
