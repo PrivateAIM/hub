@@ -16,6 +16,11 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  *   (`SELECT analysis_id … WHERE node_realm_id = ?`, plan 021) from the index
  *   alone. Created before the old index is dropped, so the filter is never
  *   unindexed.
+ * - `project_nodes (node_realm_id, project_id)` REPLACES the single-column
+ *   `node_realm_id` index, for the same reason on the project side: plan 022
+ *   scopes project reads like plan 021 scopes analyses
+ *   (`SELECT project_id … WHERE node_realm_id = ?`), and the leading
+ *   `node_realm_id` keeps anchoring the allow-listed `nodeRealmId` filter.
  * - `analyses (master_image_id)` and `projects (master_image_id)`: declared on
  *   the entities for postgres, which keeps no implicit index on a foreign key
  *   column. On MySQL the explicit index displaces the implicit one InnoDB kept
@@ -47,6 +52,12 @@ export class AddLookupAndForeignKeyIndexes1788600000000 implements MigrationInte
             DROP INDEX \`IDX_b443086bf7d7e32edead69e77c\` ON \`analysis_nodes\`
         `);
         await queryRunner.query(`
+            CREATE INDEX \`IDX_e17be232c93d5ca298780527c2\` ON \`project_nodes\` (\`node_realm_id\`, \`project_id\`)
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_7f8520e90b18fe847c0aea2287\` ON \`project_nodes\`
+        `);
+        await queryRunner.query(`
             CREATE INDEX \`IDX_344d29541553fb6bce75ce4cd3\` ON \`analyses\` (\`master_image_id\`)
         `);
         await queryRunner.query(`
@@ -60,6 +71,12 @@ export class AddLookupAndForeignKeyIndexes1788600000000 implements MigrationInte
         `);
         await queryRunner.query(`
             ALTER TABLE \`analyses\` RENAME INDEX \`IDX_344d29541553fb6bce75ce4cd3\` TO \`FK_344d29541553fb6bce75ce4cd32\`
+        `);
+        await queryRunner.query(`
+            CREATE INDEX \`IDX_7f8520e90b18fe847c0aea2287\` ON \`project_nodes\` (\`node_realm_id\`)
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_e17be232c93d5ca298780527c2\` ON \`project_nodes\`
         `);
         await queryRunner.query(`
             CREATE INDEX \`IDX_b443086bf7d7e32edead69e77c\` ON \`analysis_nodes\` (\`node_realm_id\`)

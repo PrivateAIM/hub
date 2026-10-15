@@ -28,6 +28,10 @@ import { ProjectEntity } from './project.ts';
 import { NodeEntity } from './node.ts';
 
 @Unique(['projectId', 'nodeId'])
+// Leads with nodeRealmId, so it also serves the allow-listed `nodeRealmId`
+// filter; the trailing projectId lets a participation lookup
+// (SELECT project_id ... WHERE node_realm_id = ?) answer from the index.
+@Index(['nodeRealmId', 'projectId'])
 @Entity({ name: 'project_nodes' })
 export class ProjectNodeEntity implements ProjectNode {
     @PrimaryGeneratedColumn('uuid')
@@ -76,7 +80,6 @@ export class ProjectNodeEntity implements ProjectNode {
     @JoinColumn({ name: 'node_id' })
     node: NodeEntity;
 
-    @Index()
     @Column({ name: 'node_realm_id', type: 'uuid' })
     nodeRealmId: string;
 }
