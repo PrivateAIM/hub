@@ -78,6 +78,11 @@ export class BucketCreateHandler implements ComponentHandler<
         const data = await this.validator.run(value, { group: ValidatorGroup.CREATE });
         assertBucketRefPairing(data);
 
+        // The validator mounts no actor (a client must not name one): take it from the
+        // command, whose senders are trusted — BucketService (HTTP) sets it from the ActorContext.
+        data.actorId = value.actorId ?? null;
+        data.actorType = value.actorType ?? null;
+
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(BucketEntity);
 

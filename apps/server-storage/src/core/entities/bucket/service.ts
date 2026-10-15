@@ -83,9 +83,9 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         }
 
         return this.caller.create({
+            ...validated,
             actorId: actor.identity.id,
             actorType: actor.identity.type,
-            ...validated,
         });
     }
 

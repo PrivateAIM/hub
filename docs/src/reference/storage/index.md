@@ -59,6 +59,12 @@ create of a triple that already exists in the same realm answers with the existi
 a second one; the same triple in another realm fails. Buckets without a ref are not deduplicated: they
 may share a name.
 
+A bucket records its creator (`actorId`/`actorType`): for `POST /buckets` the authenticated identity
+(an actor in the body is ignored), for a bus create the actor named in the command. The creator may
+update, clear and delete the bucket, and delete its files, without `bucket_update`/`bucket_delete`;
+everyone else needs the permission and realm access. Buckets created before this was fixed carry no
+actor and are not backfilled, so only permission holders can manage them.
+
 ## Response Shapes
 
 Every bucket and bucket-file endpoint answers with a `{ data, meta }` envelope — the record (or the

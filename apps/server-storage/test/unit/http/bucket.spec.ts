@@ -18,7 +18,8 @@ import type { Readable } from 'node:stream';
 import type { ComponentHandlerContext } from '@privateaim/server-kit';
 import type { BucketComponentEventMap } from '@privateaim/server-storage-kit';
 import { BucketCommand, BucketEvent } from '@privateaim/server-storage-kit';
-import { createAdminAuthorizationHeader } from '@privateaim/server-test-kit';
+import { PermissionName } from '@privateaim/kit';
+import { createAdminAuthorizationHeader, createRestrictedAccessToken } from '@privateaim/server-test-kit';
 import {
     createTestSuite,
 } from '../../utils/index.ts';
@@ -195,6 +196,27 @@ describe('bucket HTTP endpoints', () => {
 
             expect(finished).toHaveLength(2);
             expect(finished[1]).toBe(finished[0]);
+        });
+
+        it('should record the actor of a bus create from the command', async () => {
+            const actorId = crypto.randomUUID();
+            let created: Record<string, any> | undefined;
+            const handler = new BucketCreateHandler({ storage: suite.storage() });
+            await handler.handle({
+                ...createTestBucket(),
+                actorId,
+                actorType: 'client',
+            }, {
+                key: BucketCommand.CREATE,
+                metadata: {},
+                handle: async (...event) => {
+                    if (event[0] === BucketEvent.CREATION_FINISHED) {
+                        created = event[1];
+                    }
+                },
+            });
+
+            expect(created).toMatchObject({ actorId, actorType: 'client' });
         });
 
         it('should not dedupe ref-less buckets by name', async () => {
@@ -494,6 +516,38 @@ describe('bucket HTTP endpoints', () => {
             });
 
             expect(response.status).toBeGreaterThanOrEqual(400);
+        });
+    });
+
+    describe('ownership', () => {
+        const request = (token: string, method: string, url: string, body?: Record<string, any>) => fetch(`${getBaseURL()}${url}`, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: body ? JSON.stringify(body) : undefined,
+        });
+
+        it('should let the creator, and only the creator, delete a bucket without BUCKET_DELETE', async () => {
+            const creator = await createRestrictedAccessToken([PermissionName.BUCKET_CREATE]);
+            const other = await createRestrictedAccessToken([PermissionName.BUCKET_CREATE]);
+            const spoofed = crypto.randomUUID();
+
+            // the actor comes from the token, never from the body
+            const created = await request(creator, 'POST', '/buckets', {
+                ...createTestBucket(),
+                actorId: spoofed,
+                actorType: 'client',
+            });
+            expect(created.status).toBe(201);
+            const { data: bucket } = await created.json();
+            expect(bucket.actorType).toBe('user');
+            expect(bucket.actorId).toBeTruthy();
+            expect(bucket.actorId).not.toBe(spoofed);
+
+            expect((await request(other, 'DELETE', `/buckets/${bucket.id}`)).status).toBe(403);
+            expect((await request(creator, 'DELETE', `/buckets/${bucket.id}`)).status).toBe(202);
         });
     });
 });
