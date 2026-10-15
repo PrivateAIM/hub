@@ -30,9 +30,20 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the
   channel and redelivers the command. A replica still running it ignores the copy,
   but a redelivery that lands on another worker replica starts a second build.
-- Worker outcome events (started, progress, finished, failed) are applied one at
-  a time per server-core replica, and a late `started`/`progress` event no longer
-  moves a finished or failed process back to `started`.
+- Worker and storage outcome events (started, progress, finished, failed) go
+  through one durable queue per kind (`analysisBuilderEvents`,
+  `analysisDistributorEvents`, `masterImageBuilderEvents`,
+  `masterImageSynchronizerEvents`, `storageBucketEvents`,
+  `storageBucketFileEvents`). Each queue is a RabbitMQ *single active consumer*
+  queue: one server-core replica applies its events in publish order, and another
+  takes over if that replica goes away. Events published while server-core is
+  down wait in the queue instead of being lost. A late `started`/`progress`
+  event no longer moves a finished or failed process back to `started`.
+- **Upgrade the worker and storage services before server-core.** An upgraded
+  worker publishes its events to these queues, where they wait for the upgraded
+  server-core. An upgraded server-core consumes only the queues, so it would miss
+  events from a worker that still publishes the old way.
+- A lost broker connection is retried every 5 seconds (it was 60).
 - Failure events carry the error's `name`, `message` and `code` instead of `{}`.
 
 ## Authup upgrade to beta.68

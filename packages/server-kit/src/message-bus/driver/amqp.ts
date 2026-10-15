@@ -6,6 +6,7 @@
  */
 
 import { Client, ExchangeType } from 'amqp-extension';
+import type { QueueOptions } from 'amqp-extension';
 import type { Logger } from '../../logger';
 import { MessageBusRoutingType } from '../constants';
 import { isMessageBusPayload } from '../helpers';
@@ -60,9 +61,9 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
     protected retryDelay: number;
 
     /**
-     * Ids of WORK messages whose handler is still running in this process.
+     * WORK messages whose handler is still running in this process, by id.
      */
-    protected inFlight = new Set<string>();
+    protected inFlight = new Map<string, Promise<void>>();
 
     constructor(options: AmqpMessageBusDriverOptions) {
         this.connectionString = options.connectionString;
@@ -89,6 +90,7 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
             messageId: message.id,
             persistent: message.metadata.persistent ??
                 routing.type === MessageBusRoutingType.WORK,
+            ...this.resolveQueueOptions(routing),
         });
 
         return true;
@@ -100,13 +102,14 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
     ): Promise<void> {
         const exchange = this.resolveExchange(routing);
 
-        return exchange.consume(routing.key, {
+        await exchange.consume(routing.key, {
             // Events are applied one at a time as well: aggregator handlers
             // read-modify-write entities and would otherwise overwrite each other.
             prefetchCount: 1,
             // Only reached when the retry re-publish itself fails (broker
             // unavailable): requeue, so the message comes back as a redelivery.
             requeueOnFailure: routing.type === MessageBusRoutingType.WORK,
+            ...this.resolveQueueOptions(routing),
         }, { $any: (input) => this.deliver(routing, input, handler) });
     }
 
@@ -140,8 +143,15 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
         if (input.fields.redelivered) {
             // The channel was reset (reconnect) while this process is still
             // handling the message: the original run is alive, so drop the copy.
-            if (this.inFlight.has(payload.id)) {
+            const running = this.inFlight.get(payload.id);
+            if (running) {
                 this.logger?.debug(`Message ${payload.type} (${payload.id}) in ${routing.key} is still being handled.`);
+
+                // Acking the copy would free the prefetch slot and let the next
+                // message of an ordered stream run next to the original.
+                if (routing.ordered) {
+                    await running.catch(() => undefined);
+                }
 
                 return;
             }
@@ -151,25 +161,27 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
             // flight through the backoff, so a reset during it is not retried twice.
             // ponytail: a reset between the retry publish and the ack still
             // duplicates the command; at-least-once until a claim exists (F9/F10).
-            this.inFlight.add(payload.id);
-
-            try {
-                await this.retry(routing, payload);
-            } finally {
-                this.inFlight.delete(payload.id);
-            }
+            await this.track(payload.id, this.retry(routing, payload));
 
             return;
         }
 
-        this.inFlight.add(payload.id);
+        await this.track(payload.id, (async () => {
+            try {
+                await handler(payload);
+            } catch {
+                await this.retry(routing, payload);
+            }
+        })());
+    }
+
+    protected async track(id: string, run: Promise<void>): Promise<void> {
+        this.inFlight.set(id, run);
 
         try {
-            await handler(payload);
-        } catch {
-            await this.retry(routing, payload);
+            await run;
         } finally {
-            this.inFlight.delete(payload.id);
+            this.inFlight.delete(id);
         }
     }
 
@@ -206,6 +218,14 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
                 attempt,
             },
         });
+    }
+
+    /**
+     * Publisher and consumer must declare the queue identically (the broker
+     * answers a mismatch with 406), so both sides derive it from the routing.
+     */
+    protected resolveQueueOptions(routing: MessageBusRouting): QueueOptions {
+        return routing.ordered ? { singleActiveConsumer: true } : {};
     }
 
     private resolveExchange(routing: MessageBusRouting): Client {

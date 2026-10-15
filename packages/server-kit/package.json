@@ -49,14 +49,14 @@
     "devDependencies": {
         "@authup/access": "^1.0.0-beta.69",
         "@authup/server-test-kit": "^1.0.0-beta.69",
-        "amqp-extension": "^4.0.0",
+        "amqp-extension": "^5.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.2.0",
         "vitest": "^4.1.11"
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.69",
-        "amqp-extension": "^4.0.0",
+        "amqp-extension": "^5.0.0",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.2.0"
     },
