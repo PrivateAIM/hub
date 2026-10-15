@@ -12,16 +12,15 @@ import {
 import {
     BaseComponent,
 } from '@privateaim/server-kit';
-import type { DataSource } from 'typeorm';
-import {
-    handleAnalysisBuilderEvent,
-} from './handler.ts';
+import type { AnalysisBuilderAggregatorContext } from './types.ts';
 
 export class AnalysisBuilderAggregator extends BaseComponent<AnalysisBuilderEventMap> {
-    constructor(ctx: { dataSource: DataSource }) {
+    constructor(ctx: AnalysisBuilderAggregatorContext) {
         super();
 
-        const handler = (value, context) => handleAnalysisBuilderEvent(value, context, ctx.dataSource);
+        const handler = async (value, context) => {
+            await ctx.builder.applyEvent(context.key, value);
+        };
 
         this.mount(AnalysisBuilderEvent.EXECUTION_PROGRESS, handler);
         this.mount(AnalysisBuilderEvent.EXECUTION_STARTED, handler);

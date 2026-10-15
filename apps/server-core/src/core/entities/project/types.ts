@@ -6,10 +6,23 @@
  */
 
 import type { Project } from '@privateaim/core-kit';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityPersistContext,
+    EntityRepositoryFindManyResult,
+    IEntityRepository,
+} from '@privateaim/server-kit';
 
 export interface IProjectRepository extends IEntityRepository<Project> {
     checkUniqueness(data: Partial<Project>, existing?: Project): Promise<void>;
+    /**
+     * Save all entities in one transaction: all or nothing.
+     */
+    saveMany(entities: Project[], ctx?: EntityPersistContext): Promise<Project[]>;
+    /**
+     * Remove all entities in one transaction: all or nothing.
+     */
+    removeMany(entities: Project[], ctx?: EntityPersistContext): Promise<void>;
 }
 
 export interface IProjectService {

@@ -243,7 +243,7 @@ with `PermissionDeniedError` (403) and any other failure with `InternalError`.
 TypeORM subscribers in `adapters/database/subscribers/` (grouped by domain: `analysis/`, `node/`, `project/`, `registry/`, `master-image/`) publish domain events via the entity event system. Events flow through Redis pub/sub and AMQP (RabbitMQ).
 
 AMQP consumers are wired via two DI modules:
-- **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregator handlers receive `DataSource` and `TaskManager` via constructor DI.
+- **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregators depend only on core services and repository ports (resolved from `AnalysisInjectionKey` / `DatabaseInjectionKey`), never on a `DataSource`: the worker status rules (event → status transition, `isProcessStatusTerminal`, `isCheckVerdictStale`) live in core as `AnalysisBuilder.applyEvent` / `AnalysisDistributor.applyEvent` / `MasterImageBuilderService.applyEvent`, while the storage-bucket and authup handlers keep their orchestration in app over the ports, with `TaskManager` via constructor DI.
 - **ComponentsModule** (`app/modules/components/`) — Registers `TaskManager`, `RegistryComponentCaller` in the container. Starts task consumer workers (registry).
 
 **Process-status transitions are row-locked.** Any read-check-mutate-save of a

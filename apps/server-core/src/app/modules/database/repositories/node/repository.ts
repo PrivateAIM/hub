@@ -84,6 +84,10 @@ export class NodeRepositoryAdapter implements INodeRepository {
         await this.repository.remove(entity as NodeEntity, ctx);
     }
 
+    async removeMany(entities: Node[], ctx?: EntityPersistContext): Promise<void> {
+        await this.repository.remove(entities as NodeEntity[], ctx);
+    }
+
     async validateJoinColumns(data: Partial<Node>): Promise<void> {
         await validateEntityJoinColumns(data, {
             dataSource: this.dataSource,

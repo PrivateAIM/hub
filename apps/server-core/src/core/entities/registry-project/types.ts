@@ -6,10 +6,19 @@
  */
 
 import type { RegistryProject } from '@privateaim/core-kit';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityPersistContext,
+    EntityRepositoryFindManyResult,
+    IEntityRepository,
+} from '@privateaim/server-kit';
 
 export interface IRegistryProjectRepository extends IEntityRepository<RegistryProject> {
     findOneWithSecret(id: string): Promise<RegistryProject | null>;
+    /**
+     * Remove all entities in one transaction: all or nothing.
+     */
+    removeMany(entities: RegistryProject[], ctx?: EntityPersistContext): Promise<void>;
 }
 
 export interface IRegistryProjectService {

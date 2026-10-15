@@ -9,10 +9,18 @@ import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { Analysis, AnalysisNode, Registry } from '@privateaim/core-kit';
 import { AnalysisDistributorCommandChecker } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
+import type {
+    AnalysisDistributorBasePayload,
+    AnalysisDistributorCheckFinishedPayload,
+    AnalysisDistributorEventMap,
+    AnalysisDistributorExecutionProgressPayload,
+} from '@privateaim/server-core-worker-kit';
+import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
 import type { EntityPersistContext, IEntityRepository } from '@privateaim/server-kit';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
+import { isCheckVerdictStale, isProcessStatusTerminal } from '../helpers.ts';
 import type { IAnalysisDistributorCaller } from './types.ts';
 
 type AnalysisDistributorContext = {
@@ -86,6 +94,75 @@ export class AnalysisDistributor {
         AnalysisDistributorCommandChecker.canCheck(entity);
         await this.caller.callCheck({ id: entity.id });
         return entity;
+    }
+
+    /**
+     * Apply a worker event to the analysis' distribution status. Resolves the
+     * saved row, or null when the row is missing or the event is a no-op.
+     */
+    async applyEvent(
+        key: keyof AnalysisDistributorEventMap,
+        value: AnalysisDistributorBasePayload,
+    ): Promise<Analysis | null> {
+        // the whole read-check-mutate-save runs on the locked row, so a terminal
+        // status is checked against the row as it is now, not as it was read
+        // before a concurrent handler (another replica) committed.
+        return this.repository.updateLocked(value.id, (entity) => {
+            switch (key) {
+                case AnalysisDistributorEvent.EXECUTION_STARTED: {
+                    if (isProcessStatusTerminal(entity.distributionStatus)) {
+                        return false;
+                    }
+
+                    entity.distributionStatus = ProcessStatus.STARTED;
+                    entity.distributionProgress = 0;
+                    break;
+                }
+                case AnalysisDistributorEvent.EXECUTION_PROGRESS: {
+                    if (isProcessStatusTerminal(entity.distributionStatus)) {
+                        return false;
+                    }
+
+                    const temp = value as AnalysisDistributorExecutionProgressPayload;
+                    if (
+                        !entity.distributionProgress ||
+                        temp.progress.percent >= entity.distributionProgress
+                    ) {
+                        entity.distributionProgress = Math.min(temp.progress.percent, 100);
+                    }
+                    break;
+                }
+                case AnalysisDistributorEvent.CHECK_FAILED: {
+                    // failure of the check itself says nothing about the distribution outcome
+                    return false;
+                }
+                case AnalysisDistributorEvent.EXECUTION_FAILED: {
+                    entity.distributionStatus = ProcessStatus.FAILED;
+                    break;
+                }
+                case AnalysisDistributorEvent.EXECUTION_FINISHED: {
+                    entity.distributionStatus = ProcessStatus.EXECUTED;
+                    entity.distributionProgress = 100;
+                    break;
+                }
+                case AnalysisDistributorEvent.CHECK_FINISHED: {
+                    const temp = value as AnalysisDistributorCheckFinishedPayload;
+                    if (!temp.status || isCheckVerdictStale(temp.checkedAt, entity.updatedAt)) {
+                        return false;
+                    }
+
+                    entity.distributionStatus = temp.status;
+
+                    if (temp.status === ProcessStatus.EXECUTED) {
+                        entity.distributionProgress = 100;
+                    } else if (temp.status === ProcessStatus.FAILED) {
+                        entity.distributionProgress = 0;
+                    }
+                }
+            }
+
+            return true;
+        });
     }
 
     protected async assignRegistry(entity: Analysis) {

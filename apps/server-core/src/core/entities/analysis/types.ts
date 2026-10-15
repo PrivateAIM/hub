@@ -23,6 +23,10 @@ export interface IAnalysisRepository extends IEntityRepository<Analysis> {
      * in `fn` rolls back.
      */
     updateLocked(id: string, fn: (entity: Analysis) => boolean, ctx?: EntityPersistContext): Promise<Analysis | null>;
+    /**
+     * Remove all entities in one transaction: all or nothing.
+     */
+    removeMany(entities: Analysis[], ctx?: EntityPersistContext): Promise<void>;
 }
 
 export interface IAnalysisMetadataRecalculator {

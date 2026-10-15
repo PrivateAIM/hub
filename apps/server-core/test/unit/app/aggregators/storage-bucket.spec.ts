@@ -25,6 +25,7 @@ import {
 } from '../../../../src/adapters/database/index.ts';
 import { StorageBucketClearingFinishedHandler } from '../../../../src/app/aggregators/storage/bucket/handlers/clearing_finished.ts';
 import { StorageBucketDeletionFinishedHandler } from '../../../../src/app/aggregators/storage/bucket/handlers/deletion_finished.ts';
+import type { StorageBucketAggregatorContext } from '../../../../src/app/aggregators/storage/bucket/types.ts';
 import { ComponentsInjectionKey } from '../../../../src/app/modules/components/index.ts';
 import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index.ts';
 import { createTestDatabaseApplication } from '../../../app';
@@ -48,15 +49,19 @@ function createPayload(bucket: AnalysisBucketEntity, fileIds: string[]): BucketC
 describe('storage bucket aggregator', () => {
     const suite = createTestDatabaseApplication();
     let dataSource: DataSource;
+    let ctx: StorageBucketAggregatorContext;
     let handler: StorageBucketClearingFinishedHandler;
 
     beforeAll(async () => {
         await suite.setup();
         dataSource = suite.container.resolve(DatabaseInjectionKey.DataSource);
-        handler = new StorageBucketClearingFinishedHandler({
-            dataSource,
+        ctx = {
+            analysisRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisRepository),
+            analysisBucketRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
+            analysisBucketFileRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository),
             taskManager: suite.container.resolve(ComponentsInjectionKey.TaskManager),
-        });
+        };
+        handler = new StorageBucketClearingFinishedHandler(ctx);
     });
 
     afterAll(async () => {
@@ -121,10 +126,7 @@ describe('storage bucket aggregator', () => {
         const deleted = await createBucketWithFiles();
         const kept = await createBucketWithFiles();
 
-        const deletionHandler = new StorageBucketDeletionFinishedHandler({
-            dataSource,
-            taskManager: suite.container.resolve(ComponentsInjectionKey.TaskManager),
-        });
+        const deletionHandler = new StorageBucketDeletionFinishedHandler(ctx);
         const { fileIds, ...bucket } = createPayload(deleted.bucket, []);
         expect(fileIds).toEqual([]);
 

@@ -9,30 +9,33 @@ import type {
     BucketComponentEventMap,
     BucketEvent,
 } from '@privateaim/server-storage-kit';
-import { In } from 'typeorm';
-import { AnalysisBucketFileEntity } from '../../../../../adapters/database/index.ts';
+import type { IAnalysisBucketFileRepository } from '../../../../../core/index.ts';
 import { BaseAggregatorHandler } from '../../../base.ts';
+import type { StorageBucketAggregatorContext } from '../types.ts';
 
 export class StorageBucketClearingFinishedHandler extends BaseAggregatorHandler<
     BucketComponentEventMap,
     BucketEvent.CLEARING_FINISHED
 > {
+    protected repository: IAnalysisBucketFileRepository;
+
+    constructor(ctx: StorageBucketAggregatorContext) {
+        super(ctx);
+        this.repository = ctx.analysisBucketFileRepository;
+    }
+
     async handle(payload: BucketClearingFinishedEventPayload): Promise<void> {
         // only the files the clear removed: one uploaded meanwhile still exists in storage.
         if (!payload.fileIds || payload.fileIds.length === 0) {
             return;
         }
 
-        const repository = this.dataSource.getRepository(AnalysisBucketFileEntity);
-        const entities = await repository.findBy({
-            bucketId: payload.id,
-            bucketFileId: In(payload.fileIds),
-        });
+        const entities = await this.repository.findManyByBucketFiles(payload.id, payload.fileIds);
         if (entities.length === 0) {
             return;
         }
 
         // remove (not delete) so the subscribers publish a realtime event per file.
-        await repository.remove(entities);
+        await this.repository.removeMany(entities);
     }
 }

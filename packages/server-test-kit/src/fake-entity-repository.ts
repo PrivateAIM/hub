@@ -86,11 +86,24 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
         return entity;
     }
 
+    async saveMany(entities: T[], ctx?: EntityPersistContext): Promise<T[]> {
+        for (const entity of entities) {
+            await this.save(entity, ctx);
+        }
+        return entities;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async remove(entity: T, ctx?: EntityPersistContext): Promise<void> {
         const index = this.store.findIndex((e) => (e as any).id === (entity as any).id);
         if (index >= 0) {
             this.store.splice(index, 1);
+        }
+    }
+
+    async removeMany(entities: T[], ctx?: EntityPersistContext): Promise<void> {
+        for (const entity of entities) {
+            await this.remove(entity, ctx);
         }
     }
 

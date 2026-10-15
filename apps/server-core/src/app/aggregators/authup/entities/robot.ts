@@ -11,17 +11,20 @@ import type {
     EventRecord,
 } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
-import { useDataSource } from 'typeorm-extension';
 import type { IRegistryCaller } from '../../../../core/harbor/types.ts';
 import {
     RegistryCommand,
 } from '../../../components/index.ts';
-import { RegistryProjectEntity } from '../../../../adapters/database/index.ts';
+import type { AuthupAggregatorRepositories } from '../types.ts';
 
 // Since @authup v1.0.0-beta.53 robots are unified into clients — the
 // registry service identity is now a confidential client named
 // `ServiceID.REGISTRY`, so this handler reacts to CLIENT events.
-export async function handleAuthupRobotEvent(context: EventRecord<EntityType.CLIENT, Client>, caller?: IRegistryCaller) {
+export async function handleAuthupRobotEvent(
+    context: EventRecord<EntityType.CLIENT, Client>,
+    repositories: AuthupAggregatorRepositories,
+    caller?: IRegistryCaller,
+) {
     if (!context.data.id) {
         return;
     }
@@ -36,10 +39,7 @@ export async function handleAuthupRobotEvent(context: EventRecord<EntityType.CLI
         return;
     }
 
-    const dataSource = await useDataSource();
-
-    const projectRepository = dataSource.getRepository(RegistryProjectEntity);
-    const projects = await projectRepository.find({ select: { id: true } });
+    const projects = await repositories.registryProjectRepository.findManyBy({});
 
     if (!caller) {
         return;

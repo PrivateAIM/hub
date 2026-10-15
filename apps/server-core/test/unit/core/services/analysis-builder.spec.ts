@@ -6,8 +6,16 @@
  */
 
 import { EntityNotFoundError } from '@privateaim/errors';
-import { AnalysisError, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
+import type { Analysis } from '@privateaim/core-kit';
+import {
+    AnalysisBuilderCommandChecker,
+    AnalysisError,
+    AnalysisNodeApprovalStatus,
+    NodeType,
+} from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
+import type { AnalysisBuilderCheckFinishedPayload, AnalysisBuilderExecutionProgressPayload } from '@privateaim/server-core-worker-kit';
+import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import { 
     beforeEach, 
     describe, 
@@ -243,6 +251,147 @@ describe('AnalysisBuilder', () => {
 
             expect(result.id).toBe('analysis-1');
             expect(caller.getCallsFor('callCheck')).toHaveLength(1);
+        });
+    });
+
+    describe('applyEvent', () => {
+        function createAnalysis(overrides: Partial<Analysis> = {}): Analysis {
+            return repository.seed(createFullAnalysis(overrides));
+        }
+
+        async function findAnalysis(id: string): Promise<Analysis> {
+            return repository.findOneById(id);
+        }
+
+        it('should ignore a late EXECUTION_PROGRESS for an executed build', async () => {
+            const analysis = await createAnalysis({ buildStatus: ProcessStatus.EXECUTED, buildProgress: 100 });
+
+            const payload: AnalysisBuilderExecutionProgressPayload = {
+                id: analysis.id,
+                progress: {
+                    current: 1, 
+                    total: 1, 
+                    percent: 40, 
+                },
+            };
+            const saved = await builder.applyEvent(AnalysisBuilderEvent.EXECUTION_PROGRESS, payload);
+
+            expect(saved).toBeNull();
+            expect(await findAnalysis(analysis.id)).toMatchObject({ buildStatus: ProcessStatus.EXECUTED, buildProgress: 100 });
+        });
+
+        it('should apply build metadata on CHECK_FINISHED with status EXECUTED', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
+            });
+
+            const payload: AnalysisBuilderCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.EXECUTED,
+                hash: 'sha256:abc',
+                os: 'linux',
+                size: 1024,
+            };
+
+            await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildStatus).toBe(ProcessStatus.EXECUTED);
+            expect(entity.buildProgress).toBe(100);
+            expect(entity.buildHash).toBe('sha256:abc');
+            expect(entity.buildOs).toBe('linux');
+            expect(entity.buildSize).toBe(1024);
+        });
+
+        it('should keep build metadata and progress on CHECK_FINISHED with in-progress status', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
+                buildHash: 'sha256:previous',
+                buildOs: 'linux',
+                buildSize: 512,
+            });
+
+            const payload: AnalysisBuilderCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.STARTED,
+            };
+
+            await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildStatus).toBe(ProcessStatus.STARTED);
+            expect(entity.buildProgress).toBe(40);
+            expect(entity.buildHash).toBe('sha256:previous');
+            expect(entity.buildOs).toBe('linux');
+            expect(entity.buildSize).toBe(512);
+        });
+
+        it('should reset build artifacts on CHECK_FINISHED with status FAILED (data loss recovery)', async () => {
+            const analysis = await createAnalysis({
+                configurationLocked: true,
+                distributionNodesValid: true,
+                buildStatus: ProcessStatus.EXECUTED,
+                buildProgress: 100,
+                buildHash: 'sha256:lost',
+                buildOs: 'linux',
+                buildSize: 512,
+            });
+
+            const payload: AnalysisBuilderCheckFinishedPayload = {
+                id: analysis.id,
+                status: ProcessStatus.FAILED,
+            };
+
+            await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
+            expect(entity.buildProgress).toBe(0);
+            expect(entity.buildHash).toBeNull();
+            expect(entity.buildOs).toBeNull();
+            expect(entity.buildSize).toBeNull();
+
+            // the analysis must be rebuildable again after the reset
+            expect(() => AnalysisBuilderCommandChecker.canStart(entity)).not.toThrow();
+        });
+
+        it('should not modify the entity on CHECK_FINISHED without status', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.STARTING,
+                buildHash: 'sha256:previous',
+            });
+
+            const payload: AnalysisBuilderCheckFinishedPayload = { id: analysis.id };
+
+            await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildStatus).toBe(ProcessStatus.STARTING);
+            expect(entity.buildHash).toBe('sha256:previous');
+        });
+
+        it('should not mark the build as FAILED on CHECK_FAILED', async () => {
+            const analysis = await createAnalysis({
+                buildStatus: ProcessStatus.STARTED,
+                buildProgress: 40,
+            });
+
+            await builder.applyEvent(AnalysisBuilderEvent.CHECK_FAILED, { id: analysis.id });
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildStatus).toBe(ProcessStatus.STARTED);
+            expect(entity.buildProgress).toBe(40);
+        });
+
+        it('should mark the build as FAILED on EXECUTION_FAILED', async () => {
+            const analysis = await createAnalysis({ buildStatus: ProcessStatus.STARTED });
+
+            await builder.applyEvent(AnalysisBuilderEvent.EXECUTION_FAILED, { id: analysis.id });
+
+            const entity = await findAnalysis(analysis.id);
+            expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
         });
     });
 });
