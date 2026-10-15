@@ -84,7 +84,10 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   server-core replica takes them, not inside the HTTP request that triggered
   them. Before, server-core ran the command itself first and fell back to the
   queue, so a failing command could run twice. Without `AMQP_URL` the command
-  still runs inside the same server-core process.
+  still runs inside the same server-core process. Renaming a registry project
+  sends one relink command. Two commands for the same project sent by separate
+  requests (an unlink, then a link) can run on two replicas at once, so wait
+  for the first to finish before sending the second.
 - Failure events carry the error's `name`, `message` and `code` instead of `{}`.
 
 ## Authup upgrade to beta.68
