@@ -26,7 +26,6 @@ export class BucketFileRepositoryAdapter implements IBucketFileRepository {
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<BucketFile>> {
         const qb = this.repository.createQueryBuilder('bucketFile');
-        qb.groupBy('bucketFile.id');
 
         const { pagination } = applyQuery(qb, query);
 

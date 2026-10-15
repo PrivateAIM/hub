@@ -74,6 +74,20 @@ describe('bucket-file HTTP endpoints', () => {
             expect(typeof body.meta.total).toBe('number');
             expect(body.meta.total).toBeGreaterThanOrEqual(1);
         });
+
+        it('should count each file once when the bucket is included', async () => {
+            const response = await fetch(
+                `${getBaseURL()}/bucket-files?filter[bucketId]=${bucketId}&include=bucket`,
+                { headers: { Authorization: authorization } },
+            );
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+            expect(body.data.map((item: { id: string }) => item.id)).toEqual([fileId]);
+            expect(body.data[0].bucket.id).toBe(bucketId);
+            expect(body.meta.total).toBe(1);
+        });
     });
 
     describe('GET /bucket-files/:id', () => {
