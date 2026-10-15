@@ -14,7 +14,7 @@ import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
 } from '@privateaim/server-kit';
-import type { IAnalysisNodeRepository } from '../../../../../core/entities/analysis-node/types.ts';
+import type { AnalysisParticipationWhere, IAnalysisNodeRepository } from '../../../../../core/entities/analysis-node/types.ts';
 import { applyQuery } from '../query.ts';
 
 export class AnalysisNodeRepositoryAdapter implements IAnalysisNodeRepository {
@@ -69,7 +69,7 @@ export class AnalysisNodeRepositoryAdapter implements IAnalysisNodeRepository {
      * `(node_id, analysis_id)` unique constraint. Several nodes of one realm can
      * take part in the same analysis, hence the de-duplication.
      */
-    async findAnalysisIds(where: { nodeId: string } | { nodeRealmId: string }): Promise<string[]> {
+    async findAnalysisIds(where: AnalysisParticipationWhere): Promise<string[]> {
         const rows = await this.repository.find({
             where,
             select: { analysisId: true },

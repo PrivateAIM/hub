@@ -11,8 +11,8 @@ import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } 
 export interface IAnalysisBucketRepository extends IEntityRepository<AnalysisBucket> {}
 
 export interface IAnalysisBucketService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisBucket>>;
-    getOne(id: string, query?: Record<string, any>): Promise<AnalysisBucket>;
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisBucket>>;
+    getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisBucket>;
     create(data: Partial<AnalysisBucket>, actor: ActorContext): Promise<AnalysisBucket>;
     update(id: string, data: Partial<AnalysisBucket>, actor: ActorContext): Promise<AnalysisBucket>;
     delete(id: string, actor: ActorContext): Promise<AnalysisBucket>;

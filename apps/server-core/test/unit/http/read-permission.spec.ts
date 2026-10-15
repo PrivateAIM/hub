@@ -46,6 +46,17 @@ describe('read permission on global catalogs', () => {
         // Reach-scoped (plan 021): the grant's realm scope is lowered into the query.
         ['/analyses', PermissionName.ANALYSIS_READ],
         ['/analysis-nodes', PermissionName.ANALYSIS_READ],
+        // The analysis family is narrowed through its `analysis` relation (and, for
+        // files, `analysisBucket.type`); an own-realm grant makes those joins run.
+        ['/analysis-nodes?include=analysis', PermissionName.ANALYSIS_READ],
+        ['/analysis-buckets', PermissionName.ANALYSIS_READ],
+        ['/analysis-buckets?include=analysis', PermissionName.ANALYSIS_READ],
+        ['/analysis-bucket-files', PermissionName.ANALYSIS_READ],
+        ['/analysis-bucket-files?include=analysisBucket', PermissionName.ANALYSIS_READ],
+        ['/analysis-node-events', PermissionName.ANALYSIS_READ],
+        // A sparse fieldset without `id` must survive the reach join (paged DISTINCT-ids query).
+        ['/analysis-bucket-files?fields=path', PermissionName.ANALYSIS_READ],
+        ['/analysis-nodes?fields=approvalStatus', PermissionName.ANALYSIS_READ],
     ])('GET %s requires %s', async (path, permissionName) => {
         expect(await status(path, await createRestrictedAccessToken([]))).toBe(403);
         expect(await status(path, await createRestrictedAccessToken([permissionName]))).toBe(200);

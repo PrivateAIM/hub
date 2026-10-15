@@ -53,7 +53,7 @@ type AnalysisServiceContext = {
 };
 
 const REACH_TARGET: AnalysisReachTarget = {
-    realmAttributeName: 'realmId',
+    analysisPath: '',
     analysisIdAttributeName: 'id',
 };
 

@@ -6,7 +6,7 @@
  */
 
 import type { AnalysisNode } from '@privateaim/core-kit';
-import type { IAnalysisNodeRepository } from '../../../../../src/core/entities/analysis-node/types.ts';
+import type { AnalysisParticipationWhere, IAnalysisNodeRepository } from '../../../../../src/core/entities/analysis-node/types.ts';
 import { FakeEntityRepository } from '@privateaim/server-test-kit';
 
 /**
@@ -31,7 +31,7 @@ export class FakeAnalysisNodeRepository extends FakeEntityRepository<AnalysisNod
         return super.findManyBy({ analysisId });
     }
 
-    async findAnalysisIds(where: { nodeId: string } | { nodeRealmId: string }): Promise<string[]> {
+    async findAnalysisIds(where: AnalysisParticipationWhere): Promise<string[]> {
         const entities = await super.findManyBy(where);
 
         return [...new Set(entities.map((entity) => entity.analysisId))];

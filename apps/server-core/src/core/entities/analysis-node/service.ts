@@ -39,7 +39,7 @@ type AnalysisNodeServiceContext = {
  * other nodes' rows included.
  */
 const REACH_TARGET: AnalysisReachTarget = {
-    realmAttributeName: 'analysisRealmId',
+    analysisPath: 'analysis',
     analysisIdAttributeName: 'analysisId',
 };
 

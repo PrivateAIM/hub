@@ -6,5 +6,6 @@
  */
 
 export * from './constants.ts';
+export * from './helpers.ts';
 export * from './service.ts';
 export * from './types.ts';

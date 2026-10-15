@@ -5,8 +5,10 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { AnalysisBucket, AnalysisBucketType } from '@privateaim/core-kit';
 import { AnalysisCommand } from '@privateaim/core-kit';
+import { PermissionName } from '@privateaim/kit';
 import { VCButton } from '@vuecs/button';
 import { VCAlert } from '@vuecs/elements';
 import { VCIcon } from '@vuecs/icon';
@@ -44,6 +46,11 @@ export default defineComponent({
 
         const isBusy = ref(false);
 
+        // Only someone who could provision the bucket learns it is missing; for
+        // anyone else an empty result also means "not in reach" (e.g. RESULT/TEMP
+        // before the own node's approval), so a missing-bucket notice would mislead.
+        const canRetry = usePermissionCheck({ name: PermissionName.ANALYSIS_UPDATE });
+
         const execute = wrapFnWithBusyState(isBusy, async () => {
             try {
                 const { data: response } = await httpClient
@@ -71,6 +78,7 @@ export default defineComponent({
         };
 
         return {
+            canRetry,
             forward,
             refresh,
             retry,
@@ -102,17 +110,22 @@ export default defineComponent({
                 size="sm"
                 class="mb-3"
             >
-                <p>
-                    The {{ type }} bucket does not exist.
-                </p>
+                <template v-if="canRetry">
+                    <p>
+                        The {{ type }} bucket does not exist.
+                    </p>
 
-                <VCButton
-                    size="xs"
-                    color="neutral"
-                    @click.prevent="retry"
-                >
-                    <VCIcon name="fa6-solid:rotate-right" /> Retry
-                </VCButton>
+                    <VCButton
+                        size="xs"
+                        color="neutral"
+                        @click.prevent="retry"
+                    >
+                        <VCIcon name="fa6-solid:rotate-right" /> Retry
+                    </VCButton>
+                </template>
+                <p v-else>
+                    No {{ type }} files are available to you.
+                </p>
             </VCAlert>
         </template>
     </FAnalysisBucket>

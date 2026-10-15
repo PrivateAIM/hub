@@ -6,8 +6,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
-import { AnalysisBucketType } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucket, Node } from '@privateaim/core-kit';
+import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import {
     BadRequestError,
     EntityConflictError,
@@ -21,6 +21,7 @@ import {
     it,
 } from 'vitest';
 import { AnalysisBucketService } from '../../../../../src/core/entities/analysis-bucket/service.ts';
+import { AnalysisReachService } from '../../../../../src/core/services/analysis-reach/index.ts';
 import {
     FakeEntityRepository,
     createAllowAllActor,
@@ -29,6 +30,8 @@ import {
     createNonMasterRealmActor,
 } from '../../helpers/index.ts';
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
+import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
+import { createTestAnalysisNode } from '../../../../utils/domains/index.ts';
 
 function createFakeAnalysisBucketRepository() {
     const repo = new FakeEntityRepository<AnalysisBucket>();
@@ -49,12 +52,17 @@ function createFakeAnalysisBucketRepository() {
 }
 
 function createTestAnalysisBucket(overrides?: Partial<AnalysisBucket>): AnalysisBucket {
+    const analysisId = overrides?.analysisId ?? randomUUID();
+    const realmId = overrides?.realmId ?? 'realm-1';
+
     return {
         id: randomUUID(),
         type: AnalysisBucketType.CODE,
         bucketId: randomUUID(),
-        analysisId: randomUUID(),
-        realmId: 'realm-1',
+        analysisId,
+        // the in-memory adapter resolves `analysis.realmId` through this object
+        analysis: { id: analysisId, realmId } as Analysis,
+        realmId,
         createdAt: new Date(),
         updatedAt: new Date(),
         ...overrides,
@@ -64,12 +72,22 @@ function createTestAnalysisBucket(overrides?: Partial<AnalysisBucket>): Analysis
 describe('AnalysisBucketService', () => {
     let repository: FakeEntityRepository<AnalysisBucket>;
     let analysisRepository: FakeAnalysisRepository;
+    let analysisNodeRepository: FakeAnalysisNodeRepository;
     let service: AnalysisBucketService;
 
     beforeEach(() => {
         repository = createFakeAnalysisBucketRepository();
         analysisRepository = new FakeAnalysisRepository();
-        service = new AnalysisBucketService({ repository, analysisRepository });
+        analysisNodeRepository = new FakeAnalysisNodeRepository();
+        service = new AnalysisBucketService({
+            repository,
+            analysisRepository,
+            reach: new AnalysisReachService({
+                analysisNodeRepository,
+                analysisRepository,
+                nodeRepository: new FakeEntityRepository<Node>(),
+            }),
+        });
     });
 
     describe('getMany', () => {
@@ -79,9 +97,83 @@ describe('AnalysisBucketService', () => {
                 createTestAnalysisBucket({ id: 'ab-2' }),
             ]);
 
-            const result = await service.getMany({});
+            const actor = createAllowAllActor();
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            const result = await service.getMany({}, actor);
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
+        });
+
+        it('should show a pending node\'s realm the CODE bucket only, an approved one every bucket', async () => {
+            repository.seed([
+                createTestAnalysisBucket({
+                    id: 'code', 
+                    analysisId: 'a-1', 
+                    realmId: 'realm-b', 
+                    type: AnalysisBucketType.CODE, 
+                }),
+                createTestAnalysisBucket({
+                    id: 'result', 
+                    analysisId: 'a-1', 
+                    realmId: 'realm-b', 
+                    type: AnalysisBucketType.RESULT, 
+                }),
+                createTestAnalysisBucket({
+                    id: 'temp', 
+                    analysisId: 'a-1', 
+                    realmId: 'realm-b', 
+                    type: AnalysisBucketType.TEMP, 
+                }),
+                createTestAnalysisBucket({
+                    id: 'foreign', 
+                    analysisId: 'a-2', 
+                    realmId: 'realm-c', 
+                }),
+            ]);
+            analysisNodeRepository.seed(createTestAnalysisNode({
+                id: 'an-1',
+                analysisId: 'a-1',
+                nodeRealmId: 'realm-a',
+                approvalStatus: null,
+            }));
+
+            const pending = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+            expect(pending.data.map((e) => e.id)).toEqual(['code']);
+
+            await analysisNodeRepository.save({
+                ...(await analysisNodeRepository.findOneById('an-1')),
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            });
+
+            const approved = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+            expect(approved.data.map((e) => e.id).sort()).toEqual(['code', 'result', 'temp']);
+        });
+
+        it('should show the owner realm every bucket of its analyses', async () => {
+            repository.seed([
+                createTestAnalysisBucket({
+                    id: 'code', 
+                    analysisId: 'a-1', 
+                    realmId: 'realm-a', 
+                    type: AnalysisBucketType.CODE, 
+                }),
+                createTestAnalysisBucket({
+                    id: 'result', 
+                    analysisId: 'a-1', 
+                    realmId: 'realm-a', 
+                    type: AnalysisBucketType.RESULT, 
+                }),
+                createTestAnalysisBucket({
+                    id: 'foreign', 
+                    analysisId: 'a-2', 
+                    realmId: 'realm-c', 
+                    type: AnalysisBucketType.RESULT, 
+                }),
+            ]);
+
+            const result = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+            expect(result.data.map((e) => e.id).sort()).toEqual(['code', 'result']);
         });
     });
 
@@ -90,12 +182,28 @@ describe('AnalysisBucketService', () => {
             const bucket = createTestAnalysisBucket({ id: 'ab-1' });
             repository.seed(bucket);
 
-            const result = await service.getOne('ab-1');
+            const result = await service.getOne('ab-1', createNonMasterRealmActor('realm-1'));
             expect(result.id).toBe('ab-1');
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('nonexistent', createAllowAllActor())).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should answer a RESULT bucket of a pending node\'s analysis like a missing one', async () => {
+            repository.seed(createTestAnalysisBucket({
+                id: 'result', 
+                analysisId: 'a-1', 
+                realmId: 'realm-b', 
+                type: AnalysisBucketType.RESULT, 
+            }));
+            analysisNodeRepository.seed(createTestAnalysisNode({
+                analysisId: 'a-1', 
+                nodeRealmId: 'realm-a', 
+                approvalStatus: null, 
+            }));
+
+            await expect(service.getOne('result', createNonMasterRealmActor('realm-a'))).rejects.toThrow(EntityNotFoundError);
         });
     });
 

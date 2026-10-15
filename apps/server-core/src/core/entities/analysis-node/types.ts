@@ -5,13 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
+import type { Analysis, AnalysisNode, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+
+/** A node, or every node of a realm — optionally only where its approval is given. */
+export type AnalysisParticipationWhere = ({ nodeId: string } | { nodeRealmId: string }) & {
+    approvalStatus?: AnalysisNodeApprovalStatus;
+};
 
 export interface IAnalysisNodeRepository extends IEntityRepository<AnalysisNode> {
     findManyWithNodeByAnalysis(analysisId: string): Promise<AnalysisNode[]>;
     /** The analyses a node, or any node of a realm, takes part in. */
-    findAnalysisIds(where: { nodeId: string } | { nodeRealmId: string }): Promise<string[]>;
+    findAnalysisIds(where: AnalysisParticipationWhere): Promise<string[]>;
 }
 
 export interface IAnalysisNodeMetadataRecalculator {

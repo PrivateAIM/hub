@@ -36,6 +36,7 @@ import {
     createAuthupAggregator,
 } from '../../aggregators/index.ts';
 import { AnalysisBucketFileService } from '../../../core/index.ts';
+import { AnalysisReachService } from '../../../core/services/analysis-reach/index.ts';
 import { MasterImageBuilderService } from '../../../core/services/index.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
@@ -110,6 +111,11 @@ export class AggregatorsModule implements IModule {
                         analysisRepository,
                         analysisBucketRepository,
                         analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                        reach: new AnalysisReachService({
+                            analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                            analysisRepository,
+                            nodeRepository: container.resolve(DatabaseInjectionKey.NodeRepository),
+                        }),
                     }),
                     logger,
                     bucketFileCaller: new BucketFileTaskCaller({ messageBus, logger }),

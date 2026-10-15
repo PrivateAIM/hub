@@ -11,9 +11,12 @@ import type {
     AnalysisBucket,
     AnalysisBucketFile,
     AnalysisNode,
+    Node,
 } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
-import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
+import { eq } from '@rapiq/core';
 import {
     beforeEach,
     describe,
@@ -21,8 +24,10 @@ import {
     it,
 } from 'vitest';
 import { AnalysisBucketFileService } from '../../../../../src/core/entities/analysis-bucket-file/service.ts';
+import { AnalysisReachService } from '../../../../../src/core/services/analysis-reach/index.ts';
 import {
     FakeEntityRepository,
+    FakePermissionEvaluator,
     createAllowAllActor,
     createDenyAllActor,
     createMasterRealmActor,
@@ -78,6 +83,11 @@ describe('AnalysisBucketFileService', () => {
             analysisRepository,
             analysisBucketRepository,
             analysisNodeRepository,
+            reach: new AnalysisReachService({
+                analysisNodeRepository,
+                analysisRepository,
+                nodeRepository: new FakeEntityRepository<Node>(),
+            }),
         });
     });
 
@@ -97,7 +107,10 @@ describe('AnalysisBucketFileService', () => {
             path: 'main.py',
             root: false,
             analysisId: analysis.id,
+            // the in-memory adapter resolves `analysis.*` / `analysisBucket.type` through these
+            analysis,
             analysisBucketId: buckets[type].id,
+            analysisBucket: buckets[type],
             bucketId: buckets[type].bucketId,
             bucketFileId: randomUUID(),
             realmId: OWNER_REALM,
@@ -405,6 +418,94 @@ describe('AnalysisBucketFileService', () => {
 
         it('should answer null for an unknown file', async () => {
             await expect(service.unregisterUpload('unknown', 'unknown')).resolves.toBeNull();
+        });
+    });
+    describe('read reach', () => {
+        /** Compiles the result read to `allow` (any) and every other read to the actor's own realm. */
+        class ResultAnyEvaluator extends FakePermissionEvaluator {
+            async compile(ctx: Parameters<FakePermissionEvaluator['compile']>[0]): ReturnType<FakePermissionEvaluator['compile']> {
+                this.compileCalls.push(ctx);
+                const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
+                if (names.length === 1 && names[0] === PermissionName.ANALYSIS_RESULT_READ) {
+                    return { verdict: 'allow' };
+                }
+
+                return { verdict: 'conditional', condition: eq('realmId', 'realm-stranger') };
+            }
+        }
+
+        it('should not let a wider result read reach result files of analyses the actor cannot read', async () => {
+            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+
+            const actor = createNonMasterRealmActor('realm-stranger');
+            actor.permissionEvaluator = new ResultAnyEvaluator();
+
+            const { data } = await service.getMany({ include: 'analysis' }, actor);
+            expect(data).toHaveLength(0);
+        });
+
+        function nodeActor(holdsResultRead = true) {
+            const actor = createNonMasterRealmActor(NODE_REALM);
+            if (!holdsResultRead) {
+                actor.permissionEvaluator.setBehavior(({ method, ctx }) => {
+                    const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
+                    if (method === 'preEvaluateOneOf' && names.length === 1 && names[0] === PermissionName.ANALYSIS_RESULT_READ) {
+                        throw new PermissionDeniedError();
+                    }
+                });
+            }
+            return actor;
+        }
+
+        async function listTypes(actor: ReturnType<typeof nodeActor>) {
+            const { data } = await service.getMany({}, actor);
+            return data.map((file) => file.analysisBucketId).map((id) => Object.values(buckets).find((b) => b.id === id).type).sort();
+        }
+
+        it('should show a pending node\'s realm the CODE files only', async () => {
+            seedAnalysisNode(null);
+            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+
+            await expect(listTypes(nodeActor())).resolves.toEqual([AnalysisBucketType.CODE]);
+        });
+
+        it('should show an approved node\'s realm every file type when it holds the result read', async () => {
+            seedAnalysisNode(AnalysisNodeApprovalStatus.APPROVED);
+            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+
+            await expect(listTypes(nodeActor())).resolves.toEqual([
+                AnalysisBucketType.CODE,
+                AnalysisBucketType.RESULT,
+                AnalysisBucketType.TEMP,
+            ].sort());
+        });
+
+        it('should leave out RESULT files without the result read, not refuse the listing', async () => {
+            seedAnalysisNode(AnalysisNodeApprovalStatus.APPROVED);
+            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+
+            await expect(listTypes(nodeActor(false))).resolves.toEqual([
+                AnalysisBucketType.CODE,
+                AnalysisBucketType.TEMP,
+            ].sort());
+        });
+
+        it('should answer a RESULT file without the result read like a missing one', async () => {
+            seedAnalysisNode(AnalysisNodeApprovalStatus.APPROVED);
+            const file = seedFile(AnalysisBucketType.RESULT);
+
+            await expect(service.getOne(file.id, nodeActor(false))).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should show nothing to a realm that neither owns nor takes part', async () => {
+            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+
+            const { data } = await service.getMany({}, createNonMasterRealmActor('realm-stranger'));
+            expect(data).toHaveLength(0);
+        });
+
+        it('should refuse an actor without any analysis read permission', async () => {
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
         });
     });
 });

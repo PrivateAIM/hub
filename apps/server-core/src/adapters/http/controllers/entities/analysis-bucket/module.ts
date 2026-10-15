@@ -45,8 +45,9 @@ export class AnalysisBucketController {
     async getMany(
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<AnalysisBucket>> {
+        const actor = buildActorContext(event);
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query);
+        const { data, meta } = await this.service.getMany(query, actor);
         return { data, meta: { ...meta, schema: describeQuerySchema(analysisBucketSchema) } };
     }
 
@@ -55,8 +56,9 @@ export class AnalysisBucketController {
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<AnalysisBucket>> {
+        const actor = buildActorContext(event);
         const query = useRequestQuery(event);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
 
         return { data: entity, meta: { schema: describeQuerySchema(analysisBucketSchema, RECORD_QUERY_PARAMETERS) } };
     }
