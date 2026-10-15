@@ -200,4 +200,37 @@ describe('src/core/query (decode-level sort/filter pins)', () => {
         expect(query.sorts.value.map((sort) => [sort.name, sort.operator]))
             .toEqual([['node.name', 'ASC']]);
     });
+
+    it('should keep every declared composite sort through decode', () => {
+        // A multi-key sort binds only when the full key list prefixes ONE
+        // declared sequence, and a miss un-sorts silently. Every declared
+        // composite whose keys are all sortable (e.g. the node junctions'
+        // `sort=approvalStatus,-createdAt` inbox order) must bind whole.
+        const offenders: string[] = [];
+        let probed = 0;
+
+        for (const schema of entitySchemas) {
+            const description = schema.describe();
+            const sortable = new Set(description.sorts?.allowed || []);
+
+            for (const sequence of description.indexes || []) {
+                if (sequence.length < 2 || sequence.some((key) => !sortable.has(key))) {
+                    continue;
+                }
+
+                probed++;
+                const wire = sequence.map((key, i) => (i === 0 ? key : `-${key}`)).join(',');
+                const query = decodeQuery(`sort=${encodeURIComponent(wire)}`, { schema });
+
+                const bound = query.sorts.value.map((sort) => sort.name);
+                if (bound.join(',') !== sequence.join(',')) {
+                    offenders.push(`${schema.name}.sorts.${wire}`);
+                }
+            }
+        }
+
+        // Anti-vacuity: the node junctions declare three such composites.
+        expect(probed).toBeGreaterThanOrEqual(3);
+        expect(offenders).toEqual([]);
+    });
 });

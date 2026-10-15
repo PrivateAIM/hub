@@ -17,14 +17,16 @@ const schemaMapping = {
 export const projectNodeSchema = defineSchema<ProjectNode>({
     name: DomainType.PROJECT_NODE,
     strict: true,
-    // `projectId` anchors through the UNIQUE(projectId, nodeId) it leads;
-    // `nodeId` sits in its non-leading position and needs its own single.
+    // Each node/project id and realm leads a composite paired with the
+    // opposite side, so a filter combination from either side is backed by
+    // one index; the status composite backs `sort=approvalStatus,-createdAt`.
     indexes: [
         ['projectId', 'nodeId'],
-        ['nodeId'],
-        ['approvalStatus'],
-        ['projectRealmId'],
-        ['nodeRealmId'],
+        ['projectId', 'nodeRealmId'],
+        ['nodeId', 'projectRealmId'],
+        ['projectRealmId', 'nodeId'],
+        ['nodeRealmId', 'projectId'],
+        ['approvalStatus', 'createdAt'],
         ['createdAt'],
         ['updatedAt'],
     ],
@@ -46,7 +48,10 @@ export const projectNodeSchema = defineSchema<ProjectNode>({
         indexed: true,
     },
     relations: { allowed: ['node', 'project'] },
-    sorts: { allowed: ['createdAt', 'updatedAt'], indexed: true },
+    sorts: {
+        allowed: ['approvalStatus', 'createdAt', 'updatedAt'],
+        indexed: true,
+    },
     pagination: { maxLimit: 50 },
     schemaMapping,
 });

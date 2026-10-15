@@ -28,11 +28,24 @@ import type { ProcessStatus } from '@privateaim/kit';
 import { AnalysisEntity } from './analysis.ts';
 import { NodeEntity } from './node.ts';
 
+// Each side of the junction (node, analysis) is indexed by its id and by its
+// realm, each paired with the opposite side's realm or id, so a lookup or
+// filter combination from either side is served by one index, and the
+// participation lookups (SELECT analysis_id ... WHERE node_realm_id = ?)
+// answer from the index alone. Every leading column is also an allow-listed
+// filter key, so no single-column index is needed for these four columns.
+// typeorm hashes an index name from the SORTED column list, so each mirrored
+// pair would collide: the index whose columns are not in alphabetical order
+// carries an explicit name, hashed the same way from its columns in order.
 @Unique(['nodeId', 'analysisId'])
-// Leads with nodeRealmId, so it also serves the allow-listed `nodeRealmId`
-// filter; the trailing analysisId lets a participation lookup
-// (SELECT analysis_id ... WHERE node_realm_id = ?) answer from the index.
-@Index(['nodeRealmId', 'analysisId'])
+@Index('IDX_c0a83a2c9e8f5b096e0587230a', ['nodeId', 'analysisRealmId'])
+@Index(['analysisId', 'nodeRealmId'])
+@Index(['analysisRealmId', 'nodeId'])
+@Index('IDX_5816ce1cf851f5fc1421faa346', ['nodeRealmId', 'analysisId'])
+// Status first, newest first: an approval or execution inbox
+// (sort=approvalStatus,-createdAt).
+@Index(['approvalStatus', 'createdAt'])
+@Index(['executionStatus', 'createdAt'])
 @Entity({ name: 'analysis_nodes' })
 export class AnalysisNodeEntity implements AnalysisNode {
     @PrimaryGeneratedColumn('uuid')
@@ -40,7 +53,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
 
     // ------------------------------------------------------------------
 
-    @Index()
     @Column({
         name: 'approval_status',
         type: 'varchar',
@@ -49,7 +61,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
     })
     approvalStatus: AnalysisNodeApprovalStatus | null;
 
-    @Index()
     @Column({
         name: 'execution_status',
         type: 'varchar',
@@ -101,7 +112,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
 
     // ------------------------------------------------------------------
 
-    @Index()
     @Column({ name: 'analysis_id' })
     analysisId: Analysis['id'];
 
@@ -109,7 +119,6 @@ export class AnalysisNodeEntity implements AnalysisNode {
     @JoinColumn({ name: 'analysis_id' })
     analysis: AnalysisEntity;
 
-    @Index()
     @Column({ name: 'analysis_realm_id', type: 'uuid' })
     analysisRealmId: Realm['id'];
 

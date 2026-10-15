@@ -181,8 +181,13 @@ Mutations (`POST`, `DELETE`) describe nothing — their `meta` is exactly `{}`.
   `event`: `createdAt DESC`), the default entry plus **one** other advertised key also binds
   through that exemption, as a two-column `ORDER BY` no declared sequence covers — e.g.
   `GET /master-images?sort=path,name` executes `ORDER BY path, name` with no `(path, name)`
-  index behind it. Any other key combination is dropped: hub declares composite sequences,
-  but none whose members are all sortable.
+  index behind it. Beyond that, a multi-key sort binds only where a declared composite has
+  all its members sortable: the node junctions' status-then-age order,
+  `GET /analysis-nodes?sort=approvalStatus,-createdAt` (also `executionStatus`) and
+  `GET /project-nodes?sort=approvalStatus,-createdAt`. Any other key combination is dropped.
+  Filters are not limited this way: under anchor mode any combination binds once one key
+  leads a declared sequence, and on the node junctions every id/realm pairing across the two
+  sides (e.g. `nodeId` + `projectRealmId`) has its own composite index.
 
 ### Endpoints without capability discovery
 
