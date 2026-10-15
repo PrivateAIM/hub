@@ -9,8 +9,25 @@ import type { AnalysisNode } from '@privateaim/core-kit';
 import type { IAnalysisNodeRepository } from '../../../../../src/core/entities/analysis-node/types.ts';
 import { FakeEntityRepository } from '@privateaim/server-test-kit';
 
+/**
+ * Mirrors the typeorm adapter's relation loading: `findManyBy` is a plain
+ * `findBy` and returns rows WITHOUT their relations, only
+ * `findManyWithNodeByAnalysis` loads `node`. A fake that handed back the
+ * seeded relation from every find would hide code reading `node` off a
+ * relation-less read (the builder's approval reset did exactly that).
+ */
 export class FakeAnalysisNodeRepository extends FakeEntityRepository<AnalysisNode> implements IAnalysisNodeRepository {
+    async findManyBy(where: Record<string, any>): Promise<AnalysisNode[]> {
+        const entities = await super.findManyBy(where);
+
+        return entities.map((entity) => ({
+            ...entity, 
+            node: undefined, 
+            analysis: undefined, 
+        }));
+    }
+
     async findManyWithNodeByAnalysis(analysisId: string): Promise<AnalysisNode[]> {
-        return this.findManyBy({ analysisId });
+        return super.findManyBy({ analysisId });
     }
 }

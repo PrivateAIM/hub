@@ -6,18 +6,18 @@
  */
 
 import { EntityNotFoundError } from '@privateaim/errors';
-import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
+import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisBuilderCommandChecker, NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type { IEntityRepository } from '@privateaim/server-kit';
 import type { IAnalysisMetadataRecalculator } from '../../entities/analysis/types.ts';
-import type { IAnalysisNodeMetadataRecalculator } from '../../entities/analysis-node/types.ts';
+import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
 import type { AnalysisBuilderStartOptions, IAnalysisBuilderCaller } from './types.ts';
 
 type AnalysisBuilderContext = {
     repository: IEntityRepository<Analysis>;
-    analysisNodeRepository: IEntityRepository<AnalysisNode>;
+    analysisNodeRepository: IAnalysisNodeRepository;
     caller: IAnalysisBuilderCaller;
     analysisRecalculator: IAnalysisMetadataRecalculator;
     nodeRecalculator: IAnalysisNodeMetadataRecalculator;
@@ -27,7 +27,7 @@ type AnalysisBuilderContext = {
 export class AnalysisBuilder {
     protected repository: IEntityRepository<Analysis>;
 
-    protected analysisNodeRepository: IEntityRepository<AnalysisNode>;
+    protected analysisNodeRepository: IAnalysisNodeRepository;
 
     protected caller: IAnalysisBuilderCaller;
 
@@ -81,7 +81,9 @@ export class AnalysisBuilder {
      * previous image must not let a new one through distribution.
      */
     protected async resetApprovals(analysisId: string) {
-        const analysisNodes = await this.analysisNodeRepository.findManyBy({ analysisId });
+        // The node relation tells an aggregator apart; a plain findManyBy
+        // leaves it unloaded, which would clear the aggregator's approval too.
+        const analysisNodes = await this.analysisNodeRepository.findManyWithNodeByAnalysis(analysisId);
 
         for (const analysisNode of analysisNodes) {
             if (

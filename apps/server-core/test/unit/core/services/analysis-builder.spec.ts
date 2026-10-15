@@ -6,7 +6,7 @@
  */
 
 import { EntityNotFoundError } from '@privateaim/errors';
-import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
+import type { Analysis } from '@privateaim/core-kit';
 import { AnalysisError, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { 
@@ -20,12 +20,13 @@ import { FakeEntityRepository } from '../helpers/index.ts';
 import { FakeAnalysisBuilderCaller } from './helpers/fake-builder-caller.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
+import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { FakeAnalysisFileMetadataRecalculator } from '../entities/analysis-bucket-file/fake-metadata-recalculator.ts';
 import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
 describe('AnalysisBuilder', () => {
     let repository: FakeEntityRepository<Analysis>;
-    let analysisNodeRepository: FakeEntityRepository<AnalysisNode>;
+    let analysisNodeRepository: FakeAnalysisNodeRepository;
     let caller: FakeAnalysisBuilderCaller;
     let analysisRecalculator: FakeAnalysisMetadataRecalculator;
     let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
@@ -34,7 +35,7 @@ describe('AnalysisBuilder', () => {
 
     beforeEach(() => {
         repository = new FakeEntityRepository<Analysis>();
-        analysisNodeRepository = new FakeEntityRepository<AnalysisNode>();
+        analysisNodeRepository = new FakeAnalysisNodeRepository();
         analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
         nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
         fileRecalculator = new FakeAnalysisFileMetadataRecalculator(repository);
