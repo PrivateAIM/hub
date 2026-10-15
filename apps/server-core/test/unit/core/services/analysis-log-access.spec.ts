@@ -198,8 +198,10 @@ describe('AnalysisLogAccessService', () => {
         });
 
         it('rejects an unknown or malformed node id', async () => {
-            await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, randomUUID(), userOf(OWNER_REALM), LogAccessIntent.READ))
-                .rejects.toThrow(EntityNotFoundError);
+            for (const intent of [LogAccessIntent.READ, LogAccessIntent.DELETE]) {
+                await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, randomUUID(), userOf(OWNER_REALM), intent))
+                    .rejects.toThrow(EntityNotFoundError);
+            }
             await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, 'abc', userOf(OWNER_REALM), LogAccessIntent.READ))
                 .rejects.toThrow(BadRequestError);
         });

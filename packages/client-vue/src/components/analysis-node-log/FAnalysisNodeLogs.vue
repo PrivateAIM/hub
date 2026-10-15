@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
 import type { Log } from '@privateaim/telemetry-kit';
 import type { Ref } from 'vue';
 import {
@@ -33,6 +34,17 @@ export default defineComponent({
         // Set once the server refuses the logs (403/404: out of the caller's
         // reach), which also stops the auto-refresh from retrying.
         const denied = ref(false);
+
+        // A refusal shows no logs; any other failure stays retryable.
+        const refuse = (e: unknown) => {
+            if (!isClientErrorWithStatusCode(e, [403, 404])) {
+                throw e;
+            }
+
+            denied.value = true;
+            data.value = [];
+            total.value = 0;
+        };
         const total = ref(0);
         const data : Ref<Log[]> = ref([]);
 
@@ -75,8 +87,8 @@ export default defineComponent({
 
             try {
                 await load();
-            } catch {
-                denied.value = true;
+            } catch (e) {
+                refuse(e);
             } finally {
                 busy.value = false;
             }
@@ -99,8 +111,8 @@ export default defineComponent({
                 await preserve(() => {
                     data.value = next;
                 });
-            } catch {
-                denied.value = true;
+            } catch (e) {
+                refuse(e);
             } finally {
                 busy.value = false;
             }

@@ -82,6 +82,7 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
 
         if (intent === LogAccessIntent.DELETE) {
             await this.assertAnalysisLogAccess(analysisId, actor, intent);
+            await this.findNode(nodeId);
             return;
         }
 
@@ -89,10 +90,7 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
         // differently from a known one.
         await actor.permissionEvaluator.preEvaluateOneOf({ name: ANALYSIS_NODE_LOG_PERMISSIONS });
 
-        const node = await this.nodeRepository.findOneById(nodeId);
-        if (!node) {
-            throw new EntityNotFoundError({ entity: 'node' });
-        }
+        const node = await this.findNode(nodeId);
 
         const owner = await this.reach.resolve(actor, REACH_TARGET, { names: ANALYSIS_NODE_LOG_PERMISSIONS, grantOnly: true });
         if (await this.reaches(analysisId, owner)) {
@@ -111,6 +109,15 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
         }
 
         throw new EntityNotFoundError({ entity: 'analysis' });
+    }
+
+    protected async findNode(id: string): Promise<Node> {
+        const node = await this.nodeRepository.findOneById(id);
+        if (!node) {
+            throw new EntityNotFoundError({ entity: 'node' });
+        }
+
+        return node;
     }
 
     protected async reaches(analysisId: string, condition: ICondition | undefined): Promise<boolean> {
