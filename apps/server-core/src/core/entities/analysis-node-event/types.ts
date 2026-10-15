@@ -6,11 +6,11 @@
  */
 
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
-import type { EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 
 export interface IAnalysisNodeEventRepository extends IEntityRepository<AnalysisNodeEvent> {}
 
 export interface IAnalysisNodeEventService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisNodeEvent>>;
-    getOne(id: string, query?: Record<string, any>): Promise<AnalysisNodeEvent>;
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisNodeEvent>>;
+    getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisNodeEvent>;
 }

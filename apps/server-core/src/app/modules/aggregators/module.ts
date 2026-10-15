@@ -36,6 +36,7 @@ import {
     createAuthupAggregator,
 } from '../../aggregators/index.ts';
 import { AnalysisBucketFileService } from '../../../core/index.ts';
+import { AnalysisReachService } from '../../../core/services/analysis-reach/index.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { ComponentsInjectionKey } from '../components/constants.ts';
@@ -99,6 +100,11 @@ export class AggregatorsModule implements IModule {
                         analysisRepository: container.resolve(DatabaseInjectionKey.AnalysisRepository),
                         analysisBucketRepository: container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
                         analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                        reach: new AnalysisReachService({
+                            analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                            analysisRepository: container.resolve(DatabaseInjectionKey.AnalysisRepository),
+                            nodeRepository: container.resolve(DatabaseInjectionKey.NodeRepository),
+                        }),
                     }),
                     logger,
                     bucketFileCaller: new BucketFileTaskCaller({ messageBus, logger }),

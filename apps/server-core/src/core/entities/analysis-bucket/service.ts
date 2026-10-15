@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
 import type { AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisBucketValidator } from '@privateaim/core-kit';
@@ -21,10 +22,18 @@ import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisBucketSchema } from './schema.ts';
 import type { IAnalysisBucketRepository, IAnalysisBucketService } from './types.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
+import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
+import { buildAnalysisBucketTypeReach } from '../../services/analysis-reach/index.ts';
 
 type AnalysisBucketServiceContext = {
     repository: IAnalysisBucketRepository;
     analysisRepository: IAnalysisRepository;
+    reach: IAnalysisReachService;
+};
+
+const REACH_TARGET: AnalysisReachTarget = {
+    analysisPath: 'analysis',
+    analysisIdAttributeName: 'analysisId',
 };
 
 export class AnalysisBucketService extends AbstractEntityService implements IAnalysisBucketService {
@@ -32,33 +41,51 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
 
     protected analysisRepository: IAnalysisRepository;
 
+    protected reach: IAnalysisReachService;
+
     protected validator: AnalysisBucketValidator;
 
     constructor(ctx: AnalysisBucketServiceContext) {
         super();
         this.repository = ctx.repository;
         this.analysisRepository = ctx.analysisRepository;
+        this.reach = ctx.reach;
         this.validator = new AnalysisBucketValidator();
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisBucket>> {
-        return this.repository.findMany(decodeQuery(query, { schema: analysisBucketSchema }));
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisBucket>> {
+        return this.repository.findMany(await this.scopeRead(decodeQuery(query, { schema: analysisBucketSchema }), actor));
     }
 
-    /**
-     * `findOneById` takes no query, so an actor-supplied `fields`/`relations`
-     * selection has to go through `findMany` with an `id` condition appended.
-     */
-    async getOne(id: string, query?: Record<string, any>): Promise<AnalysisBucket> {
-        const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: analysisBucketSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
-            await this.repository.findOneById(id);
+    /** Reads through the same reach as {@link getMany}; out of reach answers 404. */
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisBucket> {
+        const scoped = await this.scopeRead(
+            decodeQuery(query, { schema: analysisBucketSchema, parameters: ['fields', 'relations'] }),
+            actor,
+        );
 
+        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
         return entity;
+    }
+
+    /** D2: CODE for every participant, RESULT and TEMP only through an approved node. */
+    protected async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+        const condition = buildAnalysisBucketTypeReach('type', [
+            {
+                types: [AnalysisBucketType.CODE],
+                reach: await this.reach.resolve(actor, REACH_TARGET),
+            },
+            {
+                types: [AnalysisBucketType.RESULT, AnalysisBucketType.TEMP],
+                reach: await this.reach.resolve(actor, REACH_TARGET, { approvedOnly: true }),
+            },
+        ]);
+
+        return condition ? appendQueryConditions(query, condition) : query;
     }
 
     async create(data: Partial<AnalysisBucket>, actor: ActorContext): Promise<AnalysisBucket> {

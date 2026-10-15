@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { eq } from '@rapiq/core';
+import type { ICondition, IQuery } from '@rapiq/core';
+import { and, eq } from '@rapiq/core';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketFileValidator, AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
@@ -26,6 +27,9 @@ import { analysisBucketFileSchema } from './schema.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
 import type { IAnalysisBucketRepository } from '../analysis-bucket/types.ts';
 import type { IAnalysisNodeRepository } from '../analysis-node/types.ts';
+import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
+import { buildAnalysisBucketTypeReach } from '../../services/analysis-reach/index.ts';
+import { isPermissionDenial } from '../../utils/index.ts';
 
 type AnalysisBucketFileServiceContext = {
     repository: IAnalysisBucketFileRepository;
@@ -33,6 +37,12 @@ type AnalysisBucketFileServiceContext = {
     analysisRepository: IAnalysisRepository;
     analysisBucketRepository: IAnalysisBucketRepository;
     analysisNodeRepository: IAnalysisNodeRepository;
+    reach: IAnalysisReachService;
+};
+
+const REACH_TARGET: AnalysisReachTarget = {
+    analysisPath: 'analysis',
+    analysisIdAttributeName: 'analysisId',
 };
 
 export class AnalysisBucketFileService extends AbstractEntityService implements IAnalysisBucketFileService {
@@ -46,6 +56,8 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
     protected analysisNodeRepository: IAnalysisNodeRepository;
 
+    protected reach: IAnalysisReachService;
+
     protected validator: AnalysisBucketFileValidator;
 
     constructor(ctx: AnalysisBucketFileServiceContext) {
@@ -55,27 +67,66 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         this.analysisRepository = ctx.analysisRepository;
         this.analysisBucketRepository = ctx.analysisBucketRepository;
         this.analysisNodeRepository = ctx.analysisNodeRepository;
+        this.reach = ctx.reach;
         this.validator = new AnalysisBucketFileValidator();
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>> {
-        return this.repository.findMany(decodeQuery(query, { schema: analysisBucketFileSchema }));
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>> {
+        return this.repository.findMany(await this.scopeRead(decodeQuery(query, { schema: analysisBucketFileSchema }), actor));
     }
 
-    /**
-     * `findOneById` takes no query, so an actor-supplied `fields`/`relations`
-     * selection has to go through `findMany` with an `id` condition appended.
-     */
-    async getOne(id: string, query?: Record<string, any>): Promise<AnalysisBucketFile> {
-        const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: analysisBucketFileSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
-            await this.repository.findOneById(id);
+    /** Reads through the same reach as {@link getMany}; out of reach answers 404. */
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisBucketFile> {
+        const scoped = await this.scopeRead(
+            decodeQuery(query, { schema: analysisBucketFileSchema, parameters: ['fields', 'relations'] }),
+            actor,
+        );
 
+        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
         }
 
         return entity;
+    }
+
+    /**
+     * D2/D6: CODE files for every participant, TEMP files only through an
+     * approved node, RESULT files additionally only with ANALYSIS_RESULT_READ
+     * — narrowed further by that grant's own reach. Without it, RESULT files are
+     * left out rather than refused, so listings of the other types still work.
+     */
+    protected async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+        const code = await this.reach.resolve(actor, REACH_TARGET);
+        const temp = await this.reach.resolve(actor, REACH_TARGET, { approvedOnly: true });
+
+        let result: ICondition | undefined | null;
+        try {
+            result = await this.reach.resolve(actor, REACH_TARGET, {
+                names: [PermissionName.ANALYSIS_RESULT_READ],
+                approvedOnly: true,
+            });
+        } catch (e) {
+            if (!isPermissionDenial(e)) {
+                throw e;
+            }
+
+            result = null;
+        }
+
+        // The result read narrows the approved-participant reach, never widens
+        // it: a file's analysis must stay readable whenever the file is (D7).
+        if (result !== null && temp !== undefined) {
+            result = result === undefined ? temp : and(temp, result);
+        }
+
+        const condition = buildAnalysisBucketTypeReach('analysisBucket.type', [
+            { types: [AnalysisBucketType.CODE], reach: code },
+            { types: [AnalysisBucketType.TEMP], reach: temp },
+            { types: [AnalysisBucketType.RESULT], reach: result },
+        ]);
+
+        return condition ? appendQueryConditions(query, condition) : query;
     }
 
     async create(data: Partial<AnalysisBucketFile>, actor: ActorContext): Promise<AnalysisBucketFile> {

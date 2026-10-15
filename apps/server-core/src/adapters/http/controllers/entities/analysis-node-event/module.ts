@@ -16,7 +16,7 @@ import {
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
-import { ForceLoggedInMiddleware } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IAnalysisNodeEventService } from '../../../../../core/index.ts';
 import { analysisNodeEventSchema } from '../../../../../core/index.ts';
@@ -38,8 +38,9 @@ export class AnalysisNodeEventController {
     async getMany(
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<AnalysisNodeEvent>> {
+        const actor = buildActorContext(event);
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query);
+        const { data, meta } = await this.service.getMany(query, actor);
         return { data, meta: { ...meta, schema: describeQuerySchema(analysisNodeEventSchema) } };
     }
 
@@ -48,8 +49,9 @@ export class AnalysisNodeEventController {
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<AnalysisNodeEvent>> {
+        const actor = buildActorContext(event);
         const query = useRequestQuery(event);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
 
         return {
             data: entity,

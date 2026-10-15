@@ -8,7 +8,12 @@
 import type { Analysis, Node } from '@privateaim/core-kit';
 import { PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
-import { eq, inArray, or } from '@rapiq/core';
+import {
+    and,
+    eq,
+    inArray,
+    or,
+} from '@rapiq/core';
 import {
     beforeEach,
     describe,
@@ -25,8 +30,8 @@ import {
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
-const ANALYSIS: AnalysisReachTarget = { realmAttributeName: 'realmId', analysisIdAttributeName: 'id' };
-const ANALYSIS_NODE: AnalysisReachTarget = { realmAttributeName: 'analysisRealmId', analysisIdAttributeName: 'analysisId' };
+const ANALYSIS: AnalysisReachTarget = { analysisPath: '', analysisIdAttributeName: 'id' };
+const ANALYSIS_NODE: AnalysisReachTarget = { analysisPath: 'analysis', analysisIdAttributeName: 'analysisId' };
 
 describe('AnalysisReachService', () => {
     let analysisNodeRepository: FakeAnalysisNodeRepository;
@@ -125,24 +130,74 @@ describe('AnalysisReachService', () => {
         ));
     });
 
-    it('should not widen analysis-node rows past a grant policy, keeping participation', async () => {
-        // With a realm column named, authup returns `post` for any policy-bearing grant.
+    it('should narrow a related entity\'s own-realm fallback through its analysis', async () => {
         const actor = createNonMasterRealmActor('realm-b');
 
         await expect(service.resolve(actor, ANALYSIS_NODE)).resolves.toEqual(or(
-            inArray('id', []),
+            eq('analysis.realmId', 'realm-b'),
             inArray('analysisId', ['a-3']),
         ));
     });
 
-    it('should lower the grant onto the realm column of the queried entity', async () => {
+    it('should re-root a grant policy onto the analysis relation of a related entity', async () => {
+        const actor = createNonMasterRealmActor('realm-b');
+        actor.permissionEvaluator.setCompileResult({
+            verdict: 'conditional',
+            condition: and(eq('realmId', 'realm-b'), eq('projectId', 'p-1')),
+        });
+
+        await expect(service.resolve(actor, ANALYSIS_NODE)).resolves.toEqual(or(
+            and(eq('analysis.realmId', 'realm-b'), eq('analysis.projectId', 'p-1')),
+            inArray('analysisId', ['a-3']),
+        ));
+    });
+
+    it('should never name a realm column, so authup can lower grant policies', async () => {
         const actor = createNonMasterRealmActor('realm-a');
 
         await service.resolve(actor, ANALYSIS_NODE);
         await service.resolve(actor, ANALYSIS);
 
-        expect(actor.permissionEvaluator.compileCalls[0].realmAttributeName).toBe('analysisRealmId');
-        expect(actor.permissionEvaluator.compileCalls[1].realmAttributeName).toBeUndefined();
+        expect(actor.permissionEvaluator.compileCalls.map((call) => call.realmAttributeName)).toEqual([undefined, undefined]);
+    });
+
+    it('should count only approved participation when asked', async () => {
+        await analysisNodeRepository.save({
+            ...(await analysisNodeRepository.findOneById('an-2')),
+            approvalStatus: null,
+        });
+
+        const actor = createNonMasterRealmActor('realm-a');
+        actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-a') });
+
+        // an-2 is pending, but a-2 stays reachable through an-3, which is approved.
+        await expect(service.resolve(actor, ANALYSIS, { approvedOnly: true })).resolves.toEqual(or(
+            eq('realmId', 'realm-a'),
+            inArray('id', ['a-1', 'a-2']),
+        ));
+
+        await analysisNodeRepository.save({
+            ...(await analysisNodeRepository.findOneById('an-3')),
+            approvalStatus: null,
+        });
+
+        await expect(service.resolve(actor, ANALYSIS, { approvedOnly: true })).resolves.toEqual(or(
+            eq('realmId', 'realm-a'),
+            inArray('id', ['a-1']),
+        ));
+        await expect(service.resolve(actor, ANALYSIS)).resolves.toEqual(or(
+            eq('realmId', 'realm-a'),
+            inArray('id', ['a-1', 'a-2']),
+        ));
+    });
+
+    it('should pre-gate and compile the given permission names', async () => {
+        const actor = createNonMasterRealmActor('realm-a');
+
+        await service.resolve(actor, ANALYSIS, { names: [PermissionName.ANALYSIS_RESULT_READ] });
+
+        expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0].name).toEqual([PermissionName.ANALYSIS_RESULT_READ]);
+        expect(actor.permissionEvaluator.compileCalls[0].name).toEqual([PermissionName.ANALYSIS_RESULT_READ]);
     });
 
     it('should reach a node client by its node alone, whatever its grant', async () => {

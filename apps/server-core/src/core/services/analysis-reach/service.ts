@@ -7,9 +7,13 @@
 
 import type { ICondition } from '@rapiq/core';
 import { eq, inArray, or } from '@rapiq/core';
+import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import type { ActorContext } from '@privateaim/server-kit';
+import { prefixConditionFields } from '../../query/index.ts';
+import type { AnalysisParticipationWhere } from '../../entities/analysis-node/types.ts';
 import { ANALYSIS_READ_PERMISSIONS } from './constants.ts';
 import type {
+    AnalysisReachOptions,
     AnalysisReachServiceContext,
     AnalysisReachTarget,
     IAnalysisReachService,
@@ -23,10 +27,13 @@ import type {
  *   realm scope of its grants confer nothing.
  * - Anyone else reaches what the grant's realm scope covers (`any`: every
  *   analysis), and a user additionally every analysis one of its realm's
- *   nodes takes part in, whatever that node's approval status.
+ *   nodes takes part in.
  *
- * Participating ids are collected first and matched with `inArray`, so lists
- * and record reads share one condition and pagination stays exact.
+ * The grant is always compiled against the analysis itself — naming another
+ * table's realm column would stop authup from lowering grant policies — and
+ * re-rooted onto the queried entity's analysis relation. Participating ids
+ * are collected first and matched with `inArray`, so lists and record reads
+ * share one condition and pagination stays exact.
  */
 export class AnalysisReachService implements IAnalysisReachService {
     protected analysisNodeRepository: AnalysisReachServiceContext['analysisNodeRepository'];
@@ -41,18 +48,24 @@ export class AnalysisReachService implements IAnalysisReachService {
         this.nodeRepository = ctx.nodeRepository;
     }
 
-    async resolve(actor: ActorContext, target: AnalysisReachTarget): Promise<ICondition | undefined> {
-        await actor.permissionEvaluator.preEvaluateOneOf({ name: ANALYSIS_READ_PERMISSIONS });
+    async resolve(
+        actor: ActorContext,
+        target: AnalysisReachTarget,
+        options: AnalysisReachOptions = {},
+    ): Promise<ICondition | undefined> {
+        const names = options.names ?? ANALYSIS_READ_PERMISSIONS;
+        const approval: Pick<AnalysisParticipationWhere, 'approvalStatus'> = options.approvedOnly ?
+            { approvalStatus: AnalysisNodeApprovalStatus.APPROVED } :
+            {};
 
-        const binding = await this.resolveClientBinding(actor, target);
+        await actor.permissionEvaluator.preEvaluateOneOf({ name: names });
+
+        const binding = await this.resolveClientBinding(actor, target, approval);
         if (binding) {
             return binding;
         }
 
-        const compiled = await actor.permissionEvaluator.compile({
-            name: ANALYSIS_READ_PERMISSIONS,
-            ...(target.realmAttributeName !== 'realmId' ? { realmAttributeName: target.realmAttributeName } : {}),
-        });
+        const compiled = await actor.permissionEvaluator.compile({ name: names });
 
         let grant: ICondition;
         switch (compiled.verdict) {
@@ -61,24 +74,13 @@ export class AnalysisReachService implements IAnalysisReachService {
             case 'deny':
                 return matchNothing();
             case 'conditional':
-                grant = compiled.condition;
+                grant = prefixConditionFields(compiled.condition, target.analysisPath);
                 break;
             default:
-                if (target.realmAttributeName !== 'realmId') {
-                    // Naming a realm column makes authup refuse to lower ANY grant
-                    // policy, so `post` here means "the grant carries a policy"; an
-                    // own-realm fallback would show rows of analyses the policy
-                    // hides on /analyses.
-                    // ponytail: fail closed; derive the reach from the analysis
-                    // reach (ids or a join) once policy-bearing grants are in use.
-                    grant = matchNothing();
-                    break;
-                }
-
                 // `post`: a grant policy that cannot lower — narrowed to the
                 // actor's own realm, as scopeReadQuery does.
                 grant = actor.realm ?
-                    eq(target.realmAttributeName, actor.realm.id) :
+                    prefixConditionFields(eq('realmId', actor.realm.id), target.analysisPath) :
                     matchNothing();
         }
 
@@ -86,7 +88,7 @@ export class AnalysisReachService implements IAnalysisReachService {
             return grant;
         }
 
-        const ids = await this.analysisNodeRepository.findAnalysisIds({ nodeRealmId: actor.realm.id });
+        const ids = await this.analysisNodeRepository.findAnalysisIds({ nodeRealmId: actor.realm.id, ...approval });
         if (ids.length === 0) {
             return grant;
         }
@@ -98,6 +100,7 @@ export class AnalysisReachService implements IAnalysisReachService {
     protected async resolveClientBinding(
         actor: ActorContext,
         target: AnalysisReachTarget,
+        approval: Pick<AnalysisParticipationWhere, 'approvalStatus'>,
     ): Promise<ICondition | undefined> {
         if (!actor.identity || actor.identity.type !== 'client' || !actor.identity.realmId) {
             return undefined;
@@ -110,7 +113,7 @@ export class AnalysisReachService implements IAnalysisReachService {
 
         const node = await this.nodeRepository.findOneBy({ clientId, realmId });
         if (node) {
-            const ids = await this.analysisNodeRepository.findAnalysisIds({ nodeId: node.id });
+            const ids = await this.analysisNodeRepository.findAnalysisIds({ nodeId: node.id, ...approval });
             return inArray(target.analysisIdAttributeName, ids);
         }
 

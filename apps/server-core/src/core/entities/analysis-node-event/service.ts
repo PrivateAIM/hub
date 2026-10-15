@@ -8,37 +8,49 @@
 import { eq } from '@rapiq/core';
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import { EntityNotFoundError } from '@privateaim/errors';
-import type { EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService } from '@privateaim/server-kit';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
 import { analysisNodeEventSchema } from './schema.ts';
 import type { IAnalysisNodeEventRepository, IAnalysisNodeEventService } from './types.ts';
 
 type AnalysisNodeEventServiceContext = {
     repository: IAnalysisNodeEventRepository;
+    reach: IAnalysisReachService;
+};
+
+/** Like analysis-node rows (D2): every participant sees every node's events. */
+const REACH_TARGET: AnalysisReachTarget = {
+    analysisPath: 'analysis',
+    analysisIdAttributeName: 'analysisId',
 };
 
 export class AnalysisNodeEventService extends AbstractEntityService implements IAnalysisNodeEventService {
     protected repository: IAnalysisNodeEventRepository;
 
+    protected reach: IAnalysisReachService;
+
     constructor(ctx: AnalysisNodeEventServiceContext) {
         super();
         this.repository = ctx.repository;
+        this.reach = ctx.reach;
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisNodeEvent>> {
-        return this.repository.findMany(decodeQuery(query, { schema: analysisNodeEventSchema }));
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisNodeEvent>> {
+        const decoded = decodeQuery(query, { schema: analysisNodeEventSchema });
+        const condition = await this.reach.resolve(actor, REACH_TARGET);
+
+        return this.repository.findMany(condition ? appendQueryConditions(decoded, condition) : decoded);
     }
 
-    /**
-     * `findOneById` takes no query, so an actor-supplied `fields`/`relations`
-     * selection has to go through `findMany` with an `id` condition appended.
-     */
-    async getOne(id: string, query?: Record<string, any>): Promise<AnalysisNodeEvent> {
-        const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: analysisNodeEventSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
-            await this.repository.findOneById(id);
+    /** Reads through the same reach as {@link getMany}; out of reach answers 404. */
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisNodeEvent> {
+        const decoded = decodeQuery(query, { schema: analysisNodeEventSchema, parameters: ['fields', 'relations'] });
+        const condition = await this.reach.resolve(actor, REACH_TARGET);
 
+        const scoped = condition ? appendQueryConditions(decoded, condition) : decoded;
+        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-node-event' });
         }

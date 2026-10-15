@@ -119,10 +119,15 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         reach: analysisReachService,
         skipAnalysisApproval: container.resolve(ConfigInjectionKey).skipAnalysisApproval,
     });
-    const analysisBucketService = new AnalysisBucketService({ repository: analysisBucketRepository, analysisRepository });
+    const analysisBucketService = new AnalysisBucketService({
+        repository: analysisBucketRepository,
+        analysisRepository,
+        reach: analysisReachService,
+    });
     const analysisBucketFileService = new AnalysisBucketFileService({
         repository: analysisBucketFileRepository,
         recalculator: container.resolve(AnalysisInjectionKey.FileRecalculator),
+        reach: analysisReachService,
         analysisRepository,
         analysisBucketRepository,
         analysisNodeRepository,
@@ -140,7 +145,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         reach: analysisReachService,
         skipAnalysisApproval: config.skipAnalysisApproval,
     });
-    const analysisNodeEventService = new AnalysisNodeEventService({ repository: analysisNodeEventRepository });
+    const analysisNodeEventService = new AnalysisNodeEventService({ repository: analysisNodeEventRepository, reach: analysisReachService });
     const nodeRegistryCredentialService = new NodeRegistryCredentialService({
         repository: nodeRepository,
         registryRepository,

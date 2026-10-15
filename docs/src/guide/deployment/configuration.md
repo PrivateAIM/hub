@@ -269,9 +269,10 @@ yielding a client that gets 403 later.
 
 ## Reading analyses requires `analysis_read` and reach
 
-**Breaking for every deployment.** `GET /analyses` and `GET /analysis-nodes`
-(list and record) now need a grant and return only the analyses the caller
-reaches.
+**Breaking for every deployment.** `GET /analyses`, `GET /analysis-nodes`,
+`GET /analysis-node-events`, `GET /analysis-buckets` and
+`GET /analysis-bucket-files` (list and record) now need a grant and return
+only rows of the analyses the caller reaches.
 
 **Which permissions allow a read.** `analysis_read`, or any analysis write or
 lifecycle permission: `analysis_create`, `analysis_update`, `analysis_delete`,
@@ -295,11 +296,19 @@ lists analyses; pair it with `analysis_read`.
   **analysis' client** only its own analysis. Neither gains anything from its
   realm or from its grants' realm scope. New analysis clients are given
   `analysis_read`; clients of analyses created before the upgrade are not.
-- **A grant carrying a policy** narrows `GET /analyses` by that policy, but
-  `GET /analysis-nodes` cannot apply it and returns only the rows of
-  analyses the caller's nodes take part in.
-- `GET /analysis-nodes` returns every row of a reachable analysis, so nodes
-  see each other's approval and execution status.
+- **A grant carrying a policy** narrows every one of these reads by that
+  policy, evaluated against the analysis the row belongs to.
+- `GET /analysis-nodes` and `GET /analysis-node-events` return every row of a
+  reachable analysis, so nodes see each other's approval and execution status.
+- **Buckets and their files depend on the bucket type:**
+  - `CODE`: everyone who reaches the analysis, including a node realm whose
+    approval is still pending (it needs the code to review it).
+  - `TEMP`: the reach of the grant, plus realms and node clients whose node is
+    **approved**.
+  - `RESULT`: as `TEMP` for the bucket itself. Its **files** additionally need
+    `analysis_result_read`, whose own `realm_scope` can only narrow that reach
+    further, never widen it. Without it, result files are left out of
+    listings (not refused) and a result file answers 404.
 - A record out of reach answers **404**, like a missing one.
 
 **Before upgrading:**
@@ -309,7 +318,8 @@ lists analyses; pair it with `analysis_read`.
    Until it exists, every node save fails (creating or editing a node, and
    assigning its registry), and every existing node client is logged as
    failed on each hourly re-sync.
-2. Grant `analysis_read` to roles that view analyses without changing them.
+2. Grant `analysis_read` to roles that view analyses without changing them,
+   and `analysis_result_read` to roles that download results.
 3. Grant the analysis permissions of every role that must see other realms'
    analyses at `realm_scope: any`.
 4. Make sure the worker's service client (`CLIENT_ID`, default `system`) holds

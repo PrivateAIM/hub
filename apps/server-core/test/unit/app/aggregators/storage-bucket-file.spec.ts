@@ -28,6 +28,7 @@ import {
 } from '../../../../src/adapters/database/index.ts';
 import { StorageBucketFileCreationFinishedHandler } from '../../../../src/app/aggregators/storage/bucket-file/handlers/creation_finished.ts';
 import { AnalysisBucketFileService } from '../../../../src/core/index.ts';
+import { AnalysisReachService } from '../../../../src/core/services/analysis-reach/index.ts';
 import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index.ts';
 import { createTestDatabaseApplication } from '../../../app';
 import { FakeAnalysisFileMetadataRecalculator } from '../../core/entities/analysis-bucket-file/fake-metadata-recalculator.ts';
@@ -58,6 +59,11 @@ describe('storage bucket-file aggregator', () => {
                 analysisRepository,
                 analysisBucketRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
                 analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                reach: new AnalysisReachService({
+                    analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                    analysisRepository,
+                    nodeRepository: suite.container.resolve(DatabaseInjectionKey.NodeRepository),
+                }),
             }),
             bucketFileCaller,
         });

@@ -38,5 +38,18 @@ export function applyQuery(
 
     const { pagination } = adapter.execute(query ?? new Query({}));
 
+    // With a join and a page, typeorm selects `DISTINCT <alias>.id` from the
+    // inner query, so a sparse fieldset without `id` would reference a missing
+    // column (500). The reach conditions join `analysis` on every family read.
+    // ponytail: belongs in rapiq's fields adapter (always project the primary key).
+    const { selects, mainAlias } = queryBuilder.expressionMap;
+    if (
+        mainAlias &&
+        selects.length > 0 &&
+        selects.every(({ selection }) => !(selection === mainAlias.name || selection === `${mainAlias.name}.id`))
+    ) {
+        queryBuilder.addSelect(`${mainAlias.name}.id`);
+    }
+
     return { pagination };
 }
