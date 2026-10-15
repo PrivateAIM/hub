@@ -11,6 +11,12 @@ export type MessageBusRouting = {
     type: `${MessageBusRoutingType}`,
     key: string,
     namespace?: string,
+    /**
+     * WORK only: deliver to one consumer at a time, in publish order, with
+     * failover to another replica (AMQP single active consumer). For replies
+     * whose handlers must not race each other across replicas.
+     */
+    ordered?: boolean,
 };
 
 export type MessageBusPayloadMetadata = {

@@ -24,8 +24,11 @@ export enum AnalysisDistributorCommand {
 }
 
 export const AnalysisDistributorEventMessageBusRouting = {
-    type: MessageBusRoutingType.PUB_SUB,
+    // A reply to a server-core command: one durable queue for all server-core
+    // replicas, handled by one of them at a time in publish order (plan 018 F4).
+    type: MessageBusRoutingType.WORK,
     key: 'analysisDistributorEvents',
+    ordered: true,
 };
 
 export const AnalysisDistributorTaskMessageBusRouting = {

@@ -36,6 +36,10 @@ class TestDriver extends AmqpMessageBusDriver {
         return true;
     }
 
+    queueOptions(routing: MessageBusRouting) {
+        return this.resolveQueueOptions(routing);
+    }
+
     run(
         routing: MessageBusRouting,
         message: MessageBusPayload,
@@ -115,6 +119,29 @@ describe('src/message-bus/driver/amqp', () => {
         expect(driver.published).toHaveLength(1);
     });
 
+    it('should hold a redelivered copy of an ordered message until the original finishes', async () => {
+        const driver = new TestDriver();
+        const ordered: MessageBusRouting = { ...work, ordered: true };
+        const message = createMessage(ordered);
+
+        const { promise, resolve } = Promise.withResolvers<void>();
+        const running = driver.run(ordered, message, () => promise);
+
+        let copyDone = false;
+        const copy = driver.run(ordered, message, () => {}, true).then(() => {
+            copyDone = true;
+        });
+
+        await new Promise((r) => { setTimeout(r, 10); });
+        expect(copyDone).toBe(false);
+
+        resolve();
+        await Promise.all([running, copy]);
+
+        expect(copyDone).toBe(true);
+        expect(driver.published).toHaveLength(0);
+    });
+
     it('should not retry a redelivery twice when the channel resets during its backoff', async () => {
         const driver = new TestDriver();
         const message = createMessage(work);
@@ -156,5 +183,13 @@ describe('src/message-bus/driver/amqp', () => {
             message: 'registry unavailable',
             code: 'registryNotFound',
         });
+    });
+
+    it('should declare an ordered routing as single active consumer queue', () => {
+        const driver = new TestDriver();
+
+        expect(driver.queueOptions({ ...work, ordered: true }))
+            .toEqual({ singleActiveConsumer: true });
+        expect(driver.queueOptions(work)).toEqual({});
     });
 });
