@@ -14,6 +14,7 @@ import {
     type PropType,
     defineComponent,
     onMounted,
+    onUnmounted,
     ref,
     watch,
 } from 'vue';
@@ -52,7 +53,14 @@ export default defineComponent({
         // hosts). Only the response whose token still matches is applied.
         let loadToken = 0;
 
-        const load = async () => {
+        // The robot account is provisioned over the message bus, a moment AFTER
+        // the node create/update that assigned the registry project returned —
+        // so the first read can come back without credentials. Re-read a few
+        // times instead of showing an empty secret until the page is reloaded.
+        let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
+        const load = async (attempt = 0) => {
+            clearTimeout(retryTimer);
             const token = ++loadToken;
             const nodeId = props.entity.id;
 
@@ -72,6 +80,7 @@ export default defineComponent({
 
             busy.value = true;
             loaded.value = false;
+            let retrying = false;
             try {
                 const credentials = await httpClient.node.getRegistryCredentials(nodeId);
                 if (token !== loadToken) {
@@ -83,20 +92,29 @@ export default defineComponent({
                 externalName.value = credentials.externalName;
                 accountName.value = credentials.accountName;
                 accountSecret.value = credentials.accountSecret;
+
+                if (!credentials.accountSecret && attempt < 3) {
+                    retrying = true;
+                    retryTimer = setTimeout(() => load(attempt + 1), 1500);
+                }
             } catch (e) {
                 if (token === loadToken) {
                     emit('failed', e);
                 }
             } finally {
-                if (token === loadToken) {
+                if (token === loadToken && !retrying) {
                     busy.value = false;
                     loaded.value = true;
                 }
             }
         };
 
-        onMounted(load);
-        watch(() => props.entity.id, load);
+        onMounted(() => load());
+        onUnmounted(() => {
+            clearTimeout(retryTimer);
+            loadToken++;
+        });
+        watch([() => props.entity.id, () => props.entity.registryProjectId], () => load());
 
         const copy = (value: string | null) => {
             if (!value) {
