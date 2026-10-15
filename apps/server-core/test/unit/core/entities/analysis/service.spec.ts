@@ -105,6 +105,7 @@ describe('AnalysisService', () => {
 
         const builder = new AnalysisBuilder({
             repository: analysisRepository,
+            analysisNodeRepository,
             caller: builderCaller,
             analysisRecalculator,
             nodeRecalculator,

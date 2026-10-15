@@ -6,11 +6,12 @@
  */
 import { usePermissionCheck } from '@authup/client-web-kit';
 import { AnalysisNodeApprovalCommand, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
+import type { ProcessStatus } from '@privateaim/kit';
 import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';
-import { injectCoreHTTPClient, renderActionCommand } from '../../core';
+import { injectCoreHTTPClient, isAnalysisNodeApprovalCommandDisabled, renderActionCommand } from '../../core';
 
 const FAnalysisNodeApprovalCommand = defineComponent({
     props: {
@@ -19,6 +20,11 @@ const FAnalysisNodeApprovalCommand = defineComponent({
             required: true,
         },
         approvalStatus: String as PropType<AnalysisNodeApprovalStatus | null>,
+        // Leave unset when the analysis is not loaded: approval is then not gated client-side.
+        analysisBuildStatus: {
+            type: String as PropType<`${ProcessStatus}` | null>,
+            default: undefined,
+        },
 
         command: {
             type: String as PropType<`${AnalysisNodeApprovalCommand}`>,
@@ -75,21 +81,11 @@ const FAnalysisNodeApprovalCommand = defineComponent({
             }
         });
 
-        const isDisabled = computed(() => {
-            if (props.approvalStatus) {
-                if (
-                    props.approvalStatus === AnalysisNodeApprovalStatus.APPROVED &&
-                    props.command === AnalysisNodeApprovalCommand.APPROVE
-                ) {
-                    return true;
-                }
-
-                return props.approvalStatus === AnalysisNodeApprovalStatus.REJECTED &&
-                    props.command === AnalysisNodeApprovalCommand.REJECT;
-            }
-
-            return props.command === AnalysisNodeApprovalCommand.REJECT;
-        });
+        const isDisabled = computed(() => isAnalysisNodeApprovalCommandDisabled({
+            command: props.command,
+            approvalStatus: props.approvalStatus,
+            analysisBuildStatus: props.analysisBuildStatus,
+        }));
 
         const execute = async () => {
             if (busy.value) return;

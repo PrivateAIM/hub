@@ -312,7 +312,10 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
                 entity = await this.builder.check(entity);
                 break;
             case AnalysisCommand.BUILD_START:
-                entity = await this.builder.start(entity, persistCtx);
+                entity = await this.builder.start(entity, {
+                    ignoreApproval: this.skipAnalysisApproval,
+                    persistCtx,
+                });
                 break;
             case AnalysisCommand.CONFIGURATION_LOCK:
                 entity = await this.configurator.lock(entity, {

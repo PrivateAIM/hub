@@ -7,7 +7,7 @@
 
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisError } from '@privateaim/core-kit';
+import { AnalysisError, AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import { 
     beforeEach, 
@@ -20,11 +20,13 @@ import { FakeEntityRepository } from '../helpers/index.ts';
 import { FakeAnalysisBuilderCaller } from './helpers/fake-builder-caller.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
+import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { FakeAnalysisFileMetadataRecalculator } from '../entities/analysis-bucket-file/fake-metadata-recalculator.ts';
-import { createFullAnalysis } from '../../../utils/domains/index.ts';
+import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
 describe('AnalysisBuilder', () => {
     let repository: FakeEntityRepository<Analysis>;
+    let analysisNodeRepository: FakeAnalysisNodeRepository;
     let caller: FakeAnalysisBuilderCaller;
     let analysisRecalculator: FakeAnalysisMetadataRecalculator;
     let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
@@ -33,12 +35,14 @@ describe('AnalysisBuilder', () => {
 
     beforeEach(() => {
         repository = new FakeEntityRepository<Analysis>();
+        analysisNodeRepository = new FakeAnalysisNodeRepository();
         analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
         nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
         fileRecalculator = new FakeAnalysisFileMetadataRecalculator(repository);
         caller = new FakeAnalysisBuilderCaller();
         builder = new AnalysisBuilder({
             repository,
+            analysisNodeRepository,
             caller,
             analysisRecalculator,
             nodeRecalculator,
@@ -66,7 +70,8 @@ describe('AnalysisBuilder', () => {
             await builder.start(analysis);
 
             expect(analysisRecalculator.getCallCount()).toBe(1);
-            expect(nodeRecalculator.getCallCount()).toBe(1);
+            // once before the check, once after the approval reset
+            expect(nodeRecalculator.getCallCount()).toBe(2);
             expect(fileRecalculator.getCallCount()).toBe(1);
         });
 
@@ -98,11 +103,70 @@ describe('AnalysisBuilder', () => {
             await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
         });
 
-        it('should throw when build nodes not valid', async () => {
-            const analysis = createFullAnalysis({ configurationLocked: true, buildNodesValid: false });
+        it('should start without node approval (approval gates distribution)', async () => {
+            const analysis = createFullAnalysis({ configurationLocked: true, distributionNodesValid: false });
             repository.seed(analysis);
 
+            const result = await builder.start(analysis);
+
+            expect(result.buildStatus).toBe(ProcessStatus.STARTING);
+        });
+
+        it('should reset every non-aggregator approval, so nodes approve the new image', async () => {
+            const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.FAILED });
+            repository.seed(analysis);
+
+            const defaultNode = createTestAnalysisNode({
+                id: 'an-default',
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            });
+            const aggregatorNode = createTestAnalysisNode({
+                id: 'an-aggregator',
+                nodeId: 'node-aggregator',
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+                node: {
+                    ...defaultNode.node,
+                    id: 'node-aggregator',
+                    type: NodeType.AGGREGATOR,
+                },
+            });
+            analysisNodeRepository.seed([defaultNode, aggregatorNode]);
+
+            await builder.start(analysis);
+
+            expect((await analysisNodeRepository.findOneById('an-default'))!.approvalStatus).toBeNull();
+            expect((await analysisNodeRepository.findOneById('an-aggregator'))!.approvalStatus)
+                .toBe(AnalysisNodeApprovalStatus.APPROVED);
+            // the reset is reflected in the aggregates before the build is dispatched
+            expect(nodeRecalculator.getCallCount()).toBe(2);
+        });
+
+        it('should keep approvals when approval is ignored', async () => {
+            const analysis = createFullAnalysis({ configurationLocked: true });
+            repository.seed(analysis);
+            analysisNodeRepository.seed(createTestAnalysisNode({
+                id: 'an-default',
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            }));
+
+            await builder.start(analysis, { ignoreApproval: true });
+
+            expect((await analysisNodeRepository.findOneById('an-default'))!.approvalStatus)
+                .toBe(AnalysisNodeApprovalStatus.APPROVED);
+        });
+
+        it('should keep approvals when the build cannot start', async () => {
+            const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTED });
+            repository.seed(analysis);
+            analysisNodeRepository.seed(createTestAnalysisNode({
+                id: 'an-default',
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            }));
+
             await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
+
+            expect((await analysisNodeRepository.findOneById('an-default'))!.approvalStatus)
+                .toBe(AnalysisNodeApprovalStatus.APPROVED);
         });
 
         it('should allow retry when build FAILED', async () => {

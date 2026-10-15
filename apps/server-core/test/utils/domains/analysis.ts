@@ -35,7 +35,7 @@ export function createFullAnalysis(overrides?: Partial<Analysis>): Analysis {
         configurationNodeAggregatorValid: true,
         configurationNodesValid: true,
         buildStatus: null,
-        buildNodesValid: true,
+        distributionNodesValid: true,
         buildProgress: null,
         buildHash: null,
         buildOs: null,

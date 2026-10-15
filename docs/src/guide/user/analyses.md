@@ -24,19 +24,20 @@ The opaque analysis id (UUID) is no longer surfaced in list views or page headli
 
 When an analysis is created, every **approved** node of its parent project is automatically assigned to it (as an `AnalysisNode`). Project nodes that are still pending project approval are skipped — once approved, they can be assigned manually.
 
-Auto-assignment does not bypass the [per-analysis approval](/guide/user/approval) step: each assigned node still carries its own approval decision. Aggregator nodes are approved automatically, while default nodes start pending and must be approved by the node's realm authority before the analysis can be locked.
+Auto-assignment does not bypass the [per-analysis approval](/guide/user/approval) step: each assigned node still carries its own approval decision. Aggregator nodes are approved automatically, while default nodes start pending and must be approved by the node's realm authority before the analysis can be distributed. A node approves the built image, so approval is only possible once the build has finished, and every new build resets it.
 
 You can still add or remove nodes afterwards. Re-assigning a node that is already attached to the analysis updates the existing assignment instead of failing, so manual selection and auto-assignment coexist safely.
 
 ## Execution Flow
 
-Once [approved](/guide/user/approval), an analysis goes through:
+An analysis goes through:
 
 1. **Configuration** — storage buckets are provisioned, configuration is locked
 2. **Build** — the worker builds a Docker image from the analysis code and master image
-3. **Distribute** — the container image is pushed to target node registries
-4. **Execute** — nodes pull and run the container against their local data
-5. **Complete** — results are collected and stored
+3. **Approve** — every node [approves](/guide/user/approval) the built image
+4. **Distribute** — the container image is pushed to target node registries
+5. **Execute** — nodes pull and run the container against their local data
+6. **Complete** — results are collected and stored
 
 ## API Endpoints
 

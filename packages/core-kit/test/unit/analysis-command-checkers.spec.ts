@@ -30,7 +30,7 @@ function createBaseAnalysis(overrides?: Partial<Analysis>): Analysis {
         configurationNodeAggregatorValid: true,
         configurationNodesValid: true,
         buildStatus: null,
-        buildNodesValid: true,
+        distributionNodesValid: true,
         buildProgress: null,
         buildHash: null,
         buildOs: null,
@@ -173,9 +173,9 @@ describe('AnalysisBuilderCommandChecker', () => {
             expect(() => AnalysisBuilderCommandChecker.canStart(entity)).toThrow(AnalysisError);
         });
 
-        it('should throw when nodes not approved', () => {
-            const entity = createBaseAnalysis({ configurationLocked: true, buildNodesValid: false });
-            expect(() => AnalysisBuilderCommandChecker.canStart(entity)).toThrow(AnalysisError);
+        it('should allow when nodes not approved (approval gates distribution)', () => {
+            const entity = createBaseAnalysis({ configurationLocked: true, distributionNodesValid: false });
+            expect(() => AnalysisBuilderCommandChecker.canStart(entity)).not.toThrow();
         });
 
         it('should allow retry when build FAILED', () => {
@@ -271,6 +271,12 @@ describe('AnalysisDistributorCommandChecker', () => {
         it('should allow when build EXECUTED and no distribution started', () => {
             const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionStatus: null });
             expect(() => AnalysisDistributorCommandChecker.canStart(entity)).not.toThrow();
+        });
+
+        it('should throw when nodes not approved', () => {
+            const entity = createBaseAnalysis({ buildStatus: ProcessStatus.EXECUTED, distributionNodesValid: false });
+            expect(() => AnalysisDistributorCommandChecker.canStart(entity))
+                .toThrow(AnalysisError.nodesApprovalRequired().message);
         });
 
         it('should throw when not built', () => {

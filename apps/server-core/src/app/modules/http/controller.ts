@@ -127,6 +127,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     });
     const analysisNodeService = new AnalysisNodeService({
         repository: analysisNodeRepository,
+        analysisRepository,
         projectNodeRepository,
         recalculator: container.resolve(AnalysisInjectionKey.NodeRecalculator),
         skipAnalysisApproval: config.skipAnalysisApproval,

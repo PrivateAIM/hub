@@ -72,9 +72,10 @@ export interface Analysis {
     buildStatus: `${ProcessStatus}` | null;
 
     /**
-     * Define if the node constraints are satisfied for the build process.
+     * Define if the node constraints are satisfied for the distribution process,
+     * i.e. every node approved the built image.
      */
-    buildNodesValid: boolean;
+    distributionNodesValid: boolean;
 
     /**
      * Percentage for building image

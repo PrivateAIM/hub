@@ -5,6 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { EntityPersistContext } from '@privateaim/server-kit';
+
+export type AnalysisBuilderStartOptions = {
+    ignoreApproval?: boolean;
+    persistCtx?: EntityPersistContext;
+};
+
 /**
  * Port for triggering analysis build operations on the worker.
  * Implemented by AnalysisBuilderComponentCaller in server-core-worker-kit.

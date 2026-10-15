@@ -71,6 +71,7 @@ export class AnalysisModule implements IModule {
         container.register(AnalysisInjectionKey.Builder, {
             useValue: new AnalysisBuilder({
                 repository: analysisRepository,
+                analysisNodeRepository,
                 caller: new AnalysisBuilderComponentCaller({ messageBus }),
                 analysisRecalculator,
                 nodeRecalculator,
