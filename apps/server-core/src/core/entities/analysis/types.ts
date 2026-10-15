@@ -31,8 +31,8 @@ export interface IAnalysisMetadataRecalculator {
 }
 
 export interface IAnalysisService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Analysis>>;
-    getOne(id: string, query?: Record<string, any>): Promise<Analysis>;
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Analysis>>;
+    getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Analysis>;
     create(data: Partial<Analysis>, actor: ActorContext): Promise<Analysis>;
     update(id: string, data: Partial<Analysis>, actor: ActorContext): Promise<Analysis>;
     delete(id: string, actor: ActorContext): Promise<Analysis>;

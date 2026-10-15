@@ -10,6 +10,8 @@ import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } 
 
 export interface IAnalysisNodeRepository extends IEntityRepository<AnalysisNode> {
     findManyWithNodeByAnalysis(analysisId: string): Promise<AnalysisNode[]>;
+    /** The analyses a node, or any node of a realm, takes part in. */
+    findAnalysisIds(where: { nodeId: string } | { nodeRealmId: string }): Promise<string[]>;
 }
 
 export interface IAnalysisNodeMetadataRecalculator {
@@ -18,8 +20,8 @@ export interface IAnalysisNodeMetadataRecalculator {
 }
 
 export interface IAnalysisNodeService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisNode>>;
-    getOne(id: string, query?: Record<string, any>): Promise<AnalysisNode>;
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisNode>>;
+    getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisNode>;
     create(data: Partial<AnalysisNode>, actor: ActorContext): Promise<AnalysisNode>;
     update(id: string, data: Partial<AnalysisNode>, actor: ActorContext): Promise<AnalysisNode>;
     delete(id: string, actor: ActorContext): Promise<AnalysisNode>;

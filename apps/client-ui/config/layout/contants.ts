@@ -111,6 +111,8 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
                 PermissionName.PROJECT_UPDATE,
                 PermissionName.PROJECT_APPROVE,
 
+                PermissionName.ANALYSIS_READ,
+
                 PermissionName.ANALYSIS_CREATE,
                 PermissionName.ANALYSIS_DELETE,
                 PermissionName.ANALYSIS_UPDATE,
@@ -133,6 +135,8 @@ export const LayoutSideDefaultNavigation: NavigationItem<NavigationItemMeta>[] =
                         PermissionName.PROJECT_CREATE,
                         PermissionName.PROJECT_DELETE,
                         PermissionName.PROJECT_UPDATE,
+
+                        PermissionName.ANALYSIS_READ,
 
                         PermissionName.ANALYSIS_CREATE,
                         PermissionName.ANALYSIS_DELETE,

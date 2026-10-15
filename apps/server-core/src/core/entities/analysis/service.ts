@@ -32,6 +32,7 @@ import type { AnalysisBuilder } from '../../services/analysis-builder/index.ts';
 import type { AnalysisConfigurator } from '../../services/analysis-configurator/index.ts';
 import type { AnalysisDistributor } from '../../services/analysis-distributor/index.ts';
 import type { AnalysisStorageManager } from '../../services/analysis-storage-manager/index.ts';
+import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisSchema } from './schema.ts';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository, IAnalysisService } from './types.ts';
@@ -47,7 +48,13 @@ type AnalysisServiceContext = {
     storageManager: AnalysisStorageManager;
     recalculator: IAnalysisMetadataRecalculator;
     nodeRecalculator: IAnalysisNodeMetadataRecalculator;
+    reach: IAnalysisReachService;
     skipAnalysisApproval?: boolean;
+};
+
+const REACH_TARGET: AnalysisReachTarget = {
+    realmAttributeName: 'realmId',
+    analysisIdAttributeName: 'id',
 };
 
 export class AnalysisService extends AbstractEntityService implements IAnalysisService {
@@ -71,6 +78,8 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
     protected nodeRecalculator: IAnalysisNodeMetadataRecalculator;
 
+    protected reach: IAnalysisReachService;
+
     protected skipAnalysisApproval: boolean;
 
     protected validator: AnalysisValidator;
@@ -87,24 +96,28 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         this.storageManager = ctx.storageManager;
         this.recalculator = ctx.recalculator;
         this.nodeRecalculator = ctx.nodeRecalculator;
+        this.reach = ctx.reach;
         this.skipAnalysisApproval = ctx.skipAnalysisApproval ?? false;
         this.validator = new AnalysisValidator();
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Analysis>> {
-        return this.repository.findMany(decodeQuery(query, { schema: analysisSchema }));
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Analysis>> {
+        const decoded = decodeQuery(query, { schema: analysisSchema });
+        const condition = await this.reach.resolve(actor, REACH_TARGET);
+
+        return this.repository.findMany(condition ? appendQueryConditions(decoded, condition) : decoded);
     }
 
     /**
-     * `findOneById` takes no query, so an actor-supplied `fields`/`relations`
-     * selection has to go through `findMany` with an `id` condition appended —
-     * the same shape `ProjectService.getOne` uses.
+     * Reads through the same reach as {@link getMany}, so an analysis out of
+     * reach answers 404 exactly like a missing one.
      */
-    async getOne(id: string, query?: Record<string, any>): Promise<Analysis> {
-        const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: analysisSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
-            await this.repository.findOneById(id);
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Analysis> {
+        const decoded = decodeQuery(query, { schema: analysisSchema, parameters: ['fields', 'relations'] });
+        const condition = await this.reach.resolve(actor, REACH_TARGET);
 
+        const scoped = condition ? appendQueryConditions(decoded, condition) : decoded;
+        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -307,7 +320,10 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new BadRequestError('Invalid command.');
         }
 
-        let entity = await this.getOne(id);
+        let entity = await this.repository.findOneById(id);
+        if (!entity) {
+            throw new EntityNotFoundError({ entity: 'analysis' });
+        }
 
         if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
             throw new PermissionDeniedError();

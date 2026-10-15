@@ -64,6 +64,21 @@ export class AnalysisNodeRepositoryAdapter implements IAnalysisNodeRepository {
         });
     }
 
+    /**
+     * Served by the `(node_realm_id, analysis_id)` index and the
+     * `(node_id, analysis_id)` unique constraint. Several nodes of one realm can
+     * take part in the same analysis, hence the de-duplication.
+     */
+    async findAnalysisIds(where: { nodeId: string } | { nodeRealmId: string }): Promise<string[]> {
+        const rows = await this.repository.find({
+            where,
+            select: { analysisId: true },
+            cache: false,
+        });
+
+        return [...new Set(rows.map((row) => row.analysisId))];
+    }
+
     create(data: Partial<AnalysisNode>): AnalysisNode {
         return this.repository.create(data) as AnalysisNode;
     }

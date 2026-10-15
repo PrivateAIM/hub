@@ -22,6 +22,7 @@ import { holdsPermission } from '../../utils/index.ts';
 import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
 import { analysisNodeSchema } from './schema.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
+import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository, IAnalysisNodeService } from './types.ts';
 
 type AnalysisNodeServiceContext = {
@@ -29,7 +30,17 @@ type AnalysisNodeServiceContext = {
     analysisRepository: IEntityRepository<Analysis>;
     projectNodeRepository: IProjectNodeRepository;
     recalculator: IAnalysisNodeMetadataRecalculator;
+    reach: IAnalysisReachService;
     skipAnalysisApproval?: boolean;
+};
+
+/**
+ * Every row of an analysis is visible to whoever reaches the analysis (D2),
+ * other nodes' rows included.
+ */
+const REACH_TARGET: AnalysisReachTarget = {
+    realmAttributeName: 'analysisRealmId',
+    analysisIdAttributeName: 'analysisId',
 };
 
 export class AnalysisNodeService extends AbstractEntityService implements IAnalysisNodeService {
@@ -41,6 +52,8 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
     protected recalculator: IAnalysisNodeMetadataRecalculator;
 
+    protected reach: IAnalysisReachService;
+
     protected skipAnalysisApproval: boolean;
 
     protected validator: AnalysisNodeValidator;
@@ -51,23 +64,25 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         this.analysisRepository = ctx.analysisRepository;
         this.projectNodeRepository = ctx.projectNodeRepository;
         this.recalculator = ctx.recalculator;
+        this.reach = ctx.reach;
         this.skipAnalysisApproval = ctx.skipAnalysisApproval ?? false;
         this.validator = new AnalysisNodeValidator();
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<AnalysisNode>> {
-        return this.repository.findMany(decodeQuery(query, { schema: analysisNodeSchema }));
+    async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisNode>> {
+        const decoded = decodeQuery(query, { schema: analysisNodeSchema });
+        const condition = await this.reach.resolve(actor, REACH_TARGET);
+
+        return this.repository.findMany(condition ? appendQueryConditions(decoded, condition) : decoded);
     }
 
-    /**
-     * `findOneById` takes no query, so an actor-supplied `fields`/`relations`
-     * selection has to go through `findMany` with an `id` condition appended.
-     */
-    async getOne(id: string, query?: Record<string, any>): Promise<AnalysisNode> {
-        const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: analysisNodeSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
-            await this.repository.findOneById(id);
+    /** Reads through the same reach as {@link getMany}; out of reach answers 404. */
+    async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisNode> {
+        const decoded = decodeQuery(query, { schema: analysisNodeSchema, parameters: ['fields', 'relations'] });
+        const condition = await this.reach.resolve(actor, REACH_TARGET);
 
+        const scoped = condition ? appendQueryConditions(decoded, condition) : decoded;
+        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-node' });
         }

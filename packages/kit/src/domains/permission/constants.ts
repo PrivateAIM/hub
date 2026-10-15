@@ -33,6 +33,7 @@ export enum PermissionName {
     NODE_DELETE = 'node_delete',
     NODE_UPDATE = 'node_update',
 
+    ANALYSIS_READ = 'analysis_read',
     ANALYSIS_APPROVE = 'analysis_approve',
     ANALYSIS_UPDATE = 'analysis_update',
     ANALYSIS_CREATE = 'analysis_create',

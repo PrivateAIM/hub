@@ -140,7 +140,7 @@ describe('AnalysisClientService', () => {
     });
 
     describe('assignDefaultPermissions', () => {
-        it('should grant both self-capabilities to a client with none', async () => {
+        it('should grant the read and both self-capabilities to a client with none', async () => {
             const authup = createFakeAuthupClient({
                 handlers: {
                     'GET /client-permissions': () => ({ data: [], meta: { total: 0 } }),
@@ -158,7 +158,8 @@ describe('AnalysisClientService', () => {
             const created = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.permissionId);
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_SELF_STORAGE_USE}`);
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
-            expect(created).toHaveLength(2);
+            expect(created).toContain(`perm-${PermissionName.ANALYSIS_READ}`);
+            expect(created).toHaveLength(3);
         });
 
         it('should additively add only the missing permission and never delete', async () => {
@@ -181,9 +182,11 @@ describe('AnalysisClientService', () => {
 
             await service.assignDefaultPermissions({ id: 'client-1' } as Client);
 
-            const created = bodiesOf(authup, 'POST', '/client-permissions');
-            expect(created).toHaveLength(1);
-            expect(created[0].permissionId).toBe(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
+            const created = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.permissionId);
+            expect(created).toEqual([
+                `perm-${PermissionName.ANALYSIS_READ}`,
+                `perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`,
+            ]);
             expect(authup.requests.some((request) => request.method === 'DELETE')).toBe(false);
         });
 
@@ -205,9 +208,11 @@ describe('AnalysisClientService', () => {
 
             await service.assignDefaultPermissions({ id: 'client-1' } as Client);
 
-            const created = bodiesOf(authup, 'POST', '/client-permissions');
-            expect(created).toHaveLength(1);
-            expect(created[0].permissionId).toBe(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
+            const created = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.permissionId);
+            expect(created).toEqual([
+                `perm-${PermissionName.ANALYSIS_READ}`,
+                `perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`,
+            ]);
         });
 
         it('should filter the existing permissions by the client id', async () => {

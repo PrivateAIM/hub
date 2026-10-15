@@ -46,8 +46,9 @@ export class AnalysisNodeController {
     async getMany(
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<AnalysisNode>> {
+        const actor = buildActorContext(event);
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query);
+        const { data, meta } = await this.service.getMany(query, actor);
         return { data, meta: { ...meta, schema: describeQuerySchema(analysisNodeSchema) } };
     }
 
@@ -67,8 +68,9 @@ export class AnalysisNodeController {
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<AnalysisNode>> {
+        const actor = buildActorContext(event);
         const query = useRequestQuery(event);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
 
         return { data: entity, meta: { schema: describeQuerySchema(analysisNodeSchema, RECORD_QUERY_PARAMETERS) } };
     }

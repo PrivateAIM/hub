@@ -125,7 +125,7 @@ The shared helpers live in `@privateaim/server-test-kit`
 - `provideAuthup(project, permissionNames)` — start an Authup container (unless
   `AUTHUP_URL` is set), provisioned with exactly the permission names the calling
   service checks. Each service passes its own set (`server-storage` 3, `server-telemetry`
-  6, `server-core` 24), listed in its `test/setup.ts`. The built-in `admin` role's
+  6, `server-core` 25), listed in its `test/setup.ts`. The built-in `admin` role's
   `globalPermissions: ['*']` picks those up at provisioning time, so the `admin`/`master`
   token resolves them via introspection. The generated `.mjs` is mounted at
   `<PROVISIONING_DIRECTORY_PATH>/hub.mjs`, where `PROVISIONING_DIRECTORY_PATH` is

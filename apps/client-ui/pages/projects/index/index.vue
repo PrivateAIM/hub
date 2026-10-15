@@ -37,6 +37,8 @@ export default defineNuxtComponent({
                 PermissionName.PROJECT_DELETE,
                 PermissionName.PROJECT_UPDATE,
 
+                PermissionName.ANALYSIS_READ,
+
                 PermissionName.ANALYSIS_CREATE,
                 PermissionName.ANALYSIS_UPDATE,
                 PermissionName.ANALYSIS_DELETE,

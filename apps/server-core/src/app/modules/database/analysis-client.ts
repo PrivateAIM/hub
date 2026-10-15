@@ -19,6 +19,8 @@ import type { AnalysisEntity } from '../../../adapters/database/entities/index.t
  * later (plan 010, phase 2), so this service never removes permissions.
  */
 const DEFAULT_PERMISSION_NAMES: string[] = [
+    // Reads its own analysis only: the reach binds an analysis client to it.
+    PermissionName.ANALYSIS_READ,
     PermissionName.ANALYSIS_SELF_STORAGE_USE,
     PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE,
 ];
