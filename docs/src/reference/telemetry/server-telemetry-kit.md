@@ -25,6 +25,13 @@ The event component no longer has a `CLEAN` command, and its dispatcher has no
 start, then daily at 01:00), so there is nothing to send.
 :::
 
+::: warning Breaking change
+`LogComponentCaller` / `EventComponentCaller` are now `LogComponentDispatcher` /
+`EventComponentDispatcher` (`callWrite` → `dispatchWrite`, `callCreate` → `dispatchCreate`). The
+`EntityEventHandler` context key `eventComponentCaller` is now `eventComponentDispatcher`, and its
+port `IEventPublisher` requires `dispatchCreate()` instead of `callCreate()`.
+:::
+
 ### Winston Transport
 
 ```typescript
