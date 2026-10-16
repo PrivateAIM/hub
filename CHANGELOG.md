@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* the kit *Caller classes are renamed to *Dispatcher and their call* methods to dispatch* (e.g. AnalysisBuilderComponentCaller.callExecute -> AnalysisBuilderComponentDispatcher.dispatchExecute, BucketFileTaskCaller -> BucketFileTaskDispatcher, LogComponentCaller.callWrite -> LogComponentDispatcher.dispatchWrite), with no aliases. They extend hubwire's RemoteDispatcher: their options no longer take hooks and the inherited call() is dispatch(). server-kit removes createDispatchCallerLogHooks and renames createWorkerCallerLogHooks to createRemoteWorkerLogHooks. Consumers of the kits need hubwire installed instead of synergos.
+* hub caller subclasses (BucketComponentCaller, LogComponentCaller, AnalysisBuilderComponentCaller, ...) require `messageBus`; server-kit, server-core-worker-kit, server-storage-kit and server-telemetry-kit depend on synergos instead of ergos.
+* createMasterRealmActor and createNonMasterRealmActor are removed from @privateaim/server-test-kit (use createAllowAllActor / createScopedActor). hasUnboundedReach and assertRecordReach take Pick<ActorContext, 'permissionEvaluator'>. Master-realm clients without unbounded grants are no longer exempt from rate limiting or admitted to foreign realm namespaces.
+* server-kit no longer exports Cache, CacheModule, CacheInjectionKey, CACHE_MODULE_NAME, buildCacheKey, CacheAdapter, MemoryCacheAdapter, RedisCacheAdapter, CacheSetOptions, CacheClearOptions or CacheKeyBuildOptions, and BaseApplicationBuilder.withCache() is gone.
+* writes need grants whose realm_scope reaches the record's realm — master-realm users with `own` grants write only in the master realm. analysis_node_log_create must be provisioned in Authup before upgrading. Analysis commands need analysis_execution_start or analysis_update. node.clientId can no longer be set over the API.
+* reading analysis logs needs an analysis read permission and an approved node or the grant's reach; reading a node's logs needs analysis_update or analysis_approve; deleting logs needs analysis_update through the grant, not through taking part as a node.
+* **server-core:** TaskManager and its types are removed from @privateaim/server-kit; IBucketCaller methods take no metadata argument. Stop old server-core replicas before new ones serve traffic: an old replica holding the ordered storageBucketEvents slot drops replies for creates a new replica sent (recover with the storageCheck command).
+* these endpoints now need `analysis_read` (or an analysis write permission) and are narrowed to reach. Downloading or listing result files needs `analysis_result_read`; grant it to roles that read results.
+* provision `analysis_read` in Authup before upgrading (until then every node save fails), grant it to roles that view analyses, and grant cross-realm roles - including a non-`system` worker client - their analysis permissions at realm_scope `any`. Master-realm users are no longer able to read every realm's analyses by realm name alone.
+
+### Features
+
+* bucket uniqueness, transient worker retries, queue-only registry dispatch, dead routings and cache removal ([#1962](https://github.com/PrivateAIM/hub/issues/1962)) ([f9568e3](https://github.com/PrivateAIM/hub/commit/f9568e38374e0b56185d6b3b6d674e81edd49b6f))
+* realtime namespaces and rate-limit exemption reach through realm_scope ([#1964](https://github.com/PrivateAIM/hub/issues/1964)) ([e42cd06](https://github.com/PrivateAIM/hub/commit/e42cd0637fad827f72a222077c9fc2c2549f093a))
+* record writes reach through grant realm_scope ([#1961](https://github.com/PrivateAIM/hub/issues/1961)) ([eba3ef8](https://github.com/PrivateAIM/hub/commit/eba3ef8f25c39cebea8f8285628f88fdb0b81718))
+* require analysis_read and participation reach for analysis reads ([#1955](https://github.com/PrivateAIM/hub/issues/1955)) ([9e798d6](https://github.com/PrivateAIM/hub/commit/9e798d647fa957854bb6f22c92956a4c40aa952b))
+* scope analysis buckets, files and node events to analysis reach ([#1957](https://github.com/PrivateAIM/hub/issues/1957)) ([da20dd5](https://github.com/PrivateAIM/hub/commit/da20dd5965de1d21f829965f141eb89924268848))
+* scope the analysis log proxies to analysis reach ([#1958](https://github.com/PrivateAIM/hub/issues/1958)) ([26a7f79](https://github.com/PrivateAIM/hub/commit/26a7f79a6e1fe364aca6e43666ee004a537c748d))
+* **server-core:** reconcile stuck analysis builds and distributions, judge staleness in core ([#1960](https://github.com/PrivateAIM/hub/issues/1960)) ([bb6cf17](https://github.com/PrivateAIM/hub/commit/bb6cf177d51d93905a8686edd639af1542e15c88))
+
+
+### Bug Fixes
+
+* **server-core:** race-safe process-status transitions ([#1954](https://github.com/PrivateAIM/hub/issues/1954)) ([68e802b](https://github.com/PrivateAIM/hub/commit/68e802b3244c446e00bb013530032133e9555bd1))
+* **server-kit:** run every entity-event handler when one fails ([bc6351f](https://github.com/PrivateAIM/hub/commit/bc6351fe3c212162281aaf564d54f45cbd19a8a8))
+
+
+### Code Refactoring
+
+* components and message bus come from synergos ([#1965](https://github.com/PrivateAIM/hub/issues/1965)) ([dbbbbfb](https://github.com/PrivateAIM/hub/commit/dbbbbfb55bfdce82ee892cd15707b13eb88d75f9))
+* migrate from synergos to hubwire 0.2 ([#1968](https://github.com/PrivateAIM/hub/issues/1968)) ([a051e5f](https://github.com/PrivateAIM/hub/commit/a051e5ffddbdc7ccae58d119a0d92d93842d6e12))
+* **server-core:** remove TaskManager, correlate bucket replies by their refs ([#1959](https://github.com/PrivateAIM/hub/issues/1959)) ([710729c](https://github.com/PrivateAIM/hub/commit/710729c47b57e2f43196629e17727b5eac598732))
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
 
 
