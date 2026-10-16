@@ -47,7 +47,7 @@ Shared libraries, located in `packages/`.
 
 | Package                  | Purpose                                    |
 |--------------------------|--------------------------------------------|
-| `server-kit`             | Logging (Winston), auth helpers, `MessageBusModule` (DI wiring for [`ergos`](https://github.com/tada5hi/ergos)'s message bus — AMQP or memory driver; components, callers and the bus itself come from ergos), Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup), `describeQuerySchema()` + `RECORD_QUERY_PARAMETERS` for the response `meta.schema`, `collectRootFilterValues()` for the log endpoints, `scopeReadQuery()` + `appendQueryConditions()` for authorized reads |
+| `server-kit`             | Logging (Winston), auth helpers, `MessageBusModule` (DI wiring for [`synergos`](https://github.com/tada5hi/synergos)'s message bus — AMQP driver from `@synergos/amqp` or memory driver; components, callers and the bus itself come from synergos) + the bus/caller/scheduled-component log-hook factories (`message-bus/hooks.ts`), Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup), `describeQuerySchema()` + `RECORD_QUERY_PARAMETERS` for the response `meta.schema`, `collectRootFilterValues()` for the log endpoints, `scopeReadQuery()` + `appendQueryConditions()` for authorized reads |
 | `server-test-kit`        | Shared test fakes (FakeEntityRepository, FakePermissionEvaluator via `@authup/server-test-kit`, actor factories) |
 | `server-db-kit`          | TypeORM utilities, database setup, migrations; options builder pinned to UTC (`pinTimezone`), `withDataSourceLock` for boot passes |
 | `server-http-kit`        | HTTP route/controller decorators for Routup, request helpers incl. the shared `buildActorContext`, rate limiter, `sanitizeError` |
@@ -141,7 +141,7 @@ apps/server-core/src/
 │   │   ├── registry/              # RegistryManagerAdapter
 │   │   └── telemetry-client/      # TelemetryClientModule
 │   ├── aggregators/               # AMQP event consumers
-│   └── components/                # ergos components: registry consumer, node-client + analysis-reconciler (scheduled)
+│   └── components/                # synergos components: registry consumer, node-client + analysis-reconciler (scheduled)
 ├── cli/                           # CLI entry point (citty)
 └── commands/                      # start, migration commands
 ```
@@ -175,7 +175,7 @@ apps/server-telemetry/src/
 │   │   ├── http/                  # HTTPModule (router, controllers, server)
 │   │   ├── victoria-logs/         # VictoriaLogsModule (client + LogStore)
 │   │   └── components/            # ComponentsModule (starts event + log consumers, event cleaner)
-│   └── components/                # ergos components: event, log consumers; event-cleaner (scheduled)
+│   └── components/                # synergos components: event, log consumers; event-cleaner (scheduled)
 ├── cli/                           # CLI entry point (citty)
 └── constants.ts
 ```

@@ -359,11 +359,15 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
   `writable/master-images/`, which `master-images.spec.ts` deletes wholesale
   before cloning the catalogue — hence `fileParallelism: false` in that package's
   `test/vitest.config.ts`. Do not re-enable it without decoupling the fixture.
-- Components, callers and the bus come from `ergos`, whose own suite covers their
+- Components, callers and the bus come from `synergos`, whose own suite covers their
   semantics (retry, ordering, unknown commands, `stop()` during a pass). Hub specs
-  pin only hub wiring. A caller spec builds a real `MessageBus` on ergos's
+  pin only hub wiring. A caller spec builds a real `MessageBus` on synergos's
   `MemoryMessageBusDriver` and puts a fake `IComponent` behind a
-  `MessageBusWorkerComponentCaller` (`apps/server-core/test/unit/components/registry/caller.spec.ts`).
+  `WorkerCaller` (`apps/server-core/test/unit/components/registry/caller.spec.ts`).
+  The server-core and server-storage test apps register a `MessageBusModule` on a
+  memory driver, since callers require a bus; nothing in those suites consumes
+  the commands. The log-hook factories are pinned by server-kit's
+  `message-bus-hooks.spec.ts` (including that a silent routing's publish is not logged).
   A scheduled-component spec (`test/unit/app/components/{node-client,analysis-reconciler}/`,
   server-telemetry's `event-cleaner.spec.ts`) asserts through `status()` and **must
   `stop()` the component in `afterEach`**: a cron task left running keeps the vitest

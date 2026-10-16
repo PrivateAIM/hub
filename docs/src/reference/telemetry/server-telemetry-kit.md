@@ -44,6 +44,6 @@ import { TelemetryTransport } from '@privateaim/server-telemetry-kit';
 ## Dependencies
 
 - `@privateaim/server-kit` — Server foundation
-- `ergos` — Component and caller base classes
+- `synergos` — Component and caller base classes
 - `@privateaim/telemetry-kit` — Telemetry types
 - `winston-transport` — Custom Winston transport base
