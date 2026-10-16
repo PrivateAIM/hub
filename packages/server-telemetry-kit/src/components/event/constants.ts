@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from '@privateaim/server-kit';
+import { MessageRoutingType } from 'synergos';
 
 export enum EventEvent {
     CREATION_STARTED = 'creationStarted',
@@ -15,10 +15,9 @@ export enum EventEvent {
 
 export enum EventCommand {
     CREATE = 'create',
-    CLEAN = 'clean',
 }
 
 export const EventTaskMessageBusRouting = {
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'telemetryEventTasks',
 };

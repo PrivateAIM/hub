@@ -7,8 +7,14 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { Component } from '@privateaim/server-kit';
-import { LoggerInjectionKey, MessageBusInjectionKey, MessageBusWorkerComponentCaller } from '@privateaim/server-kit';
+import type { IComponent } from 'synergos';
+import {
+    LoggerInjectionKey,
+    MESSAGE_BUS_MODULE_NAME,
+    MessageBusInjectionKey,
+    createWorkerCallerLogHooks,
+} from '@privateaim/server-kit';
+import { WorkerCaller } from 'synergos';
 import {
     BucketEventMessageBusRouting,
     BucketFileEventMessageBusRouting,
@@ -22,32 +28,40 @@ import { StorageInjectionKey } from '../storage/constants.ts';
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['storage', 'database'];
+    readonly dependencies: string[] = ['storage', 'database', MESSAGE_BUS_MODULE_NAME];
+
+    protected components: IComponent<any>[] = [];
 
     async setup(container: IContainer): Promise<void> {
         const storage = container.resolve(StorageInjectionKey);
 
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
-        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+        const messageBus = container.resolve(MessageBusInjectionKey);
+        const hooks = logger ? createWorkerCallerLogHooks(logger) : undefined;
 
-        const components : Component<any>[] = [
-            new MessageBusWorkerComponentCaller(new BucketComponent({ storage, logger }), {
+        this.components = [
+            new WorkerCaller(new BucketComponent({ storage, logger }), {
                 consumeRouting: BucketTaskMessageBusRouting,
                 publishRouting: BucketEventMessageBusRouting,
                 messageBus,
-                logger,
+                hooks,
             }),
-            new MessageBusWorkerComponentCaller(new BucketFileComponent({ storage, logger }), {
+            new WorkerCaller(new BucketFileComponent({ storage, logger }), {
                 consumeRouting: BucketFileTaskMessageBusRouting,
                 publishRouting: BucketFileEventMessageBusRouting,
                 messageBus,
-                logger,
+                hooks,
             }),
         ];
 
-        const promises = components.map((c) => c.start());
-        await Promise.all(promises);
+        await Promise.all(this.components.map((c) => c.start()));
+    }
+
+    async teardown(): Promise<void> {
+        const { components } = this;
+        this.components = [];
+
+        await Promise.all(components.map((c) => c.stop()));
     }
 }

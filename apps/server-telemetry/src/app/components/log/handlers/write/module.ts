@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentHandler, Logger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
+import type { ComponentHandler } from 'synergos';
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import type { LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';

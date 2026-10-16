@@ -6,7 +6,7 @@
  */
 
 import type { ObjectLiteralKeys } from '@privateaim/kit';
-import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { ComponentMetadata } from 'synergos';
 import type { Event } from '@privateaim/telemetry-kit';
 import type { EventCommand, EventEvent } from './constants';
 import type {
@@ -19,7 +19,6 @@ import type {
 
 export type EventComponentEventMap = ObjectLiteralKeys<{
     [EventCommand.CREATE]: [EventCreateCommandPayload, ComponentMetadata],
-    [EventCommand.CLEAN]: [EventCreateCommandPayload, ComponentMetadata],
 
     [EventEvent.CREATION_STARTED]: [EventCreateEventPayload, ComponentMetadata],
     [EventEvent.CREATION_FINISHED]: [Event, ComponentMetadata],

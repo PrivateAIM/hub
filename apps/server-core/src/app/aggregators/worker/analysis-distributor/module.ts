@@ -7,10 +7,10 @@
 
 import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
-import { BaseComponent } from '@privateaim/server-kit';
+import { Component } from 'synergos';
 import type { AnalysisDistributorAggregatorContext } from './types.ts';
 
-export class AnalysisDistributorAggregator extends BaseComponent<AnalysisDistributorEventMap> {
+export class AnalysisDistributorAggregator extends Component<AnalysisDistributorEventMap> {
     constructor(ctx: AnalysisDistributorAggregatorContext) {
         super();
 

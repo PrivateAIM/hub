@@ -9,13 +9,11 @@ import {
     type BucketFileComponentEventMap,
     BucketFileEvent,
 } from '@privateaim/server-storage-kit';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'synergos';
 import type { StorageBucketFileAggregatorContext } from './types.ts';
 import { StorageBucketFileCreationFinishedHandler, StorageBucketFileDeletionFinishedHandler } from './handlers/index.ts';
 
-export class StorageBucketFileAggregator extends BaseComponent<
+export class StorageBucketFileAggregator extends Component<
     BucketFileComponentEventMap
 > {
     constructor(ctx: StorageBucketFileAggregatorContext) {

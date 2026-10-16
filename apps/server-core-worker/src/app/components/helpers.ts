@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, Logger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
+import type { ComponentMetadata } from 'synergos';
 import { MESSAGE_BUS_MAX_ATTEMPTS } from '@privateaim/server-kit';
 import { isClientError } from 'hapic';
 import {

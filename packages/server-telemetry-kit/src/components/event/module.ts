@@ -5,27 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from '@privateaim/server-kit';
-import {
-    MessageBusDispatchComponentCaller,
-} from '@privateaim/server-kit';
+import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
+import { DispatchCaller } from 'synergos';
 import type { EventCreateCommandPayload } from './handlers';
 import { EventCommand, EventTaskMessageBusRouting } from './constants';
 
-export class EventComponentCaller extends MessageBusDispatchComponentCaller {
-    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+export class EventComponentCaller extends DispatchCaller {
+    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
         super({
             ...options,
             routing: EventTaskMessageBusRouting,
-            logging: false,
         });
     }
 
     async callCreate(payload: EventCreateCommandPayload, metadata: ComponentMetadata = {}) {
         return this.call(EventCommand.CREATE, payload, metadata);
-    }
-
-    async callClean(payload: EventCreateCommandPayload, metadata: ComponentMetadata = {}) {
-        return this.call(EventCommand.CLEAN, payload, metadata);
     }
 }

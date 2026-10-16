@@ -6,19 +6,25 @@
  */
 
 import type { IContainer } from 'eldin';
+import type { IMessageBusDriver } from 'synergos';
+import { MemoryMessageBusDriver, MessageBus } from 'synergos';
+import { AmqpMessageBusDriver } from '@synergos/amqp';
 import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../config/constants';
 import { LOGGER_MODULE_NAME, LoggerInjectionKey } from '../logger/constants';
-import { MESSAGE_BUS_MODULE_NAME, MessageBusInjectionKey } from './constants';
-import { AmqpMessageBusDriver } from './driver/amqp';
-import { MemoryMessageBusDriver } from './driver/memory';
-import type { IMessageBusDriver } from './driver/types';
-import { MessageBus } from './module';
+import { createAmqpDriverLogHooks, createMessageBusLogHooks } from './hooks';
+import {
+    MESSAGE_BUS_MAX_ATTEMPTS,
+    MESSAGE_BUS_MODULE_NAME,
+    MESSAGE_BUS_TOPIC_EXCHANGE,
+    MessageBusInjectionKey,
+} from './constants';
+import type { MessageBusModuleOptions } from './types';
 
-export type MessageBusModuleOptions = {
-    driverFactory?: (container: IContainer) => IMessageBusDriver,
-};
-
+/**
+ * Always registers a bus: over AMQP when a connection string is configured,
+ * otherwise in-process (memory driver), so callers can depend on one.
+ */
 export class MessageBusModule implements IModule {
     readonly name = MESSAGE_BUS_MODULE_NAME;
 
@@ -28,6 +34,8 @@ export class MessageBusModule implements IModule {
     ];
 
     private options: MessageBusModuleOptions;
+
+    private driver: IMessageBusDriver | undefined;
 
     constructor(options: MessageBusModuleOptions = {}) {
         this.options = options;
@@ -48,13 +56,32 @@ export class MessageBusModule implements IModule {
                 undefined;
 
             if (connectionString) {
-                driver = new AmqpMessageBusDriver({ connectionString, logger });
+                driver = new AmqpMessageBusDriver({
+                    connectionString,
+                    hooks: logger ? createAmqpDriverLogHooks(logger) : undefined,
+                    defaultTopicExchange: MESSAGE_BUS_TOPIC_EXCHANGE,
+                    // explicit, not the driver default: worker handlers read it to spot the last attempt
+                    maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS,
+                });
             } else {
                 driver = new MemoryMessageBusDriver();
             }
         }
 
-        const bus = new MessageBus({ driver, logger });
+        this.driver = driver;
+
+        const bus = new MessageBus({
+            driver,
+            hooks: logger ?
+                createMessageBusLogHooks(logger, { silentRoutings: this.options.silentRoutings }) :
+                undefined,
+        });
         container.register(MessageBusInjectionKey, { useValue: bus });
+    }
+
+    async teardown(): Promise<void> {
+        const { driver } = this;
+        this.driver = undefined;
+        await driver?.close?.();
     }
 }

@@ -7,13 +7,17 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
+import type { IComponent } from 'synergos';
 import {
     ConfigInjectionKey,
     LoggerInjectionKey,
+    MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
-    MessageBusWorkerComponentCaller,
     RedisSubscribeClientInjectionKey,
+    createDispatchCallerLogHooks,
+    createWorkerCallerLogHooks,
 } from '@privateaim/server-kit';
+import { WorkerCaller } from 'synergos';
 import { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import {
     AnalysisBuilderEventMessageBusRouting,
@@ -46,7 +50,11 @@ import { ComponentsInjectionKey } from '../components/constants.ts';
 export class AggregatorsModule implements IModule {
     readonly name = 'aggregators';
 
-    readonly dependencies: string[] = ['database', 'components', 'analysis'];
+    readonly dependencies: string[] = ['database', 'components', 'analysis', MESSAGE_BUS_MODULE_NAME];
+
+    protected aggregators: IComponent<any>[] = [];
+
+    protected starting: Promise<unknown> | undefined;
 
     async setup(container: IContainer): Promise<void> {
         const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
@@ -55,13 +63,13 @@ export class AggregatorsModule implements IModule {
         const masterImageRepository = container.resolve(DatabaseInjectionKey.MasterImageRepository);
         const registryComponentCaller = container.resolve(ComponentsInjectionKey.RegistryComponentCaller);
         const logger = container.resolve(LoggerInjectionKey);
-        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+        const messageBus = container.resolve(MessageBusInjectionKey);
+        const workerHooks = createWorkerCallerLogHooks(logger);
         const redisSubResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
         const config = container.resolve(ConfigInjectionKey);
 
-        const aggregators = [
+        this.aggregators = [
             createAuthupAggregator({
                 env: config.env,
                 registryComponentCaller,
@@ -73,23 +81,23 @@ export class AggregatorsModule implements IModule {
                 redisSubscribeClient: redisSubResult.success ? redisSubResult.data : undefined,
                 logger,
             }),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new AnalysisBuilderAggregator({ builder: container.resolve(AnalysisInjectionKey.Builder) }),
                 {
                     consumeRouting: AnalysisBuilderEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new AnalysisDistributorAggregator({ distributor: container.resolve(AnalysisInjectionKey.Distributor) }),
                 {
                     consumeRouting: AnalysisDistributorEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new StorageBucketAggregator({
                     analysisRepository,
                     analysisBucketRepository,
@@ -100,10 +108,10 @@ export class AggregatorsModule implements IModule {
                 {
                     consumeRouting: BucketEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new StorageBucketFileAggregator({
                     service: new AnalysisBucketFileService({
                         repository: analysisBucketFileRepository,
@@ -118,40 +126,49 @@ export class AggregatorsModule implements IModule {
                         }),
                     }),
                     logger,
-                    bucketFileCaller: new BucketFileTaskCaller({ messageBus, logger }),
+                    bucketFileCaller: new BucketFileTaskCaller({ messageBus, hooks: createDispatchCallerLogHooks(logger) }),
                 }),
                 {
                     consumeRouting: BucketFileEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new MasterImageBuilderAggregator({
                     service: new MasterImageBuilderService({ imageRepository: masterImageRepository }),
-                    eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
+                    eventComponentCaller: new EventComponentCaller({ messageBus }),
                 }),
                 {
                     consumeRouting: MasterImageBuilderEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new MasterImageSynchronizerAggregator({
                     imageRepository: masterImageRepository,
                     groupRepository: container.resolve(DatabaseInjectionKey.MasterImageGroupRepository),
                     logger,
-                    eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
+                    eventComponentCaller: new EventComponentCaller({ messageBus }),
                 }),
                 {
                     consumeRouting: MasterImageSynchronizerEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
         ];
 
-        aggregators.forEach((a) => a.start());
+        this.starting = Promise.allSettled(this.aggregators.map((a) => a.start()));
+    }
+
+    async teardown(): Promise<void> {
+        const { aggregators, starting } = this;
+        this.aggregators = [];
+        this.starting = undefined;
+
+        await starting;
+        await Promise.all(aggregators.map((a) => a.stop()));
     }
 }

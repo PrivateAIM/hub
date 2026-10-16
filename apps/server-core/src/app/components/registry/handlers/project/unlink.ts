@@ -7,7 +7,8 @@
 
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { ComponentHandler, Logger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
+import type { ComponentHandler } from 'synergos';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../adapters/database/index.ts';
 import { RegistryCommand } from '../../constants.ts';
 import type { RegistryEventMap, RegistryProjectUnlinkPayload } from '../../type.ts';

@@ -5,19 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from '@privateaim/server-kit';
-import {
-    MessageBusDispatchComponentCaller,
-} from '@privateaim/server-kit';
+import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
+import { DispatchCaller } from 'synergos';
 import { LogCommand, LogTaskMessageBusRouting } from './constants';
 import type { LogWriteCommandPayload } from './handlers';
 
-export class LogComponentCaller extends MessageBusDispatchComponentCaller {
-    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+export class LogComponentCaller extends DispatchCaller {
+    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
         super({
             ...options,
             routing: LogTaskMessageBusRouting,
-            logging: false,
         });
     }
 

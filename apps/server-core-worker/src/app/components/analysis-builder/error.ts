@@ -6,8 +6,8 @@
  */
 
 import { AnalysisBuilderErrorCode, ErrorCode } from '@privateaim/server-core-worker-kit';
-import type { ComponentErrorOptions } from '@privateaim/server-kit';
 import { BaseError } from '../error';
+import type { ComponentErrorOptions } from '../types';
 
 export class BuilderError extends BaseError {
     // Constructed directly rather than delegating to `super`: the base factories

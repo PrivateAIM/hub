@@ -9,8 +9,10 @@ import {
     AuthupClientModule,
     AuthupHookModule,
     LoggerModule,
+    MessageBusModule,
 } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
+import { MemoryMessageBusDriver } from 'synergos';
 import { ConfigModule } from '../../src/app/modules/config/index.ts';
 import { StorageModule } from '../../src/app/modules/storage/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';
@@ -24,6 +26,8 @@ export function createTestApplication(): TestHTTPApplication {
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
+        // in-process: commands are dispatched, nothing in the suite consumes them
+        new MessageBusModule({ driverFactory: () => new MemoryMessageBusDriver() }),
         new AuthupHookModule(),
         new AuthupClientModule(),
         new StorageModule(),

@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from '@privateaim/server-kit';
+import { MessageRoutingType } from 'synergos';
 
 export { RegistryCommand, RegistryHookEvent } from '../../../core/domains/index.ts';
 
 export const RegistryTaskMessageBusRouting = {
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'registryCommands',
 };

@@ -5,7 +5,8 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentData, ComponentHandler, Logger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
+import type { ComponentHandler, ObjectLiteral } from 'synergos';
 import type { RegistryCommand } from '../../constants.ts';
 import type { RegistryEventMap } from '../../type.ts';
 import { RegistryHookValidator } from './validator.ts';
@@ -24,7 +25,7 @@ export class RegistryHookHandler implements ComponentHandler<
     }
 
     async handle(
-        value: ComponentData,
+        value: ObjectLiteral,
     ): Promise<void> {
         try {
             const data = await this.validator.run(value);

@@ -7,8 +7,14 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { Component } from '@privateaim/server-kit';
-import { LoggerInjectionKey, MessageBusInjectionKey, MessageBusWorkerComponentCaller } from '@privateaim/server-kit';
+import type { IComponent } from 'synergos';
+import {
+    LoggerInjectionKey,
+    MESSAGE_BUS_MODULE_NAME,
+    MessageBusInjectionKey,
+    createWorkerCallerLogHooks,
+} from '@privateaim/server-kit';
+import { WorkerCaller } from 'synergos';
 import {
     EventTaskMessageBusRouting,
     LogTaskMessageBusRouting,
@@ -17,13 +23,16 @@ import type { LogStore } from '../../../core/services/log-store/types.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { EventComponent } from '../../components/event/index.ts';
+import { createEventCleanerComponent } from '../../components/event-cleaner/index.ts';
 import { LogComponent } from '../../components/log/index.ts';
 import { LogStoreInjectionKey } from '../victoria-logs/constants.ts';
 
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['config', 'database', 'victoriaLogs'];
+    readonly dependencies: string[] = ['config', 'database', 'victoriaLogs', MESSAGE_BUS_MODULE_NAME];
+
+    protected components: IComponent<any>[] = [];
 
     async setup(container: IContainer): Promise<void> {
         let logStore: LogStore | undefined;
@@ -39,33 +48,36 @@ export class ComponentsModule implements IModule {
 
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
-        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+        const messageBus = container.resolve(MessageBusInjectionKey);
+        const hooks = logger ? createWorkerCallerLogHooks(logger) : undefined;
 
-        const components : Component<any>[] = [
-            new MessageBusWorkerComponentCaller(
-                new EventComponent({
-                    repository: eventRepository, 
-                    logger, 
-                    retentionDays: config.eventRetentionDays, 
-                }),
+        this.components = [
+            new WorkerCaller(
+                new EventComponent({ logger, retentionDays: config.eventRetentionDays }),
                 {
                     consumeRouting: EventTaskMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new LogComponent({ logStore, logger }),
                 {
                     consumeRouting: LogTaskMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks,
                 },
             ),
+            createEventCleanerComponent({ repository: eventRepository, logger }),
         ];
 
-        const promises = components.map((c) => c.start());
-        await Promise.all(promises);
+        await Promise.all(this.components.map((c) => c.start()));
+    }
+
+    async teardown(): Promise<void> {
+        const { components } = this;
+        this.components = [];
+
+        await Promise.all(components.map((c) => c.stop()));
     }
 }

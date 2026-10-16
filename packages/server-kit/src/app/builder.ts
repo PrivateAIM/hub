@@ -15,7 +15,7 @@ import type { EntityEventModuleOptions } from '../entity-event/di-module';
 import { EntityEventModule } from '../entity-event/di-module';
 import type { LoggerModuleOptions } from '../logger/di-module';
 import { LoggerModule } from '../logger/di-module';
-import type { MessageBusModuleOptions } from '../message-bus/di-module';
+import type { MessageBusModuleOptions } from '../message-bus/types';
 import { MessageBusModule } from '../message-bus/di-module';
 import type { RedisModuleOptions } from '../redis/di-module';
 import { RedisModule } from '../redis/di-module';

@@ -9,14 +9,12 @@ import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-wo
 import {
     MasterImageSynchronizerCommand,
 } from '@privateaim/server-core-worker-kit';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'synergos';
 import type { Logger } from '@privateaim/server-kit';
 
 import { MasterImageSynchronizerExecuteHandler } from './handlers';
 
-export class MasterImageSynchronizerComponent extends BaseComponent<MasterImageSynchronizerEventMap> {
+export class MasterImageSynchronizerComponent extends Component<MasterImageSynchronizerEventMap> {
     constructor(ctx?: { logger?: Logger }) {
         super();
 

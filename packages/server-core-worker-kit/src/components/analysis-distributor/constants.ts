@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from '@privateaim/server-kit';
+import { MessageRoutingType } from 'synergos';
 
 export enum AnalysisDistributorEvent {
     EXECUTION_STARTED = 'executionStarted',
@@ -26,12 +26,12 @@ export enum AnalysisDistributorCommand {
 export const AnalysisDistributorEventMessageBusRouting = {
     // A reply to a server-core command: one durable queue for all server-core
     // replicas, handled by one of them at a time in publish order (plan 018 F4).
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'analysisDistributorEvents',
     ordered: true,
 };
 
 export const AnalysisDistributorTaskMessageBusRouting = {
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'analysisDistributorCommands',
 };

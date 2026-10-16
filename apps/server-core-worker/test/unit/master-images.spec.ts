@@ -10,12 +10,12 @@ import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-wo
 import {
     MasterImageSynchronizerCommand,
 } from '@privateaim/server-core-worker-kit';
-import { DirectComponentCaller } from '@privateaim/server-kit';
+import { DirectCaller } from 'synergos';
 import { MasterImageSynchronizerComponent } from '../../src/app/components/index.ts';
 
 describe('components > master-images', () => {
     it('should clone master images to directory', async () => {
-        const caller = new DirectComponentCaller<MasterImageSynchronizerEventMap>(
+        const caller = new DirectCaller<MasterImageSynchronizerEventMap>(
             new MasterImageSynchronizerComponent(),
         );
 

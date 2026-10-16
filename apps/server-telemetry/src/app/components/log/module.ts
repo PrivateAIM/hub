@@ -6,15 +6,13 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'synergos';
 import { LogCommand } from '@privateaim/server-telemetry-kit';
 import type { LogStore } from '../../../core/services/log-store/types.ts';
 import { MemoryLogStore } from '../../../adapters/telemetry/memory.ts';
 import { LogComponentWriteHandler } from './handlers/index.ts';
 
-export class LogComponent extends BaseComponent {
+export class LogComponent extends Component {
     constructor(ctx?: { logStore?: LogStore, logger?: Logger }) {
         super();
 

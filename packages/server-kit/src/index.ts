@@ -5,11 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './aggregator';
 export * from './core';
 export * from './app';
 export * from './authup';
-export * from './component';
 export * from './config';
 export * from './constants';
 export * from './entity-event';

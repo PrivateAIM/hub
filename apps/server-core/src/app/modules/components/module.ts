@@ -8,13 +8,16 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { withDataSourceLock } from '@privateaim/server-db-kit';
-import type { Component } from '@privateaim/server-kit';
+import type { IComponent } from 'synergos';
 import {
     AuthupClientInjectionKey,
     LoggerInjectionKey,
+    MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
-    MessageBusWorkerComponentCaller,
+    createDispatchCallerLogHooks,
+    createWorkerCallerLogHooks,
 } from '@privateaim/server-kit';
+import { WorkerCaller } from 'synergos';
 import { AnalysisReconciler } from '../../../core/services/analysis-reconciler/index.ts';
 import { createAnalysisReconcilerComponent } from '../../components/analysis-reconciler/module.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
@@ -31,9 +34,11 @@ import { ComponentsInjectionKey } from './constants.ts';
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['database', 'analysis'];
+    readonly dependencies: string[] = ['database', 'analysis', MESSAGE_BUS_MODULE_NAME];
 
-    protected components: Component[] = [];
+    protected components: IComponent[] = [];
+
+    protected starting: Promise<unknown> | undefined;
 
     async setup(container: IContainer): Promise<void> {
         // Create components
@@ -46,21 +51,23 @@ export class ComponentsModule implements IModule {
             logger,
         });
 
-        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+        const messageBus = container.resolve(MessageBusInjectionKey);
 
         // Create and register component callers
-        const registryComponentCaller = new RegistryComponentCaller(registryComponent, { messageBus, logger });
+        const registryComponentCaller = new RegistryComponentCaller(registryComponent, {
+            messageBus,
+            hooks: createDispatchCallerLogHooks(logger),
+        });
         container.register(ComponentsInjectionKey.RegistryComponentCaller, { useValue: registryComponentCaller });
 
         // Start task consumers and background components
         this.components = [
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 registryComponent,
                 {
                     consumeRouting: RegistryTaskMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: createWorkerCallerLogHooks(logger),
                 },
             ),
         ];
@@ -86,15 +93,18 @@ export class ComponentsModule implements IModule {
             }));
         }
 
-        this.components.forEach((c) => c.start());
+        // Fire-and-forget: a background component's first pass must not
+        // block boot. teardown() awaits it before stopping.
+        this.starting = Promise.allSettled(this.components.map((c) => c.start()));
     }
 
     async teardown(): Promise<void> {
-        const { components } = this;
+        const { components, starting } = this;
         this.components = [];
+        this.starting = undefined;
 
-        // The message-bus consumers have no stop(): consumption ends with the
-        // message bus connection.
-        await Promise.all(components.map((c) => c.stop?.()));
+        // A worker caller that is still starting would subscribe after its stop().
+        await starting;
+        await Promise.all(components.map((c) => c.stop()));
     }
 }

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from '@privateaim/server-kit';
+import { MessageRoutingType } from 'synergos';
 
 export enum LogEvent {
     STARTING = 'starting',
@@ -19,6 +19,6 @@ export enum LogCommand {
 }
 
 export const LogTaskMessageBusRouting = {
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'telemetryLogTasks',
 };

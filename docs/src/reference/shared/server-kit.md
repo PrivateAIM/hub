@@ -19,11 +19,34 @@ const logger = useLogger();
 logger.info('Service started');
 ```
 
-### Message Bus (AMQP)
+### Message Bus
+
+The message bus, its drivers, components and callers live in
+[`synergos`](https://github.com/tada5hi/synergos), a standalone library shared with Authup (`synergos`, plus
+`@synergos/amqp` for the AMQP driver). server-kit only wires it into the DI container:
+`MessageBusModule` always registers a `MessageBus` (typed `IMessageBus`) under
+`MessageBusInjectionKey`, with the AMQP driver (`@synergos/amqp`, topic
+exchange `MESSAGE_BUS_TOPIC_EXCHANGE` = `FLAME`) when a RabbitMQ connection string is
+configured and the in-process memory driver otherwise. Its `teardown()` closes the
+connection.
 
 ```typescript
-import { MessageBusModule } from '@privateaim/server-kit';
+import { MessageBusInjectionKey, MessageBusModule } from '@privateaim/server-kit';
+import { Component, WorkerCaller, defineScheduledComponent } from 'synergos';
 ```
+
+::: warning Breaking change
+`BaseComponent`, the component callers, `ComponentError`, `MessageBus`, the message bus
+drivers, payload helpers and routing types, and the `Aggregator` type are no longer
+exported by server-kit, and no aliases remain. Import them from `synergos`
+(`@synergos/amqp` for the AMQP driver); renamed on the way: `BaseComponent` → `Component`,
+`Component` (type) → `IComponent`, `ComponentCaller` → `ICaller`,
+`MessageBusDispatchComponentCaller` → `DispatchCaller`, `MessageBusWorkerComponentCaller`
+→ `WorkerCaller`, `DirectComponentCaller` → `DirectCaller`, `MessageBusPayload` → `Message`,
+`MessageBusRouting` → `MessageRouting`, `buildMessageBusPublishPayload` → `buildMessage`.
+Callers require a `messageBus`, and take `hooks` instead of a `logger`.
+`CompoundComponentCaller` was removed without replacement.
+:::
 
 ### Redis
 
@@ -79,14 +102,12 @@ class MyAppBuilder extends BaseApplicationBuilder {
 |--------|-------------|
 | `app` | `BaseApplicationBuilder`, `Application` base class |
 | `logger` | Winston logger setup and `LoggerModule` |
-| `message-bus` | AMQP message bus module and utilities |
+| `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `synergos` message bus; `createMessageBusLogHooks`, `createAmqpDriverLogHooks`, `createDispatchCallerLogHooks`, `createWorkerCallerLogHooks`, `createScheduledComponentLogHooks` — synergos `hooks` that log through a hub logger |
 | `redis` | Redis module and connection helpers |
 | `authup` | Authup authentication middleware module |
 | `config` | Configuration reading via `envix` |
 | `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema`; `collectRootFilterValues()` — flattens an `and`-of-`eq` filter tree into label equalities for the log endpoints and rejects any other operator with a 400 |
 | `entity-event` | Entity event pub/sub system |
-| `aggregator` | AMQP event aggregator base classes |
-| `component` | AMQP task consumer component base classes |
 | `constants` | Module names, injection keys |
 
 ### Shared DI Modules
@@ -95,7 +116,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 |-------------|---------|
 | `LoggerModule` | Winston logger with optional telemetry transport |
 | `RedisModule` | Redis client registration |
-| `MessageBusModule` | AMQP connection and queue management |
+| `MessageBusModule` | Registers the `synergos` message bus (AMQP or memory driver) with log hooks, closes it on teardown. `silentRoutings`: routings whose publishes are not logged |
 | `AuthupModule` | Authup middleware and token validation |
 | `EntityEventModule` | Domain event dispatching |
 
@@ -108,3 +129,5 @@ class MyAppBuilder extends BaseApplicationBuilder {
 - `orkos` — Module system (`IModule`)
 - `eldin` — DI container (`TypedToken`)
 - `envix` — Environment variable reading
+- `synergos` — Message bus, components and callers
+- `@synergos/amqp` — AMQP driver (brings `amqp-extension`), which `MessageBusModule` imports

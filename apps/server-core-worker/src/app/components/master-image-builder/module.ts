@@ -9,16 +9,14 @@ import type { MasterImageBuilderEventMap } from '@privateaim/server-core-worker-
 import {
     MasterImageBuilderCommand,
 } from '@privateaim/server-core-worker-kit';
-import {
-    BaseComponent,
-} from '@privateaim/server-kit';
+import { Component } from 'synergos';
 import type { Logger } from '@privateaim/server-kit';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 
 import { MasterImageBuilderExecuteHandler } from './handlers';
 
-export class MasterImageBuilderComponent extends BaseComponent<MasterImageBuilderEventMap> {
+export class MasterImageBuilderComponent extends Component<MasterImageBuilderEventMap> {
     constructor(ctx: {
         coreClient: CoreClient; 
         docker: DockerClient; 

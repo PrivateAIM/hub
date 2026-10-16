@@ -9,7 +9,7 @@ import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { AnalysisBuilderComponentCaller, AnalysisDistributorComponentCaller } from '@privateaim/server-core-worker-kit';
 import { BucketComponentCaller } from '@privateaim/server-storage-kit';
-import { LoggerInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
+import { LoggerInjectionKey, MESSAGE_BUS_MODULE_NAME, MessageBusInjectionKey } from '@privateaim/server-kit';
 import { AnalysisBuilder } from '../../../core/services/analysis-builder/index.ts';
 import { AnalysisConfigurator } from '../../../core/services/analysis-configurator/index.ts';
 import { AnalysisDistributor } from '../../../core/services/analysis-distributor/index.ts';
@@ -24,7 +24,7 @@ import { AnalysisInjectionKey } from './constants.ts';
 export class AnalysisModule implements IModule {
     readonly name = 'analysis';
 
-    readonly dependencies: string[] = ['database'];
+    readonly dependencies: string[] = ['database', MESSAGE_BUS_MODULE_NAME];
 
     async setup(container: IContainer): Promise<void> {
         const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
@@ -34,8 +34,7 @@ export class AnalysisModule implements IModule {
         const registryRepository = container.resolve(DatabaseInjectionKey.RegistryRepository);
         const config = container.resolve(ConfigInjectionKey);
 
-        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+        const messageBus = container.resolve(MessageBusInjectionKey);
 
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;

@@ -11,7 +11,7 @@ import {
     expect,
     it,
 } from 'vitest';
-import type { AnalysisReconcilerComponent } from '../../../../../src/app/components/analysis-reconciler/index.ts';
+import type { IComponent } from 'synergos';
 import { createAnalysisReconcilerComponent } from '../../../../../src/app/components/analysis-reconciler/index.ts';
 import type { AnalysisReconcileResult, IAnalysisReconciler } from '../../../../../src/core/services/analysis-reconciler/index.ts';
 
@@ -31,7 +31,7 @@ class FakeReconciler implements IAnalysisReconciler {
 }
 
 describe('createAnalysisReconcilerComponent', () => {
-    let component: AnalysisReconcilerComponent | undefined;
+    let component: IComponent | undefined;
 
     afterEach(async () => {
         // stop() unschedules the cron task, which would otherwise keep the

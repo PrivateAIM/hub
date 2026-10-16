@@ -8,7 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
 import type { ReadableStream } from 'node:stream/web';
-import { DirectComponentCaller } from '@privateaim/server-kit';
+import { DirectCaller } from 'synergos';
 import {
     BucketFileCommand,
     type BucketFileCreationFinishedEventPayload,
@@ -45,7 +45,7 @@ export async function uploadRequestFilesToBucket(
 
     const actor = useRequestIdentityOrFail(event);
 
-    const caller = new DirectComponentCaller(bucketFileComponent);
+    const caller = new DirectCaller(bucketFileComponent);
 
     const identity = useRequestIdentityOrFail(event);
 

@@ -7,7 +7,7 @@
 
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import type { ObjectLiteralKeys } from '@privateaim/kit';
-import type { ComponentData, ComponentMetadata } from '@privateaim/server-kit';
+import type { ComponentMetadata, ObjectLiteral } from 'synergos';
 import type { RegistryCommand } from './constants.ts';
 
 export type RegistrySetupPayload = {
@@ -36,7 +36,7 @@ export type RegistryProjectRelinkPayload = RegistryProjectUnlinkPayload & {
 
 export type RegistryEventMap = ObjectLiteralKeys<{
     [RegistryCommand.SETUP]: [RegistrySetupPayload, ComponentMetadata],
-    [RegistryCommand.HOOK_PROCESS]: [ComponentData, ComponentMetadata],
+    [RegistryCommand.HOOK_PROCESS]: [ObjectLiteral, ComponentMetadata],
     [RegistryCommand.DELETE]: [RegistrySetupPayload, ComponentMetadata],
     [RegistryCommand.CLEANUP]: [RegistryCleanupPayload, ComponentMetadata],
     [RegistryCommand.PROJECT_LINK]: [RegistryProjectLinkPayload, ComponentMetadata],

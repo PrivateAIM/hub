@@ -6,23 +6,26 @@
  */
 
 import type { IContainer } from 'eldin';
+import type { IComponent } from 'synergos';
+import { defineScheduledComponent } from 'synergos';
 import type { IModule } from 'orkos';
-import { LoggerInjectionKey } from '@privateaim/server-kit';
+import { LoggerInjectionKey, createScheduledComponentLogHooks } from '@privateaim/server-kit';
 import { DatabaseInjectionKey } from '../database/index.ts';
 
-/** How often expired messages are swept from the mailbox. */
-const SWEEP_INTERVAL_MS = 60_000;
-
 /**
- * Periodically deletes expired messages from the durable mailbox — rows whose
- * absolute `expiresAt` (stamped at send time) has passed.
+ * Deletes expired messages from the durable mailbox — rows whose absolute
+ * `expiresAt` (stamped at send time) has passed — once a minute. A failing
+ * sweep is logged and retried on the next tick; ticks never overlap.
+ *
+ * The cron task keeps the process alive (the old interval was unref'd), so
+ * teardown() must stop it.
  */
 export class SweeperModule implements IModule {
     readonly name = 'sweeper';
 
     readonly dependencies: string[] = ['database'];
 
-    private timer: ReturnType<typeof setInterval> | undefined;
+    private component: IComponent | undefined;
 
     async setup(container: IContainer): Promise<void> {
         const repository = container.resolve(DatabaseInjectionKey.MessageRepository);
@@ -30,40 +33,26 @@ export class SweeperModule implements IModule {
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
 
-        let inFlight = false;
-        this.timer = setInterval(() => {
-            // skip this tick if the previous sweep is still running (avoid pile-up)
-            if (inFlight) {
-                return;
-            }
+        this.component = defineScheduledComponent({
+            schedule: '* * * * *',
+            // as before: the first sweep runs one interval after boot
+            runOnStart: false,
+            hooks: logger ? createScheduledComponentLogHooks(logger, 'message-sweeper') : undefined,
+            run: async () => {
+                const removed = await repository.deleteExpired(new Date());
+                if (removed > 0) {
+                    logger?.debug(`Swept ${removed} expired message(s)`);
+                }
+            },
+        });
 
-            inFlight = true;
-            repository.deleteExpired(new Date())
-                .then((removed) => {
-                    if (removed > 0) {
-                        logger?.debug(`Swept ${removed} expired message(s)`);
-                    }
-                })
-                .catch((error) => {
-                    logger?.error(error);
-                })
-                .finally(() => {
-                    inFlight = false;
-                });
-        }, SWEEP_INTERVAL_MS);
-
-        // do not keep the process alive solely for the sweep timer
-        if (typeof this.timer.unref === 'function') {
-            this.timer.unref();
-        }
+        await this.component.start();
     }
 
     async teardown(): Promise<void> {
-        if (!this.timer) {
-            return;
-        }
+        const { component } = this;
+        this.component = undefined;
 
-        clearInterval(this.timer);
-        this.timer = undefined;
+        await component?.stop();
     }
 }

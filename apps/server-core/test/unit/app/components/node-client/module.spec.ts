@@ -12,7 +12,7 @@ import {
     expect, 
     it, 
 } from 'vitest';
-import type { NodeClientComponent } from '../../../../../src/app/components/node-client/index.ts';
+import type { IComponent } from 'synergos';
 import { createNodeClientComponent } from '../../../../../src/app/components/node-client/index.ts';
 import { FakeNodeRepository } from '../../../core/entities/node/fake-repository.ts';
 
@@ -43,7 +43,7 @@ function createRepository() {
 }
 
 describe('createNodeClientComponent', () => {
-    let component: NodeClientComponent | undefined;
+    let component: IComponent | undefined;
 
     afterEach(async () => {
         // stop() unschedules the cron task, which would otherwise keep the

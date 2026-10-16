@@ -25,6 +25,11 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   backoff (1s, 2s, 4s, 8s). An exhausted command is dropped with an error log
   line naming its type and id. Before this, a redelivered command was dropped
   silently after its first attempt.
+- **The attempt counter is an AMQP header (`x-attempt`).** Older versions kept it
+  in the message body (`metadata.attempt`). While old and new replicas run side
+  by side, a failing command may be retried more often than 5 times, because
+  each version only reads its own counter, but it is never retried forever and
+  never dropped early. No particular upgrade order is needed for this.
 - **The worker retries only failures that can go away on their own.** A
   connection error, a 5xx/429 from the core or storage API, GitHub or the
   registry, or an unreachable or failing docker daemon is retried as above, and
@@ -45,8 +50,8 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   robot account and registry credentials appear shortly after the node is
   created rather than with the response. Renaming a registry project's
   `externalName` is one relink command, so its unlink of the old Harbor project
-  and its link of the new one cannot run out of order. Without a message bus,
-  server-core still runs them in-process.
+  and its link of the new one cannot run out of order. Without a message bus, or
+  when no consumer accepted the command, server-core still runs them in-process.
 - **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
   build.** A command is acknowledged only once its handler finishes. If a build
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the
@@ -107,6 +112,16 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   a `refId` (400): only the service owning the referenced resource sets it, over
   the bus.
 - A lost broker connection is retried every 5 seconds (it was 60).
+- **Registry commands go through the queue.** Linking, unlinking or relinking a
+  project in Harbor, registry setup, cleanup and deletion, and Harbor webhook
+  processing are published to the `registryCommands` queue and run on whichever
+  server-core replica takes them, not inside the HTTP request that triggered
+  them. Before, server-core ran the command itself first and fell back to the
+  queue, so a failing command could run twice. Without `AMQP_URL` the command
+  still runs inside the same server-core process. Renaming a registry project
+  sends one relink command. Two commands for the same project sent by separate
+  requests (an unlink, then a link) can run on two replicas at once, so wait
+  for the first to finish before sending the second.
 - Failure events carry the error's `name`, `message` and `code` instead of `{}`.
 
 ## Authup upgrade to beta.68

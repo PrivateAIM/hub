@@ -6,7 +6,7 @@
  */
 
 import type { ObjectLiteralKeys } from '@privateaim/kit';
-import type { ComponentMetadata } from '@privateaim/server-kit';
+import type { ComponentMetadata } from 'synergos';
 import type { Progress } from 'docken';
 import type { MasterImageBuilderCommand, MasterImageBuilderEvent } from './constants';
 

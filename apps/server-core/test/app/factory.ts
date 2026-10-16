@@ -9,8 +9,10 @@ import {
     AuthupClientModule,
     AuthupHookModule,
     LoggerModule,
+    MessageBusModule,
 } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
+import { MemoryMessageBusDriver } from 'synergos';
 import { createFakeClient } from '@privateaim/telemetry-kit/testing';
 import type { FakeHandlerMap } from '@privateaim/telemetry-kit/testing';
 import { ConfigModule } from '../../src/app/modules/config/index.ts';
@@ -60,6 +62,8 @@ export function createTestApplication(options: TestApplicationOptions = {}): Tes
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
+        // in-process: commands are dispatched, nothing in the suite consumes them
+        new MessageBusModule({ driverFactory: () => new MemoryMessageBusDriver() }),
         new AuthupHookModule(),
         new AuthupClientModule(),
         createTestDatabaseModule(),
@@ -79,6 +83,8 @@ export function createTestDatabaseApplication(): TestApplication {
     const modules: IModule[] = [
         new ConfigModule(),
         new LoggerModule(),
+        // in-process: commands are dispatched, nothing in the suite consumes them
+        new MessageBusModule({ driverFactory: () => new MemoryMessageBusDriver() }),
         createTestDatabaseModule(),
         new AnalysisModule(),
     ];

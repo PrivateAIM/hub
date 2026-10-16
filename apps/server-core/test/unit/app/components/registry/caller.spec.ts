@@ -5,21 +5,35 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component, ComponentHandleFnArgsForMap, MessageBusPayload } from '@privateaim/server-kit';
-import { MemoryMessageBusDriver, MessageBus } from '@privateaim/server-kit';
+import type {
+    ComponentStatus,
+    IComponent,
+    Message,
+} from 'synergos';
+import { MemoryMessageBusDriver, MessageBus, WorkerCaller } from 'synergos';
 import { describe, expect, it } from 'vitest';
 import { RegistryComponentCaller } from '../../../../../src/app/components/registry/caller/index.ts';
 import { RegistryCommand, RegistryTaskMessageBusRouting } from '../../../../../src/app/components/registry/constants.ts';
 import type { RegistryEventMap } from '../../../../../src/app/components/registry/type.ts';
 
-class FakeRegistryComponent implements Component<RegistryEventMap> {
+class FakeRegistryComponent implements IComponent<RegistryEventMap> {
     readonly handled: { key: string, data: Record<string, any> }[] = [];
 
     failing = false;
 
-    start() {}
+    start(): Promise<void> {
+        return Promise.resolve();
+    }
 
-    async handle(...[key, data]: ComponentHandleFnArgsForMap<RegistryEventMap>) {
+    stop(): Promise<void> {
+        return Promise.resolve();
+    }
+
+    status(): ComponentStatus {
+        return {};
+    }
+
+    async handle(key: string, data: Record<string, any>): Promise<void> {
         if (this.failing) {
             throw new Error('harbor unavailable');
         }
@@ -34,9 +48,9 @@ describe('RegistryComponentCaller', () => {
         const component = new FakeRegistryComponent();
 
         const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
-        const consumed: MessageBusPayload[] = [];
-        await messageBus.consumeAny(RegistryTaskMessageBusRouting, (payload) => {
-            consumed.push(payload);
+        const consumed: Message[] = [];
+        await messageBus.consumeAny(RegistryTaskMessageBusRouting, (message) => {
+            consumed.push(message);
         });
 
         const caller = new RegistryComponentCaller(component, { messageBus });
@@ -44,18 +58,49 @@ describe('RegistryComponentCaller', () => {
 
         expect(component.handled).toEqual([]);
         expect(consumed).toHaveLength(1);
-        expect(consumed[0].type).toEqual(RegistryCommand.PROJECT_LINK);
-        expect(consumed[0].data).toEqual({ id: 'project-1' });
+        expect(consumed[0]).toMatchObject({
+            type: RegistryCommand.PROJECT_LINK,
+            data: { id: 'project-1' },
+            metadata: { routing: RegistryTaskMessageBusRouting },
+        });
+    });
+
+    it('should reach the in-process worker caller over the memory driver (no AMQP)', async () => {
+        const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
+        const worker = new FakeRegistryComponent();
+        const workerCaller = new WorkerCaller(worker, {
+            consumeRouting: RegistryTaskMessageBusRouting,
+            messageBus,
+        });
+        await workerCaller.start();
+
+        // a different instance: the command must arrive through the bus
+        const component = new FakeRegistryComponent();
+        const caller = new RegistryComponentCaller(component, { messageBus });
+        await caller.call(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
+
+        expect(component.handled).toEqual([]);
+        expect(worker.handled).toEqual([{ key: RegistryCommand.PROJECT_LINK, data: { id: 'project-1' } }]);
+        await workerCaller.stop();
     });
 
     it('should run the command in-process when the bus accepts it nowhere', async () => {
         // memory driver with no consumer registered (yet): publish resolves false
         const component = new FakeRegistryComponent();
         const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
+        const undelivered: Message[] = [];
 
-        const caller = new RegistryComponentCaller(component, { messageBus });
+        const caller = new RegistryComponentCaller(component, {
+            messageBus,
+            hooks: {
+                onUndelivered: (message) => {
+                    undelivered.push(message);
+                },
+            },
+        });
         await caller.call(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
 
+        expect(undelivered.map((message) => message.type)).toEqual([RegistryCommand.PROJECT_LINK]);
         expect(component.handled).toEqual([{ key: RegistryCommand.PROJECT_LINK, data: { id: 'project-1' } }]);
     });
 

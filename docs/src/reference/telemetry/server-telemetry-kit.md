@@ -19,6 +19,12 @@ const caller = useLogComponentCaller();
 await caller.write({ level: 'info', message: 'Hello' });
 ```
 
+::: warning Removed: `EventCommand.CLEAN`
+The event component no longer has a `CLEAN` command, and `callClean()` is gone from its
+caller. Expired events are swept by a scheduled component inside server-telemetry (once at
+start, then daily at 01:00), so there is nothing to send.
+:::
+
 ### Winston Transport
 
 ```typescript
@@ -38,5 +44,6 @@ import { TelemetryTransport } from '@privateaim/server-telemetry-kit';
 ## Dependencies
 
 - `@privateaim/server-kit` — Server foundation
+- `synergos` — Component and caller base classes
 - `@privateaim/telemetry-kit` — Telemetry types
 - `winston-transport` — Custom Winston transport base

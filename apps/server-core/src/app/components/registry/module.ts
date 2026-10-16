@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BaseComponent } from '@privateaim/server-kit';
+import { Component } from 'synergos';
 import type { Logger } from '@privateaim/server-kit';
 import type { Client as AuthupClient } from '@authup/core-http-kit';
 import { RegistryCommand } from './constants.ts';
@@ -19,7 +19,7 @@ import {
 } from './handlers/index.ts';
 import type { RegistryEventMap } from './type.ts';
 
-export class RegistryComponent extends BaseComponent<RegistryEventMap> {
+export class RegistryComponent extends Component<RegistryEventMap> {
     constructor(ctx: {
         publicURL: string; 
         authupClient?: AuthupClient; 

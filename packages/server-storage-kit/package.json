@@ -35,5 +35,8 @@
         "build:js": "rimraf ./dist && tsdown",
         "build:types": "tsc --noEmit -p tsconfig.build.json",
         "build": "npm run build:js && npm run build:types"
+    },
+    "dependencies": {
+        "synergos": "^0.1.0"
     }
 }

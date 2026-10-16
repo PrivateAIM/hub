@@ -6,25 +6,16 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import { BaseComponent } from '@privateaim/server-kit';
+import { Component } from 'synergos';
 import type { EventComponentEventMap } from '@privateaim/server-telemetry-kit';
 import { EventCommand } from '@privateaim/server-telemetry-kit';
-import type { IEventRepository } from '../../../core/entities/index.ts';
-import { EventComponentCleanerHandler, EventComponentCreateHandler } from './handlers/index.ts';
+import { EventComponentCreateHandler } from './handlers/index.ts';
 
-export class EventComponent extends BaseComponent<EventComponentEventMap> {
-    constructor(ctx: {
-        repository: IEventRepository, 
-        logger?: Logger, 
-        retentionDays?: number 
-    }) {
+export class EventComponent extends Component<EventComponentEventMap> {
+    constructor(ctx: { logger?: Logger, retentionDays?: number }) {
         super();
 
         this.mount(EventCommand.CREATE, new EventComponentCreateHandler({ logger: ctx.logger, retentionDays: ctx.retentionDays }));
-        this.mount(EventCommand.CLEAN, new EventComponentCleanerHandler({
-            repository: ctx.repository,
-            logger: ctx.logger,
-        }));
     }
 
     async start() {

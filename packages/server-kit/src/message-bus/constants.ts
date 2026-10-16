@@ -6,7 +6,7 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { MessageBus } from './module';
+import type { IMessageBus } from 'synergos';
 
 export const MESSAGE_BUS_MODULE_NAME = 'messageBus';
 
@@ -16,9 +16,10 @@ export const MESSAGE_BUS_MODULE_NAME = 'messageBus';
  */
 export const MESSAGE_BUS_MAX_ATTEMPTS = 5;
 
-export const MessageBusInjectionKey = new TypedToken<MessageBus>('MessageBus');
+export const MessageBusInjectionKey = new TypedToken<IMessageBus>('MessageBus');
 
-export enum MessageBusRoutingType {
-    WORK = 'work',
-    PUB_SUB = 'pubSub',
-}
+/**
+ * Topic exchange of PUB_SUB routings without a namespace. Part of the wire
+ * contract: a different name is a different exchange.
+ */
+export const MESSAGE_BUS_TOPIC_EXCHANGE = 'FLAME';

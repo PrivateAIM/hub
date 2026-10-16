@@ -13,7 +13,8 @@ import type {
     AnalysisBuilderEventMap,
 } from '@privateaim/server-core-worker-kit';
 import { AnalysisBuilderCommand, AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
-import type { ComponentHandler, ComponentHandlerContext, Logger } from '@privateaim/server-kit';
+import type { Logger } from '@privateaim/server-kit';
+import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';
 import type { ImageInspectInfo } from 'dockerode';

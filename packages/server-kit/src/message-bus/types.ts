@@ -1,71 +1,20 @@
 /*
- * Copyright (c) 2024-2025.
+ * Copyright (c) 2025.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MessageBusRoutingType } from './constants';
+import type { IContainer } from 'eldin';
+import type { IMessageBusDriver, MessageRouting } from 'synergos';
 
-export type MessageBusRouting = {
-    type: `${MessageBusRoutingType}`,
-    key: string,
-    namespace?: string,
+export type MessageBusLogHooksOptions = {
     /**
-     * WORK only: deliver to one consumer at a time, in publish order, with
-     * failover to another replica (AMQP single active consumer). For replies
-     * whose handlers must not race each other across replicas.
+     * Routings whose publishes are not logged (the log and event queues).
      */
-    ordered?: boolean,
+    silentRoutings?: MessageRouting[],
 };
 
-export type MessageBusPayloadMetadata = {
-    timestamp: number,
-    redelivered?: boolean,
-    /**
-     * 1-based delivery attempt of a WORK message, set by the driver on retry.
-     */
-    attempt?: number,
-    persistent?: boolean,
-    routing: MessageBusRouting
-};
-
-export type MessageBusPublishOptions = {
-    logging?: boolean
-};
-
-export type MessageBusPayload<
-    T = string,
-    D = Record<string, any>,
-> = {
-    id: string,
-    type: T,
-    data: D,
-    metadata: MessageBusPayloadMetadata
-};
-
-export type MessageBusPayloadMetadataInput = Partial<Pick<MessageBusPayloadMetadata, 'timestamp'>> &
-Omit<MessageBusPayloadMetadata, 'timestamp'>;
-
-export type MessageBusPayloadInput<
-    KEY = string,
-    VALUE = Record<string, any>,
-> = {
-    id?: string,
-    type: KEY,
-    data?: VALUE,
-    metadata: MessageBusPayloadMetadataInput
-};
-
-export type MessageBusHandler<
-    KEY = string,
-    D = Record<string, any>,
-> = (message: MessageBusPayload<KEY, D>) => Promise<void> | void;
-
-export type MessageBusHandlers<
-    R extends Record<string, Record<string, any>> = Record<string, Record<string, any>>,
-> = {
-    $any?: MessageBusHandler
-} & {
-    [K in keyof R]: MessageBusHandler<K, R[K]>
+export type MessageBusModuleOptions = MessageBusLogHooksOptions & {
+    driverFactory?: (container: IContainer) => IMessageBusDriver,
 };

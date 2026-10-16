@@ -111,7 +111,7 @@ DI modules, wiring, and infrastructure services.
 - Fluent API: `.withConfig().withDatabase().withHTTP()`
 
 **Aggregators** (`app/aggregators/`): AMQP event consumers
-**Components** (`app/components/`): AMQP task consumers (`BaseComponent` + a message-bus caller), and background components without a queue that follow authup's `{ start, stop, status }` shape — a pass at start, then a cron (`node-client/`: node-client permission sync)
+**Components** (`app/components/`): everything here implements `IComponent { start, stop, status }` from [`synergos`](https://github.com/tada5hi/synergos) (shared with authup). Two shapes: AMQP task consumers — a synergos `Component` (key → handler map) behind a `WorkerCaller` — and scheduled background jobs built with `defineScheduledComponent({ schedule, run, hooks })`: a pass at start, then a cron (`node-client/`: node-client permission sync, `analysis-reconciler/`). A `run` that throws is reported to `hooks.onError` (hub passes `createScheduledComponentLogHooks` from server-kit, or logs inside `run` itself) and does not count as a success; `start()` never rejects. Every `ComponentsModule` stops what it started in `teardown()`
 
 ## Service Pattern
 
@@ -244,7 +244,20 @@ TypeORM subscribers in `adapters/database/subscribers/` (grouped by domain: `ana
 
 AMQP consumers are wired via two DI modules:
 - **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregators depend only on core services and repository ports (resolved from `AnalysisInjectionKey` / `DatabaseInjectionKey`), never on a `DataSource`: the worker status rules (event → status transition, `isProcessStatusTerminal`, `isCheckVerdictStale`) live in core as `AnalysisBuilder.applyEvent` / `AnalysisDistributor.applyEvent` / `MasterImageBuilderService.applyEvent`, while the storage-bucket and authup handlers keep their orchestration in app over the ports. Storage-bucket replies are correlated by the bucket itself (`refType`/`refId` + `parseAnalysisBucketName(name)`), not by a task store.
-- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container: with a message bus it only dispatches to the `registryCommands` queue (the registry consumer runs it; a throwing command is retried, but the Harbor handlers log and swallow Harbor errors), and calls the component in-process only when there is no bus. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor).
+- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container: with a message bus it only dispatches to the `registryCommands` queue (the registry consumer runs it; a throwing command is retried, but the Harbor handlers log and swallow Harbor errors), and calls the component in-process only when there is no bus or the bus accepted the command nowhere (memory driver before the registry consumer subscribed). It publishes through `IMessageBus.publish` itself, since synergos's `DispatchCaller.call()` does not report acceptance. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor). Both modules start their components fire-and-forget; `teardown()` awaits those starts, then `stop()`s each.
+
+**The bus is synergos's `MessageBus`.** server-kit's `MessageBusModule` always registers one,
+typed `IMessageBus`, under `MessageBusInjectionKey`: with `@synergos/amqp`'s `AmqpMessageBusDriver`
+(topic exchange `MESSAGE_BUS_TOPIC_EXCHANGE` = `FLAME`) when a RabbitMQ connection string is
+configured, else the in-process `MemoryMessageBusDriver`; its `teardown()` closes the driver.
+Callers require a bus, so every module that builds one declares the `messageBus` dependency and
+`resolve`s it. synergos logs nothing itself: hub passes `hooks` built by server-kit's
+`message-bus/hooks.ts` factories, and `silentRoutings` (server-telemetry-kit's
+`TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS`) keeps the publish of a log line or audit event out of
+the log. WORK routings are
+retried by amqp-extension (counter in the `x-attempt` header, `MESSAGE_BUS_MAX_ATTEMPTS` = 5 attempts, exponential backoff
+capped at 30s, then dropped) with an in-process redelivery guard; delivery is at-least-once.
+Hub-specific policy stays in hub: the routings, `ordered` reply queues and the exchange name.
 
 **Process-status transitions are row-locked.** Any read-check-mutate-save of a
 `buildStatus`/`distributionStatus` (command starts, configuration lock/unlock, the master-image rollback,
@@ -369,13 +382,15 @@ Manages log aggregation via VictoriaLogs and event tracking via TypeORM.
 **Service-specific modules:**
 - `VictoriaLogsModule` — registers VictoriaLogs client + `LogStore` in container
 - `ComponentsModule` — resolves `EventRepository` from the container and starts
-  EventComponent + LogComponent via `QueueWorkerComponentCaller`
+  EventComponent + LogComponent via `WorkerCaller` (synergos), plus the
+  event cleaner; `teardown()` stops all three
 
-**Event retention sweep:** `EventComponentCleanerHandler` (once at start, then daily
-at 01:00) drops every `expiring` row whose `expiresAt` has passed. The window is
+**Event retention sweep:** `createEventCleanerComponent` (`app/components/event-cleaner/`,
+a synergos scheduled component: once at start, then daily at 01:00; no longer an
+`EventCommand`, so a failing first pass is logged instead of failing boot) drops every `expiring` row whose `expiresAt` has passed. The window is
 stamped at **ingest** by `EventComponentCreateHandler` from `EVENT_RETENTION_DAYS`
 (default 7 days; `0` keeps rows forever) — publishers no longer stamp, and an
-explicit `expiresAt`, or `expiring: false`, from the publisher wins. The handler owns only the
+explicit `expiresAt`, or `expiring: false`, from the publisher wins. The component owns only the
 schedule: the sweep itself is `IEventRepository.deleteExpired(now, { batchSize })`,
 so nothing in `app/components/` reaches for a `DataSource`.
 
@@ -412,7 +427,7 @@ common `IStorageAdapter` port.
   or `FsStorageAdapter` (local filesystem). Controllers and components depend on the
   port, not on a MinIO client.
 - `ComponentsModule` — resolves the storage adapter from the container, starts the
-  bucket + bucket-file consumers via `QueueWorkerComponentCaller`
+  bucket + bucket-file consumers via `WorkerCaller` (synergos)
 
 ### server-core-worker
 
@@ -432,7 +447,8 @@ Background worker executing Docker containers. No database entities — purely q
 `isRetryableFailure(e, context.metadata)` (`app/components/helpers.ts`) holds — a transient
 error (`isTransientError`: hapic network error or 5xx/429, dockerode `statusCode` ≥ 500, node
 socket codes, `ENOENT` only on `connect`) before the last attempt (`metadata.attempt` <
-`MESSAGE_BUS_MAX_ATTEMPTS` from server-kit) — so the AMQP driver retries it; everything else
+`MESSAGE_BUS_MAX_ATTEMPTS` from server-kit; `@synergos/amqp` fills `metadata.attempt` from the
+`x-attempt` header on consume) — so the AMQP driver retries it; everything else
 emits `*_FAILED`. A permanent error misread as transient costs only the backoff. The
 distributor keeps the local analysis image while a retry is pending (it re-tags from it) and
 removes it otherwise. Errors inside a docker build/push stream are permanent.
@@ -460,7 +476,7 @@ decommission (plan 013 phase 5).
 - `WakeupModule` — redis pub/sub when redis is present (cross-instance), else an
   in-process fallback; emits the payload-free `messagePending` into the recipient's
   local socket room
-- `SweeperModule` — 60s timer deleting messages past their absolute `expiresAt`,
+- `SweeperModule` — a synergos scheduled component (`'* * * * *'`, `runOnStart: false`) deleting messages past their absolute `expiresAt`,
   via the same batched `deleteExpired(now, { batchSize })` shape as the telemetry
   event sweep (`MESSAGE_SWEEP_BATCH_SIZE`, 1000). The id select uses `Raw`, not
   `LessThan`: `expires_at` is a datetime column behind a `string`-typed property,

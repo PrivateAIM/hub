@@ -12,3 +12,9 @@ export type Heartbeat = {
     touch: () => void,
     stop: () => void,
 };
+
+export type ComponentErrorOptions = {
+    code?: string | null,
+    message?: string,
+    cause?: unknown,
+};

@@ -10,6 +10,7 @@ import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core
 import type { BucketFileDeleteCommandPayload } from '@privateaim/server-storage-kit';
 import { BucketFileTaskCaller } from '@privateaim/server-storage-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
+import { MemoryMessageBusDriver, MessageBus } from 'synergos';
 import {
     afterAll,
     beforeAll,
@@ -35,6 +36,11 @@ import { FakeAnalysisFileMetadataRecalculator } from '../../core/entities/analys
 
 class FakeBucketFileCaller extends BucketFileTaskCaller {
     deleted: BucketFileDeleteCommandPayload[] = [];
+
+    constructor() {
+        // callDelete is overridden, so nothing reaches this bus
+        super({ messageBus: new MessageBus({ driver: new MemoryMessageBusDriver() }) });
+    }
 
     override async callDelete(payload: BucketFileDeleteCommandPayload) {
         this.deleted.push(payload);
