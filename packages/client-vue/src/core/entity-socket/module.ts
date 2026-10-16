@@ -185,17 +185,22 @@ export function createEntitySocket<
     };
 
     let isActive = false;
+    // The namespace the active subscription lives in: realmId can change
+    // (management realm switch) while subscribed, and unsubscribe must leave
+    // the namespace it joined, not the recomputed one.
+    let activeRealmId : string | undefined;
     const subscribe = async () => {
         if ((ctx.target && !targetId.value) || isActive) {
             return;
         }
 
         isActive = true;
+        activeRealmId = realmId.value;
 
-        const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
+        const socket = await socketManager.connect(buildDomainNamespaceName(activeRealmId));
         let event : DomainEventFullName<string, DomainEventSubscriptionName> | undefined;
         if (ctx.buildSubscribeEventName) {
-            event = ctx.buildSubscribeEventName(realmId.value);
+            event = ctx.buildSubscribeEventName(activeRealmId);
         } else {
             event = buildDomainEventFullName(
                 ctx.type,
@@ -234,11 +239,11 @@ export function createEntitySocket<
 
         isActive = false;
 
-        const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
+        const socket = await socketManager.connect(buildDomainNamespaceName(activeRealmId));
 
         let event : DomainEventFullName<string, DomainEventSubscriptionName>;
         if (ctx.buildUnsubscribeEventName) {
-            event = ctx.buildUnsubscribeEventName(realmId.value);
+            event = ctx.buildUnsubscribeEventName(activeRealmId);
         } else {
             event = buildDomainEventFullName(
                 ctx.type,
@@ -249,7 +254,7 @@ export function createEntitySocket<
         if (ctx.onCreated) {
             socket.off<any>(buildDomainEventFullName(
                 ctx.type,
-                EntityDefaultEventName.UPDATED,
+                EntityDefaultEventName.CREATED,
             ), handleCreated);
         }
 
@@ -280,8 +285,8 @@ export function createEntitySocket<
         return unsubscribe();
     });
 
-    watch(targetId, (val, oldValue) => {
-        if (val !== oldValue && isMounted) {
+    watch([targetId, realmId], ([val, realm], [oldValue, oldRealm]) => {
+        if ((val !== oldValue || realm !== oldRealm) && isMounted) {
             Promise.resolve()
                 .then(() => unsubscribe())
                 .then(() => subscribe());

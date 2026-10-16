@@ -5,10 +5,23 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainType } from '@privateaim/core-kit';
-import { ref } from 'vue';
+import { EntityDefaultEventName } from '@authup/core-kit';
+import { ClientManager } from '@authup/core-realtime-kit';
+import { injectStore } from '@authup/client-web-kit';
+import { DomainType, buildDomainNamespaceName } from '@privateaim/core-kit';
+import type { CTSEvents, STCEvents } from '@privateaim/core-realtime-kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
+import { flushPromises } from '@vue/test-utils';
+import {
+    defineComponent, 
+    getCurrentInstance, 
+    h, 
+    ref,
+} from 'vue';
 import { describe, expect, it } from 'vitest';
-import { resolveEntitySocketRealmId } from '../../../src/core/entity-socket';
+import { createEntitySocket, resolveEntitySocketRealmId } from '../../../src/core/entity-socket';
+import { provideSocketManager } from '../../../src/core/socket';
+import { mountClientVueComponent } from '../../utils';
 
 // The global namespace needs a grant reaching every realm, so a realm-bound
 // user connecting there is refused and loses realtime silently.
@@ -27,5 +40,47 @@ describe('entity socket namespace', () => {
         for (const type of [DomainType.MASTER_IMAGE, DomainType.MASTER_IMAGE_GROUP, DomainType.REGISTRY, DomainType.REGISTRY_PROJECT]) {
             expect(resolveEntitySocketRealmId(type, ref('a'), 'm')).toBeUndefined();
         }
+    });
+});
+
+// Hands out real, never-connected sockets; acks resolve at once, so the
+// subscribe/unsubscribe chain runs offline. Listener counts per namespace
+// show which namespace a subscription is (still) attached to.
+class OfflineClientManager extends ClientManager<STCEvents, CTSEvents> {
+    override async connect(namespace?: string) {
+        const socket = this.inject(namespace);
+        socket.emitWithAck = async () => undefined;
+        return socket;
+    }
+}
+
+describe('entity socket subscription', () => {
+    it('should leave the namespace it joined and rejoin when the management realm changes', async () => {
+        const manager = new OfflineClientManager({ url: 'http://fake.test', options: { autoConnect: false } });
+        const created = buildDomainEventFullName(DomainType.ANALYSIS, EntityDefaultEventName.CREATED);
+        const listeners = (realmId: string) => manager.inject(buildDomainNamespaceName(realmId)).listeners(created).length;
+        let store: ReturnType<typeof injectStore> | undefined;
+
+        const component = defineComponent({
+            setup() {
+                provideSocketManager(manager, getCurrentInstance()?.appContext.app);
+                store = injectStore();
+                store.setRealmManagement({ id: 'r1', name: 'one' });
+                createEntitySocket({ type: DomainType.ANALYSIS, onCreated: () => {} });
+                return () => h('div');
+            },
+        });
+
+        const { wrapper } = mountClientVueComponent(component, {}, {});
+        await flushPromises();
+        expect([listeners('r1'), listeners('r2')]).toEqual([1, 0]);
+
+        store?.setRealmManagement({ id: 'r2', name: 'two' });
+        await flushPromises();
+        expect([listeners('r1'), listeners('r2')]).toEqual([0, 1]);
+
+        wrapper.unmount();
+        await flushPromises();
+        expect([listeners('r1'), listeners('r2')]).toEqual([0, 0]);
     });
 });
