@@ -5,7 +5,12 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component, ComponentCaller, MessageBus } from '@privateaim/server-kit';
+import type {
+    Component,
+    ComponentCaller,
+    Logger,
+    MessageBus,
+} from '@privateaim/server-kit';
 import {
     DirectComponentCaller,
     MessageBusDispatchComponentCaller,
@@ -19,23 +24,32 @@ import { RegistryTaskMessageBusRouting } from '../constants.ts';
  * consumer started by `ComponentsModule` runs it, and retries a command that
  * throws (the Harbor handlers log and swallow Harbor errors instead). The
  * queue is not ordered: two commands for one project must be one command
- * (PROJECT_RELINK). The component is called in-process only when there is no bus.
- * Never both — a direct call that fell back to the queue on failure turned the
- * queue into an accidental one-shot retry.
+ * (PROJECT_RELINK). The component is called in-process when there is no bus,
+ * or when the bus accepted no consumer for the command (memory driver before
+ * the registry consumer is started) — it is never lost. A failing direct call
+ * is not re-queued: that turned the queue into an accidental one-shot retry.
  */
 export class RegistryComponentCaller implements IRegistryCaller {
-    protected caller: ComponentCaller;
+    protected direct: ComponentCaller;
 
-    constructor(component: Component<RegistryEventMap>, ctx?: { messageBus?: MessageBus }) {
-        this.caller = ctx?.messageBus ?
-            new MessageBusDispatchComponentCaller({
+    protected dispatcher?: MessageBusDispatchComponentCaller;
+
+    constructor(component: Component<RegistryEventMap>, ctx?: { messageBus?: MessageBus, logger?: Logger }) {
+        this.direct = new DirectComponentCaller(component);
+        if (ctx?.messageBus) {
+            this.dispatcher = new MessageBusDispatchComponentCaller({
                 routing: RegistryTaskMessageBusRouting,
                 messageBus: ctx.messageBus,
-            }) :
-            new DirectComponentCaller(component);
+                logger: ctx.logger,
+            });
+        }
     }
 
     async call(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void> {
-        await this.caller.call(command, data, meta);
+        if (this.dispatcher && await this.dispatcher.dispatch(command, data, meta)) {
+            return;
+        }
+
+        await this.direct.call(command, data, meta);
     }
 }

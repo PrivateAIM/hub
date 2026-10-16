@@ -48,6 +48,17 @@ describe('RegistryComponentCaller', () => {
         expect(consumed[0].data).toEqual({ id: 'project-1' });
     });
 
+    it('should run the command in-process when the bus accepts it nowhere', async () => {
+        // memory driver with no consumer registered (yet): publish resolves false
+        const component = new FakeRegistryComponent();
+        const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
+
+        const caller = new RegistryComponentCaller(component, { messageBus });
+        await caller.call(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
+
+        expect(component.handled).toEqual([{ key: RegistryCommand.PROJECT_LINK, data: { id: 'project-1' } }]);
+    });
+
     it('should call the component directly without a message bus', async () => {
         const component = new FakeRegistryComponent();
 
