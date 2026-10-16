@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* the kit *Caller classes are renamed to *Dispatcher and their call* methods to dispatch* (e.g. AnalysisBuilderComponentCaller.callExecute -> AnalysisBuilderComponentDispatcher.dispatchExecute, BucketFileTaskCaller -> BucketFileTaskDispatcher, LogComponentCaller.callWrite -> LogComponentDispatcher.dispatchWrite), with no aliases. They extend hubwire's RemoteDispatcher: their options no longer take hooks and the inherited call() is dispatch(). server-kit removes createDispatchCallerLogHooks and renames createWorkerCallerLogHooks to createRemoteWorkerLogHooks. Consumers of the kits need hubwire installed instead of synergos.
+* hub caller subclasses (BucketComponentCaller, LogComponentCaller, AnalysisBuilderComponentCaller, ...) require `messageBus`; server-kit, server-core-worker-kit, server-storage-kit and server-telemetry-kit depend on synergos instead of ergos.
+* server-kit no longer exports Cache, CacheModule, CacheInjectionKey, CACHE_MODULE_NAME, buildCacheKey, CacheAdapter, MemoryCacheAdapter, RedisCacheAdapter, CacheSetOptions, CacheClearOptions or CacheKeyBuildOptions, and BaseApplicationBuilder.withCache() is gone.
+
+### Features
+
+* bucket uniqueness, transient worker retries, queue-only registry dispatch, dead routings and cache removal ([#1962](https://github.com/PrivateAIM/hub/issues/1962)) ([f9568e3](https://github.com/PrivateAIM/hub/commit/f9568e38374e0b56185d6b3b6d674e81edd49b6f))
+
+
+### Code Refactoring
+
+* components and message bus come from synergos ([#1965](https://github.com/PrivateAIM/hub/issues/1965)) ([dbbbbfb](https://github.com/PrivateAIM/hub/commit/dbbbbfb55bfdce82ee892cd15707b13eb88d75f9))
+* migrate from synergos to hubwire 0.2 ([#1968](https://github.com/PrivateAIM/hub/issues/1968)) ([a051e5f](https://github.com/PrivateAIM/hub/commit/a051e5ffddbdc7ccae58d119a0d92d93842d6e12))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/telemetry-kit bumped from ^0.18.0 to ^0.18.1
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/telemetry-kit bumped from ^0.18.0 to ^0.18.1
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.16.1...v0.18.0) (2026-10-15)
 
 
