@@ -10,7 +10,7 @@ import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
 import { VCTimeago } from '@vuecs/timeago';
 import type { TableColumn } from '@vuecs/table';
-import { REALM_MASTER_NAME, type Realm } from '@authup/core-kit';
+import type { Realm } from '@authup/core-kit';
 import { FDisplayName } from '@privateaim/client-vue';
 import { PermissionName } from '@authup/core-kit';
 import {
@@ -23,7 +23,7 @@ import {
     storeToRefs,
     usePermissionCheck,
 } from '@authup/client-web-kit';
-import { computed, resolveComponent } from 'vue';
+import { resolveComponent } from 'vue';
 import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
@@ -41,10 +41,7 @@ export default defineNuxtComponent({
     emits: ['deleted'],
     setup(props, { emit }) {
         const store = injectStore();
-        const {
-            realm,
-            realmManagementId,
-        } = storeToRefs(store);
+        const { realmManagementId } = storeToRefs(store);
 
         const handleDeleted = (e: Realm) => {
             emit('deleted', e);
@@ -52,8 +49,6 @@ export default defineNuxtComponent({
 
         const hasEditPermission = usePermissionCheck({ name: PermissionName.REALM_UPDATE });
         const hasDropPermission = usePermissionCheck({ name: PermissionName.REALM_DELETE });
-
-        const isMaster = computed(() => realm.value && realm.value.name === REALM_MASTER_NAME);
 
         const NuxtLink = resolveComponent('NuxtLink');
 
@@ -84,7 +79,6 @@ export default defineNuxtComponent({
         ];
 
         return {
-            isMaster,
             columns,
             hasEditPermission,
             hasDropPermission,
@@ -134,17 +128,15 @@ export default defineNuxtComponent({
                 </template>
                 <template #cell-options="{ row }">
                     <div class="flex items-center">
-                        <template v-if="isMaster">
-                            <VCButton
-                                v-if="realmManagementId !== row.id"
-                                size="xs"
-                                color="primary"
-                                class="me-1"
-                                @click.prevent="setRealmManagement(row)"
-                            >
-                                <VCIcon name="fa6-solid:check" />
-                            </VCButton>
-                        </template>
+                        <VCButton
+                            v-if="realmManagementId !== row.id"
+                            size="xs"
+                            color="primary"
+                            class="me-1"
+                            @click.prevent="setRealmManagement(row)"
+                        >
+                            <VCIcon name="fa6-solid:check" />
+                        </VCButton>
                         <VCButton
                             :as="NuxtLink"
                             :to="'/admin/realms/'+ row.id"

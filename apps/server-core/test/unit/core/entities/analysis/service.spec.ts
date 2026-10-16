@@ -40,8 +40,6 @@ import {
     FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
-    createNonMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeAnalysisRepository } from './fake-repository.ts';
@@ -181,7 +179,7 @@ describe('AnalysisService', () => {
                 nodeRealmId: 'realm-a',
             } as AnalysisNode);
 
-            const result = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+            const result = await service.getMany({}, createAllowAllActor('realm-a'));
 
             expect(result.data.map((e) => e.id).sort()).toEqual(['joined', 'own']);
             expect(result.meta.total).toBe(2);
@@ -196,7 +194,7 @@ describe('AnalysisService', () => {
         it('should return entity by ID', async () => {
             analysisRepository.seed(createFullAnalysis());
 
-            const result = await service.getOne('analysis-1', createNonMasterRealmActor('realm-1'));
+            const result = await service.getOne('analysis-1', createAllowAllActor('realm-1'));
             expect(result.id).toBe('analysis-1');
         });
 
@@ -207,14 +205,14 @@ describe('AnalysisService', () => {
         it('should answer an analysis out of reach like a missing one', async () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'realm-c' }));
 
-            await expect(service.getOne('analysis-1', createNonMasterRealmActor('realm-a')))
+            await expect(service.getOne('analysis-1', createAllowAllActor('realm-a')))
                 .rejects.toThrow(EntityNotFoundError);
         });
 
         it('should not let the master realm read beyond its grant', async () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'realm-c' }));
 
-            await expect(service.getOne('analysis-1', createMasterRealmActor('realm-master')))
+            await expect(service.getOne('analysis-1', createAllowAllActor('realm-master')))
                 .rejects.toThrow(EntityNotFoundError);
         });
     });

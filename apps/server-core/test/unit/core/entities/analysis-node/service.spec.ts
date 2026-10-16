@@ -28,7 +28,6 @@ import { createPermissionActor } from '../../helpers/index.ts';
 import {
     FakeEntityRepository,
     createAllowAllActor,
-    createNonMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeAnalysisNodeMetadataRecalculator } from './fake-metadata-recalculator.ts';
@@ -137,7 +136,7 @@ describe('AnalysisNodeService', () => {
                 }),
             ]);
 
-            const result = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+            const result = await service.getMany({}, createAllowAllActor('realm-a'));
 
             expect(result.data.map((e) => e.id).sort()).toEqual(['mine', 'peer']);
         });
@@ -165,7 +164,7 @@ describe('AnalysisNodeService', () => {
                 }),
             ]);
 
-            const actor = createNonMasterRealmActor('realm-a');
+            const actor = createAllowAllActor('realm-a');
             actor.identity = {
                 id: 'client-a',
                 type: 'client',

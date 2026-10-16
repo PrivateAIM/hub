@@ -22,7 +22,7 @@ import {
 } from 'vitest';
 import { AnalysisReachService } from '../../../../src/core/services/analysis-reach/index.ts';
 import type { AnalysisReachTarget } from '../../../../src/core/services/analysis-reach/index.ts';
-import { FakeEntityRepository, createDenyAllActor, createNonMasterRealmActor } from '@privateaim/server-test-kit';
+import { FakeEntityRepository, createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
@@ -74,7 +74,7 @@ describe('AnalysisReachService', () => {
     });
 
     it('should pre-gate the read one-of, every analysis write implying read', async () => {
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
 
         await service.resolve(actor, ANALYSIS);
 
@@ -94,21 +94,21 @@ describe('AnalysisReachService', () => {
     });
 
     it('should not narrow for a grant reaching every realm', async () => {
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
         actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
 
         await expect(service.resolve(actor, ANALYSIS)).resolves.toBeUndefined();
     });
 
     it('should match nothing when the grant reaches no realm, participation included', async () => {
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
         actor.permissionEvaluator.setCompileResult({ verdict: 'deny' });
 
         await expect(service.resolve(actor, ANALYSIS)).resolves.toEqual(inArray('id', []));
     });
 
     it('should OR a user\'s grant reach with the analyses its realm\'s nodes take part in', async () => {
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-a') });
 
         await expect(service.resolve(actor, ANALYSIS)).resolves.toEqual(or(
@@ -118,7 +118,7 @@ describe('AnalysisReachService', () => {
     });
 
     it('should fall back to the own realm for a grant policy that cannot lower', async () => {
-        const actor = createNonMasterRealmActor('realm-b');
+        const actor = createAllowAllActor('realm-b');
 
         await expect(service.resolve(actor, ANALYSIS)).resolves.toEqual(or(
             eq('realmId', 'realm-b'),
@@ -127,7 +127,7 @@ describe('AnalysisReachService', () => {
     });
 
     it('should narrow a related entity\'s own-realm fallback through its analysis', async () => {
-        const actor = createNonMasterRealmActor('realm-b');
+        const actor = createAllowAllActor('realm-b');
 
         await expect(service.resolve(actor, ANALYSIS_NODE)).resolves.toEqual(or(
             eq('analysis.realmId', 'realm-b'),
@@ -136,7 +136,7 @@ describe('AnalysisReachService', () => {
     });
 
     it('should re-root a grant policy onto the analysis relation of a related entity', async () => {
-        const actor = createNonMasterRealmActor('realm-b');
+        const actor = createAllowAllActor('realm-b');
         actor.permissionEvaluator.setCompileResult({
             verdict: 'conditional',
             condition: and(eq('realmId', 'realm-b'), eq('projectId', 'p-1')),
@@ -149,7 +149,7 @@ describe('AnalysisReachService', () => {
     });
 
     it('should never name a realm column, so authup can lower grant policies', async () => {
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
 
         await service.resolve(actor, ANALYSIS_NODE);
         await service.resolve(actor, ANALYSIS);
@@ -163,7 +163,7 @@ describe('AnalysisReachService', () => {
             approvalStatus: null,
         });
 
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-a') });
 
         // an-2 is pending, but a-2 stays reachable through an-3, which is approved.
@@ -188,7 +188,7 @@ describe('AnalysisReachService', () => {
     });
 
     it('should pre-gate and compile the given permission names', async () => {
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
 
         await service.resolve(actor, ANALYSIS, { names: [PermissionName.ANALYSIS_RESULT_READ] });
 
@@ -197,7 +197,7 @@ describe('AnalysisReachService', () => {
     });
 
     it('should leave participation out for grant-only reach', async () => {
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-a') });
 
         await expect(service.resolve(actor, ANALYSIS, { grantOnly: true })).resolves.toEqual(eq('realmId', 'realm-a'));
@@ -210,7 +210,7 @@ describe('AnalysisReachService', () => {
             realmId: 'realm-a',
         } as Node);
 
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
         actor.identity = {
             id: 'client-n-a1',
             type: 'client',
@@ -228,7 +228,7 @@ describe('AnalysisReachService', () => {
             realmId: 'realm-a',
         } as Node);
 
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
         actor.identity = {
             id: 'client-n-a1',
             type: 'client',
@@ -247,7 +247,7 @@ describe('AnalysisReachService', () => {
             realmId: 'realm-a',
         } as Node);
 
-        const actor = createNonMasterRealmActor('realm-b');
+        const actor = createAllowAllActor('realm-b');
         actor.identity = {
             id: 'client-n-b',
             type: 'client',
@@ -265,7 +265,7 @@ describe('AnalysisReachService', () => {
             realmId: 'realm-a',
         } as Analysis);
 
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
         actor.identity = {
             id: 'client-a-9',
             type: 'client',
@@ -294,7 +294,7 @@ describe('AnalysisReachService', () => {
     });
 
     it('should not let any other client participate through its realm', async () => {
-        const actor = createNonMasterRealmActor('realm-a');
+        const actor = createAllowAllActor('realm-a');
         actor.identity = {
             id: 'some-service',
             type: 'client',

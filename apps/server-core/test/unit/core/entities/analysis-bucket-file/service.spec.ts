@@ -31,8 +31,6 @@ import {
     FakePermissionEvaluator,
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
-    createNonMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
@@ -142,14 +140,14 @@ describe('AnalysisBucketFileService', () => {
 
     describe('create', () => {
         it('should stamp the analysis realm, not the actor realm', async () => {
-            const result = await service.create(createPayload(AnalysisBucketType.CODE), createMasterRealmActor());
+            const result = await service.create(createPayload(AnalysisBucketType.CODE), createAllowAllActor());
 
             expect(result.realmId).toBe(OWNER_REALM);
             expect(result.analysisId).toBe(analysis.id);
         });
 
         it('should let the owner realm add a code file', async () => {
-            const result = await service.create(createPayload(AnalysisBucketType.CODE), createNonMasterRealmActor(OWNER_REALM));
+            const result = await service.create(createPayload(AnalysisBucketType.CODE), createAllowAllActor(OWNER_REALM));
 
             expect(result.realmId).toBe(OWNER_REALM);
         });
@@ -170,7 +168,7 @@ describe('AnalysisBucketFileService', () => {
             analysis.configurationLocked = true;
 
             await expect(
-                service.create(createPayload(AnalysisBucketType.CODE), createMasterRealmActor()),
+                service.create(createPayload(AnalysisBucketType.CODE), createAllowAllActor()),
             ).rejects.toThrow(BadRequestError);
         });
 
@@ -183,7 +181,7 @@ describe('AnalysisBucketFileService', () => {
         it.each([AnalysisBucketType.RESULT, AnalysisBucketType.TEMP])('should let an approved node realm add a %s file', async (type) => {
             seedAnalysisNode(AnalysisNodeApprovalStatus.APPROVED);
 
-            const result = await service.create(createPayload(type), createNonMasterRealmActor(NODE_REALM));
+            const result = await service.create(createPayload(type), createAllowAllActor(NODE_REALM));
 
             expect(result.realmId).toBe(OWNER_REALM);
         });
@@ -192,12 +190,12 @@ describe('AnalysisBucketFileService', () => {
             seedAnalysisNode(null);
 
             await expect(
-                service.create(createPayload(type), createNonMasterRealmActor(NODE_REALM)),
+                service.create(createPayload(type), createAllowAllActor(NODE_REALM)),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should let the analysis client add a result file', async () => {
-            const actor = createNonMasterRealmActor(OWNER_REALM);
+            const actor = createAllowAllActor(OWNER_REALM);
             actor.identity = { id: randomUUID(), type: 'client' };
             analysis.clientId = actor.identity.id;
 
@@ -206,7 +204,7 @@ describe('AnalysisBucketFileService', () => {
         });
 
         it('should deny another client of the owner realm a result file', async () => {
-            const actor = createNonMasterRealmActor(OWNER_REALM);
+            const actor = createAllowAllActor(OWNER_REALM);
             actor.identity = { id: randomUUID(), type: 'client' };
             analysis.clientId = randomUUID();
 
@@ -217,19 +215,19 @@ describe('AnalysisBucketFileService', () => {
 
         it('should deny the owner realm a result file without node participation', async () => {
             await expect(
-                service.create(createPayload(AnalysisBucketType.RESULT), createNonMasterRealmActor(OWNER_REALM)),
+                service.create(createPayload(AnalysisBucketType.RESULT), createAllowAllActor(OWNER_REALM)),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should deny root on a result file to a non-participant before validating it', async () => {
             await expect(
-                service.create(createPayload(AnalysisBucketType.RESULT, true), createNonMasterRealmActor(NODE_REALM)),
+                service.create(createPayload(AnalysisBucketType.RESULT, true), createAllowAllActor(NODE_REALM)),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should reject a storage bucket other than the analysis bucket\'s', async () => {
             await expect(
-                service.create({ ...createPayload(AnalysisBucketType.CODE), bucketId: randomUUID() }, createMasterRealmActor()),
+                service.create({ ...createPayload(AnalysisBucketType.CODE), bucketId: randomUUID() }, createAllowAllActor()),
             ).rejects.toThrow(BadRequestError);
             expect(repository.getAll()).toHaveLength(0);
         });
@@ -264,7 +262,7 @@ describe('AnalysisBucketFileService', () => {
         it('should let the owner realm update a code file', async () => {
             const file = seedFile(AnalysisBucketType.CODE);
 
-            const result = await service.update(file.id, { root: true }, createNonMasterRealmActor(OWNER_REALM));
+            const result = await service.update(file.id, { root: true }, createAllowAllActor(OWNER_REALM));
             expect(result.root).toBe(true);
         });
 
@@ -301,7 +299,7 @@ describe('AnalysisBucketFileService', () => {
             analysis.configurationLocked = true;
 
             await expect(
-                service.update(file.id, { path: 'x.py' }, createMasterRealmActor()),
+                service.update(file.id, { path: 'x.py' }, createAllowAllActor()),
             ).rejects.toThrow(BadRequestError);
         });
 
@@ -309,7 +307,7 @@ describe('AnalysisBucketFileService', () => {
             const file = seedFile(AnalysisBucketType.RESULT);
 
             await expect(
-                service.update(file.id, { root: true }, createMasterRealmActor()),
+                service.update(file.id, { root: true }, createAllowAllActor()),
             ).rejects.toThrow(BadRequestError);
         });
 
@@ -317,7 +315,7 @@ describe('AnalysisBucketFileService', () => {
             const file = seedFile(AnalysisBucketType.TEMP);
 
             await expect(
-                service.update(file.id, { path: 'x.py' }, createNonMasterRealmActor(OWNER_REALM)),
+                service.update(file.id, { path: 'x.py' }, createAllowAllActor(OWNER_REALM)),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -336,7 +334,7 @@ describe('AnalysisBucketFileService', () => {
         it('should let the owner realm delete a code file', async () => {
             const file = seedFile(AnalysisBucketType.CODE);
 
-            await service.delete(file.id, createNonMasterRealmActor(OWNER_REALM));
+            await service.delete(file.id, createAllowAllActor(OWNER_REALM));
             expect(repository.getAll()).toHaveLength(0);
         });
 
@@ -361,7 +359,7 @@ describe('AnalysisBucketFileService', () => {
             analysis.configurationLocked = true;
 
             await expect(
-                service.delete(file.id, createMasterRealmActor()),
+                service.delete(file.id, createAllowAllActor()),
             ).rejects.toThrow(BadRequestError);
         });
 
@@ -369,7 +367,7 @@ describe('AnalysisBucketFileService', () => {
             const file = seedFile(AnalysisBucketType.RESULT);
             analysis.configurationLocked = true;
 
-            await service.delete(file.id, createNonMasterRealmActor(OWNER_REALM));
+            await service.delete(file.id, createAllowAllActor(OWNER_REALM));
             expect(repository.getAll()).toHaveLength(0);
         });
 
@@ -377,7 +375,7 @@ describe('AnalysisBucketFileService', () => {
             const file = seedFile(AnalysisBucketType.TEMP);
 
             await expect(
-                service.delete(file.id, createNonMasterRealmActor(OWNER_REALM)),
+                service.delete(file.id, createAllowAllActor(OWNER_REALM)),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -471,7 +469,7 @@ describe('AnalysisBucketFileService', () => {
         it('should not let a wider result read reach result files of analyses the actor cannot read', async () => {
             for (const type of Object.values(AnalysisBucketType)) seedFile(type);
 
-            const actor = createNonMasterRealmActor('realm-stranger');
+            const actor = createAllowAllActor('realm-stranger');
             actor.permissionEvaluator = new ResultAnyEvaluator();
 
             const { data } = await service.getMany({ include: 'analysis' }, actor);
@@ -479,7 +477,7 @@ describe('AnalysisBucketFileService', () => {
         });
 
         function nodeActor(holdsResultRead = true) {
-            const actor = createNonMasterRealmActor(NODE_REALM);
+            const actor = createAllowAllActor(NODE_REALM);
             if (!holdsResultRead) {
                 actor.permissionEvaluator.setBehavior(({ method, ctx }) => {
                     const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
@@ -534,7 +532,7 @@ describe('AnalysisBucketFileService', () => {
         it('should show nothing to a realm that neither owns nor takes part', async () => {
             for (const type of Object.values(AnalysisBucketType)) seedFile(type);
 
-            const { data } = await service.getMany({}, createNonMasterRealmActor('realm-stranger'));
+            const { data } = await service.getMany({}, createAllowAllActor('realm-stranger'));
             expect(data).toHaveLength(0);
         });
 

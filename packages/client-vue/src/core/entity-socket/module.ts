@@ -7,12 +7,13 @@
 
 import type { DomainEventFullName } from '@privateaim/kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
-import { EntityDefaultEventName, REALM_MASTER_NAME } from '@authup/core-kit';
+import { EntityDefaultEventName } from '@authup/core-kit';
 import type {
     DomainTypeMap,
 } from '@privateaim/core-kit';
 import {
     DomainEventSubscriptionName,
+    DomainType,
     buildDomainChannelName,
     buildDomainNamespaceName,
 } from '@privateaim/core-kit';
@@ -25,11 +26,41 @@ import {
     isRef, 
     onMounted, 
     onUnmounted, 
+    unref,
     watch,
 } from 'vue';
+import type { MaybeRef } from 'vue';
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
 import type { EntitySocket, EntitySocketContext } from './type';
 import { injectSocketManager, isSocketManagerUsable } from '../socket';
+
+/**
+ * Realm-less catalogs: their events are published to the global namespace only.
+ */
+const GLOBAL_NAMESPACE_TYPES: string[] = [
+    DomainType.MASTER_IMAGE,
+    DomainType.MASTER_IMAGE_GROUP,
+    DomainType.REGISTRY,
+    DomainType.REGISTRY_PROJECT,
+];
+
+/**
+ * The namespace to connect to: the global one (`undefined`) for a realm-less
+ * catalog, else the requested realm, else the current management realm. The
+ * global namespace needs a grant reaching every realm, and a list's realm ref
+ * is often empty, meaning "current".
+ */
+export function resolveEntitySocketRealmId(
+    type: string,
+    realmId: MaybeRef<string | undefined>,
+    managementRealmId: string | undefined,
+): string | undefined {
+    if (GLOBAL_NAMESPACE_TYPES.includes(type)) {
+        return undefined;
+    }
+
+    return unref(realmId) || managementRealmId;
+}
 
 export function createEntitySocket<
     TYPE extends keyof DomainTypeMap,
@@ -52,21 +83,7 @@ export function createEntitySocket<
     const store = injectStore();
     const storeRefs = storeToRefs(store);
 
-    const realmId = computed(() => {
-        if (storeRefs.realmName.value === REALM_MASTER_NAME) {
-            return undefined;
-        }
-
-        if (isRef(ctx.realmId)) {
-            return ctx.realmId.value;
-        }
-
-        if (ctx.realmId) {
-            return ctx.realmId;
-        }
-
-        return storeRefs.realmId.value;
-    });
+    const realmId = computed(() => resolveEntitySocketRealmId(ctx.type, ctx.realmId, storeRefs.realmManagementId.value));
 
     const targetId = computed(() => (isRef(ctx.targetId) ? ctx.targetId.value : ctx.targetId));
 
@@ -168,17 +185,22 @@ export function createEntitySocket<
     };
 
     let isActive = false;
+    // The namespace the active subscription lives in: realmId can change
+    // (management realm switch) while subscribed, and unsubscribe must leave
+    // the namespace it joined, not the recomputed one.
+    let activeRealmId : string | undefined;
     const subscribe = async () => {
         if ((ctx.target && !targetId.value) || isActive) {
             return;
         }
 
         isActive = true;
+        activeRealmId = realmId.value;
 
-        const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
+        const socket = await socketManager.connect(buildDomainNamespaceName(activeRealmId));
         let event : DomainEventFullName<string, DomainEventSubscriptionName> | undefined;
         if (ctx.buildSubscribeEventName) {
-            event = ctx.buildSubscribeEventName(realmId.value);
+            event = ctx.buildSubscribeEventName(activeRealmId);
         } else {
             event = buildDomainEventFullName(
                 ctx.type,
@@ -217,11 +239,11 @@ export function createEntitySocket<
 
         isActive = false;
 
-        const socket = await socketManager.connect(buildDomainNamespaceName(realmId.value));
+        const socket = await socketManager.connect(buildDomainNamespaceName(activeRealmId));
 
         let event : DomainEventFullName<string, DomainEventSubscriptionName>;
         if (ctx.buildUnsubscribeEventName) {
-            event = ctx.buildUnsubscribeEventName(realmId.value);
+            event = ctx.buildUnsubscribeEventName(activeRealmId);
         } else {
             event = buildDomainEventFullName(
                 ctx.type,
@@ -232,7 +254,7 @@ export function createEntitySocket<
         if (ctx.onCreated) {
             socket.off<any>(buildDomainEventFullName(
                 ctx.type,
-                EntityDefaultEventName.UPDATED,
+                EntityDefaultEventName.CREATED,
             ), handleCreated);
         }
 
@@ -263,8 +285,8 @@ export function createEntitySocket<
         return unsubscribe();
     });
 
-    watch(targetId, (val, oldValue) => {
-        if (val !== oldValue && isMounted) {
+    watch([targetId, realmId], ([val, realm], [oldValue, oldRealm]) => {
+        if ((val !== oldValue || realm !== oldRealm) && isMounted) {
             Promise.resolve()
                 .then(() => unsubscribe())
                 .then(() => subscribe());

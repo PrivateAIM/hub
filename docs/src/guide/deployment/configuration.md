@@ -466,6 +466,29 @@ Behaviour changes on top:
    `realm_scope: any`, and give roles that start builds or distributions
    `analysis_execution_start`.
 
+## Realtime and rate limiting follow `realm_scope`
+
+**Breaking for cross-realm users.** The last master-realm-by-name checks are gone.
+
+- **Realtime namespaces.** A socket connects to `/resources/<realmId>` (that
+  realm's events) or `/resources` (every realm's events). The own realm's
+  namespace is open. Another realm's namespace and the global one need a hub
+  grant at `realm_scope: any` with no policy.
+- **Realtime subscriptions** check the room's permissions against the
+  namespace: in a realm namespace a grant must reach that realm, in the global
+  namespace it must reach every realm. An `any` grant for one entity no longer
+  opens another entity's rooms.
+- **The UI** connects to the namespace of the realm a list asks for, else of
+  the current management realm (*Admin → Realms*, now offered on every realm).
+  Master images, master-image groups, registries and registry projects are
+  published to the global namespace only, so their lists update live only for
+  callers with an unbounded grant — as before, when only the master realm got
+  them. Before, every other user's connection was refused, so their lists
+  updated only on reload.
+- **The rate limiter** no longer throttles a client that holds **every** hub
+  permission at `realm_scope: any` with no policy (the `system` client). Being in the master
+  realm no longer exempts a client; users are always limited.
+
 ## Authup upgrade to beta.69
 
 Hub now requires Authup `1.0.0-beta.69`, a security release. Read the

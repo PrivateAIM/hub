@@ -20,7 +20,6 @@ import { BucketService } from '../../../../../src/core/entities/bucket/service.t
 import {
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeBucketCaller } from './fake-caller.ts';
@@ -137,7 +136,7 @@ describe('BucketService', () => {
         });
 
         it('should set realmId from actor when not provided', async () => {
-            const actor = createMasterRealmActor('my-realm');
+            const actor = createAllowAllActor('my-realm');
 
             await service.create({ name: 'new-bucket' }, actor);
 
@@ -205,7 +204,7 @@ describe('BucketService', () => {
             const bucket = createTestBucket();
             repository.seed(bucket);
 
-            const result = await service.update(bucket.id, {}, createMasterRealmActor());
+            const result = await service.update(bucket.id, {}, createAllowAllActor());
             expect(result.id).toBe(bucket.id);
         });
 
@@ -267,7 +266,7 @@ describe('BucketService', () => {
             const bucket = createTestBucket();
             repository.seed(bucket);
 
-            await service.update(bucket.id, {}, createMasterRealmActor());
+            await service.update(bucket.id, {}, createAllowAllActor());
 
             expect(storage.getMakeBucketCalls()).toHaveLength(1);
             expect(storage.getBuckets()).toHaveLength(1);
@@ -284,7 +283,7 @@ describe('BucketService', () => {
                 .replace(/[^a-z0-9]+$/g, '');
             storage.addBucket(bucketName);
 
-            await service.update(bucket.id, {}, createMasterRealmActor());
+            await service.update(bucket.id, {}, createAllowAllActor());
 
             expect(storage.getMakeBucketCalls()).toHaveLength(0);
             expect(storage.getBuckets()).toHaveLength(1);
@@ -296,7 +295,7 @@ describe('BucketService', () => {
             const bucket = createTestBucket();
             repository.seed(bucket);
 
-            const result = await service.delete(bucket.id, createMasterRealmActor());
+            const result = await service.delete(bucket.id, createAllowAllActor());
             expect(result.id).toBe(bucket.id);
             expect(caller.getDeleteCalls()).toHaveLength(1);
         });
@@ -349,7 +348,7 @@ describe('BucketService', () => {
             const bucket = createTestBucket();
             repository.seed(bucket);
 
-            const result = await service.clear(bucket.id, createMasterRealmActor());
+            const result = await service.clear(bucket.id, createAllowAllActor());
             expect(result.id).toBe(bucket.id);
             expect(caller.getClearCalls()).toEqual([bucket.id]);
             expect(caller.getDeleteCalls()).toHaveLength(0);

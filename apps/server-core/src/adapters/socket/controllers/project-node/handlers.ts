@@ -21,6 +21,7 @@ import {
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import { buildSocketSubscribeError } from '../../error.ts';
+import { assertSocketSubscribeReach } from '../../reach.ts';
 import type {
     Socket,
 } from '../../types.ts';
@@ -34,11 +35,9 @@ export function registerProjectNodeSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.PROJECT_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.PROJECT_APPROVE,
-                    ],
-                });
+                await assertSocketSubscribeReach(socket.data, [
+                    PermissionName.PROJECT_APPROVE,
+                ]);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));
@@ -77,11 +76,9 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainSubType.PROJECT_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.PROJECT_APPROVE,
-                    ],
-                });
+                await assertSocketSubscribeReach(socket.data, [
+                    PermissionName.PROJECT_APPROVE,
+                ]);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));
@@ -117,11 +114,9 @@ export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainSubType.PROJECT_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.PROJECT_UPDATE,
-                    ],
-                });
+                await assertSocketSubscribeReach(socket.data, [
+                    PermissionName.PROJECT_UPDATE,
+                ]);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));
