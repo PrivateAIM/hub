@@ -76,7 +76,8 @@ export async function uploadRequestFilesToBucket(
                             },
                             data: file,
                         },
-                        {},
+                        // one correlationId for every event of this command
+                        { correlationId: randomUUID() },
                         {
                             handle: async (childValue, childContext) => {
                                 await bucketFileEventDispatcher?.dispatch(

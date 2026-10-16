@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { randomUUID } from 'node:crypto';
 import {
     BucketFileCommand,
     BucketFileEvent,
@@ -28,7 +29,8 @@ export class BucketFileDispatcherAdapter implements IBucketFileDispatcher {
             this.component.handle(
                 BucketFileCommand.DELETE,
                 { id },
-                {},
+                // one correlationId for every event of this command
+                { correlationId: randomUUID() },
                 {
                     handle: async (childValue, childContext) => {
                         try {
