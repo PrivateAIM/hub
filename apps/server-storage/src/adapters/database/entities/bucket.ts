@@ -14,10 +14,13 @@ import {
     Entity,
     Index,
     PrimaryGeneratedColumn,
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 
 @Index(['refType', 'refId'])
+// one bucket per name and owning resource; ref-less buckets (NULL refs) stay unconstrained.
+@Unique(['refType', 'refId', 'name'])
 @Entity({ name: 'buckets' })
 export class BucketEntity implements Bucket {
     @PrimaryGeneratedColumn('uuid')

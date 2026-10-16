@@ -23,6 +23,7 @@ import {
     DockenGroupAttributesValidator,
     DockenImageAttributesValidator,
 } from './validators';
+import { isRetryableFailure } from '../../../helpers.ts';
 
 export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
     MasterImageSynchronizerEventMap,
@@ -48,6 +49,16 @@ export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(payload, context);
         } catch (e) {
+            if (isRetryableFailure(e, context.metadata)) {
+                this.logger?.warn({
+                    message: e,
+                    command: MasterImageSynchronizerCommand.EXECUTE,
+                    retry: true,
+                });
+
+                throw e;
+            }
+
             this.logger?.error({
                 message: e,
                 command: MasterImageSynchronizerCommand.EXECUTE,

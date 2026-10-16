@@ -21,7 +21,6 @@ import {
     FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeBucketFileCaller } from './fake-caller.ts';
@@ -88,7 +87,7 @@ describe('BucketFileService', () => {
             const file = createTestBucketFile();
             repository.seed(file);
 
-            const result = await service.delete(file.id, createMasterRealmActor());
+            const result = await service.delete(file.id, createAllowAllActor());
             expect(result.id).toBe(file.id);
             expect(caller.getDeleteCalls()).toHaveLength(1);
             expect(caller.getDeleteCalls()[0]).toBe(file.id);

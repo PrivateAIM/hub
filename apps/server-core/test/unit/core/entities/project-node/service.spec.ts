@@ -22,7 +22,6 @@ import { createPermissionActor } from '../../helpers/index.ts';
 import {
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeProjectRepository } from '../project/fake-repository.ts';
@@ -133,7 +132,7 @@ describe('ProjectNodeService', () => {
         it('should create with valid data', async () => {
             const result = await service.create(
                 { projectId, nodeId },
-                createMasterRealmActor('realm-1'),
+                createAllowAllActor('realm-1'),
             );
 
             expect(result.projectId).toBe(projectId);
@@ -144,7 +143,7 @@ describe('ProjectNodeService', () => {
         it('should set realm IDs from joined entities', async () => {
             const result = await service.create(
                 { projectId, nodeId },
-                createMasterRealmActor('realm-1'),
+                createAllowAllActor('realm-1'),
             );
 
             expect(result.projectRealmId).toBe('realm-1');
@@ -219,7 +218,7 @@ describe('ProjectNodeService', () => {
 
             const result = await approvalService.create(
                 { projectId, nodeId },
-                createMasterRealmActor('realm-1'),
+                createAllowAllActor('realm-1'),
             );
 
             expect(result.approvalStatus).toBe(ProjectNodeApprovalStatus.APPROVED);
@@ -243,7 +242,7 @@ describe('ProjectNodeService', () => {
 
             const result = await aggregatorService.create(
                 { projectId, nodeId },
-                createMasterRealmActor('realm-1'),
+                createAllowAllActor('realm-1'),
             );
 
             expect(result.approvalStatus).toBe(ProjectNodeApprovalStatus.APPROVED);
@@ -252,7 +251,7 @@ describe('ProjectNodeService', () => {
         it('should increment project nodes count', async () => {
             await service.create(
                 { projectId, nodeId },
-                createMasterRealmActor('realm-1'),
+                createAllowAllActor('realm-1'),
             );
 
             const project = await projectRepository.findOneBy({ id: projectId });
@@ -268,7 +267,7 @@ describe('ProjectNodeService', () => {
             const result = await service.update(
                 pn.id,
                 { approvalStatus: ProjectNodeApprovalStatus.APPROVED },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(result.approvalStatus).toBe(ProjectNodeApprovalStatus.APPROVED);
@@ -326,7 +325,7 @@ describe('ProjectNodeService', () => {
             });
             repository.seed(pn);
 
-            const result = await service.delete(pn.id, createMasterRealmActor());
+            const result = await service.delete(pn.id, createAllowAllActor());
             expect(result.id).toBe(pn.id);
             expect(repository.getAll()).toHaveLength(0);
         });
@@ -426,7 +425,7 @@ describe('ProjectNodeService', () => {
             });
             repository.seed(pn);
 
-            await service.delete(pn.id, createMasterRealmActor());
+            await service.delete(pn.id, createAllowAllActor());
 
             const updated = await projectRepository.findOneBy({ id: projectId });
             expect(updated!.nodes).toBe(2);

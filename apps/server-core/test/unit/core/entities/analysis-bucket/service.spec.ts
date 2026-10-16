@@ -27,8 +27,6 @@ import {
     FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
-    createNonMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
@@ -140,7 +138,7 @@ describe('AnalysisBucketService', () => {
                 approvalStatus: null,
             }));
 
-            const pending = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+            const pending = await service.getMany({}, createAllowAllActor('realm-a'));
             expect(pending.data.map((e) => e.id)).toEqual(['code']);
 
             await analysisNodeRepository.save({
@@ -148,7 +146,7 @@ describe('AnalysisBucketService', () => {
                 approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
             });
 
-            const approved = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+            const approved = await service.getMany({}, createAllowAllActor('realm-a'));
             expect(approved.data.map((e) => e.id).sort()).toEqual(['code', 'result', 'temp']);
         });
 
@@ -174,7 +172,7 @@ describe('AnalysisBucketService', () => {
                 }),
             ]);
 
-            const result = await service.getMany({}, createNonMasterRealmActor('realm-a'));
+            const result = await service.getMany({}, createAllowAllActor('realm-a'));
             expect(result.data.map((e) => e.id).sort()).toEqual(['code', 'result']);
         });
     });
@@ -184,7 +182,7 @@ describe('AnalysisBucketService', () => {
             const bucket = createTestAnalysisBucket({ id: 'ab-1' });
             repository.seed(bucket);
 
-            const result = await service.getOne('ab-1', createNonMasterRealmActor('realm-1'));
+            const result = await service.getOne('ab-1', createAllowAllActor('realm-1'));
             expect(result.id).toBe('ab-1');
         });
 
@@ -205,7 +203,7 @@ describe('AnalysisBucketService', () => {
                 approvalStatus: null,
             }));
 
-            await expect(service.getOne('result', createNonMasterRealmActor('realm-a'))).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('result', createAllowAllActor('realm-a'))).rejects.toThrow(EntityNotFoundError);
         });
     });
 
@@ -249,7 +247,7 @@ describe('AnalysisBucketService', () => {
                     bucketId: randomUUID(),
                     type: AnalysisBucketType.CODE,
                 },
-                createNonMasterRealmActor('realm-1'),
+                createAllowAllActor('realm-1'),
             );
 
             expect(result.realmId).toBe('realm-1');
@@ -313,7 +311,7 @@ describe('AnalysisBucketService', () => {
             const bucket = createTestAnalysisBucket();
             repository.seed(bucket);
 
-            const result = await service.update(bucket.id, {}, createMasterRealmActor());
+            const result = await service.update(bucket.id, {}, createAllowAllActor());
             expect(result.id).toBe(bucket.id);
         });
 
@@ -366,7 +364,7 @@ describe('AnalysisBucketService', () => {
             const bucket = createTestAnalysisBucket();
             repository.seed(bucket);
 
-            const result = await service.delete(bucket.id, createMasterRealmActor());
+            const result = await service.delete(bucket.id, createAllowAllActor());
             expect(result.id).toBe(bucket.id);
             expect(repository.getAll()).toHaveLength(0);
         });
@@ -402,7 +400,7 @@ describe('AnalysisBucketService', () => {
             analysisRepository.seed({ id: bucket.analysisId, configurationLocked: true } as Analysis);
 
             await expect(
-                service.delete(bucket.id, createMasterRealmActor()),
+                service.delete(bucket.id, createAllowAllActor()),
             ).rejects.toThrow(BadRequestError);
             expect(repository.getAll()).toHaveLength(1);
         });
@@ -412,7 +410,7 @@ describe('AnalysisBucketService', () => {
             repository.seed(bucket);
             analysisRepository.seed({ id: bucket.analysisId, configurationLocked: true } as Analysis);
 
-            await service.delete(bucket.id, createMasterRealmActor());
+            await service.delete(bucket.id, createAllowAllActor());
             expect(repository.getAll()).toHaveLength(0);
         });
 

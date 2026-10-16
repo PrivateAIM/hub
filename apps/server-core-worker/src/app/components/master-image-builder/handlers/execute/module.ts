@@ -25,6 +25,7 @@ import path from 'node:path';
 import tar from 'tar-fs';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
 import { buildDockerImageURL } from '../../../../../adapters/docker/index.ts';
+import { isRetryableFailure } from '../../../helpers.ts';
 
 export class MasterImageBuilderExecuteHandler implements ComponentHandler<
     MasterImageBuilderEventMap,
@@ -54,6 +55,16 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(payload, context);
         } catch (e) {
+            if (isRetryableFailure(e, context.metadata)) {
+                this.logger?.warn({
+                    message: e,
+                    command: MasterImageBuilderCommand.EXECUTE,
+                    retry: true,
+                });
+
+                throw e;
+            }
+
             this.logger?.error({
                 message: e,
                 command: MasterImageBuilderCommand.EXECUTE,

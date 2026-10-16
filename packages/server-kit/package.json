@@ -33,7 +33,6 @@
         "@authup/core-kit": "^1.0.0-beta.69",
         "@authup/specs": "^1.0.0-beta.69",
         "@hapic/oauth2": "^4.0.2",
-        "@isaacs/ttlcache": "^2.1.5",
         "@privateaim/errors": "^0.18.0",
         "@privateaim/kit": "^0.18.0",
         "@rapiq/core": "^2.4.0",

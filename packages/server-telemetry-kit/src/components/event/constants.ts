@@ -17,11 +17,6 @@ export enum EventCommand {
     CREATE = 'create',
 }
 
-export const EventEventMessageBusRouting = {
-    type: MessageRoutingType.PUB_SUB,
-    key: 'telemetryEventEvents',
-};
-
 export const EventTaskMessageBusRouting = {
     type: MessageRoutingType.WORK,
     key: 'telemetryEventTasks',

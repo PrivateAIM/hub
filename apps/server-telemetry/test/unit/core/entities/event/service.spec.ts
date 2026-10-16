@@ -22,7 +22,6 @@ import { FakeEventRepository } from './fake-repository.ts';
 import {
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 
@@ -181,7 +180,7 @@ describe('EventService', () => {
         });
 
         it('should set realmId from actor when not provided', async () => {
-            const actor = createMasterRealmActor('my-realm');
+            const actor = createAllowAllActor('my-realm');
 
             const result = await service.create(
                 {
@@ -273,7 +272,7 @@ describe('EventService', () => {
             const event = createTestEvent();
             repository.seed(event);
 
-            const result = await service.delete(event.id, createMasterRealmActor());
+            const result = await service.delete(event.id, createAllowAllActor());
             expect(result.id).toBe(event.id);
             expect(repository.getAll()).toHaveLength(0);
         });

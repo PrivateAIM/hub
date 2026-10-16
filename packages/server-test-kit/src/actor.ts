@@ -8,7 +8,6 @@
 import { randomUUID } from 'node:crypto';
 import type { PermissionCompileResult } from '@authup/access';
 import { BuiltInPolicyType, realmScopeMatches } from '@authup/access';
-import { REALM_MASTER_NAME } from '@authup/core-kit';
 import { PermissionDeniedError } from '@privateaim/errors';
 import { eq, or } from '@rapiq/core';
 import { FakePermissionEvaluator } from './fake-permission-evaluator.ts';
@@ -24,7 +23,7 @@ export function createAllowAllActor(realmId?: string): FakeActorContext {
     const id = realmId ?? randomUUID();
     return {
         permissionEvaluator: new FakePermissionEvaluator(),
-        realm: { id, name: REALM_MASTER_NAME },
+        realm: { id, name: 'test-realm' },
         identity: { id: randomUUID(), type: 'user' },
         metadata: {},
     };
@@ -34,26 +33,6 @@ export function createDenyAllActor(realmId?: string): FakeActorContext {
     const id = realmId ?? randomUUID();
     return {
         permissionEvaluator: createDenyingEvaluator(),
-        realm: { id, name: 'test-realm' },
-        identity: { id: randomUUID(), type: 'user' },
-        metadata: {},
-    };
-}
-
-export function createMasterRealmActor(realmId?: string): FakeActorContext {
-    const id = realmId ?? randomUUID();
-    return {
-        permissionEvaluator: new FakePermissionEvaluator(),
-        realm: { id, name: REALM_MASTER_NAME },
-        identity: { id: randomUUID(), type: 'user' },
-        metadata: {},
-    };
-}
-
-export function createNonMasterRealmActor(realmId?: string): FakeActorContext {
-    const id = realmId ?? randomUUID();
-    return {
-        permissionEvaluator: new FakePermissionEvaluator(),
         realm: { id, name: 'test-realm' },
         identity: { id: randomUUID(), type: 'user' },
         metadata: {},

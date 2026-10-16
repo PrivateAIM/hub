@@ -1,0 +1,125 @@
+/*
+ * Copyright (c) 2026.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import type {
+    ComponentStatus,
+    IComponent,
+    Message,
+} from 'synergos';
+import { MemoryMessageBusDriver, MessageBus, WorkerCaller } from 'synergos';
+import { describe, expect, it } from 'vitest';
+import { RegistryComponentCaller } from '../../../../../src/app/components/registry/caller/index.ts';
+import { RegistryCommand, RegistryTaskMessageBusRouting } from '../../../../../src/app/components/registry/constants.ts';
+import type { RegistryEventMap } from '../../../../../src/app/components/registry/type.ts';
+
+class FakeRegistryComponent implements IComponent<RegistryEventMap> {
+    readonly handled: { key: string, data: Record<string, any> }[] = [];
+
+    failing = false;
+
+    start(): Promise<void> {
+        return Promise.resolve();
+    }
+
+    stop(): Promise<void> {
+        return Promise.resolve();
+    }
+
+    status(): ComponentStatus {
+        return {};
+    }
+
+    async handle(key: string, data: Record<string, any>): Promise<void> {
+        if (this.failing) {
+            throw new Error('harbor unavailable');
+        }
+
+        this.handled.push({ key, data });
+    }
+}
+
+describe('RegistryComponentCaller', () => {
+    it('should only dispatch through the message bus when one is configured', async () => {
+        // The component must never run in-process here, not even first.
+        const component = new FakeRegistryComponent();
+
+        const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
+        const consumed: Message[] = [];
+        await messageBus.consumeAny(RegistryTaskMessageBusRouting, (message) => {
+            consumed.push(message);
+        });
+
+        const caller = new RegistryComponentCaller(component, { messageBus });
+        await caller.call(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
+
+        expect(component.handled).toEqual([]);
+        expect(consumed).toHaveLength(1);
+        expect(consumed[0]).toMatchObject({
+            type: RegistryCommand.PROJECT_LINK,
+            data: { id: 'project-1' },
+            metadata: { routing: RegistryTaskMessageBusRouting },
+        });
+    });
+
+    it('should reach the in-process worker caller over the memory driver (no AMQP)', async () => {
+        const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
+        const worker = new FakeRegistryComponent();
+        const workerCaller = new WorkerCaller(worker, {
+            consumeRouting: RegistryTaskMessageBusRouting,
+            messageBus,
+        });
+        await workerCaller.start();
+
+        // a different instance: the command must arrive through the bus
+        const component = new FakeRegistryComponent();
+        const caller = new RegistryComponentCaller(component, { messageBus });
+        await caller.call(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
+
+        expect(component.handled).toEqual([]);
+        expect(worker.handled).toEqual([{ key: RegistryCommand.PROJECT_LINK, data: { id: 'project-1' } }]);
+        await workerCaller.stop();
+    });
+
+    it('should run the command in-process when the bus accepts it nowhere', async () => {
+        // memory driver with no consumer registered (yet): publish resolves false
+        const component = new FakeRegistryComponent();
+        const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
+        const undelivered: Message[] = [];
+
+        const caller = new RegistryComponentCaller(component, {
+            messageBus,
+            hooks: {
+                onUndelivered: (message) => {
+                    undelivered.push(message);
+                },
+            },
+        });
+        await caller.call(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
+
+        expect(undelivered.map((message) => message.type)).toEqual([RegistryCommand.PROJECT_LINK]);
+        expect(component.handled).toEqual([{ key: RegistryCommand.PROJECT_LINK, data: { id: 'project-1' } }]);
+    });
+
+    it('should call the component directly without a message bus', async () => {
+        const component = new FakeRegistryComponent();
+
+        const caller = new RegistryComponentCaller(component);
+        await caller.call(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
+
+        expect(component.handled).toEqual([{ key: RegistryCommand.PROJECT_LINK, data: { id: 'project-1' } }]);
+    });
+
+    it('should surface a direct call failure without a message bus', async () => {
+        const component = new FakeRegistryComponent();
+        component.failing = true;
+
+        const caller = new RegistryComponentCaller(component);
+
+        await expect(caller.call(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {}))
+            .rejects.toThrow('harbor unavailable');
+    });
+});

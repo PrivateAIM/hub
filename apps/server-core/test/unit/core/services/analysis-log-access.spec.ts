@@ -22,7 +22,7 @@ import { AnalysisReachService } from '../../../../src/core/services/analysis-rea
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { FakeNodeRepository } from '../entities/node/fake-repository.ts';
-import { createDenyAllActor, createNonMasterRealmActor, createScopedActor } from '@privateaim/server-test-kit';
+import { createAllowAllActor, createDenyAllActor, createScopedActor } from '@privateaim/server-test-kit';
 import { createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
 const OWNER_REALM = randomUUID();
@@ -37,10 +37,10 @@ const APPROVED_NODE_CLIENT = randomUUID();
 const PENDING_NODE_CLIENT = randomUUID();
 
 function userOf(realmId: string): FakeActorContext {
-    return createNonMasterRealmActor(realmId);
+    return createAllowAllActor(realmId);
 }
 
-function clientOf(clientId: string, realmId: string, actor = createNonMasterRealmActor(realmId)): FakeActorContext {
+function clientOf(clientId: string, realmId: string, actor = createAllowAllActor(realmId)): FakeActorContext {
     actor.identity = {
         id: clientId,
         type: 'client',

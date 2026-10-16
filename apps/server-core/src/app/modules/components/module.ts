@@ -54,7 +54,7 @@ export class ComponentsModule implements IModule {
         const messageBus = container.resolve(MessageBusInjectionKey);
 
         // Create and register component callers
-        const registryComponentCaller = new RegistryComponentCaller({
+        const registryComponentCaller = new RegistryComponentCaller(registryComponent, {
             messageBus,
             hooks: createDispatchCallerLogHooks(logger),
         });

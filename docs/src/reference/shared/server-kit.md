@@ -105,7 +105,6 @@ class MyAppBuilder extends BaseApplicationBuilder {
 | `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `synergos` message bus; `createMessageBusLogHooks`, `createAmqpDriverLogHooks`, `createDispatchCallerLogHooks`, `createWorkerCallerLogHooks`, `createScheduledComponentLogHooks` — synergos `hooks` that log through a hub logger |
 | `redis` | Redis module and connection helpers |
 | `authup` | Authup authentication middleware module |
-| `cache` | Cache module (Redis-backed) |
 | `config` | Configuration reading via `envix` |
 | `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema`; `collectRootFilterValues()` — flattens an `and`-of-`eq` filter tree into label equalities for the log endpoints and rejects any other operator with a 400 |
 | `entity-event` | Entity event pub/sub system |
@@ -119,7 +118,6 @@ class MyAppBuilder extends BaseApplicationBuilder {
 | `RedisModule` | Redis client registration |
 | `MessageBusModule` | Registers the `synergos` message bus (AMQP or memory driver) with log hooks, closes it on teardown. `silentRoutings`: routings whose publishes are not logged |
 | `AuthupModule` | Authup middleware and token validation |
-| `CacheModule` | Redis-backed caching |
 | `EntityEventModule` | Domain event dispatching |
 
 ## Dependencies

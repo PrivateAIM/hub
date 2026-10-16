@@ -11,6 +11,7 @@ import { createFakeClient } from '@privateaim/core-http-kit/testing';
 import type { Client as DockerClient } from 'docken';
 import type { AnalysisDistributorCheckPayload } from '@privateaim/server-core-worker-kit';
 import { AnalysisDistributorCommand, AnalysisDistributorEvent } from '@privateaim/server-core-worker-kit';
+import { MESSAGE_BUS_MAX_ATTEMPTS } from '@privateaim/server-kit';
 import { describe, expect, it } from 'vitest';
 import { AnalysisDistributorCheckHandler } from '../../../../src/app/components/analysis-distributor/handlers/check/module';
 import { FakeComponentHandlerContext } from '../fakes/fake-component-handler-context';
@@ -85,8 +86,9 @@ function createHandler(coreClient: ICoreClient, docker: FakeDockerClient) {
     });
 }
 
-function run(coreClient: ICoreClient, docker: FakeDockerClient) {
+function run(coreClient: ICoreClient, docker: FakeDockerClient, attempt?: number) {
     const context = new FakeComponentHandlerContext(AnalysisDistributorCommand.CHECK);
+    context.metadata.attempt = attempt;
 
     return createHandler(coreClient, docker)
         .handle(PAYLOAD, context)
@@ -224,13 +226,19 @@ describe('AnalysisDistributorCheckHandler', () => {
         expect(context.lastEvent().payload.status).toBe(ProcessStatus.STARTED);
     });
 
-    it('should fail the check when docker itself is unreachable', async () => {
+    it('should leave a check to the message bus retry when docker itself is unreachable', async () => {
+        const docker = new FakeDockerClient({ distributionError: new FakeDockerError(500, 'daemon down') });
+
+        await expect(run(createCoreClient(), docker)).rejects.toThrow('daemon down');
+    });
+
+    it('should fail the check on the last attempt when docker itself is unreachable', async () => {
         // Anything but a missing-image response means the image state is
         // unknown, so no verdict may be made — it must propagate, not be
         // silently downgraded to FAILED.
         const coreClient = createCoreClient();
         const docker = new FakeDockerClient({ distributionError: new FakeDockerError(500, 'daemon down') });
-        const context = await run(coreClient, docker);
+        const context = await run(coreClient, docker, MESSAGE_BUS_MAX_ATTEMPTS);
 
         expect(context.lastEvent().event).toBe(AnalysisDistributorEvent.CHECK_FAILED);
         expect(context.eventsOf(AnalysisDistributorEvent.CHECK_FINISHED)).toHaveLength(0);

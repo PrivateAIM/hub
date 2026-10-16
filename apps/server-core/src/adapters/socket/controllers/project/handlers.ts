@@ -20,6 +20,7 @@ import {
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import { buildSocketSubscribeError } from '../../error.ts';
+import { assertSocketSubscribeReach } from '../../reach.ts';
 import type {
     Socket,
 } from '../../types.ts';
@@ -31,12 +32,10 @@ export function registerProjectSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.PROJECT_DELETE,
-                        PermissionName.PROJECT_UPDATE,
-                    ],
-                });
+                await assertSocketSubscribeReach(socket.data, [
+                    PermissionName.PROJECT_DELETE,
+                    PermissionName.PROJECT_UPDATE,
+                ]);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));

@@ -37,7 +37,11 @@ export function buildRecordPolicyData(reach: RecordReach): PolicyData {
  * Throws a permission error (403) unless a grant of `name` (any of, for an
  * array) reaches the record's realm and satisfies its policies.
  */
-export async function assertRecordReach(actor: ActorContext, name: string | string[], reach: RecordReach): Promise<void> {
+export async function assertRecordReach(
+    actor: Pick<ActorContext, 'permissionEvaluator'>,
+    name: string | string[],
+    reach: RecordReach,
+): Promise<void> {
     const data = buildRecordPolicyData(reach);
 
     if (Array.isArray(name)) {
@@ -72,7 +76,10 @@ export async function reachesRecord(actor: ActorContext, name: string | string[]
  * role and the `system` client hold. It replaces "is a master-realm member".
  * Fail-closed: a policy-bearing `any` grant compiles to `conditional`.
  */
-export async function hasUnboundedReach(actor: ActorContext, name: string | string[]): Promise<boolean> {
+export async function hasUnboundedReach(
+    actor: Pick<ActorContext, 'permissionEvaluator'>,
+    name: string | string[],
+): Promise<boolean> {
     try {
         const result = await actor.permissionEvaluator.compile({ name });
         return result.verdict === 'allow';

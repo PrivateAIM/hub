@@ -16,9 +16,7 @@ import {
 } from '@privateaim/server-kit';
 import { WorkerCaller } from 'synergos';
 import {
-    EventEventMessageBusRouting,
     EventTaskMessageBusRouting,
-    LogEventMessageBusRouting,
     LogTaskMessageBusRouting,
 } from '@privateaim/server-telemetry-kit';
 import type { LogStore } from '../../../core/services/log-store/types.ts';
@@ -58,7 +56,6 @@ export class ComponentsModule implements IModule {
                 new EventComponent({ logger, retentionDays: config.eventRetentionDays }),
                 {
                     consumeRouting: EventTaskMessageBusRouting,
-                    publishRouting: EventEventMessageBusRouting,
                     messageBus,
                     hooks,
                 },
@@ -67,7 +64,6 @@ export class ComponentsModule implements IModule {
                 new LogComponent({ logStore, logger }),
                 {
                     consumeRouting: LogTaskMessageBusRouting,
-                    publishRouting: LogEventMessageBusRouting,
                     messageBus,
                     hooks,
                 },

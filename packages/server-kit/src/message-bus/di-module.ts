@@ -13,7 +13,12 @@ import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../config/constants';
 import { LOGGER_MODULE_NAME, LoggerInjectionKey } from '../logger/constants';
 import { createAmqpDriverLogHooks, createMessageBusLogHooks } from './hooks';
-import { MESSAGE_BUS_MODULE_NAME, MESSAGE_BUS_TOPIC_EXCHANGE, MessageBusInjectionKey } from './constants';
+import {
+    MESSAGE_BUS_MAX_ATTEMPTS,
+    MESSAGE_BUS_MODULE_NAME,
+    MESSAGE_BUS_TOPIC_EXCHANGE,
+    MessageBusInjectionKey,
+} from './constants';
 import type { MessageBusModuleOptions } from './types';
 
 /**
@@ -55,6 +60,8 @@ export class MessageBusModule implements IModule {
                     connectionString,
                     hooks: logger ? createAmqpDriverLogHooks(logger) : undefined,
                     defaultTopicExchange: MESSAGE_BUS_TOPIC_EXCHANGE,
+                    // explicit, not the driver default: worker handlers read it to spot the last attempt
+                    maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS,
                 });
             } else {
                 driver = new MemoryMessageBusDriver();

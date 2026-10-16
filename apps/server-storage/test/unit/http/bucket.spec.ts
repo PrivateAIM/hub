@@ -18,7 +18,8 @@ import type { Readable } from 'node:stream';
 import type { ComponentHandlerContext } from 'synergos';
 import type { BucketComponentEventMap } from '@privateaim/server-storage-kit';
 import { BucketCommand, BucketEvent } from '@privateaim/server-storage-kit';
-import { createAdminAuthorizationHeader } from '@privateaim/server-test-kit';
+import { PermissionName } from '@privateaim/kit';
+import { createAdminAuthorizationHeader, createRestrictedAccessToken } from '@privateaim/server-test-kit';
 import {
     createTestSuite,
 } from '../../utils/index.ts';
@@ -26,6 +27,8 @@ import { createTestBucket } from '../../utils/domains/index.ts';
 import { toBucketName } from '../../../src/core/utils/bucket-name.ts';
 import type { IStorageAdapter } from '../../../src/core/storage/types.ts';
 import { BucketClearHandler } from '../../../src/app/components/bucket/handlers/clear/index.ts';
+import { BucketCreateHandler } from '../../../src/app/components/bucket/handlers/create/index.ts';
+import { RacingBucketCreateHandler } from './racing-bucket-create-handler.ts';
 
 /**
  * Delegates to a real adapter, but fails one operation like an unreachable backend.
@@ -135,6 +138,101 @@ describe('bucket HTTP endpoints', () => {
             expect(body.data.region).toBe('us-east');
             expect(body.data.createdAt).toBeDefined();
             expect(body.data.updatedAt).toBeDefined();
+        });
+
+        it('should reject a refId on HTTP creates', async () => {
+            const response = await fetch(`${getBaseURL()}/buckets`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: authorization,
+                },
+                body: JSON.stringify(createTestBucket({ refType: 'analysis', refId: crypto.randomUUID() })),
+            });
+
+            expect(response.status).toBe(400);
+        });
+
+        it('should reuse the bucket of a repeated bus create with the same ref and name', async () => {
+            const input = createTestBucket({ refType: 'analysis', refId: crypto.randomUUID() });
+            const finished: string[] = [];
+            const handler = new BucketCreateHandler({ storage: suite.storage() });
+            const handle = () => handler.handle({ ...input }, {
+                key: BucketCommand.CREATE,
+                metadata: {},
+                handle: async (...event) => {
+                    if (event[0] === BucketEvent.CREATION_FINISHED) {
+                        finished.push(event[1].id);
+                    }
+                },
+            });
+
+            await handle();
+            await handle();
+
+            expect(finished).toHaveLength(2);
+            expect(finished[1]).toBe(finished[0]);
+        });
+
+        it('should resolve a create that lost the unique race to the existing bucket', async () => {
+            const input = createTestBucket({
+                refType: 'analysis',
+                refId: crypto.randomUUID(),
+                realmId: crypto.randomUUID(),
+            });
+            const finished: string[] = [];
+            const handle = (handler: BucketCreateHandler) => handler.handle({ ...input }, {
+                key: BucketCommand.CREATE,
+                metadata: {},
+                handle: async (...event) => {
+                    if (event[0] === BucketEvent.CREATION_FINISHED) {
+                        finished.push(event[1].id);
+                    }
+                },
+            });
+
+            await handle(new BucketCreateHandler({ storage: suite.storage() }));
+            await handle(new RacingBucketCreateHandler({ storage: suite.storage() }));
+
+            expect(finished).toHaveLength(2);
+            expect(finished[1]).toBe(finished[0]);
+        });
+
+        it('should record the actor of a bus create from the command', async () => {
+            const actorId = crypto.randomUUID();
+            let created: Record<string, any> | undefined;
+            const handler = new BucketCreateHandler({ storage: suite.storage() });
+            await handler.handle({
+                ...createTestBucket(),
+                actorId,
+                actorType: 'client',
+            }, {
+                key: BucketCommand.CREATE,
+                metadata: {},
+                handle: async (...event) => {
+                    if (event[0] === BucketEvent.CREATION_FINISHED) {
+                        created = event[1];
+                    }
+                },
+            });
+
+            expect(created).toMatchObject({ actorId, actorType: 'client' });
+        });
+
+        it('should not dedupe ref-less buckets by name', async () => {
+            const input = createTestBucket();
+            const create = () => fetch(`${getBaseURL()}/buckets`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: authorization,
+                },
+                body: JSON.stringify(input),
+            }).then((response) => response.json());
+
+            const first = await create();
+            const second = await create();
+            expect(first.data.id).not.toBe(second.data.id);
         });
     });
 
@@ -418,6 +516,99 @@ describe('bucket HTTP endpoints', () => {
             });
 
             expect(response.status).toBeGreaterThanOrEqual(400);
+        });
+    });
+
+    describe('ownership', () => {
+        const request = (token: string, method: string, url: string, body?: Record<string, any>) => fetch(`${getBaseURL()}${url}`, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: body ? JSON.stringify(body) : undefined,
+        });
+
+        it('should let the creator, and only the creator, delete a bucket without BUCKET_DELETE', async () => {
+            const creator = await createRestrictedAccessToken([PermissionName.BUCKET_CREATE]);
+            const other = await createRestrictedAccessToken([PermissionName.BUCKET_CREATE]);
+            const spoofed = crypto.randomUUID();
+
+            // the actor comes from the token, never from the body
+            const created = await request(creator, 'POST', '/buckets', {
+                ...createTestBucket(),
+                actorId: spoofed,
+                actorType: 'client',
+            });
+            expect(created.status).toBe(201);
+            const { data: bucket } = await created.json();
+            expect(bucket.actorType).toBe('user');
+            expect(bucket.actorId).toBeTruthy();
+            expect(bucket.actorId).not.toBe(spoofed);
+
+            expect((await request(other, 'DELETE', `/buckets/${bucket.id}`)).status).toBe(403);
+            expect((await request(creator, 'DELETE', `/buckets/${bucket.id}`)).status).toBe(202);
+        });
+
+        describe('upload', () => {
+            const upload = async (token: string, id: string) => {
+                const formData = new FormData();
+                formData.append('file[0]', new Blob([await fs.promises.readFile(path.join(import.meta.dirname, '../../data/file.json'))]), `${crypto.randomUUID()}.json`);
+
+                return fetch(`${getBaseURL()}/buckets/${id}/upload`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${token}` },
+                    body: formData,
+                });
+            };
+
+            const countFiles = async (id: string) => {
+                const { meta } = await suite.client().bucketFile.getMany({ filters: { bucketId: id } });
+                return meta.total;
+            };
+
+            let refLessBucketId: string;
+
+            beforeAll(async () => {
+                const creator = await createRestrictedAccessToken([PermissionName.BUCKET_CREATE]);
+                const created = await request(creator, 'POST', '/buckets', createTestBucket());
+                expect(created.status).toBe(201);
+                refLessBucketId = (await created.json()).data.id;
+
+                expect((await upload(creator, refLessBucketId)).status).toBe(201);
+            });
+
+            it('should deny a non-owner without BUCKET_UPDATE before storing anything', async () => {
+                const before = await countFiles(refLessBucketId);
+                const other = await createRestrictedAccessToken([PermissionName.BUCKET_CREATE]);
+
+                expect((await upload(other, refLessBucketId)).status).toBe(403);
+                expect(await countFiles(refLessBucketId)).toBe(before);
+            });
+
+            it('should let a BUCKET_UPDATE holder of the bucket realm upload', async () => {
+                const updater = await createRestrictedAccessToken([PermissionName.BUCKET_UPDATE]);
+
+                expect((await upload(updater, refLessBucketId)).status).toBe(201);
+            });
+
+            it('should leave uploads to a bucket with a ref to the owning service', async () => {
+                let bucketId: string | undefined;
+                const handler = new BucketCreateHandler({ storage: suite.storage() });
+                await handler.handle(createTestBucket({ refType: 'analysis', refId: crypto.randomUUID() }), {
+                    key: BucketCommand.CREATE,
+                    metadata: {},
+                    handle: async (...event) => {
+                        if (event[0] === BucketEvent.CREATION_FINISHED) {
+                            bucketId = event[1].id;
+                        }
+                    },
+                });
+                expect(bucketId).toBeDefined();
+
+                const stranger = await createRestrictedAccessToken();
+                expect((await upload(stranger, bucketId!)).status).toBe(201);
+            });
         });
     });
 });

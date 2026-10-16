@@ -105,7 +105,9 @@ export function createDispatchCallerLogHooks(logger: Logger): DispatchCallerHook
 export function createWorkerCallerLogHooks(logger: Logger): WorkerCallerHooks {
     return {
         onUnrouted(key) {
-            logger.warn(`Event ${key} could not be handled: no routing to publish it to.`);
+            // no publish routing means no one subscribes to the component's events
+            // (e.g. telemetry event/log ingestion), so dropping is expected
+            logger.debug(`Event ${key} could not be handled: no routing to publish it to.`);
         },
     };
 }

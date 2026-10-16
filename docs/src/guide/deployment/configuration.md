@@ -30,6 +30,30 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   by side, a failing command may be retried more often than 5 times, because
   each version only reads its own counter, but it is never retried forever and
   never dropped early. No particular upgrade order is needed for this.
+- **The worker retries only failures that can go away on their own.** A
+  connection error, a 5xx/429 from the core or storage API, GitHub or the
+  registry, or an unreachable or failing docker daemon is retried as above, and
+  the analysis keeps its `started` status meanwhile. Anything else — a broken
+  Dockerfile step, a 4xx, a missing registry — fails the build, distribution or
+  check right away, as before. A retryable failure that persists through the 5th
+  attempt is meant to be reported as failed, not dropped. Currently the worker
+  cannot see the attempt counter, so such a failure is retried and then dropped;
+  an analysis is then failed by the stale check below, a master-image build is not. Only a worker that dies on every
+  attempt leaves a build or distribution `started`; server-core fails it once it
+  is 15 minutes stale (see below). An error docker reports inside a build or push
+  stream (e.g. a registry 503 during push) counts as permanent.
+- **Harbor registry commands go through the `registryCommands` queue** (project
+  link/relink/unlink, registry setup/cleanup/delete, webhook processing). They
+  used to run inside server-core's request first and reach the queue only if that
+  call threw. They are now only queued and run by the registry consumer, which
+  retries a command that throws. The Harbor handlers still log a Harbor error and
+  give up rather than throw, so a Harbor outage leaves the project unlinked, as
+  before, until the next link (e.g. a node or registry project update). A node's
+  robot account and registry credentials appear shortly after the node is
+  created rather than with the response. Renaming a registry project's
+  `externalName` is one relink command, so its unlink of the old Harbor project
+  and its link of the new one cannot run out of order. Without a message bus, or
+  when no consumer accepted the command, server-core still runs them in-process.
 - **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
   build.** A command is acknowledged only once its handler finishes. If a build
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the
@@ -77,6 +101,18 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   minutes as `failed`. A new worker with an old server-core is safe: it reports
   a stuck process as still running, so it stays stuck until server-core is
   upgraded too.
+- **Analysis buckets are deduplicated on upgrade.** server-core now allows one
+  analysis bucket per analysis and type, and server-storage one bucket per
+  `(refType, refId, name)`. Their migrations clean up duplicates a repeated or
+  concurrent bucket create may have left: server-core keeps the oldest link per
+  analysis and type and deletes the newer ones (with their file rows), and
+  server-storage clears `refType`/`refId` on every newer duplicate bucket. No
+  storage bucket or file is deleted; a bucket whose link was dropped stays in
+  server-storage as a ref-less orphan, which an operator can delete with
+  `DELETE /buckets/:id`. A repeated bucket create command now answers with the
+  existing bucket instead of creating another. `POST /buckets` no longer accepts
+  a `refId` (400): only the service owning the referenced resource sets it, over
+  the bus.
 - A lost broker connection is retried every 5 seconds (it was 60).
 - **Registry commands go through the queue.** Linking, unlinking or relinking a
   project in Harbor, registry setup, cleanup and deletion, and Harbor webhook
@@ -219,6 +255,16 @@ against the analysis's realm, not the caller's:
 - Result files are updated and deleted by the analysis realm with
   `analysis_update`; temp files only by a caller whose `analysis_update` reaches
   every realm.
+
+## Uploading into a bucket requires ownership or `bucket_update`
+
+**Breaking for API clients.** `POST /buckets/:id/upload` into a bucket created
+over HTTP (one without a `refId`) answers 403 unless the caller created the
+bucket or holds `bucket_update` with access to the bucket's realm. Previously
+any authenticated caller could upload into any bucket. Buckets created before
+the creator was recorded have no owner, so only `bucket_update` holders can
+upload into them. Analysis buckets (which carry a `refId`) are unchanged: their
+uploads are still checked by server-core when it registers them.
 
 ## Reading nodes, master images, registries, registry projects and events requires `*_read`
 
@@ -436,6 +482,29 @@ Behaviour changes on top:
 2. Give every role that must write in other realms its permissions at
    `realm_scope: any`, and give roles that start builds or distributions
    `analysis_execution_start`.
+
+## Realtime and rate limiting follow `realm_scope`
+
+**Breaking for cross-realm users.** The last master-realm-by-name checks are gone.
+
+- **Realtime namespaces.** A socket connects to `/resources/<realmId>` (that
+  realm's events) or `/resources` (every realm's events). The own realm's
+  namespace is open. Another realm's namespace and the global one need a hub
+  grant at `realm_scope: any` with no policy.
+- **Realtime subscriptions** check the room's permissions against the
+  namespace: in a realm namespace a grant must reach that realm, in the global
+  namespace it must reach every realm. An `any` grant for one entity no longer
+  opens another entity's rooms.
+- **The UI** connects to the namespace of the realm a list asks for, else of
+  the current management realm (*Admin → Realms*, now offered on every realm).
+  Master images, master-image groups, registries and registry projects are
+  published to the global namespace only, so their lists update live only for
+  callers with an unbounded grant — as before, when only the master realm got
+  them. Before, every other user's connection was refused, so their lists
+  updated only on reload.
+- **The rate limiter** no longer throttles a client that holds **every** hub
+  permission at `realm_scope: any` with no policy (the `system` client). Being in the master
+  realm no longer exempts a client; users are always limited.
 
 ## Authup upgrade to beta.69
 

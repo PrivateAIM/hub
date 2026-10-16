@@ -244,7 +244,7 @@ TypeORM subscribers in `adapters/database/subscribers/` (grouped by domain: `ana
 
 AMQP consumers are wired via two DI modules:
 - **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregators depend only on core services and repository ports (resolved from `AnalysisInjectionKey` / `DatabaseInjectionKey`), never on a `DataSource`: the worker status rules (event → status transition, `isProcessStatusTerminal`, `isCheckVerdictStale`) live in core as `AnalysisBuilder.applyEvent` / `AnalysisDistributor.applyEvent` / `MasterImageBuilderService.applyEvent`, while the storage-bucket and authup handlers keep their orchestration in app over the ports. Storage-bucket replies are correlated by the bucket itself (`refType`/`refId` + `parseAnalysisBucketName(name)`), not by a task store.
-- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container: a `DispatchCaller` on `registryCommands`, queue-only (plan 018 F17), so with AMQP a registry command runs on whichever replica consumes that queue, not inside the HTTP request. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor). Both modules start their components fire-and-forget; `teardown()` awaits those starts, then `stop()`s each.
+- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container: with a message bus it only dispatches to the `registryCommands` queue (the registry consumer runs it; a throwing command is retried, but the Harbor handlers log and swallow Harbor errors), and calls the component in-process only when there is no bus or the bus accepted the command nowhere (memory driver before the registry consumer subscribed). It publishes through `IMessageBus.publish` itself, since synergos's `DispatchCaller.call()` does not report acceptance. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor). Both modules start their components fire-and-forget; `teardown()` awaits those starts, then `stop()`s each.
 
 **The bus is synergos's `MessageBus`.** server-kit's `MessageBusModule` always registers one,
 typed `IMessageBus`, under `MessageBusInjectionKey`: with `@synergos/amqp`'s `AmqpMessageBusDriver`
@@ -255,7 +255,7 @@ Callers require a bus, so every module that builds one declares the `messageBus`
 `message-bus/hooks.ts` factories, and `silentRoutings` (server-telemetry-kit's
 `TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS`) keeps the publish of a log line or audit event out of
 the log. WORK routings are
-retried by amqp-extension (counter in the `x-attempt` header, 5 attempts, exponential backoff
+retried by amqp-extension (counter in the `x-attempt` header, `MESSAGE_BUS_MAX_ATTEMPTS` = 5 attempts, exponential backoff
 capped at 30s, then dropped) with an in-process redelivery guard; delivery is at-least-once.
 Hub-specific policy stays in hub: the routings, `ordered` reply queues and the exchange name.
 
@@ -442,6 +442,15 @@ Background worker executing Docker containers. No database entities — purely q
 - `CoreClientModule` — sets up core API client via `setCoreClient()`
 - `StorageClientModule` — sets up storage API client via `setStorageClient()`
 - `ComponentsModule` — starts all 4 worker components (analysis-builder, analysis-distributor, master-image-builder, master-image-synchronizer)
+
+**Failure classification:** every check/execute handler rethrows a failure for which
+`isRetryableFailure(e, context.metadata)` (`app/components/helpers.ts`) holds — a transient
+error (`isTransientError`: hapic network error or 5xx/429, dockerode `statusCode` ≥ 500, node
+socket codes, `ENOENT` only on `connect`) before the last attempt (`metadata.attempt` <
+`MESSAGE_BUS_MAX_ATTEMPTS` from server-kit) — so the AMQP driver retries it; everything else
+emits `*_FAILED`. A permanent error misread as transient costs only the backoff. The
+distributor keeps the local analysis image while a retry is pending (it re-tags from it) and
+removes it otherwise. Errors inside a docker build/push stream are permanent.
 
 **Entry point:** Uses `src/index.ts` with `dotenv/config` directly (no citty CLI).
 

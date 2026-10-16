@@ -18,11 +18,6 @@ export enum LogCommand {
     WRITE = 'write',
 }
 
-export const LogEventMessageBusRouting = {
-    type: MessageRoutingType.PUB_SUB,
-    key: 'telemetryLogEvents',
-};
-
 export const LogTaskMessageBusRouting = {
     type: MessageRoutingType.WORK,
     key: 'telemetryLogTasks',

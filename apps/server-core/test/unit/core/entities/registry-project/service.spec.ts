@@ -23,7 +23,6 @@ import {
     FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeRegistryManager } from '../node/fake-registry-manager.ts';
@@ -415,7 +414,7 @@ describe('RegistryProjectService', () => {
             const result = await service.update(
                 project.id,
                 { name: 'updated-project' },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(result.name).toBe('updated-project');
@@ -470,18 +469,19 @@ describe('RegistryProjectService', () => {
             expect(names).toEqual(['test-project', 'updated-project']);
         });
 
-        it('should relink with one command when externalName changes', async () => {
+        it('should relink with the previous externalName when it changes', async () => {
             const project = createTestRegistryProject({ externalName: 'old-name' });
             repository.seed(project);
 
             await service.update(
                 project.id,
                 { externalName: 'new-name' },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
-            // one command, so its unlink and link can not run on two replicas at once
+            // one command, so its unlink cannot run after its link on another consumer.
             expect(registryManager.getRelinkCalls()).toHaveLength(1);
+            expect(registryManager.getRelinkCalls()[0]).toMatchObject({ id: project.id, externalName: 'old-name' });
             expect(registryManager.getUnlinkCalls()).toHaveLength(0);
             expect(registryManager.getLinkCalls()).toHaveLength(0);
         });
@@ -493,7 +493,7 @@ describe('RegistryProjectService', () => {
             await service.update(
                 project.id,
                 { name: 'updated' },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(registryManager.getUnlinkCalls()).toHaveLength(0);
@@ -506,7 +506,7 @@ describe('RegistryProjectService', () => {
             const project = createTestRegistryProject();
             repository.seed(project);
 
-            const result = await service.delete(project.id, createMasterRealmActor());
+            const result = await service.delete(project.id, createAllowAllActor());
             expect(result.id).toBe(project.id);
             expect(repository.getAll()).toHaveLength(0);
         });
@@ -540,7 +540,7 @@ describe('RegistryProjectService', () => {
             const project = createTestRegistryProject();
             repository.seed(project);
 
-            await service.delete(project.id, createMasterRealmActor());
+            await service.delete(project.id, createAllowAllActor());
 
             expect(registryManager.getUnlinkCalls()).toHaveLength(1);
         });

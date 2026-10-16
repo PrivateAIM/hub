@@ -34,7 +34,7 @@ import {
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
 import { createBuildContext, generateDockerFileContent } from '../../helpers';
-import { startHeartbeat } from '../../../helpers.ts';
+import { isRetryableFailure, startHeartbeat } from '../../../helpers.ts';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -78,6 +78,19 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 heartbeat.touch();
             });
         } catch (e) {
+            if (isRetryableFailure(e, context.metadata)) {
+                this.logger?.warn({
+                    message: e,
+                    command: AnalysisBuilderCommand.EXECUTE,
+                    analysisId: value.id,
+                    [LogFlag.REF_ID]: value.id,
+                    retry: true,
+                });
+
+                // no image cleanup: the retry builds the same tag again.
+                throw e;
+            }
+
             this.logger?.error({
                 message: e,
                 command: AnalysisBuilderCommand.EXECUTE,

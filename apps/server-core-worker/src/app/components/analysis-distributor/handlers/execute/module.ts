@@ -26,10 +26,11 @@ import { waitForStream } from 'docken';
 import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
+    cleanupDockerImage,
     cleanupDockerImages,
 } from '../../../../../adapters/docker/index.ts';
 import { BuilderError } from '../../../analysis-builder/error';
-import { startHeartbeat } from '../../../helpers.ts';
+import { isRetryableFailure, startHeartbeat } from '../../../helpers.ts';
 
 export class AnalysisDistributorExecuteHandler implements ComponentHandler<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -69,6 +70,18 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
                 heartbeat.touch();
             });
         } catch (e) {
+            if (isRetryableFailure(e, context.metadata)) {
+                this.logger?.warn({
+                    message: e,
+                    command: AnalysisDistributorCommand.EXECUTE,
+                    analysisId: value.id,
+                    [LogFlag.REF_ID]: value.id,
+                    retry: true,
+                });
+
+                throw e;
+            }
+
             this.logger?.error({
                 message: e,
                 command: AnalysisDistributorCommand.EXECUTE,
@@ -129,6 +142,32 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         // -----------------------------------------------------------------------------------
 
+        try {
+            await this.distribute(analysis, nodes, registry, context, onProgress);
+        } catch (e) {
+            // a retry tags and pushes from the local image again, so it stays.
+            if (!isRetryableFailure(e, context.metadata)) {
+                await cleanupDockerImage(this.docker, this.buildImageTag(analysis));
+            }
+
+            throw e;
+        }
+
+        await cleanupDockerImage(this.docker, this.buildImageTag(analysis));
+
+        await context.handle(
+            AnalysisDistributorEvent.EXECUTION_FINISHED,
+            value,
+        );
+    }
+
+    protected async distribute(
+        analysis: Analysis,
+        nodes: Node[],
+        registry: Registry,
+        context: ComponentHandlerContext<AnalysisDistributorEventMap, AnalysisDistributorCommand.EXECUTE>,
+        onProgress?: (progress: Progress) => void,
+    ): Promise<void> {
         let tags : string[];
 
         try {
@@ -180,11 +219,6 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
             throw e;
         }
-
-        await context.handle(
-            AnalysisDistributorEvent.EXECUTION_FINISHED,
-            value,
-        );
     }
 
     protected async tagImage(
@@ -236,8 +270,6 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
             await cleanupDockerImages(this.docker, tags);
 
             throw e;
-        } finally {
-            await image.remove({ force: true });
         }
 
         this.logger?.info({

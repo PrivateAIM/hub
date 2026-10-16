@@ -264,9 +264,9 @@ Generic test fakes shared across all services live in `packages/server-test-kit/
 - `FakeEntityRepository<T>` — In-memory `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
 - `FakePermissionEvaluator` — authup's `IPermissionEvaluator` fake, re-exported from `@authup/server-test-kit`: public call arrays (`preEvaluateCalls`, `preEvaluateOneOfCalls`, `evaluateCalls`, `evaluateOneOfCalls`, `compileCalls`), `setBehavior` / `deny` / `denyAll`, `compile()` defaulting to `post`
 - `FakeActorContext` — `ActorContext` whose `permissionEvaluator` is the fake, so specs read the call arrays without a cast
-- `createAllowAllActor()` — `FakeActorContext` with master realm that permits all operations
-- `createDenyAllActor()` — `FakeActorContext` with non-master realm whose evaluator throws `PermissionDeniedError`
-- `createMasterRealmActor()` / `createNonMasterRealmActor()` — Realm-specific actor factories
+- `createAllowAllActor()` — `FakeActorContext` that permits all operations
+- `createDenyAllActor()` — `FakeActorContext` whose evaluator throws `PermissionDeniedError`
+- `createScopedActor({ realmScope })` — `FakeActorContext` whose grants carry a `realm_scope`, enforced via authup's `realmScopeMatches` (use it for realm denials; the other factories allow everything)
 
 ### Test directory layout (domain-grouped)
 
@@ -465,7 +465,7 @@ Existing fakes to reuse:
 - `FakeEntityRepository<T>` — `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`
 - `FakePermissionEvaluator` (from `@authup/server-test-kit`) — call arrays + `setBehavior`/`deny`/`denyAll`; the hub deny factory passes `PermissionDeniedError` to `denyAll`, since authup's default is `PermissionError.denied`
 - `createAllowAllActor()` / `createDenyAllActor()` — `FakeActorContext` fakes for permission testing
-- `createMasterRealmActor()` / `createNonMasterRealmActor()` — realm-scoped actor fakes
+- `createScopedActor({ realmScope })` — realm-scoped actor fake (`realmMatch` enforced, `compile()` lowered per scope)
 - `createFakeAuthupClient({ handlers, fallback, baseURL })` / `FakeAuthupClient` — a REAL `AuthupClient` on a `MemoryTransport`, with `requests` and `fakeAuthupResponse(status, body)`. Use this for anything talking to authup. Deliberately **not** `@authup/core-http-kit/testing`'s `createFakeClient`: that one overrides `request()` and hard-codes a 200, so it can never drive the `isClientErrorWithStatusCode(e, 404)` branches that `AnalysisClientService` and `NodeClientService` depend on.
 
 **HTTP clients (`@privateaim/<kit>/testing`)** — see [Transport-level FakeClient](#transport-level-fakeclient):

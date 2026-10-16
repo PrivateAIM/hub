@@ -25,4 +25,5 @@ export interface IBucketService {
     update(id: string, data: Partial<Bucket>, actor: ActorContext): Promise<Bucket>;
     delete(id: string, actor: ActorContext): Promise<Bucket>;
     clear(id: string, actor: ActorContext): Promise<Bucket>;
+    checkUploadAccess(entity: Bucket, actor: ActorContext): Promise<void>;
 }
