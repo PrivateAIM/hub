@@ -39,7 +39,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/buckets` | List buckets |
-| `POST` | `/buckets` | Create bucket |
+| `POST` | `/buckets` | Create bucket (no `refId`, see below) |
 | `GET` | `/buckets/:id` | Get bucket |
 | `POST` | `/buckets/:id` | Update bucket |
 | `DELETE` | `/buckets/:id` | Delete bucket |
@@ -51,6 +51,26 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `DELETE` | `/bucket-files/:id` | Delete file |
 | `GET` | `/bucket-files/:id/stream` | Stream file contents |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
+
+A bucket with a `refType` **and** `refId` is unique per `(refType, refId, name)`. Only the service
+owning the referenced resource sets a `refId`, through the `create` bus command; `POST /buckets` with
+a `refId` answers 400, since storage cannot check who owns the referenced resource. A repeated bus
+create of a triple that already exists in the same realm answers with the existing bucket instead of
+a second one; the same triple in another realm fails. Buckets without a ref are not deduplicated: they
+may share a name.
+
+A bucket records its creator (`actorId`/`actorType`): for `POST /buckets` the authenticated identity
+(an actor in the body is ignored), for a bus create the actor named in the command. The creator may
+update, clear and delete the bucket, and delete its files, without `bucket_update`/`bucket_delete`;
+everyone else needs the permission and realm access. Buckets created before this was fixed carry no
+actor and are not backfilled, so only permission holders can manage them.
+
+Uploading (`POST /buckets/:id/upload`) into a bucket **without** a `refId` requires being its creator,
+or `bucket_update` with realm access; anyone else gets 403 before a file is stored. A bucket **with**
+a `refId` (e.g. an analysis bucket) accepts uploads from any authenticated caller, because its
+legitimate uploaders span realms and storage cannot evaluate the referencing service's permissions:
+the owning service checks each upload when it registers it (see
+[Writing analysis buckets and files](/guide/deployment/configuration#writing-analysis-buckets-and-files-requires-analysis-update)).
 
 ## Response Shapes
 

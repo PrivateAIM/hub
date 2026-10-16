@@ -50,7 +50,7 @@ export class ComponentsModule implements IModule {
         const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
         // Create and register component callers
-        const registryComponentCaller = new RegistryComponentCaller(registryComponent, { messageBus });
+        const registryComponentCaller = new RegistryComponentCaller(registryComponent, { messageBus, logger });
         container.register(ComponentsInjectionKey.RegistryComponentCaller, { useValue: registryComponentCaller });
 
         // Start task consumers and background components

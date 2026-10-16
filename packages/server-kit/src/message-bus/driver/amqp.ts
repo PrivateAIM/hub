@@ -8,7 +8,7 @@
 import { Client, ExchangeType } from 'amqp-extension';
 import type { QueueOptions } from 'amqp-extension';
 import type { Logger } from '../../logger';
-import { MessageBusRoutingType } from '../constants';
+import { MESSAGE_BUS_MAX_ATTEMPTS, MessageBusRoutingType } from '../constants';
 import { isMessageBusPayload } from '../helpers';
 import type { MessageBusPayload, MessageBusRouting } from '../types';
 import type { IMessageBusDriver } from './types';
@@ -17,7 +17,8 @@ export type AmqpMessageBusDriverOptions = {
     connectionString: string,
     logger?: Logger,
     /**
-     * Delivery attempts of a WORK message before it is dropped (default: 5).
+     * Delivery attempts of a WORK message before it is dropped
+     * (default: MESSAGE_BUS_MAX_ATTEMPTS).
      */
     maxAttempts?: number,
     /**
@@ -68,7 +69,7 @@ export class AmqpMessageBusDriver implements IMessageBusDriver {
     constructor(options: AmqpMessageBusDriverOptions) {
         this.connectionString = options.connectionString;
         this.logger = options.logger;
-        this.maxAttempts = options.maxAttempts ?? 5;
+        this.maxAttempts = options.maxAttempts ?? MESSAGE_BUS_MAX_ATTEMPTS;
         this.retryDelay = options.retryDelay ?? 1000;
     }
 

@@ -705,7 +705,7 @@ app/modules/<name>/
 - **Injection keys** use `TypedToken<T>` from `eldin` — one constant per token, co-located with the module that registers it
 - **Types/interfaces** always live in `types.ts`, never inline in `module.ts`
 - **Module names** are string constants in `ModuleName` enum (`packages/server-kit/src/services/module-names.ts`)
-- **Shared modules** (logger, redis, amqp, authup, cache, entity-event, queue-router) live in `packages/server-kit/src/services/<name>/`
+- **Shared modules** (logger, redis, amqp, authup, entity-event, queue-router) live in `packages/server-kit/src/services/<name>/`
 - **Per-service modules** (database, minio, victoria-logs, etc.) live in `apps/<service>/src/app/modules/<name>/`
 - Each service has `app/builder.ts` (`ServiceXApplicationBuilder extends BaseApplicationBuilder`) with `withConfig()`, `withDatabase()`, `withHTTP()`
 - Each service has `app/factory.ts` with `createApplication()` using the builder

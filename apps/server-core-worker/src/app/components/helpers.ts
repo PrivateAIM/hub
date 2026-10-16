@@ -5,8 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Logger } from '@privateaim/server-kit';
-import { ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS, ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS } from './constants';
+import type { ComponentMetadata, Logger } from '@privateaim/server-kit';
+import { MESSAGE_BUS_MAX_ATTEMPTS } from '@privateaim/server-kit';
+import { isClientError } from 'hapic';
+import {
+    ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS,
+    ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS,
+    TRANSIENT_ERROR_CODES,
+} from './constants';
 import type { Heartbeat } from './types';
 
 /**
@@ -43,4 +49,56 @@ export function startHeartbeat(
         },
         stop: () => clearInterval(timer),
     };
+}
+
+/**
+ * Whether a failure may go away on its own, so the same command is worth
+ * running again: the request never reached its target (socket errors, the
+ * docker daemon down) or the target answered 5xx/429 — core/storage/GitHub
+ * through hapic, the docker daemon through dockerode (`statusCode`).
+ * Everything else (4xx, a failing Dockerfile step, validation) is permanent.
+ *
+ * ponytail: errors docker reports INSIDE a build/push stream (`errorDetail`,
+ * e.g. a registry 503 on push or a base-image pull) are plain errors and so
+ * permanent; their text is the only signal and is not parsed.
+ */
+export function isTransientError(error: unknown): boolean {
+    if (isClientError(error)) {
+        if (!error.response) {
+            return true;
+        }
+
+        return error.response.status >= 500 || error.response.status === 429;
+    }
+
+    if (!(error instanceof Error)) {
+        return false;
+    }
+
+    if ('statusCode' in error && typeof error.statusCode === 'number') {
+        return error.statusCode >= 500;
+    }
+
+    if ('code' in error && typeof error.code === 'string') {
+        // ENOENT is only the daemon socket when connecting, else a missing file.
+        if (error.code === 'ENOENT') {
+            return 'syscall' in error && error.syscall === 'connect';
+        }
+
+        return TRANSIENT_ERROR_CODES.includes(error.code);
+    }
+
+    return false;
+}
+
+/**
+ * Rethrow (the message bus retries it with backoff) instead of reporting
+ * `*_FAILED`: only a transient error, and never on the last delivery attempt,
+ * so a failure that outlasts the retries is still reported, not dropped.
+ * A permanent error misread as transient therefore costs only the backoff.
+ */
+export function isRetryableFailure(error: unknown, metadata: ComponentMetadata): boolean {
+    const attempt = typeof metadata.attempt === 'number' ? metadata.attempt : 1;
+
+    return attempt < MESSAGE_BUS_MAX_ATTEMPTS && isTransientError(error);
 }

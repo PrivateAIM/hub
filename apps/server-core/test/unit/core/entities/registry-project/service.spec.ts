@@ -470,7 +470,7 @@ describe('RegistryProjectService', () => {
             expect(names).toEqual(['test-project', 'updated-project']);
         });
 
-        it('should unlink and relink when externalName changes', async () => {
+        it('should relink with the previous externalName when it changes', async () => {
             const project = createTestRegistryProject({ externalName: 'old-name' });
             repository.seed(project);
 
@@ -480,8 +480,11 @@ describe('RegistryProjectService', () => {
                 createMasterRealmActor(),
             );
 
-            expect(registryManager.getUnlinkCalls()).toHaveLength(1);
-            expect(registryManager.getLinkCalls()).toHaveLength(1);
+            // one command, so its unlink cannot run after its link on another consumer.
+            expect(registryManager.getRelinkCalls()).toHaveLength(1);
+            expect(registryManager.getRelinkCalls()[0]).toMatchObject({ id: project.id, externalName: 'old-name' });
+            expect(registryManager.getUnlinkCalls()).toHaveLength(0);
+            expect(registryManager.getLinkCalls()).toHaveLength(0);
         });
 
         it('should only link (not unlink) when externalName does not change', async () => {

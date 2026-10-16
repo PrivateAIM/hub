@@ -25,6 +25,28 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   backoff (1s, 2s, 4s, 8s). An exhausted command is dropped with an error log
   line naming its type and id. Before this, a redelivered command was dropped
   silently after its first attempt.
+- **The worker retries only failures that can go away on their own.** A
+  connection error, a 5xx/429 from the core or storage API, GitHub or the
+  registry, or an unreachable or failing docker daemon is retried as above, and
+  the analysis keeps its `started` status meanwhile. Anything else — a broken
+  Dockerfile step, a 4xx, a missing registry — fails the build, distribution or
+  check right away, as before. A retryable failure that persists through the 5th
+  attempt is reported as failed, not dropped. Only a worker that dies on every
+  attempt leaves a build or distribution `started`; server-core fails it once it
+  is 15 minutes stale (see below). An error docker reports inside a build or push
+  stream (e.g. a registry 503 during push) counts as permanent.
+- **Harbor registry commands go through the `registryCommands` queue** (project
+  link/relink/unlink, registry setup/cleanup/delete, webhook processing). They
+  used to run inside server-core's request first and reach the queue only if that
+  call threw. They are now only queued and run by the registry consumer, which
+  retries a command that throws. The Harbor handlers still log a Harbor error and
+  give up rather than throw, so a Harbor outage leaves the project unlinked, as
+  before, until the next link (e.g. a node or registry project update). A node's
+  robot account and registry credentials appear shortly after the node is
+  created rather than with the response. Renaming a registry project's
+  `externalName` is one relink command, so its unlink of the old Harbor project
+  and its link of the new one cannot run out of order. Without a message bus,
+  server-core still runs them in-process.
 - **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
   build.** A command is acknowledged only once its handler finishes. If a build
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the
@@ -72,6 +94,18 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   minutes as `failed`. A new worker with an old server-core is safe: it reports
   a stuck process as still running, so it stays stuck until server-core is
   upgraded too.
+- **Analysis buckets are deduplicated on upgrade.** server-core now allows one
+  analysis bucket per analysis and type, and server-storage one bucket per
+  `(refType, refId, name)`. Their migrations clean up duplicates a repeated or
+  concurrent bucket create may have left: server-core keeps the oldest link per
+  analysis and type and deletes the newer ones (with their file rows), and
+  server-storage clears `refType`/`refId` on every newer duplicate bucket. No
+  storage bucket or file is deleted; a bucket whose link was dropped stays in
+  server-storage as a ref-less orphan, which an operator can delete with
+  `DELETE /buckets/:id`. A repeated bucket create command now answers with the
+  existing bucket instead of creating another. `POST /buckets` no longer accepts
+  a `refId` (400): only the service owning the referenced resource sets it, over
+  the bus.
 - A lost broker connection is retried every 5 seconds (it was 60).
 - Failure events carry the error's `name`, `message` and `code` instead of `{}`.
 
@@ -204,6 +238,16 @@ against the analysis's realm, not the caller's:
 - Result files are updated and deleted by the analysis realm with
   `analysis_update`; temp files only by a caller whose `analysis_update` reaches
   every realm.
+
+## Uploading into a bucket requires ownership or `bucket_update`
+
+**Breaking for API clients.** `POST /buckets/:id/upload` into a bucket created
+over HTTP (one without a `refId`) answers 403 unless the caller created the
+bucket or holds `bucket_update` with access to the bucket's realm. Previously
+any authenticated caller could upload into any bucket. Buckets created before
+the creator was recorded have no owner, so only `bucket_update` holders can
+upload into them. Analysis buckets (which carry a `refId`) are unchanged: their
+uploads are still checked by server-core when it registers them.
 
 ## Reading nodes, master images, registries, registry projects and events requires `*_read`
 

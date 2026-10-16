@@ -11,7 +11,6 @@ import type { AuthupHookModuleOptions } from '../authup/client-hook/di-module';
 import { AuthupHookModule } from '../authup/client-hook/di-module';
 import type { AuthupClientModuleOptions } from '../authup/client/di-module';
 import { AuthupClientModule } from '../authup/client/di-module';
-import { CacheModule } from '../cache/di-module';
 import type { EntityEventModuleOptions } from '../entity-event/di-module';
 import { EntityEventModule } from '../entity-event/di-module';
 import type { LoggerModuleOptions } from '../logger/di-module';
@@ -34,7 +33,6 @@ export class BaseApplicationBuilder {
     withRedis(options?: RedisModuleOptions | false): this {
         if (options !== false) {
             this.modules.push(new RedisModule(options));
-            this.modules.push(new CacheModule());
         }
         return this;
     }
@@ -57,11 +55,6 @@ export class BaseApplicationBuilder {
         if (options !== false) {
             this.modules.push(new AuthupClientModule(options));
         }
-        return this;
-    }
-
-    withCache(): this {
-        this.modules.push(new CacheModule());
         return this;
     }
 

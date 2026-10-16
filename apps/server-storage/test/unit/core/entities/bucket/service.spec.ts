@@ -109,6 +109,18 @@ describe('BucketService', () => {
             expect(caller.getCreateCalls()[0].actorType).toBe('user');
         });
 
+        it('should reject a refId, which only the owning service sets over the bus', async () => {
+            await expect(service.create(
+                {
+                    name: 'new-bucket', 
+                    refType: 'analysis', 
+                    refId: randomUUID(), 
+                },
+                createAllowAllActor('realm-1'),
+            )).rejects.toThrow(BadRequestError);
+            expect(caller.getCreateCalls()).toHaveLength(0);
+        });
+
         it('should throw PermissionDeniedError when actor lacks permission', async () => {
             await expect(
                 service.create({ name: 'new-bucket' }, createDenyAllActor()),
@@ -163,24 +175,6 @@ describe('BucketService', () => {
             );
 
             expect(caller.getCreateCalls()[0].realmId).toBe(realmId);
-        });
-
-        it('should delegate to caller with both refType and refId set', async () => {
-            const actor = createAllowAllActor('realm-1');
-            const refId = randomUUID();
-
-            await service.create(
-                {
-                    name: 'new-bucket', 
-                    refType: 'analysis', 
-                    refId, 
-                },
-                actor,
-            );
-
-            const call = caller.getCreateCalls()[0];
-            expect(call.refType).toBe('analysis');
-            expect(call.refId).toBe(refId);
         });
 
         it('should delegate to caller with only refType set', async () => {
@@ -411,6 +405,53 @@ describe('BucketService', () => {
 
             expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_DELETE);
             expect(caller.getClearCalls()).toEqual([bucket.id]);
+        });
+    });
+
+    describe('checkUploadAccess', () => {
+        it('should let the owner upload without BUCKET_UPDATE', async () => {
+            const actor = createDenyAllActor();
+            const bucket = createTestBucket({
+                actorId: actor.identity!.id,
+                actorType: 'user',
+                realmId: 'other-realm',
+            });
+
+            await expect(service.checkUploadAccess(bucket, actor)).resolves.toBeUndefined();
+        });
+
+        it('should deny a non-owner without BUCKET_UPDATE', async () => {
+            await expect(
+                service.checkUploadAccess(createTestBucket(), createDenyAllActor()),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should let a BUCKET_UPDATE holder of the bucket realm upload', async () => {
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+
+            await expect(service.checkUploadAccess(createTestBucket({ realmId: 'realm-1' }), actor)).resolves.toBeUndefined();
+            expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_UPDATE);
+        });
+
+        it('should deny an own-scoped BUCKET_UPDATE holder of another realm', async () => {
+            await expect(
+                service.checkUploadAccess(
+                    createTestBucket({ realmId: 'other-realm' }),
+                    createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
+                ),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should leave a bucket with a ref to the owning service', async () => {
+            const bucket = createTestBucket({ refType: 'analysis', refId: randomUUID() });
+
+            await expect(service.checkUploadAccess(bucket, createDenyAllActor())).resolves.toBeUndefined();
+        });
+
+        it('should gate a bucket with only a refType like a ref-less one', async () => {
+            await expect(
+                service.checkUploadAccess(createTestBucket({ refType: 'analysis' }), createDenyAllActor()),
+            ).rejects.toThrow(PermissionDeniedError);
         });
     });
 });

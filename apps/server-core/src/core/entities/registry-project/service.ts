@@ -207,8 +207,8 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
                 validated.externalName &&
                 previousExternalName !== validated.externalName
             ) {
-                await this.registryManager.unlinkProject(saved);
-                await this.registryManager.linkProject(saved.id);
+                // one command: separate unlink + link messages could run out of order.
+                await this.registryManager.relinkProject({ ...saved, externalName: previousExternalName });
             } else {
                 await this.registryManager.linkProject(saved.id);
             }

@@ -31,13 +31,25 @@ export class MessageBusDispatchComponentCaller<
         type: K & string,
         ...payload: ComponentCallerPayload<EventMap[K]>
     ): Promise<void> {
+        await this.dispatch(type, ...payload);
+    }
+
+    /**
+     * Like call(), but resolves whether the bus accepted the message: false
+     * when there is no bus or no consumer took it (memory driver), so a caller
+     * that must not lose a command can run it another way.
+     */
+    async dispatch<K extends keyof EventMap>(
+        type: K & string,
+        ...payload: ComponentCallerPayload<EventMap[K]>
+    ): Promise<boolean> {
         const [data, metadata] = payload;
 
         if (!this.messageBus) {
             if (this.logger) {
                 this.logger.warn(`Can not publish ${type} event.`);
             }
-            return;
+            return false;
         }
 
         const published = await this.messageBus.publish(
@@ -55,5 +67,7 @@ export class MessageBusDispatchComponentCaller<
         if (!published && this.logger) {
             this.logger.warn(`Message ${type} in ${this.options.routing.key} was not delivered to any consumer.`);
         }
+
+        return published;
     }
 }

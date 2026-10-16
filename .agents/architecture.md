@@ -244,7 +244,7 @@ TypeORM subscribers in `adapters/database/subscribers/` (grouped by domain: `ana
 
 AMQP consumers are wired via two DI modules:
 - **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregators depend only on core services and repository ports (resolved from `AnalysisInjectionKey` / `DatabaseInjectionKey`), never on a `DataSource`: the worker status rules (event → status transition, `isProcessStatusTerminal`, `isCheckVerdictStale`) live in core as `AnalysisBuilder.applyEvent` / `AnalysisDistributor.applyEvent` / `MasterImageBuilderService.applyEvent`, while the storage-bucket and authup handlers keep their orchestration in app over the ports. Storage-bucket replies are correlated by the bucket itself (`refType`/`refId` + `parseAnalysisBucketName(name)`), not by a task store.
-- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor).
+- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentCaller` in the container: with a message bus it only dispatches to the `registryCommands` queue (the registry consumer runs it; a throwing command is retried, but the Harbor handlers log and swallow Harbor errors), and calls the component in-process only when there is no bus. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor).
 
 **Process-status transitions are row-locked.** Any read-check-mutate-save of a
 `buildStatus`/`distributionStatus` (command starts, configuration lock/unlock, the master-image rollback,
@@ -427,6 +427,15 @@ Background worker executing Docker containers. No database entities — purely q
 - `CoreClientModule` — sets up core API client via `setCoreClient()`
 - `StorageClientModule` — sets up storage API client via `setStorageClient()`
 - `ComponentsModule` — starts all 4 worker components (analysis-builder, analysis-distributor, master-image-builder, master-image-synchronizer)
+
+**Failure classification:** every check/execute handler rethrows a failure for which
+`isRetryableFailure(e, context.metadata)` (`app/components/helpers.ts`) holds — a transient
+error (`isTransientError`: hapic network error or 5xx/429, dockerode `statusCode` ≥ 500, node
+socket codes, `ENOENT` only on `connect`) before the last attempt (`metadata.attempt` <
+`MESSAGE_BUS_MAX_ATTEMPTS` from server-kit) — so the AMQP driver retries it; everything else
+emits `*_FAILED`. A permanent error misread as transient costs only the backoff. The
+distributor keeps the local analysis image while a retry is pending (it re-tags from it) and
+removes it otherwise. Errors inside a docker build/push stream are permanent.
 
 **Entry point:** Uses `src/index.ts` with `dotenv/config` directly (no citty CLI).
 
