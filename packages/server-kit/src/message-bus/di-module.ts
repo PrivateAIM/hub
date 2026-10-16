@@ -6,15 +6,20 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IMessageBusDriver } from 'ergos';
-import { MemoryMessageBusDriver, MessageBus } from 'ergos';
-import { AmqpMessageBusDriver } from 'ergos/amqp';
+import type { IMessageBusDriver } from 'synergos';
+import { MemoryMessageBusDriver, MessageBus } from 'synergos';
+import { AmqpMessageBusDriver } from '@synergos/amqp';
 import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../config/constants';
 import { LOGGER_MODULE_NAME, LoggerInjectionKey } from '../logger/constants';
+import { createAmqpDriverLogHooks, createMessageBusLogHooks } from './hooks';
 import { MESSAGE_BUS_MODULE_NAME, MESSAGE_BUS_TOPIC_EXCHANGE, MessageBusInjectionKey } from './constants';
 import type { MessageBusModuleOptions } from './types';
 
+/**
+ * Always registers a bus: over AMQP when a connection string is configured,
+ * otherwise in-process (memory driver), so callers can depend on one.
+ */
 export class MessageBusModule implements IModule {
     readonly name = MESSAGE_BUS_MODULE_NAME;
 
@@ -48,7 +53,7 @@ export class MessageBusModule implements IModule {
             if (connectionString) {
                 driver = new AmqpMessageBusDriver({
                     connectionString,
-                    logger,
+                    hooks: logger ? createAmqpDriverLogHooks(logger) : undefined,
                     defaultTopicExchange: MESSAGE_BUS_TOPIC_EXCHANGE,
                 });
             } else {
@@ -58,7 +63,12 @@ export class MessageBusModule implements IModule {
 
         this.driver = driver;
 
-        const bus = new MessageBus({ driver, logger });
+        const bus = new MessageBus({
+            driver,
+            hooks: logger ?
+                createMessageBusLogHooks(logger, { silentRoutings: this.options.silentRoutings }) :
+                undefined,
+        });
         container.register(MessageBusInjectionKey, { useValue: bus });
     }
 

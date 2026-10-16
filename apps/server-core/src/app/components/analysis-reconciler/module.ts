@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IComponent } from 'ergos';
-import { defineScheduledComponent } from 'ergos';
+import type { IComponent } from 'synergos';
+import { defineScheduledComponent } from 'synergos';
 import type { AnalysisReconcileResult } from '../../../core/services/analysis-reconciler/index.ts';
 import { ANALYSIS_RECONCILER_SCHEDULE } from './constants.ts';
 import type { AnalysisReconcilerComponentContext } from './types.ts';
@@ -16,7 +16,7 @@ import type { AnalysisReconcilerComponentContext } from './types.ts';
  * ANALYSIS_RECONCILER_SCHEDULE.
  *
  * A pass throws (after logging) whenever a check failed, so lastSuccessAt is
- * stamped only for a clean pass. No logger is handed to the scheduled
+ * stamped only for a clean pass. No log hooks are handed to the scheduled
  * component: run() already logs at error level.
  *
  * ponytail: no database lock. Every replica runs its own pass, so a stuck
@@ -30,7 +30,6 @@ import type { AnalysisReconcilerComponentContext } from './types.ts';
  */
 export function createAnalysisReconcilerComponent(ctx: AnalysisReconcilerComponentContext): IComponent {
     return defineScheduledComponent({
-        name: 'analysis-reconciler',
         schedule: ANALYSIS_RECONCILER_SCHEDULE,
         run: async () => {
             let result: AnalysisReconcileResult;

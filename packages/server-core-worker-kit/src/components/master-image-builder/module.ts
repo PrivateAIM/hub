@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from 'ergos';
-import { MessageBusDispatchComponentCaller } from 'ergos';
+import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
+import { DispatchCaller } from 'synergos';
 import { MasterImageBuilderCommand, MasterImageBuilderTaskMessageBusRouting } from './constants';
 import type { MasterImageBuilderExecutePayload } from './types';
 
-export class MasterImageBuilderComponentCaller extends MessageBusDispatchComponentCaller {
-    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+export class MasterImageBuilderComponentCaller extends DispatchCaller {
+    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
         super({ ...options, routing: MasterImageBuilderTaskMessageBusRouting });
     }
 

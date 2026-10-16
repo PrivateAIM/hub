@@ -7,9 +7,14 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { IComponent } from 'ergos';
-import { LoggerInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
-import { MessageBusWorkerComponentCaller } from 'ergos';
+import type { IComponent } from 'synergos';
+import {
+    LoggerInjectionKey,
+    MESSAGE_BUS_MODULE_NAME,
+    MessageBusInjectionKey,
+    createWorkerCallerLogHooks,
+} from '@privateaim/server-kit';
+import { WorkerCaller } from 'synergos';
 import {
     BucketEventMessageBusRouting,
     BucketFileEventMessageBusRouting,
@@ -23,7 +28,7 @@ import { StorageInjectionKey } from '../storage/constants.ts';
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['storage', 'database'];
+    readonly dependencies: string[] = ['storage', 'database', MESSAGE_BUS_MODULE_NAME];
 
     protected components: IComponent<any>[] = [];
 
@@ -32,21 +37,21 @@ export class ComponentsModule implements IModule {
 
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
-        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+        const messageBus = container.resolve(MessageBusInjectionKey);
+        const hooks = logger ? createWorkerCallerLogHooks(logger) : undefined;
 
         this.components = [
-            new MessageBusWorkerComponentCaller(new BucketComponent({ storage, logger }), {
+            new WorkerCaller(new BucketComponent({ storage, logger }), {
                 consumeRouting: BucketTaskMessageBusRouting,
                 publishRouting: BucketEventMessageBusRouting,
                 messageBus,
-                logger,
+                hooks,
             }),
-            new MessageBusWorkerComponentCaller(new BucketFileComponent({ storage, logger }), {
+            new WorkerCaller(new BucketFileComponent({ storage, logger }), {
                 consumeRouting: BucketFileTaskMessageBusRouting,
                 publishRouting: BucketFileEventMessageBusRouting,
                 messageBus,
-                logger,
+                hooks,
             }),
         ];
 

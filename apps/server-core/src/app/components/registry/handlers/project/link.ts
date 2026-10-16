@@ -7,7 +7,7 @@
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler } from 'ergos';
+import type { ComponentHandler } from 'synergos';
 import type { Client as AuthupClient } from '@authup/core-http-kit';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../adapters/database/index.ts';
 import { RegistryCommand } from '../../constants.ts';

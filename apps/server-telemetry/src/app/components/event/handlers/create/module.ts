@@ -6,7 +6,7 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler, ComponentHandlerContext } from 'ergos';
+import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
 import { DAY_IN_MS } from '@privateaim/kit';
 import { DomainType, EventValidator, LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';

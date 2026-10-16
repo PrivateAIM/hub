@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from 'ergos';
+import { MessageRoutingType } from 'synergos';
 
 export enum LogEvent {
     STARTING = 'starting',
@@ -19,11 +19,11 @@ export enum LogCommand {
 }
 
 export const LogEventMessageBusRouting = {
-    type: MessageBusRoutingType.PUB_SUB,
+    type: MessageRoutingType.PUB_SUB,
     key: 'telemetryLogEvents',
 };
 
 export const LogTaskMessageBusRouting = {
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'telemetryLogTasks',
 };

@@ -7,9 +7,14 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { IComponent } from 'ergos';
-import { LoggerInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
-import { MessageBusWorkerComponentCaller } from 'ergos';
+import type { IComponent } from 'synergos';
+import {
+    LoggerInjectionKey,
+    MESSAGE_BUS_MODULE_NAME,
+    MessageBusInjectionKey,
+    createWorkerCallerLogHooks,
+} from '@privateaim/server-kit';
+import { WorkerCaller } from 'synergos';
 import {
     EventEventMessageBusRouting,
     EventTaskMessageBusRouting,
@@ -27,7 +32,7 @@ import { LogStoreInjectionKey } from '../victoria-logs/constants.ts';
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['config', 'database', 'victoriaLogs'];
+    readonly dependencies: string[] = ['config', 'database', 'victoriaLogs', MESSAGE_BUS_MODULE_NAME];
 
     protected components: IComponent<any>[] = [];
 
@@ -45,26 +50,26 @@ export class ComponentsModule implements IModule {
 
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
-        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+        const messageBus = container.resolve(MessageBusInjectionKey);
+        const hooks = logger ? createWorkerCallerLogHooks(logger) : undefined;
 
         this.components = [
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new EventComponent({ logger, retentionDays: config.eventRetentionDays }),
                 {
                     consumeRouting: EventTaskMessageBusRouting,
                     publishRouting: EventEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new LogComponent({ logStore, logger }),
                 {
                     consumeRouting: LogTaskMessageBusRouting,
                     publishRouting: LogEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks,
                 },
             ),
             createEventCleanerComponent({ repository: eventRepository, logger }),

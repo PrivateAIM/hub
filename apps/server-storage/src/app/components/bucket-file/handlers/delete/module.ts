@@ -7,7 +7,7 @@
 
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler, ComponentHandlerContext } from 'ergos';
+import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
 import type {
     BucketFileComponentEventMap,
     BucketFileDeleteCommandPayload,

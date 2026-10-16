@@ -13,6 +13,7 @@ import {
 import {
     LogComponentCaller,
     LoggerTransport,
+    TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { CoreClientModule } from './modules/core-client/index.ts';
@@ -27,7 +28,7 @@ export function createApplication() {
 
     const builder = new ServerCoreWorkerApplicationBuilder()
         .withConfig()
-        .withMessageBus()
+        .withMessageBus({ silentRoutings: TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS })
         .withAuthupHook();
 
     builder.withLogger({

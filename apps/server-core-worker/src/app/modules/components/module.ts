@@ -7,13 +7,15 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { IComponent } from 'ergos';
+import type { IComponent } from 'synergos';
 import {
     LoggerConsoleTransport,
+    MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
     createLogger,
+    createWorkerCallerLogHooks,
 } from '@privateaim/server-kit';
-import { MessageBusWorkerComponentCaller } from 'ergos';
+import { WorkerCaller } from 'synergos';
 import {
     AnalysisBuilderEventMessageBusRouting,
     AnalysisBuilderTaskMessageBusRouting,
@@ -41,7 +43,7 @@ import {
 export class ComponentsModule implements IModule {
     readonly name = 'components';
 
-    readonly dependencies: string[] = ['coreClient', 'storageClient', 'docker'];
+    readonly dependencies: string[] = ['coreClient', 'storageClient', 'docker', MESSAGE_BUS_MODULE_NAME];
 
     protected components: IComponent<any>[] = [];
 
@@ -50,10 +52,8 @@ export class ComponentsModule implements IModule {
         const storageClient = container.resolve(StorageClientInjectionKey);
         const docker = container.resolve(DockerInjectionKey);
 
-        // Resolve messageBus (if available) for log transport
-        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
-        const logCaller = messageBus ? new LogComponentCaller({ messageBus }) : undefined;
+        const messageBus = container.resolve(MessageBusInjectionKey);
+        const logCaller = new LogComponentCaller({ messageBus });
 
         const analysisBuilderLogger = createLogger({
             options: { defaultMeta: { component: ComponentName.ANALYSIS_BUILDER } },
@@ -67,9 +67,7 @@ export class ComponentsModule implements IModule {
                         [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                     },
                     save: async (data) => {
-                        if (logCaller) {
-                            await logCaller.callWrite(data);
-                        }
+                        await logCaller.callWrite(data);
                     },
                 }),
             ],
@@ -87,9 +85,7 @@ export class ComponentsModule implements IModule {
                         [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                     },
                     save: async (data) => {
-                        if (logCaller) {
-                            await logCaller.callWrite(data);
-                        }
+                        await logCaller.callWrite(data);
                     },
                 }),
             ],
@@ -107,16 +103,14 @@ export class ComponentsModule implements IModule {
                         [LogFlag.REF_TYPE]: DomainType.MASTER_IMAGE,
                     },
                     save: async (data) => {
-                        if (logCaller) {
-                            await logCaller.callWrite(data);
-                        }
+                        await logCaller.callWrite(data);
                     },
                 }),
             ],
         });
 
         this.components = [
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new AnalysisBuilderComponent({
                     coreClient,
                     storageClient,
@@ -127,10 +121,10 @@ export class ComponentsModule implements IModule {
                     publishRouting: AnalysisBuilderEventMessageBusRouting,
                     consumeRouting: AnalysisBuilderTaskMessageBusRouting,
                     messageBus,
-                    logger: analysisBuilderLogger,
+                    hooks: createWorkerCallerLogHooks(analysisBuilderLogger),
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new AnalysisDistributorComponent({
                     coreClient,
                     docker,
@@ -140,10 +134,10 @@ export class ComponentsModule implements IModule {
                     publishRouting: AnalysisDistributorEventMessageBusRouting,
                     consumeRouting: AnalysisDistributorTaskMessageBusRouting,
                     messageBus,
-                    logger: analysisDistributorLogger,
+                    hooks: createWorkerCallerLogHooks(analysisDistributorLogger),
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new MasterImageBuilderComponent({
                     coreClient,
                     docker,
@@ -153,16 +147,16 @@ export class ComponentsModule implements IModule {
                     publishRouting: MasterImageBuilderEventMessageBusRouting,
                     consumeRouting: MasterImageBuilderTaskMessageBusRouting,
                     messageBus,
-                    logger: masterImageBuilderLogger,
+                    hooks: createWorkerCallerLogHooks(masterImageBuilderLogger),
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new MasterImageSynchronizerComponent({ logger: masterImageBuilderLogger }),
                 {
                     publishRouting: MasterImageSynchronizerEventMessageBusRouting,
                     consumeRouting: MasterImageSynchronizerTaskMessageBusRouting,
                     messageBus,
-                    logger: masterImageBuilderLogger,
+                    hooks: createWorkerCallerLogHooks(masterImageBuilderLogger),
                 },
             ),
         ];

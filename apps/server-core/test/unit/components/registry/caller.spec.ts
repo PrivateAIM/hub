@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentStatus, IComponent, MessageBusPayload } from 'ergos';
-import { MemoryMessageBusDriver, MessageBus, MessageBusWorkerComponentCaller } from 'ergos';
+import type { ComponentStatus, IComponent, Message } from 'synergos';
+import { MemoryMessageBusDriver, MessageBus, WorkerCaller } from 'synergos';
 import { describe, expect, it } from 'vitest';
 import { RegistryComponentCaller } from '../../../../src/app/components/registry/caller/module.ts';
 import { RegistryCommand, RegistryTaskMessageBusRouting } from '../../../../src/app/components/registry/constants.ts';
@@ -34,7 +34,7 @@ class FakeRegistryComponent implements IComponent {
 describe('src/app/components/registry/caller', () => {
     it('dispatches through the registry task queue, never in-process', async () => {
         const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
-        const received: MessageBusPayload[] = [];
+        const received: Message[] = [];
         await messageBus.consumeAny(RegistryTaskMessageBusRouting, async (payload) => {
             received.push(payload);
         });
@@ -53,7 +53,7 @@ describe('src/app/components/registry/caller', () => {
     it('reaches the in-process worker caller over the memory driver (no AMQP)', async () => {
         const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
         const component = new FakeRegistryComponent();
-        const worker = new MessageBusWorkerComponentCaller(component, {
+        const worker = new WorkerCaller(component, {
             consumeRouting: RegistryTaskMessageBusRouting,
             messageBus,
         });

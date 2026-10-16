@@ -6,7 +6,7 @@
  */
 
 import type { ObjectLiteralKeys } from '@privateaim/kit';
-import type { ComponentMetadata } from 'ergos';
+import type { ComponentMetadata } from 'synergos';
 import type { BucketFileCommand, BucketFileEvent } from './constants';
 import type {
     BucketFileCreateCommandPayload,

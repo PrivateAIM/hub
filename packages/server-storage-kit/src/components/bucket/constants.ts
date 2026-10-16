@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from 'ergos';
+import { MessageRoutingType } from 'synergos';
 
 export enum BucketCommand {
     CREATE = 'create',
@@ -30,12 +30,12 @@ export enum BucketEvent {
 export const BucketEventMessageBusRouting = {
     // A reply to a server-core command: one durable queue for all server-core
     // replicas, handled by one of them at a time in publish order (plan 018 F4).
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'storageBucketEvents',
     ordered: true,
 };
 
 export const BucketTaskMessageBusRouting = {
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'storageBucketTasks',
 };

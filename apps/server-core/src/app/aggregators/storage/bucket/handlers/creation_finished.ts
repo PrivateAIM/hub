@@ -6,7 +6,7 @@
  */
 import { DomainType, parseAnalysisBucketName } from '@privateaim/core-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler } from 'ergos';
+import type { ComponentHandler } from 'synergos';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';

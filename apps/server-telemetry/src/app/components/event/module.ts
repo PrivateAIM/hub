@@ -6,7 +6,7 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import { Component } from 'ergos';
+import { Component } from 'synergos';
 import type { EventComponentEventMap } from '@privateaim/server-telemetry-kit';
 import { EventCommand } from '@privateaim/server-telemetry-kit';
 import { EventComponentCreateHandler } from './handlers/index.ts';

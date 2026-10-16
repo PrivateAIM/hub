@@ -7,14 +7,17 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { IComponent } from 'ergos';
+import type { IComponent } from 'synergos';
 import {
     ConfigInjectionKey,
     LoggerInjectionKey,
+    MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
     RedisSubscribeClientInjectionKey,
+    createDispatchCallerLogHooks,
+    createWorkerCallerLogHooks,
 } from '@privateaim/server-kit';
-import { MessageBusWorkerComponentCaller } from 'ergos';
+import { WorkerCaller } from 'synergos';
 import { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import {
     AnalysisBuilderEventMessageBusRouting,
@@ -47,7 +50,7 @@ import { ComponentsInjectionKey } from '../components/constants.ts';
 export class AggregatorsModule implements IModule {
     readonly name = 'aggregators';
 
-    readonly dependencies: string[] = ['database', 'components', 'analysis'];
+    readonly dependencies: string[] = ['database', 'components', 'analysis', MESSAGE_BUS_MODULE_NAME];
 
     protected aggregators: IComponent<any>[] = [];
 
@@ -60,8 +63,8 @@ export class AggregatorsModule implements IModule {
         const masterImageRepository = container.resolve(DatabaseInjectionKey.MasterImageRepository);
         const registryComponentCaller = container.resolve(ComponentsInjectionKey.RegistryComponentCaller);
         const logger = container.resolve(LoggerInjectionKey);
-        const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-        const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+        const messageBus = container.resolve(MessageBusInjectionKey);
+        const workerHooks = createWorkerCallerLogHooks(logger);
         const redisSubResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
         const config = container.resolve(ConfigInjectionKey);
@@ -78,23 +81,23 @@ export class AggregatorsModule implements IModule {
                 redisSubscribeClient: redisSubResult.success ? redisSubResult.data : undefined,
                 logger,
             }),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new AnalysisBuilderAggregator({ builder: container.resolve(AnalysisInjectionKey.Builder) }),
                 {
                     consumeRouting: AnalysisBuilderEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new AnalysisDistributorAggregator({ distributor: container.resolve(AnalysisInjectionKey.Distributor) }),
                 {
                     consumeRouting: AnalysisDistributorEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new StorageBucketAggregator({
                     analysisRepository,
                     analysisBucketRepository,
@@ -105,10 +108,10 @@ export class AggregatorsModule implements IModule {
                 {
                     consumeRouting: BucketEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new StorageBucketFileAggregator({
                     service: new AnalysisBucketFileService({
                         repository: analysisBucketFileRepository,
@@ -123,36 +126,36 @@ export class AggregatorsModule implements IModule {
                         }),
                     }),
                     logger,
-                    bucketFileCaller: new BucketFileTaskCaller({ messageBus, logger }),
+                    bucketFileCaller: new BucketFileTaskCaller({ messageBus, hooks: createDispatchCallerLogHooks(logger) }),
                 }),
                 {
                     consumeRouting: BucketFileEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new MasterImageBuilderAggregator({
                     service: new MasterImageBuilderService({ imageRepository: masterImageRepository }),
-                    eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
+                    eventComponentCaller: new EventComponentCaller({ messageBus }),
                 }),
                 {
                     consumeRouting: MasterImageBuilderEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
-            new MessageBusWorkerComponentCaller(
+            new WorkerCaller(
                 new MasterImageSynchronizerAggregator({
                     imageRepository: masterImageRepository,
                     groupRepository: container.resolve(DatabaseInjectionKey.MasterImageGroupRepository),
                     logger,
-                    eventComponentCaller: messageBus ? new EventComponentCaller({ messageBus }) : undefined,
+                    eventComponentCaller: new EventComponentCaller({ messageBus }),
                 }),
                 {
                     consumeRouting: MasterImageSynchronizerEventMessageBusRouting,
                     messageBus,
-                    logger,
+                    hooks: workerHooks,
                 },
             ),
         ];

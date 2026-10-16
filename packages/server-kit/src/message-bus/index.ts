@@ -7,4 +7,5 @@
 
 export * from './constants';
 export * from './di-module';
+export * from './hooks';
 export * from './types';

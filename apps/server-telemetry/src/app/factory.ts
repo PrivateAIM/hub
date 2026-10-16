@@ -13,7 +13,12 @@ import {
     MessageBusInjectionKey,
     RedisClientInjectionKey,
 } from '@privateaim/server-kit';
-import { EntityEventHandler, EventComponentCaller, LoggerTransport } from '@privateaim/server-telemetry-kit';
+import {
+    EntityEventHandler,
+    EventComponentCaller,
+    LoggerTransport,
+    TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS,
+} from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { LogComponentWriteHandler } from './components/log/handlers/index.ts';
 import { VictoriaLogsModule } from './modules/victoria-logs/index.ts';
@@ -24,7 +29,7 @@ import { ServerTelemetryApplicationBuilder } from './builder.ts';
 export function createApplication() {
     const builder = new ServerTelemetryApplicationBuilder()
         .withConfig()
-        .withMessageBus()
+        .withMessageBus({ silentRoutings: TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS })
         .withRedis()
         .withAuthupHook()
         .withAuthupClient();
@@ -39,9 +44,7 @@ export function createApplication() {
                 handlers.push(new EntityEventSocketHandler(redisResult.data));
             }
 
-            const mbResult = container.tryResolve(MessageBusInjectionKey);
-            const messageBus = mbResult.success ? mbResult.data : undefined;
-            const eventCaller = messageBus ? new EventComponentCaller({ messageBus }) : undefined;
+            const eventCaller = new EventComponentCaller({ messageBus: container.resolve(MessageBusInjectionKey) });
 
             const loggerResult = container.tryResolve(LoggerInjectionKey);
             handlers.push(new EntityEventHandler({

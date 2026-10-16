@@ -7,8 +7,8 @@
 
 import type { Bucket } from '@privateaim/storage-kit';
 import { BadRequestError } from '@privateaim/errors';
-import type { MessageBusDispatchComponentCaller } from 'ergos';
-import { DirectComponentCaller } from 'ergos';
+import type { DispatchCaller } from 'synergos';
+import { DirectCaller } from 'synergos';
 import type { BucketComponentEventMap } from '@privateaim/server-storage-kit';
 import { BucketCommand, BucketEvent } from '@privateaim/server-storage-kit';
 import type { IBucketCaller } from '../../../../core/entities/index.ts';
@@ -17,18 +17,18 @@ import type { BucketComponent } from '../../../components/bucket/module.ts';
 export class BucketCallerAdapter implements IBucketCaller {
     protected component: BucketComponent;
 
-    protected eventCaller?: MessageBusDispatchComponentCaller<BucketComponentEventMap>;
+    protected eventCaller?: DispatchCaller<BucketComponentEventMap>;
 
     constructor(
         component: BucketComponent,
-        eventCaller?: MessageBusDispatchComponentCaller<BucketComponentEventMap>,
+        eventCaller?: DispatchCaller<BucketComponentEventMap>,
     ) {
         this.component = component;
         this.eventCaller = eventCaller;
     }
 
     async create(data: Record<string, any>): Promise<Bucket> {
-        const caller = new DirectComponentCaller(this.component);
+        const caller = new DirectCaller(this.component);
         const output = await caller.callAndWait(BucketCommand.CREATE, data, {});
 
         if (output.creationFinished) {
@@ -43,7 +43,7 @@ export class BucketCallerAdapter implements IBucketCaller {
     }
 
     async delete(id: string): Promise<Bucket> {
-        const caller = new DirectComponentCaller(this.component);
+        const caller = new DirectCaller(this.component);
         const output = await caller.callAndWait(BucketCommand.DELETE, { id }, {});
 
         if (output.deletionFinished) {
@@ -60,7 +60,7 @@ export class BucketCallerAdapter implements IBucketCaller {
     }
 
     async clear(id: string): Promise<Bucket> {
-        const caller = new DirectComponentCaller(this.component);
+        const caller = new DirectCaller(this.component);
         const output = await caller.callAndWait(BucketCommand.CLEAR, { id }, {});
 
         if (output.clearingFinished) {

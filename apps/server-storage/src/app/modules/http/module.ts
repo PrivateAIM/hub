@@ -13,6 +13,7 @@ import {
     AuthupClientInjectionKey,
     EnvironmentName,
     LoggerInjectionKey,
+    MESSAGE_BUS_MODULE_NAME,
     RedisClientInjectionKey,
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
@@ -42,6 +43,7 @@ export class HTTPModule implements IModule {
         'config',
         'database',
         'storage',
+        MESSAGE_BUS_MODULE_NAME,
         { name: AUTHUP_CLIENT_MODULE_NAME, optional: true },
     ];
 

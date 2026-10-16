@@ -6,7 +6,7 @@
  */
 
 import type { ObjectLiteralKeys, ProcessStatus } from '@privateaim/kit';
-import type { ComponentMetadata } from 'ergos';
+import type { ComponentMetadata } from 'synergos';
 import type { Progress } from 'docken';
 import type { AnalysisBuilderCommand, AnalysisBuilderEvent } from './constants';
 

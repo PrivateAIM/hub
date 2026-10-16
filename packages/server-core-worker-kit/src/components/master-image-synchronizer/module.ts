@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from 'ergos';
-import { MessageBusDispatchComponentCaller } from 'ergos';
+import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
+import { DispatchCaller } from 'synergos';
 import {
     MasterImageSynchronizerCommand,
     MasterImageSynchronizerTaskMessageBusRouting,
 } from './constants';
 import type { MasterImageSynchronizerEventMap, MasterImageSynchronizerExecutePayload } from './types';
 
-export class MasterImageSynchronizerComponentCaller extends MessageBusDispatchComponentCaller<MasterImageSynchronizerEventMap> {
-    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+export class MasterImageSynchronizerComponentCaller extends DispatchCaller<MasterImageSynchronizerEventMap> {
+    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
         super({ ...options, routing: MasterImageSynchronizerTaskMessageBusRouting });
     }
 

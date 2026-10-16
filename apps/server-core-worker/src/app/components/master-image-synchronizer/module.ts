@@ -9,7 +9,7 @@ import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-wo
 import {
     MasterImageSynchronizerCommand,
 } from '@privateaim/server-core-worker-kit';
-import { Component } from 'ergos';
+import { Component } from 'synergos';
 import type { Logger } from '@privateaim/server-kit';
 
 import { MasterImageSynchronizerExecuteHandler } from './handlers';

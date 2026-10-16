@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from 'ergos';
+import { MessageRoutingType } from 'synergos';
 
 export enum EventEvent {
     CREATION_STARTED = 'creationStarted',
@@ -18,11 +18,11 @@ export enum EventCommand {
 }
 
 export const EventEventMessageBusRouting = {
-    type: MessageBusRoutingType.PUB_SUB,
+    type: MessageRoutingType.PUB_SUB,
     key: 'telemetryEventEvents',
 };
 
 export const EventTaskMessageBusRouting = {
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'telemetryEventTasks',
 };

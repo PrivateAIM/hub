@@ -15,7 +15,7 @@ import {
     MasterImageSynchronizerEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler, ComponentHandlerContext } from 'ergos';
+import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
 import { scanDirectory } from 'docken';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
 import { GitHubClient } from '../../../../../adapters/github/index.ts';

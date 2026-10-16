@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from 'ergos';
+import { MessageRoutingType } from 'synergos';
 
 export enum MasterImageBuilderEvent {
     EXECUTION_FAILED = 'executionFailed',
@@ -21,12 +21,12 @@ export enum MasterImageBuilderCommand {
 export const MasterImageBuilderEventMessageBusRouting = {
     // A reply to a server-core command: one durable queue for all server-core
     // replicas, handled by one of them at a time in publish order (plan 018 F4).
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'masterImageBuilderEvents',
     ordered: true,
 };
 
 export const MasterImageBuilderTaskMessageBusRouting = {
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'masterImageBuilderTasks',
 };

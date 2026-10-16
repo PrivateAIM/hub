@@ -6,8 +6,9 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import type { IComponent } from 'ergos';
-import { defineScheduledComponent } from 'ergos';
+import { createScheduledComponentLogHooks } from '@privateaim/server-kit';
+import type { IComponent } from 'synergos';
+import { defineScheduledComponent } from 'synergos';
 import type { IEventRepository } from '../../../core/entities/index.ts';
 
 /**
@@ -16,9 +17,8 @@ import type { IEventRepository } from '../../../core/entities/index.ts';
  */
 export function createEventCleanerComponent(ctx: { repository: IEventRepository, logger?: Logger }): IComponent {
     return defineScheduledComponent({
-        name: 'event-cleaner',
         schedule: '0 1 * * *',
-        logger: ctx.logger,
+        hooks: ctx.logger ? createScheduledComponentLogHooks(ctx.logger, 'event-cleaner') : undefined,
         run: async () => {
             // ISO-8601, because expiresAt is a varchar compared lexicographically.
             const isoDate = new Date().toISOString();

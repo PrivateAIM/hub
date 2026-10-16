@@ -37,6 +37,6 @@
         "build": "npm run build:js && npm run build:types"
     },
     "dependencies": {
-        "ergos": "file:../../../../tada5hi/ergos"
+        "synergos": "^0.0.0"
     }
 }

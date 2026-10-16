@@ -14,6 +14,7 @@ import {
     AuthupClientInjectionKey,
     EnvironmentName,
     LoggerInjectionKey,
+    MESSAGE_BUS_MODULE_NAME,
     RedisClientInjectionKey,
     RedisPublishClientInjectionKey,
     RedisSubscribeClientInjectionKey,
@@ -57,6 +58,7 @@ export class HTTPModule implements IModule {
         'config',
         'database',
         'analysis',
+        MESSAGE_BUS_MODULE_NAME,
         { name: 'telemetryClient', optional: true },
         { name: AUTHUP_CLIENT_MODULE_NAME, optional: true },
     ];

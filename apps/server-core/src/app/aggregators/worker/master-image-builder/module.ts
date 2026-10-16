@@ -10,7 +10,7 @@ import type { MasterImageBuilderEventMap } from '@privateaim/server-core-worker-
 import {
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
-import { Component } from 'ergos';
+import { Component } from 'synergos';
 import type { MasterImageBuilderAggregatorContext } from './types.ts';
 
 export class MasterImageBuilderAggregator extends Component<MasterImageBuilderEventMap> {

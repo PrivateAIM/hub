@@ -13,7 +13,7 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type { IEntityRepository, Logger } from '@privateaim/server-kit';
 import type { IMasterImageRepository } from '../../../../core/entities/master-image/types.ts';
-import { Component } from 'ergos';
+import { Component } from 'synergos';
 import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
 import {
     handleMasterImageSynchronizerExecutionFinishedEvent,

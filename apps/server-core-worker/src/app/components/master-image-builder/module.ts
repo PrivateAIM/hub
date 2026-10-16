@@ -9,7 +9,7 @@ import type { MasterImageBuilderEventMap } from '@privateaim/server-core-worker-
 import {
     MasterImageBuilderCommand,
 } from '@privateaim/server-core-worker-kit';
-import { Component } from 'ergos';
+import { Component } from 'synergos';
 import type { Logger } from '@privateaim/server-kit';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';

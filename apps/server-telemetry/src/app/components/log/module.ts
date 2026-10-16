@@ -6,7 +6,7 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import { Component } from 'ergos';
+import { Component } from 'synergos';
 import { LogCommand } from '@privateaim/server-telemetry-kit';
 import type { LogStore } from '../../../core/services/log-store/types.ts';
 import { MemoryLogStore } from '../../../adapters/telemetry/memory.ts';

@@ -6,8 +6,8 @@
  */
 
 import type { IContainer } from 'eldin';
-import { LoggerInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
-import { MessageBusDispatchComponentCaller } from 'ergos';
+import { LoggerInjectionKey, MessageBusInjectionKey, createDispatchCallerLogHooks } from '@privateaim/server-kit';
+import { DispatchCaller } from 'synergos';
 import { BucketEventMessageBusRouting, BucketFileEventCaller } from '@privateaim/server-storage-kit';
 import { BucketController } from '../../../adapters/http/controllers/bucket/module.ts';
 import { BucketFileController } from '../../../adapters/http/controllers/bucket-file/module.ts';
@@ -29,8 +29,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const loggerResult = container.tryResolve(LoggerInjectionKey);
     const logger = loggerResult.success ? loggerResult.data : undefined;
 
-    const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-    const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+    const messageBus = container.resolve(MessageBusInjectionKey);
 
     const bucketComponent = new BucketComponent({ storage, logger });
     const bucketFileComponent = new BucketFileComponent({ storage, logger });
@@ -38,10 +37,10 @@ export function createControllers(container: IContainer): Record<string, any>[] 
 
     const bucketCaller = new BucketCallerAdapter(
         bucketComponent,
-        new MessageBusDispatchComponentCaller({
-            messageBus, 
-            logger, 
-            routing: BucketEventMessageBusRouting, 
+        new DispatchCaller({
+            messageBus,
+            hooks: logger ? createDispatchCallerLogHooks(logger) : undefined,
+            routing: BucketEventMessageBusRouting,
         }),
     );
     const bucketFileCaller = new BucketFileCallerAdapter(bucketFileComponent, bucketFileEventCaller);

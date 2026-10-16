@@ -19,6 +19,7 @@ import {
     EventComponentCaller,
     LogComponentCaller,
     LoggerTransport,
+    TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS,
 } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { StorageModule } from './modules/storage/index.ts';
@@ -32,7 +33,7 @@ export function createApplication() {
 
     const builder = new ServerStorageApplicationBuilder()
         .withConfig()
-        .withMessageBus()
+        .withMessageBus({ silentRoutings: TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS })
         .withRedis()
         .withAuthupHook()
         .withAuthupClient();
@@ -47,9 +48,7 @@ export function createApplication() {
                 handlers.push(new EntityEventSocketHandler(redisResult.data));
             }
 
-            const mbResult = container.tryResolve(MessageBusInjectionKey);
-            const messageBus = mbResult.success ? mbResult.data : undefined;
-            const eventCaller = messageBus ? new EventComponentCaller({ messageBus }) : undefined;
+            const eventCaller = new EventComponentCaller({ messageBus: container.resolve(MessageBusInjectionKey) });
 
             const loggerResult = container.tryResolve(LoggerInjectionKey);
             handlers.push(new EntityEventHandler({

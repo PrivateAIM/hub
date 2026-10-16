@@ -7,7 +7,7 @@
 
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import type { ObjectLiteralKeys } from '@privateaim/kit';
-import type { ComponentMetadata, ObjectLiteral } from 'ergos';
+import type { ComponentMetadata, ObjectLiteral } from 'synergos';
 import type { RegistryCommand } from './constants.ts';
 
 export type RegistrySetupPayload = {

@@ -5,8 +5,8 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ILogger, MessageBus } from 'ergos';
-import { MessageBusDispatchComponentCaller } from 'ergos';
+import type { DispatchCallerOptions } from 'synergos';
+import { DispatchCaller } from 'synergos';
 import type { RegistryEventMap } from '../type.ts';
 import { RegistryTaskMessageBusRouting } from '../constants.ts';
 
@@ -15,12 +15,8 @@ import { RegistryTaskMessageBusRouting } from '../constants.ts';
  * replica's worker caller consumes RegistryTaskMessageBusRouting handles
  * them — in-process with the memory driver.
  */
-export class RegistryComponentCaller extends MessageBusDispatchComponentCaller<RegistryEventMap> {
-    constructor(ctx: { messageBus?: MessageBus, logger?: ILogger }) {
-        super({
-            routing: RegistryTaskMessageBusRouting,
-            messageBus: ctx.messageBus,
-            logger: ctx.logger,
-        });
+export class RegistryComponentCaller extends DispatchCaller<RegistryEventMap> {
+    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
+        super({ ...options, routing: RegistryTaskMessageBusRouting });
     }
 }

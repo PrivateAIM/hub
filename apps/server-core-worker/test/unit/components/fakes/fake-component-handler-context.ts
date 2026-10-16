@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata } from 'ergos';
+import type { ComponentMetadata } from 'synergos';
 
 export type FakeEmittedEvent = {
     event: string,

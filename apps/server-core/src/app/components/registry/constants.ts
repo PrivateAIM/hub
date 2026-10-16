@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageBusRoutingType } from 'ergos';
+import { MessageRoutingType } from 'synergos';
 
 export { RegistryCommand, RegistryHookEvent } from '../../../core/domains/index.ts';
 
 export const RegistryEventMessageBusRouting = {
-    type: MessageBusRoutingType.PUB_SUB,
+    type: MessageRoutingType.PUB_SUB,
     key: 'registryEvents',
 };
 
 export const RegistryTaskMessageBusRouting = {
-    type: MessageBusRoutingType.WORK,
+    type: MessageRoutingType.WORK,
     key: 'registryCommands',
 };

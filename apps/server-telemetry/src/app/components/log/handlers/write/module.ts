@@ -6,7 +6,7 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler } from 'ergos';
+import type { ComponentHandler } from 'synergos';
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import { LogValidator } from '@privateaim/telemetry-kit';
 import type { LogWriteCommandPayload } from '@privateaim/server-telemetry-kit';

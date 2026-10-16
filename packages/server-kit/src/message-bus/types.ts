@@ -6,8 +6,15 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IMessageBusDriver } from 'ergos';
+import type { IMessageBusDriver, MessageRouting } from 'synergos';
 
-export type MessageBusModuleOptions = {
+export type MessageBusLogHooksOptions = {
+    /**
+     * Routings whose publishes are not logged (the log and event queues).
+     */
+    silentRoutings?: MessageRouting[],
+};
+
+export type MessageBusModuleOptions = MessageBusLogHooksOptions & {
     driverFactory?: (container: IContainer) => IMessageBusDriver,
 };

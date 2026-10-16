@@ -81,8 +81,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         registryCaller: callerResult.success ? callerResult.data : undefined,
     });
     const config = container.resolve(ConfigInjectionKey);
-    const messageBusResult = container.tryResolve(MessageBusInjectionKey);
-    const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
+    const messageBus = container.resolve(MessageBusInjectionKey);
     const masterImageService = new MasterImageService({
         repository: masterImageRepository,
         synchronizerCaller: new MasterImageSynchronizerComponentCaller({ messageBus }),

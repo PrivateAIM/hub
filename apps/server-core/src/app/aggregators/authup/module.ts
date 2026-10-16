@@ -6,7 +6,7 @@
  */
 
 import { EntityType } from '@authup/core-kit';
-import type { IComponent } from 'ergos';
+import type { IComponent } from 'synergos';
 import { EnvironmentName } from '@privateaim/server-kit';
 import {
     handleAuthupRealmEvent,

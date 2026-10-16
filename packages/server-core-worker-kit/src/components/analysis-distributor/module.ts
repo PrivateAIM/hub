@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from 'ergos';
-import { MessageBusDispatchComponentCaller } from 'ergos';
+import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
+import { DispatchCaller } from 'synergos';
 import { AnalysisDistributorCommand, AnalysisDistributorTaskMessageBusRouting } from './constants';
 import type {
     AnalysisDistributorCheckPayload,
@@ -14,8 +14,8 @@ import type {
     AnalysisDistributorExecutePayload,
 } from './types';
 
-export class AnalysisDistributorComponentCaller extends MessageBusDispatchComponentCaller<AnalysisDistributorEventMap> {
-    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+export class AnalysisDistributorComponentCaller extends DispatchCaller<AnalysisDistributorEventMap> {
+    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
         super({ ...options, routing: AnalysisDistributorTaskMessageBusRouting });
     }
 

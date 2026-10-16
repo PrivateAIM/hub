@@ -6,10 +6,10 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IComponent } from 'ergos';
-import { defineScheduledComponent } from 'ergos';
+import type { IComponent } from 'synergos';
+import { defineScheduledComponent } from 'synergos';
 import type { IModule } from 'orkos';
-import { LoggerInjectionKey } from '@privateaim/server-kit';
+import { LoggerInjectionKey, createScheduledComponentLogHooks } from '@privateaim/server-kit';
 import { DatabaseInjectionKey } from '../database/index.ts';
 
 /**
@@ -34,11 +34,10 @@ export class SweeperModule implements IModule {
         const logger = loggerResult.success ? loggerResult.data : undefined;
 
         this.component = defineScheduledComponent({
-            name: 'message-sweeper',
             schedule: '* * * * *',
             // as before: the first sweep runs one interval after boot
             runOnStart: false,
-            logger,
+            hooks: logger ? createScheduledComponentLogHooks(logger, 'message-sweeper') : undefined,
             run: async () => {
                 const removed = await repository.deleteExpired(new Date());
                 if (removed > 0) {

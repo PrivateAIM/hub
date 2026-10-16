@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from 'ergos';
-import { MessageBusDispatchComponentCaller } from 'ergos';
+import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
+import { DispatchCaller } from 'synergos';
 import {
     BucketCommand,
     BucketTaskMessageBusRouting,
 } from './constants';
 import type { BucketClearCommandPayload, BucketCreateCommandPayload, BucketDeleteCommandPayload } from './handlers';
 
-export class BucketComponentCaller extends MessageBusDispatchComponentCaller {
-    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+export class BucketComponentCaller extends DispatchCaller {
+    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
         super({ ...options, routing: BucketTaskMessageBusRouting });
     }
 

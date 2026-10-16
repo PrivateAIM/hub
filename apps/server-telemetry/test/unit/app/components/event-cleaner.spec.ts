@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { IComponent } from 'ergos';
+import type { IComponent } from 'synergos';
 import {
     afterEach,
     beforeEach,

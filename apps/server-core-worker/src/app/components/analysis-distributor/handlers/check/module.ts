@@ -20,7 +20,7 @@ import {
     AnalysisDistributorEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler, ComponentHandlerContext } from 'ergos';
+import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import { getManyAll } from '@privateaim/core-http-kit';
 import type { Client as DockerClient } from 'docken';

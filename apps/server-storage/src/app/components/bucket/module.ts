@@ -6,7 +6,7 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import { Component } from 'ergos';
+import { Component } from 'synergos';
 import type {
     BucketComponentEventMap,
 } from '@privateaim/server-storage-kit';

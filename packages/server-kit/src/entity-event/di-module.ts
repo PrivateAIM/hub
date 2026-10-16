@@ -8,6 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency  } from 'orkos';
 import { LOGGER_MODULE_NAME, LoggerInjectionKey } from '../logger/constants';
+import { MESSAGE_BUS_MODULE_NAME } from '../message-bus/constants';
 import { REDIS_MODULE_NAME } from '../redis/constants';
 import { ENTITY_EVENT_MODULE_NAME, EntityEventPublisherInjectionKey } from './constants';
 import { EntityEventPublisher } from './module';
@@ -24,6 +25,8 @@ export class EntityEventModule implements IModule {
     readonly dependencies: (string | ModuleDependency)[] = [
         { name: REDIS_MODULE_NAME, optional: true },
         { name: LOGGER_MODULE_NAME, optional: true },
+        // set up first when present: a handler factory may resolve the bus
+        { name: MESSAGE_BUS_MODULE_NAME, optional: true },
     ];
 
     private options: EntityEventModuleOptions;

@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IComponent } from 'ergos';
-import { defineScheduledComponent } from 'ergos';
+import type { IComponent } from 'synergos';
+import { defineScheduledComponent } from 'synergos';
 import { NODE_CLIENT_SYNC_SCHEDULE } from './constants.ts';
 import { syncNodeClientPermissions } from './sync.ts';
 import type { NodeClientComponentContext, NodeClientPermissionSyncResult } from './types.ts';
@@ -18,12 +18,11 @@ import type { NodeClientComponentContext, NodeClientPermissionSyncResult } from 
  * permission a release adds (node_read) never reaches existing node clients.
  *
  * A pass throws (after logging) whenever a node failed, so lastSuccessAt is
- * stamped only for a clean pass. No logger is handed to the scheduled
+ * stamped only for a clean pass. No log hooks are handed to the scheduled
  * component: run() already logs at error level.
  */
 export function createNodeClientComponent(ctx: NodeClientComponentContext): IComponent {
     return defineScheduledComponent({
-        name: 'node-client',
         schedule: NODE_CLIENT_SYNC_SCHEDULE,
         run: async () => {
             let result: NodeClientPermissionSyncResult;

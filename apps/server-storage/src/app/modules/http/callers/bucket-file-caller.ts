@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DirectComponentCaller } from 'ergos';
+import { DirectCaller } from 'synergos';
 import {
     BucketFileCommand,
     BucketFileEvent,
@@ -25,7 +25,7 @@ export class BucketFileCallerAdapter implements IBucketFileCaller {
     }
 
     async delete(id: string): Promise<void> {
-        const caller = new DirectComponentCaller(this.component);
+        const caller = new DirectCaller(this.component);
 
         await new Promise<void>((resolve, reject) => {
             caller.callWith(

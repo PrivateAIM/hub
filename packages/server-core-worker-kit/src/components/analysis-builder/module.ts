@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, MessageBusDispatchComponentCallerOptions } from 'ergos';
-import { MessageBusDispatchComponentCaller } from 'ergos';
+import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
+import { DispatchCaller } from 'synergos';
 import { AnalysisBuilderCommand, AnalysisBuilderTaskMessageBusRouting } from './constants';
 import type { AnalysisBuilderBasePayload, AnalysisBuilderEventMap, AnalysisBuilderExecutePayload } from './types';
 
-export class AnalysisBuilderComponentCaller extends MessageBusDispatchComponentCaller<AnalysisBuilderEventMap> {
-    constructor(options: Partial<MessageBusDispatchComponentCallerOptions> = {}) {
+export class AnalysisBuilderComponentCaller extends DispatchCaller<AnalysisBuilderEventMap> {
+    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
         super({ ...options, routing: AnalysisBuilderTaskMessageBusRouting });
     }
 
