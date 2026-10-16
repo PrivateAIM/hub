@@ -36,9 +36,7 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   the analysis keeps its `started` status meanwhile. Anything else — a broken
   Dockerfile step, a 4xx, a missing registry — fails the build, distribution or
   check right away, as before. A retryable failure that persists through the 5th
-  attempt is meant to be reported as failed, not dropped. Currently the worker
-  cannot see the attempt counter, so such a failure is retried and then dropped;
-  an analysis is then failed by the stale check below, a master-image build is not. Only a worker that dies on every
+  attempt is reported as failed, not dropped. Only a worker that dies on every
   attempt leaves a build or distribution `started`; server-core fails it once it
   is 15 minutes stale (see below). An error docker reports inside a build or push
   stream (e.g. a registry 503 during push) counts as permanent.

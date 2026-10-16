@@ -37,6 +37,6 @@
         "build": "npm run build:js && npm run build:types"
     },
     "dependencies": {
-        "synergos": "^0.0.0"
+        "synergos": "^0.1.0"
     }
 }

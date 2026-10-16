@@ -447,7 +447,8 @@ Background worker executing Docker containers. No database entities — purely q
 `isRetryableFailure(e, context.metadata)` (`app/components/helpers.ts`) holds — a transient
 error (`isTransientError`: hapic network error or 5xx/429, dockerode `statusCode` ≥ 500, node
 socket codes, `ENOENT` only on `connect`) before the last attempt (`metadata.attempt` <
-`MESSAGE_BUS_MAX_ATTEMPTS` from server-kit) — so the AMQP driver retries it; everything else
+`MESSAGE_BUS_MAX_ATTEMPTS` from server-kit; `@synergos/amqp` fills `metadata.attempt` from the
+`x-attempt` header on consume) — so the AMQP driver retries it; everything else
 emits `*_FAILED`. A permanent error misread as transient costs only the backoff. The
 distributor keeps the local analysis image while a retry is pending (it re-tags from it) and
 removes it otherwise. Errors inside a docker build/push stream are permanent.
