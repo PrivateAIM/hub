@@ -236,6 +236,16 @@ against the analysis's realm, not the caller's:
 - Result files are updated and deleted by the analysis realm with
   `analysis_update`; temp files by the master realm only.
 
+## Uploading into a bucket requires ownership or `bucket_update`
+
+**Breaking for API clients.** `POST /buckets/:id/upload` into a bucket created
+over HTTP (one without a `refId`) answers 403 unless the caller created the
+bucket or holds `bucket_update` with access to the bucket's realm. Previously
+any authenticated caller could upload into any bucket. Buckets created before
+the creator was recorded have no owner, so only `bucket_update` holders can
+upload into them. Analysis buckets (which carry a `refId`) are unchanged: their
+uploads are still checked by server-core when it registers them.
+
 ## Reading nodes, master images, registries, registry projects and events requires `*_read`
 
 **Breaking for every deployment.** Listing or reading these entities now needs a

@@ -114,7 +114,9 @@ export class BucketController {
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ) {
+        const actor = buildActorContext(event);
         const entity = await this.service.getOne(id);
+        await this.service.checkUploadAccess(entity, actor);
 
         const files = await uploadRequestFilesToBucket(event, entity, this.bucketFileComponent, this.bucketFileEventCaller);
 

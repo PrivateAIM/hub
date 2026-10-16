@@ -65,6 +65,13 @@ update, clear and delete the bucket, and delete its files, without `bucket_updat
 everyone else needs the permission and realm access. Buckets created before this was fixed carry no
 actor and are not backfilled, so only permission holders can manage them.
 
+Uploading (`POST /buckets/:id/upload`) into a bucket **without** a `refId` requires being its creator,
+or `bucket_update` with realm access; anyone else gets 403 before a file is stored. A bucket **with**
+a `refId` (e.g. an analysis bucket) accepts uploads from any authenticated caller, because its
+legitimate uploaders span realms and storage cannot evaluate the referencing service's permissions:
+the owning service checks each upload when it registers it (see
+[Writing analysis buckets and files](/guide/deployment/configuration#writing-analysis-buckets-and-files-requires-analysis-update)).
+
 ## Response Shapes
 
 Every bucket and bucket-file endpoint answers with a `{ data, meta }` envelope — the record (or the

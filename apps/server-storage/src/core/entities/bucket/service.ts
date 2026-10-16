@@ -156,6 +156,27 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         return this.caller.clear(entity.id);
     }
 
+    async checkUploadAccess(entity: Bucket, actor: ActorContext): Promise<void> {
+        // ponytail: a bucket with a refId belongs to another service's resource (e.g. an
+        // analysis), whose uploaders span realms and whose permissions storage cannot
+        // evaluate; server-core checks those uploads after the fact. A synchronous gate
+        // for them is plan 012 (analysis capability tokens) — until then a rejected
+        // RESULT/TEMP upload stays in storage.
+        if (entity.refId) {
+            return;
+        }
+
+        if (this.isOwnedByActor(entity, actor)) {
+            return;
+        }
+
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_UPDATE });
+
+        if (!isRealmResourceWritable(actor.realm, entity.realmId)) {
+            throw new PermissionDeniedError();
+        }
+    }
+
     private isOwnedByActor(entity: Bucket, actor: ActorContext): boolean {
         if (!actor.identity) return false;
         return entity.actorType === actor.identity.type &&
