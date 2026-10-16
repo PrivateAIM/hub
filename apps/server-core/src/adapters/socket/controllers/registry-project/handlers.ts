@@ -20,6 +20,7 @@ import {
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import { buildSocketSubscribeError } from '../../error.ts';
+import { assertSocketSubscribeReach } from '../../reach.ts';
 import type {
     Socket,
 } from '../../types.ts';
@@ -31,12 +32,10 @@ export function registerRegistryProjectSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.REGISTRY_MANAGE,
-                        PermissionName.REGISTRY_PROJECT_MANAGE,
-                    ],
-                });
+                await assertSocketSubscribeReach(socket.data, [
+                    PermissionName.REGISTRY_MANAGE,
+                    PermissionName.REGISTRY_PROJECT_MANAGE,
+                ]);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));

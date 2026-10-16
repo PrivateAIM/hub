@@ -21,8 +21,6 @@ import { NodeService } from '../../../../../src/core/entities/node/service.ts';
 import {
     createAllowAllActor,
     createDenyAllActor,
-    createMasterRealmActor,
-    createNonMasterRealmActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeNodeRepository } from './fake-repository.ts';
@@ -108,7 +106,7 @@ describe('NodeService', () => {
                 createTestNode({ id: 'n-2', realmId: 'realm-2' }),
             ]);
 
-            const result = await service.getMany({}, createNonMasterRealmActor());
+            const result = await service.getMany({}, createAllowAllActor());
             expect(result.data).toHaveLength(2);
         });
 
@@ -145,7 +143,7 @@ describe('NodeService', () => {
         it('should create with valid data', async () => {
             const result = await service.create(
                 { name: 'new-node' },
-                createMasterRealmActor('realm-1'),
+                createAllowAllActor('realm-1'),
             );
 
             expect(result.name).toBe('new-node');
@@ -159,7 +157,7 @@ describe('NodeService', () => {
         });
 
         it('should set realmId from actor when not provided', async () => {
-            const actor = createMasterRealmActor('actor-realm-id');
+            const actor = createAllowAllActor('actor-realm-id');
 
             const result = await service.create(
                 { name: 'new-node' },
@@ -211,7 +209,7 @@ describe('NodeService', () => {
 
             await service.create(
                 { name: 'new-node' },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(registryManager.getLinkCalls()).toHaveLength(1);
@@ -223,7 +221,7 @@ describe('NodeService', () => {
 
             const result = await service.create(
                 { name: 'new-node' },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             // A node owning a project but with a null `registryId` reads as
@@ -235,7 +233,7 @@ describe('NodeService', () => {
         it('should convert non-hex publicKey to hex', async () => {
             const result = await service.create(
                 { name: 'new-node', publicKey: 'hello' },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(result.publicKey).toBe(Buffer.from('hello', 'utf8').toString('hex'));
@@ -250,7 +248,7 @@ describe('NodeService', () => {
             const result = await service.update(
                 node.id,
                 { name: 'updated-node' },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(result.name).toBe('updated-node');
@@ -266,7 +264,7 @@ describe('NodeService', () => {
             const result = await service.update(
                 node.id,
                 { name: 'updated-node', clientId: randomUUID() },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(result.clientId).toBeNull();
@@ -331,7 +329,7 @@ describe('NodeService', () => {
             const result = await service.update(
                 node.id,
                 { registryId: nextRegistryId },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             // The stale project (on the old registry) is torn down ...
@@ -370,7 +368,7 @@ describe('NodeService', () => {
             const result = await service.update(
                 node.id,
                 { name: 'renamed-node' },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(registryManager.getUnlinkCalls()).toHaveLength(0);
@@ -398,7 +396,7 @@ describe('NodeService', () => {
             const result = await service.update(
                 node.id,
                 { registryId: null },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(registryManager.getUnlinkCalls()).toHaveLength(1);
@@ -429,7 +427,7 @@ describe('NodeService', () => {
             const result = await service.update(
                 node.id,
                 { name: 'renamed-node' },
-                createMasterRealmActor(),
+                createAllowAllActor(),
             );
 
             expect(registryManager.getUnlinkCalls()).toHaveLength(0);
@@ -464,7 +462,7 @@ describe('NodeService', () => {
                     .find((item) => item.id === node.id) ?? null;
             });
 
-            await service.update(node.id, { registryId: null }, createMasterRealmActor());
+            await service.update(node.id, { registryId: null }, createAllowAllActor());
 
             expect(registryManager.getRemoveCalls()).toHaveLength(1);
             expect(persistedAtRemoval).not.toBeNull();
@@ -495,7 +493,7 @@ describe('NodeService', () => {
                     .find((item) => item.id === node.id)?.registryProjectId;
             });
 
-            await service.update(node.id, { registryId: nextRegistryId }, createMasterRealmActor());
+            await service.update(node.id, { registryId: nextRegistryId }, createAllowAllActor());
 
             // The node already points at the freshly provisioned project — never at
             // the one being removed.
@@ -510,7 +508,7 @@ describe('NodeService', () => {
             const node = createTestNode();
             repository.seed(node);
 
-            const result = await service.delete(node.id, createMasterRealmActor());
+            const result = await service.delete(node.id, createAllowAllActor());
             expect(result.id).toBe(node.id);
             expect(repository.getAll()).toHaveLength(0);
         });
@@ -558,7 +556,7 @@ describe('NodeService', () => {
             const node = createTestNode({ registryProjectId });
             repository.seed(node);
 
-            await service.delete(node.id, createMasterRealmActor());
+            await service.delete(node.id, createAllowAllActor());
 
             expect(registryManager.getUnlinkCalls()).toHaveLength(1);
             expect(registryManager.getProjects()).toHaveLength(0);

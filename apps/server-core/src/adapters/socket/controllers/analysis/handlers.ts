@@ -20,6 +20,7 @@ import {
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import { buildSocketSubscribeError } from '../../error.ts';
+import { assertSocketSubscribeReach } from '../../reach.ts';
 import type { Socket } from '../../types.ts';
 
 export function registerAnalysisSocketHandlers(socket: Socket) {
@@ -29,13 +30,11 @@ export function registerAnalysisSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.ANALYSIS, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.ANALYSIS_UPDATE,
-                        PermissionName.ANALYSIS_EXECUTION_START,
-                        PermissionName.ANALYSIS_EXECUTION_STOP,
-                    ],
-                });
+                await assertSocketSubscribeReach(socket.data, [
+                    PermissionName.ANALYSIS_UPDATE,
+                    PermissionName.ANALYSIS_EXECUTION_START,
+                    PermissionName.ANALYSIS_EXECUTION_STOP,
+                ]);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));

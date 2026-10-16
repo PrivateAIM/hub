@@ -21,6 +21,7 @@ import {
 } from '@privateaim/server-realtime-kit';
 import { MASTER_IMAGE_READ_PERMISSIONS } from '../../../../core/index.ts';
 import { buildSocketSubscribeError } from '../../error.ts';
+import { assertSocketSubscribeReach } from '../../reach.ts';
 import type { Socket } from '../../types.ts';
 
 export function registerMasterImageSocketHandlers(socket: Socket) {
@@ -31,7 +32,7 @@ export function registerMasterImageSocketHandlers(socket: Socket) {
         async (target, cb) => {
             // Subscribing requires the same grants as the HTTP read.
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({ name: MASTER_IMAGE_READ_PERMISSIONS });
+                await assertSocketSubscribeReach(socket.data, MASTER_IMAGE_READ_PERMISSIONS);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));

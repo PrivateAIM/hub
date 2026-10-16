@@ -39,3 +39,6 @@ export type Server = ServerBase<
     STSEvents,
     SocketData
 >;
+
+/** The part of an authenticated socket's data the reach gates read. */
+export type SocketReachData = Pick<SocketData, 'permissionEvaluator' | 'identity' | 'namespaceId'>;

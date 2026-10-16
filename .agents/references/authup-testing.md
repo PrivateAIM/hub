@@ -41,7 +41,7 @@ describe('AnalysisService', () => {
 - `FakeEntityRepository<T>` — in-memory `IEntityRepository` backed by an array
 - `createAllowAllActor()` — mock `ActorContext` that allows everything
 - `createDenyAllActor()` — mock `ActorContext` that denies everything
-- `createMasterRealmActor()` / `createNonMasterRealmActor(realmId)` — realm-specific actors
+- `createScopedActor({ realmScope })` — actor whose grants carry a `realm_scope`
 
 **What to test:** permission gates, validation, realm defaulting, uniqueness, error paths.
 

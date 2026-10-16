@@ -5,21 +5,31 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { REALM_MASTER_NAME } from '@authup/core-kit';
+import { PermissionName } from '@privateaim/kit';
+import { hasUnboundedReach } from '@privateaim/server-kit';
 import type { OptionsInput } from '@routup/rate-limit';
 import { rateLimit } from '@routup/rate-limit';
 import type { App, IAppEvent } from 'routup';
-import { useRequestIdentity } from '../request';
+import { useRequestEnv, useRequestIdentity } from '../request';
+
+const PERMISSION_NAMES = Object.values(PermissionName);
 
 export function mountRateLimiterMiddleware(app: App) {
     const options : OptionsInput = {
-        skip(event: IAppEvent) {
+        async skip(event: IAppEvent) {
             const identity = useRequestIdentity(event);
+            const permissionEvaluator = useRequestEnv(event, 'permissionEvaluator');
+            if (!identity || identity.type !== 'client' || !permissionEvaluator) {
+                return false;
+            }
 
-            // Never throttle hub's own service clients, e.g. the worker's `system` client.
-            return !!identity &&
-                identity.type === 'client' &&
-                identity.realmName === REALM_MASTER_NAME;
+            // Never throttle hub's own service clients, e.g. the worker's `system` client:
+            // a client whose grants reach every realm (`realm_scope: any`, no policy) for
+            // EVERY hub permission. One name per call: several names compile as any-of.
+            const verdicts = await Promise.all(PERMISSION_NAMES.map(
+                (name) => hasUnboundedReach({ permissionEvaluator }, name),
+            ));
+            return verdicts.every(Boolean);
         },
         max(event: IAppEvent) {
             const identity = useRequestIdentity(event);

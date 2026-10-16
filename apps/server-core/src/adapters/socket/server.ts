@@ -6,8 +6,6 @@
  */
 
 import type { IClient } from '@authup/core-http-kit';
-import { REALM_MASTER_NAME } from '@authup/core-kit';
-import { PermissionDeniedError } from '@privateaim/errors';
 import type {
     CTSEvents,
     STCEvents,
@@ -28,6 +26,8 @@ import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { Server as HTTPServer } from 'node:http';
 import type { Client as RedisClient } from 'redis-extension';
 import type { Server } from 'socket.io';
+import { buildSocketSubscribeError } from './error.ts';
+import { SOCKET_NAMESPACE_PATTERN, assertSocketNamespaceReach, resolveSocketNamespaceId } from './reach.ts';
 import { registerSocketControllers } from './register.ts';
 
 type SocketServerContext = {
@@ -53,8 +53,7 @@ export function createSocketServer(
         redisSubscribeClient: ctx.redisSubscribeClient,
     });
 
-    const pattern = /^\/resources(?:\/[a-z0-9A-Z-_]+)?$/;
-    const nsp = server.of(pattern);
+    const nsp = server.of(SOCKET_NAMESPACE_PATTERN);
 
     if (ctx.logger) {
         mountLoggingMiddleware(nsp, { logger: ctx.logger });
@@ -76,38 +75,24 @@ export function createSocketServer(
         logger: ctx.logger,
     });
 
-    nsp.use((socket: Socket, next) => {
+    nsp.use(async (socket: Socket, next) => {
         if (!socket.data.identity) {
             next();
             return;
         }
 
-        const matches = socket.nsp.name.match(pattern);
-        if (typeof matches[1] === 'undefined') {
-            if (socket.data.identity.realmName !== REALM_MASTER_NAME) {
-                ctx.logger?.error({
-                    message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the global scope.`,
-                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                });
-                next(new PermissionDeniedError());
+        socket.data.namespaceId = resolveSocketNamespaceId(socket.nsp.name);
 
-                return;
-            }
-        } else {
-            [, socket.data.namespaceId] = matches;
+        try {
+            await assertSocketNamespaceReach(socket.data);
+        } catch (e) {
+            ctx.logger?.error({
+                message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the namespace ${socket.nsp.name}.`,
+                [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
+            });
 
-            if (
-                matches[1] !== socket.data.identity.realmId &&
-                socket.data.identity.realmName !== REALM_MASTER_NAME
-            ) {
-                ctx.logger?.error({
-                    message: `Socket/${socket.id}: Realm ${socket.data.identity.realmName} is not permitted for the realm ${matches[1]}.`,
-                    [LogFlag.CHANNEL]: LogChannel.WEBSOCKET,
-                });
-
-                next(new PermissionDeniedError());
-                return;
-            }
+            next(buildSocketSubscribeError(e));
+            return;
         }
 
         next();

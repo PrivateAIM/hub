@@ -21,6 +21,7 @@ import {
     unsubscribeSocketRoom,
 } from '@privateaim/server-realtime-kit';
 import { buildSocketSubscribeError } from '../../error.ts';
+import { assertSocketSubscribeReach } from '../../reach.ts';
 import type {
     Socket,
 } from '../../types.ts';
@@ -32,11 +33,9 @@ export function registerAnalysisNodeSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.ANALYSIS_APPROVE,
-                    ],
-                });
+                await assertSocketSubscribeReach(socket.data, [
+                    PermissionName.ANALYSIS_APPROVE,
+                ]);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));
@@ -73,11 +72,9 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_IN, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.ANALYSIS_APPROVE,
-                    ],
-                });
+                await assertSocketSubscribeReach(socket.data, [
+                    PermissionName.ANALYSIS_APPROVE,
+                ]);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));
@@ -107,11 +104,9 @@ export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
         buildDomainEventFullName(DomainSubType.ANALYSIS_NODE_OUT, DomainEventSubscriptionName.SUBSCRIBE),
         async (target, cb) => {
             try {
-                await socket.data.permissionEvaluator.preEvaluateOneOf({
-                    name: [
-                        PermissionName.ANALYSIS_UPDATE,
-                    ],
-                });
+                await assertSocketSubscribeReach(socket.data, [
+                    PermissionName.ANALYSIS_UPDATE,
+                ]);
             } catch (e) {
                 if (isEventCallback(cb)) {
                     cb(buildSocketSubscribeError(e));
