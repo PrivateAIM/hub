@@ -11,12 +11,12 @@ import type {
     IAnalysisBucketRepository,
     IAnalysisRepository,
 } from '../../../../core/index.ts';
-import type { IBucketCaller } from '../../../../core/services/index.ts';
+import type { IBucketDispatcher } from '../../../../core/services/index.ts';
 
 export type StorageBucketAggregatorContext = {
     analysisRepository: IAnalysisRepository;
     analysisBucketRepository: IAnalysisBucketRepository;
     analysisBucketFileRepository: IAnalysisBucketFileRepository;
-    bucketCaller: IBucketCaller;
+    bucketDispatcher: IBucketDispatcher;
     logger?: Logger;
 };

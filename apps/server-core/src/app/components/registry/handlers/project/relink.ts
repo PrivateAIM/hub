@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
+import type { ComponentHandler, ComponentHandlerContext } from 'hubwire';
 import type { RegistryEventMap, RegistryProjectRelinkPayload } from '../../type.ts';
 import { RegistryCommand } from '../../constants.ts';
 

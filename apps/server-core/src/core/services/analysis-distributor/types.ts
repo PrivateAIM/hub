@@ -7,9 +7,9 @@
 
 /**
  * Port for triggering analysis distribution operations on the worker.
- * Implemented by AnalysisDistributorComponentCaller in server-core-worker-kit.
+ * Implemented by AnalysisDistributorComponentDispatcher in server-core-worker-kit.
  */
-export interface IAnalysisDistributorCaller {
-    callExecute(data: { id: string }): Promise<void>;
-    callCheck(data: { id: string }): Promise<void>;
+export interface IAnalysisDistributorDispatcher {
+    dispatchExecute(data: { id: string }): Promise<void>;
+    dispatchCheck(data: { id: string }): Promise<void>;
 }

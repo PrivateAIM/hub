@@ -6,9 +6,9 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IMessageBusDriver } from 'synergos';
-import { MemoryMessageBusDriver, MessageBus } from 'synergos';
-import { AmqpMessageBusDriver } from '@synergos/amqp';
+import type { IMessageBus, IMessageBusDriver } from 'hubwire';
+import { MemoryMessageBusDriver, MessageBus } from 'hubwire';
+import { AmqpMessageBusDriver } from '@hubwire/amqp';
 import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../config/constants';
 import { LOGGER_MODULE_NAME, LoggerInjectionKey } from '../logger/constants';
@@ -18,12 +18,15 @@ import {
     MESSAGE_BUS_MODULE_NAME,
     MESSAGE_BUS_TOPIC_EXCHANGE,
     MessageBusInjectionKey,
+    RemoteMessageBusInjectionKey,
 } from './constants';
 import type { MessageBusModuleOptions } from './types';
 
 /**
  * Always registers a bus: over AMQP when a connection string is configured,
- * otherwise in-process (memory driver), so callers can depend on one.
+ * otherwise in-process (memory driver), so callers can depend on one. Only a
+ * bus whose driver is not the memory driver is also registered as
+ * `RemoteMessageBusInjectionKey`.
  */
 export class MessageBusModule implements IModule {
     readonly name = MESSAGE_BUS_MODULE_NAME;
@@ -35,7 +38,7 @@ export class MessageBusModule implements IModule {
 
     private options: MessageBusModuleOptions;
 
-    private driver: IMessageBusDriver | undefined;
+    private messageBus: IMessageBus | undefined;
 
     constructor(options: MessageBusModuleOptions = {}) {
         this.options = options;
@@ -60,7 +63,6 @@ export class MessageBusModule implements IModule {
                     connectionString,
                     hooks: logger ? createAmqpDriverLogHooks(logger) : undefined,
                     defaultTopicExchange: MESSAGE_BUS_TOPIC_EXCHANGE,
-                    // explicit, not the driver default: worker handlers read it to spot the last attempt
                     maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS,
                 });
             } else {
@@ -68,20 +70,22 @@ export class MessageBusModule implements IModule {
             }
         }
 
-        this.driver = driver;
-
         const bus = new MessageBus({
             driver,
             hooks: logger ?
                 createMessageBusLogHooks(logger, { silentRoutings: this.options.silentRoutings }) :
                 undefined,
         });
+        this.messageBus = bus;
         container.register(MessageBusInjectionKey, { useValue: bus });
+        if (!(driver instanceof MemoryMessageBusDriver)) {
+            container.register(RemoteMessageBusInjectionKey, { useValue: bus });
+        }
     }
 
     async teardown(): Promise<void> {
-        const { driver } = this;
-        this.driver = undefined;
-        await driver?.close?.();
+        const { messageBus } = this;
+        this.messageBus = undefined;
+        await messageBus?.close();
     }
 }

@@ -5,20 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
-import { DispatchCaller } from 'synergos';
+import type { ComponentMetadata, RemoteDispatcherOptions } from 'hubwire';
+import { RemoteDispatcher } from 'hubwire';
 import { LogCommand, LogTaskMessageBusRouting } from './constants';
 import type { LogWriteCommandPayload } from './handlers';
 
-export class LogComponentCaller extends DispatchCaller {
-    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
+export class LogComponentDispatcher extends RemoteDispatcher {
+    constructor(options: Omit<RemoteDispatcherOptions, 'routing'>) {
         super({
             ...options,
             routing: LogTaskMessageBusRouting,
         });
     }
 
-    async callWrite(payload: LogWriteCommandPayload, metadata: ComponentMetadata = {}) {
-        return this.call(LogCommand.WRITE, payload, metadata);
+    async dispatchWrite(payload: LogWriteCommandPayload, metadata: ComponentMetadata = {}): Promise<void> {
+        await this.dispatch(LogCommand.WRITE, payload, metadata);
     }
 }

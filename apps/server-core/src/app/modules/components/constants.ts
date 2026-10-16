@@ -6,12 +6,12 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { IRegistryCaller } from '../../../core/harbor/types.ts';
+import type { IRegistryDispatcher } from '../../../core/harbor/types.ts';
 
 export const ComponentsInjectionKey = {
-    // Typed against the port `RegistryComponentCaller` implements, not the
-    // concrete class — every consumer only ever calls `.call(...)` on this
-    // (see `RegistryService.registryCaller`, already typed `IRegistryCaller`),
+    // Typed against the port `RegistryComponentDispatcher` implements, not the
+    // concrete class — every consumer only ever calls `.dispatch(...)` on this
+    // (see `RegistryService.registryDispatcher`, already typed `IRegistryDispatcher`),
     // and the narrower port is what makes this fake-able in tests.
-    RegistryComponentCaller: new TypedToken<IRegistryCaller>('RegistryComponentCaller'),
+    RegistryComponentDispatcher: new TypedToken<IRegistryDispatcher>('RegistryComponentDispatcher'),
 } as const;

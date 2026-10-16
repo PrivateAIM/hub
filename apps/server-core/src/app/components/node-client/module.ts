@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IComponent } from 'synergos';
-import { defineScheduledComponent } from 'synergos';
+import type { IScheduledComponent } from 'hubwire';
+import { defineScheduledComponent } from 'hubwire';
 import { NODE_CLIENT_SYNC_SCHEDULE } from './constants.ts';
 import { syncNodeClientPermissions } from './sync.ts';
 import type { NodeClientComponentContext, NodeClientPermissionSyncResult } from './types.ts';
@@ -21,7 +21,7 @@ import type { NodeClientComponentContext, NodeClientPermissionSyncResult } from 
  * stamped only for a clean pass. No log hooks are handed to the scheduled
  * component: run() already logs at error level.
  */
-export function createNodeClientComponent(ctx: NodeClientComponentContext): IComponent {
+export function createNodeClientComponent(ctx: NodeClientComponentContext): IScheduledComponent {
     return defineScheduledComponent({
         schedule: NODE_CLIENT_SYNC_SCHEDULE,
         run: async () => {

@@ -86,9 +86,9 @@ function createHandler(coreClient: ICoreClient, docker: FakeDockerClient) {
     });
 }
 
-function run(coreClient: ICoreClient, docker: FakeDockerClient, attempt?: number) {
+function run(coreClient: ICoreClient, docker: FakeDockerClient, attempt = 1) {
     const context = new FakeComponentHandlerContext(AnalysisDistributorCommand.CHECK);
-    context.metadata.attempt = attempt;
+    context.metadata.delivery = { attempt, maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS };
 
     return createHandler(coreClient, docker)
         .handle(PAYLOAD, context)

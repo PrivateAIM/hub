@@ -10,7 +10,7 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
-import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
+import type { ComponentHandler, ComponentHandlerContext } from 'hubwire';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../adapters/database/index.ts';
 import { RegistryCommand } from '../constants.ts';
 import type { RegistryCleanupPayload, RegistryEventMap } from '../type.ts';

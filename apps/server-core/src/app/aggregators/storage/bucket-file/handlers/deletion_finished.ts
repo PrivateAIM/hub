@@ -6,7 +6,7 @@
  */
 import { DomainType } from '@privateaim/core-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler } from 'synergos';
+import type { ComponentHandler } from 'hubwire';
 import type { BucketFileComponentEventMap } from '@privateaim/server-storage-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';

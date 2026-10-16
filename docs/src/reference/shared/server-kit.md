@@ -21,30 +21,44 @@ logger.info('Service started');
 
 ### Message Bus
 
-The message bus, its drivers, components and callers live in
-[`synergos`](https://github.com/tada5hi/synergos), a standalone library shared with Authup (`synergos`, plus
-`@synergos/amqp` for the AMQP driver). server-kit only wires it into the DI container:
+The message bus, its drivers, components, dispatchers and workers live in
+[`hubwire`](https://github.com/tada5hi/hubwire), a standalone library shared with Authup (`hubwire`, plus
+`@hubwire/amqp` for the AMQP driver). server-kit only wires it into the DI container:
 `MessageBusModule` always registers a `MessageBus` (typed `IMessageBus`) under
-`MessageBusInjectionKey`, with the AMQP driver (`@synergos/amqp`, topic
+`MessageBusInjectionKey`, with the AMQP driver (`@hubwire/amqp`, topic
 exchange `MESSAGE_BUS_TOPIC_EXCHANGE` = `FLAME`) when a RabbitMQ connection string is
 configured and the in-process memory driver otherwise. Its `teardown()` closes the
-connection.
+bus (`IMessageBus.close()`), and with it the connection. Only a bus on another driver than
+the memory driver is also registered as `RemoteMessageBusInjectionKey`: the memory driver
+keeps a WORK message until a consumer takes it, so a publisher whose consumer is another
+service (log lines and entity events for server-telemetry) resolves that token and stays
+unbuilt without AMQP.
 
 ```typescript
 import { MessageBusInjectionKey, MessageBusModule } from '@privateaim/server-kit';
-import { Component, WorkerCaller, defineScheduledComponent } from 'synergos';
+import { Component, RemoteWorker, defineScheduledComponent } from 'hubwire';
 ```
+
+A handler sees the driver's delivery attempt as `metadata.delivery = { attempt, maxAttempts }`
+(`MESSAGE_BUS_MAX_ATTEMPTS` = 5 over AMQP, `1/1` on the memory driver). `publish()` resolves
+once the transport took the message, never after a handler ran.
 
 ::: warning Breaking change
 `BaseComponent`, the component callers, `ComponentError`, `MessageBus`, the message bus
 drivers, payload helpers and routing types, and the `Aggregator` type are no longer
-exported by server-kit, and no aliases remain. Import them from `synergos`
-(`@synergos/amqp` for the AMQP driver); renamed on the way: `BaseComponent` → `Component`,
-`Component` (type) → `IComponent`, `ComponentCaller` → `ICaller`,
-`MessageBusDispatchComponentCaller` → `DispatchCaller`, `MessageBusWorkerComponentCaller`
-→ `WorkerCaller`, `DirectComponentCaller` → `DirectCaller`, `MessageBusPayload` → `Message`,
+exported by server-kit, and no aliases remain. Import them from `hubwire`
+(`@hubwire/amqp` for the AMQP driver); renamed on the way: `BaseComponent` → `Component`,
+`Component` (type) → `IComponent`, `ComponentCaller` → `IDispatcher`,
+`MessageBusDispatchComponentCaller` → `RemoteDispatcher`, `MessageBusWorkerComponentCaller`
+→ `RemoteWorker`, `DirectComponentCaller` → `LocalDispatcher`, `MessageBusPayload` → `Message`,
 `MessageBusRouting` → `MessageRouting`, `buildMessageBusPublishPayload` → `buildMessage`.
-Callers require a `messageBus`, and take `hooks` instead of a `logger`.
+Dispatchers and workers require a `messageBus`; a `RemoteWorker` takes `hooks` instead of a
+`logger`, a `RemoteDispatcher` takes neither. The hub caller subclasses now extend
+`RemoteDispatcher`, lost their `hooks` option and are renamed: `*ComponentCaller` →
+`*ComponentDispatcher`, `BucketFile*Caller` → `BucketFile*Dispatcher`, their `call*` methods →
+`dispatch*` (e.g. `callExecute` → `dispatchExecute`).
+`createDispatchCallerLogHooks` was removed (a publish no longer reports an undelivered
+message) and `createWorkerCallerLogHooks` is now `createRemoteWorkerLogHooks`.
 `CompoundComponentCaller` was removed without replacement.
 :::
 
@@ -102,7 +116,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 |--------|-------------|
 | `app` | `BaseApplicationBuilder`, `Application` base class |
 | `logger` | Winston logger setup and `LoggerModule` |
-| `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `synergos` message bus; `createMessageBusLogHooks`, `createAmqpDriverLogHooks`, `createDispatchCallerLogHooks`, `createWorkerCallerLogHooks`, `createScheduledComponentLogHooks` — synergos `hooks` that log through a hub logger |
+| `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `hubwire` message bus; `createMessageBusLogHooks`, `createAmqpDriverLogHooks`, `createRemoteWorkerLogHooks`, `createScheduledComponentLogHooks` — hubwire `hooks` that log through a hub logger |
 | `redis` | Redis module and connection helpers |
 | `authup` | Authup authentication middleware module |
 | `config` | Configuration reading via `envix` |
@@ -116,7 +130,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 |-------------|---------|
 | `LoggerModule` | Winston logger with optional telemetry transport |
 | `RedisModule` | Redis client registration |
-| `MessageBusModule` | Registers the `synergos` message bus (AMQP or memory driver) with log hooks, closes it on teardown. `silentRoutings`: routings whose publishes are not logged |
+| `MessageBusModule` | Registers the `hubwire` message bus (AMQP or memory driver) with log hooks, and as `RemoteMessageBusInjectionKey` unless it is the memory driver; closes it on teardown. `silentRoutings`: routings whose publishes are not logged |
 | `AuthupModule` | Authup middleware and token validation |
 | `EntityEventModule` | Domain event dispatching |
 
@@ -129,5 +143,5 @@ class MyAppBuilder extends BaseApplicationBuilder {
 - `orkos` — Module system (`IModule`)
 - `eldin` — DI container (`TypedToken`)
 - `envix` — Environment variable reading
-- `synergos` — Message bus, components and callers
-- `@synergos/amqp` — AMQP driver (brings `amqp-extension`), which `MessageBusModule` imports
+- `hubwire` — Message bus, components, dispatchers and workers
+- `@hubwire/amqp` — AMQP driver (brings `amqp-extension`), which `MessageBusModule` imports

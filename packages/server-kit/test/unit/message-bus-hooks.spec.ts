@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MemoryMessageBusDriver, MessageBus, buildMessage } from 'synergos';
-import type { MessageRouting } from 'synergos';
+import { MemoryMessageBusDriver, MessageBus, buildMessage } from 'hubwire';
+import type { MessageRouting } from 'hubwire';
+import { drain } from '@hubwire/test';
 import { describe, expect, it } from 'vitest';
 import {
     LoggerMemoryTransport,
@@ -48,6 +49,7 @@ describe('src/message-bus/hooks', () => {
 
         await bus.consume(logRouting, { write: () => {} });
         await bus.publish(buildMessage({ type: 'write', metadata: { routing: logRouting } }));
+        await drain();
 
         expect(transport.items.map((item) => item.message)).toEqual(['Consuming queue message write in log']);
     });
@@ -61,8 +63,8 @@ describe('src/message-bus/hooks', () => {
             },
         });
 
-        await expect(bus.publish(buildMessage({ type: 'execute', metadata: { routing: taskRouting } })))
-            .rejects.toThrow('boom');
+        await bus.publish(buildMessage({ type: 'execute', metadata: { routing: taskRouting } }));
+        await drain();
 
         const errors = transport.items.filter((item) => item.level === 'error');
         expect(errors.map((item) => item.message)).toEqual(['Handling queue message execute in task failed: boom']);

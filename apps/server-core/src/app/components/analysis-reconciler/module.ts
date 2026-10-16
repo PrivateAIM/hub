@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IComponent } from 'synergos';
-import { defineScheduledComponent } from 'synergos';
+import type { IScheduledComponent } from 'hubwire';
+import { defineScheduledComponent } from 'hubwire';
 import type { AnalysisReconcileResult } from '../../../core/services/analysis-reconciler/index.ts';
 import { ANALYSIS_RECONCILER_SCHEDULE } from './constants.ts';
 import type { AnalysisReconcilerComponentContext } from './types.ts';
@@ -28,7 +28,7 @@ import type { AnalysisReconcilerComponentContext } from './types.ts';
  * process per pass, and a returning worker drains that backlog ahead of later
  * EXECUTEs.
  */
-export function createAnalysisReconcilerComponent(ctx: AnalysisReconcilerComponentContext): IComponent {
+export function createAnalysisReconcilerComponent(ctx: AnalysisReconcilerComponentContext): IScheduledComponent {
     return defineScheduledComponent({
         schedule: ANALYSIS_RECONCILER_SCHEDULE,
         run: async () => {

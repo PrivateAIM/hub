@@ -29,17 +29,17 @@ import type { IEventPublisher } from './types.ts';
 const TIMESTAMP_KEYS = new Set<string>(['createdAt', 'updatedAt', 'expiresAt']);
 
 export type EntityEventHandlerContext = {
-    eventComponentCaller?: IEventPublisher,
+    eventComponentDispatcher?: IEventPublisher,
     logger?: Logger,
 };
 
 export class EntityEventHandler implements IEntityEventHandler {
-    protected eventComponentCaller?: IEventPublisher;
+    protected eventComponentDispatcher?: IEventPublisher;
 
     protected logger?: Logger;
 
     constructor(ctx: EntityEventHandlerContext = {}) {
-        this.eventComponentCaller = ctx.eventComponentCaller;
+        this.eventComponentDispatcher = ctx.eventComponentDispatcher;
         this.logger = ctx.logger;
     }
 
@@ -127,8 +127,8 @@ export class EntityEventHandler implements IEntityEventHandler {
 
         entity.data = data;
 
-        if (this.eventComponentCaller) {
-            await this.eventComponentCaller.callCreate(entity);
+        if (this.eventComponentDispatcher) {
+            await this.eventComponentDispatcher.dispatchCreate(entity);
 
             return;
         }

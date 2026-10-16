@@ -12,7 +12,7 @@ export interface IBucketRepository extends IEntityRepository<Bucket> {
     findOneByIdOrName(id: string): Promise<Bucket | null>;
 }
 
-export interface IBucketCaller {
+export interface IBucketDispatcher {
     create(data: Record<string, any>): Promise<Bucket>;
     delete(id: string): Promise<Bucket>;
     clear(id: string): Promise<Bucket>;

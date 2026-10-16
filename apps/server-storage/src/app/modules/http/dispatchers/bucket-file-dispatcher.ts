@@ -5,37 +5,34 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DirectCaller } from 'synergos';
 import {
     BucketFileCommand,
     BucketFileEvent,
-    type BucketFileEventCaller,
+    type BucketFileEventDispatcher,
 } from '@privateaim/server-storage-kit';
-import type { IBucketFileCaller } from '../../../../core/entities/index.ts';
+import type { IBucketFileDispatcher } from '../../../../core/entities/index.ts';
 import type { BucketFileComponent } from '../../../components/bucket-file/module.ts';
 
-export class BucketFileCallerAdapter implements IBucketFileCaller {
+export class BucketFileDispatcherAdapter implements IBucketFileDispatcher {
     protected component: BucketFileComponent;
 
-    protected eventCaller: BucketFileEventCaller;
+    protected eventDispatcher: BucketFileEventDispatcher | undefined;
 
-    constructor(component: BucketFileComponent, eventCaller: BucketFileEventCaller) {
+    constructor(component: BucketFileComponent, eventDispatcher?: BucketFileEventDispatcher) {
         this.component = component;
-        this.eventCaller = eventCaller;
+        this.eventDispatcher = eventDispatcher;
     }
 
     async delete(id: string): Promise<void> {
-        const caller = new DirectCaller(this.component);
-
         await new Promise<void>((resolve, reject) => {
-            caller.callWith(
+            this.component.handle(
                 BucketFileCommand.DELETE,
                 { id },
                 {},
                 {
                     handle: async (childValue, childContext) => {
                         try {
-                            await this.eventCaller.call(
+                            await this.eventDispatcher?.dispatch(
                                 childContext.key,
                                 childValue,
                                 childContext.metadata,

@@ -12,23 +12,23 @@ import { PermissionName } from '@privateaim/kit';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
 import { decodeQuery } from '../../query/index.ts';
-import type { IBucketFileCaller, IBucketFileRepository, IBucketFileService } from './types.ts';
+import type { IBucketFileDispatcher, IBucketFileRepository, IBucketFileService } from './types.ts';
 import { bucketFileSchema } from './schema.ts';
 
 type BucketFileServiceContext = {
     repository: IBucketFileRepository;
-    caller: IBucketFileCaller;
+    dispatcher: IBucketFileDispatcher;
 };
 
 export class BucketFileService extends AbstractEntityService implements IBucketFileService {
     protected repository: IBucketFileRepository;
 
-    protected caller: IBucketFileCaller;
+    protected dispatcher: IBucketFileDispatcher;
 
     constructor(ctx: BucketFileServiceContext) {
         super();
         this.repository = ctx.repository;
-        this.caller = ctx.caller;
+        this.dispatcher = ctx.dispatcher;
     }
 
     async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<BucketFile>> {
@@ -62,7 +62,7 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
             await assertRecordReach(actor, PermissionName.BUCKET_UPDATE, { realmId: entity.realmId, attributes: entity });
         }
 
-        await this.caller.delete(entity.id);
+        await this.dispatcher.delete(entity.id);
 
         const { id: entityId } = entity;
 

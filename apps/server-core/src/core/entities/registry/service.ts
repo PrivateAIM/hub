@@ -17,7 +17,7 @@ import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
-import type { IRegistryCaller } from '../../harbor/types.ts';
+import type { IRegistryDispatcher } from '../../harbor/types.ts';
 import { decodeQuery } from '../../query/index.ts';
 import { registrySchema } from './schema.ts';
 import type { IRegistryRepository, IRegistryService } from './types.ts';
@@ -25,7 +25,7 @@ import type { IRegistryRepository, IRegistryService } from './types.ts';
 type RegistryServiceContext = {
     repository: IRegistryRepository;
     registryProjectRepository?: IEntityRepository<RegistryProject>;
-    registryCaller?: IRegistryCaller;
+    registryDispatcher?: IRegistryDispatcher;
 };
 
 /**
@@ -50,7 +50,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
 
     protected registryProjectRepository?: IEntityRepository<RegistryProject>;
 
-    protected registryCaller?: IRegistryCaller;
+    protected registryDispatcher?: IRegistryDispatcher;
 
     protected validator: RegistryValidator;
 
@@ -58,7 +58,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         super();
         this.repository = ctx.repository;
         this.registryProjectRepository = ctx.registryProjectRepository;
-        this.registryCaller = ctx.registryCaller;
+        this.registryDispatcher = ctx.registryDispatcher;
         this.validator = new RegistryValidator();
     }
 
@@ -175,8 +175,8 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
     ): Promise<void> {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_MANAGE });
 
-        if (!this.registryCaller) {
-            throw new BadRequestError('Registry caller is not available.');
+        if (!this.registryDispatcher) {
+            throw new BadRequestError('Registry dispatcher is not available.');
         }
 
         switch (command) {
@@ -194,7 +194,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
                     [RegistryAPICommand.DELETE]: 'DELETE',
                 };
 
-                await this.registryCaller.call(commandMap[command], { id: entity.id }, {});
+                await this.registryDispatcher.dispatch(commandMap[command], { id: entity.id }, {});
                 break;
             }
             case RegistryAPICommand.PROJECT_LINK:
@@ -209,13 +209,13 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
                 }
 
                 if (command === RegistryAPICommand.PROJECT_LINK) {
-                    await this.registryCaller.call(
+                    await this.registryDispatcher.dispatch(
                         'PROJECT_LINK',
                         { id: entity.id, secret: data.secret },
                         {},
                     );
                 } else {
-                    await this.registryCaller.call(
+                    await this.registryDispatcher.dispatch(
                         'PROJECT_UNLINK',
                         {
                             id: entity.id,

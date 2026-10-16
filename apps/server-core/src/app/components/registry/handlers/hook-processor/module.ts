@@ -6,7 +6,7 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler, ObjectLiteral } from 'synergos';
+import type { ComponentHandler, ObjectLiteral } from 'hubwire';
 import type { RegistryCommand } from '../../constants.ts';
 import type { RegistryEventMap } from '../../type.ts';
 import { RegistryHookValidator } from './validator.ts';

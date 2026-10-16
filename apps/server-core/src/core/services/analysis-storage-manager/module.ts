@@ -14,13 +14,13 @@ import type {
     AnalysisStorageMangerClearOptions,
     AnalysisStorageMangerRemoveOptions, 
     IAnalysisStorageManager,
-    IBucketCaller, 
+    IBucketDispatcher, 
 } from './types.ts';
 
 type AnalysisStorageManagerContext = {
     repository: IEntityRepository<Analysis>;
     bucketRepository: IEntityRepository<AnalysisBucket>;
-    caller: IBucketCaller;
+    dispatcher: IBucketDispatcher;
 };
 
 export class AnalysisStorageManager implements IAnalysisStorageManager {
@@ -28,12 +28,12 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
 
     protected bucketRepository: IEntityRepository<AnalysisBucket>;
 
-    protected caller: IBucketCaller;
+    protected dispatcher: IBucketDispatcher;
 
     constructor(ctx: AnalysisStorageManagerContext) {
         this.repository = ctx.repository;
         this.bucketRepository = ctx.bucketRepository;
-        this.caller = ctx.caller;
+        this.dispatcher = ctx.dispatcher;
     }
 
     async check(
@@ -55,7 +55,7 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 continue;
             }
 
-            await this.caller.callCreate({
+            await this.dispatcher.dispatchCreate({
                 name: buildAnalysisBucketName(bucketType, entity.id),
                 realmId: entity.realmId,
                 refType: DomainType.ANALYSIS,
@@ -84,7 +84,7 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 continue;
             }
 
-            await this.caller.callDelete({ id: analysisBucket.bucketId });
+            await this.dispatcher.dispatchDelete({ id: analysisBucket.bucketId });
         }
 
         return entity;
@@ -109,7 +109,7 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 continue;
             }
 
-            await this.caller.callClear({ id: analysisBucket.bucketId });
+            await this.dispatcher.dispatchClear({ id: analysisBucket.bucketId });
         }
 
         return entity;

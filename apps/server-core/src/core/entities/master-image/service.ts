@@ -15,10 +15,10 @@ import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@
 import { decodeQuery } from '../../query/index.ts';
 import { masterImageSchema } from './schema.ts';
 import type {
-    IMasterImageBuilderCaller,
+    IMasterImageBuilderDispatcher,
     IMasterImageRepository,
     IMasterImageService,
-    IMasterImageSynchronizerCaller,
+    IMasterImageSynchronizerDispatcher,
 } from './types.ts';
 
 /**
@@ -34,8 +34,8 @@ const MASTER_IMAGE_BUILD_CLAIM_STALE_MS = 15 * 60 * 1000;
 
 type MasterImageServiceContext = {
     repository: IMasterImageRepository;
-    synchronizerCaller: IMasterImageSynchronizerCaller;
-    builderCaller: IMasterImageBuilderCaller;
+    synchronizerDispatcher: IMasterImageSynchronizerDispatcher;
+    builderDispatcher: IMasterImageBuilderDispatcher;
     masterImagesConfig: {
         owner: string;
         repository: string;
@@ -46,9 +46,9 @@ type MasterImageServiceContext = {
 export class MasterImageService extends AbstractEntityService implements IMasterImageService {
     protected repository: IMasterImageRepository;
 
-    protected synchronizerCaller: IMasterImageSynchronizerCaller;
+    protected synchronizerDispatcher: IMasterImageSynchronizerDispatcher;
 
-    protected builderCaller: IMasterImageBuilderCaller;
+    protected builderDispatcher: IMasterImageBuilderDispatcher;
 
     protected masterImagesConfig: {
         owner: string;
@@ -59,8 +59,8 @@ export class MasterImageService extends AbstractEntityService implements IMaster
     constructor(ctx: MasterImageServiceContext) {
         super();
         this.repository = ctx.repository;
-        this.synchronizerCaller = ctx.synchronizerCaller;
-        this.builderCaller = ctx.builderCaller;
+        this.synchronizerDispatcher = ctx.synchronizerDispatcher;
+        this.builderDispatcher = ctx.builderDispatcher;
         this.masterImagesConfig = ctx.masterImagesConfig;
     }
 
@@ -101,7 +101,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
 
         switch (command) {
             case MasterImageCommand.SYNC: {
-                await this.synchronizerCaller.callExecute({
+                await this.synchronizerDispatcher.dispatchExecute({
                     owner: this.masterImagesConfig.owner,
                     repository: this.masterImagesConfig.repository,
                     branch: this.masterImagesConfig.branch,
@@ -140,7 +140,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                 }
 
                 try {
-                    await this.builderCaller.callExecute({ id: entity.id });
+                    await this.builderDispatcher.dispatchExecute({ id: entity.id });
                 } catch (e) {
                     // presumably nothing was dispatched, so no worker event will
                     // move STARTING on — but a publish can fail after the broker

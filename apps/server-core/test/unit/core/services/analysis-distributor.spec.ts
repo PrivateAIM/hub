@@ -25,7 +25,7 @@ import {
 import { AnalysisDistributor } from '../../../../src/core/services/analysis-distributor/module.ts';
 import { ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS, ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/core/services/helpers.ts';
 import { FakeEntityRepository } from '@privateaim/server-test-kit';
-import { FakeAnalysisDistributorCaller } from './helpers/fake-distributor-caller.ts';
+import { FakeAnalysisDistributorDispatcher } from './helpers/fake-distributor-dispatcher.ts';
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
@@ -49,7 +49,7 @@ describe('AnalysisDistributor', () => {
     let repository: FakeAnalysisRepository;
     let analysisNodeRepository: FakeEntityRepository<AnalysisNode>;
     let registryRepository: FakeEntityRepository<Registry>;
-    let caller: FakeAnalysisDistributorCaller;
+    let dispatcher: FakeAnalysisDistributorDispatcher;
     let analysisRecalculator: FakeAnalysisMetadataRecalculator;
     let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
     let fileRecalculator: FakeAnalysisFileMetadataRecalculator;
@@ -59,7 +59,7 @@ describe('AnalysisDistributor', () => {
         repository = new FakeAnalysisRepository();
         analysisNodeRepository = new FakeEntityRepository<AnalysisNode>();
         registryRepository = new FakeEntityRepository<Registry>();
-        caller = new FakeAnalysisDistributorCaller();
+        dispatcher = new FakeAnalysisDistributorDispatcher();
         analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
         nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
         fileRecalculator = new FakeAnalysisFileMetadataRecalculator(repository);
@@ -67,7 +67,7 @@ describe('AnalysisDistributor', () => {
             repository,
             analysisNodeRepository,
             registryRepository,
-            caller,
+            dispatcher,
             analysisRecalculator,
             nodeRecalculator,
             fileRecalculator,
@@ -95,8 +95,8 @@ describe('AnalysisDistributor', () => {
             const result = await distributor.start(analysis);
 
             expect(result.distributionStatus).toBe(ProcessStatus.STARTING);
-            expect(caller.getCallsFor('callExecute')).toHaveLength(1);
-            expect(caller.getCallsFor('callExecute')[0].data.id).toBe('analysis-1');
+            expect(dispatcher.getCallsFor('dispatchExecute')).toHaveLength(1);
+            expect(dispatcher.getCallsFor('dispatchExecute')[0].data.id).toBe('analysis-1');
         });
 
         it('should call recalculators before starting', async () => {
@@ -146,7 +146,7 @@ describe('AnalysisDistributor', () => {
             registryRepository.seed(createTestRegistry());
 
             await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError.nodesApprovalRequired().message);
-            expect(caller.getCallsFor('callExecute')).toHaveLength(0);
+            expect(dispatcher.getCallsFor('dispatchExecute')).toHaveLength(0);
         });
 
         it('should throw when distribution already in progress', async () => {
@@ -166,7 +166,7 @@ describe('AnalysisDistributor', () => {
             };
 
             await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError);
-            expect(caller.getCallsFor('callExecute')).toHaveLength(0);
+            expect(dispatcher.getCallsFor('dispatchExecute')).toHaveLength(0);
         });
 
         it('should persist the auto-assigned registry with the STARTING transition', async () => {
@@ -215,7 +215,7 @@ describe('AnalysisDistributor', () => {
             const result = await distributor.check(analysis);
 
             expect(result.id).toBe('analysis-1');
-            expect(caller.getCallsFor('callCheck')).toHaveLength(1);
+            expect(dispatcher.getCallsFor('dispatchCheck')).toHaveLength(1);
         });
 
         it('should resolve entity by string ID', async () => {
@@ -253,7 +253,7 @@ describe('AnalysisDistributor', () => {
             const result = await distributor.check(analysis);
 
             expect(result.id).toBe('analysis-1');
-            expect(caller.getCallsFor('callCheck')).toHaveLength(1);
+            expect(dispatcher.getCallsFor('dispatchCheck')).toHaveLength(1);
         });
     });
 

@@ -6,7 +6,7 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
+import type { ComponentHandler, ComponentHandlerContext } from 'hubwire';
 import type { BucketComponentEventMap, BucketCreateCommandPayload } from '@privateaim/server-storage-kit';
 import {
     BucketCommand,

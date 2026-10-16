@@ -12,7 +12,7 @@ import {
     expect, 
     it, 
 } from 'vitest';
-import type { IComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
 import { createNodeClientComponent } from '../../../../../src/app/components/node-client/index.ts';
 import { FakeNodeRepository } from '../../../core/entities/node/fake-repository.ts';
 

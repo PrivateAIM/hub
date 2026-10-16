@@ -576,8 +576,8 @@ src/
 
 - **Entity services** (`core/entities/<name>/service.ts`): Own validation (`this.validator.run(data, { group: ValidatorGroup.CREATE })`), receive repos via constructor injection
 - **Port interfaces** (`core/entities/<name>/types.ts`): `IXRepository extends IEntityRepository<T>`, `IXService`
-- **Business services** (`core/services/`): Accept all dependencies via constructor (repositories, callers)
-- **Service port interfaces** (`core/services/types.ts`): `IAnalysisBuilderCaller`, `IBucketCaller`, etc.
+- **Business services** (`core/services/`): Accept all dependencies via constructor (repositories, dispatchers)
+- **Service port interfaces** (`core/services/types.ts`): `IAnalysisBuilderDispatcher`, `IBucketDispatcher`, etc.
 - **No TypeORM, no routup** imports anywhere in `core/`. Use container DI via injection keys.
 
 ### Controller Conventions
@@ -705,8 +705,8 @@ app/modules/<name>/
 - **Injection keys** use `TypedToken<T>` from `eldin` — one constant per token, co-located with the module that registers it
 - **Types/interfaces** always live in `types.ts`, never inline in `module.ts`
 - **Module names** are string constants in `ModuleName` enum (`packages/server-kit/src/services/module-names.ts`)
-- **Shared modules** (logger, redis, message-bus, authup, entity-event) live in `packages/server-kit/src/<name>/`. `message-bus/` holds only the DI module, the injection key and the log-hook factories (`hooks.ts`): the bus, its drivers, components and callers come from [`synergos`](https://github.com/tada5hi/synergos) (`@synergos/amqp` for the AMQP driver). Observability is a `hooks` option, never a logger — build it with the server-kit factories rather than per service
-- **Every module that starts components stops them** — `ComponentsModule` (and server-core's `AggregatorsModule`) keep what they started and `await` each `stop()` in `teardown()`; a scheduled job is `defineScheduledComponent` (synergos), never a hand-rolled `node-cron` task or `setInterval`
+- **Shared modules** (logger, redis, message-bus, authup, entity-event) live in `packages/server-kit/src/<name>/`. `message-bus/` holds only the DI module, the injection key and the log-hook factories (`hooks.ts`): the bus, its drivers, components, dispatchers (`LocalDispatcher` / `RemoteDispatcher`) and workers (`RemoteWorker`) come from [`hubwire`](https://github.com/tada5hi/hubwire) (`@hubwire/amqp` for the AMQP driver). Observability is a `hooks` option, never a logger — build it with the server-kit factories rather than per service
+- **Every module that starts components stops them** — `ComponentsModule` (and server-core's `AggregatorsModule`) keep what they started in one `IComponent[]` and `await` each `stop()` in `teardown()`, then each `settled?.()` (only a scheduled component has it; its `stop()` never waits for a pass in flight, which must not outlive the database); a scheduled job is `defineScheduledComponent` (hubwire), never a hand-rolled `node-cron` task or `setInterval`
 - **Per-service modules** (database, minio, victoria-logs, etc.) live in `apps/<service>/src/app/modules/<name>/`
 - Each service has `app/builder.ts` (`ServiceXApplicationBuilder extends BaseApplicationBuilder`) with `withConfig()`, `withDatabase()`, `withHTTP()`
 - Each service has `app/factory.ts` with `createApplication()` using the builder
@@ -719,7 +719,7 @@ app/modules/<name>/
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | `entityEvent`?, `authupClient`? | `DataSource`, 13 repo adapters, `RegistryManager` |
-| ComponentsModule | `components` | `database`, `analysis`, `messageBus` | `RegistryComponentCaller` (bus dispatch, in-process when no consumer accepted it); starts the registry consumer and the node-client and analysis-reconciler scheduled components, stops them on teardown |
+| ComponentsModule | `components` | `database`, `analysis`, `messageBus` | `RegistryComponentDispatcher` (bus dispatch, in-process only without a bus); starts the registry consumer and the node-client and analysis-reconciler scheduled components, stops them on teardown |
 | AnalysisModule | `analysis` | `database` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
 | AggregatorsModule | `aggregators` | `database`, `components`, `analysis` | nothing (starts AMQP event consumers, stops them on teardown) |

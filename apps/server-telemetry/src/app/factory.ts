@@ -15,7 +15,7 @@ import {
 } from '@privateaim/server-kit';
 import {
     EntityEventHandler,
-    EventComponentCaller,
+    EventComponentDispatcher,
     LoggerTransport,
     TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS,
 } from '@privateaim/server-telemetry-kit';
@@ -44,11 +44,11 @@ export function createApplication() {
                 handlers.push(new EntityEventSocketHandler(redisResult.data));
             }
 
-            const eventCaller = new EventComponentCaller({ messageBus: container.resolve(MessageBusInjectionKey) });
+            const eventDispatcher = new EventComponentDispatcher({ messageBus: container.resolve(MessageBusInjectionKey) });
 
             const loggerResult = container.tryResolve(LoggerInjectionKey);
             handlers.push(new EntityEventHandler({
-                eventComponentCaller: eventCaller,
+                eventComponentDispatcher: eventDispatcher,
                 logger: loggerResult.success ? loggerResult.data : undefined,
             }));
 

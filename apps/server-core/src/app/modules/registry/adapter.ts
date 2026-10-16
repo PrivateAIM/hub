@@ -9,7 +9,7 @@ import type { RegistryProject } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { RegistryEntity, RegistryProjectEntity } from '../../../adapters/database/entities/index.ts';
 import { RegistryCommand } from '../../components/index.ts';
-import type { IRegistryCaller } from '../../../core/harbor/types.ts';
+import type { IRegistryDispatcher } from '../../../core/harbor/types.ts';
 import type { IRegistryManager } from '../../../core/index.ts';
 
 export class RegistryManagerAdapter implements IRegistryManager {
@@ -17,30 +17,30 @@ export class RegistryManagerAdapter implements IRegistryManager {
 
     protected registryProjectRepository: Repository<RegistryProjectEntity>;
 
-    // Either a resolved caller, or a resolver for one. A resolver matters
+    // Either a resolved dispatcher, or a resolver for one. A resolver matters
     // because `RegistryManagerAdapter` is constructed during
     // `DatabaseModule.setup()`, which orkos always runs before
     // `ComponentsModule.setup()` (the latter declares `dependencies: ['database']`)
-    // — the caller a plain instance would carry does not exist yet at that point,
+    // — the dispatcher a plain instance would carry does not exist yet at that point,
     // and would stay `undefined` forever. A resolver is instead consulted fresh on
-    // every call, so it only needs the caller to exist by the time something
+    // every call, so it only needs the dispatcher to exist by the time something
     // actually triggers a link/relink/unlink, which is always after every module
     // is ready.
-    protected registryComponentCaller?: IRegistryCaller | (() => IRegistryCaller | undefined);
+    protected registryComponentDispatcher?: IRegistryDispatcher | (() => IRegistryDispatcher | undefined);
 
     constructor(ctx: {
         dataSource: DataSource;
-        registryComponentCaller?: IRegistryCaller | (() => IRegistryCaller | undefined);
+        registryComponentDispatcher?: IRegistryDispatcher | (() => IRegistryDispatcher | undefined);
     }) {
         this.registryRepository = ctx.dataSource.getRepository(RegistryEntity);
         this.registryProjectRepository = ctx.dataSource.getRepository(RegistryProjectEntity);
-        this.registryComponentCaller = ctx.registryComponentCaller;
+        this.registryComponentDispatcher = ctx.registryComponentDispatcher;
     }
 
-    private resolveRegistryComponentCaller(): IRegistryCaller | undefined {
-        return typeof this.registryComponentCaller === 'function' ?
-            this.registryComponentCaller() :
-            this.registryComponentCaller;
+    private resolveRegistryComponentDispatcher(): IRegistryDispatcher | undefined {
+        return typeof this.registryComponentDispatcher === 'function' ?
+            this.registryComponentDispatcher() :
+            this.registryComponentDispatcher;
     }
 
     async findDefaultRegistryId(): Promise<string | null> {
@@ -85,21 +85,21 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async linkProject(id: string): Promise<void> {
-        const caller = this.resolveRegistryComponentCaller();
-        if (!caller) {
+        const dispatcher = this.resolveRegistryComponentDispatcher();
+        if (!dispatcher) {
             return;
         }
 
-        await caller.call(RegistryCommand.PROJECT_LINK, { id }, {});
+        await dispatcher.dispatch(RegistryCommand.PROJECT_LINK, { id }, {});
     }
 
     async relinkProject(project: RegistryProject): Promise<void> {
-        const caller = this.resolveRegistryComponentCaller();
-        if (!caller) {
+        const dispatcher = this.resolveRegistryComponentDispatcher();
+        if (!dispatcher) {
             return;
         }
 
-        await caller.call(
+        await dispatcher.dispatch(
             RegistryCommand.PROJECT_RELINK,
             {
                 id: project.id,
@@ -112,12 +112,12 @@ export class RegistryManagerAdapter implements IRegistryManager {
     }
 
     async unlinkProject(project: RegistryProject): Promise<void> {
-        const caller = this.resolveRegistryComponentCaller();
-        if (!caller) {
+        const dispatcher = this.resolveRegistryComponentDispatcher();
+        if (!dispatcher) {
             return;
         }
 
-        await caller.call(
+        await dispatcher.dispatch(
             RegistryCommand.PROJECT_UNLINK,
             {
                 id: project.id,

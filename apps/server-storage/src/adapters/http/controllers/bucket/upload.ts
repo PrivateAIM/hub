@@ -8,12 +8,11 @@
 import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
 import type { ReadableStream } from 'node:stream/web';
-import { DirectCaller } from 'synergos';
 import {
     BucketFileCommand,
     type BucketFileCreationFinishedEventPayload,
     BucketFileEvent,
-    type BucketFileEventCaller,
+    type BucketFileEventDispatcher,
 } from '@privateaim/server-storage-kit';
 import Busboy from 'busboy';
 import path from 'node:path';
@@ -27,7 +26,7 @@ export async function uploadRequestFilesToBucket(
     event: IAppEvent,
     bucket: BucketEntity,
     bucketFileComponent: BucketFileComponent,
-    bucketFileEventCaller: BucketFileEventCaller,
+    bucketFileEventDispatcher?: BucketFileEventDispatcher,
 ) {
     const contentType = event.headers.get('content-type');
     if (!contentType || !contentType.startsWith('multipart/')) {
@@ -45,8 +44,6 @@ export async function uploadRequestFilesToBucket(
 
     const actor = useRequestIdentityOrFail(event);
 
-    const caller = new DirectCaller(bucketFileComponent);
-
     const identity = useRequestIdentityOrFail(event);
 
     return new Promise<BucketFileCreationFinishedEventPayload[]>((resolve, reject) => {
@@ -63,7 +60,7 @@ export async function uploadRequestFilesToBucket(
                     fileResolve,
                     fileReject,
                 ) => {
-                    caller.callWith(
+                    bucketFileComponent.handle(
                         BucketFileCommand.CREATE,
                         {
                             meta: {
@@ -82,7 +79,7 @@ export async function uploadRequestFilesToBucket(
                         {},
                         {
                             handle: async (childValue, childContext) => {
-                                await bucketFileEventCaller.call(
+                                await bucketFileEventDispatcher?.dispatch(
                                     childContext.key,
                                     childValue,
                                     childContext.metadata,

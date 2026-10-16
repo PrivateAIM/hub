@@ -36,7 +36,7 @@ import {
 import type { StorageBucketAggregatorContext } from '../../../../src/app/aggregators/storage/bucket/types.ts';
 import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index.ts';
 import { createTestDatabaseApplication } from '../../../app';
-import { FakeBucketCaller } from '../../core/services/helpers/fake-bucket-caller.ts';
+import { FakeBucketDispatcher } from '../../core/services/helpers/fake-bucket-dispatcher.ts';
 import { FakeLogger } from './fake-logger.ts';
 
 function createPayload(bucket: AnalysisBucketEntity, fileIds: string[]): BucketClearingFinishedEventPayload {
@@ -68,7 +68,7 @@ describe('storage bucket aggregator', () => {
             analysisRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisRepository),
             analysisBucketRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
             analysisBucketFileRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository),
-            bucketCaller: new FakeBucketCaller(),
+            bucketDispatcher: new FakeBucketDispatcher(),
         };
         handler = new StorageBucketClearingFinishedHandler(ctx);
     });
@@ -178,9 +178,9 @@ describe('storage bucket aggregator', () => {
 
     describe('creation finished', () => {
         function createHandler() {
-            const bucketCaller = new FakeBucketCaller();
-            const handler = new StorageBucketCreationFinishedHandler({ ...ctx, bucketCaller });
-            return { bucketCaller, handler };
+            const bucketDispatcher = new FakeBucketDispatcher();
+            const handler = new StorageBucketCreationFinishedHandler({ ...ctx, bucketDispatcher });
+            return { bucketDispatcher, handler };
         }
 
         async function findAnalysisBuckets(analysisId: string) {
@@ -189,7 +189,7 @@ describe('storage bucket aggregator', () => {
 
         it('should link the analysis bucket named by the reply', async () => {
             const analysis = await createAnalysis();
-            const { bucketCaller, handler } = createHandler();
+            const { bucketDispatcher, handler } = createHandler();
             const bucket = createBucket(analysis, { name: buildAnalysisBucketName(AnalysisBucketType.RESULT, analysis.id) });
 
             await handler.handle(bucket);
@@ -201,7 +201,7 @@ describe('storage bucket aggregator', () => {
                 bucketId: bucket.id,
                 realmId: analysis.realmId,
             });
-            expect(bucketCaller.getCallCount()).toBe(0);
+            expect(bucketDispatcher.getCallCount()).toBe(0);
         });
 
         it.each([
@@ -212,17 +212,17 @@ describe('storage bucket aggregator', () => {
             ['a realm other than the analysis', () => ({ realmId: faker.string.uuid() })],
         ])('should ignore a reply with %s', async (_label, overrides) => {
             const analysis = await createAnalysis();
-            const { bucketCaller, handler } = createHandler();
+            const { bucketDispatcher, handler } = createHandler();
 
             await handler.handle(createBucket(analysis, overrides(analysis.id)));
 
             expect(await findAnalysisBuckets(analysis.id)).toHaveLength(0);
-            expect(bucketCaller.getCallCount()).toBe(0);
+            expect(bucketDispatcher.getCallCount()).toBe(0);
         });
 
         it('should delete a duplicate storage bucket and keep the linked one', async () => {
             const analysis = await createAnalysis();
-            const { bucketCaller, handler } = createHandler();
+            const { bucketDispatcher, handler } = createHandler();
             const linked = createBucket(analysis);
             const orphan = createBucket(analysis);
 
@@ -232,19 +232,19 @@ describe('storage bucket aggregator', () => {
             const entities = await findAnalysisBuckets(analysis.id);
             expect(entities).toHaveLength(1);
             expect(entities[0].bucketId).toEqual(linked.id);
-            expect(bucketCaller.getCalls()).toEqual([{ method: 'callDelete', data: { id: orphan.id } }]);
+            expect(bucketDispatcher.getCalls()).toEqual([{ method: 'dispatchDelete', data: { id: orphan.id } }]);
         });
 
         it('should not delete the linked bucket on a repeated reply', async () => {
             const analysis = await createAnalysis();
-            const { bucketCaller, handler } = createHandler();
+            const { bucketDispatcher, handler } = createHandler();
             const linked = createBucket(analysis);
 
             await handler.handle(linked);
             await handler.handle(linked);
 
             expect(await findAnalysisBuckets(analysis.id)).toHaveLength(1);
-            expect(bucketCaller.getCallCount()).toBe(0);
+            expect(bucketDispatcher.getCallCount()).toBe(0);
         });
     });
 

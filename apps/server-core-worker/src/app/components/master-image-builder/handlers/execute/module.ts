@@ -19,7 +19,7 @@ import {
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
+import type { ComponentHandler, ComponentHandlerContext } from 'hubwire';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import path from 'node:path';
 import tar from 'tar-fs';

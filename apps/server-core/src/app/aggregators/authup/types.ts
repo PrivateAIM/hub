@@ -7,7 +7,7 @@
 
 import type { Logger } from '@privateaim/server-kit';
 import type { Client as RedisClient } from 'redis-extension';
-import type { IRegistryCaller } from '../../../core/harbor/types.ts';
+import type { IRegistryDispatcher } from '../../../core/harbor/types.ts';
 import type {
     IAnalysisBucketFileRepository,
     IAnalysisRepository,
@@ -26,7 +26,7 @@ export type AuthupAggregatorRepositories = {
 
 export type AuthupAggregatorContext = AuthupAggregatorRepositories & {
     env: string;
-    registryComponentCaller?: IRegistryCaller;
+    registryComponentDispatcher?: IRegistryDispatcher;
     redisSubscribeClient?: RedisClient;
     logger?: Logger;
 };

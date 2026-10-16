@@ -5,7 +5,8 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata } from 'synergos';
+import { MESSAGE_BUS_MAX_ATTEMPTS } from '@privateaim/server-kit';
+import type { ComponentMetadata } from 'hubwire';
 
 export type FakeEmittedEvent = {
     event: string,
@@ -25,7 +26,8 @@ export type FakeEmittedEvent = {
 export class FakeComponentHandlerContext<Key extends string = string> {
     public readonly emitted : FakeEmittedEvent[] = [];
 
-    public readonly metadata : ComponentMetadata = {};
+    // the first delivery of a retrying driver, as a worker handler sees it in production
+    public readonly metadata : ComponentMetadata = { delivery: { attempt: 1, maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS } };
 
     constructor(public readonly key : Key) {}
 

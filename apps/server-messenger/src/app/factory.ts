@@ -8,10 +8,10 @@
 import type { Application } from 'orkos';
 import {
     LoggerConsoleTransport,
-    MessageBusInjectionKey,
+    RemoteMessageBusInjectionKey,
 } from '@privateaim/server-kit';
 import {
-    LogComponentCaller,
+    LogComponentDispatcher,
     LoggerTransport,
     TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS,
 } from '@privateaim/server-telemetry-kit';
@@ -20,7 +20,7 @@ import { ServerMessengerApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
     let app: Application;
-    let logCaller: LogComponentCaller | undefined;
+    let logDispatcher: LogComponentDispatcher | undefined;
 
     const builder = new ServerMessengerApplicationBuilder()
         .withConfig()
@@ -35,12 +35,13 @@ export function createApplication() {
                         [LogFlag.CHANNEL]: LogChannel.SYSTEM,
                     },
                     save: async (data) => {
-                        if (!logCaller) {
-                            const result = app?.container.tryResolve(MessageBusInjectionKey);
+                        if (!logDispatcher) {
+                            // only over AMQP: no in-process consumer takes a log line here
+                            const result = app?.container.tryResolve(RemoteMessageBusInjectionKey);
                             if (!result?.success) return;
-                            logCaller = new LogComponentCaller({ messageBus: result.data });
+                            logDispatcher = new LogComponentDispatcher({ messageBus: result.data });
                         }
-                        await logCaller.callWrite(data);
+                        await logDispatcher.dispatchWrite(data);
                     },
                 }),
             ],

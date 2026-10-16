@@ -10,18 +10,18 @@ npm install @privateaim/server-telemetry-kit
 
 ## Usage
 
-### Log Component Caller
+### Log Component Dispatcher
 
 ```typescript
-import { useLogComponentCaller } from '@privateaim/server-telemetry-kit';
+import { LogComponentDispatcher } from '@privateaim/server-telemetry-kit';
 
-const caller = useLogComponentCaller();
-await caller.write({ level: 'info', message: 'Hello' });
+const dispatcher = new LogComponentDispatcher({ messageBus });
+await dispatcher.dispatchWrite({ level: 'info', message: 'Hello' });
 ```
 
 ::: warning Removed: `EventCommand.CLEAN`
-The event component no longer has a `CLEAN` command, and `callClean()` is gone from its
-caller. Expired events are swept by a scheduled component inside server-telemetry (once at
+The event component no longer has a `CLEAN` command, and its dispatcher has no
+`callClean()` / `dispatchClean()`. Expired events are swept by a scheduled component inside server-telemetry (once at
 start, then daily at 01:00), so there is nothing to send.
 :::
 
@@ -39,11 +39,11 @@ import { TelemetryTransport } from '@privateaim/server-telemetry-kit';
 |--------|-------------|
 | `components` | AMQP consumer components for events and logs |
 | `core` | Core telemetry utilities |
-| `services` | Log component caller, Winston transport |
+| `services` | Log component dispatcher, Winston transport |
 
 ## Dependencies
 
 - `@privateaim/server-kit` — Server foundation
-- `synergos` — Component and caller base classes
+- `hubwire` — Component and dispatcher base classes
 - `@privateaim/telemetry-kit` — Telemetry types
 - `winston-transport` — Custom Winston transport base

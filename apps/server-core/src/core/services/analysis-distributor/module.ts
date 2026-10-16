@@ -27,13 +27,13 @@ import {
     isProcessStatusInProgress,
     isProcessStatusTerminal,
 } from '../helpers.ts';
-import type { IAnalysisDistributorCaller } from './types.ts';
+import type { IAnalysisDistributorDispatcher } from './types.ts';
 
 type AnalysisDistributorContext = {
     repository: IAnalysisRepository;
     analysisNodeRepository: IEntityRepository<AnalysisNode>;
     registryRepository: IEntityRepository<Registry>;
-    caller: IAnalysisDistributorCaller;
+    dispatcher: IAnalysisDistributorDispatcher;
     analysisRecalculator: IAnalysisMetadataRecalculator;
     nodeRecalculator: IAnalysisNodeMetadataRecalculator;
     fileRecalculator: IAnalysisFileMetadataRecalculator;
@@ -46,7 +46,7 @@ export class AnalysisDistributor {
 
     protected registryRepository: IEntityRepository<Registry>;
 
-    protected caller: IAnalysisDistributorCaller;
+    protected dispatcher: IAnalysisDistributorDispatcher;
 
     protected analysisRecalculator: IAnalysisMetadataRecalculator;
 
@@ -58,7 +58,7 @@ export class AnalysisDistributor {
         this.repository = ctx.repository;
         this.analysisNodeRepository = ctx.analysisNodeRepository;
         this.registryRepository = ctx.registryRepository;
-        this.caller = ctx.caller;
+        this.dispatcher = ctx.dispatcher;
         this.analysisRecalculator = ctx.analysisRecalculator;
         this.nodeRecalculator = ctx.nodeRecalculator;
         this.fileRecalculator = ctx.fileRecalculator;
@@ -90,7 +90,7 @@ export class AnalysisDistributor {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        await this.caller.callExecute({ id: started.id });
+        await this.dispatcher.dispatchExecute({ id: started.id });
 
         return started;
     }
@@ -98,7 +98,7 @@ export class AnalysisDistributor {
     async check(input: string | Analysis) {
         const entity = await this.resolve(input);
         AnalysisDistributorCommandChecker.canCheck(entity);
-        await this.caller.callCheck({ id: entity.id });
+        await this.dispatcher.dispatchCheck({ id: entity.id });
         return entity;
     }
 

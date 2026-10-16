@@ -6,8 +6,8 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IComponent } from 'synergos';
-import { defineScheduledComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
+import { defineScheduledComponent } from 'hubwire';
 import type { IModule } from 'orkos';
 import { LoggerInjectionKey, createScheduledComponentLogHooks } from '@privateaim/server-kit';
 import { DatabaseInjectionKey } from '../database/index.ts';
@@ -54,5 +54,7 @@ export class SweeperModule implements IModule {
         this.component = undefined;
 
         await component?.stop();
+        // stop() never waits for a sweep in flight; it must finish before the database closes.
+        await component?.settled?.();
     }
 }

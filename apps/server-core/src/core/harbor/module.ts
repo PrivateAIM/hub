@@ -9,12 +9,12 @@ import { parseConnectionString } from '@hapic/harbor';
 import type { Registry } from '@privateaim/core-kit';
 import { getHostNameFromString } from '@privateaim/kit';
 import type { IEntityRepository } from '@privateaim/server-kit';
-import type { IRegistryCaller } from './types.ts';
+import type { IRegistryDispatcher } from './types.ts';
 
 type SetupHarborContext = {
     harborURL: string;
     registryRepository: IEntityRepository<Registry>;
-    registryCaller?: IRegistryCaller;
+    registryDispatcher?: IRegistryDispatcher;
 };
 
 export async function setupHarborService(ctx: SetupHarborContext) {
@@ -36,7 +36,7 @@ export async function setupHarborService(ctx: SetupHarborContext) {
 
     await ctx.registryRepository.save(entity);
 
-    if (ctx.registryCaller) {
-        await ctx.registryCaller.call('SETUP', { id: entity.id }, {});
+    if (ctx.registryDispatcher) {
+        await ctx.registryDispatcher.dispatch('SETUP', { id: entity.id }, {});
     }
 }

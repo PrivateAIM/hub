@@ -44,9 +44,9 @@ function createCoreClient(analysis: Record<string, any> = {}) {
 
 const PAYLOAD: AnalysisBuilderCheckPayload = { id: ANALYSIS_ID };
 
-function run(coreClient: ICoreClient, docker: FakeDockerClient, attempt?: number) {
+function run(coreClient: ICoreClient, docker: FakeDockerClient, attempt = 1) {
     const context = new FakeComponentHandlerContext(AnalysisBuilderCommand.CHECK);
-    context.metadata.attempt = attempt;
+    context.metadata.delivery = { attempt, maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS };
     const handler = new AnalysisBuilderCheckHandler({
         coreClient,
         // `docken`'s Client is a concrete class, not a port, so the fake cannot

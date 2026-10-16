@@ -9,7 +9,7 @@ import type { AnalysisBuilderEventMap } from '@privateaim/server-core-worker-kit
 import {
     AnalysisBuilderCommand,
 } from '@privateaim/server-core-worker-kit';
-import { Component } from 'synergos';
+import { Component } from 'hubwire';
 import type { Logger } from '@privateaim/server-kit';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import type { IStorageClient as StorageClient } from '@privateaim/storage-kit';

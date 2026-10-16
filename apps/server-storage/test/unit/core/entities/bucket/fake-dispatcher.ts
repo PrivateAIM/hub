@@ -7,9 +7,9 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Bucket } from '@privateaim/storage-kit';
-import type { IBucketCaller } from '../../../../../src/core/entities/bucket/types.ts';
+import type { IBucketDispatcher } from '../../../../../src/core/entities/bucket/types.ts';
 
-export class FakeBucketCaller implements IBucketCaller {
+export class FakeBucketDispatcher implements IBucketDispatcher {
     private createCalls: Record<string, any>[] = [];
 
     private deleteCalls: string[] = [];

@@ -19,8 +19,8 @@ import {
 import { MasterImageService } from '../../../../../src/core/entities/master-image/service.ts';
 import { createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { FakeMasterImageRepository } from './fake-repository.ts';
-import { FakeMasterImageBuilderCaller } from './fake-builder-caller.ts';
-import { FakeMasterImageSynchronizerCaller } from './fake-synchronizer-caller.ts';
+import { FakeMasterImageBuilderDispatcher } from './fake-builder-dispatcher.ts';
+import { FakeMasterImageSynchronizerDispatcher } from './fake-synchronizer-dispatcher.ts';
 
 const READ_PERMISSIONS = [PermissionName.MASTER_IMAGE_READ, PermissionName.MASTER_IMAGE_MANAGE];
 
@@ -51,18 +51,18 @@ const masterImagesConfig = {
 
 describe('MasterImageService', () => {
     let repository: FakeMasterImageRepository;
-    let synchronizerCaller: FakeMasterImageSynchronizerCaller;
-    let builderCaller: FakeMasterImageBuilderCaller;
+    let synchronizerDispatcher: FakeMasterImageSynchronizerDispatcher;
+    let builderDispatcher: FakeMasterImageBuilderDispatcher;
     let service: MasterImageService;
 
     beforeEach(() => {
         repository = new FakeMasterImageRepository();
-        synchronizerCaller = new FakeMasterImageSynchronizerCaller();
-        builderCaller = new FakeMasterImageBuilderCaller();
+        synchronizerDispatcher = new FakeMasterImageSynchronizerDispatcher();
+        builderDispatcher = new FakeMasterImageBuilderDispatcher();
         service = new MasterImageService({
             repository,
-            synchronizerCaller,
-            builderCaller,
+            synchronizerDispatcher,
+            builderDispatcher,
             masterImagesConfig,
         });
     });
@@ -113,15 +113,15 @@ describe('MasterImageService', () => {
 
     describe('executeCommand', () => {
         describe('SYNC', () => {
-            it('should call synchronizerCaller with config', async () => {
+            it('should call synchronizerDispatcher with config', async () => {
                 await service.executeCommand(
                     MasterImageCommand.SYNC,
                     {},
                     createAllowAllActor(),
                 );
 
-                expect(synchronizerCaller.getCallCount()).toBe(1);
-                expect(synchronizerCaller.getCalls()[0]).toEqual(masterImagesConfig);
+                expect(synchronizerDispatcher.getCallCount()).toBe(1);
+                expect(synchronizerDispatcher.getCalls()[0]).toEqual(masterImagesConfig);
             });
 
             it('should return undefined for sync command', async () => {
@@ -146,7 +146,7 @@ describe('MasterImageService', () => {
         });
 
         describe('BUILD', () => {
-            it('should call builderCaller and set buildStatus to STARTING', async () => {
+            it('should call builderDispatcher and set buildStatus to STARTING', async () => {
                 const image = createTestMasterImage({ id: 'mi-1' });
                 repository.seed(image);
 
@@ -158,8 +158,8 @@ describe('MasterImageService', () => {
 
                 expect(result).toBeDefined();
                 expect(result!.buildStatus).toBe(ProcessStatus.STARTING);
-                expect(builderCaller.getCallCount()).toBe(1);
-                expect(builderCaller.getCalls()[0]).toEqual({ id: 'mi-1' });
+                expect(builderDispatcher.getCallCount()).toBe(1);
+                expect(builderDispatcher.getCalls()[0]).toEqual({ id: 'mi-1' });
             });
 
             it('should reject a second build while the first is starting', async () => {
@@ -172,7 +172,7 @@ describe('MasterImageService', () => {
                     service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor()),
                 ).rejects.toThrow(BadRequestError);
 
-                expect(builderCaller.getCallCount()).toBe(1);
+                expect(builderDispatcher.getCallCount()).toBe(1);
                 expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.STARTING);
             });
 
@@ -185,12 +185,12 @@ describe('MasterImageService', () => {
 
                 await service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor());
 
-                expect(builderCaller.getCallCount()).toBe(1);
+                expect(builderDispatcher.getCallCount()).toBe(1);
             });
 
             it('should restore buildStatus when the dispatch fails', async () => {
                 repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
-                builderCaller.failWith = new Error('broker unavailable');
+                builderDispatcher.failWith = new Error('broker unavailable');
 
                 await expect(
                     service.executeCommand(
@@ -205,9 +205,9 @@ describe('MasterImageService', () => {
 
             it('should not revert a status a worker event already advanced', async () => {
                 repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
-                builderCaller.failWith = new Error('publish confirm timed out');
+                builderDispatcher.failWith = new Error('publish confirm timed out');
                 // the broker took the message after all, and the worker already reported
-                builderCaller.onExecute = async () => {
+                builderDispatcher.onExecute = async () => {
                     await repository.save({ ...repository.getAll()[0], buildStatus: ProcessStatus.STARTED });
                 };
 

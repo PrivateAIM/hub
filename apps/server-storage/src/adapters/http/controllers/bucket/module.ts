@@ -15,7 +15,7 @@ import { DomainType } from '@privateaim/storage-kit';
 import type { Logger } from '@privateaim/server-kit';
 import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
-import type { BucketFileEventCaller } from '@privateaim/server-storage-kit';
+import type { BucketFileEventDispatcher } from '@privateaim/server-storage-kit';
 import {
     DBody,
     DContext,
@@ -47,7 +47,10 @@ type BucketControllerContext = {
     bucketFileRepository: IBucketFileRepository;
     storage: IStorageAdapter;
     bucketFileComponent: BucketFileComponent;
-    bucketFileEventCaller: BucketFileEventCaller;
+    /**
+     * Forwards file events to server-core; absent without a remote (AMQP) bus.
+     */
+    bucketFileEventDispatcher?: BucketFileEventDispatcher;
     logger?: Logger;
 };
 
@@ -62,7 +65,7 @@ export class BucketController {
 
     protected bucketFileComponent: BucketFileComponent;
 
-    protected bucketFileEventCaller: BucketFileEventCaller;
+    protected bucketFileEventDispatcher: BucketFileEventDispatcher | undefined;
 
     protected logger: Logger | undefined;
 
@@ -71,7 +74,7 @@ export class BucketController {
         this.bucketFileRepository = ctx.bucketFileRepository;
         this.storage = ctx.storage;
         this.bucketFileComponent = ctx.bucketFileComponent;
-        this.bucketFileEventCaller = ctx.bucketFileEventCaller;
+        this.bucketFileEventDispatcher = ctx.bucketFileEventDispatcher;
         this.logger = ctx.logger;
     }
 
@@ -118,7 +121,7 @@ export class BucketController {
         const entity = await this.service.getOne(id);
         await this.service.checkUploadAccess(entity, actor);
 
-        const files = await uploadRequestFilesToBucket(event, entity, this.bucketFileComponent, this.bucketFileEventCaller);
+        const files = await uploadRequestFilesToBucket(event, entity, this.bucketFileComponent, this.bucketFileEventDispatcher);
 
         event.response.status = 201;
         return {

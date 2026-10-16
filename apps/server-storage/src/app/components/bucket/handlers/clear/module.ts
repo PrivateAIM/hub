@@ -7,7 +7,7 @@
 
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler, ComponentHandlerContext } from 'synergos';
+import type { ComponentHandler, ComponentHandlerContext } from 'hubwire';
 import type { BucketClearCommandPayload, BucketComponentEventMap } from '@privateaim/server-storage-kit';
 import {
     BucketCommand,

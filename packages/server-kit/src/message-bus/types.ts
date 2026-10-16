@@ -6,7 +6,7 @@
  */
 
 import type { IContainer } from 'eldin';
-import type { IMessageBusDriver, MessageRouting } from 'synergos';
+import type { IMessageBusDriver, MessageRouting } from 'hubwire';
 
 export type MessageBusLogHooksOptions = {
     /**

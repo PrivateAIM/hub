@@ -27,12 +27,12 @@ import {
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { IAnalysisFileMetadataRecalculator } from '../../entities/analysis-bucket-file/types.ts';
-import type { AnalysisBuilderStartOptions, IAnalysisBuilderCaller } from './types.ts';
+import type { AnalysisBuilderStartOptions, IAnalysisBuilderDispatcher } from './types.ts';
 
 type AnalysisBuilderContext = {
     repository: IAnalysisRepository;
     analysisNodeRepository: IAnalysisNodeRepository;
-    caller: IAnalysisBuilderCaller;
+    dispatcher: IAnalysisBuilderDispatcher;
     analysisRecalculator: IAnalysisMetadataRecalculator;
     nodeRecalculator: IAnalysisNodeMetadataRecalculator;
     fileRecalculator: IAnalysisFileMetadataRecalculator;
@@ -43,7 +43,7 @@ export class AnalysisBuilder {
 
     protected analysisNodeRepository: IAnalysisNodeRepository;
 
-    protected caller: IAnalysisBuilderCaller;
+    protected dispatcher: IAnalysisBuilderDispatcher;
 
     protected analysisRecalculator: IAnalysisMetadataRecalculator;
 
@@ -54,7 +54,7 @@ export class AnalysisBuilder {
     constructor(ctx: AnalysisBuilderContext) {
         this.repository = ctx.repository;
         this.analysisNodeRepository = ctx.analysisNodeRepository;
-        this.caller = ctx.caller;
+        this.dispatcher = ctx.dispatcher;
         this.analysisRecalculator = ctx.analysisRecalculator;
         this.nodeRecalculator = ctx.nodeRecalculator;
         this.fileRecalculator = ctx.fileRecalculator;
@@ -89,7 +89,7 @@ export class AnalysisBuilder {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        await this.caller.callExecute({ id: started.id });
+        await this.dispatcher.dispatchExecute({ id: started.id });
 
         return started;
     }
@@ -97,7 +97,7 @@ export class AnalysisBuilder {
     async check(input: string | Analysis) {
         const entity = await this.resolve(input);
         AnalysisBuilderCommandChecker.canCheck(entity);
-        await this.caller.callCheck({ id: entity.id });
+        await this.dispatcher.dispatchCheck({ id: entity.id });
         return entity;
     }
 

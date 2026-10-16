@@ -49,9 +49,9 @@ import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts'
 import { FakeAnalysisFileMetadataRecalculator } from '../analysis-bucket-file/fake-metadata-recalculator.ts';
 import { FakeProjectRepository } from '../project/fake-repository.ts';
 import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
-import { FakeAnalysisBuilderCaller } from '../../services/helpers/fake-builder-caller.ts';
-import { FakeAnalysisDistributorCaller } from '../../services/helpers/fake-distributor-caller.ts';
-import { FakeBucketCaller } from '../../services/helpers/fake-bucket-caller.ts';
+import { FakeAnalysisBuilderDispatcher } from '../../services/helpers/fake-builder-dispatcher.ts';
+import { FakeAnalysisDistributorDispatcher } from '../../services/helpers/fake-distributor-dispatcher.ts';
+import { FakeBucketDispatcher } from '../../services/helpers/fake-bucket-dispatcher.ts';
 import { createFullAnalysis } from '../../../../utils/domains/index.ts';
 
 function createTestProject(overrides?: Partial<Project>): Project {
@@ -80,9 +80,9 @@ describe('AnalysisService', () => {
     let service: AnalysisService;
 
     // Sub-service dependencies
-    let builderCaller: FakeAnalysisBuilderCaller;
-    let distributorCaller: FakeAnalysisDistributorCaller;
-    let bucketCaller: FakeBucketCaller;
+    let builderDispatcher: FakeAnalysisBuilderDispatcher;
+    let distributorDispatcher: FakeAnalysisDistributorDispatcher;
+    let bucketDispatcher: FakeBucketDispatcher;
     let analysisRecalculator: FakeAnalysisMetadataRecalculator;
     let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
 
@@ -90,9 +90,9 @@ describe('AnalysisService', () => {
         analysisRepository = new FakeAnalysisRepository();
         projectRepository = new FakeProjectRepository();
         projectNodeRepository = new FakeProjectNodeRepository();
-        builderCaller = new FakeAnalysisBuilderCaller();
-        distributorCaller = new FakeAnalysisDistributorCaller();
-        bucketCaller = new FakeBucketCaller();
+        builderDispatcher = new FakeAnalysisBuilderDispatcher();
+        distributorDispatcher = new FakeAnalysisDistributorDispatcher();
+        bucketDispatcher = new FakeBucketDispatcher();
 
         analysisNodeRepository = new FakeAnalysisNodeRepository();
         const registryRepository = new FakeEntityRepository<Registry>();
@@ -105,7 +105,7 @@ describe('AnalysisService', () => {
         const builder = new AnalysisBuilder({
             repository: analysisRepository,
             analysisNodeRepository,
-            caller: builderCaller,
+            dispatcher: builderDispatcher,
             analysisRecalculator,
             nodeRecalculator,
             fileRecalculator,
@@ -121,7 +121,7 @@ describe('AnalysisService', () => {
             repository: analysisRepository,
             analysisNodeRepository,
             registryRepository,
-            caller: distributorCaller,
+            dispatcher: distributorDispatcher,
             analysisRecalculator,
             nodeRecalculator,
             fileRecalculator,
@@ -129,7 +129,7 @@ describe('AnalysisService', () => {
         const storageManager = new AnalysisStorageManager({
             repository: analysisRepository,
             bucketRepository,
-            caller: bucketCaller,
+            dispatcher: bucketDispatcher,
         });
 
         service = new AnalysisService({
@@ -234,7 +234,7 @@ describe('AnalysisService', () => {
             );
 
             expect(result.id).toBeDefined();
-            expect(bucketCaller.getCallsFor('callCreate').length).toBeGreaterThan(0);
+            expect(bucketDispatcher.getCallsFor('dispatchCreate').length).toBeGreaterThan(0);
         });
 
         it('should call recalcDebounced after save', async () => {
@@ -670,7 +670,7 @@ describe('AnalysisService', () => {
             await expect(
                 service.executeCommand('analysis-1', AnalysisCommand.STORAGE_CHECK, actor),
             ).rejects.toThrow(PermissionDeniedError);
-            expect(bucketCaller.getCallsFor('callCreate')).toHaveLength(0);
+            expect(bucketDispatcher.getCallsFor('dispatchCreate')).toHaveLength(0);
         });
 
         it('should deny an actor without the command\'s permission', async () => {
@@ -737,7 +737,7 @@ describe('AnalysisService', () => {
             );
 
             expect(result.buildStatus).toBe(ProcessStatus.STARTING);
-            expect(builderCaller.getCallsFor('callExecute')).toHaveLength(1);
+            expect(builderDispatcher.getCallsFor('dispatchExecute')).toHaveLength(1);
         });
 
         it('should dispatch BUILD_CHECK to builder', async () => {
@@ -752,7 +752,7 @@ describe('AnalysisService', () => {
                 createAllowAllActor(),
             );
 
-            expect(builderCaller.getCallsFor('callCheck')).toHaveLength(1);
+            expect(builderDispatcher.getCallsFor('dispatchCheck')).toHaveLength(1);
         });
 
         it('should dispatch DISTRIBUTION_START to distributor', async () => {
@@ -768,7 +768,7 @@ describe('AnalysisService', () => {
             );
 
             expect(result.distributionStatus).toBe(ProcessStatus.STARTING);
-            expect(distributorCaller.getCallsFor('callExecute')).toHaveLength(1);
+            expect(distributorDispatcher.getCallsFor('dispatchExecute')).toHaveLength(1);
         });
 
         it('should dispatch DISTRIBUTION_CHECK to distributor', async () => {
@@ -784,7 +784,7 @@ describe('AnalysisService', () => {
                 createAllowAllActor(),
             );
 
-            expect(distributorCaller.getCallsFor('callCheck')).toHaveLength(1);
+            expect(distributorDispatcher.getCallsFor('dispatchCheck')).toHaveLength(1);
         });
 
         it('should dispatch STORAGE_CHECK to storageManager', async () => {
@@ -796,7 +796,7 @@ describe('AnalysisService', () => {
                 createAllowAllActor(),
             );
 
-            expect(bucketCaller.getCallsFor('callCreate').length).toBeGreaterThan(0);
+            expect(bucketDispatcher.getCallsFor('dispatchCreate').length).toBeGreaterThan(0);
         });
     });
 });

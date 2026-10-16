@@ -340,7 +340,7 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
 - Place test files in `test/unit/**/*.spec.ts`
 - Use `@faker-js/faker` for test data generation
 - HTTP integration tests: use `TestSuite` which wires controllers via DI modules
-- Service-level tests: use `FakeEntityRepository` and fake callers
+- Service-level tests: use `FakeEntityRepository` and fake dispatchers
 - Service-level (core/entity) tests use fakes and need no database or Authup
 - HTTP-facing suites (core/storage/telemetry) need Docker: they start Authup (always)
   and, unless `DB_TYPE` is set, a PostgreSQL container. Set `DB_TYPE`/`DB_HOST`
@@ -359,14 +359,23 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
   `writable/master-images/`, which `master-images.spec.ts` deletes wholesale
   before cloning the catalogue — hence `fileParallelism: false` in that package's
   `test/vitest.config.ts`. Do not re-enable it without decoupling the fixture.
-- Components, callers and the bus come from `synergos`, whose own suite covers their
+- Components, dispatchers, workers and the bus come from `hubwire`, whose own suite covers their
   semantics (retry, ordering, unknown commands, `stop()` during a pass). Hub specs
-  pin only hub wiring. A caller spec builds a real `MessageBus` on synergos's
-  `MemoryMessageBusDriver` and puts a fake `IComponent` behind a
-  `WorkerCaller` (`apps/server-core/test/unit/components/registry/caller.spec.ts`).
+  pin only hub wiring. A dispatcher spec builds a real `MessageBus` on hubwire's
+  `MemoryMessageBusDriver` and puts a fake `ICallable` behind a
+  `RemoteWorker` (`apps/server-core/test/unit/app/components/registry/dispatcher.spec.ts`).
+  **`publish()` / `dispatch()` resolve before any handler ran** (the memory driver delivers on
+  a later microtask): wait with `drain()` from `@hubwire/test` (a dev dependency of server-kit
+  and server-core) or a deferred, never on the publish. A dispatcher whose bus must only
+  record takes `@hubwire/test`'s `FakeMessageBus` instead of a hand-written fake. A worker
+  handler spec sets the delivery it needs on the fake context
+  (`metadata.delivery = { attempt, maxAttempts }`; server-core-worker's
+  `FakeComponentHandlerContext` defaults to the first of `MESSAGE_BUS_MAX_ATTEMPTS`).
   The server-core and server-storage test apps register a `MessageBusModule` on a
-  memory driver, since callers require a bus; nothing in those suites consumes
-  the commands. The log-hook factories are pinned by server-kit's
+  memory driver, since dispatchers require a bus; nothing in those suites consumes
+  the commands, and `RemoteMessageBusInjectionKey` stays unbound, so server-storage
+  publishes no bucket or file events (server-kit's `message-bus-module.spec.ts` pins
+  when that token is registered). The log-hook factories are pinned by server-kit's
   `message-bus-hooks.spec.ts` (including that a silent routing's publish is not logged).
   A scheduled-component spec (`test/unit/app/components/{node-client,analysis-reconciler}/`,
   server-telemetry's `event-cleaner.spec.ts`) asserts through `status()` and **must
@@ -487,8 +496,8 @@ file needs more than one: `import { createFakeClient as createFakeCoreClient } f
 - `FakeProjectRepository` — `IProjectRepository` with `checkUniqueness()`
 - `FakeRegistryRepository` — `IRegistryRepository` with `findOneWithSecret()`
 - `FakeRegistryManager` — `IRegistryManager` with call recording
-- `FakeRegistryCaller` — `IRegistryCaller` with call recording
-- `FakeMasterImageBuilderCaller` / `FakeMasterImageSynchronizerCaller` — caller fakes with call recording
+- `FakeRegistryDispatcher` — `IRegistryDispatcher` with dispatch recording
+- `FakeMasterImageBuilderDispatcher` / `FakeMasterImageSynchronizerDispatcher` — dispatcher fakes with dispatch recording
 - `FakeAnalysisMetadataRecalculator` / `FakeAnalysisNodeMetadataRecalculator` / `FakeAnalysisFileMetadataRecalculator` — record `recalc()` and `recalcDebounced()` calls
 
 When a dependency has no fake yet, create one in the entity's test directory (`test/unit/core/entities/<entity>/`) implementing the port interface.

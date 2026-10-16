@@ -5,20 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
-import { DispatchCaller } from 'synergos';
+import type { ComponentMetadata, RemoteDispatcherOptions } from 'hubwire';
+import { RemoteDispatcher } from 'hubwire';
 import type { EventCreateCommandPayload } from './handlers';
 import { EventCommand, EventTaskMessageBusRouting } from './constants';
 
-export class EventComponentCaller extends DispatchCaller {
-    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
+export class EventComponentDispatcher extends RemoteDispatcher {
+    constructor(options: Omit<RemoteDispatcherOptions, 'routing'>) {
         super({
             ...options,
             routing: EventTaskMessageBusRouting,
         });
     }
 
-    async callCreate(payload: EventCreateCommandPayload, metadata: ComponentMetadata = {}) {
-        return this.call(EventCommand.CREATE, payload, metadata);
+    async dispatchCreate(payload: EventCreateCommandPayload, metadata: ComponentMetadata = {}): Promise<void> {
+        await this.dispatch(EventCommand.CREATE, payload, metadata);
     }
 }

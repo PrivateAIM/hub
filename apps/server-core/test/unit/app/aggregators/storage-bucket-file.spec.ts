@@ -8,9 +8,9 @@
 import { faker } from '@faker-js/faker';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import type { BucketFileDeleteCommandPayload } from '@privateaim/server-storage-kit';
-import { BucketFileTaskCaller } from '@privateaim/server-storage-kit';
+import { BucketFileTaskDispatcher } from '@privateaim/server-storage-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
-import { MemoryMessageBusDriver, MessageBus } from 'synergos';
+import { FakeMessageBus } from '@hubwire/test';
 import {
     afterAll,
     beforeAll,
@@ -34,15 +34,15 @@ import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index
 import { createTestDatabaseApplication } from '../../../app';
 import { FakeAnalysisFileMetadataRecalculator } from '../../core/entities/analysis-bucket-file/fake-metadata-recalculator.ts';
 
-class FakeBucketFileCaller extends BucketFileTaskCaller {
+class FakeBucketFileDispatcher extends BucketFileTaskDispatcher {
     deleted: BucketFileDeleteCommandPayload[] = [];
 
     constructor() {
-        // callDelete is overridden, so nothing reaches this bus
-        super({ messageBus: new MessageBus({ driver: new MemoryMessageBusDriver() }) });
+        // dispatchDelete is overridden, so nothing reaches this bus
+        super({ messageBus: new FakeMessageBus() });
     }
 
-    override async callDelete(payload: BucketFileDeleteCommandPayload) {
+    override async dispatchDelete(payload: BucketFileDeleteCommandPayload) {
         this.deleted.push(payload);
     }
 }
@@ -51,12 +51,12 @@ describe('storage bucket-file aggregator', () => {
     const suite = createTestDatabaseApplication();
     let dataSource: DataSource;
     let handler: StorageBucketFileCreationFinishedHandler;
-    let bucketFileCaller: FakeBucketFileCaller;
+    let bucketFileDispatcher: FakeBucketFileDispatcher;
 
     beforeAll(async () => {
         await suite.setup();
         dataSource = suite.container.resolve(DatabaseInjectionKey.DataSource);
-        bucketFileCaller = new FakeBucketFileCaller();
+        bucketFileDispatcher = new FakeBucketFileDispatcher();
         const analysisRepository = suite.container.resolve(DatabaseInjectionKey.AnalysisRepository);
         handler = new StorageBucketFileCreationFinishedHandler({
             service: new AnalysisBucketFileService({
@@ -71,7 +71,7 @@ describe('storage bucket-file aggregator', () => {
                     nodeRepository: suite.container.resolve(DatabaseInjectionKey.NodeRepository),
                 }),
             }),
-            bucketFileCaller,
+            bucketFileDispatcher,
         });
     });
 
@@ -158,7 +158,7 @@ describe('storage bucket-file aggregator', () => {
         await handler.handle(payload);
 
         expect(await findFiles(bucket.bucketId)).toHaveLength(0);
-        expect(bucketFileCaller.deleted).toContainEqual({ id: payload.id });
+        expect(bucketFileDispatcher.deleted).toContainEqual({ id: payload.id });
     });
 
     it('should reject and delete a code file from a foreign realm', async () => {
@@ -168,7 +168,7 @@ describe('storage bucket-file aggregator', () => {
         await handler.handle(payload);
 
         expect(await findFiles(bucket.bucketId)).toHaveLength(0);
-        expect(bucketFileCaller.deleted).toContainEqual({ id: payload.id });
+        expect(bucketFileDispatcher.deleted).toContainEqual({ id: payload.id });
     });
 
     it('should register a result file from an approved node realm and map a client uploader', async () => {
@@ -194,7 +194,7 @@ describe('storage bucket-file aggregator', () => {
         await handler.handle(payload);
 
         expect(await findFiles(bucket.bucketId)).toHaveLength(0);
-        expect(bucketFileCaller.deleted).not.toContainEqual({ id: payload.id });
+        expect(bucketFileDispatcher.deleted).not.toContainEqual({ id: payload.id });
     });
 
     it('should not match any approved node when the uploader has no realm', async () => {

@@ -7,14 +7,14 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { IComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
 import {
     LoggerInjectionKey,
     MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
-    createWorkerCallerLogHooks,
+    createRemoteWorkerLogHooks,
 } from '@privateaim/server-kit';
-import { WorkerCaller } from 'synergos';
+import { RemoteWorker } from 'hubwire';
 import {
     EventTaskMessageBusRouting,
     LogTaskMessageBusRouting,
@@ -49,21 +49,21 @@ export class ComponentsModule implements IModule {
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
         const messageBus = container.resolve(MessageBusInjectionKey);
-        const hooks = logger ? createWorkerCallerLogHooks(logger) : undefined;
+        const hooks = logger ? createRemoteWorkerLogHooks(logger) : undefined;
 
         this.components = [
-            new WorkerCaller(
+            new RemoteWorker(
                 new EventComponent({ logger, retentionDays: config.eventRetentionDays }),
                 {
-                    consumeRouting: EventTaskMessageBusRouting,
+                    consume: EventTaskMessageBusRouting,
                     messageBus,
                     hooks,
                 },
             ),
-            new WorkerCaller(
+            new RemoteWorker(
                 new LogComponent({ logStore, logger }),
                 {
-                    consumeRouting: LogTaskMessageBusRouting,
+                    consume: LogTaskMessageBusRouting,
                     messageBus,
                     hooks,
                 },
@@ -79,5 +79,7 @@ export class ComponentsModule implements IModule {
         this.components = [];
 
         await Promise.all(components.map((c) => c.stop()));
+        // stop() never waits for a cleaner pass in flight; it must finish before the database closes.
+        await Promise.all(components.map((c) => c.settled?.()));
     }
 }

@@ -6,8 +6,7 @@
  */
 
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentMetadata } from 'synergos';
-import { MESSAGE_BUS_MAX_ATTEMPTS } from '@privateaim/server-kit';
+import type { ComponentMetadata, MessageDelivery } from 'hubwire';
 import { isClientError } from 'hapic';
 import {
     ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS,
@@ -94,12 +93,16 @@ export function isTransientError(error: unknown): boolean {
 
 /**
  * Rethrow (the message bus retries it with backoff) instead of reporting
- * `*_FAILED`: only a transient error, and never on the last delivery attempt,
- * so a failure that outlasts the retries is still reported, not dropped.
+ * `*_FAILED`: only a transient error, and never on the last delivery attempt
+ * (`metadata.delivery`, set by the driver), so a failure that outlasts the
+ * retries is still reported, not dropped. Without a delivery (an in-process
+ * call) nothing retries, so every attempt is the last.
  * A permanent error misread as transient therefore costs only the backoff.
  */
 export function isRetryableFailure(error: unknown, metadata: ComponentMetadata): boolean {
-    const attempt = typeof metadata.attempt === 'number' ? metadata.attempt : 1;
+    // set by the message bus driver on consume
+    const delivery = metadata.delivery as MessageDelivery | undefined;
+    const { attempt, maxAttempts } = delivery ?? { attempt: 1, maxAttempts: 1 };
 
-    return attempt < MESSAGE_BUS_MAX_ATTEMPTS && isTransientError(error);
+    return attempt < maxAttempts && isTransientError(error);
 }

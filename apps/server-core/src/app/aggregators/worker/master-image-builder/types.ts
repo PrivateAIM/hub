@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
+import type { EventComponentDispatcher } from '@privateaim/server-telemetry-kit';
 import type { MasterImageBuilderService } from '../../../../core/services/index.ts';
 
 export type MasterImageBuilderAggregatorContext = {
     service: MasterImageBuilderService;
-    eventComponentCaller?: EventComponentCaller;
+    eventComponentDispatcher?: EventComponentDispatcher;
 };

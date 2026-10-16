@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MessageRouting } from 'synergos';
+import type { MessageRouting } from 'hubwire';
 import { EventTaskMessageBusRouting } from './event/constants';
 import { LogTaskMessageBusRouting } from './log/constants';
 

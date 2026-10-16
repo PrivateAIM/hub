@@ -7,18 +7,17 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { IComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
 import {
     ConfigInjectionKey,
     LoggerInjectionKey,
     MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
     RedisSubscribeClientInjectionKey,
-    createDispatchCallerLogHooks,
-    createWorkerCallerLogHooks,
+    createRemoteWorkerLogHooks,
 } from '@privateaim/server-kit';
-import { WorkerCaller } from 'synergos';
-import { EventComponentCaller } from '@privateaim/server-telemetry-kit';
+import { RemoteWorker } from 'hubwire';
+import { EventComponentDispatcher } from '@privateaim/server-telemetry-kit';
 import {
     AnalysisBuilderEventMessageBusRouting,
     AnalysisDistributorEventMessageBusRouting,
@@ -26,10 +25,10 @@ import {
     MasterImageSynchronizerEventMessageBusRouting,
 } from '@privateaim/server-core-worker-kit';
 import {
-    BucketComponentCaller,
+    BucketComponentDispatcher,
     BucketEventMessageBusRouting,
     BucketFileEventMessageBusRouting,
-    BucketFileTaskCaller,
+    BucketFileTaskDispatcher,
 } from '@privateaim/server-storage-kit';
 import {
     AnalysisBuilderAggregator,
@@ -54,17 +53,15 @@ export class AggregatorsModule implements IModule {
 
     protected aggregators: IComponent<any>[] = [];
 
-    protected starting: Promise<unknown> | undefined;
-
     async setup(container: IContainer): Promise<void> {
         const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
         const analysisBucketRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketRepository);
         const analysisBucketFileRepository = container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository);
         const masterImageRepository = container.resolve(DatabaseInjectionKey.MasterImageRepository);
-        const registryComponentCaller = container.resolve(ComponentsInjectionKey.RegistryComponentCaller);
+        const registryComponentDispatcher = container.resolve(ComponentsInjectionKey.RegistryComponentDispatcher);
         const logger = container.resolve(LoggerInjectionKey);
         const messageBus = container.resolve(MessageBusInjectionKey);
-        const workerHooks = createWorkerCallerLogHooks(logger);
+        const workerHooks = createRemoteWorkerLogHooks(logger);
         const redisSubResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
         const config = container.resolve(ConfigInjectionKey);
@@ -72,7 +69,7 @@ export class AggregatorsModule implements IModule {
         this.aggregators = [
             createAuthupAggregator({
                 env: config.env,
-                registryComponentCaller,
+                registryComponentDispatcher,
                 analysisRepository,
                 analysisBucketFileRepository,
                 nodeRepository: container.resolve(DatabaseInjectionKey.NodeRepository),
@@ -81,37 +78,37 @@ export class AggregatorsModule implements IModule {
                 redisSubscribeClient: redisSubResult.success ? redisSubResult.data : undefined,
                 logger,
             }),
-            new WorkerCaller(
+            new RemoteWorker(
                 new AnalysisBuilderAggregator({ builder: container.resolve(AnalysisInjectionKey.Builder) }),
                 {
-                    consumeRouting: AnalysisBuilderEventMessageBusRouting,
+                    consume: AnalysisBuilderEventMessageBusRouting,
                     messageBus,
                     hooks: workerHooks,
                 },
             ),
-            new WorkerCaller(
+            new RemoteWorker(
                 new AnalysisDistributorAggregator({ distributor: container.resolve(AnalysisInjectionKey.Distributor) }),
                 {
-                    consumeRouting: AnalysisDistributorEventMessageBusRouting,
+                    consume: AnalysisDistributorEventMessageBusRouting,
                     messageBus,
                     hooks: workerHooks,
                 },
             ),
-            new WorkerCaller(
+            new RemoteWorker(
                 new StorageBucketAggregator({
                     analysisRepository,
                     analysisBucketRepository,
                     analysisBucketFileRepository,
-                    bucketCaller: new BucketComponentCaller({ messageBus }),
+                    bucketDispatcher: new BucketComponentDispatcher({ messageBus }),
                     logger,
                 }),
                 {
-                    consumeRouting: BucketEventMessageBusRouting,
+                    consume: BucketEventMessageBusRouting,
                     messageBus,
                     hooks: workerHooks,
                 },
             ),
-            new WorkerCaller(
+            new RemoteWorker(
                 new StorageBucketFileAggregator({
                     service: new AnalysisBucketFileService({
                         repository: analysisBucketFileRepository,
@@ -126,49 +123,49 @@ export class AggregatorsModule implements IModule {
                         }),
                     }),
                     logger,
-                    bucketFileCaller: new BucketFileTaskCaller({ messageBus, hooks: createDispatchCallerLogHooks(logger) }),
+                    bucketFileDispatcher: new BucketFileTaskDispatcher({ messageBus }),
                 }),
                 {
-                    consumeRouting: BucketFileEventMessageBusRouting,
+                    consume: BucketFileEventMessageBusRouting,
                     messageBus,
                     hooks: workerHooks,
                 },
             ),
-            new WorkerCaller(
+            new RemoteWorker(
                 new MasterImageBuilderAggregator({
                     service: new MasterImageBuilderService({ imageRepository: masterImageRepository }),
-                    eventComponentCaller: new EventComponentCaller({ messageBus }),
+                    eventComponentDispatcher: new EventComponentDispatcher({ messageBus }),
                 }),
                 {
-                    consumeRouting: MasterImageBuilderEventMessageBusRouting,
+                    consume: MasterImageBuilderEventMessageBusRouting,
                     messageBus,
                     hooks: workerHooks,
                 },
             ),
-            new WorkerCaller(
+            new RemoteWorker(
                 new MasterImageSynchronizerAggregator({
                     imageRepository: masterImageRepository,
                     groupRepository: container.resolve(DatabaseInjectionKey.MasterImageGroupRepository),
                     logger,
-                    eventComponentCaller: new EventComponentCaller({ messageBus }),
+                    eventComponentDispatcher: new EventComponentDispatcher({ messageBus }),
                 }),
                 {
-                    consumeRouting: MasterImageSynchronizerEventMessageBusRouting,
+                    consume: MasterImageSynchronizerEventMessageBusRouting,
                     messageBus,
                     hooks: workerHooks,
                 },
             ),
         ];
 
-        this.starting = Promise.allSettled(this.aggregators.map((a) => a.start()));
+        // Fire-and-forget: a stop() during a start() still leaves nothing subscribed.
+        void Promise.allSettled(this.aggregators.map((a) => a.start()));
     }
 
     async teardown(): Promise<void> {
-        const { aggregators, starting } = this;
+        const { aggregators } = this;
         this.aggregators = [];
-        this.starting = undefined;
 
-        await starting;
         await Promise.all(aggregators.map((a) => a.stop()));
+        await Promise.all(aggregators.map((a) => a.settled?.()));
     }
 }

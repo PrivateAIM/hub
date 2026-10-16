@@ -7,8 +7,8 @@
 
 /**
  * Port for registry setup operations.
- * Implemented by RegistryComponentCaller in app layer.
+ * Implemented by RegistryComponentDispatcher in app layer.
  */
-export interface IRegistryCaller {
-    call(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void>;
+export interface IRegistryDispatcher {
+    dispatch(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void>;
 }

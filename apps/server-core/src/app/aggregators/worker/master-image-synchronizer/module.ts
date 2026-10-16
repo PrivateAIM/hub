@@ -13,8 +13,8 @@ import {
 } from '@privateaim/server-core-worker-kit';
 import type { IEntityRepository, Logger } from '@privateaim/server-kit';
 import type { IMasterImageRepository } from '../../../../core/entities/master-image/types.ts';
-import { Component } from 'synergos';
-import type { EventComponentCaller } from '@privateaim/server-telemetry-kit';
+import { Component } from 'hubwire';
+import type { EventComponentDispatcher } from '@privateaim/server-telemetry-kit';
 import {
     handleMasterImageSynchronizerExecutionFinishedEvent,
 } from './handler.ts';
@@ -22,7 +22,7 @@ import {
 type MasterImageSynchronizerAggregatorContext = {
     imageRepository: IMasterImageRepository;
     groupRepository: IEntityRepository<MasterImageGroup>;
-    eventComponentCaller?: EventComponentCaller;
+    eventComponentDispatcher?: EventComponentDispatcher;
     logger?: Logger;
 };
 
@@ -31,8 +31,8 @@ export class MasterImageSynchronizerAggregator extends Component<MasterImageSync
         super();
 
         const recordEvent = async (name: string) => {
-            if (ctx.eventComponentCaller) {
-                await ctx.eventComponentCaller.callCreate({
+            if (ctx.eventComponentDispatcher) {
+                await ctx.eventComponentDispatcher.dispatchCreate({
                     name,
                     data: {},
                     refType: DomainType.MASTER_IMAGE,
