@@ -5,28 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
-import { DispatchCaller } from 'synergos';
+import type { ComponentMetadata, RemoteDispatcherOptions } from 'hubwire';
+import { RemoteDispatcher } from 'hubwire';
 import {
     BucketCommand,
     BucketTaskMessageBusRouting,
 } from './constants';
 import type { BucketClearCommandPayload, BucketCreateCommandPayload, BucketDeleteCommandPayload } from './handlers';
 
-export class BucketComponentCaller extends DispatchCaller {
-    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
+export class BucketComponentDispatcher extends RemoteDispatcher {
+    constructor(options: Omit<RemoteDispatcherOptions, 'routing'>) {
         super({ ...options, routing: BucketTaskMessageBusRouting });
     }
 
-    async callCreate(payload: BucketCreateCommandPayload, metadata: ComponentMetadata = {}) {
-        return this.call(BucketCommand.CREATE, payload, metadata);
+    async dispatchCreate(payload: BucketCreateCommandPayload, metadata: ComponentMetadata = {}): Promise<void> {
+        await this.dispatch(BucketCommand.CREATE, payload, metadata);
     }
 
-    async callDelete(payload: BucketDeleteCommandPayload, metadata: ComponentMetadata = {}) {
-        return this.call(BucketCommand.DELETE, payload, metadata);
+    async dispatchDelete(payload: BucketDeleteCommandPayload, metadata: ComponentMetadata = {}): Promise<void> {
+        await this.dispatch(BucketCommand.DELETE, payload, metadata);
     }
 
-    async callClear(payload: BucketClearCommandPayload, metadata: ComponentMetadata = {}) {
-        return this.call(BucketCommand.CLEAR, payload, metadata);
+    async dispatchClear(payload: BucketClearCommandPayload, metadata: ComponentMetadata = {}): Promise<void> {
+        await this.dispatch(BucketCommand.CLEAR, payload, metadata);
     }
 }

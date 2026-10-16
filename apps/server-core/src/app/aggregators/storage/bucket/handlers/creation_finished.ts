@@ -6,12 +6,12 @@
  */
 import { DomainType, parseAnalysisBucketName } from '@privateaim/core-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler } from 'synergos';
+import type { ComponentHandler } from 'hubwire';
 import type { BucketComponentEventMap, BucketEvent } from '@privateaim/server-storage-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { IAnalysisBucketRepository, IAnalysisRepository } from '../../../../../core/index.ts';
-import type { IBucketCaller } from '../../../../../core/services/index.ts';
+import type { IBucketDispatcher } from '../../../../../core/services/index.ts';
 import type { StorageBucketAggregatorContext } from '../types.ts';
 
 export class StorageBucketCreationFinishedHandler implements ComponentHandler<
@@ -22,14 +22,14 @@ export class StorageBucketCreationFinishedHandler implements ComponentHandler<
 
     protected analysisBucketRepository: IAnalysisBucketRepository;
 
-    protected bucketCaller: IBucketCaller;
+    protected bucketDispatcher: IBucketDispatcher;
 
     protected logger?: Logger;
 
     constructor(ctx: StorageBucketAggregatorContext) {
         this.analysisRepository = ctx.analysisRepository;
         this.analysisBucketRepository = ctx.analysisBucketRepository;
-        this.bucketCaller = ctx.bucketCaller;
+        this.bucketDispatcher = ctx.bucketDispatcher;
         this.logger = ctx.logger;
     }
 
@@ -62,7 +62,7 @@ export class StorageBucketCreationFinishedHandler implements ComponentHandler<
             // a repeated check() created a second storage bucket: remove it, keep the linked one.
             if (analysisBucket.bucketId !== bucket.id) {
                 this.logger?.info(`Deleting duplicate ${parsed.type} bucket of analysis`, { ...meta, bucketId: bucket.id });
-                await this.bucketCaller.callDelete({ id: bucket.id });
+                await this.bucketDispatcher.dispatchDelete({ id: bucket.id });
             }
             return;
         }

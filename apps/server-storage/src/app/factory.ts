@@ -11,13 +11,13 @@ import {
     EntityEventSocketHandler,
     LoggerConsoleTransport,
     LoggerInjectionKey,
-    MessageBusInjectionKey,
     RedisClientInjectionKey,
+    RemoteMessageBusInjectionKey,
 } from '@privateaim/server-kit';
 import {
     EntityEventHandler,
-    EventComponentCaller,
-    LogComponentCaller,
+    EventComponentDispatcher,
+    LogComponentDispatcher,
     LoggerTransport,
     TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS,
 } from '@privateaim/server-telemetry-kit';
@@ -29,7 +29,7 @@ import { ServerStorageApplicationBuilder } from './builder.ts';
 
 export function createApplication() {
     let app: Application;
-    let logCaller: LogComponentCaller | undefined;
+    let logDispatcher: LogComponentDispatcher | undefined;
 
     const builder = new ServerStorageApplicationBuilder()
         .withConfig()
@@ -48,13 +48,15 @@ export function createApplication() {
                 handlers.push(new EntityEventSocketHandler(redisResult.data));
             }
 
-            const eventCaller = new EventComponentCaller({ messageBus: container.resolve(MessageBusInjectionKey) });
-
-            const loggerResult = container.tryResolve(LoggerInjectionKey);
-            handlers.push(new EntityEventHandler({
-                eventComponentCaller: eventCaller,
-                logger: loggerResult.success ? loggerResult.data : undefined,
-            }));
+            // only over AMQP: server-telemetry consumes entity events, nothing in-process does
+            const messageBusResult = container.tryResolve(RemoteMessageBusInjectionKey);
+            if (messageBusResult.success) {
+                const loggerResult = container.tryResolve(LoggerInjectionKey);
+                handlers.push(new EntityEventHandler({
+                    eventComponentDispatcher: new EventComponentDispatcher({ messageBus: messageBusResult.data }),
+                    logger: loggerResult.success ? loggerResult.data : undefined,
+                }));
+            }
 
             return handlers;
         },
@@ -69,12 +71,13 @@ export function createApplication() {
                     [LogFlag.CHANNEL]: LogChannel.SYSTEM,
                 },
                 save: async (data) => {
-                    if (!logCaller) {
-                        const result = app?.container.tryResolve(MessageBusInjectionKey);
+                    if (!logDispatcher) {
+                        // only over AMQP: no in-process consumer takes a log line here
+                        const result = app?.container.tryResolve(RemoteMessageBusInjectionKey);
                         if (!result?.success) return;
-                        logCaller = new LogComponentCaller({ messageBus: result.data });
+                        logDispatcher = new LogComponentDispatcher({ messageBus: result.data });
                     }
-                    await logCaller.callWrite(data);
+                    await logDispatcher.dispatchWrite(data);
                 },
             }),
         ],

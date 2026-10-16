@@ -10,7 +10,7 @@ import type { MasterImageBuilderEventMap } from '@privateaim/server-core-worker-
 import {
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
-import { Component } from 'synergos';
+import { Component } from 'hubwire';
 import type { MasterImageBuilderAggregatorContext } from './types.ts';
 
 export class MasterImageBuilderAggregator extends Component<MasterImageBuilderEventMap> {
@@ -23,8 +23,8 @@ export class MasterImageBuilderAggregator extends Component<MasterImageBuilderEv
                 return;
             }
 
-            if (ctx.eventComponentCaller) {
-                await ctx.eventComponentCaller.callCreate({
+            if (ctx.eventComponentDispatcher) {
+                await ctx.eventComponentDispatcher.dispatchCreate({
                     name: context.key,
                     data: {},
                     refType: DomainType.MASTER_IMAGE,

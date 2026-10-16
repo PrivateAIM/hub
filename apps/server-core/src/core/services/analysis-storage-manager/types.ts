@@ -9,17 +9,17 @@ import type { Analysis, AnalysisBucketType } from '@privateaim/core-kit';
 
 /**
  * Port for managing storage buckets.
- * Implemented by BucketComponentCaller in server-storage-kit.
+ * Implemented by BucketComponentDispatcher in server-storage-kit.
  */
-export interface IBucketCaller {
-    callCreate(data: {
+export interface IBucketDispatcher {
+    dispatchCreate(data: {
         name: string; 
         realmId: string; 
         refType?: string; 
         refId?: string 
     }): Promise<void>;
-    callDelete(data: { id: string }): Promise<void>;
-    callClear(data: { id: string }): Promise<void>;
+    dispatchDelete(data: { id: string }): Promise<void>;
+    dispatchClear(data: { id: string }): Promise<void>;
 }
 
 export type AnalysisStorageMangerCheckOptions = {

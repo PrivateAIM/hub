@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DispatchCallerHooks, IMessageBus } from 'synergos';
+import type { IMessageBus } from 'hubwire';
 
-export type RegistryComponentCallerContext = {
+export type RegistryComponentDispatcherContext = {
     messageBus?: IMessageBus,
-    hooks?: DispatchCallerHooks,
 };

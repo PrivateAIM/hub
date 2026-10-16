@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IRegistryCaller } from '../../../../../src/core/harbor/types.ts';
+import type { IRegistryDispatcher } from '../../../../../src/core/harbor/types.ts';
 
 type CallRecord = {
     command: string;
@@ -13,10 +13,10 @@ type CallRecord = {
     meta: Record<string, any>;
 };
 
-export class FakeRegistryCaller implements IRegistryCaller {
+export class FakeRegistryDispatcher implements IRegistryDispatcher {
     private calls: CallRecord[] = [];
 
-    async call(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void> {
+    async dispatch(command: string, data: Record<string, any>, meta: Record<string, any>): Promise<void> {
         this.calls.push({
             command, 
             data, 

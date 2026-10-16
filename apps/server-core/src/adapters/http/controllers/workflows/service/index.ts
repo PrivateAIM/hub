@@ -18,12 +18,12 @@ import {
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { IAppEvent } from 'routup';
 import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
-import type { IRegistryCaller } from '../../../../../core/harbor/types.ts';
+import type { IRegistryDispatcher } from '../../../../../core/harbor/types.ts';
 import type { IRegistryService } from '../../../../../core/index.ts';
 
 type ServiceControllerContext = {
     registryService: IRegistryService;
-    registryCaller: IRegistryCaller;
+    registryDispatcher: IRegistryDispatcher;
 };
 
 @DTags('extra')
@@ -31,11 +31,11 @@ type ServiceControllerContext = {
 export class ServiceController {
     protected registryService: IRegistryService;
 
-    protected registryCaller: IRegistryCaller;
+    protected registryDispatcher: IRegistryDispatcher;
 
     constructor(ctx: ServiceControllerContext) {
         this.registryService = ctx.registryService;
-        this.registryCaller = ctx.registryCaller;
+        this.registryDispatcher = ctx.registryDispatcher;
     }
 
     @DPost('/:id/hook', [ForceLoggedInMiddleware])
@@ -49,7 +49,7 @@ export class ServiceController {
             throw new EntityNotFoundError({ entity: 'service' });
         }
 
-        await this.registryCaller.call('HOOK_PROCESS', data, {});
+        await this.registryDispatcher.dispatch('HOOK_PROCESS', data, {});
 
         event.response.status = 202;
         return null;

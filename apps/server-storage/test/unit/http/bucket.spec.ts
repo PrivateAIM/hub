@@ -15,7 +15,7 @@ import {
 import path from 'node:path';
 import fs from 'node:fs';
 import type { Readable } from 'node:stream';
-import type { ComponentHandlerContext } from 'synergos';
+import type { ComponentHandlerContext } from 'hubwire';
 import type { BucketComponentEventMap } from '@privateaim/server-storage-kit';
 import { BucketCommand, BucketEvent } from '@privateaim/server-storage-kit';
 import { PermissionName } from '@privateaim/kit';

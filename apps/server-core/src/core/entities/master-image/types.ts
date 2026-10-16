@@ -26,8 +26,8 @@ export interface IMasterImageRepository extends IEntityRepository<MasterImage> {
 /**
  * Port for triggering master image synchronization on the worker.
  */
-export interface IMasterImageSynchronizerCaller {
-    callExecute(data: {
+export interface IMasterImageSynchronizerDispatcher {
+    dispatchExecute(data: {
         owner: string; 
         repository: string; 
         branch: string 
@@ -37,8 +37,8 @@ export interface IMasterImageSynchronizerCaller {
 /**
  * Port for triggering master image build on the worker.
  */
-export interface IMasterImageBuilderCaller {
-    callExecute(data: { id: string }): Promise<void>;
+export interface IMasterImageBuilderDispatcher {
+    dispatchExecute(data: { id: string }): Promise<void>;
 }
 
 export interface IMasterImageService {

@@ -6,9 +6,9 @@
  */
 
 import type { IContainer } from 'eldin';
-import { LoggerInjectionKey, MessageBusInjectionKey, createDispatchCallerLogHooks } from '@privateaim/server-kit';
-import { DispatchCaller } from 'synergos';
-import { BucketEventMessageBusRouting, BucketFileEventCaller } from '@privateaim/server-storage-kit';
+import { LoggerInjectionKey, RemoteMessageBusInjectionKey } from '@privateaim/server-kit';
+import { RemoteDispatcher } from 'hubwire';
+import { BucketEventMessageBusRouting, BucketFileEventDispatcher } from '@privateaim/server-storage-kit';
 import { BucketController } from '../../../adapters/http/controllers/bucket/module.ts';
 import { BucketFileController } from '../../../adapters/http/controllers/bucket-file/module.ts';
 import { RootController } from '../../../adapters/http/controllers/root/index.ts';
@@ -18,8 +18,8 @@ import { BucketComponent } from '../../components/bucket/module.ts';
 import { BucketFileComponent } from '../../components/bucket-file/module.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { StorageInjectionKey } from '../storage/constants.ts';
-import { BucketCallerAdapter } from './callers/bucket-caller.ts';
-import { BucketFileCallerAdapter } from './callers/bucket-file-caller.ts';
+import { BucketDispatcherAdapter } from './dispatchers/bucket-dispatcher.ts';
+import { BucketFileDispatcherAdapter } from './dispatchers/bucket-file-dispatcher.ts';
 
 export function createControllers(container: IContainer): Record<string, any>[] {
     const bucketRepository = container.resolve(DatabaseInjectionKey.BucketRepository);
@@ -29,31 +29,31 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const loggerResult = container.tryResolve(LoggerInjectionKey);
     const logger = loggerResult.success ? loggerResult.data : undefined;
 
-    const messageBus = container.resolve(MessageBusInjectionKey);
+    // only over AMQP: server-core consumes bucket and file events, nothing in-process does
+    const messageBusResult = container.tryResolve(RemoteMessageBusInjectionKey);
+    const messageBus = messageBusResult.success ? messageBusResult.data : undefined;
 
     const bucketComponent = new BucketComponent({ storage, logger });
     const bucketFileComponent = new BucketFileComponent({ storage, logger });
-    const bucketFileEventCaller = new BucketFileEventCaller({ messageBus });
+    const bucketFileEventDispatcher = messageBus ? new BucketFileEventDispatcher({ messageBus }) : undefined;
 
-    const bucketCaller = new BucketCallerAdapter(
+    const bucketDispatcher = new BucketDispatcherAdapter(
         bucketComponent,
-        new DispatchCaller({
-            messageBus,
-            hooks: logger ? createDispatchCallerLogHooks(logger) : undefined,
-            routing: BucketEventMessageBusRouting,
-        }),
+        messageBus ?
+            new RemoteDispatcher({ messageBus, routing: BucketEventMessageBusRouting }) :
+            undefined,
     );
-    const bucketFileCaller = new BucketFileCallerAdapter(bucketFileComponent, bucketFileEventCaller);
+    const bucketFileDispatcher = new BucketFileDispatcherAdapter(bucketFileComponent, bucketFileEventDispatcher);
 
     const bucketService = new BucketService({
         repository: bucketRepository,
-        caller: bucketCaller,
+        dispatcher: bucketDispatcher,
         storage,
     });
 
     const bucketFileService = new BucketFileService({
         repository: bucketFileRepository,
-        caller: bucketFileCaller,
+        dispatcher: bucketFileDispatcher,
     });
 
     return [
@@ -62,7 +62,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
             bucketFileRepository,
             storage,
             bucketFileComponent,
-            bucketFileEventCaller,
+            bucketFileEventDispatcher,
             logger,
         }),
         new BucketFileController({

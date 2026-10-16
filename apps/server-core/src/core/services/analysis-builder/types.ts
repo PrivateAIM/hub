@@ -14,9 +14,9 @@ export type AnalysisBuilderStartOptions = {
 
 /**
  * Port for triggering analysis build operations on the worker.
- * Implemented by AnalysisBuilderComponentCaller in server-core-worker-kit.
+ * Implemented by AnalysisBuilderComponentDispatcher in server-core-worker-kit.
  */
-export interface IAnalysisBuilderCaller {
-    callExecute(data: { id: string }): Promise<void>;
-    callCheck(data: { id: string }): Promise<void>;
+export interface IAnalysisBuilderDispatcher {
+    dispatchExecute(data: { id: string }): Promise<void>;
+    dispatchCheck(data: { id: string }): Promise<void>;
 }

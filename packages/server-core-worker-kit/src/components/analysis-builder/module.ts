@@ -5,21 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
-import { DispatchCaller } from 'synergos';
+import type { ComponentMetadata, RemoteDispatcherOptions } from 'hubwire';
+import { RemoteDispatcher } from 'hubwire';
 import { AnalysisBuilderCommand, AnalysisBuilderTaskMessageBusRouting } from './constants';
 import type { AnalysisBuilderBasePayload, AnalysisBuilderEventMap, AnalysisBuilderExecutePayload } from './types';
 
-export class AnalysisBuilderComponentCaller extends DispatchCaller<AnalysisBuilderEventMap> {
-    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
+export class AnalysisBuilderComponentDispatcher extends RemoteDispatcher<AnalysisBuilderEventMap> {
+    constructor(options: Omit<RemoteDispatcherOptions, 'routing'>) {
         super({ ...options, routing: AnalysisBuilderTaskMessageBusRouting });
     }
 
-    async callExecute(payload: AnalysisBuilderExecutePayload, metadata: ComponentMetadata = {}) {
-        return this.call(AnalysisBuilderCommand.EXECUTE, payload, metadata);
+    async dispatchExecute(payload: AnalysisBuilderExecutePayload, metadata: ComponentMetadata = {}): Promise<void> {
+        await this.dispatch(AnalysisBuilderCommand.EXECUTE, payload, metadata);
     }
 
-    async callCheck(payload: AnalysisBuilderBasePayload, metadata: ComponentMetadata = {}) {
-        return this.call(AnalysisBuilderCommand.CHECK, payload, metadata);
+    async dispatchCheck(payload: AnalysisBuilderBasePayload, metadata: ComponentMetadata = {}): Promise<void> {
+        await this.dispatch(AnalysisBuilderCommand.CHECK, payload, metadata);
     }
 }

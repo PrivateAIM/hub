@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IBucketFileCaller } from '../../../../../src/core/entities/bucket-file/types.ts';
+import type { IBucketFileDispatcher } from '../../../../../src/core/entities/bucket-file/types.ts';
 
-export class FakeBucketFileCaller implements IBucketFileCaller {
+export class FakeBucketFileDispatcher implements IBucketFileDispatcher {
     private deleteCalls: string[] = [];
 
     async delete(id: string): Promise<void> {

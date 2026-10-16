@@ -5,14 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AmqpMessageBusDriverHooks } from '@synergos/amqp';
+import type { AmqpMessageBusDriverHooks } from '@hubwire/amqp';
 import type {
-    DispatchCallerHooks,
     MessageBusHooks,
     MessageRouting,
+    RemoteWorkerHooks,
     ScheduledComponentHooks,
-    WorkerCallerHooks,
-} from 'synergos';
+} from 'hubwire';
 import type { Logger } from '../logger';
 import type { MessageBusLogHooksOptions } from './types';
 
@@ -91,20 +90,9 @@ export function createAmqpDriverLogHooks(logger: Logger): AmqpMessageBusDriverHo
     };
 }
 
-export function createDispatchCallerLogHooks(logger: Logger): DispatchCallerHooks {
+export function createRemoteWorkerLogHooks(logger: Logger): RemoteWorkerHooks {
     return {
-        onUndelivered(message) {
-            logger.warn(
-                `Message ${message.type} in ${message.metadata.routing.key} was not delivered to any consumer.`,
-                { messageId: message.id },
-            );
-        },
-    };
-}
-
-export function createWorkerCallerLogHooks(logger: Logger): WorkerCallerHooks {
-    return {
-        onUnrouted(key) {
+        onUnrouted({ key }) {
             // no publish routing means no one subscribes to the component's events
             // (e.g. telemetry event/log ingestion), so dropping is expected
             logger.debug(`Event ${key} could not be handled: no routing to publish it to.`);

@@ -7,14 +7,14 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { IComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
 import {
     LoggerInjectionKey,
     MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
-    createWorkerCallerLogHooks,
+    createRemoteWorkerLogHooks,
 } from '@privateaim/server-kit';
-import { WorkerCaller } from 'synergos';
+import { RemoteWorker } from 'hubwire';
 import {
     BucketEventMessageBusRouting,
     BucketFileEventMessageBusRouting,
@@ -38,18 +38,18 @@ export class ComponentsModule implements IModule {
         const loggerResult = container.tryResolve(LoggerInjectionKey);
         const logger = loggerResult.success ? loggerResult.data : undefined;
         const messageBus = container.resolve(MessageBusInjectionKey);
-        const hooks = logger ? createWorkerCallerLogHooks(logger) : undefined;
+        const hooks = logger ? createRemoteWorkerLogHooks(logger) : undefined;
 
         this.components = [
-            new WorkerCaller(new BucketComponent({ storage, logger }), {
-                consumeRouting: BucketTaskMessageBusRouting,
-                publishRouting: BucketEventMessageBusRouting,
+            new RemoteWorker(new BucketComponent({ storage, logger }), {
+                consume: BucketTaskMessageBusRouting,
+                publish: BucketEventMessageBusRouting,
                 messageBus,
                 hooks,
             }),
-            new WorkerCaller(new BucketFileComponent({ storage, logger }), {
-                consumeRouting: BucketFileTaskMessageBusRouting,
-                publishRouting: BucketFileEventMessageBusRouting,
+            new RemoteWorker(new BucketFileComponent({ storage, logger }), {
+                consume: BucketFileTaskMessageBusRouting,
+                publish: BucketFileEventMessageBusRouting,
                 messageBus,
                 hooks,
             }),

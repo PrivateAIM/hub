@@ -9,30 +9,29 @@ import { describe, expect, it } from 'vitest';
 import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-worker-kit';
 import {
     MasterImageSynchronizerCommand,
+    MasterImageSynchronizerEvent,
 } from '@privateaim/server-core-worker-kit';
-import { DirectCaller } from 'synergos';
+import { LocalDispatcher } from 'hubwire';
 import { MasterImageSynchronizerComponent } from '../../src/app/components/index.ts';
 
 describe('components > master-images', () => {
     it('should clone master images to directory', async () => {
-        const caller = new DirectCaller<MasterImageSynchronizerEventMap>(
+        const dispatcher = new LocalDispatcher<MasterImageSynchronizerEventMap>(
             new MasterImageSynchronizerComponent(),
         );
 
-        const output = await caller.callAndWait(
+        const { replies } = await dispatcher.dispatch(
             MasterImageSynchronizerCommand.EXECUTE,
             {
                 owner: 'PrivateAim',
                 repository: 'master-images',
                 branch: 'develop',
             },
-            {},
         );
-        expect(output.executionFinished).toBeDefined();
+        const finished = replies.find((reply) => reply.key === MasterImageSynchronizerEvent.EXECUTION_FINISHED);
+        expect(finished).toBeDefined();
 
-        const { executionFinished: data } = output;
-
-        expect(data.images.length).toBeGreaterThan(0);
-        expect(data.groups.length).toBeGreaterThan(0);
+        expect(finished!.data.images.length).toBeGreaterThan(0);
+        expect(finished!.data.groups.length).toBeGreaterThan(0);
     });
 });

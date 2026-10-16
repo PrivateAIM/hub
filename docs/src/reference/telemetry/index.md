@@ -108,5 +108,5 @@ denylist also — deliberately, fail-closed — suppresses the non-secret `bucke
   long-running delete.
 
 ::: warning
-The telemetry service is the log writer itself, so its own logger cannot use the log component caller (would be circular). It uses a `MemoryLogStore` fallback internally.
+The telemetry service is the log writer itself, so its own logger cannot use the log component dispatcher (would be circular). It uses a `MemoryLogStore` fallback internally.
 :::

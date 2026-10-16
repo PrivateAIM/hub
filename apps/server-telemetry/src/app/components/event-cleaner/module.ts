@@ -7,15 +7,15 @@
 
 import type { Logger } from '@privateaim/server-kit';
 import { createScheduledComponentLogHooks } from '@privateaim/server-kit';
-import type { IComponent } from 'synergos';
-import { defineScheduledComponent } from 'synergos';
+import type { IScheduledComponent } from 'hubwire';
+import { defineScheduledComponent } from 'hubwire';
 import type { IEventRepository } from '../../../core/entities/index.ts';
 
 /**
  * Retention sweep: one pass at start, then daily at 01:00. A failing pass is
  * logged by the scheduled component and retried on the next tick.
  */
-export function createEventCleanerComponent(ctx: { repository: IEventRepository, logger?: Logger }): IComponent {
+export function createEventCleanerComponent(ctx: { repository: IEventRepository, logger?: Logger }): IScheduledComponent {
     return defineScheduledComponent({
         schedule: '0 1 * * *',
         hooks: ctx.logger ? createScheduledComponentLogHooks(ctx.logger, 'event-cleaner') : undefined,

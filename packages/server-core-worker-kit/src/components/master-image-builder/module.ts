@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
-import { DispatchCaller } from 'synergos';
+import type { ComponentMetadata, RemoteDispatcherOptions } from 'hubwire';
+import { RemoteDispatcher } from 'hubwire';
 import { MasterImageBuilderCommand, MasterImageBuilderTaskMessageBusRouting } from './constants';
 import type { MasterImageBuilderExecutePayload } from './types';
 
-export class MasterImageBuilderComponentCaller extends DispatchCaller {
-    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
+export class MasterImageBuilderComponentDispatcher extends RemoteDispatcher {
+    constructor(options: Omit<RemoteDispatcherOptions, 'routing'>) {
         super({ ...options, routing: MasterImageBuilderTaskMessageBusRouting });
     }
 
-    async callExecute(payload: MasterImageBuilderExecutePayload, metadata: ComponentMetadata = {}) {
-        return this.call(MasterImageBuilderCommand.EXECUTE, payload, metadata);
+    async dispatchExecute(payload: MasterImageBuilderExecutePayload, metadata: ComponentMetadata = {}): Promise<void> {
+        await this.dispatch(MasterImageBuilderCommand.EXECUTE, payload, metadata);
     }
 }

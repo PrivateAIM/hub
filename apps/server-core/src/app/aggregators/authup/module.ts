@@ -6,7 +6,7 @@
  */
 
 import { EntityType } from '@authup/core-kit';
-import type { IComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
 import { EnvironmentName } from '@privateaim/server-kit';
 import {
     handleAuthupRealmEvent,
@@ -43,7 +43,7 @@ export function createAuthupAggregator(ctx: AuthupAggregatorContext) : IComponen
                 break;
             }
             case EntityType.CLIENT: {
-                await handleAuthupRobotEvent(event, ctx, ctx.registryComponentCaller);
+                await handleAuthupRobotEvent(event, ctx, ctx.registryComponentDispatcher);
                 break;
             }
             case EntityType.USER: {
@@ -55,8 +55,9 @@ export function createAuthupAggregator(ctx: AuthupAggregatorContext) : IComponen
 
     return {
         async start() {
-            await redisSub.subscribe(...channels);
+            // listen first: a stop() during the subscribe removes the listener again
             redisSub.on('message', onMessage);
+            await redisSub.subscribe(...channels);
         },
         async stop() {
             redisSub.off('message', onMessage);

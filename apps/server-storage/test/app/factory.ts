@@ -12,7 +12,7 @@ import {
     MessageBusModule,
 } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
-import { MemoryMessageBusDriver } from 'synergos';
+import { MemoryMessageBusDriver } from 'hubwire';
 import { ConfigModule } from '../../src/app/modules/config/index.ts';
 import { StorageModule } from '../../src/app/modules/storage/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';

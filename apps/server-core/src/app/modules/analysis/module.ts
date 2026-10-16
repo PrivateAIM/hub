@@ -7,8 +7,8 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import { AnalysisBuilderComponentCaller, AnalysisDistributorComponentCaller } from '@privateaim/server-core-worker-kit';
-import { BucketComponentCaller } from '@privateaim/server-storage-kit';
+import { AnalysisBuilderComponentDispatcher, AnalysisDistributorComponentDispatcher } from '@privateaim/server-core-worker-kit';
+import { BucketComponentDispatcher } from '@privateaim/server-storage-kit';
 import { LoggerInjectionKey, MESSAGE_BUS_MODULE_NAME, MessageBusInjectionKey } from '@privateaim/server-kit';
 import { AnalysisBuilder } from '../../../core/services/analysis-builder/index.ts';
 import { AnalysisConfigurator } from '../../../core/services/analysis-configurator/index.ts';
@@ -42,7 +42,7 @@ export class AnalysisModule implements IModule {
         const storageManager = new AnalysisStorageManager({
             repository: analysisRepository,
             bucketRepository: analysisBucketRepository,
-            caller: new BucketComponentCaller({ messageBus }),
+            dispatcher: new BucketComponentDispatcher({ messageBus }),
         });
 
         const analysisRecalculator = new AnalysisMetadataRecalculator({ repository: analysisRepository });
@@ -69,7 +69,7 @@ export class AnalysisModule implements IModule {
             useValue: new AnalysisBuilder({
                 repository: analysisRepository,
                 analysisNodeRepository,
-                caller: new AnalysisBuilderComponentCaller({ messageBus }),
+                dispatcher: new AnalysisBuilderComponentDispatcher({ messageBus }),
                 analysisRecalculator,
                 nodeRecalculator,
                 fileRecalculator,
@@ -91,7 +91,7 @@ export class AnalysisModule implements IModule {
                 repository: analysisRepository,
                 analysisNodeRepository,
                 registryRepository,
-                caller: new AnalysisDistributorComponentCaller({ messageBus }),
+                dispatcher: new AnalysisDistributorComponentDispatcher({ messageBus }),
                 analysisRecalculator,
                 nodeRecalculator,
                 fileRecalculator,

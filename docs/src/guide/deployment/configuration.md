@@ -50,8 +50,9 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   robot account and registry credentials appear shortly after the node is
   created rather than with the response. Renaming a registry project's
   `externalName` is one relink command, so its unlink of the old Harbor project
-  and its link of the new one cannot run out of order. Without a message bus, or
-  when no consumer accepted the command, server-core still runs them in-process.
+  and its link of the new one cannot run out of order. Without a message bus
+  server-core runs them in-process; a command sent before the registry consumer
+  has started waits in the queue.
 - **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
   build.** A command is acknowledged only once its handler finishes. If a build
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the

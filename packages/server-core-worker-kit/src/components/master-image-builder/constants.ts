@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MessageRoutingType } from 'synergos';
+import { MessageRoutingType } from 'hubwire';
 
 export enum MasterImageBuilderEvent {
     EXECUTION_FAILED = 'executionFailed',

@@ -12,7 +12,7 @@ import {
     MessageBusModule,
 } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
-import { MemoryMessageBusDriver } from 'synergos';
+import { MemoryMessageBusDriver } from 'hubwire';
 import { createFakeClient } from '@privateaim/telemetry-kit/testing';
 import type { FakeHandlerMap } from '@privateaim/telemetry-kit/testing';
 import { ConfigModule } from '../../src/app/modules/config/index.ts';

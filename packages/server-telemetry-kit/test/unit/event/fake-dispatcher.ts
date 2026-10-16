@@ -12,7 +12,7 @@ import type { IEventPublisher } from '../../../src/core';
 export class FakeEventPublisher implements IEventPublisher {
     public readonly created: Partial<Event>[] = [];
 
-    async callCreate(payload: Partial<Event>): Promise<void> {
+    async dispatchCreate(payload: Partial<Event>): Promise<void> {
         this.created.push(payload);
     }
 

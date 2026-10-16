@@ -8,16 +8,15 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { withDataSourceLock } from '@privateaim/server-db-kit';
-import type { IComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
 import {
     AuthupClientInjectionKey,
     LoggerInjectionKey,
     MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
-    createDispatchCallerLogHooks,
-    createWorkerCallerLogHooks,
+    createRemoteWorkerLogHooks,
 } from '@privateaim/server-kit';
-import { WorkerCaller } from 'synergos';
+import { RemoteWorker } from 'hubwire';
 import { AnalysisReconciler } from '../../../core/services/analysis-reconciler/index.ts';
 import { createAnalysisReconcilerComponent } from '../../components/analysis-reconciler/module.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
@@ -27,7 +26,7 @@ import { NodeClientService } from '../database/node-client.ts';
 import { NODE_CLIENT_SYNC_DATABASE_LOCK } from '../../components/node-client/constants.ts';
 import { createNodeClientComponent } from '../../components/node-client/module.ts';
 import { RegistryComponent } from '../../components/registry/module.ts';
-import { RegistryComponentCaller } from '../../components/registry/caller/module.ts';
+import { RegistryComponentDispatcher } from '../../components/registry/dispatcher/module.ts';
 import { RegistryTaskMessageBusRouting } from '../../components/registry/constants.ts';
 import { ComponentsInjectionKey } from './constants.ts';
 
@@ -37,8 +36,6 @@ export class ComponentsModule implements IModule {
     readonly dependencies: string[] = ['database', 'analysis', MESSAGE_BUS_MODULE_NAME];
 
     protected components: IComponent[] = [];
-
-    protected starting: Promise<unknown> | undefined;
 
     async setup(container: IContainer): Promise<void> {
         // Create components
@@ -53,21 +50,18 @@ export class ComponentsModule implements IModule {
 
         const messageBus = container.resolve(MessageBusInjectionKey);
 
-        // Create and register component callers
-        const registryComponentCaller = new RegistryComponentCaller(registryComponent, {
-            messageBus,
-            hooks: createDispatchCallerLogHooks(logger),
-        });
-        container.register(ComponentsInjectionKey.RegistryComponentCaller, { useValue: registryComponentCaller });
+        // Create and register component dispatchers
+        const registryComponentDispatcher = new RegistryComponentDispatcher(registryComponent, { messageBus });
+        container.register(ComponentsInjectionKey.RegistryComponentDispatcher, { useValue: registryComponentDispatcher });
 
         // Start task consumers and background components
         this.components = [
-            new WorkerCaller(
+            new RemoteWorker(
                 registryComponent,
                 {
-                    consumeRouting: RegistryTaskMessageBusRouting,
+                    consume: RegistryTaskMessageBusRouting,
                     messageBus,
-                    hooks: createWorkerCallerLogHooks(logger),
+                    hooks: createRemoteWorkerLogHooks(logger),
                 },
             ),
         ];
@@ -93,18 +87,18 @@ export class ComponentsModule implements IModule {
             }));
         }
 
+
         // Fire-and-forget: a background component's first pass must not
-        // block boot. teardown() awaits it before stopping.
-        this.starting = Promise.allSettled(this.components.map((c) => c.start()));
+        // block boot. teardown() awaits it through settled().
+        void Promise.allSettled(this.components.map((c) => c.start()));
     }
 
     async teardown(): Promise<void> {
-        const { components, starting } = this;
+        const { components } = this;
         this.components = [];
-        this.starting = undefined;
 
-        // A worker caller that is still starting would subscribe after its stop().
-        await starting;
         await Promise.all(components.map((c) => c.stop()));
+        // stop() never waits for a cron pass in flight; it must finish before the database closes.
+        await Promise.all(components.map((c) => c.settled?.()));
     }
 }

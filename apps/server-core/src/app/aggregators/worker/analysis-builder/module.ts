@@ -9,7 +9,7 @@ import type { AnalysisBuilderEventMap } from '@privateaim/server-core-worker-kit
 import {
     AnalysisBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
-import { Component } from 'synergos';
+import { Component } from 'hubwire';
 import type { AnalysisBuilderAggregatorContext } from './types.ts';
 
 export class AnalysisBuilderAggregator extends Component<AnalysisBuilderEventMap> {

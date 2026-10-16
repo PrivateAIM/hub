@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import { Component } from 'synergos';
+import { Component } from 'hubwire';
 import type { Logger } from '@privateaim/server-kit';
 import type { AnalysisDistributorEventMap } from '@privateaim/server-core-worker-kit';
 import {

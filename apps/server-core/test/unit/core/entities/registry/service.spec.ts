@@ -19,7 +19,7 @@ import {
 import { RegistryService } from '../../../../../src/core/entities/registry/service.ts';
 import { FakeEntityRepository, createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { FakeRegistryRepository } from './fake-repository.ts';
-import { FakeRegistryCaller } from './fake-caller.ts';
+import { FakeRegistryDispatcher } from './fake-dispatcher.ts';
 
 const READ_PERMISSIONS = [PermissionName.REGISTRY_READ, PermissionName.REGISTRY_MANAGE];
 
@@ -39,17 +39,17 @@ function createTestRegistry(overrides?: Partial<Registry>): Registry {
 describe('RegistryService', () => {
     let repository: FakeRegistryRepository;
     let registryProjectRepository: FakeEntityRepository<RegistryProject>;
-    let registryCaller: FakeRegistryCaller;
+    let registryDispatcher: FakeRegistryDispatcher;
     let service: RegistryService;
 
     beforeEach(() => {
         repository = new FakeRegistryRepository();
         registryProjectRepository = new FakeEntityRepository<RegistryProject>();
-        registryCaller = new FakeRegistryCaller();
+        registryDispatcher = new FakeRegistryDispatcher();
         service = new RegistryService({
             repository,
             registryProjectRepository,
-            registryCaller,
+            registryDispatcher,
         });
     });
 
@@ -242,7 +242,7 @@ describe('RegistryService', () => {
 
     describe('executeCommand', () => {
         describe('SETUP/CLEANUP/DELETE', () => {
-            it('should call registryCaller for SETUP command', async () => {
+            it('should call registryDispatcher for SETUP command', async () => {
                 const registry = createTestRegistry({ id: 'r-1' });
                 repository.seed(registry);
 
@@ -252,11 +252,11 @@ describe('RegistryService', () => {
                     createAllowAllActor(),
                 );
 
-                expect(registryCaller.getCallCount()).toBe(1);
-                expect(registryCaller.getCalls()[0].command).toBe('SETUP');
+                expect(registryDispatcher.getCallCount()).toBe(1);
+                expect(registryDispatcher.getCalls()[0].command).toBe('SETUP');
             });
 
-            it('should call registryCaller for CLEANUP command', async () => {
+            it('should call registryDispatcher for CLEANUP command', async () => {
                 const registry = createTestRegistry({ id: 'r-1' });
                 repository.seed(registry);
 
@@ -266,7 +266,7 @@ describe('RegistryService', () => {
                     createAllowAllActor(),
                 );
 
-                expect(registryCaller.getCalls()[0].command).toBe('CLEANUP');
+                expect(registryDispatcher.getCalls()[0].command).toBe('CLEANUP');
             });
 
             it('should throw EntityNotFoundError when registry does not exist', async () => {
@@ -281,7 +281,7 @@ describe('RegistryService', () => {
         });
 
         describe('PROJECT_LINK/PROJECT_UNLINK', () => {
-            it('should call registryCaller for PROJECT_LINK', async () => {
+            it('should call registryDispatcher for PROJECT_LINK', async () => {
                 const project = {
                     id: 'rp-1',
                     registryId: 'r-1',
@@ -296,11 +296,11 @@ describe('RegistryService', () => {
                     createAllowAllActor(),
                 );
 
-                expect(registryCaller.getCallCount()).toBe(1);
-                expect(registryCaller.getCalls()[0].command).toBe('PROJECT_LINK');
+                expect(registryDispatcher.getCallCount()).toBe(1);
+                expect(registryDispatcher.getCalls()[0].command).toBe('PROJECT_LINK');
             });
 
-            it('should call registryCaller for PROJECT_UNLINK', async () => {
+            it('should call registryDispatcher for PROJECT_UNLINK', async () => {
                 const project = {
                     id: 'rp-1',
                     registryId: 'r-1',
@@ -315,7 +315,7 @@ describe('RegistryService', () => {
                     createAllowAllActor(),
                 );
 
-                expect(registryCaller.getCalls()[0].command).toBe('PROJECT_UNLINK');
+                expect(registryDispatcher.getCalls()[0].command).toBe('PROJECT_UNLINK');
             });
 
             it('should throw EntityNotFoundError when registry project does not exist', async () => {
@@ -339,11 +339,11 @@ describe('RegistryService', () => {
             ).rejects.toThrow(PermissionDeniedError);
         });
 
-        it('should throw BadRequestError when registryCaller is not available', async () => {
-            const serviceWithoutCaller = new RegistryService({ repository });
+        it('should throw BadRequestError when registryDispatcher is not available', async () => {
+            const serviceWithoutDispatcher = new RegistryService({ repository });
 
             await expect(
-                serviceWithoutCaller.executeCommand(
+                serviceWithoutDispatcher.executeCommand(
                     RegistryAPICommand.SETUP,
                     { id: 'r-1' },
                     createAllowAllActor(),

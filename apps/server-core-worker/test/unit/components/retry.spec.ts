@@ -59,22 +59,28 @@ describe('isTransientError', () => {
 describe('isRetryableFailure', () => {
     const transient = new FakeDockerError(503);
 
+    const delivery = (attempt: number) => ({ delivery: { attempt, maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS } });
+
     it('should retry a transient error before the last attempt', () => {
-        expect(isRetryableFailure(transient, {})).toBe(true);
-        expect(isRetryableFailure(transient, { attempt: MESSAGE_BUS_MAX_ATTEMPTS - 1 })).toBe(true);
+        expect(isRetryableFailure(transient, delivery(1))).toBe(true);
+        expect(isRetryableFailure(transient, delivery(MESSAGE_BUS_MAX_ATTEMPTS - 1))).toBe(true);
     });
 
     it('should not retry on the last attempt', () => {
-        expect(isRetryableFailure(transient, { attempt: MESSAGE_BUS_MAX_ATTEMPTS })).toBe(false);
+        expect(isRetryableFailure(transient, delivery(MESSAGE_BUS_MAX_ATTEMPTS))).toBe(false);
+    });
+
+    it('should not retry without a delivery (no driver retries it)', () => {
+        expect(isRetryableFailure(transient, {})).toBe(false);
     });
 
     it('should not retry a permanent error', () => {
-        expect(isRetryableFailure(new FakeDockerError(404), {})).toBe(false);
+        expect(isRetryableFailure(new FakeDockerError(404), delivery(1))).toBe(false);
     });
 });
 
 describe('AnalysisBuilderExecuteHandler failure classification', () => {
-    function run(status: number, attempt?: number) {
+    function run(status: number, attempt = 1) {
         const handler = new AnalysisBuilderExecuteHandler({
             coreClient: createFakeClient({ handlers: { 'GET /analyses/:id': () => fakeResponse(status, { message: 'core' }) } }),
             storageClient: createFakeStorageClient(),
@@ -82,9 +88,7 @@ describe('AnalysisBuilderExecuteHandler failure classification', () => {
             docker: new FakeDockerClient({ inspectError: new FakeDockerError(404) }) as unknown as DockerClient,
         });
         const context = new FakeComponentHandlerContext(AnalysisBuilderCommand.EXECUTE);
-        if (attempt) {
-            context.metadata.attempt = attempt;
-        }
+        context.metadata.delivery = { attempt, maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS };
 
         return { promise: handler.handle({ id: ANALYSIS_ID }, context), context };
     }

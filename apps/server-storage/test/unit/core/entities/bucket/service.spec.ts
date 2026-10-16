@@ -22,7 +22,7 @@ import {
     createDenyAllActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
-import { FakeBucketCaller } from './fake-caller.ts';
+import { FakeBucketDispatcher } from './fake-dispatcher.ts';
 import { FakeBucketRepository } from './fake-repository.ts';
 import { FakeStorageAdapter } from './fake-storage.ts';
 
@@ -42,17 +42,17 @@ function createTestBucket(overrides?: Partial<Bucket>): Bucket {
 
 describe('BucketService', () => {
     let repository: FakeBucketRepository;
-    let caller: FakeBucketCaller;
+    let dispatcher: FakeBucketDispatcher;
     let storage: FakeStorageAdapter;
     let service: BucketService;
 
     beforeEach(() => {
         repository = new FakeBucketRepository();
-        caller = new FakeBucketCaller();
+        dispatcher = new FakeBucketDispatcher();
         storage = new FakeStorageAdapter();
         service = new BucketService({
             repository,
-            caller,
+            dispatcher,
             storage,
         });
     });
@@ -93,7 +93,7 @@ describe('BucketService', () => {
     });
 
     describe('create', () => {
-        it('should delegate to caller with actor info', async () => {
+        it('should delegate to dispatcher with actor info', async () => {
             const actor = createAllowAllActor('realm-1');
 
             const result = await service.create(
@@ -102,10 +102,10 @@ describe('BucketService', () => {
             );
 
             expect(result).toBeDefined();
-            expect(caller.getCreateCalls()).toHaveLength(1);
-            expect(caller.getCreateCalls()[0].name).toBe('new-bucket');
-            expect(caller.getCreateCalls()[0].actorId).toBe(actor.identity!.id);
-            expect(caller.getCreateCalls()[0].actorType).toBe('user');
+            expect(dispatcher.getCreateCalls()).toHaveLength(1);
+            expect(dispatcher.getCreateCalls()[0].name).toBe('new-bucket');
+            expect(dispatcher.getCreateCalls()[0].actorId).toBe(actor.identity!.id);
+            expect(dispatcher.getCreateCalls()[0].actorType).toBe('user');
         });
 
         it('should reject a refId, which only the owning service sets over the bus', async () => {
@@ -117,7 +117,7 @@ describe('BucketService', () => {
                 },
                 createAllowAllActor('realm-1'),
             )).rejects.toThrow(BadRequestError);
-            expect(caller.getCreateCalls()).toHaveLength(0);
+            expect(dispatcher.getCreateCalls()).toHaveLength(0);
         });
 
         it('should throw PermissionDeniedError when actor lacks permission', async () => {
@@ -140,7 +140,7 @@ describe('BucketService', () => {
 
             await service.create({ name: 'new-bucket' }, actor);
 
-            const call = caller.getCreateCalls()[0];
+            const call = dispatcher.getCreateCalls()[0];
             expect(call.realmId).toBe('my-realm');
         });
 
@@ -152,7 +152,7 @@ describe('BucketService', () => {
             const [call] = actor.permissionEvaluator.evaluateCalls;
             expect(call.name).toBe(PermissionName.BUCKET_CREATE);
             expect(call.data!.get(BuiltInPolicyType.REALM_MATCH)).toBe(actor.realm!.id);
-            expect(caller.getCreateCalls()[0].realmId).toBe(actor.realm!.id);
+            expect(dispatcher.getCreateCalls()[0].realmId).toBe(actor.realm!.id);
         });
 
         it('should throw PermissionDeniedError when an own-scoped grant targets another realm', async () => {
@@ -162,7 +162,7 @@ describe('BucketService', () => {
                     createScopedActor({ realmScope: 'own' }),
                 ),
             ).rejects.toThrow(PermissionDeniedError);
-            expect(caller.getCreateCalls()).toHaveLength(0);
+            expect(dispatcher.getCreateCalls()).toHaveLength(0);
         });
 
         it('should create in another realm with an any-scoped grant', async () => {
@@ -173,10 +173,10 @@ describe('BucketService', () => {
                 createScopedActor({ realmScope: 'any' }),
             );
 
-            expect(caller.getCreateCalls()[0].realmId).toBe(realmId);
+            expect(dispatcher.getCreateCalls()[0].realmId).toBe(realmId);
         });
 
-        it('should delegate to caller with only refType set', async () => {
+        it('should delegate to dispatcher with only refType set', async () => {
             const actor = createAllowAllActor('realm-1');
 
             await service.create(
@@ -184,7 +184,7 @@ describe('BucketService', () => {
                 actor,
             );
 
-            const call = caller.getCreateCalls()[0];
+            const call = dispatcher.getCreateCalls()[0];
             expect(call.refType).toBe('analysis');
             expect(call.refId).toBeUndefined();
         });
@@ -291,13 +291,13 @@ describe('BucketService', () => {
     });
 
     describe('delete', () => {
-        it('should delegate to caller', async () => {
+        it('should delegate to dispatcher', async () => {
             const bucket = createTestBucket();
             repository.seed(bucket);
 
             const result = await service.delete(bucket.id, createAllowAllActor());
             expect(result.id).toBe(bucket.id);
-            expect(caller.getDeleteCalls()).toHaveLength(1);
+            expect(dispatcher.getDeleteCalls()).toHaveLength(1);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -328,7 +328,7 @@ describe('BucketService', () => {
             await expect(
                 service.delete(bucket.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
-            expect(caller.getDeleteCalls()).toHaveLength(0);
+            expect(dispatcher.getDeleteCalls()).toHaveLength(0);
         });
 
         it('should delete a bucket of the own realm with an own-scoped grant', async () => {
@@ -339,19 +339,19 @@ describe('BucketService', () => {
             await service.delete(bucket.id, actor);
 
             expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_DELETE);
-            expect(caller.getDeleteCalls()).toEqual([bucket.id]);
+            expect(dispatcher.getDeleteCalls()).toEqual([bucket.id]);
         });
     });
 
     describe('clear', () => {
-        it('should delegate to caller', async () => {
+        it('should delegate to dispatcher', async () => {
             const bucket = createTestBucket();
             repository.seed(bucket);
 
             const result = await service.clear(bucket.id, createAllowAllActor());
             expect(result.id).toBe(bucket.id);
-            expect(caller.getClearCalls()).toEqual([bucket.id]);
-            expect(caller.getDeleteCalls()).toHaveLength(0);
+            expect(dispatcher.getClearCalls()).toEqual([bucket.id]);
+            expect(dispatcher.getDeleteCalls()).toHaveLength(0);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -382,7 +382,7 @@ describe('BucketService', () => {
             await expect(
                 service.clear(bucket.id, createDenyAllActor()),
             ).rejects.toThrow(PermissionDeniedError);
-            expect(caller.getClearCalls()).toHaveLength(0);
+            expect(dispatcher.getClearCalls()).toHaveLength(0);
         });
 
         it('should throw PermissionDeniedError when the grant does not reach the bucket realm', async () => {
@@ -392,7 +392,7 @@ describe('BucketService', () => {
             await expect(
                 service.clear(bucket.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
-            expect(caller.getClearCalls()).toHaveLength(0);
+            expect(dispatcher.getClearCalls()).toHaveLength(0);
         });
 
         it('should clear a bucket of another realm with an any-scoped grant', async () => {
@@ -403,7 +403,7 @@ describe('BucketService', () => {
             await service.clear(bucket.id, actor);
 
             expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_DELETE);
-            expect(caller.getClearCalls()).toEqual([bucket.id]);
+            expect(dispatcher.getClearCalls()).toEqual([bucket.id]);
         });
     });
 

@@ -30,7 +30,7 @@ import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
 import { MasterImageBuilderService } from '../../../../src/core/services/master-image/index.ts';
 import { createTestDatabaseApplication } from '../../../app/index.ts';
-import { FakeAnalysisBuilderCaller } from '../../core/services/helpers/fake-builder-caller.ts';
+import { FakeAnalysisBuilderDispatcher } from '../../core/services/helpers/fake-builder-dispatcher.ts';
 import { FakeAnalysisMetadataRecalculator } from '../../core/entities/analysis/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../../core/entities/analysis-node/fake-metadata-recalculator.ts';
 import { FakeAnalysisFileMetadataRecalculator } from '../../core/entities/analysis-bucket-file/fake-metadata-recalculator.ts';
@@ -104,11 +104,11 @@ describe('status transition row lock', () => {
         }));
 
         const repository = suite.container.resolve(DatabaseInjectionKey.AnalysisRepository);
-        const caller = new FakeAnalysisBuilderCaller();
+        const dispatcher = new FakeAnalysisBuilderDispatcher();
         const builder = new AnalysisBuilder({
             repository,
             analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
-            caller,
+            dispatcher,
             analysisRecalculator: new FakeAnalysisMetadataRecalculator(repository),
             nodeRecalculator: new FakeAnalysisNodeMetadataRecalculator(repository),
             fileRecalculator: new BarrierFileMetadataRecalculator(repository),
@@ -123,7 +123,7 @@ describe('status transition row lock', () => {
         );
 
         const rejected = results.filter((result): result is PromiseRejectedResult => result.status === 'rejected');
-        expect(caller.getCallsFor('callExecute')).toHaveLength(1);
+        expect(dispatcher.getCallsFor('dispatchExecute')).toHaveLength(1);
         expect(rejected).toHaveLength(CONCURRENCY - 1);
         for (const result of rejected) {
             expect(result.reason).toBeInstanceOf(AnalysisError);

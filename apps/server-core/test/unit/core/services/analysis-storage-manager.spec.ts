@@ -20,7 +20,7 @@ import {
 } from 'vitest';
 import { AnalysisStorageManager } from '../../../../src/core/services/analysis-storage-manager/module.ts';
 import { FakeEntityRepository } from '@privateaim/server-test-kit';
-import { FakeBucketCaller } from './helpers/fake-bucket-caller.ts';
+import { FakeBucketDispatcher } from './helpers/fake-bucket-dispatcher.ts';
 import { createFullAnalysis } from '../../../utils/domains/index.ts';
 
 function createTestBucket(overrides?: Partial<AnalysisBucket>): AnalysisBucket {
@@ -40,17 +40,17 @@ function createTestBucket(overrides?: Partial<AnalysisBucket>): AnalysisBucket {
 describe('AnalysisStorageManager', () => {
     let repository: FakeEntityRepository<Analysis>;
     let bucketRepository: FakeEntityRepository<AnalysisBucket>;
-    let caller: FakeBucketCaller;
+    let dispatcher: FakeBucketDispatcher;
     let storageManager: AnalysisStorageManager;
 
     beforeEach(() => {
         repository = new FakeEntityRepository<Analysis>();
         bucketRepository = new FakeEntityRepository<AnalysisBucket>();
-        caller = new FakeBucketCaller();
+        dispatcher = new FakeBucketDispatcher();
         storageManager = new AnalysisStorageManager({
             repository,
             bucketRepository,
-            caller,
+            dispatcher,
         });
     });
 
@@ -62,7 +62,7 @@ describe('AnalysisStorageManager', () => {
             await storageManager.check(analysis);
 
             const bucketTypes = Object.values(AnalysisBucketType);
-            expect(caller.getCallsFor('callCreate')).toHaveLength(bucketTypes.length);
+            expect(dispatcher.getCallsFor('dispatchCreate')).toHaveLength(bucketTypes.length);
         });
 
         it('should create bucket with correct name and realmId', async () => {
@@ -71,7 +71,7 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.check(analysis, { type: AnalysisBucketType.CODE });
 
-            const createCalls = caller.getCallsFor('callCreate');
+            const createCalls = dispatcher.getCallsFor('dispatchCreate');
             expect(createCalls).toHaveLength(1);
             expect(createCalls[0].data).toEqual({
                 name: buildAnalysisBucketName(AnalysisBucketType.CODE, 'analysis-1'),
@@ -91,7 +91,7 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.check(analysis, { type: AnalysisBucketType.CODE });
 
-            expect(caller.getCallCount()).toBe(0);
+            expect(dispatcher.getCallCount()).toBe(0);
         });
 
         it('should only create missing buckets when some exist', async () => {
@@ -105,7 +105,7 @@ describe('AnalysisStorageManager', () => {
             await storageManager.check(analysis);
 
             // CODE exists, so only RESULT and TEMP should be created
-            expect(caller.getCallsFor('callCreate')).toHaveLength(2);
+            expect(dispatcher.getCallsFor('dispatchCreate')).toHaveLength(2);
         });
 
         it('should resolve entity by string ID', async () => {
@@ -114,7 +114,7 @@ describe('AnalysisStorageManager', () => {
 
             const result = await storageManager.check('analysis-1', { type: AnalysisBucketType.CODE });
             expect(result.id).toBe('analysis-1');
-            expect(caller.getCallCount()).toBe(1);
+            expect(dispatcher.getCallCount()).toBe(1);
         });
 
         it('should throw for missing entity', async () => {
@@ -135,7 +135,7 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.remove(analysis, { type: AnalysisBucketType.CODE });
 
-            const deleteCalls = caller.getCallsFor('callDelete');
+            const deleteCalls = dispatcher.getCallsFor('dispatchDelete');
             expect(deleteCalls).toHaveLength(1);
             expect(deleteCalls[0].data).toEqual({ id: 'ext-code' });
         });
@@ -146,7 +146,7 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.remove(analysis, { type: AnalysisBucketType.CODE });
 
-            expect(caller.getCallCount()).toBe(0);
+            expect(dispatcher.getCallCount()).toBe(0);
         });
 
         it('should remove all bucket types when no type specified', async () => {
@@ -175,7 +175,7 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.remove(analysis);
 
-            expect(caller.getCallsFor('callDelete')).toHaveLength(3);
+            expect(dispatcher.getCallsFor('dispatchDelete')).toHaveLength(3);
         });
 
         it('should resolve entity by string ID', async () => {
@@ -202,7 +202,7 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.clear(analysis, { type: AnalysisBucketType.TEMP });
 
-            const clearCalls = caller.getCallsFor('callClear');
+            const clearCalls = dispatcher.getCallsFor('dispatchClear');
             expect(clearCalls).toHaveLength(1);
             expect(clearCalls[0].data).toEqual({ id: 'ext-temp' });
         });
@@ -213,7 +213,7 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.clear(analysis, { type: AnalysisBucketType.TEMP });
 
-            expect(caller.getCallCount()).toBe(0);
+            expect(dispatcher.getCallCount()).toBe(0);
         });
 
         it('should only clear the requested type', async () => {
@@ -236,7 +236,7 @@ describe('AnalysisStorageManager', () => {
 
             await storageManager.clear(analysis, { type: AnalysisBucketType.TEMP });
 
-            expect(caller.getCallsFor('callClear').map((c) => c.data)).toEqual([{ id: 'ext-temp' }]);
+            expect(dispatcher.getCallsFor('dispatchClear').map((c) => c.data)).toEqual([{ id: 'ext-temp' }]);
         });
 
         it('should throw for missing entity', async () => {

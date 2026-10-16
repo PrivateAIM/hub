@@ -6,10 +6,10 @@
  */
 
 import type {
-    IMasterImageBuilderCaller,
+    IMasterImageBuilderDispatcher,
 } from '../../../../../src/core/entities/master-image/types.ts';
 
-export class FakeMasterImageBuilderCaller implements IMasterImageBuilderCaller {
+export class FakeMasterImageBuilderDispatcher implements IMasterImageBuilderDispatcher {
     private calls: Array<{ id: string }> = [];
 
     failWith: Error | undefined;
@@ -20,7 +20,7 @@ export class FakeMasterImageBuilderCaller implements IMasterImageBuilderCaller {
      */
     onExecute: (() => Promise<void>) | undefined;
 
-    async callExecute(data: { id: string }): Promise<void> {
+    async dispatchExecute(data: { id: string }): Promise<void> {
         this.calls.push(data);
 
         await this.onExecute?.();

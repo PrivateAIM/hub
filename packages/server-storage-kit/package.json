@@ -37,6 +37,6 @@
         "build": "npm run build:js && npm run build:types"
     },
     "dependencies": {
-        "synergos": "^0.1.0"
+        "hubwire": "^0.2.1"
     }
 }

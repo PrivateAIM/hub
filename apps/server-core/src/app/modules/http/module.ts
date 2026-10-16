@@ -53,6 +53,10 @@ export class HTTPModule implements IModule {
      * `tryResolve`s the Authup client to mount the authorization middleware
      * (HTTP and socket), and that middleware fails CLOSED without one — every
      * route answers 401, every socket is refused, with no startup error.
+     *
+     * `components` is declared OPTIONAL for the same reason: this module
+     * `tryResolve`s its registry dispatcher; without it, registry commands
+     * fail and the Harbor webhook controller is not mounted.
      */
     readonly dependencies: (string | ModuleDependency)[] = [
         'config',
@@ -61,6 +65,7 @@ export class HTTPModule implements IModule {
         MESSAGE_BUS_MODULE_NAME,
         { name: 'telemetryClient', optional: true },
         { name: AUTHUP_CLIENT_MODULE_NAME, optional: true },
+        { name: 'components', optional: true },
     ];
 
     private options: HTTPModuleOptions;

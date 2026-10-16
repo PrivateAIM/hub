@@ -24,7 +24,7 @@ import {
 } from 'vitest';
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
 import { ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS, ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/core/services/helpers.ts';
-import { FakeAnalysisBuilderCaller } from './helpers/fake-builder-caller.ts';
+import { FakeAnalysisBuilderDispatcher } from './helpers/fake-builder-dispatcher.ts';
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisMetadataRecalculator } from '../entities/analysis/fake-metadata-recalculator.ts';
 import { FakeAnalysisNodeMetadataRecalculator } from '../entities/analysis-node/fake-metadata-recalculator.ts';
@@ -35,7 +35,7 @@ import { createFullAnalysis, createTestAnalysisNode } from '../../../utils/domai
 describe('AnalysisBuilder', () => {
     let repository: FakeAnalysisRepository;
     let analysisNodeRepository: FakeAnalysisNodeRepository;
-    let caller: FakeAnalysisBuilderCaller;
+    let dispatcher: FakeAnalysisBuilderDispatcher;
     let analysisRecalculator: FakeAnalysisMetadataRecalculator;
     let nodeRecalculator: FakeAnalysisNodeMetadataRecalculator;
     let fileRecalculator: FakeAnalysisFileMetadataRecalculator;
@@ -47,11 +47,11 @@ describe('AnalysisBuilder', () => {
         analysisRecalculator = new FakeAnalysisMetadataRecalculator(repository);
         nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(repository);
         fileRecalculator = new FakeAnalysisFileMetadataRecalculator(repository);
-        caller = new FakeAnalysisBuilderCaller();
+        dispatcher = new FakeAnalysisBuilderDispatcher();
         builder = new AnalysisBuilder({
             repository,
             analysisNodeRepository,
-            caller,
+            dispatcher,
             analysisRecalculator,
             nodeRecalculator,
             fileRecalculator,
@@ -67,8 +67,8 @@ describe('AnalysisBuilder', () => {
 
             expect(result.buildStatus).toBe(ProcessStatus.STARTING);
             expect(result.buildProgress).toBeNull();
-            expect(caller.getCallsFor('callExecute')).toHaveLength(1);
-            expect(caller.getCallsFor('callExecute')[0].data.id).toBe('analysis-1');
+            expect(dispatcher.getCallsFor('dispatchExecute')).toHaveLength(1);
+            expect(dispatcher.getCallsFor('dispatchExecute')[0].data.id).toBe('analysis-1');
         });
 
         it('should call all recalculators before checking', async () => {
@@ -90,7 +90,7 @@ describe('AnalysisBuilder', () => {
             const result = await builder.start('analysis-1');
 
             expect(result.buildStatus).toBe(ProcessStatus.STARTING);
-            expect(caller.getCallCount()).toBe(1);
+            expect(dispatcher.getCallCount()).toBe(1);
         });
 
         it('should save entity to repository', async () => {
@@ -195,7 +195,7 @@ describe('AnalysisBuilder', () => {
             };
 
             await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
-            expect(caller.getCallsFor('callExecute')).toHaveLength(0);
+            expect(dispatcher.getCallsFor('dispatchExecute')).toHaveLength(0);
         });
 
         it('should throw when build already in progress', async () => {
@@ -214,8 +214,8 @@ describe('AnalysisBuilder', () => {
             const result = await builder.check(analysis);
 
             expect(result.id).toBe('analysis-1');
-            expect(caller.getCallsFor('callCheck')).toHaveLength(1);
-            expect(caller.getCallsFor('callCheck')[0].data.id).toBe('analysis-1');
+            expect(dispatcher.getCallsFor('dispatchCheck')).toHaveLength(1);
+            expect(dispatcher.getCallsFor('dispatchCheck')[0].data.id).toBe('analysis-1');
         });
 
         it('should resolve entity by string ID', async () => {
@@ -251,7 +251,7 @@ describe('AnalysisBuilder', () => {
             const result = await builder.check(analysis);
 
             expect(result.id).toBe('analysis-1');
-            expect(caller.getCallsFor('callCheck')).toHaveLength(1);
+            expect(dispatcher.getCallsFor('dispatchCheck')).toHaveLength(1);
         });
     });
 

@@ -7,8 +7,8 @@
 
 import type { IContainer } from 'eldin';
 import {
-    MasterImageBuilderComponentCaller,
-    MasterImageSynchronizerComponentCaller,
+    MasterImageBuilderComponentDispatcher,
+    MasterImageSynchronizerComponentDispatcher,
 } from '@privateaim/server-core-worker-kit';
 import { AuthupClientInjectionKey, MessageBusInjectionKey } from '@privateaim/server-kit';
 import {
@@ -74,18 +74,18 @@ export function createControllers(container: IContainer): Record<string, any>[] 
 
     // Create services
     const nodeService = new NodeService({ repository: nodeRepository, registryManager });
-    const callerResult = container.tryResolve(ComponentsInjectionKey.RegistryComponentCaller);
+    const dispatcherResult = container.tryResolve(ComponentsInjectionKey.RegistryComponentDispatcher);
     const registryService = new RegistryService({
         repository: registryRepository,
         registryProjectRepository,
-        registryCaller: callerResult.success ? callerResult.data : undefined,
+        registryDispatcher: dispatcherResult.success ? dispatcherResult.data : undefined,
     });
     const config = container.resolve(ConfigInjectionKey);
     const messageBus = container.resolve(MessageBusInjectionKey);
     const masterImageService = new MasterImageService({
         repository: masterImageRepository,
-        synchronizerCaller: new MasterImageSynchronizerComponentCaller({ messageBus }),
-        builderCaller: new MasterImageBuilderComponentCaller({ messageBus }),
+        synchronizerDispatcher: new MasterImageSynchronizerComponentDispatcher({ messageBus }),
+        builderDispatcher: new MasterImageBuilderComponentDispatcher({ messageBus }),
         masterImagesConfig: {
             owner: config.masterImagesOwner,
             repository: config.masterImagesRepository,
@@ -168,10 +168,10 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         new AnalysisNodeEventController({ service: analysisNodeEventService }),
     ];
 
-    if (callerResult.success) {
+    if (dispatcherResult.success) {
         controllers.push(new ServiceController({
             registryService,
-            registryCaller: callerResult.data,
+            registryDispatcher: dispatcherResult.data,
         }));
     }
 

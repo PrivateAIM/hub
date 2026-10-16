@@ -11,7 +11,7 @@ import type {
     EventRecord,
 } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
-import type { IRegistryCaller } from '../../../../core/harbor/types.ts';
+import type { IRegistryDispatcher } from '../../../../core/harbor/types.ts';
 import {
     RegistryCommand,
 } from '../../../components/index.ts';
@@ -23,7 +23,7 @@ import type { AuthupAggregatorRepositories } from '../types.ts';
 export async function handleAuthupRobotEvent(
     context: EventRecord<EntityType.CLIENT, Client>,
     repositories: AuthupAggregatorRepositories,
-    caller?: IRegistryCaller,
+    dispatcher?: IRegistryDispatcher,
 ) {
     if (!context.data.id) {
         return;
@@ -41,12 +41,12 @@ export async function handleAuthupRobotEvent(
 
     const projects = await repositories.registryProjectRepository.findManyBy({});
 
-    if (!caller) {
+    if (!dispatcher) {
         return;
     }
 
     for (const project of projects) {
-        await caller.call(
+        await dispatcher.dispatch(
             RegistryCommand.PROJECT_LINK,
             { id: project.id },
             {},

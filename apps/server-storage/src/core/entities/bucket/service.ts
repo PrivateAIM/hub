@@ -13,21 +13,21 @@ import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
 import { decodeQuery } from '../../query/index.ts';
-import type { IBucketCaller, IBucketRepository, IBucketService } from './types.ts';
+import type { IBucketDispatcher, IBucketRepository, IBucketService } from './types.ts';
 import { BucketValidator, assertBucketRefPairing } from '@privateaim/storage-kit';
 import { bucketSchema } from './schema.ts';
 import type { IStorageAdapter } from '../../storage/types.ts';
 
 type BucketServiceContext = {
     repository: IBucketRepository;
-    caller: IBucketCaller;
+    dispatcher: IBucketDispatcher;
     storage: IStorageAdapter;
 };
 
 export class BucketService extends AbstractEntityService implements IBucketService {
     protected repository: IBucketRepository;
 
-    protected caller: IBucketCaller;
+    protected dispatcher: IBucketDispatcher;
 
     protected storage: IStorageAdapter;
 
@@ -36,7 +36,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
     constructor(ctx: BucketServiceContext) {
         super();
         this.repository = ctx.repository;
-        this.caller = ctx.caller;
+        this.dispatcher = ctx.dispatcher;
         this.storage = ctx.storage;
         this.validator = new BucketValidator();
     }
@@ -80,7 +80,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         await assertRecordReach(actor, PermissionName.BUCKET_CREATE, { realmId: validated.realmId, attributes: validated });
 
-        return this.caller.create({
+        return this.dispatcher.create({
             ...validated,
             actorId: actor.identity.id,
             actorType: actor.identity.type,
@@ -134,7 +134,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
             await assertRecordReach(actor, PermissionName.BUCKET_DELETE, { realmId: entity.realmId, attributes: entity });
         }
 
-        return this.caller.delete(entity.id);
+        return this.dispatcher.delete(entity.id);
     }
 
     async clear(id: string, actor: ActorContext): Promise<Bucket> {
@@ -148,7 +148,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
             await assertRecordReach(actor, PermissionName.BUCKET_DELETE, { realmId: entity.realmId, attributes: entity });
         }
 
-        return this.caller.clear(entity.id);
+        return this.dispatcher.clear(entity.id);
     }
 
     async checkUploadAccess(entity: Bucket, actor: ActorContext): Promise<void> {

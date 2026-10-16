@@ -9,7 +9,7 @@ import {
     type BucketComponentEventMap,
     BucketEvent,
 } from '@privateaim/server-storage-kit';
-import { Component } from 'synergos';
+import { Component } from 'hubwire';
 import type { StorageBucketAggregatorContext } from './types.ts';
 import {
     StorageBucketClearingFinishedHandler,

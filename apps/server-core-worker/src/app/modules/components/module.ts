@@ -7,15 +7,16 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
-import type { IComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
 import {
     LoggerConsoleTransport,
     MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
+    RemoteMessageBusInjectionKey,
     createLogger,
-    createWorkerCallerLogHooks,
+    createRemoteWorkerLogHooks,
 } from '@privateaim/server-kit';
-import { WorkerCaller } from 'synergos';
+import { RemoteWorker } from 'hubwire';
 import {
     AnalysisBuilderEventMessageBusRouting,
     AnalysisBuilderTaskMessageBusRouting,
@@ -28,7 +29,7 @@ import {
     MasterImageSynchronizerTaskMessageBusRouting,
 } from '@privateaim/server-core-worker-kit';
 import { DomainType } from '@privateaim/core-kit';
-import { LogComponentCaller, LoggerTransport } from '@privateaim/server-telemetry-kit';
+import { LogComponentDispatcher, LoggerTransport } from '@privateaim/server-telemetry-kit';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { CoreClientInjectionKey } from '../core-client/constants.ts';
 import { StorageClientInjectionKey } from '../storage-client/constants.ts';
@@ -53,7 +54,11 @@ export class ComponentsModule implements IModule {
         const docker = container.resolve(DockerInjectionKey);
 
         const messageBus = container.resolve(MessageBusInjectionKey);
-        const logCaller = new LogComponentCaller({ messageBus });
+        // only over AMQP: server-telemetry consumes the log lines, nothing in-process does
+        const remoteResult = container.tryResolve(RemoteMessageBusInjectionKey);
+        const logDispatcher = remoteResult.success ?
+            new LogComponentDispatcher({ messageBus: remoteResult.data }) :
+            undefined;
 
         const analysisBuilderLogger = createLogger({
             options: { defaultMeta: { component: ComponentName.ANALYSIS_BUILDER } },
@@ -67,7 +72,7 @@ export class ComponentsModule implements IModule {
                         [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                     },
                     save: async (data) => {
-                        await logCaller.callWrite(data);
+                        await logDispatcher?.dispatchWrite(data);
                     },
                 }),
             ],
@@ -85,7 +90,7 @@ export class ComponentsModule implements IModule {
                         [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                     },
                     save: async (data) => {
-                        await logCaller.callWrite(data);
+                        await logDispatcher?.dispatchWrite(data);
                     },
                 }),
             ],
@@ -103,14 +108,14 @@ export class ComponentsModule implements IModule {
                         [LogFlag.REF_TYPE]: DomainType.MASTER_IMAGE,
                     },
                     save: async (data) => {
-                        await logCaller.callWrite(data);
+                        await logDispatcher?.dispatchWrite(data);
                     },
                 }),
             ],
         });
 
         this.components = [
-            new WorkerCaller(
+            new RemoteWorker(
                 new AnalysisBuilderComponent({
                     coreClient,
                     storageClient,
@@ -118,45 +123,45 @@ export class ComponentsModule implements IModule {
                     logger: analysisBuilderLogger,
                 }),
                 {
-                    publishRouting: AnalysisBuilderEventMessageBusRouting,
-                    consumeRouting: AnalysisBuilderTaskMessageBusRouting,
+                    publish: AnalysisBuilderEventMessageBusRouting,
+                    consume: AnalysisBuilderTaskMessageBusRouting,
                     messageBus,
-                    hooks: createWorkerCallerLogHooks(analysisBuilderLogger),
+                    hooks: createRemoteWorkerLogHooks(analysisBuilderLogger),
                 },
             ),
-            new WorkerCaller(
+            new RemoteWorker(
                 new AnalysisDistributorComponent({
                     coreClient,
                     docker,
                     logger: analysisDistributorLogger,
                 }),
                 {
-                    publishRouting: AnalysisDistributorEventMessageBusRouting,
-                    consumeRouting: AnalysisDistributorTaskMessageBusRouting,
+                    publish: AnalysisDistributorEventMessageBusRouting,
+                    consume: AnalysisDistributorTaskMessageBusRouting,
                     messageBus,
-                    hooks: createWorkerCallerLogHooks(analysisDistributorLogger),
+                    hooks: createRemoteWorkerLogHooks(analysisDistributorLogger),
                 },
             ),
-            new WorkerCaller(
+            new RemoteWorker(
                 new MasterImageBuilderComponent({
                     coreClient,
                     docker,
                     logger: masterImageBuilderLogger,
                 }),
                 {
-                    publishRouting: MasterImageBuilderEventMessageBusRouting,
-                    consumeRouting: MasterImageBuilderTaskMessageBusRouting,
+                    publish: MasterImageBuilderEventMessageBusRouting,
+                    consume: MasterImageBuilderTaskMessageBusRouting,
                     messageBus,
-                    hooks: createWorkerCallerLogHooks(masterImageBuilderLogger),
+                    hooks: createRemoteWorkerLogHooks(masterImageBuilderLogger),
                 },
             ),
-            new WorkerCaller(
+            new RemoteWorker(
                 new MasterImageSynchronizerComponent({ logger: masterImageBuilderLogger }),
                 {
-                    publishRouting: MasterImageSynchronizerEventMessageBusRouting,
-                    consumeRouting: MasterImageSynchronizerTaskMessageBusRouting,
+                    publish: MasterImageSynchronizerEventMessageBusRouting,
+                    consume: MasterImageSynchronizerTaskMessageBusRouting,
                     messageBus,
-                    hooks: createWorkerCallerLogHooks(masterImageBuilderLogger),
+                    hooks: createRemoteWorkerLogHooks(masterImageBuilderLogger),
                 },
             ),
         ];

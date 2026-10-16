@@ -11,10 +11,10 @@ npm install @privateaim/server-storage-kit
 ## Usage
 
 ```typescript
-import { useBucketComponentCaller } from '@privateaim/server-storage-kit';
+import { BucketComponentDispatcher } from '@privateaim/server-storage-kit';
 
-const caller = useBucketComponentCaller();
-await caller.create({ name: 'analysis-bucket' });
+const dispatcher = new BucketComponentDispatcher({ messageBus });
+await dispatcher.dispatchCreate({ name: 'analysis-bucket' });
 ```
 
 ## API
@@ -23,7 +23,7 @@ await caller.create({ name: 'analysis-bucket' });
 
 | Module | Description |
 |--------|-------------|
-| `components` | Bucket and bucket-file AMQP component callers |
+| `components` | Bucket and bucket-file component dispatchers (`BucketComponentDispatcher`, `BucketFileTaskDispatcher`, `BucketFileEventDispatcher`) |
 
 ## Dependencies
 

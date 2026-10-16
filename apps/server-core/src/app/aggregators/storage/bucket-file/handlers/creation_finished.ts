@@ -6,8 +6,8 @@
  */
 import { AnalysisBucketType, DomainType } from '@privateaim/core-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler } from 'synergos';
-import type { BucketFileComponentEventMap, BucketFileTaskCaller } from '@privateaim/server-storage-kit';
+import type { ComponentHandler } from 'hubwire';
+import type { BucketFileComponentEventMap, BucketFileTaskDispatcher } from '@privateaim/server-storage-kit';
 import type { BucketFile } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { IAnalysisBucketFileService } from '../../../../../core/index.ts';
@@ -16,13 +16,13 @@ import type { StorageBucketFileAggregatorContext } from '../types.ts';
 export class StorageBucketFileCreationFinishedHandler implements ComponentHandler<BucketFileComponentEventMap> {
     protected service: IAnalysisBucketFileService;
 
-    protected bucketFileCaller?: BucketFileTaskCaller;
+    protected bucketFileDispatcher?: BucketFileTaskDispatcher;
 
     protected logger?: Logger;
 
     constructor(ctx: StorageBucketFileAggregatorContext) {
         this.service = ctx.service;
-        this.bucketFileCaller = ctx.bucketFileCaller;
+        this.bucketFileDispatcher = ctx.bucketFileDispatcher;
         this.logger = ctx.logger;
     }
 
@@ -45,7 +45,7 @@ export class StorageBucketFileCreationFinishedHandler implements ComponentHandle
         // An unregistered object in a code bucket breaks every later build, so it is removed.
         // RESULT/TEMP objects are kept: a misjudged uploader must not cost result data.
         if (result.bucket.type === AnalysisBucketType.CODE) {
-            await this.bucketFileCaller?.callDelete({ id: data.id });
+            await this.bucketFileDispatcher?.dispatchDelete({ id: data.id });
         }
     }
 }

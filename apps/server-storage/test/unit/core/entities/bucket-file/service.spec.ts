@@ -23,7 +23,7 @@ import {
     createDenyAllActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
-import { FakeBucketFileCaller } from './fake-caller.ts';
+import { FakeBucketFileDispatcher } from './fake-dispatcher.ts';
 
 function createTestBucketFile(overrides?: Partial<BucketFile>): BucketFile {
     return {
@@ -46,13 +46,13 @@ function createTestBucketFile(overrides?: Partial<BucketFile>): BucketFile {
 
 describe('BucketFileService', () => {
     let repository: FakeEntityRepository<BucketFile>;
-    let caller: FakeBucketFileCaller;
+    let dispatcher: FakeBucketFileDispatcher;
     let service: BucketFileService;
 
     beforeEach(() => {
         repository = new FakeEntityRepository<BucketFile>();
-        caller = new FakeBucketFileCaller();
-        service = new BucketFileService({ repository, caller });
+        dispatcher = new FakeBucketFileDispatcher();
+        service = new BucketFileService({ repository, dispatcher });
     });
 
     describe('getMany', () => {
@@ -83,14 +83,14 @@ describe('BucketFileService', () => {
     });
 
     describe('delete', () => {
-        it('should delete and delegate to caller', async () => {
+        it('should delete and delegate to dispatcher', async () => {
             const file = createTestBucketFile();
             repository.seed(file);
 
             const result = await service.delete(file.id, createAllowAllActor());
             expect(result.id).toBe(file.id);
-            expect(caller.getDeleteCalls()).toHaveLength(1);
-            expect(caller.getDeleteCalls()[0]).toBe(file.id);
+            expect(dispatcher.getDeleteCalls()).toHaveLength(1);
+            expect(dispatcher.getDeleteCalls()[0]).toBe(file.id);
             expect(repository.getAll()).toHaveLength(0);
         });
 
@@ -148,7 +148,7 @@ describe('BucketFileService', () => {
             await expect(
                 service.delete(file.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
-            expect(caller.getDeleteCalls()).toHaveLength(0);
+            expect(dispatcher.getDeleteCalls()).toHaveLength(0);
             expect(repository.getAll()).toHaveLength(1);
         });
 
@@ -180,7 +180,7 @@ describe('BucketFileService', () => {
             repository.seed(file);
 
             await service.delete(file.id, createScopedActor({ realmId: 'realm-1', realmScope: 'any' }));
-            expect(caller.getDeleteCalls()).toEqual([file.id]);
+            expect(dispatcher.getDeleteCalls()).toEqual([file.id]);
         });
 
         it('should throw PermissionDeniedError when actor lacks permission and is not owner', async () => {

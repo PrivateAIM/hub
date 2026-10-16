@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { IComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
 import {
     afterEach,
     beforeEach,

@@ -6,17 +6,17 @@
  */
 
 import type {
-    IMasterImageSynchronizerCaller,
+    IMasterImageSynchronizerDispatcher,
 } from '../../../../../src/core/entities/master-image/types.ts';
 
-export class FakeMasterImageSynchronizerCaller implements IMasterImageSynchronizerCaller {
+export class FakeMasterImageSynchronizerDispatcher implements IMasterImageSynchronizerDispatcher {
     private calls: Array<{
         owner: string;
         repository: string;
         branch: string
     }> = [];
 
-    async callExecute(data: {
+    async dispatchExecute(data: {
         owner: string;
         repository: string;
         branch: string

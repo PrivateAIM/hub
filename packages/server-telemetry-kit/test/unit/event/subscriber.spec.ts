@@ -14,7 +14,7 @@ import {
     it, 
 } from 'vitest';
 import { EntityEventHandler } from '../../../src/core';
-import { FakeEventPublisher } from './fake-caller.ts';
+import { FakeEventPublisher } from './fake-dispatcher.ts';
 
 function buildContext(overrides: Partial<EntityEventHandleOptions> = {}): EntityEventHandleOptions {
     return {
@@ -36,7 +36,7 @@ describe('core/event (EntityEventHandler)', () => {
 
     beforeEach(() => {
         publisher = new FakeEventPublisher();
-        handler = new EntityEventHandler({ eventComponentCaller: publisher });
+        handler = new EntityEventHandler({ eventComponentDispatcher: publisher });
     });
 
     it('should not publish an event for the event domain itself', async () => {

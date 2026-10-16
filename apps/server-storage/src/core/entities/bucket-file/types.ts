@@ -12,7 +12,7 @@ export interface IBucketFileRepository extends IEntityRepository<BucketFile> {
 
 }
 
-export interface IBucketFileCaller {
+export interface IBucketFileDispatcher {
     delete(id: string): Promise<void>;
 }
 

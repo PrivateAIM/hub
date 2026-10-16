@@ -11,7 +11,7 @@ import {
     expect,
     it,
 } from 'vitest';
-import type { IComponent } from 'synergos';
+import type { IComponent } from 'hubwire';
 import { createAnalysisReconcilerComponent } from '../../../../../src/app/components/analysis-reconciler/index.ts';
 import type { AnalysisReconcileResult, IAnalysisReconciler } from '../../../../../src/core/services/analysis-reconciler/index.ts';
 

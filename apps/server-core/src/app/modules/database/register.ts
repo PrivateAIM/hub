@@ -42,8 +42,8 @@ export function registerRepositories(container: IContainer, dataSource: DataSour
             // Resolved lazily: `ComponentsModule` (which registers this) always
             // sets up AFTER `DatabaseModule` — see the comment on
             // `RegistryManagerAdapter`.
-            registryComponentCaller: () => {
-                const result = container.tryResolve(ComponentsInjectionKey.RegistryComponentCaller);
+            registryComponentDispatcher: () => {
+                const result = container.tryResolve(ComponentsInjectionKey.RegistryComponentDispatcher);
                 return result.success ? result.data : undefined;
             },
         }),

@@ -5,20 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, DispatchCallerOptions } from 'synergos';
-import { DispatchCaller } from 'synergos';
+import type { ComponentMetadata, RemoteDispatcherOptions } from 'hubwire';
+import { RemoteDispatcher } from 'hubwire';
 import {
     MasterImageSynchronizerCommand,
     MasterImageSynchronizerTaskMessageBusRouting,
 } from './constants';
 import type { MasterImageSynchronizerEventMap, MasterImageSynchronizerExecutePayload } from './types';
 
-export class MasterImageSynchronizerComponentCaller extends DispatchCaller<MasterImageSynchronizerEventMap> {
-    constructor(options: Omit<DispatchCallerOptions, 'routing'>) {
+export class MasterImageSynchronizerComponentDispatcher extends RemoteDispatcher<MasterImageSynchronizerEventMap> {
+    constructor(options: Omit<RemoteDispatcherOptions, 'routing'>) {
         super({ ...options, routing: MasterImageSynchronizerTaskMessageBusRouting });
     }
 
-    async callExecute(payload: MasterImageSynchronizerExecutePayload, metadata: ComponentMetadata = {}) {
-        return this.call(MasterImageSynchronizerCommand.EXECUTE, payload, metadata);
+    async dispatchExecute(payload: MasterImageSynchronizerExecutePayload, metadata: ComponentMetadata = {}): Promise<void> {
+        await this.dispatch(MasterImageSynchronizerCommand.EXECUTE, payload, metadata);
     }
 }

@@ -6,7 +6,7 @@
  */
 import { DomainType, parseAnalysisBucketName } from '@privateaim/core-kit';
 import type { Logger } from '@privateaim/server-kit';
-import type { ComponentHandler } from 'synergos';
+import type { ComponentHandler } from 'hubwire';
 import type {
     BucketComponentEventMap,
     BucketCreationFailedEventPayload,

@@ -18,12 +18,12 @@ import {
 import { AnalysisNodeMetadataRecalculator } from '../../../../../src/core/entities/analysis-node/recalculator.ts';
 import { AnalysisStorageManager } from '../../../../../src/core/services/analysis-storage-manager/module.ts';
 import { createFullAnalysis, createTestAnalysisNode } from '../../../../utils/domains/index.ts';
-import { FakeBucketCaller } from '../../services/helpers/fake-bucket-caller.ts';
+import { FakeBucketDispatcher } from '../../services/helpers/fake-bucket-dispatcher.ts';
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from './fake-repository.ts';
 
-class ThrowingBucketCaller extends FakeBucketCaller {
-    async callClear(): Promise<void> {
+class ThrowingBucketDispatcher extends FakeBucketDispatcher {
+    async dispatchClear(): Promise<void> {
         throw new Error('message bus unavailable');
     }
 }
@@ -45,9 +45,9 @@ describe('AnalysisNodeMetadataRecalculator', () => {
     let analysisRepository: FakeAnalysisRepository;
     let analysisNodeRepository: FakeAnalysisNodeRepository;
     let bucketRepository: FakeEntityRepository<AnalysisBucket>;
-    let caller: FakeBucketCaller;
+    let dispatcher: FakeBucketDispatcher;
 
-    function createRecalculator(bucketCaller: FakeBucketCaller = caller) {
+    function createRecalculator(bucketDispatcher: FakeBucketDispatcher = dispatcher) {
         return new AnalysisNodeMetadataRecalculator({
             analysisRepository,
             analysisNodeRepository,
@@ -55,7 +55,7 @@ describe('AnalysisNodeMetadataRecalculator', () => {
             storageManager: new AnalysisStorageManager({
                 repository: analysisRepository,
                 bucketRepository,
-                caller: bucketCaller,
+                dispatcher: bucketDispatcher,
             }),
         });
     }
@@ -72,7 +72,7 @@ describe('AnalysisNodeMetadataRecalculator', () => {
         analysisRepository = new FakeAnalysisRepository();
         analysisNodeRepository = new FakeAnalysisNodeRepository();
         bucketRepository = new FakeEntityRepository<AnalysisBucket>();
-        caller = new FakeBucketCaller();
+        dispatcher = new FakeBucketDispatcher();
 
         analysisRepository.seed(createFullAnalysis());
         bucketRepository.seed([
@@ -100,7 +100,7 @@ describe('AnalysisNodeMetadataRecalculator', () => {
 
         await createRecalculator().recalc('analysis-1');
 
-        expect(caller.getCallsFor('callClear').map((c) => c.data)).toEqual([{ id: `ext-${AnalysisBucketType.TEMP}` }]);
+        expect(dispatcher.getCallsFor('dispatchClear').map((c) => c.data)).toEqual([{ id: `ext-${AnalysisBucketType.TEMP}` }]);
     });
 
     it('should clear the temp bucket when nodes executed, failed or stopped', async () => {
@@ -108,7 +108,7 @@ describe('AnalysisNodeMetadataRecalculator', () => {
 
         await createRecalculator().recalc('analysis-1');
 
-        expect(caller.getCallsFor('callClear')).toHaveLength(1);
+        expect(dispatcher.getCallsFor('dispatchClear')).toHaveLength(1);
     });
 
     it('should not clear while a node has not started', async () => {
@@ -116,7 +116,7 @@ describe('AnalysisNodeMetadataRecalculator', () => {
 
         await createRecalculator().recalc('analysis-1');
 
-        expect(caller.getCallsFor('callClear')).toHaveLength(0);
+        expect(dispatcher.getCallsFor('dispatchClear')).toHaveLength(0);
     });
 
     it('should not clear while a node is still running', async () => {
@@ -127,13 +127,13 @@ describe('AnalysisNodeMetadataRecalculator', () => {
         seedNodes([ProcessStatus.EXECUTED, ProcessStatus.STARTED]);
         await createRecalculator().recalc('analysis-1');
 
-        expect(caller.getCallsFor('callClear')).toHaveLength(0);
+        expect(dispatcher.getCallsFor('dispatchClear')).toHaveLength(0);
     });
 
     it('should not clear without nodes', async () => {
         await createRecalculator().recalc('analysis-1');
 
-        expect(caller.getCallsFor('callClear')).toHaveLength(0);
+        expect(dispatcher.getCallsFor('dispatchClear')).toHaveLength(0);
     });
 
     it('should not clear or throw without a temp bucket', async () => {
@@ -142,13 +142,13 @@ describe('AnalysisNodeMetadataRecalculator', () => {
         seedNodes([ProcessStatus.EXECUTED]);
 
         await expect(createRecalculator().recalc('analysis-1')).resolves.toBeDefined();
-        expect(caller.getCallsFor('callClear')).toHaveLength(0);
+        expect(dispatcher.getCallsFor('dispatchClear')).toHaveLength(0);
     });
 
     it('should resolve when clearing fails', async () => {
         seedNodes([ProcessStatus.EXECUTED]);
 
-        await expect(createRecalculator(new ThrowingBucketCaller()).recalc('analysis-1'))
+        await expect(createRecalculator(new ThrowingBucketDispatcher()).recalc('analysis-1'))
             .resolves.toBeDefined();
     });
 });
