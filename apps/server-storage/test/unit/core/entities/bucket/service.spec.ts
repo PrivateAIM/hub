@@ -7,7 +7,9 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Bucket } from '@privateaim/storage-kit';
+import { BuiltInPolicyType } from '@authup/access';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionName } from '@privateaim/kit';
 import {
     beforeEach,
     describe,
@@ -19,7 +21,7 @@ import {
     createAllowAllActor,
     createDenyAllActor,
     createMasterRealmActor,
-    createNonMasterRealmActor,
+    createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeBucketCaller } from './fake-caller.ts';
 import { FakeBucketRepository } from './fake-repository.ts';
@@ -143,16 +145,36 @@ describe('BucketService', () => {
             expect(call.realmId).toBe('my-realm');
         });
 
-        it('should throw PermissionDeniedError when non-master realm sets different realmId', async () => {
-            const actor = createNonMasterRealmActor('realm-1');
-            const otherRealmId = randomUUID();
+        it('should evaluate BUCKET_CREATE against the actor realm when none is provided', async () => {
+            const actor = createScopedActor({ realmScope: 'own' });
 
+            await service.create({ name: 'new-bucket' }, actor);
+
+            const [call] = actor.permissionEvaluator.evaluateCalls;
+            expect(call.name).toBe(PermissionName.BUCKET_CREATE);
+            expect(call.data!.get(BuiltInPolicyType.REALM_MATCH)).toBe(actor.realm!.id);
+            expect(caller.getCreateCalls()[0].realmId).toBe(actor.realm!.id);
+        });
+
+        it('should throw PermissionDeniedError when an own-scoped grant targets another realm', async () => {
             await expect(
                 service.create(
-                    { name: 'new-bucket', realmId: otherRealmId },
-                    actor,
+                    { name: 'new-bucket', realmId: randomUUID() },
+                    createScopedActor({ realmScope: 'own' }),
                 ),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(caller.getCreateCalls()).toHaveLength(0);
+        });
+
+        it('should create in another realm with an any-scoped grant', async () => {
+            const realmId = randomUUID();
+
+            await service.create(
+                { name: 'new-bucket', realmId },
+                createScopedActor({ realmScope: 'any' }),
+            );
+
+            expect(caller.getCreateCalls()[0].realmId).toBe(realmId);
         });
 
         it('should delegate to caller with only refType set', async () => {
@@ -209,13 +231,36 @@ describe('BucketService', () => {
             expect(result.id).toBe(bucket.id);
         });
 
-        it('should enforce realm writability for non-owner', async () => {
+        it('should throw PermissionDeniedError when the grant does not reach the bucket realm', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
-                service.update(bucket.id, {}, createNonMasterRealmActor('realm-1')),
+                service.update(bucket.id, {}, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should update a bucket of another realm with an any-scoped grant', async () => {
+            const bucket = createTestBucket({ realmId: 'other-realm' });
+            repository.seed(bucket);
+
+            const result = await service.update(bucket.id, {}, createScopedActor({ realmId: 'realm-1', realmScope: 'any' }));
+            expect(result.id).toBe(bucket.id);
+        });
+
+        it('should evaluate BUCKET_UPDATE against both the stored and the merged row', async () => {
+            const bucket = createTestBucket({ realmId: 'realm-1' });
+            repository.seed(bucket);
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            await service.update(bucket.id, {}, actor);
+
+            const calls = actor.permissionEvaluator.evaluateCalls;
+            expect(calls.map((call) => call.name)).toEqual([PermissionName.BUCKET_UPDATE, PermissionName.BUCKET_UPDATE]);
+            expect(calls.map((call) => call.data!.get(BuiltInPolicyType.REALM_MATCH))).toEqual(['realm-1', 'realm-1']);
+            // The fake merge restamps updatedAt, so the second call carries the merged row.
+            expect(calls[1].data!.get<Bucket>(BuiltInPolicyType.ATTRIBUTES).updatedAt)
+                .not.toBe(calls[0].data!.get<Bucket>(BuiltInPolicyType.ATTRIBUTES).updatedAt);
         });
 
         it('should create minio bucket if it does not exist', async () => {
@@ -277,13 +322,25 @@ describe('BucketService', () => {
             expect(result.id).toBe(bucket.id);
         });
 
-        it('should enforce realm writability for non-owner', async () => {
+        it('should throw PermissionDeniedError when the grant does not reach the bucket realm', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
-                service.delete(bucket.id, createNonMasterRealmActor('realm-1')),
+                service.delete(bucket.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(caller.getDeleteCalls()).toHaveLength(0);
+        });
+
+        it('should delete a bucket of the own realm with an own-scoped grant', async () => {
+            const bucket = createTestBucket({ realmId: 'realm-1' });
+            repository.seed(bucket);
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            await service.delete(bucket.id, actor);
+
+            expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_DELETE);
+            expect(caller.getDeleteCalls()).toEqual([bucket.id]);
         });
     });
 
@@ -329,14 +386,25 @@ describe('BucketService', () => {
             expect(caller.getClearCalls()).toHaveLength(0);
         });
 
-        it('should enforce realm writability for non-owner', async () => {
+        it('should throw PermissionDeniedError when the grant does not reach the bucket realm', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
-                service.clear(bucket.id, createNonMasterRealmActor('realm-1')),
+                service.clear(bucket.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
             expect(caller.getClearCalls()).toHaveLength(0);
+        });
+
+        it('should clear a bucket of another realm with an any-scoped grant', async () => {
+            const bucket = createTestBucket({ realmId: 'other-realm' });
+            repository.seed(bucket);
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'any' });
+            await service.clear(bucket.id, actor);
+
+            expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_DELETE);
+            expect(caller.getClearCalls()).toEqual([bucket.id]);
         });
     });
 
@@ -359,15 +427,18 @@ describe('BucketService', () => {
         });
 
         it('should let a BUCKET_UPDATE holder of the bucket realm upload', async () => {
-            const actor = createNonMasterRealmActor('realm-1');
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
 
-            await expect(service.checkUploadAccess(createTestBucket(), actor)).resolves.toBeUndefined();
-            expect(actor.permissionEvaluator.preEvaluateCalls).toHaveLength(1);
+            await expect(service.checkUploadAccess(createTestBucket({ realmId: 'realm-1' }), actor)).resolves.toBeUndefined();
+            expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_UPDATE);
         });
 
-        it('should deny a BUCKET_UPDATE holder of another realm', async () => {
+        it('should deny an own-scoped BUCKET_UPDATE holder of another realm', async () => {
             await expect(
-                service.checkUploadAccess(createTestBucket({ realmId: 'other-realm' }), createNonMasterRealmActor('realm-1')),
+                service.checkUploadAccess(
+                    createTestBucket({ realmId: 'other-realm' }),
+                    createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
+                ),
             ).rejects.toThrow(PermissionDeniedError);
         });
 

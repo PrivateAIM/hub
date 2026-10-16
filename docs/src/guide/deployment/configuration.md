@@ -210,8 +210,9 @@ only `project_create` now creates a project but cannot attach nodes to it; grant
 against the analysis's realm, not the caller's:
 
 - Creating, updating or deleting an analysis bucket, and adding, updating or
-  deleting a **code** file, require `analysis_update` in the analysis's realm
-  (or the master realm). Grant it to every role that uploads analysis code.
+  deleting a **code** file, require `analysis_update` reaching the analysis's
+  realm (see [Writes take their realm reach from `realm_scope`](#writes-take-their-realm-reach-from-realm-scope)).
+  Grant it to every role that uploads analysis code.
 - Code files are frozen once the analysis configuration is locked: a write
   answers 400, and so does deleting the code bucket.
 - An analysis has at most one bucket per type, and a storage bucket backs at
@@ -224,17 +225,19 @@ against the analysis's realm, not the caller's:
   object would break every later build), so server-storage must consume the
   `storageBucketFileTasks` queue (it does from this release on); a rejected
   result or temp upload stays in storage, so a misjudged uploader never costs
-  result data. This check is realm-level only, and master-realm uploads through
-  storage are rejected too; upload through a node or the owner realm.
+  result data. This check is realm-level only, and uploads through storage by
+  anyone else are rejected too; upload through a node or the owner realm.
 - Storage still lets an uploader delete its own object, even a code file of a
   locked analysis. server-core logs such a deletion as an error; it cannot
   prevent it.
-- A **result** or **temp** file may be added by the master realm, by the realm
+- A **result** or **temp** file may be added by a caller whose `analysis_update`
+  reaches every realm (`realm_scope: any`, no policy — `admin`, `system`), by the realm
   of a node whose analysis participation is approved, or by the analysis's own
   client. Only a code file can be
   the root file.
 - Result files are updated and deleted by the analysis realm with
-  `analysis_update`; temp files by the master realm only.
+  `analysis_update`; temp files only by a caller whose `analysis_update` reaches
+  every realm.
 
 ## Uploading into a bucket requires ownership or `bucket_update`
 
@@ -312,7 +315,7 @@ before this release carry no realm**, so an `own` grant does not see them;
    provisioned.
 
 **After upgrading:** nothing to do for node clients. server-core re-grants each
-existing node's client its permissions (`analysis_update`, `analysis_read`, `node_read`) in the
+existing node's client its permissions (`analysis_read`, `node_read`, `analysis_node_log_create`, all at `realm_scope: none`) in the
 background — once at start, then hourly — so node-side services (pod
 orchestration, the storage service, the message broker) keep reading `/nodes`.
 Each pass removes any other permission a node client was granted by hand, as
@@ -408,6 +411,60 @@ lists analyses; pair it with `analysis_read`.
 
 **After upgrading:** node clients need nothing. server-core grants each node's
 client `analysis_read` in the background, once at start and then hourly.
+
+## Writes take their realm reach from `realm_scope`
+
+**Breaking for every deployment.** Hub no longer treats the master realm as
+special anywhere a record is written. Every create, update, delete and command —
+analyses, analysis nodes, buckets and files, nodes, projects, project nodes,
+registry projects, client and registry credentials, storage buckets and files,
+telemetry events — needs its permission through a grant whose `realm_scope`
+reaches the record's realm:
+
+- `any` reaches every realm. The built-in `admin` role and the `system` client
+  hold their grants at `any`.
+- `own` reaches the caller's own realm, `ownOrNull` also records without a realm
+  (realm-less registry projects and telemetry events), `none` reaches nothing.
+- A master-realm user whose grants are `own` now writes only in the master realm.
+  Grant cross-realm roles their permissions at `realm_scope: any`.
+- A record out of reach answers **403**. On an update, the grant's policies must
+  allow both the stored and the updated record.
+
+Behaviour changes on top:
+
+- **Analysis commands check a permission.** Starting a build or a distribution
+  needs `analysis_execution_start`; every other command (`buildCheck`,
+  `distributionCheck`, `configurationLock`/`Unlock`, `storageCheck`) needs
+  `analysis_update`. Before, only realm membership was checked.
+- **Node clients** hold `analysis_read`, `node_read` and the new
+  `analysis_node_log_create`, all at `realm_scope: none`, and no longer
+  `analysis_update`. Their own node is authorized by binding: a node's client
+  reports execution status on its own analysis-node rows, writes its run's logs
+  and reads them, but cannot change other analyses of its realm. The background
+  sync rewrites existing grants.
+- **Analysis clients'** permissions are created at `realm_scope: none`.
+- **A node's client is assigned by Hub only.** `clientId` can no longer be set
+  through `POST`/`PUT /nodes`, and a client belongs to at most one node. The
+  upgrade migration keeps a client shared by several nodes on the oldest one;
+  the others get a fresh client on their next save, so their node software
+  needs the new credentials.
+- **Writing a node's logs** (`POST /analysis-node-logs`) needs
+  `analysis_node_log_create`: the node's own client, or a grant reaching the
+  node's realm. Telemetry's `log_create` is not given to nodes.
+- **Registry credentials of a node** need `node_update` or `registry_manage`
+  reaching the node's realm.
+- **Deleting a realm-less telemetry event** needs `event_delete` at `ownOrNull`
+  or `any`.
+- **Creating an analysis** needs `analysis_create` reaching the project's realm.
+
+**Before upgrading:**
+
+1. Add `analysis_node_log_create` to your Authup provisioning. Until it exists,
+   every node save fails and every node client is logged as failed on each
+   hourly re-sync.
+2. Give every role that must write in other realms its permissions at
+   `realm_scope: any`, and give roles that start builds or distributions
+   `analysis_execution_start`.
 
 ## Authup upgrade to beta.69
 

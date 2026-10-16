@@ -6,10 +6,7 @@ Realms are organizational containers in FLAME Hub that group identity providers,
 
 ![Realms overview](/images/hub_realms.png)
 
-Each realm is an isolated organizational unit. Resources created within a realm (projects, analyses, nodes) are scoped to that realm unless accessed by a **master realm** administrator.
-
-- The **master realm** has global access — its members can manage all resources across realms
-- Non-master realm users can only access resources within their own realm
+Each realm is an isolated organizational unit. Resources created within a realm (projects, analyses, nodes) are scoped to that realm. Which realms a user or client reaches is decided per permission by the grant's **realm scope**, not by the realm they belong to — the master realm is not special.
 
 ## Managing Realms
 
@@ -23,14 +20,16 @@ Each realm is an isolated organizational unit. Resources created within a realm 
 
 ## Realm Scoping
 
-All realm-scoped entities carry a `realmId` property (the `realm_id` column). Access is enforced by the `isRealmResourceWritable()` helper in every entity service:
+All realm-scoped entities carry a `realmId` property (the `realm_id` column). Every permission a role or client holds is granted with a `realm_scope`, and that scope decides which records the permission reaches:
 
 ```
-Master realm member  →  can read/write all resources
-Other realm member   →  can only read/write own realm's resources
+any        →  every realm, and records without a realm
+ownOrNull  →  the holder's own realm, and records without a realm
+own        →  the holder's own realm
+none       →  no realm
 ```
 
-This applies to all CRUD operations — creating, reading, updating, and deleting entities.
+The built-in `admin` role and the `system` client hold their permissions at `any`. A record out of reach answers 403 on a write; reads only return what is in reach. Analyses add participation on top: the realms of an analysis' nodes reach it too (see [Analyses](analyses.md)).
 
 ## Users
 

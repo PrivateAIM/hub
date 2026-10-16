@@ -8,15 +8,16 @@
 import { eq } from '@rapiq/core';
 import type { ProjectNode } from '@privateaim/core-kit';
 import { NodeType, ProjectNodeApprovalStatus, ProjectNodeValidator  } from '@privateaim/core-kit';
-import {
-    PermissionName,
-    ValidatorGroup, 
-    isRealmResourceWritable, 
-} from '@privateaim/kit';
+import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import {
+    AbstractEntityService,
+    appendQueryConditions,
+    assertRecordReach,
+    reachesRecord,
+} from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import type { IProjectRepository } from '../project/types.ts';
 import { projectNodeSchema } from './schema.ts';
 import type { IProjectNodeRepository, IProjectNodeService } from './types.ts';
@@ -76,9 +77,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
         validated.projectRealmId = validated.project.realmId;
         validated.nodeRealmId = validated.node.realmId;
 
-        if (!isRealmResourceWritable(actor.realm, validated.project.realmId)) {
-            throw new PermissionDeniedError('The referenced project realm is not permitted.');
-        }
+        await assertRecordReach(actor, PermissionName.PROJECT_UPDATE, { realmId: validated.projectRealmId, attributes: validated });
 
         const entity = this.repository.create(validated);
 
@@ -107,12 +106,11 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
             throw new EntityNotFoundError({ entity: 'project-node' });
         }
 
-        const isAuthorityOfNode = isRealmResourceWritable(actor.realm, entity.nodeRealmId);
-        if (!isAuthorityOfNode) {
-            throw new PermissionDeniedError('You are not permitted to update this object.');
-        }
+        // Approval is the node's decision: the grant must reach the node's realm.
+        await assertRecordReach(actor, PermissionName.PROJECT_APPROVE, { realmId: entity.nodeRealmId, attributes: entity });
 
         const merged = this.repository.merge(entity, validated);
+        await assertRecordReach(actor, PermissionName.PROJECT_APPROVE, { realmId: merged.nodeRealmId, attributes: merged });
 
         return this.repository.save(merged, { data: actor.metadata });
     }
@@ -127,9 +125,11 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
             throw new EntityNotFoundError({ entity: 'project-node' });
         }
 
+        // Either side may detach: the project's realm or the node's. Two
+        // checks, since authup reads several realms as "all of", not "any of".
         if (
-            !isRealmResourceWritable(actor.realm, entity.nodeRealmId) &&
-            !isRealmResourceWritable(actor.realm, entity.projectRealmId)
+            !await reachesRecord(actor, PermissionName.PROJECT_UPDATE, { realmId: entity.projectRealmId, attributes: entity }) &&
+            !await reachesRecord(actor, PermissionName.PROJECT_UPDATE, { realmId: entity.nodeRealmId, attributes: entity })
         ) {
             throw new PermissionDeniedError('You are not authorized to drop this relation object.');
         }

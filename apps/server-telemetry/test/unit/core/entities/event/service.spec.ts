@@ -7,6 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Event } from '@privateaim/telemetry-kit';
+import { BuiltInPolicyType } from '@authup/access';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import { eq } from '@rapiq/core';
@@ -22,7 +23,7 @@ import {
     createAllowAllActor,
     createDenyAllActor,
     createMasterRealmActor,
-    createNonMasterRealmActor,
+    createScopedActor,
 } from '@privateaim/server-test-kit';
 
 function createTestEvent(overrides?: Partial<Event>): Event {
@@ -194,21 +195,53 @@ describe('EventService', () => {
             expect(result.realmId).toBe('my-realm');
         });
 
-        it('should throw PermissionDeniedError when non-master realm sets different realmId', async () => {
-            const actor = createNonMasterRealmActor('realm-1');
-            const otherRealmId = randomUUID();
+        it('should evaluate EVENT_CREATE against the actor realm when none is provided', async () => {
+            const actor = createScopedActor({ realmScope: 'own' });
 
+            const result = await service.create(
+                {
+                    refType: 'analysis',
+                    scope: 'entity',
+                    name: 'created',
+                },
+                actor,
+            );
+
+            const [call] = actor.permissionEvaluator.evaluateCalls;
+            expect(call.name).toBe(PermissionName.EVENT_CREATE);
+            expect(call.data!.get(BuiltInPolicyType.REALM_MATCH)).toBe(actor.realm!.id);
+            expect(result.realmId).toBe(actor.realm!.id);
+        });
+
+        it('should throw PermissionDeniedError when an own-scoped grant targets another realm', async () => {
             await expect(
                 service.create(
                     {
                         refType: 'analysis',
                         scope: 'entity',
                         name: 'created',
-                        realmId: otherRealmId,
+                        realmId: randomUUID(),
                     },
-                    actor,
+                    createScopedActor({ realmScope: 'own' }),
                 ),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(0);
+        });
+
+        it('should create in another realm with an any-scoped grant', async () => {
+            const realmId = randomUUID();
+
+            const result = await service.create(
+                {
+                    refType: 'analysis',
+                    scope: 'entity',
+                    name: 'created',
+                    realmId,
+                },
+                createScopedActor({ realmScope: 'any' }),
+            );
+
+            expect(result.realmId).toBe(realmId);
         });
 
         // Column bounds live in the released 1771519574696 migration and are
@@ -260,29 +293,46 @@ describe('EventService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should enforce realm writability for non-master realm', async () => {
+        it('should throw PermissionDeniedError when the grant does not reach the event realm', async () => {
             const event = createTestEvent({ realmId: 'other-realm' });
             repository.seed(event);
 
             await expect(
-                service.delete(event.id, createNonMasterRealmActor('realm-1')),
+                service.delete(event.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
         });
 
-        it('should allow master realm to delete any event', async () => {
+        it('should delete an event of another realm with an any-scoped grant', async () => {
             const event = createTestEvent({ realmId: 'other-realm' });
             repository.seed(event);
 
-            const result = await service.delete(event.id, createMasterRealmActor());
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'any' });
+            const result = await service.delete(event.id, actor);
+
             expect(result.id).toBe(event.id);
+            expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.EVENT_DELETE);
         });
 
-        it('should allow delete when event has no realmId', async () => {
+        it('should throw PermissionDeniedError for a realm-less event with an own-scoped grant', async () => {
             const event = createTestEvent({ realmId: null });
             repository.seed(event);
 
-            const result = await service.delete(event.id, createNonMasterRealmActor('realm-1'));
+            await expect(
+                service.delete(event.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
+            ).rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()).toHaveLength(1);
+        });
+
+        it('should delete a realm-less event with an ownOrNull-scoped grant', async () => {
+            const event = createTestEvent({ realmId: null });
+            repository.seed(event);
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'ownOrNull' });
+            const result = await service.delete(event.id, actor);
+
             expect(result.id).toBe(event.id);
+            expect(actor.permissionEvaluator.evaluateCalls[0].data!.get(BuiltInPolicyType.REALM_MATCH)).toBeNull();
         });
     });
 });

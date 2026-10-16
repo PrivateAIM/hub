@@ -6,7 +6,6 @@
  */
 
 export * from './permission';
-export * from './realm';
 
 export * from './constants';
 export * from './helpers';

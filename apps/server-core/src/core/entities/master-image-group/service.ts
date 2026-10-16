@@ -10,8 +10,8 @@ import type { MasterImageGroup } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, scopeReadQuery } from '@privateaim/server-kit';
-import { appendQueryConditions, decodeQuery } from '../../query/index.ts';
+import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@privateaim/server-kit';
+import { decodeQuery } from '../../query/index.ts';
 import { masterImageGroupSchema } from './schema.ts';
 import type { IMasterImageGroupRepository, IMasterImageGroupService } from './types.ts';
 

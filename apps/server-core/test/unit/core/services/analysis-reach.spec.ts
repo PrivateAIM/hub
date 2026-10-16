@@ -22,11 +22,7 @@ import {
 } from 'vitest';
 import { AnalysisReachService } from '../../../../src/core/services/analysis-reach/index.ts';
 import type { AnalysisReachTarget } from '../../../../src/core/services/analysis-reach/index.ts';
-import {
-    FakeEntityRepository,
-    createDenyAllActor,
-    createNonMasterRealmActor,
-} from '../helpers/index.ts';
+import { FakeEntityRepository, createDenyAllActor, createNonMasterRealmActor } from '@privateaim/server-test-kit';
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../utils/domains/index.ts';
 
@@ -44,35 +40,35 @@ describe('AnalysisReachService', () => {
         analysisRepository = new FakeEntityRepository<Analysis>();
         nodeRepository = new FakeEntityRepository<Node>();
         service = new AnalysisReachService({
-            analysisNodeRepository, 
-            analysisRepository, 
-            nodeRepository, 
+            analysisNodeRepository,
+            analysisRepository,
+            nodeRepository,
         });
 
         analysisNodeRepository.seed([
             createTestAnalysisNode({
-                id: 'an-1', 
-                analysisId: 'a-1', 
-                nodeId: 'n-a1', 
-                nodeRealmId: 'realm-a', 
+                id: 'an-1',
+                analysisId: 'a-1',
+                nodeId: 'n-a1',
+                nodeRealmId: 'realm-a',
             }),
             createTestAnalysisNode({
-                id: 'an-2', 
-                analysisId: 'a-2', 
-                nodeId: 'n-a2', 
-                nodeRealmId: 'realm-a', 
+                id: 'an-2',
+                analysisId: 'a-2',
+                nodeId: 'n-a2',
+                nodeRealmId: 'realm-a',
             }),
             createTestAnalysisNode({
-                id: 'an-3', 
-                analysisId: 'a-2', 
-                nodeId: 'n-a1', 
-                nodeRealmId: 'realm-a', 
+                id: 'an-3',
+                analysisId: 'a-2',
+                nodeId: 'n-a1',
+                nodeRealmId: 'realm-a',
             }),
             createTestAnalysisNode({
-                id: 'an-4', 
-                analysisId: 'a-3', 
-                nodeId: 'n-b', 
-                nodeRealmId: 'realm-b', 
+                id: 'an-4',
+                analysisId: 'a-3',
+                nodeId: 'n-b',
+                nodeRealmId: 'realm-b',
             }),
         ]);
     });
@@ -227,16 +223,16 @@ describe('AnalysisReachService', () => {
 
     it('should reach a node client by its node alone, whatever its grant', async () => {
         nodeRepository.seed({
-            id: 'n-a1', 
-            clientId: 'client-n-a1', 
-            realmId: 'realm-a', 
+            id: 'n-a1',
+            clientId: 'client-n-a1',
+            realmId: 'realm-a',
         } as Node);
 
         const actor = createNonMasterRealmActor('realm-a');
         actor.identity = {
-            id: 'client-n-a1', 
-            type: 'client', 
-            realmId: 'realm-a', 
+            id: 'client-n-a1',
+            type: 'client',
+            realmId: 'realm-a',
         };
         actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
 
@@ -246,16 +242,16 @@ describe('AnalysisReachService', () => {
 
     it('should ignore a node of another realm that claims the client', async () => {
         nodeRepository.seed({
-            id: 'n-x', 
-            clientId: 'client-n-b', 
-            realmId: 'realm-a', 
+            id: 'n-x',
+            clientId: 'client-n-b',
+            realmId: 'realm-a',
         } as Node);
 
         const actor = createNonMasterRealmActor('realm-b');
         actor.identity = {
-            id: 'client-n-b', 
-            type: 'client', 
-            realmId: 'realm-b', 
+            id: 'client-n-b',
+            type: 'client',
+            realmId: 'realm-b',
         };
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-b') });
 
@@ -264,16 +260,16 @@ describe('AnalysisReachService', () => {
 
     it('should reach an analysis client by its one analysis', async () => {
         analysisRepository.seed({
-            id: 'a-9', 
-            clientId: 'client-a-9', 
-            realmId: 'realm-a', 
+            id: 'a-9',
+            clientId: 'client-a-9',
+            realmId: 'realm-a',
         } as Analysis);
 
         const actor = createNonMasterRealmActor('realm-a');
         actor.identity = {
-            id: 'client-a-9', 
-            type: 'client', 
-            realmId: 'realm-a', 
+            id: 'client-a-9',
+            type: 'client',
+            realmId: 'realm-a',
         };
         actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
 
@@ -282,16 +278,16 @@ describe('AnalysisReachService', () => {
 
     it('should still pre-gate a bound client', async () => {
         nodeRepository.seed({
-            id: 'n-a1', 
-            clientId: 'client-n-a1', 
-            realmId: 'realm-a', 
+            id: 'n-a1',
+            clientId: 'client-n-a1',
+            realmId: 'realm-a',
         } as Node);
 
         const actor = createDenyAllActor('realm-a');
         actor.identity = {
-            id: 'client-n-a1', 
-            type: 'client', 
-            realmId: 'realm-a', 
+            id: 'client-n-a1',
+            type: 'client',
+            realmId: 'realm-a',
         };
 
         await expect(service.resolve(actor, ANALYSIS)).rejects.toThrow(PermissionDeniedError);
@@ -300,9 +296,9 @@ describe('AnalysisReachService', () => {
     it('should not let any other client participate through its realm', async () => {
         const actor = createNonMasterRealmActor('realm-a');
         actor.identity = {
-            id: 'some-service', 
-            type: 'client', 
-            realmId: 'realm-a', 
+            id: 'some-service',
+            type: 'client',
+            realmId: 'realm-a',
         };
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-a') });
 
