@@ -38,7 +38,7 @@
         "@ilingo/vue": "^6.1.1",
         "@nuxt/icon": "^2.5.1",
         "@nuxtjs/google-fonts": "^3.2.0",
-        "@pinia/nuxt": "^1.0.2",
+        "@pinia/nuxt": "^1.0.3",
         "@privateaim/client-vue": "^0.19.0",
         "@privateaim/client-vue-theme": "^0.19.0",
         "@privateaim/core-kit": "^0.19.0",
