@@ -18,7 +18,12 @@ import {
     appendQueryConditions,
     scopeReadQuery,
 } from '@privateaim/server-kit';
-import { evaluateRecord, evaluateRecordUpdate, isPermissionError } from '@authup/access';
+import {
+    evaluateRecord, 
+    evaluateRecordUpdate, 
+    isPermissionError, 
+    reachesRecord,
+} from '@authup/access';
 import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
 import { decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
@@ -145,7 +150,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     private async checkSecretFieldAccess(entities: RegistryProject[], actor: ActorContext): Promise<void> {
-        if (await this.holdsRegistryManage(actor)) {
+        if (await this.holdsRegistryManage(entities, actor)) {
             return;
         }
 
@@ -158,18 +163,38 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         throw new PermissionDeniedError();
     }
 
-    /** Only a permission denial reads as "not held"; any other failure propagates. */
-    private async holdsRegistryManage(actor: ActorContext): Promise<boolean> {
-        try {
-            await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_MANAGE });
-            return true;
-        } catch (e) {
-            if (isPermissionError(e)) {
+    /**
+     * Whether a REGISTRY_MANAGE grant reaches every secret-bearing project, by
+     * its realm and against the row — not just whether one is held, or an
+     * `own` grant would reveal the secrets of every realm the caller can read.
+     * Only a permission denial reads as "not held"; any other failure propagates.
+     */
+    private async holdsRegistryManage(entities: RegistryProject[], actor: ActorContext): Promise<boolean> {
+        for (const entity of entities) {
+            if (!this.hasSecretField(entity)) {
+                continue;
+            }
+
+            // A sparse fieldset (`?fields=id,accountSecret`) may not load the
+            // realm, and an undefined record realm is refused outright.
+            const realmId = typeof entity.realmId === 'undefined' ?
+                (await this.repository.findOneById(entity.id))?.realmId :
+                entity.realmId;
+            if (typeof realmId === 'undefined') {
                 return false;
             }
 
-            throw e;
+            const reached = await reachesRecord(actor.permissionEvaluator, {
+                name: PermissionName.REGISTRY_MANAGE,
+                realm: realmId,
+                data: { attributes: { ...entity, realmId } },
+            });
+            if (!reached) {
+                return false;
+            }
         }
+
+        return true;
     }
 
     async create(data: Partial<RegistryProject>, actor: ActorContext): Promise<RegistryProject> {

@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
-import { EntityNotFoundError } from '@privateaim/errors';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import { eq } from '@rapiq/core';
 import {
@@ -122,7 +122,9 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor('realm-1');
             await service.getMany({}, actor);
 
-            expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
+            const manage = actor.permissionEvaluator.evaluateCalls
+                .find((call) => call.name === PermissionName.REGISTRY_MANAGE);
+            expect(manage?.data?.get(BuiltInPolicyType.REALM_MATCH)).toBe('realm-1');
         });
 
         it('should reject without a read permission', async () => {
@@ -270,7 +272,37 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor('realm-1');
             await service.getOne('rp-1', actor);
 
-            expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
+            const manage = actor.permissionEvaluator.evaluateCalls
+                .find((call) => call.name === PermissionName.REGISTRY_MANAGE);
+            expect(manage?.data?.get(BuiltInPolicyType.REALM_MATCH)).toBe('realm-1');
+        });
+
+        it('should not reveal a secret outside the realm a REGISTRY_MANAGE grant reaches', async () => {
+            repository.seed(createTestRegistryProject({
+                id: 'rp-1', 
+                accountSecret: 'secret', 
+                realmId: 'realm-2', 
+            }));
+
+            // Reads reach every realm; REGISTRY_MANAGE is evaluated at `own`.
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            await expect(service.getOne('rp-1', actor)).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should reveal a secret inside the realm a REGISTRY_MANAGE grant reaches', async () => {
+            repository.seed(createTestRegistryProject({
+                id: 'rp-1', 
+                accountSecret: 'secret', 
+                realmId: 'realm-1', 
+            }));
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            const result = await service.getOne('rp-1', actor);
+            expect(result.accountSecret).toBe('secret');
         });
 
         it('should allow node-client to access own registry project secret', async () => {
