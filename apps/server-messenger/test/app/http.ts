@@ -49,7 +49,6 @@ export class TestHTTPApplication extends TestApplication {
 
         const config = this.container.resolve(ConfigInjectionKey);
         const hook = createAuthupClientAuthenticationHook({
-            baseURL: config.authupURL,
             tokenCreator: createAuthupUserTokenCreator({
                 baseURL: config.authupURL,
                 name: 'admin',

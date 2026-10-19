@@ -58,11 +58,14 @@ describe('adapters/http/message authentication', () => {
     });
 
     /**
-     * Credential confusion: authup's introspection falls back to the token in
-     * the request's own `Authorization` header when the body `token` fails its
-     * validator (too short, too long), and hub's verifier inherits its own
-     * service credentials onto that header — so a malformed bearer was
-     * reported as the hub `system` client and answered 200.
+     * Credential confusion: an Authup server <= 1.0.0-beta.69 falls back to
+     * the token in the request's own `Authorization` header when the body
+     * `token` fails its validator (too short, too long), and that header
+     * carries hub's own service credentials — so a malformed bearer was
+     * reported as the hub `system` client and answered 200. Since beta.70
+     * (authup#3724) the server answers `active: false` itself, so against the
+     * suite's Authup image these 401s hold with or without hub's guard; the
+     * guard is pinned by server-http-kit's token-verifier spec.
      */
     it.each([
         ['a short garbage bearer', 'not-a-token'],

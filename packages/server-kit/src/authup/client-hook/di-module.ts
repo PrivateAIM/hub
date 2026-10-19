@@ -39,7 +39,6 @@ export class AuthupHookModule implements IModule {
 
             const config = configResult.data;
             options = {
-                baseURL: config.authupURL,
                 tokenCreator: createAuthupClientTokenCreator({
                     baseURL: config.authupURL,
                     clientId: config.clientId,

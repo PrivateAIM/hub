@@ -70,6 +70,8 @@ export function createSocketServer(
                 clientSecret: ctx.config.clientSecret,
                 realm: ctx.config.realm,
             }),
+            clientId: ctx.config.clientId,
+            realm: ctx.config.realm,
             redisClient: ctx.redisPublishClient,
         }),
         logger: ctx.logger,
