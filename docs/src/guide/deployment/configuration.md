@@ -206,11 +206,11 @@ acted on it as that client.
 
 Every Hub service now refuses a credential that is not structurally a compact
 JWS within those bounds **before** introspecting it, answering 401 (sockets:
-connection refused). The fallback itself is fixed upstream in authup#3724;
-upgrading Authup to the first release after `1.0.0-beta.69` closes the upstream
-half, until then the Hub-side guard is what stops it. Any
-token-verifier cache (Redis `token:*` keys) may hold entries for such strings —
-flush it once after upgrading.
+connection refused). The fallback itself is fixed upstream in authup#3724,
+released in Authup `1.0.0-beta.70`; against an older Authup server the Hub-side
+guard is what stops it, since Hub's verifier still sends such a token to
+introspection. Entries cached for such strings sit under Redis `token:*` keys,
+which Hub no longer reads since the [beta.70 upgrade](#authup-upgrade-to-beta-70).
 
 ## Attaching nodes to a project requires `project_update`
 
@@ -529,6 +529,43 @@ Authup deployment Hub runs against:
   and `Secure` on https. Behind a TLS-terminating proxy, forward
   `X-Forwarded-Proto` (the [reverse proxy](./reverse-proxy.md) example already
   does) so server-side cookie writes in client-ui get `Secure` too.
+
+## Authup upgrade to beta.70
+
+Hub now requires Authup `1.0.0-beta.70`. Read the
+[Authup upgrade guide](https://authup.org/guide/deployment/upgrading) for the
+release. Hub needs no data changes; these points concern Hub's services and the
+Authup deployment they run against:
+
+- **Token verification moved to vouchly.** Hub verifies every token by
+  introspection, as before. Results are now cached in Redis under `vouchly:*`
+  keys; the `token:*` keys written by earlier versions are not read again and
+  expire with their tokens. A cached result is still served until the token's
+  `exp`, so a revoked token keeps working until then.
+- **Cached results are kept per Authup client.** Authup only reports a token
+  active to a client allowed to introspect it, so a result is cached for the
+  client that asked. Services using the same Redis and `AUTHUP_URL` reuse each
+  other's results only when they authenticate as the same client (the default,
+  `system` for all of them); services with their own clients each introspect a
+  token once.
+- **An Authup outage answers 401.** A failed introspection request (Authup
+  unreachable or answering 5xx) is now reported as `invalid_token` and answered
+  401, not with Authup's own status.
+- **The malformed-bearer fix is complete.** Authup now answers a malformed
+  token `active: false` itself (see
+  [Malformed bearer tokens](#malformed-bearer-tokens-no-longer-authenticate)).
+  Hub keeps its own check as defence in depth: it still protects a deployment
+  that upgrades Hub before its Authup server.
+- **Realm and self-service grants are checked for realm reach.** In Authup,
+  `realm_update` and `realm_delete` at the default `own` reach now manage only
+  the actor's own realm. Grant them at `any` to admins who manage other realms
+  from Hub's realm pages. The built-in `admin` role already has `any`. A
+  `user_self_manage` or `client_self_manage` grant stored at `realmScope: none`
+  no longer permits self-edits in the account console; grant it at `own`.
+- **RSA signing keys must be at least 2048 bits.** Hub verifies by
+  introspection, so it does not check key size itself. Authup now refuses to
+  import a shorter key, and its own adapters reject tokens signed with one.
+  Replace any shorter imported key as the Authup guide describes.
 
 ## Database Variables
 
