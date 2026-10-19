@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionError } from '@authup/access';
 import { randomUUID } from 'node:crypto';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -128,7 +129,7 @@ describe('AnalysisLogAccessService', () => {
 
         it('requires the analysis read one-of', async () => {
             await expect(service.assertAnalysisLogAccess(ANALYSIS_ID, createDenyAllActor(OWNER_REALM), LogAccessIntent.READ))
-                .rejects.toThrow(PermissionDeniedError);
+                .rejects.toThrow(PermissionError);
         });
 
         it('lets only the owner side delete, with ANALYSIS_UPDATE', async () => {
@@ -140,7 +141,7 @@ describe('AnalysisLogAccessService', () => {
             await expect(service.assertAnalysisLogAccess(ANALYSIS_ID, userOf(APPROVED_REALM), LogAccessIntent.DELETE))
                 .rejects.toThrow(EntityNotFoundError);
             await expect(service.assertAnalysisLogAccess(ANALYSIS_ID, createDenyAllActor(OWNER_REALM), LogAccessIntent.DELETE))
-                .rejects.toThrow(PermissionDeniedError);
+                .rejects.toThrow(PermissionError);
         });
 
         it('rejects a malformed analysis id', async () => {
@@ -193,7 +194,7 @@ describe('AnalysisLogAccessService', () => {
 
         it('refuses a caller without the capability before looking up the node', async () => {
             await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, randomUUID(), createDenyAllActor(OWNER_REALM), LogAccessIntent.READ))
-                .rejects.toThrow(PermissionDeniedError);
+                .rejects.toThrow(PermissionError);
         });
 
         it('lets the node\'s own client read its approved run without the capability', async () => {
@@ -208,7 +209,7 @@ describe('AnalysisLogAccessService', () => {
             const actor = clientOf(PENDING_NODE_CLIENT, PENDING_REALM, createDenyAllActor(PENDING_REALM));
 
             await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, PENDING_NODE, actor, LogAccessIntent.READ))
-                .rejects.toThrow(PermissionDeniedError);
+                .rejects.toThrow(PermissionError);
         });
 
         it('does not count a client bound in another realm', async () => {
@@ -250,7 +251,7 @@ describe('AnalysisLogAccessService', () => {
 
             const denied = clientOf(APPROVED_NODE_CLIENT, APPROVED_REALM, createDenyAllActor(APPROVED_REALM));
             await expect(service.assertAnalysisNodeLogCreate(ANALYSIS_ID, APPROVED_NODE, denied))
-                .rejects.toThrow(PermissionDeniedError);
+                .rejects.toThrow(PermissionError);
         });
 
         it('lets the node\'s own client write by its binding, not its grant\'s reach', async () => {

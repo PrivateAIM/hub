@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionError } from '@authup/access';
 import type { PermissionCompileContext, PermissionCompileResult } from '@authup/access';
 import { PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
@@ -76,7 +77,7 @@ describe('adapters/socket/reach', () => {
         it('lets an own-scoped actor join rooms in its own realm namespace only', async () => {
             const actor = createScopedActor({ realmScope: 'own' });
             await expect(assertSocketSubscribeReach(toSocketData(actor, actor.realm.id), ANALYSIS)).resolves.toBeUndefined();
-            await expect(assertSocketSubscribeReach(toSocketData(actor, randomUUID()), ANALYSIS)).rejects.toThrow(PermissionDeniedError);
+            await expect(assertSocketSubscribeReach(toSocketData(actor, randomUUID()), ANALYSIS)).rejects.toThrow(PermissionError);
             await expect(assertSocketSubscribeReach(toSocketData(actor), ANALYSIS)).rejects.toThrow(PermissionDeniedError);
         });
 

@@ -6,14 +6,13 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { hasUnboundedReach, reachesRecord } from '@authup/access';
 import { Client } from '@authup/core-http-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { ActorContext } from '@privateaim/server-kit';
 import {
     createAuthupPermissionEvaluator,
     createAuthupUserTokenCreator,
-    hasUnboundedReach,
-    reachesRecord,
     resolveAuthupPolicySubject,
 } from '@privateaim/server-kit';
 import { createAuthupTokenVerifier } from '@privateaim/server-http-kit';
@@ -26,10 +25,11 @@ import {
     it,
 } from 'vitest';
 
-// Every hub write takes its realm reach from `assertRecordReach`, which relies
-// on authup applying a grant's `realm_scope` to the `realmMatch` input. This
-// pins that against the real Authup the suite runs: if it stopped, writes
-// would silently lose their reach check.
+// Every hub write takes its realm reach from @authup/access's record helpers
+// (`evaluateRecord`, `reachesRecord`, …), which rely on authup applying a
+// grant's `realm_scope` to the record realm. This pins that against the real
+// Authup the suite runs: if it stopped, writes would silently lose their
+// reach check.
 
 const NAME = PermissionName.NODE_UPDATE;
 
@@ -121,9 +121,10 @@ describe('record reach against a real Authup', () => {
         // grants at `none` and still pass it.
         await expect(actor.permissionEvaluator.preEvaluate({ name: NAME })).resolves.toBeUndefined();
 
-        await expect(reachesRecord(actor, NAME, { realmId: actor.realm?.id })).resolves.toBe(own);
-        await expect(reachesRecord(actor, NAME, { realmId: otherRealmId })).resolves.toBe(other);
-        await expect(reachesRecord(actor, NAME, { realmId: null })).resolves.toBe(realmless);
-        await expect(hasUnboundedReach(actor, NAME)).resolves.toBe(unbounded);
+        const { permissionEvaluator } = actor;
+        await expect(reachesRecord(permissionEvaluator, { name: NAME, realm: actor.realm.id })).resolves.toBe(own);
+        await expect(reachesRecord(permissionEvaluator, { name: NAME, realm: otherRealmId })).resolves.toBe(other);
+        await expect(reachesRecord(permissionEvaluator, { name: NAME, realm: null })).resolves.toBe(realmless);
+        await expect(hasUnboundedReach(permissionEvaluator, NAME)).resolves.toBe(unbounded);
     }, 60_000);
 });

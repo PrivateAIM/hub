@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import type {
     Analysis,
     AnalysisBucket,
@@ -155,13 +155,13 @@ describe('AnalysisBucketFileService', () => {
         it('should deny a code file from a foreign realm', async () => {
             await expect(
                 service.create(createPayload(AnalysisBucketType.CODE), createScopedActor({ realmId: NODE_REALM, realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should deny a code file without analysis_update', async () => {
             await expect(
                 service.create(createPayload(AnalysisBucketType.CODE), createDenyAllActor(OWNER_REALM)),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should reject a code file once the configuration is locked', async () => {
@@ -283,7 +283,7 @@ describe('AnalysisBucketFileService', () => {
 
             await expect(
                 service.update(file.id, { path: 'x.py' }, createScopedActor({ realmId: NODE_REALM, realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should deny an update without analysis_update', async () => {
@@ -291,7 +291,7 @@ describe('AnalysisBucketFileService', () => {
 
             await expect(
                 service.update(file.id, { path: 'x.py' }, createDenyAllActor(OWNER_REALM)),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should reject a code file update once locked', async () => {
@@ -343,7 +343,7 @@ describe('AnalysisBucketFileService', () => {
 
             await expect(
                 service.delete(file.id, createScopedActor({ realmId: NODE_REALM, realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should deny without analysis_update', async () => {
@@ -351,7 +351,7 @@ describe('AnalysisBucketFileService', () => {
 
             await expect(
                 service.delete(file.id, createDenyAllActor(OWNER_REALM)),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should reject a code file delete once locked', async () => {
@@ -482,7 +482,7 @@ describe('AnalysisBucketFileService', () => {
                 actor.permissionEvaluator.setBehavior(({ method, ctx }) => {
                     const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
                     if (method === 'preEvaluateOneOf' && names.length === 1 && names[0] === PermissionName.ANALYSIS_RESULT_READ) {
-                        throw new PermissionDeniedError();
+                        throw PermissionError.deniedAll(names);
                     }
                 });
             }
@@ -537,7 +537,7 @@ describe('AnalysisBucketFileService', () => {
         });
 
         it('should refuse an actor without any analysis read permission', async () => {
-            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionError);
         });
     });
 });

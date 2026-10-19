@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionError } from '@authup/access';
 import { randomUUID } from 'node:crypto';
 import type { Analysis } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
@@ -112,7 +113,7 @@ describe('AnalysisClientPermissionService', () => {
             const service = createService(authup, [analysis]);
 
             await expect(service.getMany(analysis.id!, createScopedActor({ realmScope: 'own' })))
-                .rejects.toThrow(PermissionDeniedError);
+                .rejects.toThrow(PermissionError);
             expect(authup.requests).toHaveLength(0);
         });
     });
@@ -198,7 +199,7 @@ describe('AnalysisClientPermissionService', () => {
 
             await expect(
                 service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createScopedActor({ realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(authup.requests).toHaveLength(0);
         });
 
@@ -278,7 +279,7 @@ describe('AnalysisClientPermissionService', () => {
 
             await expect(
                 service.delete(analysis.id!, STORAGE_PERMISSION.id, createScopedActor({ realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(authup.requests).toHaveLength(0);
         });
     });

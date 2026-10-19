@@ -9,9 +9,9 @@
  * Re-exported from authup rather than re-implemented, so hub's service tests
  * drive the exact fake authup's own services are tested against: public call
  * arrays, `setBehavior` / `deny` / `denyAll`, and `compile()` defaulting to
- * `post`. The hub actor factories pass hub's `PermissionDeniedError` to
- * `denyAll`, since authup's default (`PermissionError.denied`) is not what
- * hub's `toThrow(PermissionDeniedError)` assertions expect.
+ * `post`. A denial throws authup's `PermissionError` (the default of `deny` /
+ * `denyAll`), as the production evaluator does — never hub's
+ * `PermissionDeniedError`, which only hub's own gates throw.
  */
 export { FakePermissionEvaluator } from '@authup/server-test-kit';
 export type {

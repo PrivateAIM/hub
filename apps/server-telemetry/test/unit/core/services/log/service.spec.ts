@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionError } from '@authup/access';
+import { BadRequestError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import { createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { LogChannel, LogLevel } from '@privateaim/telemetry-kit';
@@ -46,7 +47,7 @@ describe('LogService', () => {
         });
 
         it('should deny without permission and not write', async () => {
-            await expect(service.create(input, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.create(input, createDenyAllActor())).rejects.toThrow(PermissionError);
             expect(store.items).toHaveLength(0);
         });
     });
@@ -82,7 +83,7 @@ describe('LogService', () => {
         });
 
         it('should deny without permission', async () => {
-            await expect(service.getMany({ filter: { foo: 'bar' } }, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({ filter: { foo: 'bar' } }, createDenyAllActor())).rejects.toThrow(PermissionError);
             expect(store.queryCalls).toHaveLength(0);
         });
     });
@@ -108,7 +109,7 @@ describe('LogService', () => {
         });
 
         it('should deny without permission', async () => {
-            await expect(service.deleteMany({ filter: { foo: 'bar' } }, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.deleteMany({ filter: { foo: 'bar' } }, createDenyAllActor())).rejects.toThrow(PermissionError);
             expect(store.deleteCalls).toHaveLength(0);
         });
     });

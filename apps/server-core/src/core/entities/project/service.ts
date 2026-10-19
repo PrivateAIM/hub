@@ -14,7 +14,8 @@ import {
 } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
+import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
+import { evaluateRecord, evaluateRecordUpdate } from '@authup/access';
 import { decodeQuery } from '../../query/index.ts';
 import type { IProjectRepository, IProjectService } from './types.ts';
 import { projectSchema } from './schema.ts';
@@ -70,7 +71,11 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             validated.realmId = this.getActorRealmId(actor);
         }
 
-        await assertRecordReach(actor, PermissionName.PROJECT_CREATE, { realmId: validated.realmId, attributes: validated });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.PROJECT_CREATE,
+            realm: validated.realmId,
+            data: { attributes: validated },
+        });
 
         // No identity falls through to the default branch, like any other kind.
         switch (actor.identity?.type) {
@@ -104,10 +109,14 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             throw new EntityNotFoundError({ entity: 'project' });
         }
 
-        await assertRecordReach(actor, PermissionName.PROJECT_UPDATE, { realmId: entity.realmId, attributes: entity });
-
+        // Snapshot the stored row: typeorm's merge() writes into `entity`.
+        const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
-        await assertRecordReach(actor, PermissionName.PROJECT_UPDATE, { realmId: merged.realmId, attributes: merged });
+        await evaluateRecordUpdate(actor.permissionEvaluator, {
+            name: PermissionName.PROJECT_UPDATE,
+            current,
+            next: { realm: merged.realmId, data: { attributes: merged } },
+        });
 
         await this.repository.checkUniqueness(merged, entity);
 
@@ -122,7 +131,11 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
             throw new EntityNotFoundError({ entity: 'project' });
         }
 
-        await assertRecordReach(actor, PermissionName.PROJECT_DELETE, { realmId: entity.realmId, attributes: entity });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.PROJECT_DELETE,
+            realm: entity.realmId,
+            data: { attributes: entity },
+        });
 
         if (entity.analyses > 0) {
             throw new BadRequestError('The project still has associated analyses.');

@@ -7,8 +7,8 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Bucket, BucketFile } from '@privateaim/storage-kit';
-import { BuiltInPolicyType } from '@authup/access';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
+import { EntityNotFoundError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import {
     beforeEach,
@@ -136,7 +136,7 @@ describe('BucketFileService', () => {
             expect(result.id).toBe(file.id);
         });
 
-        it('should throw PermissionDeniedError when the grant does not reach the file realm', async () => {
+        it('should deny when the grant does not reach the file realm', async () => {
             const file = createTestBucketFile({
                 actorId: 'other-user',
                 actorType: 'user',
@@ -147,7 +147,7 @@ describe('BucketFileService', () => {
 
             await expect(
                 service.delete(file.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(dispatcher.getDeleteCalls()).toHaveLength(0);
             expect(repository.getAll()).toHaveLength(1);
         });
@@ -183,7 +183,7 @@ describe('BucketFileService', () => {
             expect(dispatcher.getDeleteCalls()).toEqual([file.id]);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission and is not owner', async () => {
+        it('should deny when actor lacks permission and is not owner', async () => {
             const file = createTestBucketFile({
                 actorId: 'other-user',
                 actorType: 'user',
@@ -194,7 +194,7 @@ describe('BucketFileService', () => {
 
             await expect(
                 service.delete(file.id, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
     });
 });

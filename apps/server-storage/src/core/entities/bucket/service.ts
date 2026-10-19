@@ -11,7 +11,8 @@ import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@pr
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
+import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
+import { evaluateRecord, evaluateRecordUpdate } from '@authup/access';
 import { decodeQuery } from '../../query/index.ts';
 import type { IBucketDispatcher, IBucketRepository, IBucketService } from './types.ts';
 import { BucketValidator, assertBucketRefPairing } from '@privateaim/storage-kit';
@@ -78,7 +79,12 @@ export class BucketService extends AbstractEntityService implements IBucketServi
             validated.realmId = this.getActorRealmId(actor);
         }
 
-        await assertRecordReach(actor, PermissionName.BUCKET_CREATE, { realmId: validated.realmId, attributes: validated });
+        // A bucket's realm column is nullable: an actor without a realm creates a global row.
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.BUCKET_CREATE,
+            realm: validated.realmId ?? null,
+            data: { attributes: validated },
+        });
 
         return this.dispatcher.create({
             ...validated,
@@ -98,14 +104,19 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         const isOwner = this.isOwnedByActor(entity, actor);
         if (!isOwner) {
             await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_UPDATE });
-            await assertRecordReach(actor, PermissionName.BUCKET_UPDATE, { realmId: entity.realmId, attributes: entity });
         }
 
+        // Snapshot the stored row: typeorm's merge() writes into `entity`.
+        const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         entity = this.repository.merge(entity, validated);
 
         // Attribute policies bind the target state as well as the stored one.
         if (!isOwner) {
-            await assertRecordReach(actor, PermissionName.BUCKET_UPDATE, { realmId: entity.realmId, attributes: entity });
+            await evaluateRecordUpdate(actor.permissionEvaluator, {
+                name: PermissionName.BUCKET_UPDATE,
+                current,
+                next: { realm: entity.realmId, data: { attributes: entity } },
+            });
         }
 
         await this.repository.save(entity, { data: actor.metadata });
@@ -131,7 +142,11 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         if (!this.isOwnedByActor(entity, actor)) {
             await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_DELETE });
-            await assertRecordReach(actor, PermissionName.BUCKET_DELETE, { realmId: entity.realmId, attributes: entity });
+            await evaluateRecord(actor.permissionEvaluator, {
+                name: PermissionName.BUCKET_DELETE,
+                realm: entity.realmId,
+                data: { attributes: entity },
+            });
         }
 
         return this.dispatcher.delete(entity.id);
@@ -145,7 +160,11 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         if (!this.isOwnedByActor(entity, actor)) {
             await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_DELETE });
-            await assertRecordReach(actor, PermissionName.BUCKET_DELETE, { realmId: entity.realmId, attributes: entity });
+            await evaluateRecord(actor.permissionEvaluator, {
+                name: PermissionName.BUCKET_DELETE,
+                realm: entity.realmId,
+                data: { attributes: entity },
+            });
         }
 
         return this.dispatcher.clear(entity.id);
@@ -165,7 +184,11 @@ export class BucketService extends AbstractEntityService implements IBucketServi
             return;
         }
 
-        await assertRecordReach(actor, PermissionName.BUCKET_UPDATE, { realmId: entity.realmId, attributes: entity });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.BUCKET_UPDATE,
+            realm: entity.realmId,
+            data: { attributes: entity },
+        });
     }
 
     private isOwnedByActor(entity: Bucket, actor: ActorContext): boolean {

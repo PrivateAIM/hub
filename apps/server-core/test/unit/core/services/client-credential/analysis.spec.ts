@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Analysis, AnalysisNode, Node } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
@@ -259,7 +259,7 @@ describe('AnalysisClientCredentialService', () => {
 
             await expect(
                 service.setCredentials(ANALYSIS_ID, undefined, createScopedActor({ realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(reader.writes).toHaveLength(0);
         });
 

@@ -10,7 +10,8 @@ import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { AbstractEntityService, assertRecordReach, reachesRecord } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
+import { evaluateRecord, reachesRecord } from '@authup/access';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
@@ -94,7 +95,11 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
         // matching once attribute policies are enabled, and a denylist-shaped one
         // then fails OPEN. See docs/src/guide/development/migration-camelcase.md
         // -> "Authup attribute policies".
-        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: analysis.realmId, attributes: analysis });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            realm: analysis.realmId,
+            data: { attributes: analysis },
+        });
 
         if (!analysis.clientId) {
             throw new BadRequestError('The analysis has no client provisioned yet.');
@@ -128,6 +133,10 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
             }
         }
 
-        return reachesRecord(actor, PermissionName.ANALYSIS_UPDATE, { realmId: analysis.realmId, attributes: analysis });
+        return reachesRecord(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            realm: analysis.realmId,
+            data: { attributes: analysis },
+        });
     }
 }

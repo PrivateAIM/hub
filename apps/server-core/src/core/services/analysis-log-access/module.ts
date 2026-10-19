@@ -12,7 +12,8 @@ import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { appendQueryConditions, reachesRecord } from '@privateaim/server-kit';
+import { appendQueryConditions } from '@privateaim/server-kit';
+import { reachesRecord } from '@authup/access';
 import { defineIssueItem } from '@ebec/core';
 import { ValidupError, buildErrorMessageForAttribute } from 'validup';
 import { z } from 'zod';
@@ -136,7 +137,11 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
 
         if (
             !isNodeClient(actor, node) &&
-            !await reachesRecord(actor, PermissionName.ANALYSIS_NODE_LOG_CREATE, { realmId: node.realmId, attributes: node })
+            !await reachesRecord(actor.permissionEvaluator, {
+                name: PermissionName.ANALYSIS_NODE_LOG_CREATE,
+                realm: node.realmId,
+                data: { attributes: node },
+            })
         ) {
             throw new PermissionDeniedError('You are not permitted to write logs of this node.');
         }

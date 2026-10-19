@@ -12,7 +12,8 @@ import { AnalysisBucketType, AnalysisBucketValidator } from '@privateaim/core-ki
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { BadRequestError, EntityConflictError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
+import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
+import { evaluateRecord, evaluateRecordUpdate } from '@authup/access';
 import { decodeQuery } from '../../query/index.ts';
 import { analysisBucketSchema } from './schema.ts';
 import type { IAnalysisBucketRepository, IAnalysisBucketService } from './types.ts';
@@ -112,14 +113,18 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
-        await this.assertOwner(actor, entity);
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
 
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
+        // Snapshot the stored row: typeorm's merge() writes into `entity`.
+        const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
-
-        // The grant's policies bind the target state too (authup's evaluateUpdate).
-        await this.assertOwner(actor, merged);
+        await evaluateRecordUpdate(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            current,
+            next: { realm: merged.realmId, data: { attributes: merged } },
+        });
 
         return this.repository.save(merged, { data: actor.metadata });
     }
@@ -151,6 +156,10 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
     /** The bucket's realm is its analysis' (stamped on create). */
     protected async assertOwner(actor: ActorContext, bucket: Partial<AnalysisBucket>): Promise<void> {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
-        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: bucket.realmId, attributes: bucket });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            realm: bucket.realmId,
+            data: { attributes: bucket },
+        });
     }
 }

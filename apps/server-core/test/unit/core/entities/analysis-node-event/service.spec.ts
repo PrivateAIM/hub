@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionError } from '@authup/access';
 import { randomUUID } from 'node:crypto';
 import type { Analysis, AnalysisNodeEvent, Node } from '@privateaim/core-kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { EntityNotFoundError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -94,7 +95,7 @@ describe('AnalysisNodeEventService', () => {
         });
 
         it('should refuse an actor without any analysis read permission', async () => {
-            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionError);
         });
     });
 

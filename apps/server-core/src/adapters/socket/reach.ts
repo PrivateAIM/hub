@@ -7,7 +7,7 @@
 
 import { PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
-import { assertRecordReach, hasUnboundedReach } from '@privateaim/server-kit';
+import { evaluateRecordOneOf, hasUnboundedReach } from '@authup/access';
 import type { SocketReachData } from './types.ts';
 
 const PERMISSION_NAMES: string[] = Object.values(PermissionName);
@@ -43,7 +43,7 @@ export async function assertSocketNamespaceReach(data: SocketReachData): Promise
         return;
     }
 
-    if (!await hasUnboundedReach({ permissionEvaluator }, PERMISSION_NAMES)) {
+    if (!await hasUnboundedReach(permissionEvaluator, PERMISSION_NAMES)) {
         throw new PermissionDeniedError();
     }
 }
@@ -60,11 +60,12 @@ export async function assertSocketSubscribeReach(data: SocketReachData, names: s
     }
 
     if (namespaceId) {
-        await assertRecordReach({ permissionEvaluator }, names, { realmId: namespaceId });
+        // No row: an attribute policy on the grant stays pending and denies.
+        await evaluateRecordOneOf(permissionEvaluator, { name: names, realm: namespaceId });
         return;
     }
 
-    if (!await hasUnboundedReach({ permissionEvaluator }, names)) {
+    if (!await hasUnboundedReach(permissionEvaluator, names)) {
         throw new PermissionDeniedError();
     }
 }

@@ -16,11 +16,9 @@ import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } 
 import {
     AbstractEntityService,
     appendQueryConditions,
-    assertRecordReach,
-    holdsPermission,
-    isPermissionDenial,
     scopeReadQuery,
 } from '@privateaim/server-kit';
+import { evaluateRecord, evaluateRecordUpdate, isPermissionError } from '@authup/access';
 import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
 import { decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
@@ -114,7 +112,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         try {
             return await scopeReadQuery(query, actor, { names: REGISTRY_PROJECT_READ_PERMISSIONS });
         } catch (e) {
-            if (!isPermissionDenial(e)) {
+            if (!isPermissionError(e)) {
                 throw e;
             }
 
@@ -147,7 +145,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     private async checkSecretFieldAccess(entities: RegistryProject[], actor: ActorContext): Promise<void> {
-        if (await holdsPermission(actor, PermissionName.REGISTRY_MANAGE)) {
+        if (await this.holdsRegistryManage(actor)) {
             return;
         }
 
@@ -160,6 +158,20 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         throw new PermissionDeniedError();
     }
 
+    /** Only a permission denial reads as "not held"; any other failure propagates. */
+    private async holdsRegistryManage(actor: ActorContext): Promise<boolean> {
+        try {
+            await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_MANAGE });
+            return true;
+        } catch (e) {
+            if (isPermissionError(e)) {
+                return false;
+            }
+
+            throw e;
+        }
+    }
+
     async create(data: Partial<RegistryProject>, actor: ActorContext): Promise<RegistryProject> {
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
 
@@ -169,9 +181,13 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
         const entity = this.repository.create(validated);
 
-        // A project created here carries no realm: a global row, which only
-        // `ownOrNull`/`any` grants reach.
-        await assertRecordReach(actor, PermissionName.REGISTRY_PROJECT_MANAGE, { realmId: entity.realmId, attributes: entity });
+        // A project created here carries no realm (the validator mounts none):
+        // a global row, which only `ownOrNull`/`any` grants reach.
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.REGISTRY_PROJECT_MANAGE,
+            realm: entity.realmId ?? null,
+            data: { attributes: entity },
+        });
 
         const saved = await this.repository.save(entity, { data: actor.metadata });
 
@@ -192,12 +208,16 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
-        await assertRecordReach(actor, PermissionName.REGISTRY_PROJECT_MANAGE, { realmId: entity.realmId, attributes: entity });
-
         const previousExternalName = entity.externalName;
 
+        // Snapshot the stored row: typeorm's merge() writes into `entity`.
+        const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
-        await assertRecordReach(actor, PermissionName.REGISTRY_PROJECT_MANAGE, { realmId: merged.realmId, attributes: merged });
+        await evaluateRecordUpdate(actor.permissionEvaluator, {
+            name: PermissionName.REGISTRY_PROJECT_MANAGE,
+            current,
+            next: { realm: merged.realmId, data: { attributes: merged } },
+        });
 
         const saved = await this.repository.save(merged, { data: actor.metadata });
 
@@ -225,7 +245,11 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
-        await assertRecordReach(actor, PermissionName.REGISTRY_PROJECT_MANAGE, { realmId: entity.realmId, attributes: entity });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.REGISTRY_PROJECT_MANAGE,
+            realm: entity.realmId,
+            data: { attributes: entity },
+        });
 
         const entityId = entity.id;
 

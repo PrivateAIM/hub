@@ -22,7 +22,8 @@ import {
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions, assertRecordReach  } from '@privateaim/server-kit';
+import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
+import { evaluateRecord, evaluateRecordUpdate } from '@authup/access';
 import type { IProjectRepository } from '../project/types.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from '../analysis-node/types.ts';
@@ -161,7 +162,11 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         // matching once attribute policies are enabled, and a denylist-shaped one
         // then fails OPEN. See docs/src/guide/development/migration-camelcase.md
         // -> "Authup attribute policies".
-        await assertRecordReach(actor, PermissionName.ANALYSIS_CREATE, { realmId: entity.realmId, attributes: entity });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_CREATE,
+            realm: entity.realmId,
+            data: { attributes: entity },
+        });
 
         await this.repository.save(entity, { data: actor.metadata });
 
@@ -234,18 +239,19 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: entity.realmId, attributes: entity });
-
         if (isPropertySet(validated, 'masterImageId')) {
             if (validated.masterImageId !== entity.masterImageId) {
                 validated.imageCommandArguments = null;
             }
         }
 
-        // The grant's policies bind the target state too (authup's evaluateUpdate).
-        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, {
-            realmId: entity.realmId,
-            attributes: this.repository.merge({ ...entity }, validated),
+        // The stored row and the target state (merged into a copy: the row
+        // itself is written through the lock below).
+        const next = this.repository.merge({ ...entity }, validated);
+        await evaluateRecordUpdate(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            current: { realm: entity.realmId, data: { attributes: entity } },
+            next: { realm: next.realmId, data: { attributes: next } },
         });
 
         // merged into the locked row, not the copy read above: save() diffs
@@ -281,7 +287,11 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        await assertRecordReach(actor, PermissionName.ANALYSIS_DELETE, { realmId: entity.realmId, attributes: entity });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_DELETE,
+            realm: entity.realmId,
+            data: { attributes: entity },
+        });
 
         const { project } = entity;
         const entityId = entity.id;
@@ -318,7 +328,11 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
 
-        await assertRecordReach(actor, permissionName, { realmId: entity.realmId, attributes: entity });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: permissionName,
+            realm: entity.realmId,
+            data: { attributes: entity },
+        });
 
         const persistCtx = { data: actor.metadata };
 

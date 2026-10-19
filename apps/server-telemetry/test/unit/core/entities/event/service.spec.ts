@@ -7,8 +7,8 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Event } from '@privateaim/telemetry-kit';
-import { BuiltInPolicyType } from '@authup/access';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
+import { EntityNotFoundError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import { eq } from '@rapiq/core';
 import {
@@ -109,10 +109,10 @@ describe('EventService', () => {
             expect(actor.permissionEvaluator.compileCalls[0].name).toEqual(names);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             await expect(
                 service.getMany({}, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
     });
 
@@ -139,13 +139,13 @@ describe('EventService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const event = createTestEvent({ id: 'e-1' });
             repository.seed(event);
 
             await expect(
                 service.getOne('e-1', createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
     });
 
@@ -166,7 +166,7 @@ describe('EventService', () => {
             expect(repository.getAll()).toHaveLength(1);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             await expect(
                 service.create(
                     {
@@ -176,7 +176,7 @@ describe('EventService', () => {
                     },
                     createDenyAllActor(),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should set realmId from actor when not provided', async () => {
@@ -212,7 +212,7 @@ describe('EventService', () => {
             expect(result.realmId).toBe(actor.realm!.id);
         });
 
-        it('should throw PermissionDeniedError when an own-scoped grant targets another realm', async () => {
+        it('should deny when an own-scoped grant targets another realm', async () => {
             await expect(
                 service.create(
                     {
@@ -223,7 +223,7 @@ describe('EventService', () => {
                     },
                     createScopedActor({ realmScope: 'own' }),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(0);
         });
 
@@ -277,13 +277,13 @@ describe('EventService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const event = createTestEvent();
             repository.seed(event);
 
             await expect(
                 service.delete(event.id, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -292,13 +292,13 @@ describe('EventService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw PermissionDeniedError when the grant does not reach the event realm', async () => {
+        it('should deny when the grant does not reach the event realm', async () => {
             const event = createTestEvent({ realmId: 'other-realm' });
             repository.seed(event);
 
             await expect(
                 service.delete(event.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(1);
         });
 
@@ -313,13 +313,13 @@ describe('EventService', () => {
             expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.EVENT_DELETE);
         });
 
-        it('should throw PermissionDeniedError for a realm-less event with an own-scoped grant', async () => {
+        it('should deny for a realm-less event with an own-scoped grant', async () => {
             const event = createTestEvent({ realmId: null });
             repository.seed(event);
 
             await expect(
                 service.delete(event.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(1);
         });
 

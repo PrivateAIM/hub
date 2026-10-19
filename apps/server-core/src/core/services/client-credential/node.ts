@@ -9,7 +9,7 @@ import type { Node } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { reachesRecord } from '@privateaim/server-kit';
+import { reachesRecord } from '@authup/access';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type {
     ClientCredentials,
@@ -96,6 +96,10 @@ export class NodeClientCredentialService implements INodeClientCredentialService
             return true;
         }
 
-        return reachesRecord(actor, PermissionName.NODE_UPDATE, { realmId: node.realmId, attributes: node });
+        return reachesRecord(actor.permissionEvaluator, {
+            name: PermissionName.NODE_UPDATE,
+            realm: node.realmId,
+            data: { attributes: node },
+        });
     }
 }

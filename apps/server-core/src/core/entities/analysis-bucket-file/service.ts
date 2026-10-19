@@ -12,13 +12,13 @@ import { AnalysisBucketFileValidator, AnalysisBucketType, AnalysisNodeApprovalSt
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
 import {
-    AbstractEntityService,
-    appendQueryConditions,
-    assertRecordReach,
+    evaluateRecord,
+    evaluateRecordUpdate,
     hasUnboundedReach,
-    isPermissionDenial,
-} from '@privateaim/server-kit';
+    isPermissionError,
+} from '@authup/access';
 import type { BucketFile } from '@privateaim/storage-kit';
 import type {
     AnalysisBucketUploadRemoval,
@@ -111,7 +111,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
                 approvedOnly: true,
             });
         } catch (e) {
-            if (!isPermissionDenial(e)) {
+            if (!isPermissionError(e)) {
                 throw e;
             }
 
@@ -202,17 +202,23 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
-        await this.assertOwner(actor, analysis, entity);
+
+        // The analysis' realm writes the file, before and after (D3). The stored
+        // row is snapshotted, since typeorm's merge() writes into `entity`.
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
+        const current = { realm: analysis.realmId, data: { attributes: { ...entity } } };
+        const merged = this.repository.merge(entity, validated);
+        await evaluateRecordUpdate(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            current,
+            next: { realm: analysis.realmId, data: { attributes: merged } },
+        });
+
         await this.assertBucketWritable(actor, bucket, analysis);
 
         if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
             throw new BadRequestError('Only a code file can be the root file.');
         }
-
-        const merged = this.repository.merge(entity, validated);
-
-        // The grant's policies bind the target state too (authup's evaluateUpdate).
-        await this.assertOwner(actor, analysis, merged);
 
         const saved = await this.repository.save(merged, { data: actor.metadata });
 
@@ -362,13 +368,17 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
     /** The system: a grant reaching every realm unconditionally (plan 021, Q4). */
     protected async isSystem(actor: ActorContext): Promise<boolean> {
-        return hasUnboundedReach(actor, PermissionName.ANALYSIS_UPDATE);
+        return hasUnboundedReach(actor.permissionEvaluator, PermissionName.ANALYSIS_UPDATE);
     }
 
     /** The analysis' realm writes the file, whichever realm uploaded it (D3). */
     protected async assertOwner(actor: ActorContext, analysis: Analysis, file: Partial<AnalysisBucketFile>): Promise<void> {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
-        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: analysis.realmId, attributes: file });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            realm: analysis.realmId,
+            data: { attributes: file },
+        });
     }
 
     protected assertUnlocked(analysis: Analysis): void {
