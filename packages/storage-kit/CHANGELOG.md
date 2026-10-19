@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* assertRecordReach, reachesRecord, hasUnboundedReach, holdsPermission, isPermissionDenial, buildRecordPolicyData and RecordReach are removed from @privateaim/server-kit. The server-test-kit actor fakes deny with authup's PermissionError instead of PermissionDeniedError.
+
+### Features
+
+* adopt authup 1.0.0-beta.70 ([#1970](https://github.com/PrivateAIM/hub/issues/1970)) ([5cdba0f](https://github.com/PrivateAIM/hub/commit/5cdba0f8c1b5762b22c3808f21a9055f4d70531a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/errors bumped from ^0.18.0 to ^0.18.1
+  * devDependencies
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
 
 

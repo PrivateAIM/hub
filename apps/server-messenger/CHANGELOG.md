@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* assertRecordReach, reachesRecord, hasUnboundedReach, holdsPermission, isPermissionDenial, buildRecordPolicyData and RecordReach are removed from @privateaim/server-kit. The server-test-kit actor fakes deny with authup's PermissionError instead of PermissionDeniedError.
+* the kit *Caller classes are renamed to *Dispatcher and their call* methods to dispatch* (e.g. AnalysisBuilderComponentCaller.callExecute -> AnalysisBuilderComponentDispatcher.dispatchExecute, BucketFileTaskCaller -> BucketFileTaskDispatcher, LogComponentCaller.callWrite -> LogComponentDispatcher.dispatchWrite), with no aliases. They extend hubwire's RemoteDispatcher: their options no longer take hooks and the inherited call() is dispatch(). server-kit removes createDispatchCallerLogHooks and renames createWorkerCallerLogHooks to createRemoteWorkerLogHooks. Consumers of the kits need hubwire installed instead of synergos.
+* hub caller subclasses (BucketComponentCaller, LogComponentCaller, AnalysisBuilderComponentCaller, ...) require `messageBus`; server-kit, server-core-worker-kit, server-storage-kit and server-telemetry-kit depend on synergos instead of ergos.
+
+### Features
+
+* adopt authup 1.0.0-beta.70 ([#1970](https://github.com/PrivateAIM/hub/issues/1970)) ([5cdba0f](https://github.com/PrivateAIM/hub/commit/5cdba0f8c1b5762b22c3808f21a9055f4d70531a))
+
+
+### Code Refactoring
+
+* components and message bus come from synergos ([#1965](https://github.com/PrivateAIM/hub/issues/1965)) ([dbbbbfb](https://github.com/PrivateAIM/hub/commit/dbbbbfb55bfdce82ee892cd15707b13eb88d75f9))
+* migrate from synergos to hubwire 0.2 ([#1968](https://github.com/PrivateAIM/hub/issues/1968)) ([a051e5f](https://github.com/PrivateAIM/hub/commit/a051e5ffddbdc7ccae58d119a0d92d93842d6e12))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/errors bumped from ^0.18.0 to ^0.18.1
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/messenger-kit bumped from ^0.16.2 to ^0.17.0
+    * @privateaim/server-db-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-http-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-realtime-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-telemetry-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/telemetry-kit bumped from ^0.18.0 to ^0.19.0
+  * devDependencies
+    * @privateaim/messenger-http-kit bumped from ^0.16.2 to ^0.17.0
+    * @privateaim/server-test-kit bumped from ^0.18.0 to ^0.19.0
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
 
 

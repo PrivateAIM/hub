@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* assertRecordReach, reachesRecord, hasUnboundedReach, holdsPermission, isPermissionDenial, buildRecordPolicyData and RecordReach are removed from @privateaim/server-kit. The server-test-kit actor fakes deny with authup's PermissionError instead of PermissionDeniedError.
+* createMasterRealmActor and createNonMasterRealmActor are removed from @privateaim/server-test-kit (use createAllowAllActor / createScopedActor). hasUnboundedReach and assertRecordReach take Pick<ActorContext, 'permissionEvaluator'>. Master-realm clients without unbounded grants are no longer exempt from rate limiting or admitted to foreign realm namespaces.
+* provision `analysis_read` in Authup before upgrading (until then every node save fails), grant it to roles that view analyses, and grant cross-realm roles - including a non-`system` worker client - their analysis permissions at realm_scope `any`. Master-realm users are no longer able to read every realm's analyses by realm name alone.
+
+### Features
+
+* adopt authup 1.0.0-beta.70 ([#1970](https://github.com/PrivateAIM/hub/issues/1970)) ([5cdba0f](https://github.com/PrivateAIM/hub/commit/5cdba0f8c1b5762b22c3808f21a9055f4d70531a))
+* realtime namespaces and rate-limit exemption reach through realm_scope ([#1964](https://github.com/PrivateAIM/hub/issues/1964)) ([e42cd06](https://github.com/PrivateAIM/hub/commit/e42cd0637fad827f72a222077c9fc2c2549f093a))
+* require analysis_read and participation reach for analysis reads ([#1955](https://github.com/PrivateAIM/hub/issues/1955)) ([9e798d6](https://github.com/PrivateAIM/hub/commit/9e798d647fa957854bb6f22c92956a4c40aa952b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/client-vue-theme bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/core-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/storage-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/telemetry-kit bumped from ^0.18.0 to ^0.19.0
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
 
 

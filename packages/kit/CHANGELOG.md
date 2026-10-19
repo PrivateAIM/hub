@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* assertRecordReach, reachesRecord, hasUnboundedReach, holdsPermission, isPermissionDenial, buildRecordPolicyData and RecordReach are removed from @privateaim/server-kit. The server-test-kit actor fakes deny with authup's PermissionError instead of PermissionDeniedError.
+* writes need grants whose realm_scope reaches the record's realm — master-realm users with `own` grants write only in the master realm. analysis_node_log_create must be provisioned in Authup before upgrading. Analysis commands need analysis_execution_start or analysis_update. node.clientId can no longer be set over the API.
+* provision `analysis_read` in Authup before upgrading (until then every node save fails), grant it to roles that view analyses, and grant cross-realm roles - including a non-`system` worker client - their analysis permissions at realm_scope `any`. Master-realm users are no longer able to read every realm's analyses by realm name alone.
+
+### Features
+
+* adopt authup 1.0.0-beta.70 ([#1970](https://github.com/PrivateAIM/hub/issues/1970)) ([5cdba0f](https://github.com/PrivateAIM/hub/commit/5cdba0f8c1b5762b22c3808f21a9055f4d70531a))
+* record writes reach through grant realm_scope ([#1961](https://github.com/PrivateAIM/hub/issues/1961)) ([eba3ef8](https://github.com/PrivateAIM/hub/commit/eba3ef8f25c39cebea8f8285628f88fdb0b81718))
+* require analysis_read and participation reach for analysis reads ([#1955](https://github.com/PrivateAIM/hub/issues/1955)) ([9e798d6](https://github.com/PrivateAIM/hub/commit/9e798d647fa957854bb6f22c92956a4c40aa952b))
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
 
 
