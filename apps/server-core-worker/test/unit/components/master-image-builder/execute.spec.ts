@@ -57,11 +57,13 @@ async function writeFixture() {
 }
 
 describe('MasterImageBuilderExecuteHandler', () => {
+    // a CI runner's docker daemon can take longer than the 10 s hook default
+    // to remove an image
     afterAll(async () => {
         await docker.getImage(TAG).remove({ force: true }).catch(() => { /* never built */ });
 
         fs.rmSync(directory, { recursive: true, force: true });
-    });
+    }, 60_000);
 
     it('should build the image from the master image directory', async () => {
         await writeFixture();
