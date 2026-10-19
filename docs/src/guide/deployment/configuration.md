@@ -266,6 +266,12 @@ the creator was recorded have no owner, so only `bucket_update` holders can
 upload into them. Analysis buckets (which carry a `refId`) are unchanged: their
 uploads are still checked by server-core when it registers them.
 
+Analysis buckets created before `refType`/`refId` existed carry no ref.
+Migration `1788900000000-BackfillAnalysisBucketRefs` recovers it from the bucket
+name (`analysis-<type>-files.<analysisId>`), so node and analysis uploads into
+older analyses keep working. A duplicate that the `1788600000000` migration
+detached stays ref-less; server-core does not link it.
+
 ## Reading nodes, master images, registries, registry projects and events requires `*_read`
 
 **Breaking for every deployment.** Listing or reading these entities now needs a
