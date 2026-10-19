@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-telemetry-kit",
     "type": "module",
-    "version": "0.18.0",
+    "version": "0.19.0",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "files": [
@@ -27,15 +27,15 @@
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
-        "@privateaim/kit": "^0.18.0",
-        "@privateaim/server-kit": "^0.18.0",
-        "@privateaim/telemetry-kit": "^0.18.0",
+        "@privateaim/kit": "^0.19.0",
+        "@privateaim/server-kit": "^0.19.0",
+        "@privateaim/telemetry-kit": "^0.19.0",
         "vitest": "^4.1.11"
     },
     "peerDependencies": {
-        "@privateaim/kit": "^0.18.0",
-        "@privateaim/server-kit": "^0.18.0",
-        "@privateaim/telemetry-kit": "^0.18.0"
+        "@privateaim/kit": "^0.19.0",
+        "@privateaim/server-kit": "^0.19.0",
+        "@privateaim/telemetry-kit": "^0.19.0"
     },
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",

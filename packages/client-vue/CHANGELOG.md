@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* assertRecordReach, reachesRecord, hasUnboundedReach, holdsPermission, isPermissionDenial, buildRecordPolicyData and RecordReach are removed from @privateaim/server-kit. The server-test-kit actor fakes deny with authup's PermissionError instead of PermissionDeniedError.
+* createMasterRealmActor and createNonMasterRealmActor are removed from @privateaim/server-test-kit (use createAllowAllActor / createScopedActor). hasUnboundedReach and assertRecordReach take Pick<ActorContext, 'permissionEvaluator'>. Master-realm clients without unbounded grants are no longer exempt from rate limiting or admitted to foreign realm namespaces.
+* server-kit no longer exports Cache, CacheModule, CacheInjectionKey, CACHE_MODULE_NAME, buildCacheKey, CacheAdapter, MemoryCacheAdapter, RedisCacheAdapter, CacheSetOptions, CacheClearOptions or CacheKeyBuildOptions, and BaseApplicationBuilder.withCache() is gone.
+* reading analysis logs needs an analysis read permission and an approved node or the grant's reach; reading a node's logs needs analysis_update or analysis_approve; deleting logs needs analysis_update through the grant, not through taking part as a node.
+* these endpoints now need `analysis_read` (or an analysis write permission) and are narrowed to reach. Downloading or listing result files needs `analysis_result_read`; grant it to roles that read results.
+
+### Features
+
+* adopt authup 1.0.0-beta.70 ([#1970](https://github.com/PrivateAIM/hub/issues/1970)) ([5cdba0f](https://github.com/PrivateAIM/hub/commit/5cdba0f8c1b5762b22c3808f21a9055f4d70531a))
+* bucket uniqueness, transient worker retries, queue-only registry dispatch, dead routings and cache removal ([#1962](https://github.com/PrivateAIM/hub/issues/1962)) ([f9568e3](https://github.com/PrivateAIM/hub/commit/f9568e38374e0b56185d6b3b6d674e81edd49b6f))
+* realtime namespaces and rate-limit exemption reach through realm_scope ([#1964](https://github.com/PrivateAIM/hub/issues/1964)) ([e42cd06](https://github.com/PrivateAIM/hub/commit/e42cd0637fad827f72a222077c9fc2c2549f093a))
+* scope analysis buckets, files and node events to analysis reach ([#1957](https://github.com/PrivateAIM/hub/issues/1957)) ([da20dd5](https://github.com/PrivateAIM/hub/commit/da20dd5965de1d21f829965f141eb89924268848))
+* scope the analysis log proxies to analysis reach ([#1958](https://github.com/PrivateAIM/hub/issues/1958)) ([26a7f79](https://github.com/PrivateAIM/hub/commit/26a7f79a6e1fe364aca6e43666ee004a537c748d))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/core-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/core-realtime-kit bumped from ^0.18.0 to ^0.18.1
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/storage-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/telemetry-kit bumped from ^0.18.0 to ^0.19.0
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/core-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/storage-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/telemetry-kit bumped from ^0.18.0 to ^0.19.0
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
 
 

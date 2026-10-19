@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* assertRecordReach, reachesRecord, hasUnboundedReach, holdsPermission, isPermissionDenial, buildRecordPolicyData and RecordReach are removed from @privateaim/server-kit. The server-test-kit actor fakes deny with authup's PermissionError instead of PermissionDeniedError.
+* createMasterRealmActor and createNonMasterRealmActor are removed from @privateaim/server-test-kit (use createAllowAllActor / createScopedActor). hasUnboundedReach and assertRecordReach take Pick<ActorContext, 'permissionEvaluator'>. Master-realm clients without unbounded grants are no longer exempt from rate limiting or admitted to foreign realm namespaces.
+* writes need grants whose realm_scope reaches the record's realm — master-realm users with `own` grants write only in the master realm. analysis_node_log_create must be provisioned in Authup before upgrading. Analysis commands need analysis_execution_start or analysis_update. node.clientId can no longer be set over the API.
+
+### Features
+
+* adopt authup 1.0.0-beta.70 ([#1970](https://github.com/PrivateAIM/hub/issues/1970)) ([5cdba0f](https://github.com/PrivateAIM/hub/commit/5cdba0f8c1b5762b22c3808f21a9055f4d70531a))
+* realtime namespaces and rate-limit exemption reach through realm_scope ([#1964](https://github.com/PrivateAIM/hub/issues/1964)) ([e42cd06](https://github.com/PrivateAIM/hub/commit/e42cd0637fad827f72a222077c9fc2c2549f093a))
+* record writes reach through grant realm_scope ([#1961](https://github.com/PrivateAIM/hub/issues/1961)) ([eba3ef8](https://github.com/PrivateAIM/hub/commit/eba3ef8f25c39cebea8f8285628f88fdb0b81718))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-kit bumped from ^0.18.0 to ^0.19.0
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-kit bumped from ^0.18.0 to ^0.19.0
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.18.0) (2026-10-15)
 
 

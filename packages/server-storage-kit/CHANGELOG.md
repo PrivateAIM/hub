@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* the kit *Caller classes are renamed to *Dispatcher and their call* methods to dispatch* (e.g. AnalysisBuilderComponentCaller.callExecute -> AnalysisBuilderComponentDispatcher.dispatchExecute, BucketFileTaskCaller -> BucketFileTaskDispatcher, LogComponentCaller.callWrite -> LogComponentDispatcher.dispatchWrite), with no aliases. They extend hubwire's RemoteDispatcher: their options no longer take hooks and the inherited call() is dispatch(). server-kit removes createDispatchCallerLogHooks and renames createWorkerCallerLogHooks to createRemoteWorkerLogHooks. Consumers of the kits need hubwire installed instead of synergos.
+* hub caller subclasses (BucketComponentCaller, LogComponentCaller, AnalysisBuilderComponentCaller, ...) require `messageBus`; server-kit, server-core-worker-kit, server-storage-kit and server-telemetry-kit depend on synergos instead of ergos.
+* **server-core:** TaskManager and its types are removed from @privateaim/server-kit; IBucketCaller methods take no metadata argument. Stop old server-core replicas before new ones serve traffic: an old replica holding the ordered storageBucketEvents slot drops replies for creates a new replica sent (recover with the storageCheck command).
+
+### Code Refactoring
+
+* components and message bus come from synergos ([#1965](https://github.com/PrivateAIM/hub/issues/1965)) ([dbbbbfb](https://github.com/PrivateAIM/hub/commit/dbbbbfb55bfdce82ee892cd15707b13eb88d75f9))
+* migrate from synergos to hubwire 0.2 ([#1968](https://github.com/PrivateAIM/hub/issues/1968)) ([a051e5f](https://github.com/PrivateAIM/hub/commit/a051e5ffddbdc7ccae58d119a0d92d93842d6e12))
+* **server-core:** remove TaskManager, correlate bucket replies by their refs ([#1959](https://github.com/PrivateAIM/hub/issues/1959)) ([710729c](https://github.com/PrivateAIM/hub/commit/710729c47b57e2f43196629e17727b5eac598732))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/storage-kit bumped from ^0.18.0 to ^0.19.0
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/server-kit bumped from ^0.18.0 to ^0.19.0
+    * @privateaim/storage-kit bumped from ^0.18.0 to ^0.19.0
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.14.1...v0.18.0) (2026-10-15)
 
 

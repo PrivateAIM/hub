@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.18.1](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.18.1) (2026-10-19)
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.8.42...v0.18.0) (2026-10-15)
 
 
