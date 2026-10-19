@@ -44,6 +44,7 @@ import { AnalysisReachService } from '../../../core/services/analysis-reach/inde
 import { MasterImageBuilderService } from '../../../core/services/index.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
+import { startComponentsInBackground } from '../../components/start/module.ts';
 import { ComponentsInjectionKey } from '../components/constants.ts';
 
 export class AggregatorsModule implements IModule {
@@ -157,8 +158,8 @@ export class AggregatorsModule implements IModule {
             ),
         ];
 
-        // Fire-and-forget: a stop() during a start() still leaves nothing subscribed.
-        void Promise.allSettled(this.aggregators.map((a) => a.start()));
+        // Fire-and-forget, but a failed start is logged: a stop() during a start() still leaves nothing subscribed.
+        void startComponentsInBackground(this.aggregators, logger);
     }
 
     async teardown(): Promise<void> {
