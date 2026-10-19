@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ITokenVerifier } from '@authup/server-adapter-kit';
+import type { ITokenCache, ITokenVerifier } from '@authup/server-adapter-kit';
 import type { Client as RedisClient } from 'redis-extension';
 import type { Client as AuthupClient, TokenCreator } from '@authup/core-http-kit';
 
@@ -23,6 +23,11 @@ export type AuthTokenVerifierCreateContext = {
      */
     clientId?: string,
     realm?: string,
+    /**
+     * The result cache. Defaults to Redis when `redisClient` is set, else
+     * process memory.
+     */
+    cache?: ITokenCache,
     redisClient?: RedisClient,
 };
 

@@ -16,7 +16,9 @@ import {
     RedisTokenCache,
     TokenVerifier,
 } from '@authup/server-adapter-kit';
+import { HubError } from '@privateaim/errors';
 import { assertIntrospectableToken } from '@privateaim/server-kit';
+import { VouchlyErrorCode, isVouchlyError } from 'vouchly';
 import type { AuthTokenVerifierCreateContext } from './types.ts';
 import { UnconfiguredTokenVerifier } from './unconfigured-token-verifier.ts';
 
@@ -40,8 +42,39 @@ import { UnconfiguredTokenVerifier } from './unconfigured-token-verifier.ts';
 export class IntrospectableTokenVerifier extends TokenVerifier {
     override async verify(token: string, options?: TokenVerifyOptions): Promise<TokenVerificationData> {
         assertIntrospectableToken(token);
-        return super.verify(token, options);
+
+        try {
+            return await super.verify(token, options);
+        } catch (e) {
+            throw toUpstreamError(e);
+        }
     }
+}
+
+/**
+ * vouchly reports every failed introspection request (authup unreachable,
+ * a 5xx or 429 answer, hub's own service credential refused, a failed token
+ * mint) as `introspection_failed`, which authup's adapter maps onto
+ * `invalid_token` — a 401 that makes every authup client hook drop its
+ * session, although the caller's token was never judged. Such a failure is
+ * answered 502 instead; a token authup did judge (inactive, expired,
+ * malformed) keeps its 401.
+ */
+function toUpstreamError(input: unknown): unknown {
+    if (
+        input instanceof Error &&
+        isVouchlyError(input.cause) &&
+        input.cause.code === VouchlyErrorCode.INTROSPECTION_FAILED
+    ) {
+        return new HubError({
+            code: 'upstream_error',
+            status: 502,
+            message: input.message,
+            cause: input,
+        });
+    }
+
+    return input;
 }
 
 /**
@@ -66,7 +99,9 @@ export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext): 
     }
 
     let cache : ITokenCache;
-    if (ctx.redisClient) {
+    if (ctx.cache) {
+        cache = ctx.cache;
+    } else if (ctx.redisClient) {
         cache = new RedisTokenCache(ctx.redisClient);
     } else {
         cache = new MemoryTokenCache();

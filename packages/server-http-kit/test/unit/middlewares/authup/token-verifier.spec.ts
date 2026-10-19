@@ -5,8 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isUnauthorizedError } from '@privateaim/errors';
-import { describe, expect, it } from 'vitest';
+import { once } from 'node:events';
+import type { Server } from 'node:http';
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
+import type { ITokenCache } from '@authup/server-adapter-kit';
+import { isHubError, isUnauthorizedError } from '@privateaim/errors';
+import {
+    afterEach, 
+    describe, 
+    expect, 
+    it,
+} from 'vitest';
 import {
     buildAuthupTokenCacheNamespace,
     createAuthupTokenVerifier,
@@ -111,5 +121,126 @@ describe('buildAuthupTokenCacheNamespace', () => {
 
     it('keeps authup\'s default without a client id', () => {
         expect(buildAuthupTokenCacheNamespace({ baseURL })).toBeUndefined();
+    });
+});
+
+/**
+ * An Authup that answers the introspection with a fixed status and body, and
+ * hands out a service token on any other path.
+ */
+async function serveAuthup(status: number, body: Record<string, any>): Promise<Server> {
+    const server = createServer((req, res) => {
+        res.writeHead(req.url?.startsWith('/token/introspect') ? status : 200, { 'content-type': 'application/json' });
+        res.end(JSON.stringify(req.url?.startsWith('/token/introspect') ?
+            body :
+            {
+                access_token: 'service-token', 
+                expires_in: 3600, 
+                token_type: 'Bearer', 
+            }));
+    });
+    server.listen(0, '127.0.0.1');
+    await once(server, 'listening');
+    return server;
+}
+
+function urlOf(server: Server): string {
+    return `http://127.0.0.1:${(server.address() as AddressInfo).port}/`;
+}
+
+/**
+ * vouchly reports a failed introspection request as `introspection_failed`,
+ * which authup's adapter turns into `invalid_token` (401) — a status every
+ * authup client hook answers by dropping its session, although the caller's
+ * token was never judged. Hub answers such a failure 502.
+ */
+describe('createAuthupTokenVerifier upstream failures', () => {
+    const servers: Server[] = [];
+
+    afterEach(async () => {
+        await Promise.all(servers.map((server) => new Promise((resolve) => {
+            server.close(resolve);
+        })));
+        servers.length = 0;
+    });
+
+    async function verifyAgainst(status: number, body: Record<string, any>): Promise<unknown> {
+        const server = await serveAuthup(status, body);
+        servers.push(server);
+
+        const verifier = createAuthupTokenVerifier({
+            baseURL: urlOf(server),
+            creator: async () => ({
+                access_token: 'service-token', 
+                expires_in: 3600, 
+                token_type: 'Bearer', 
+            }),
+        });
+
+        return verifier.verify(jws).then(() => undefined, (e: unknown) => e);
+    }
+
+    it.each([503, 500, 429])('answers 502 when the introspection endpoint answers %s', async (status) => {
+        const error = await verifyAgainst(status, { code: 'internal_error', message: 'down' });
+
+        expect(isHubError(error)).toBe(true);
+        expect(error).toMatchObject({ code: 'upstream_error', status: 502 });
+    });
+
+    it('answers 502 when Authup is unreachable', async () => {
+        const verifier = createAuthupTokenVerifier({
+            baseURL: 'http://127.0.0.1:1/',
+            creator: async () => ({
+                access_token: 'service-token', 
+                expires_in: 3600, 
+                token_type: 'Bearer', 
+            }),
+        });
+
+        const error = await verifier.verify(jws).then(() => undefined, (e: unknown) => e);
+
+        expect(error).toMatchObject({ code: 'upstream_error', status: 502 });
+    });
+
+    it('keeps the 401 of a token Authup judged inactive', async () => {
+        const error = await verifyAgainst(200, { active: false });
+
+        expect(isHubError(error)).toBe(false);
+        expect(error).toMatchObject({ code: 'inactive_token' });
+    });
+});
+
+/**
+ * The namespace must actually reach the cache: two verifiers introspecting as
+ * different clients write different keys for the same token.
+ */
+describe('createAuthupTokenVerifier cache namespace wiring', () => {
+    it('keys cached results by the introspecting client', async () => {
+        const keys: string[] = [];
+        const cache: ITokenCache = {
+            get: async (key) => {
+                keys.push(key);
+                return undefined;
+            },
+            set: async () => undefined,
+        };
+
+        for (const clientId of ['core', 'storage']) {
+            const verifier = createAuthupTokenVerifier({
+                baseURL: 'http://127.0.0.1:1/',
+                creator: async () => ({
+                    access_token: 'service-token', 
+                    expires_in: 3600, 
+                    token_type: 'Bearer', 
+                }),
+                clientId,
+                realm: 'master',
+                cache,
+            });
+            await verifier.verify(jws).catch(() => undefined);
+        }
+
+        expect(keys).toHaveLength(2);
+        expect(keys[0]).not.toEqual(keys[1]);
     });
 });
