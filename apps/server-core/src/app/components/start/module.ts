@@ -15,21 +15,17 @@ import type { IComponent } from 'hubwire';
  * consumer that never receives a message, and used to surface only as an
  * unhandled rejection. Each failure is logged at error level.
  *
- * Resolves once every start settled; it never rejects.
+ * Resolves once every start settled; it never rejects. Each failure is logged
+ * when it rejects, not when the slowest start settles.
  */
 export async function startComponentsInBackground(
     components: IComponent[],
     logger?: Logger,
 ): Promise<void> {
-    const results = await Promise.allSettled(components.map((component) => component.start()));
-
-    for (const result of results) {
-        if (result.status === 'rejected') {
-            const reason = result.reason instanceof Error ?
-                result.reason.message :
-                String(result.reason);
-
-            logger?.error(`A component failed to start and will not process any message: ${reason}`);
-        }
-    }
+    // each failure is logged as it happens: a start that never settles must
+    // not hold back the error of one that already failed.
+    await Promise.allSettled(components.map((component) => component.start().catch((e: unknown) => {
+        const reason = e instanceof Error ? e.message : String(e);
+        logger?.error(`A component failed to start and will not process any message: ${reason}`);
+    })));
 }

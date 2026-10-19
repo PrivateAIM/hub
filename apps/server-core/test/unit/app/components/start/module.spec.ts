@@ -13,9 +13,13 @@ import { FakeLogger } from '../../aggregators/fake-logger.ts';
 class FakeComponent implements IComponent {
     started = false;
 
-    constructor(protected failure?: Error) {}
+    constructor(protected failure?: Error, protected hang = false) {}
 
     async start(): Promise<void> {
+        if (this.hang) {
+            await new Promise(() => {});
+        }
+
         if (this.failure) {
             throw this.failure;
         }
@@ -46,6 +50,21 @@ describe('startComponentsInBackground', () => {
         expect(logger.entries).toHaveLength(1);
         expect(logger.entries[0].level).toBe('error');
         expect(logger.entries[0].message).toContain('storageBucketEvents');
+    });
+
+    it('should log a failed start without waiting for a start that never settles', async () => {
+        const logger = new FakeLogger();
+
+        // not awaited: the hanging start keeps the helper pending forever
+        void startComponentsInBackground([
+            new FakeComponent(undefined, true),
+            new FakeComponent(new Error('ACCESS_REFUSED')),
+        ], logger);
+
+        await new Promise((resolve) => { setImmediate(resolve); });
+
+        expect(logger.entries).toHaveLength(1);
+        expect(logger.entries[0].message).toContain('ACCESS_REFUSED');
     });
 
     it('should log nothing when every component starts', async () => {
