@@ -91,54 +91,70 @@ export class NodeClientService {
             // The node writes the logs of its own analysis runs.
             PermissionName.ANALYSIS_NODE_LOG_CREATE,
         ];
-        const permissionNamesAssigned: string[] = [];
-
-        const relationsToDelete: string[] = [];
+        const assigned = new Set<string>();
+        const rescoped: string[] = [];
+        const revoked: string[] = [];
         for (const clientPermission of clientPermissions) {
-            if (
-                !permissionNames.includes(clientPermission.permission.name) ||
-                clientPermission.realmScope !== REALM_SCOPE.NONE
-            ) {
-                relationsToDelete.push(clientPermission.id);
+            const { name } = clientPermission.permission;
+            if (!permissionNames.includes(name)) {
+                revoked.push(clientPermission.id);
                 continue;
             }
 
-            permissionNamesAssigned.push(clientPermission.permission.name);
-        }
-
-        if (relationsToDelete.length > 0) {
-            for (const element of relationsToDelete) {
-                await this.authup.clientPermission.delete(element);
+            if (clientPermission.realmScope !== REALM_SCOPE.NONE) {
+                rescoped.push(clientPermission.id);
+                continue;
             }
+
+            assigned.add(name);
         }
 
+        // Resolve every permission to grant BEFORE changing anything: a name
+        // missing in Authup must fail the sync with the client's grants
+        // untouched, not after the old ones were already revoked (which
+        // stripped node_read from every node client on an upgrade that ran
+        // before analysis_read was provisioned).
+        const permissions = new Map<string, Permission>();
         for (const permissionName of permissionNames) {
-            const index = permissionNamesAssigned.indexOf(permissionName);
-            if (index !== -1) {
-                continue;
+            if (!assigned.has(permissionName)) {
+                permissions.set(permissionName, await this.resolvePermission(permissionName));
             }
+        }
 
-            let permission: Permission;
+        // grant before revoking, so a failing request leaves the client with
+        // more than it needs rather than less. A re-scoped grant is the one
+        // exception: Authup keeps one grant per (client, permission), so it
+        // is replaced in place.
+        for (const id of rescoped) {
+            await this.authup.clientPermission.delete(id);
+        }
 
-            try {
-                const { data } = await this.authup.permission.getOne(permissionName);
-                permission = data;
-            } catch (e) {
-                if (!isClientErrorWithStatusCode(e, 404)) {
-                    throw e;
-                }
-
-                throw new Error(
-                    `The permission ${permissionName} is not provisioned in Authup, so it cannot be granted to node clients.`,
-                    { cause: e },
-                );
-            }
-
+        for (const permission of permissions.values()) {
             await this.authup.clientPermission.create({
                 clientId,
                 permissionId: permission.id,
                 realmScope: REALM_SCOPE.NONE,
             });
+        }
+
+        for (const id of revoked) {
+            await this.authup.clientPermission.delete(id);
+        }
+    }
+
+    protected async resolvePermission(permissionName: string): Promise<Permission> {
+        try {
+            const { data } = await this.authup.permission.getOne(permissionName);
+            return data;
+        } catch (e) {
+            if (!isClientErrorWithStatusCode(e, 404)) {
+                throw e;
+            }
+
+            throw new Error(
+                `The permission ${permissionName} is not provisioned in Authup, so it cannot be granted to node clients.`,
+                { cause: e },
+            );
         }
     }
 }

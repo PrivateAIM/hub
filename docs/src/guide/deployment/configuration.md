@@ -476,9 +476,10 @@ Behaviour changes on top:
 
 **Before upgrading:**
 
-1. Add `analysis_node_log_create` to your Authup provisioning. Until it exists,
-   every node save fails and every node client is logged as failed on each
-   hourly re-sync.
+1. Add `analysis_read` and `analysis_node_log_create` to your Authup
+   provisioning. Until both exist, every node save fails and every node client
+   is logged as failed on each hourly re-sync. The sync checks for both before
+   it changes anything, so a node client keeps its previous grants until then.
 2. Give every role that must write in other realms its permissions at
    `realm_scope: any`, and give roles that start builds or distributions
    `analysis_execution_start`.

@@ -201,7 +201,8 @@ describe('NodeClientService.assignPermissions', () => {
 
         await new NodeClientService(authup).assignPermissions('client-1');
 
-        expect(revocations(authup)).toEqual(['cp-update', 'cp-read', 'cp-log']);
+        // re-scoped grants are replaced first, unneeded ones revoked last
+        expect(revocations(authup)).toEqual(['cp-read', 'cp-log', 'cp-update']);
         expect(grants(authup)).toEqual([
             {
                 clientId: 'client-1', 
@@ -240,6 +241,32 @@ describe('NodeClientService.assignPermissions', () => {
         await new NodeClientService(authup).assignPermissions('client-1');
 
         expect(authup.requests.map((req) => req.method)).toEqual(['GET']);
+    });
+
+    it('should leave every existing grant in place when a permission is not provisioned', async () => {
+        // the upgrade from v0.18.0: node_read at the default scope plus
+        // analysis_update, run before analysis_read exists in Authup
+        const authup = createAuthup({
+            missing: [PermissionName.ANALYSIS_READ],
+            existing: [
+                {
+                    id: 'cp-update',
+                    permission: { name: PermissionName.ANALYSIS_UPDATE },
+                    realmScope: 'own',
+                },
+                {
+                    id: 'cp-node',
+                    permission: { name: PermissionName.NODE_READ },
+                    realmScope: 'own',
+                },
+            ],
+        });
+
+        await expect(new NodeClientService(authup).assignPermissions('client-1'))
+            .rejects.toThrow(PermissionName.ANALYSIS_READ);
+
+        expect(revocations(authup)).toEqual([]);
+        expect(grants(authup)).toEqual([]);
     });
 
     it('should throw when a permission is not provisioned in Authup', async () => {
