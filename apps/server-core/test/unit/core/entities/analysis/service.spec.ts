@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type {
     Analysis,
     AnalysisBucket,
@@ -22,7 +22,7 @@ import {
     NodeType,
     ProjectNodeApprovalStatus,
 } from '@privateaim/core-kit';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import {
     beforeEach,
@@ -186,7 +186,7 @@ describe('AnalysisService', () => {
         });
 
         it('should refuse an actor without any analysis read permission', async () => {
-            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionError);
         });
     });
 
@@ -497,7 +497,7 @@ describe('AnalysisService', () => {
             await expect(service.create(
                 { name: 'test-analysis', projectId: project.id },
                 createScopedActor({ realmId: 'realm-a', realmScope: 'own' }),
-            )).rejects.toThrow(PermissionDeniedError);
+            )).rejects.toThrow(PermissionError);
             expect(analysisRepository.getAll()).toHaveLength(0);
         });
     });
@@ -507,7 +507,7 @@ describe('AnalysisService', () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'realm-b' }));
 
             await expect(service.update('analysis-1', { name: 'updated' }, createScopedActor({ realmId: 'realm-a', realmScope: 'own' })))
-                .rejects.toThrow(PermissionDeniedError);
+                .rejects.toThrow(PermissionError);
             expect(analysisRepository.getAll()[0].name).not.toBe('updated');
         });
 
@@ -611,12 +611,12 @@ describe('AnalysisService', () => {
             expect(result.project.analyses).toBeGreaterThanOrEqual(0);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             analysisRepository.seed(createFullAnalysis());
 
             await expect(
                 service.delete('analysis-1', createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -631,7 +631,7 @@ describe('AnalysisService', () => {
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
             await expect(
                 service.delete('analysis-1', actor),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(await analysisRepository.findOneById('analysis-1')).not.toBeNull();
         });
 
@@ -669,7 +669,7 @@ describe('AnalysisService', () => {
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
             await expect(
                 service.executeCommand('analysis-1', AnalysisCommand.STORAGE_CHECK, actor),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(bucketDispatcher.getCallsFor('dispatchCreate')).toHaveLength(0);
         });
 
@@ -678,7 +678,7 @@ describe('AnalysisService', () => {
 
             await expect(
                 service.executeCommand('analysis-1', AnalysisCommand.STORAGE_CHECK, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it.each([

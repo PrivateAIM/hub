@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { PermissionError } from '@authup/access';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type { MasterImageGroup } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import {
@@ -56,7 +57,7 @@ describe('MasterImageGroupService', () => {
         });
 
         it('should reject without a read permission', async () => {
-            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionError);
             expect(repository.findManyCalls).toHaveLength(0);
         });
     });
@@ -79,7 +80,7 @@ describe('MasterImageGroupService', () => {
         it('should reject without a read permission', async () => {
             repository.seed(createTestMasterImageGroup());
 
-            await expect(service.getOne('mig-1', createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getOne('mig-1', createDenyAllActor())).rejects.toThrow(PermissionError);
         });
     });
 
@@ -92,12 +93,12 @@ describe('MasterImageGroupService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             repository.seed(createTestMasterImageGroup());
 
             await expect(
                 service.delete('mig-1', createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {

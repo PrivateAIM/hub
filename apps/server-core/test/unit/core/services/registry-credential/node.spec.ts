@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -51,7 +51,7 @@ function ownRealmGrantActor(realmId: string, permissions: string[]): ActorContex
                 ctx.data.get(BuiltInPolicyType.REALM_MATCH) === realmId;
 
             if (!held || !reached) {
-                throw new PermissionDeniedError();
+                throw PermissionError.evaluationFailed(ctx.name);
             }
         }),
         realm: { id: realmId, name: 'node-realm' },

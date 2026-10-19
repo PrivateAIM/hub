@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionError } from '@authup/access';
 import type { Analysis, Node } from '@privateaim/core-kit';
-import { PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import {
     and,
@@ -90,7 +90,7 @@ describe('AnalysisReachService', () => {
     });
 
     it('should refuse an actor holding none of them', async () => {
-        await expect(service.resolve(createDenyAllActor(), ANALYSIS)).rejects.toThrow(PermissionDeniedError);
+        await expect(service.resolve(createDenyAllActor(), ANALYSIS)).rejects.toThrow(PermissionError);
     });
 
     it('should not narrow for a grant reaching every realm', async () => {
@@ -290,7 +290,7 @@ describe('AnalysisReachService', () => {
             realmId: 'realm-a',
         };
 
-        await expect(service.resolve(actor, ANALYSIS)).rejects.toThrow(PermissionDeniedError);
+        await expect(service.resolve(actor, ANALYSIS)).rejects.toThrow(PermissionError);
     });
 
     it('should not let any other client participate through its realm', async () => {

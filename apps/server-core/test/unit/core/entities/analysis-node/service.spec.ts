@@ -14,7 +14,7 @@ import type {
 } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus, NodeType } from '@privateaim/core-kit';
 import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import {
     beforeEach,
@@ -183,7 +183,7 @@ describe('AnalysisNodeService', () => {
             await expect(service.create(
                 { analysisId, nodeId },
                 createScopedActor({ realmId: 'realm-2', realmScope: 'own' }),
-            )).rejects.toThrow(PermissionDeniedError);
+            )).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(0);
         });
 
@@ -554,6 +554,24 @@ describe('AnalysisNodeService', () => {
             repository.seed(node);
 
             await service.delete(node.id, createScopedActor({ realmId: 'realm-2', realmScope: 'own' }));
+
+            expect(repository.getAll()).toHaveLength(0);
+        });
+
+        // Either name suffices on the node side: an array passed to authup's
+        // `reachesRecord` would require BOTH, so this pins `reachesRecordOneOf`.
+        it('should let the node realm detach its own node with ANALYSIS_APPROVE alone', async () => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+            });
+            repository.seed(node);
+
+            await service.delete(node.id, createPermissionActor({
+                realm: { id: 'realm-2', name: 'realm-2' },
+                permissions: [PermissionName.ANALYSIS_APPROVE],
+            }));
 
             expect(repository.getAll()).toHaveLength(0);
         });

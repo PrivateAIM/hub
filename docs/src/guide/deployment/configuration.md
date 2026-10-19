@@ -206,11 +206,12 @@ acted on it as that client.
 
 Every Hub service now refuses a credential that is not structurally a compact
 JWS within those bounds **before** introspecting it, answering 401 (sockets:
-connection refused). The fallback itself is fixed upstream in authup#3724;
-upgrading Authup to the first release after `1.0.0-beta.69` closes the upstream
-half, until then the Hub-side guard is what stops it. Any
-token-verifier cache (Redis `token:*` keys) may hold entries for such strings —
-flush it once after upgrading.
+connection refused). The fallback itself is fixed upstream in authup#3724,
+released in Authup `1.0.0-beta.70`. Authup's own beta.70 token verifier
+still sends such a token to introspection, so against an older Authup server
+Hub's guard (`IntrospectableTokenVerifier`, which refuses the token before
+introspecting it) is what stops it. Entries cached for such strings sit under Redis `token:*` keys,
+which Hub no longer reads since the [beta.70 upgrade](#authup-upgrade-to-beta-70).
 
 ## Attaching nodes to a project requires `project_update`
 
@@ -529,6 +530,54 @@ Authup deployment Hub runs against:
   and `Secure` on https. Behind a TLS-terminating proxy, forward
   `X-Forwarded-Proto` (the [reverse proxy](./reverse-proxy.md) example already
   does) so server-side cookie writes in client-ui get `Secure` too.
+
+## Authup upgrade to beta.70
+
+Hub now requires Authup `1.0.0-beta.70`. Read the
+[Authup upgrade guide](https://authup.org/guide/deployment/upgrading) for the
+release. Hub needs no data changes; these points concern Hub's services and the
+Authup deployment they run against:
+
+- **Token verification moved to vouchly.** Hub verifies every token by
+  introspection, as before. Results are now cached in Redis under `vouchly:*`
+  keys; the `token:*` keys written by earlier versions are not read again and
+  expire with their tokens. A cached result is still served until the token's
+  `exp`, so a revoked token keeps working until then.
+- **Cached results are kept per Authup client.** Authup only reports a token
+  active to a client allowed to introspect it, so a result is cached for the
+  client that asked. Services using the same Redis and `AUTHUP_URL` reuse each
+  other's results only when they authenticate as the same client (the default,
+  `system` for all of them); services with their own clients each introspect a
+  token once.
+- **An Authup outage answers 502.** When Hub cannot get an answer about a
+  token (Authup unreachable, answering 5xx or 429, or refusing Hub's own
+  service credential), the request answers 502 `upstream_error`. A token
+  Authup judged (inactive, expired) still answers 401. Before this release an
+  unreachable Authup answered 401, which made `client-ui` sign the user out.
+- **The malformed-bearer fix is complete.** Authup now answers a malformed
+  token `active: false` itself (see
+  [Malformed bearer tokens](#malformed-bearer-tokens-no-longer-authenticate)).
+  Hub keeps its own check as defence in depth: it still protects a deployment
+  that upgrades Hub before its Authup server.
+- **Realm and self-service grants are checked for realm reach.** In Authup,
+  `realm_update` and `realm_delete` at the default `own` reach now manage only
+  the actor's own realm. Grant them at `any` to admins who manage other realms
+  from Hub's realm pages. The built-in `admin` role already has `any`. A
+  `user_self_manage` or `client_self_manage` grant stored at `realmScope: none`
+  no longer permits self-edits in the account console; grant it at `own`.
+- **Attribute-policy grants no longer join realm realtime rooms.** A grant
+  carrying an `attributes` / `attributeNames` policy no longer admits its
+  holder to rooms in a realm namespace (`/resources/<realmId>`): a room has no
+  row to evaluate the policy against, so it fails closed. HTTP reads and writes
+  evaluate such policies against the record and are unaffected.
+- **`registry_manage` reveals registry-project secrets only in its reach.** A
+  grant at `own` (or `ownOrNull`) returns `accountSecret` only for projects in
+  the realms it reaches; before, any `registry_manage` grant revealed the
+  secret of every registry project the caller could read.
+- **RSA signing keys must be at least 2048 bits.** Hub verifies by
+  introspection, so it does not check key size itself. Authup now refuses to
+  import a shorter key, and its own adapters reject tokens signed with one.
+  Replace any shorter imported key as the Authup guide describes.
 
 ## Database Variables
 

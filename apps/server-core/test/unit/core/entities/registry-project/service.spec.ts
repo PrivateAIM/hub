@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -122,13 +122,15 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor('realm-1');
             await service.getMany({}, actor);
 
-            expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
+            const manage = actor.permissionEvaluator.evaluateCalls
+                .find((call) => call.name === PermissionName.REGISTRY_MANAGE);
+            expect(manage?.data?.get(BuiltInPolicyType.REALM_MATCH)).toBe('realm-1');
         });
 
         it('should reject without a read permission', async () => {
             const actor = createDenyAllActor();
 
-            await expect(service.getMany({}, actor)).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({}, actor)).rejects.toThrow(PermissionError);
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toMatchObject({ name: READ_PERMISSIONS });
         });
 
@@ -161,7 +163,7 @@ describe('RegistryProjectService', () => {
                 realmId: 'realm-1',
             };
 
-            await expect(service.getMany({}, actor)).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({}, actor)).rejects.toThrow(PermissionError);
         });
 
         it('should apply a read grant a node-client holds instead of narrowing it to its own project', async () => {
@@ -185,12 +187,12 @@ describe('RegistryProjectService', () => {
             actor.permissionEvaluator.setBehavior(({ method, ctx }) => {
                 const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
                 if (method === 'preEvaluateOneOf' && names.includes(PermissionName.REGISTRY_READ)) {
-                    throw new PermissionDeniedError();
+                    throw PermissionError.deniedAll(names);
                 }
             });
 
             await expect(service.getMany({}, actor)).resolves.toBeDefined();
-            await expect(service.getMany({ include: 'registry' }, actor)).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({ include: 'registry' }, actor)).rejects.toThrow(PermissionError);
         });
 
         describe('by compile verdict', () => {
@@ -246,7 +248,7 @@ describe('RegistryProjectService', () => {
 
             await expect(
                 service.getOne('rp-1', createDenyAllActor('realm-1')),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should answer an out-of-reach row like a missing one', async () => {
@@ -270,7 +272,37 @@ describe('RegistryProjectService', () => {
             const actor = createAllowAllActor('realm-1');
             await service.getOne('rp-1', actor);
 
-            expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
+            const manage = actor.permissionEvaluator.evaluateCalls
+                .find((call) => call.name === PermissionName.REGISTRY_MANAGE);
+            expect(manage?.data?.get(BuiltInPolicyType.REALM_MATCH)).toBe('realm-1');
+        });
+
+        it('should not reveal a secret outside the realm a REGISTRY_MANAGE grant reaches', async () => {
+            repository.seed(createTestRegistryProject({
+                id: 'rp-1', 
+                accountSecret: 'secret', 
+                realmId: 'realm-2', 
+            }));
+
+            // Reads reach every realm; REGISTRY_MANAGE is evaluated at `own`.
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            await expect(service.getOne('rp-1', actor)).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should reveal a secret inside the realm a REGISTRY_MANAGE grant reaches', async () => {
+            repository.seed(createTestRegistryProject({
+                id: 'rp-1', 
+                accountSecret: 'secret', 
+                realmId: 'realm-1', 
+            }));
+
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+            const result = await service.getOne('rp-1', actor);
+            expect(result.accountSecret).toBe('secret');
         });
 
         it('should allow node-client to access own registry project secret', async () => {
@@ -372,7 +404,7 @@ describe('RegistryProjectService', () => {
             expect(registryManager.getLinkCalls()).toHaveLength(1);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             await expect(
                 service.create(
                     {
@@ -383,7 +415,7 @@ describe('RegistryProjectService', () => {
                     },
                     createDenyAllActor(),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         // A project created here carries no realm: a global row.
@@ -397,7 +429,7 @@ describe('RegistryProjectService', () => {
 
             await expect(
                 service.create(data, createScopedActor({ realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(0);
             expect(registryManager.getLinkCalls()).toHaveLength(0);
 
@@ -426,13 +458,13 @@ describe('RegistryProjectService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const project = createTestRegistryProject();
             repository.seed(project);
 
             await expect(
                 service.update(project.id, { name: 'updated-project' }, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should deny updating a project in a realm the grant does not reach', async () => {
@@ -441,7 +473,7 @@ describe('RegistryProjectService', () => {
 
             await expect(
                 service.update(project.id, { name: 'updated-project' }, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(registryManager.getLinkCalls()).toHaveLength(0);
         });
 
@@ -451,7 +483,7 @@ describe('RegistryProjectService', () => {
 
             await expect(
                 service.update(project.id, { name: 'updated-project' }, createScopedActor({ realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
 
             const result = await service.update(project.id, { name: 'updated-project' }, createScopedActor({ realmScope: 'ownOrNull' }));
             expect(result.name).toBe('updated-project');
@@ -511,13 +543,13 @@ describe('RegistryProjectService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const project = createTestRegistryProject();
             repository.seed(project);
 
             await expect(
                 service.delete(project.id, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -532,7 +564,7 @@ describe('RegistryProjectService', () => {
 
             await expect(
                 service.delete(project.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(1);
         });
 

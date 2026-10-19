@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { hasUnboundedReach } from '@authup/access';
 import { PermissionName } from '@privateaim/kit';
-import { hasUnboundedReach } from '@privateaim/server-kit';
 import type { OptionsInput } from '@routup/rate-limit';
 import { rateLimit } from '@routup/rate-limit';
 import type { App, IAppEvent } from 'routup';
@@ -27,7 +27,7 @@ export function mountRateLimiterMiddleware(app: App) {
             // a client whose grants reach every realm (`realm_scope: any`, no policy) for
             // EVERY hub permission. One name per call: several names compile as any-of.
             const verdicts = await Promise.all(PERMISSION_NAMES.map(
-                (name) => hasUnboundedReach({ permissionEvaluator }, name),
+                (name) => hasUnboundedReach(permissionEvaluator, name),
             ));
             return verdicts.every(Boolean);
         },

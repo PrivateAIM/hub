@@ -6,8 +6,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BuiltInPolicyType } from '@authup/access';
-import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
+import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { Project } from '@privateaim/core-kit';
 import {
     beforeEach,
@@ -111,7 +111,7 @@ describe('ProjectService', () => {
 
             await expect(
                 service.create({}, createScopedActor({ realmScope: 'none' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(1);
         });
     });
@@ -122,7 +122,7 @@ describe('ProjectService', () => {
 
             await expect(
                 service.update('project-1', { displayName: 'renamed' }, createScopedActor({ realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should evaluate both the stored and the merged project', async () => {
@@ -158,12 +158,12 @@ describe('ProjectService', () => {
             ).rejects.toThrow(BadRequestError);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             repository.seed(createTestProject());
 
             await expect(
                 service.delete('project-1', createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -177,7 +177,7 @@ describe('ProjectService', () => {
 
             await expect(
                 service.delete('project-1', createScopedActor({ realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(1);
         });
 

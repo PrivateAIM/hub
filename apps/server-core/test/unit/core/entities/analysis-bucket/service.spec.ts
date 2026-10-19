@@ -6,15 +6,10 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import type { Analysis, AnalysisBucket, Node } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
-import {
-    BadRequestError,
-    EntityConflictError,
-    EntityNotFoundError,
-    PermissionDeniedError,
-} from '@privateaim/errors';
+import { BadRequestError, EntityConflictError, EntityNotFoundError } from '@privateaim/errors';
 import {
     beforeEach,
     describe,
@@ -261,7 +256,7 @@ describe('AnalysisBucketService', () => {
                     type: AnalysisBucketType.CODE,
                 },
                 createScopedActor({ realmId: 'other-realm', realmScope: 'own' }),
-            )).rejects.toThrow(PermissionDeniedError);
+            )).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(0);
         });
 
@@ -302,7 +297,7 @@ describe('AnalysisBucketService', () => {
                     type: AnalysisBucketType.CODE,
                 },
                 createDenyAllActor('realm-1'),
-            )).rejects.toThrow(PermissionDeniedError);
+            )).rejects.toThrow(PermissionError);
         });
     });
 
@@ -327,7 +322,7 @@ describe('AnalysisBucketService', () => {
 
             await expect(
                 service.update(bucket.id, {}, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should deny the owner realm without analysis_update', async () => {
@@ -336,7 +331,7 @@ describe('AnalysisBucketService', () => {
 
             await expect(
                 service.update(bucket.id, {}, createDenyAllActor('realm-1')),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should evaluate both the stored and the merged row', async () => {
@@ -381,7 +376,7 @@ describe('AnalysisBucketService', () => {
 
             await expect(
                 service.delete(bucket.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should deny the owner realm without analysis_update', async () => {
@@ -390,7 +385,7 @@ describe('AnalysisBucketService', () => {
 
             await expect(
                 service.delete(bucket.id, createDenyAllActor('realm-1')),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(1);
         });
 

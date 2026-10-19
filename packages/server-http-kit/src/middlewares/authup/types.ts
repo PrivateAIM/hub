@@ -5,13 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ITokenVerifier } from '@authup/server-adapter-kit';
+import type { ITokenCache, ITokenVerifier } from '@authup/server-adapter-kit';
 import type { Client as RedisClient } from 'redis-extension';
 import type { Client as AuthupClient, TokenCreator } from '@authup/core-http-kit';
 
 export type AuthTokenVerifierCreateContext = {
+    /**
+     * The Authup URL. Without it the verifier refuses every token.
+     */
     baseURL?: string,
     creator: TokenCreator,
+    /**
+     * The Authup client `creator` mints its introspection token for (and its
+     * realm). Set, it gives that client its own result-cache namespace, so a
+     * service introspecting with a different client never serves another
+     * client's cached result. Every hub service passes its own.
+     */
+    clientId?: string,
+    realm?: string,
+    /**
+     * The result cache. Defaults to Redis when `redisClient` is set, else
+     * process memory.
+     */
+    cache?: ITokenCache,
     redisClient?: RedisClient,
 };
 

@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import type { Node, Project, ProjectNode } from '@privateaim/core-kit';
 import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -150,13 +150,13 @@ describe('ProjectNodeService', () => {
             expect(result.nodeRealmId).toBe('realm-1');
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             await expect(
                 service.create(
                     { projectId, nodeId },
                     createDenyAllActor(),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should require PROJECT_UPDATE to attach nodes, even for the project creator', async () => {
@@ -171,7 +171,7 @@ describe('ProjectNodeService', () => {
                         permissions: [PermissionName.PROJECT_CREATE],
                     }),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
 
             const result = await service.create(
                 { projectId, nodeId },
@@ -192,7 +192,7 @@ describe('ProjectNodeService', () => {
                     { projectId, nodeId },
                     createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should attach a node of another realm when the grant reaches the project realm', async () => {
@@ -279,13 +279,13 @@ describe('ProjectNodeService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const pn = createTestProjectNode();
             repository.seed(pn);
 
             await expect(
                 service.update(pn.id, {}, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         // Approval is the node's decision: reaching the project realm is not enough.
@@ -299,7 +299,7 @@ describe('ProjectNodeService', () => {
                     { approvalStatus: ProjectNodeApprovalStatus.APPROVED },
                     createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()[0].approvalStatus).toBeNull();
         });
 
@@ -330,13 +330,13 @@ describe('ProjectNodeService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const pn = createTestProjectNode();
             repository.seed(pn);
 
             await expect(
                 service.delete(pn.id, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should delete when the actor holds PROJECT_UPDATE', async () => {
@@ -367,7 +367,7 @@ describe('ProjectNodeService', () => {
                         permissions: [PermissionName.PROJECT_CREATE],
                     }),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(1);
         });
 

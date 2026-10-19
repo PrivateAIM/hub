@@ -135,6 +135,8 @@ export class HTTPModule implements IModule {
                         clientSecret: config.clientSecret,
                         realm: config.realm,
                     }),
+                    clientId: config.clientId,
+                    realm: config.realm,
                     redisClient: redisResult.success ? redisResult.data : undefined,
                 }),
             },

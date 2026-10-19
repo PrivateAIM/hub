@@ -14,11 +14,11 @@ import {
     isHex,
 } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
+import { evaluateRecord, evaluateRecordUpdate } from '@authup/access';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import {
     AbstractEntityService,
     appendQueryConditions,
-    assertRecordReach,
     scopeReadQuery,
 } from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
@@ -109,7 +109,11 @@ export class NodeService extends AbstractEntityService implements INodeService {
             validated.realmId = this.getActorRealmId(actor);
         }
 
-        await assertRecordReach(actor, PermissionName.NODE_CREATE, { realmId: validated.realmId, attributes: validated });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.NODE_CREATE,
+            realm: validated.realmId,
+            data: { attributes: validated },
+        });
 
         const entity = this.repository.create(validated);
 
@@ -142,10 +146,14 @@ export class NodeService extends AbstractEntityService implements INodeService {
             throw new EntityNotFoundError({ entity: 'node' });
         }
 
-        await assertRecordReach(actor, PermissionName.NODE_UPDATE, { realmId: entity.realmId, attributes: entity });
-
+        // Snapshot the stored row: typeorm's merge() writes into `entity`.
+        const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
-        await assertRecordReach(actor, PermissionName.NODE_UPDATE, { realmId: merged.realmId, attributes: merged });
+        await evaluateRecordUpdate(actor.permissionEvaluator, {
+            name: PermissionName.NODE_UPDATE,
+            current,
+            next: { realm: merged.realmId, data: { attributes: merged } },
+        });
 
         // Only an explicit `registryId: null` disconnects the node. An update
         // that merely omits the field (a rename, a visibility toggle, …) must
@@ -174,7 +182,11 @@ export class NodeService extends AbstractEntityService implements INodeService {
             throw new EntityNotFoundError({ entity: 'node' });
         }
 
-        await assertRecordReach(actor, PermissionName.NODE_DELETE, { realmId: entity.realmId, attributes: entity });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.NODE_DELETE,
+            realm: entity.realmId,
+            data: { attributes: entity },
+        });
 
         await this.unlinkRegistryProject(entity);
 

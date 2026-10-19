@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionError } from '@authup/access';
 import { randomUUID } from 'node:crypto';
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryAPICommand } from '@privateaim/core-kit';
-import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import {
     beforeEach,
@@ -76,17 +77,17 @@ describe('RegistryService', () => {
             expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
         });
 
-        it('should throw PermissionDeniedError when requesting secret without permission', async () => {
+        it('should deny when requesting secret without permission', async () => {
             repository.seed(createTestRegistry());
 
             // The read gate (preEvaluateOneOf) passes; only the REGISTRY_MANAGE
             // check guarding the secret (preEvaluate) is denied.
             const actor = createAllowAllActor();
-            actor.permissionEvaluator.deny('preEvaluate', new PermissionDeniedError('test'));
+            actor.permissionEvaluator.deny('preEvaluate');
 
             await expect(
                 service.getMany({ fields: '+accountSecret' }, actor),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should only run the read gate when the secret field is not requested', async () => {
@@ -101,7 +102,7 @@ describe('RegistryService', () => {
         });
 
         it('should reject without a read permission', async () => {
-            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionError);
             expect(repository.findManyCalls).toHaveLength(0);
         });
     });
@@ -121,7 +122,7 @@ describe('RegistryService', () => {
         it('should reject without a read permission', async () => {
             repository.seed(createTestRegistry({ id: 'r-1' }));
 
-            await expect(service.getOne('r-1', createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getOne('r-1', createDenyAllActor())).rejects.toThrow(PermissionError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -161,13 +162,13 @@ describe('RegistryService', () => {
             expect(result.host).toBe('registry.io');
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             await expect(
                 service.create(
                     { name: 'new-registry', host: 'registry.io' },
                     createDenyAllActor(),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
     });
 
@@ -191,13 +192,13 @@ describe('RegistryService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const registry = createTestRegistry();
             repository.seed(registry);
 
             await expect(
                 service.update(registry.id, { name: 'updated-registry' }, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should extract hostname on update', async () => {
@@ -224,13 +225,13 @@ describe('RegistryService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const registry = createTestRegistry();
             repository.seed(registry);
 
             await expect(
                 service.delete(registry.id, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -329,14 +330,14 @@ describe('RegistryService', () => {
             });
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             await expect(
                 service.executeCommand(
                     RegistryAPICommand.SETUP,
                     { id: 'r-1' },
                     createDenyAllActor(),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should throw BadRequestError when registryDispatcher is not available', async () => {

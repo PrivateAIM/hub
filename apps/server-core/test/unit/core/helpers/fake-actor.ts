@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { PermissionDeniedError } from '@privateaim/errors';
+import { PermissionError } from '@authup/access';
 import type { FakeActorContext } from '@privateaim/server-test-kit';
 import { FakePermissionEvaluator } from '@privateaim/server-test-kit';
 import type { PermissionActorOptions } from './types.ts';
@@ -14,8 +14,8 @@ import type { PermissionActorOptions } from './types.ts';
 /**
  * Build an actor that holds exactly `permissions`. Like the real evaluator,
  * `preEvaluate`/`evaluate` pass only when EVERY requested name is held and the
- * `*OneOf` methods when ANY is. A refusal throws `PermissionDeniedError`, the
- * error a real denial surfaces as, so code that tells a denial apart from
+ * `*OneOf` methods when ANY is. A refusal throws authup's `PermissionError`, the
+ * error the production evaluator throws, so code that tells a denial apart from
  * other failures sees the real thing.
  */
 export function createPermissionActor(options: PermissionActorOptions): FakeActorContext {
@@ -29,7 +29,7 @@ export function createPermissionActor(options: PermissionActorOptions): FakeActo
                 names.every((name) => granted.has(name));
 
             if (!permitted) {
-                throw new PermissionDeniedError();
+                throw PermissionError.evaluationFailed(ctx.name);
             }
         }),
         realm: options.realm,

@@ -9,7 +9,8 @@ import type { Node } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { AbstractEntityService, reachesRecord } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
+import { reachesRecordOneOf } from '@authup/access';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type { IRegistryRepository } from '../../entities/registry/types.ts';
 import type { IRegistryProjectRepository } from '../../entities/registry-project/types.ts';
@@ -100,10 +101,10 @@ export class NodeRegistryCredentialService extends AbstractEntityService impleme
             return true;
         }
 
-        return reachesRecord(
-            actor,
-            [PermissionName.NODE_UPDATE, PermissionName.REGISTRY_MANAGE],
-            { realmId: node.realmId, attributes: node },
-        );
+        return reachesRecordOneOf(actor.permissionEvaluator, {
+            name: [PermissionName.NODE_UPDATE, PermissionName.REGISTRY_MANAGE],
+            realm: node.realmId,
+            data: { attributes: node },
+        });
     }
 }

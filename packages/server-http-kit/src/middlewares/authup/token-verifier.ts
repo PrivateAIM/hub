@@ -6,44 +6,111 @@
  */
 
 import type {
-    ITokenVerifierCache,
+    ITokenCache,
+    ITokenVerifier,
     TokenVerificationData,
     TokenVerifyOptions,
 } from '@authup/server-adapter-kit';
 import {
-    MemoryTokenVerifierCache,
-    RedisTokenVerifierCache,
+    MemoryTokenCache,
+    RedisTokenCache,
     TokenVerifier,
 } from '@authup/server-adapter-kit';
+import { HubError } from '@privateaim/errors';
 import { assertIntrospectableToken } from '@privateaim/server-kit';
+import { VouchlyErrorCode, isVouchlyError } from 'vouchly';
 import type { AuthTokenVerifierCreateContext } from './types.ts';
+import { UnconfiguredTokenVerifier } from './unconfigured-token-verifier.ts';
 
 /**
  * Refuses a credential that is not structurally a token before it reaches
  * introspection — see `isIntrospectableToken` for the credential confusion
- * this closes (authup#3724: a malformed token was reported as the calling
- * service's own client). Lives on the verifier every service builds, so every
- * credential source — header, cookie fallback, socket handshake — is covered
- * from one place.
+ * this closes (authup#3724: an Authup server <= 1.0.0-beta.69 reported a
+ * malformed token as the calling service's own client, and the beta.70
+ * verifier still forwards such a token to introspection). Lives on the
+ * verifier every service builds, so every credential source — header, cookie
+ * fallback, socket handshake — is covered from one place.
+ *
+ * Every hub service passes a `creator`, so the verifier runs in REMOTE mode
+ * (introspection), and always passes a result cache: Redis when the service
+ * has one, else process memory. Entries live until the token's `exp` and are
+ * namespaced per introspecting client (`buildAuthupTokenCacheNamespace`):
+ * authup answers `active: false` to a caller that may not introspect a token,
+ * so a result is only valid for the client that asked. Services sharing one
+ * Redis, one Authup URL and one client still share entries.
  */
 export class IntrospectableTokenVerifier extends TokenVerifier {
     override async verify(token: string, options?: TokenVerifyOptions): Promise<TokenVerificationData> {
         assertIntrospectableToken(token);
-        return super.verify(token, options);
+
+        try {
+            return await super.verify(token, options);
+        } catch (e) {
+            throw toUpstreamError(e);
+        }
     }
 }
 
-export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext): IntrospectableTokenVerifier {
-    let cache : ITokenVerifierCache;
-    if (ctx.redisClient) {
-        cache = new RedisTokenVerifierCache(ctx.redisClient);
+/**
+ * vouchly reports every failed introspection request (authup unreachable,
+ * a 5xx or 429 answer, hub's own service credential refused, a failed token
+ * mint) as `introspection_failed`, which authup's adapter maps onto
+ * `invalid_token` — a 401 that makes every authup client hook drop its
+ * session, although the caller's token was never judged. Such a failure is
+ * answered 502 instead; a token authup did judge (inactive, expired,
+ * malformed) keeps its 401.
+ */
+function toUpstreamError(input: unknown): unknown {
+    if (
+        input instanceof Error &&
+        isVouchlyError(input.cause) &&
+        input.cause.code === VouchlyErrorCode.INTROSPECTION_FAILED
+    ) {
+        return new HubError({
+            code: 'upstream_error',
+            status: 502,
+            message: input.message,
+            cause: input,
+        });
+    }
+
+    return input;
+}
+
+/**
+ * The result-cache namespace of a verifier introspecting as `ctx.clientId`
+ * (in `ctx.realm`): authup's default (`authup:remote:<baseURL>`) plus the
+ * client, so verifiers of different clients never share entries. Without a
+ * client id, `undefined` keeps authup's default.
+ */
+export function buildAuthupTokenCacheNamespace(
+    ctx: Pick<AuthTokenVerifierCreateContext, 'baseURL' | 'clientId' | 'realm'>,
+): string | undefined {
+    if (!ctx.clientId) {
+        return undefined;
+    }
+
+    return `authup:remote:${ctx.baseURL}:client:${ctx.realm ?? ''}:${ctx.clientId}`;
+}
+
+export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext): ITokenVerifier {
+    if (!ctx.baseURL) {
+        return new UnconfiguredTokenVerifier();
+    }
+
+    let cache : ITokenCache;
+    if (ctx.cache) {
+        cache = ctx.cache;
+    } else if (ctx.redisClient) {
+        cache = new RedisTokenCache(ctx.redisClient);
     } else {
-        cache = new MemoryTokenVerifierCache();
+        cache = new MemoryTokenCache();
     }
 
     return new IntrospectableTokenVerifier({
         baseURL: ctx.baseURL,
         creator: ctx.creator,
         cache,
+        cacheNamespace: buildAuthupTokenCacheNamespace(ctx),
     });
 }

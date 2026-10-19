@@ -328,8 +328,32 @@ checks (credential ownership, the messenger mailbox, bucket ownership, socket ro
 see the real caller. Authup applies the same rule since authup#3723 (`useRequestPolicyGrants`).
 The credential needs
 `permission_read` at `ownOrNull` or wider. Fetch failures propagate; no cross-request
-catalog cache or name-only fallback is installed. Token-verifier caching and socket
-connection lifetimes remain unchanged.
+catalog cache or name-only fallback is installed. The catalog read leaves socket
+connection lifetimes unchanged; token-verifier caching is described under
+[Token verification](#token-verification-authup-beta70).
+
+### Token verification (Authup beta.70)
+
+Every service builds its verifier with `createAuthupTokenVerifier`
+(`server-http-kit/src/middlewares/authup/token-verifier.ts`). It passes a `creator`, so
+authup's vouchly-based `TokenVerifier` runs in remote mode (introspection), with a result
+cache (Redis, else memory) kept until the token's `exp`. Its namespace
+(`buildAuthupTokenCacheNamespace`) adds the service's Authup client and realm to authup's
+default `authup:remote:<baseURL>`, because authup answers `active: false` to a client that
+may not introspect a token: a result is valid only for the client that asked. Services on one
+Redis share results only when they introspect as the same client.
+
+- **Keep `IntrospectableTokenVerifier`.** In remote mode vouchly forwards every non-empty
+  string to introspection, compact or not. Only an Authup server ≥ beta.70 (authup#3724)
+  answers a malformed token `active: false`. An unguarded verifier against a beta.69 server
+  accepts `not-a-token` as the `system` client (verified). Hub requires a beta.70+ server, so
+  the guard is defence in depth: it covers a deployment that upgraded hub before Authup, and
+  spares the mint and the introspection round-trip for a token that cannot be valid.
+- **No `AUTHUP_URL`, no `TokenVerifier`.** beta.70's constructor derives the introspection
+  endpoint eagerly and throws without a base URL, so `createAuthupTokenVerifier` returns an
+  `UnconfiguredTokenVerifier` (refuses every token) instead. Without this, a service booted
+  without Authup would crash instead of answering 401.
+- A failed introspection request (Authup down, 5xx, 429, refused service credential) surfaces from vouchly as `invalid_token`; `IntrospectableTokenVerifier` rethrows it as `upstream_error` → 502, so client hooks do not drop a session over an outage. A judged token (inactive, expired) stays 401.
 
 The evaluator enforces the data a call supplies. A service using only `preEvaluate`
 still has only a pre-gate.
@@ -351,14 +375,30 @@ be watched by custom async navigation resolvers.
 Entities are scoped to realms via `realmId`. There is no master-realm bypass (plan 021, D5):
 reach comes from each grant's `realm_scope` (`any` / `ownOrNull` / `own` / `none`).
 
-- **Writes on one record** (create with its target realm, update, delete, commands):
-  `assertRecordReach` / `reachesRecord` (`server-kit/src/core/authorization/`) evaluate with
-  `PolicyData({ realmMatch: record.realmId ?? null, attributes })`. The `realmMatch` key is what
-  applies the scope; `attributes` alone apply none. Out of reach → 403. Updates check the stored
-  and the merged row.
+- **Writes on one record** (create with its target realm, update, delete, commands) go
+  through `@authup/access`'s record helpers, called with `actor.permissionEvaluator`:
+  `evaluateRecord` / `evaluateRecordOneOf` (throw), `reachesRecord` / `reachesRecordOneOf`
+  (predicates), `evaluateRecordUpdate`. Hub has no copies of its own (the former
+  `server-kit/src/core/authorization/` is gone since beta.70). Rules:
+  - `realm` is the record's realm, and it is required: `undefined` throws. Pass a stored row's
+    realm **raw** (`entity.realmId`), so a projection that dropped the column fails instead of
+    reading as global. `null` only where a global row or create target is meant (a realm-less
+    registry project or event, a bucket created by an actor without a realm).
+  - The row goes in as `data: { attributes: row }`; nothing is synthesized, so a grant's
+    attribute policy without a row stays pending and denies (the socket room gate passes none).
+  - An array of names is **all of** with `evaluateRecord` / `reachesRecord`. Use the `*OneOf`
+    variant for "any of these names".
+  - Updates use `evaluateRecordUpdate({ current, next })`. Snapshot `current`'s attributes
+    (`{ ...entity }`) before `repository.merge()`: typeorm's merge writes into the entity.
+  - The predicates read only authup's `PermissionError` as `false`; any other error
+    propagates. The production evaluator throws only `PermissionError`, and so do the test
+    fakes (`createDenyAllActor`, `createScopedActor`). Hub's own `PermissionDeniedError`
+    is what hub code throws after a predicate said no. Both map to 403.
+  - Out of reach → 403.
 - **Reads** lower `compile()` into the query (`scopeReadQuery`, `AnalysisReachService`).
-- **"Reaches every realm"** (the old "master"/"system" checks) is `hasUnboundedReach`: the
-  compiled verdict is `allow`.
+- **"Reaches every realm"** (the old "master"/"system" checks) is `hasUnboundedReach(evaluator,
+  name)` from `@authup/access`: the compiled verdict is `allow`. `compile()` never throws for a
+  name the actor does not hold (it drops out → `deny`).
 - Node and analysis clients reach by **binding** (`node.clientId` / `analysis.clientId`, in the
   client's own realm); their grants are scoped `none`.
 

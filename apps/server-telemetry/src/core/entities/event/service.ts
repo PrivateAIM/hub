@@ -13,9 +13,9 @@ import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/s
 import {
     AbstractEntityService,
     appendQueryConditions,
-    assertRecordReach,
     scopeReadQuery,
 } from '@privateaim/server-kit';
+import { evaluateRecord } from '@authup/access';
 import type { IQuery } from '@rapiq/core';
 import { Query, eq } from '@rapiq/core';
 import { decodeQuery } from '../../query/index.ts';
@@ -81,7 +81,12 @@ export class EventService extends AbstractEntityService implements IEventService
             validated.realmId = this.getActorRealmId(actor);
         }
 
-        await assertRecordReach(actor, PermissionName.EVENT_CREATE, { realmId: validated.realmId, attributes: validated });
+        // An event's realm column is nullable: an actor without a realm records a global row.
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.EVENT_CREATE,
+            realm: validated.realmId ?? null,
+            data: { attributes: validated },
+        });
 
         const entity = this.repository.create(validated);
 
@@ -97,8 +102,14 @@ export class EventService extends AbstractEntityService implements IEventService
             throw new EntityNotFoundError({ entity: 'event' });
         }
 
-        // A realm-less event is reached only by an `ownOrNull`/`any` grant.
-        await assertRecordReach(actor, PermissionName.EVENT_DELETE, { realmId: entity.realmId ?? null, attributes: entity });
+        // A realm-less event (null) is reached only by an `ownOrNull`/`any`
+        // grant. Read raw: a row whose projection dropped the realm throws
+        // instead of reading as global.
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.EVENT_DELETE,
+            realm: entity.realmId,
+            data: { attributes: entity },
+        });
 
         const { id: entityId } = entity;
 

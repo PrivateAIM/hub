@@ -34,7 +34,9 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
         this.findManyCalls.push(query);
 
         const matchesFilters = compileFilters(query.filters);
-        const data = this.store.filter((entity) => matchesFilters(entity));
+        const data = this.store
+            .filter((entity) => matchesFilters(entity))
+            .map((entity) => this.load(entity));
 
         return {
             data,
@@ -47,15 +49,17 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
     }
 
     async findOneById(id: string): Promise<T | null> {
-        return this.store.find((e) => (e as any).id === id) ?? null;
+        return this.load(this.store.find((e) => (e as any).id === id));
     }
 
     async findOneBy(where: Record<string, any>): Promise<T | null> {
-        return this.store.find((e) => this.matchesWhere(e, where)) ?? null;
+        return this.load(this.store.find((e) => this.matchesWhere(e, where)));
     }
 
     async findManyBy(where: Record<string, any>): Promise<T[]> {
-        return this.store.filter((e) => this.matchesWhere(e, where));
+        return this.store
+            .filter((e) => this.matchesWhere(e, where))
+            .map((e) => this.load(e));
     }
 
     create(data: Partial<T>): T {
@@ -67,12 +71,13 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
         } as Partial<T> as T;
     }
 
+    /**
+     * Mutates `entity` in place and returns it, like typeorm's `merge`, so a
+     * service that reads the stored row after merging sees the merged one —
+     * snapshot it first.
+     */
     merge(entity: T, data: Partial<T>): T {
-        return {
-            ...entity,
-            ...data,
-            updatedAt: new Date().toISOString(),
-        };
+        return Object.assign(entity, data, { updatedAt: new Date().toISOString() });
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -132,6 +137,17 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
 
         this.store.push(input);
         return input;
+    }
+
+    /**
+     * A read hands out a copy of the stored row, as a database load does, so
+     * mutating a loaded entity (e.g. through `merge`) changes nothing stored
+     * until it is saved.
+     */
+    private load(entity: T): T;
+    private load(entity: T | undefined): T | null;
+    private load(entity: T | undefined): T | null {
+        return entity ? { ...entity } : null;
     }
 
     private matchesWhere(entity: T, where: Record<string, any>): boolean {

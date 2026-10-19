@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import type { Bucket } from '@privateaim/storage-kit';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import {
@@ -120,10 +120,10 @@ describe('BucketService', () => {
             expect(dispatcher.getCreateCalls()).toHaveLength(0);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             await expect(
                 service.create({ name: 'new-bucket' }, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should throw PermissionDeniedError when actor has no identity', async () => {
@@ -155,13 +155,13 @@ describe('BucketService', () => {
             expect(dispatcher.getCreateCalls()[0].realmId).toBe(actor.realm!.id);
         });
 
-        it('should throw PermissionDeniedError when an own-scoped grant targets another realm', async () => {
+        it('should deny when an own-scoped grant targets another realm', async () => {
             await expect(
                 service.create(
                     { name: 'new-bucket', realmId: randomUUID() },
                     createScopedActor({ realmScope: 'own' }),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(dispatcher.getCreateCalls()).toHaveLength(0);
         });
 
@@ -230,13 +230,13 @@ describe('BucketService', () => {
             expect(result.id).toBe(bucket.id);
         });
 
-        it('should throw PermissionDeniedError when the grant does not reach the bucket realm', async () => {
+        it('should deny when the grant does not reach the bucket realm', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
                 service.update(bucket.id, {}, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should update a bucket of another realm with an any-scoped grant', async () => {
@@ -321,13 +321,13 @@ describe('BucketService', () => {
             expect(result.id).toBe(bucket.id);
         });
 
-        it('should throw PermissionDeniedError when the grant does not reach the bucket realm', async () => {
+        it('should deny when the grant does not reach the bucket realm', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
                 service.delete(bucket.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(dispatcher.getDeleteCalls()).toHaveLength(0);
         });
 
@@ -375,23 +375,23 @@ describe('BucketService', () => {
             expect(result.id).toBe(bucket.id);
         });
 
-        it('should throw PermissionDeniedError when non-owner lacks permission', async () => {
+        it('should deny when non-owner lacks permission', async () => {
             const bucket = createTestBucket();
             repository.seed(bucket);
 
             await expect(
                 service.clear(bucket.id, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(dispatcher.getClearCalls()).toHaveLength(0);
         });
 
-        it('should throw PermissionDeniedError when the grant does not reach the bucket realm', async () => {
+        it('should deny when the grant does not reach the bucket realm', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
             repository.seed(bucket);
 
             await expect(
                 service.clear(bucket.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(dispatcher.getClearCalls()).toHaveLength(0);
         });
 
@@ -422,7 +422,7 @@ describe('BucketService', () => {
         it('should deny a non-owner without BUCKET_UPDATE', async () => {
             await expect(
                 service.checkUploadAccess(createTestBucket(), createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should let a BUCKET_UPDATE holder of the bucket realm upload', async () => {
@@ -438,7 +438,7 @@ describe('BucketService', () => {
                     createTestBucket({ realmId: 'other-realm' }),
                     createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should leave a bucket with a ref to the owning service', async () => {
@@ -450,7 +450,7 @@ describe('BucketService', () => {
         it('should gate a bucket with only a refType like a ref-less one', async () => {
             await expect(
                 service.checkUploadAccess(createTestBucket({ refType: 'analysis' }), createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
     });
 });

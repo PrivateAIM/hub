@@ -7,15 +7,19 @@
 
 import { randomUUID } from 'node:crypto';
 import type { PermissionCompileResult } from '@authup/access';
-import { BuiltInPolicyType, realmScopeMatches } from '@authup/access';
-import { PermissionDeniedError } from '@privateaim/errors';
+import { BuiltInPolicyType, PermissionError, realmScopeMatches } from '@authup/access';
 import { eq, or } from '@rapiq/core';
 import { FakePermissionEvaluator } from './fake-permission-evaluator.ts';
 import type { FakeActorContext, ScopedActorOptions } from './types.ts';
 
+/**
+ * Denies with authup's `PermissionError`, the error the production evaluator
+ * throws, so code that tells a denial apart from other failures (authup's
+ * `reachesRecord`, which reads only `isPermissionError`) sees the real thing.
+ */
 function createDenyingEvaluator(): FakePermissionEvaluator {
     const evaluator = new FakePermissionEvaluator();
-    evaluator.denyAll(new PermissionDeniedError());
+    evaluator.denyAll();
     return evaluator;
 }
 
@@ -55,7 +59,7 @@ export function createScopedActor(options: ScopedActorOptions): FakeActorContext
 
         const resourceRealmId = ctx.data.get<string | null>(BuiltInPolicyType.REALM_MATCH);
         if (!realmScopeMatches(options.realmScope, resourceRealmId, id)) {
-            throw new PermissionDeniedError();
+            throw PermissionError.evaluationFailed(ctx.name);
         }
     });
     permissionEvaluator.setCompileResult(compileRealmScope(options.realmScope, id));

@@ -12,12 +12,8 @@ import { PermissionName, ProcessStatus, ValidatorGroup } from '@privateaim/kit';
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import {
-    AbstractEntityService,
-    appendQueryConditions,
-    assertRecordReach,
-    reachesRecord,
-} from '@privateaim/server-kit';
+import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
+import { evaluateRecord, reachesRecord, reachesRecordOneOf } from '@authup/access';
 import { decodeQuery } from '../../query/index.ts';
 import { analysisNodeSchema } from './schema.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
@@ -99,7 +95,11 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         validated.analysisRealmId = validated.analysis.realmId;
         validated.nodeRealmId = validated.node.realmId;
 
-        await assertRecordReach(actor, PermissionName.ANALYSIS_UPDATE, { realmId: validated.analysisRealmId, attributes: validated });
+        await evaluateRecord(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            realm: validated.analysisRealmId,
+            data: { attributes: validated },
+        });
 
         if (validated.analysis.configurationLocked) {
             throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
@@ -157,7 +157,8 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         const isNodeClient = await this.isNodeClient(entity, actor);
 
-        await this.assertUpdatable(entity, validated, actor, isNodeClient);
+        // Snapshot the stored row: typeorm's merge() below writes into `entity`.
+        await this.assertUpdatable({ ...entity }, validated, actor, isNodeClient);
 
         // A node approves the built image (hash, size, OS), which does not
         // exist before the build has finished; a rejection is possible any time.
@@ -199,12 +200,16 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         // The analysis' realm, or the node's realm detaching its own node.
         if (
-            !await reachesRecord(actor, PermissionName.ANALYSIS_UPDATE, { realmId: entity.analysisRealmId, attributes: entity }) &&
-            !await reachesRecord(
-                actor,
-                [PermissionName.ANALYSIS_UPDATE, PermissionName.ANALYSIS_APPROVE],
-                { realmId: entity.nodeRealmId, attributes: entity },
-            )
+            !await reachesRecord(actor.permissionEvaluator, {
+                name: PermissionName.ANALYSIS_UPDATE,
+                realm: entity.analysisRealmId,
+                data: { attributes: entity },
+            }) &&
+            !await reachesRecordOneOf(actor.permissionEvaluator, {
+                name: [PermissionName.ANALYSIS_UPDATE, PermissionName.ANALYSIS_APPROVE],
+                realm: entity.nodeRealmId,
+                data: { attributes: entity },
+            })
         ) {
             throw new PermissionDeniedError();
         }
@@ -231,10 +236,23 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         actor: ActorContext,
         isNodeClient: boolean,
     ): Promise<void> {
-        const canApprove = await reachesRecord(actor, PermissionName.ANALYSIS_APPROVE, { realmId: row.nodeRealmId, attributes: row });
+        const record = { attributes: row };
+        const canApprove = await reachesRecord(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_APPROVE,
+            realm: row.nodeRealmId,
+            data: record,
+        });
         const canUpdateNode = isNodeClient ||
-            await reachesRecord(actor, PermissionName.ANALYSIS_UPDATE, { realmId: row.nodeRealmId, attributes: row });
-        const canUpdateAnalysis = await reachesRecord(actor, PermissionName.ANALYSIS_UPDATE, { realmId: row.analysisRealmId, attributes: row });
+            await reachesRecord(actor.permissionEvaluator, {
+                name: PermissionName.ANALYSIS_UPDATE,
+                realm: row.nodeRealmId,
+                data: record,
+            });
+        const canUpdateAnalysis = await reachesRecord(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            realm: row.analysisRealmId,
+            data: record,
+        });
 
         if (!canApprove && !canUpdateNode && !canUpdateAnalysis) {
             throw new PermissionDeniedError();

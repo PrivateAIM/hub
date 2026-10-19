@@ -6,10 +6,10 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { BuiltInPolicyType } from '@authup/access';
+import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import type { Node, RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { EntityNotFoundError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import {
     beforeEach,
@@ -111,7 +111,7 @@ describe('NodeService', () => {
         });
 
         it('should reject without a read permission', async () => {
-            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionError);
             expect(repository.findManyCalls).toHaveLength(0);
         });
     });
@@ -135,7 +135,7 @@ describe('NodeService', () => {
         it('should reject without a read permission', async () => {
             repository.seed(createTestNode({ id: 'n-1' }));
 
-            await expect(service.getOne('n-1', createDenyAllActor())).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getOne('n-1', createDenyAllActor())).rejects.toThrow(PermissionError);
         });
     });
 
@@ -150,10 +150,10 @@ describe('NodeService', () => {
             expect(repository.getAll()).toHaveLength(1);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             await expect(
                 service.create({ name: 'new-node' }, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should set realmId from actor when not provided', async () => {
@@ -175,7 +175,7 @@ describe('NodeService', () => {
                     { name: 'new-node', realmId: randomUUID() },
                     actor,
                 ),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(0);
         });
 
@@ -201,7 +201,7 @@ describe('NodeService', () => {
 
             await expect(
                 service.create({ name: 'new-node' }, createScopedActor({ realmScope: 'none' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should link registry project when registryManager is available', async () => {
@@ -276,13 +276,13 @@ describe('NodeService', () => {
             ).rejects.toThrow(EntityNotFoundError);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const node = createTestNode();
             repository.seed(node);
 
             await expect(
                 service.update(node.id, { name: 'updated-node' }, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should deny updating a node in a realm the grant does not reach', async () => {
@@ -291,7 +291,7 @@ describe('NodeService', () => {
 
             await expect(
                 service.update(node.id, { name: 'updated-node' }, createScopedActor({ realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()[0].name).toBe('test-node');
         });
 
@@ -513,13 +513,13 @@ describe('NodeService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
-        it('should throw PermissionDeniedError when actor lacks permission', async () => {
+        it('should deny when actor lacks permission', async () => {
             const node = createTestNode();
             repository.seed(node);
 
             await expect(
                 service.delete(node.id, createDenyAllActor()),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
@@ -534,7 +534,7 @@ describe('NodeService', () => {
 
             await expect(
                 service.delete(node.id, createScopedActor({ realmScope: 'own' })),
-            ).rejects.toThrow(PermissionDeniedError);
+            ).rejects.toThrow(PermissionError);
             expect(repository.getAll()).toHaveLength(1);
         });
 
