@@ -28,6 +28,7 @@ import { createNodeClientComponent } from '../../components/node-client/module.t
 import { RegistryComponent } from '../../components/registry/module.ts';
 import { RegistryComponentDispatcher } from '../../components/registry/dispatcher/module.ts';
 import { RegistryTaskMessageBusRouting } from '../../components/registry/constants.ts';
+import { startComponentsInBackground } from '../../components/start/module.ts';
 import { ComponentsInjectionKey } from './constants.ts';
 
 export class ComponentsModule implements IModule {
@@ -88,9 +89,9 @@ export class ComponentsModule implements IModule {
         }
 
 
-        // Fire-and-forget: a background component's first pass must not
+        // Fire-and-forget, but a failed start is logged: a background component's first pass must not
         // block boot. teardown() awaits it through settled().
-        void Promise.allSettled(this.components.map((c) => c.start()));
+        void startComponentsInBackground(this.components, logger);
     }
 
     async teardown(): Promise<void> {

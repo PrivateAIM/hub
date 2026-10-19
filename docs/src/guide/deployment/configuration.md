@@ -266,6 +266,12 @@ the creator was recorded have no owner, so only `bucket_update` holders can
 upload into them. Analysis buckets (which carry a `refId`) are unchanged: their
 uploads are still checked by server-core when it registers them.
 
+Analysis buckets created before `refType`/`refId` existed carry no ref.
+Migration `1788900000000-BackfillAnalysisBucketRefs` recovers it from the bucket
+name (`analysis-<type>-files.<analysisId>`), so node and analysis uploads into
+older analyses keep working. A duplicate that the `1788600000000` migration
+detached stays ref-less; server-core does not link it.
+
 ## Reading nodes, master images, registries, registry projects and events requires `*_read`
 
 **Breaking for every deployment.** Listing or reading these entities now needs a
@@ -476,9 +482,10 @@ Behaviour changes on top:
 
 **Before upgrading:**
 
-1. Add `analysis_node_log_create` to your Authup provisioning. Until it exists,
-   every node save fails and every node client is logged as failed on each
-   hourly re-sync.
+1. Add `analysis_read` and `analysis_node_log_create` to your Authup
+   provisioning. Until both exist, every node save fails and every node client
+   is logged as failed on each hourly re-sync. The sync checks for both before
+   it changes anything, so a node client keeps its previous grants until then.
 2. Give every role that must write in other realms its permissions at
    `realm_scope: any`, and give roles that start builds or distributions
    `analysis_execution_start`.

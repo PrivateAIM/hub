@@ -291,7 +291,7 @@ the analysis builder/distributor execute handlers re-emit their last progress ev
 until no real progress arrived for 2 h, so a hung docker stream goes stale. Stale is not
 recovered: with one worker the CHECK waits behind the hung EXECUTE on the same prefetch-1 queue,
 so recovery needs a worker restart, a second worker replica, or RabbitMQ's `consumer_timeout`.
-EXECUTION_FINISHED applies only while the locked row is STARTING/STARTED, so a late finish cannot
+Every EXECUTION_* event (STARTED, PROGRESS, FAILED, FINISHED) applies only while the locked row is STARTING/STARTED, so a late finish cannot
 resurrect a run already FAILED or reset to null (full fix: run ids). The distributor check reports
 an in-progress status for permanently missing preconditions (no nodes, no registry, no registry
 project), so the stale rule fails such a run. `AnalysisReconciler.reconcile()`

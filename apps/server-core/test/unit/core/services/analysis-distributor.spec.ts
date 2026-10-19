@@ -414,6 +414,30 @@ describe('AnalysisDistributor', () => {
             expect(await findAnalysis(analysis.id)).toMatchObject({ distributionProgress: 40, updatedAt });
         });
 
+        it.each([
+            [AnalysisDistributorEvent.EXECUTION_STARTED, null],
+            [AnalysisDistributorEvent.EXECUTION_PROGRESS, null],
+            [AnalysisDistributorEvent.EXECUTION_FAILED, null],
+            [AnalysisDistributorEvent.EXECUTION_FAILED, ProcessStatus.EXECUTED],
+        ])('should ignore a late %s on a %s distribution', async (event, status) => {
+            // e.g. a stale run declared FAILED, then unlocked (null), whose
+            // retried EXECUTE still runs — it must not wedge the analysis.
+            const analysis = await createAnalysis({ distributionStatus: status });
+
+            const payload: AnalysisDistributorExecutionProgressPayload = {
+                id: analysis.id,
+                progress: {
+                    current: 0, 
+                    total: 0, 
+                    percent: 10, 
+                },
+            };
+            const saved = await distributor.applyEvent(event, payload);
+
+            expect(saved).toBeNull();
+            expect(await findAnalysis(analysis.id)).toMatchObject({ distributionStatus: status });
+        });
+
         it.each([ProcessStatus.FAILED, null])('should not resurrect a %s distribution on a late EXECUTION_FINISHED', async (status) => {
             const analysis = await createAnalysis({
                 buildStatus: ProcessStatus.EXECUTED,

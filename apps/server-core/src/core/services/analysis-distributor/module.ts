@@ -25,7 +25,6 @@ import {
     isProcessHeartbeatDue,
     isProcessStale,
     isProcessStatusInProgress,
-    isProcessStatusTerminal,
 } from '../helpers.ts';
 import type { IAnalysisDistributorDispatcher } from './types.ts';
 
@@ -116,7 +115,10 @@ export class AnalysisDistributor {
         return this.repository.updateLocked(value.id, (entity) => {
             switch (key) {
                 case AnalysisDistributorEvent.EXECUTION_STARTED: {
-                    if (isProcessStatusTerminal(entity.distributionStatus)) {
+                    // only a run core still considers running (STARTING/STARTED)
+                    // may progress: not a terminal one, and not one unlocked to
+                    // null, which a late event would leave unlocked-but-running.
+                    if (!isProcessStatusInProgress(entity.distributionStatus)) {
                         return false;
                     }
 
@@ -125,7 +127,10 @@ export class AnalysisDistributor {
                     break;
                 }
                 case AnalysisDistributorEvent.EXECUTION_PROGRESS: {
-                    if (isProcessStatusTerminal(entity.distributionStatus)) {
+                    // only a run core still considers running (STARTING/STARTED)
+                    // may progress: not a terminal one, and not one unlocked to
+                    // null, which a late event would leave unlocked-but-running.
+                    if (!isProcessStatusInProgress(entity.distributionStatus)) {
                         return false;
                     }
 
@@ -157,6 +162,12 @@ export class AnalysisDistributor {
                     return false;
                 }
                 case AnalysisDistributorEvent.EXECUTION_FAILED: {
+                    // a late failure must neither flip a finished run nor
+                    // write onto one unlocked to null.
+                    if (!isProcessStatusInProgress(entity.distributionStatus)) {
+                        return false;
+                    }
+
                     entity.distributionStatus = ProcessStatus.FAILED;
                     break;
                 }

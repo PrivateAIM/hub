@@ -70,10 +70,12 @@ describe('docker/pack', () => {
             expect(size.toString('utf-8')).toContain('4224');
         } finally {
             await container.remove({ force: true });
-            await testContainer.stop();
+            // no stop(): `sleep` as PID 1 ignores SIGTERM, so a plain stop
+            // waits out docker's 10 s grace period. A forced remove kills it.
             await testContainer.remove({ force: true });
 
             await image.remove({ force: true });
         }
-    }, 30_000);
+        // the alpine pull goes over the network, which is slow on CI runners
+    }, 120_000);
 });
