@@ -22,7 +22,6 @@ import {
     isProcessHeartbeatDue,
     isProcessStale,
     isProcessStatusInProgress,
-    isProcessStatusTerminal,
 } from '../helpers.ts';
 import type { IAnalysisMetadataRecalculator, IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
@@ -115,7 +114,10 @@ export class AnalysisBuilder {
         return this.repository.updateLocked(value.id, (entity) => {
             switch (key) {
                 case AnalysisBuilderEvent.EXECUTION_STARTED: {
-                    if (isProcessStatusTerminal(entity.buildStatus)) {
+                    // only a run core still considers running (STARTING/STARTED)
+                    // may progress: not a terminal one, and not one unlocked to
+                    // null, which a late event would leave unlocked-but-running.
+                    if (!isProcessStatusInProgress(entity.buildStatus)) {
                         return false;
                     }
 
@@ -124,7 +126,10 @@ export class AnalysisBuilder {
                     break;
                 }
                 case AnalysisBuilderEvent.EXECUTION_PROGRESS: {
-                    if (isProcessStatusTerminal(entity.buildStatus)) {
+                    // only a run core still considers running (STARTING/STARTED)
+                    // may progress: not a terminal one, and not one unlocked to
+                    // null, which a late event would leave unlocked-but-running.
+                    if (!isProcessStatusInProgress(entity.buildStatus)) {
                         return false;
                     }
 
@@ -156,6 +161,12 @@ export class AnalysisBuilder {
                     return false;
                 }
                 case AnalysisBuilderEvent.EXECUTION_FAILED: {
+                    // a late failure must neither flip a finished run nor
+                    // write onto one unlocked to null.
+                    if (!isProcessStatusInProgress(entity.buildStatus)) {
+                        return false;
+                    }
+
                     entity.buildStatus = ProcessStatus.FAILED;
                     break;
                 }

@@ -424,6 +424,29 @@ describe('AnalysisBuilder', () => {
             expect(await findAnalysis(analysis.id)).toMatchObject({ buildProgress: 40, updatedAt });
         });
 
+        it.each([
+            [AnalysisBuilderEvent.EXECUTION_STARTED, null],
+            [AnalysisBuilderEvent.EXECUTION_PROGRESS, null],
+            [AnalysisBuilderEvent.EXECUTION_FAILED, null],
+            [AnalysisBuilderEvent.EXECUTION_FAILED, ProcessStatus.EXECUTED],
+        ])('should ignore a late %s on a %s build', async (event, status) => {
+            // e.g. a stale run declared FAILED, then unlocked (null), whose
+            // retried EXECUTE still runs — it must not wedge the analysis.
+            const analysis = await createAnalysis({ buildStatus: status });
+
+            const saved = await builder.applyEvent(event, {
+                id: analysis.id,
+                progress: {
+                    current: 0, 
+                    total: 0, 
+                    percent: 10, 
+                },
+            });
+
+            expect(saved).toBeNull();
+            expect(await findAnalysis(analysis.id)).toMatchObject({ buildStatus: status });
+        });
+
         it.each([ProcessStatus.FAILED, null])('should not resurrect a %s build on a late EXECUTION_FINISHED', async (status) => {
             const analysis = await createAnalysis({
                 buildStatus: status,
