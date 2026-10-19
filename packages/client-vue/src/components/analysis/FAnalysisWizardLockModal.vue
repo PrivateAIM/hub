@@ -6,8 +6,9 @@
   -->
 
 <script lang="ts">
+import { usePermissionCheck } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisCommand } from '@privateaim/core-kit';
+import { AnalysisCommand, getAnalysisCommandPermissionName } from '@privateaim/core-kit';
 import { VCButton } from '@vuecs/button';
 import { VCAlert } from '@vuecs/elements';
 import { VCIcon } from '@vuecs/icon';
@@ -37,6 +38,8 @@ export default defineComponent({
 
         const isBusy = ref(false);
         const lockIt = ref(true);
+        // only offer the build when the server would accept it
+        const canBuild = usePermissionCheck({ name: getAnalysisCommandPermissionName(AnalysisCommand.BUILD_START) });
         const buildIt = ref(true);
 
         const close = () => {
@@ -63,7 +66,7 @@ export default defineComponent({
                     emit('updated', entity);
                 }
 
-                if (buildIt.value) {
+                if (buildIt.value && canBuild.value) {
                     const { data } = await apiClient
                         .analysis.runCommand(props.entity.id, AnalysisCommand.BUILD_START);
 
@@ -87,6 +90,7 @@ export default defineComponent({
             handleBuildItChanged,
 
             buildIt,
+            canBuild,
             lockIt,
 
             execute,
@@ -134,7 +138,7 @@ export default defineComponent({
                         </VCFormCheckbox>
                         In order to build the analysis, the configuration must be locked!
                     </div>
-                    <div v-if="lockIt">
+                    <div v-if="lockIt && canBuild">
                         <VCFormCheckbox
                             v-model="buildIt"
                             :disabled="isBusy"

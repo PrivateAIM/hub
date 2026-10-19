@@ -13,6 +13,7 @@ import {
     AnalysisValidator,
     NodeType,
     ProjectNodeApprovalStatus,
+    getAnalysisCommandPermissionName,
 } from '@privateaim/core-kit';
 import {
     PermissionName,
@@ -317,9 +318,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             throw new BadRequestError('Invalid command.');
         }
 
-        const permissionName = command === AnalysisCommand.BUILD_START || command === AnalysisCommand.DISTRIBUTION_START ?
-            PermissionName.ANALYSIS_EXECUTION_START :
-            PermissionName.ANALYSIS_UPDATE;
+        const permissionName = getAnalysisCommandPermissionName(command);
 
         await actor.permissionEvaluator.preEvaluate({ name: permissionName });
 

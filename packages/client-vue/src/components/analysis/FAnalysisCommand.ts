@@ -12,8 +12,8 @@ import {
     AnalysisCommand,
     AnalysisConfiguratorCommandChecker,
     AnalysisDistributorCommandChecker,
+    getAnalysisCommandPermissionName,
 } from '@privateaim/core-kit';
-import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import {
     computed, 
@@ -73,7 +73,8 @@ const FAnalysisCommand = defineComponent({
             }
         });
 
-        const isAllowed = usePermissionCheck({ name: PermissionName.ANALYSIS_UPDATE });
+        // the same permission the server enforces for this command
+        const isAllowed = usePermissionCheck({ name: getAnalysisCommandPermissionName(props.command) });
 
         const shouldDisplay = computed<boolean>(
             () => {
