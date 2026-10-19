@@ -328,8 +328,9 @@ checks (credential ownership, the messenger mailbox, bucket ownership, socket ro
 see the real caller. Authup applies the same rule since authup#3723 (`useRequestPolicyGrants`).
 The credential needs
 `permission_read` at `ownOrNull` or wider. Fetch failures propagate; no cross-request
-catalog cache or name-only fallback is installed. Token-verifier caching and socket
-connection lifetimes remain unchanged.
+catalog cache or name-only fallback is installed. The catalog read leaves socket
+connection lifetimes unchanged; token-verifier caching is described under
+[Token verification](#token-verification-authup-beta70).
 
 ### Token verification (Authup beta.70)
 
@@ -352,7 +353,7 @@ Redis share results only when they introspect as the same client.
   endpoint eagerly and throws without a base URL, so `createAuthupTokenVerifier` returns an
   `UnconfiguredTokenVerifier` (refuses every token) instead. Without this, a service booted
   without Authup would crash instead of answering 401.
-- A failed introspection request (Authup down, 5xx) now surfaces as `invalid_token` → 401.
+- A failed introspection request (Authup down, 5xx, 429, refused service credential) surfaces from vouchly as `invalid_token`; `IntrospectableTokenVerifier` rethrows it as `upstream_error` → 502, so client hooks do not drop a session over an outage. A judged token (inactive, expired) stays 401.
 
 The evaluator enforces the data a call supplies. A service using only `preEvaluate`
 still has only a pre-gate.

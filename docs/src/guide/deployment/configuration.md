@@ -207,9 +207,10 @@ acted on it as that client.
 Every Hub service now refuses a credential that is not structurally a compact
 JWS within those bounds **before** introspecting it, answering 401 (sockets:
 connection refused). The fallback itself is fixed upstream in authup#3724,
-released in Authup `1.0.0-beta.70`; against an older Authup server the Hub-side
-guard is what stops it, since Hub's verifier still sends such a token to
-introspection. Entries cached for such strings sit under Redis `token:*` keys,
+released in Authup `1.0.0-beta.70`. Authup's own beta.70 token verifier
+still sends such a token to introspection, so against an older Authup server
+Hub's guard (`IntrospectableTokenVerifier`, which refuses the token before
+introspecting it) is what stops it. Entries cached for such strings sit under Redis `token:*` keys,
 which Hub no longer reads since the [beta.70 upgrade](#authup-upgrade-to-beta-70).
 
 ## Attaching nodes to a project requires `project_update`
@@ -548,9 +549,11 @@ Authup deployment they run against:
   other's results only when they authenticate as the same client (the default,
   `system` for all of them); services with their own clients each introspect a
   token once.
-- **An Authup outage answers 401.** A failed introspection request (Authup
-  unreachable or answering 5xx) is now reported as `invalid_token` and answered
-  401, not with Authup's own status.
+- **An Authup outage answers 502.** When Hub cannot get an answer about a
+  token (Authup unreachable, answering 5xx or 429, or refusing Hub's own
+  service credential), the request answers 502 `upstream_error`. A token
+  Authup judged (inactive, expired) still answers 401. Before this release an
+  unreachable Authup answered 401, which made `client-ui` sign the user out.
 - **The malformed-bearer fix is complete.** Authup now answers a malformed
   token `active: false` itself (see
   [Malformed bearer tokens](#malformed-bearer-tokens-no-longer-authenticate)).
@@ -562,6 +565,15 @@ Authup deployment they run against:
   from Hub's realm pages. The built-in `admin` role already has `any`. A
   `user_self_manage` or `client_self_manage` grant stored at `realmScope: none`
   no longer permits self-edits in the account console; grant it at `own`.
+- **Attribute-policy grants no longer join realm realtime rooms.** A grant
+  carrying an `attributes` / `attributeNames` policy no longer admits its
+  holder to rooms in a realm namespace (`/resources/<realmId>`): a room has no
+  row to evaluate the policy against, so it fails closed. HTTP reads and writes
+  evaluate such policies against the record and are unaffected.
+- **`registry_manage` reveals registry-project secrets only in its reach.** A
+  grant at `own` (or `ownOrNull`) returns `accountSecret` only for projects in
+  the realms it reaches; before, any `registry_manage` grant revealed the
+  secret of every registry project the caller could read.
 - **RSA signing keys must be at least 2048 bits.** Hub verifies by
   introspection, so it does not check key size itself. Authup now refuses to
   import a shorter key, and its own adapters reject tokens signed with one.

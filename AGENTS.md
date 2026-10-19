@@ -347,8 +347,20 @@ What is not obvious from the diff:
   `TokenVerifier` constructor dereferences `baseURL`; `createAuthupTokenVerifier`
   now returns an `UnconfiguredTokenVerifier` (refuses every token, 401) and is
   typed `ITokenVerifier`.
-- **An Authup outage now answers 401**, not authup's own status: vouchly reports
-  a failed introspection request as `invalid_token`.
+- **An Authup outage answers 502, never 401.** vouchly reports every failed
+  introspection request (unreachable, 5xx, 429, hub's own credential refused,
+  failed mint) as `introspection_failed`, which authup's adapter maps onto
+  `invalid_token` — a 401 that makes every authup client hook (client-ui, the
+  worker) drop or re-mint its session although the token was never judged.
+  `IntrospectableTokenVerifier` rethrows it as `HubError({ code:
+  'upstream_error', status: 502 })` (reading `vouchly`'s error, now a declared
+  server-http-kit dependency); an inactive/expired token keeps its 401. Pinned
+  by server-http-kit's `token-verifier.spec.ts` against a real HTTP stub
+  (negative-controlled). The result cache is injectable (`cache`) for specs.
+- **`registry_manage` is evaluated per secret-bearing registry project** (by
+  its realm and row), not just pre-gated: an `own` grant used to reveal
+  `accountSecret` of every realm the caller could read (pre-existing, found in
+  review). A sparse fieldset that dropped `realmId` re-reads it.
 - `ClientAuthenticationHookOptions.baseURL` (ignored since beta.70) is no longer
   passed by `AuthupHookModule` or the test apps.
 
