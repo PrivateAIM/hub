@@ -434,14 +434,15 @@ describe('AnalysisBuilder', () => {
             // retried EXECUTE still runs — it must not wedge the analysis.
             const analysis = await createAnalysis({ buildStatus: status });
 
-            const saved = await builder.applyEvent(event, {
+            const payload: AnalysisBuilderExecutionProgressPayload = {
                 id: analysis.id,
                 progress: {
                     current: 0, 
                     total: 0, 
                     percent: 10, 
                 },
-            });
+            };
+            const saved = await builder.applyEvent(event, payload);
 
             expect(saved).toBeNull();
             expect(await findAnalysis(analysis.id)).toMatchObject({ buildStatus: status });

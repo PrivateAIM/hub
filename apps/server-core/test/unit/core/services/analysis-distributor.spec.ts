@@ -424,14 +424,15 @@ describe('AnalysisDistributor', () => {
             // retried EXECUTE still runs — it must not wedge the analysis.
             const analysis = await createAnalysis({ distributionStatus: status });
 
-            const saved = await distributor.applyEvent(event, {
+            const payload: AnalysisDistributorExecutionProgressPayload = {
                 id: analysis.id,
                 progress: {
                     current: 0, 
                     total: 0, 
                     percent: 10, 
                 },
-            });
+            };
+            const saved = await distributor.applyEvent(event, payload);
 
             expect(saved).toBeNull();
             expect(await findAnalysis(analysis.id)).toMatchObject({ distributionStatus: status });
