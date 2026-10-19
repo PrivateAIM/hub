@@ -157,7 +157,8 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         const isNodeClient = await this.isNodeClient(entity, actor);
 
-        await this.assertUpdatable(entity, validated, actor, isNodeClient);
+        // Snapshot the stored row: typeorm's merge() below writes into `entity`.
+        await this.assertUpdatable({ ...entity }, validated, actor, isNodeClient);
 
         // A node approves the built image (hash, size, OS), which does not
         // exist before the build has finished; a rejection is possible any time.

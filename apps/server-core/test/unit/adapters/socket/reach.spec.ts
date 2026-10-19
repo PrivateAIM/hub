@@ -5,8 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionError } from '@authup/access';
-import type { PermissionCompileContext, PermissionCompileResult } from '@authup/access';
+import { BuiltInPolicyType, PermissionError, createAuthorizationEvaluator } from '@authup/access';
+import type {
+    AuthorizationGrant,
+    PermissionCompileContext,
+    PermissionCompileResult,
+} from '@authup/access';
 import { PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import type { FakeActorContext } from '@privateaim/server-test-kit';
@@ -47,6 +51,50 @@ class PerNameEvaluator extends FakePermissionEvaluator {
     }
 }
 
+/**
+ * A real authup evaluator holding ANALYSIS_UPDATE at `realm_scope: own` in
+ * `realmId`, optionally with an inverted `attributes` junction policy on the
+ * grant (passes for any row that is NOT configuration-locked).
+ */
+async function createAttributePolicyEvaluator(realmId: string, withAttributePolicy: boolean) {
+    const bindingPolicyId = randomUUID();
+    const attributesPolicyId = randomUUID();
+    const grant: AuthorizationGrant = {
+        name: PermissionName.ANALYSIS_UPDATE,
+        realm_id: null,
+        client_id: null,
+        realm_scope: 'own',
+        policies: withAttributePolicy ? [attributesPolicyId] : [],
+    };
+
+    return createAuthorizationEvaluator({
+        catalog: {
+            policies: {
+                [bindingPolicyId]: { type: BuiltInPolicyType.PERMISSION_BINDING },
+                [attributesPolicyId]: {
+                    type: BuiltInPolicyType.ATTRIBUTES,
+                    invert: true,
+                    query: { configurationLocked: true },
+                },
+            },
+            permissions: [{
+                name: PermissionName.ANALYSIS_UPDATE,
+                realm_id: null,
+                client_id: null,
+                decision_strategy: null,
+                policies: [bindingPolicyId],
+            }],
+        },
+        grants: [grant],
+        identity: {
+            id: randomUUID(),
+            type: 'user',
+            realmId,
+            realmName: 'tenant',
+        },
+    });
+}
+
 describe('adapters/socket/reach', () => {
     it('reads the realm id of a realm namespace, none for the global one', () => {
         const realmId = randomUUID();
@@ -85,6 +133,41 @@ describe('adapters/socket/reach', () => {
             const actor = createScopedActor({ realmScope: 'any' });
             await expect(assertSocketSubscribeReach(toSocketData(actor), ANALYSIS)).resolves.toBeUndefined();
             await expect(assertSocketSubscribeReach(toSocketData(actor, randomUUID()), ANALYSIS)).resolves.toBeUndefined();
+        });
+
+        it('evaluates a realm-namespace room without row attributes', async () => {
+            const actor = createScopedActor({ realmScope: 'own' });
+            await assertSocketSubscribeReach(toSocketData(actor, actor.realm.id), ANALYSIS);
+
+            const [call] = actor.permissionEvaluator.evaluateOneOfCalls;
+            expect(call.data?.get(BuiltInPolicyType.REALM_MATCH)).toBe(actor.realm.id);
+            expect(call.data?.has(BuiltInPolicyType.ATTRIBUTES)).toBe(false);
+        });
+
+        it('refuses a realm-namespace room to a grant carrying an attribute policy', async () => {
+            // There is no row to evaluate the policy against, so it stays
+            // pending and denies — fail closed, even for an inverted policy
+            // that an empty attribute set would satisfy.
+            const realmId = randomUUID();
+            const data = (permissionEvaluator: SocketReachData['permissionEvaluator']): SocketReachData => ({
+                permissionEvaluator,
+                identity: {
+                    id: randomUUID(), 
+                    type: 'user', 
+                    realmId, 
+                    realmName: 'tenant', 
+                },
+                namespaceId: realmId,
+            });
+
+            await expect(assertSocketSubscribeReach(
+                data(await createAttributePolicyEvaluator(realmId, false)),
+                ANALYSIS,
+            )).resolves.toBeUndefined();
+            await expect(assertSocketSubscribeReach(
+                data(await createAttributePolicyEvaluator(realmId, true)),
+                ANALYSIS,
+            )).rejects.toThrow(PermissionError);
         });
 
         it('does not let an unbounded grant of one family open another family\'s global rooms', async () => {
