@@ -53,7 +53,7 @@
         "@hubwire/test": "^0.1.1",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.2.0",
-        "vitest": "^4.1.11"
+        "vitest": "^5.0.5"
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.71",
