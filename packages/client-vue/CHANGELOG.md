@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.19.1](https://github.com/PrivateAIM/hub/compare/v0.19.0...v0.19.1) (2026-10-20)
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/* to 1.0.0-beta.71 ([#1976](https://github.com/PrivateAIM/hub/issues/1976)) ([ee40202](https://github.com/PrivateAIM/hub/commit/ee40202d44f716dacfb61ada6473fe73f23b9ac8))
+* **deps:** bump minorandpatch group and dev majors except typescript ([#1977](https://github.com/PrivateAIM/hub/issues/1977)) ([17d5922](https://github.com/PrivateAIM/hub/commit/17d5922db81fb29dc46c7b40133eb903e14596aa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/core-kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/core-realtime-kit bumped from ^0.18.1 to ^0.18.2
+    * @privateaim/kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/storage-kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/telemetry-kit bumped from ^0.19.0 to ^0.19.1
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/core-kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/storage-kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/telemetry-kit bumped from ^0.19.0 to ^0.19.1
+
 ## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.19.0) (2026-10-19)
 
 
