@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.17.1](https://github.com/PrivateAIM/hub/compare/v0.17.0...v0.17.1) (2026-10-20)
+
+
+### Bug Fixes
+
+* **deps:** bump minorandpatch group and dev majors except typescript ([#1977](https://github.com/PrivateAIM/hub/issues/1977)) ([17d5922](https://github.com/PrivateAIM/hub/commit/17d5922db81fb29dc46c7b40133eb903e14596aa))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/kit bumped from ^0.19.0 to ^0.19.1
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/kit bumped from ^0.19.0 to ^0.19.1
+
 ## [0.17.0](https://github.com/PrivateAIM/hub/compare/v0.16.2...v0.17.0) (2026-10-19)
 
 
