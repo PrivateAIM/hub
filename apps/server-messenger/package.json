@@ -20,8 +20,8 @@
     "license": "Apache-2.0",
     "description": "This package contains the realtime application which connects the API with socket based clients.",
     "dependencies": {
-        "@authup/core-kit": "^1.0.0-beta.70",
-        "@authup/kit": "^1.0.0-beta.70",
+        "@authup/core-kit": "^1.0.0-beta.71",
+        "@authup/kit": "^1.0.0-beta.71",
         "@privateaim/errors": "^0.18.1",
         "@privateaim/kit": "^0.19.0",
         "@privateaim/messenger-kit": "^0.17.0",
