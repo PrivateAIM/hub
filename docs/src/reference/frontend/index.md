@@ -23,6 +23,7 @@ docker run -e ... privateaim/hub ui
 |----------|---------|-------------|
 | `NUXT_PUBLIC_CORE_URL` | — | Core API base URL |
 | `NUXT_PUBLIC_AUTHUP_URL` | — | Authup URL |
+| `NUXT_AUTHUP_URL` | `AUTHUP_URL` at build time | Address the server render dials Authup on (e.g. an in-cluster service). Only requests are sent there: every URL in the rendered page (identity-provider links, OAuth2 endpoints) keeps `NUXT_PUBLIC_AUTHUP_URL` |
 | `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `admin-console` | OAuth2 client used for the login (authorization-code) flow |
 | `NUXT_PUBLIC_ACCOUNT_URL` | `<NUXT_PUBLIC_AUTHUP_URL>/console/account` | Authup account console, linked from the "Account" sidebar entry |
 | `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
