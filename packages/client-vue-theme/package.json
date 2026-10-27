@@ -47,14 +47,14 @@
     },
     "homepage": "https://github.com/PrivateAim/hub#readme",
     "dependencies": {
-        "@authup/client-web-kit-theme": "^1.0.0-beta.71",
-        "@vuecs/design": "^1.2.1",
-        "@vuecs/theme-tailwind": "^6.5.0"
+        "@authup/client-web-kit-theme": "^1.0.0-beta.72",
+        "@vuecs/design": "^1.2.2",
+        "@vuecs/theme-tailwind": "^6.5.1"
     },
     "peerDependencies": {
         "@vuecs/core": "^3.6.0",
-        "@vuecs/design": "^1.2.1",
-        "@vuecs/theme-tailwind": "^6.5.0",
+        "@vuecs/design": "^1.2.2",
+        "@vuecs/theme-tailwind": "^6.5.1",
         "tailwindcss": "^4.3.3"
     },
     "publishConfig": {

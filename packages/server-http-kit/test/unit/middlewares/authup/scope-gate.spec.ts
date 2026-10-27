@@ -18,9 +18,9 @@ import { useRequestPermissionEvaluator } from '../../../../src/request/index.ts'
 const catalog: AuthorizationCatalog = {
     permissions: [{
         name: 'node_update',
-        realm_id: null,
-        client_id: null,
-        decision_strategy: null,
+        realmId: null,
+        clientId: null,
+        decisionStrategy: null,
         policies: ['binding'],
     }],
     policies: { binding: { type: 'permissionBinding' } },
