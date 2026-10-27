@@ -15,9 +15,9 @@ import { createAuthupPermissionEvaluator, resolveAuthupPolicySubject } from '../
 const catalog: AuthorizationCatalog = {
     permissions: [{
         name: 'node_update',
-        realm_id: null,
-        client_id: null,
-        decision_strategy: null,
+        realmId: null,
+        clientId: null,
+        decisionStrategy: null,
         policies: ['binding'],
     }],
     policies: { binding: { type: 'permissionBinding' }, restricted: { type: 'attributes', query: { name: 'allowed' } } },
@@ -111,9 +111,9 @@ describe('Authup authorization catalog', () => {
             const identityCatalog: AuthorizationCatalog = {
                 permissions: [{
                     name: 'user_only',
-                    realm_id: null,
-                    client_id: null,
-                    decision_strategy: null,
+                    realmId: null,
+                    clientId: null,
+                    decisionStrategy: null,
                     policies: ['users'],
                 }],
                 policies: { users: { type: 'identity', types: ['user'] } },

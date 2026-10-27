@@ -79,9 +79,9 @@ async function createAttributePolicyEvaluator(realmId: string, withAttributePoli
             },
             permissions: [{
                 name: PermissionName.ANALYSIS_UPDATE,
-                realm_id: null,
-                client_id: null,
-                decision_strategy: null,
+                realmId: null,
+                clientId: null,
+                decisionStrategy: null,
                 policies: [bindingPolicyId],
             }],
         },

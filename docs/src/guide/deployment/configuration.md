@@ -586,6 +586,30 @@ Authup deployment they run against:
   import a shorter key, and its own adapters reject tokens signed with one.
   Replace any shorter imported key as the Authup guide describes.
 
+## Authup upgrade to beta.72
+
+Hub now requires Authup `1.0.0-beta.72`. Read the
+[Authup upgrade guide](https://authup.org/guide/deployment/upgrading) for the
+release. Hub needs no data changes:
+
+- **Upgrade the Authup server and Hub together.** `POST /authorization/check`
+  (the batch behind every `client-ui` permission gate) and `GET /authorization`
+  (the catalog Hub's services read) changed shape. An older `client-ui` against a
+  newer Authup, or the reverse, denies every gate. An older Hub service against
+  a newer Authup rejects the catalog, and every authenticated request fails.
+- **Hub's permissions stay global.** A check by bare name matches the global
+  permission definition only, both in Hub's services and in `client-ui`.
+  Provision Hub's permission names without a `realmId`, as before. A copy owned
+  by a realm or client is a different permission, and Hub never checks it.
+- **Roles, permissions, scopes and policies created without a realm are now
+  global.** Before, they landed in the creator's realm. This affects the admin
+  pages in `client-ui`. A realm admin (not master) gets their own realm filled in
+  by the form. A master user creating a permission now creates a global one,
+  which is what Hub checks.
+- **A token without the `global` scope introspects with no grants.** Hub already
+  ignored such grants (see
+  [Authup upgrade to beta.68](#authup-upgrade-to-beta-68)), so nothing changes.
+
 ## Database Variables
 
 Used by `server-core`, `server-storage`, `server-telemetry`, and `server-messenger`:

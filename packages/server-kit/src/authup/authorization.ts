@@ -27,7 +27,10 @@ import type { AuthupPolicySubject, AuthupTokenSubjectData } from './types.ts';
  * - identity-reading policies (`identity`, realm match, …) still evaluate
  *   against the real caller instead of against nobody.
  *
- * Authup applies the same rule since authup#3723 (`useRequestPolicyGrants`).
+ * Authup applies the same rule since authup#3723 (`useRequestPolicyGrants`),
+ * and since 1.0.0-beta.72 (authup#3773) its introspection reports no grants for
+ * such a token either. Hub keeps the gate: it does not depend on the server's
+ * version, and it is what pins the rule in hub's own specs.
  */
 export function resolveAuthupPolicySubject(data: AuthupTokenSubjectData): AuthupPolicySubject {
     const scopes = unwrapOAuth2Scope(data.scope || []);
