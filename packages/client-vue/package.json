@@ -78,7 +78,7 @@
         "@vuecs/timeago": "^2.2.1",
         "@vueuse/core": "^15.0.0",
         "hapic": "^3.0.2",
-        "happy-dom": "^21.0.3",
+        "happy-dom": "^21.0.4",
         "ilingo": "^6.2.1",
         "pinia": "^4.0.3",
         "smob": "^1.6.2",
