@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.19.2](https://github.com/PrivateAIM/hub/compare/v0.19.1...v0.19.2) (2026-10-27)
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/* to 1.0.0-beta.72 ([#1984](https://github.com/PrivateAIM/hub/issues/1984)) ([52836fc](https://github.com/PrivateAIM/hub/commit/52836fc9e782eba57b78901ef272ef0ee69a2574))
+* **deps:** bump the minorandpatch group with 10 updates ([1cfa8c3](https://github.com/PrivateAIM/hub/commit/1cfa8c3e312a7434ff5a0ef2f3f90964e4e7225b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/errors bumped from ^0.19.0 to ^0.19.1
+    * @privateaim/kit bumped from ^0.19.1 to ^0.19.2
+    * @privateaim/server-db-kit bumped from ^0.19.1 to ^0.19.2
+    * @privateaim/server-http-kit bumped from ^0.19.1 to ^0.19.2
+    * @privateaim/server-kit bumped from ^0.19.1 to ^0.19.2
+    * @privateaim/server-telemetry-kit bumped from ^0.19.1 to ^0.19.2
+    * @privateaim/telemetry-kit bumped from ^0.19.1 to ^0.19.2
+  * devDependencies
+    * @privateaim/server-test-kit bumped from ^0.19.1 to ^0.19.2
+
 ## [0.19.1](https://github.com/PrivateAIM/hub/compare/v0.19.0...v0.19.1) (2026-10-20)
 
 
