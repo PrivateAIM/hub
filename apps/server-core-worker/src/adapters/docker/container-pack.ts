@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Readable } from 'node:stream';
-import type { Headers } from 'tar-stream';
+import { Readable } from 'node:stream';
+import type { Header } from 'tar-stream';
 import tar from 'tar-stream';
 
 /**
@@ -57,11 +57,11 @@ export type DockerContainerPackTarget = {
 export type DockerContainerPackOptions = {
     path: string,
 
-    validateEntry?: (entry: Headers) => void,
+    validateEntry?: (entry: Header) => void,
 
-    onEntryPackStarted?: (entry: Headers) => void,
-    onEntryPackFinished?: (entry: Headers) => void,
-    onEntryPackFailed?: (error: Error, entry: Headers) => void,
+    onEntryPackStarted?: (entry: Header) => void,
+    onEntryPackFinished?: (entry: Header) => void,
+    onEntryPackFailed?: (error: Error, entry: Header) => void,
 };
 
 export async function packDockerContainerWithTarStream(
@@ -189,7 +189,7 @@ export async function packDockerContainerWithTarStream(
             });
 
             stream.on('end', () => {
-                entry.end();
+                entry.end(undefined);
             });
 
             stream.on('error', (err) => {
@@ -209,7 +209,7 @@ export async function packDockerContainerWithTarStream(
             pack.finalize();
         });
 
-        container.putArchive(pack, { path: options.path })
+        container.putArchive(Readable.from(pack), { path: options.path })
             .then(() => resolve())
             .catch(fail);
 
