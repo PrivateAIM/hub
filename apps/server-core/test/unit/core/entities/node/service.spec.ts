@@ -241,11 +241,25 @@ describe('NodeService', () => {
                 createAllowAllActor(),
             );
 
-            expect(result.publicKey).toBe(Buffer.from('hello', 'utf8').toHex());
+            expect(result.publicKey).toBe('68656c6c6f');
         });
     });
 
     describe('update', () => {
+        it('should convert non-hex publicKey to hex', async () => {
+            const node = createTestNode({ realmId: 'realm-1' });
+
+            repository.seed(node);
+
+            const result = await service.update(
+                node.id,
+                { publicKey: 'hello' },
+                createAllowAllActor(),
+            );
+
+            expect(result.publicKey).toBe('68656c6c6f');
+        });
+
         it('should update existing entity', async () => {
             const node = createTestNode({ realmId: 'realm-1' });
 

@@ -314,7 +314,7 @@ it('should deny without permission', async () => {
 
 GitHub Actions (`.github/workflows/main.yml`) runs:
 
-1. **Install** — `npm ci` with Node 24
+1. **Install** — `npm ci` with Node 26
 2. **Build** — `npm run build` (Nx with caching)
 3. **Test** — Parallel matrix: MySQL, Postgres, SQLite
    - Database provided as a workflow service (external), selected per matrix entry

@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- **Node.js** ≥24.0.0
+- **Node.js** ≥26.0.0
 - **npm** (ships with Node.js)
 - **Docker** and **Docker Compose** (for database services)
 

@@ -42,7 +42,8 @@ export default [
         },
     },
     {
-        // Node 24 does not implement Uint8Array's hex/base64 methods yet.
+        // Keep Buffer encoding APIs and the kit's existing base64 conversions;
+        // adopting Node 26 does not require rewriting serialization.
         files: ['apps/server-*/**/*.ts', 'packages/server-*/**/*.ts', 'packages/kit/**/*.ts'],
         rules: {
             'unicorn/prefer-uint8array-hex': 'off',

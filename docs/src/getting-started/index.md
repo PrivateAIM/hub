@@ -18,7 +18,7 @@ Hub provides the backend services and frontend application that coordinate feder
 ## Technology Stack
 
 - **Language**: TypeScript (all packages)
-- **Runtime**: Node.js ≥24.0.0
+- **Runtime**: Node.js ≥26.0.0
 - **Package Manager**: npm (workspaces)
 - **Build Orchestration**: Nx 22
 - **Database**: MySQL, PostgreSQL, or SQLite (via TypeORM)

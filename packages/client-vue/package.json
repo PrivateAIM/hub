@@ -136,6 +136,6 @@
     },
     "gitHead": "ed48328bdd01d844915c26c6fcfb7fdcc1f33396",
     "engines": {
-        "node": ">=24.0.0"
+        "node": ">=26.0.0"
     }
 }

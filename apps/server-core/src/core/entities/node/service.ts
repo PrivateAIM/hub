@@ -122,7 +122,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         if (entity.publicKey && !isHex(entity.publicKey)) {
             entity.publicKey = Buffer
-                .from(entity.publicKey, 'utf8').toHex();
+                .from(entity.publicKey, 'utf8').toString('hex');
         }
 
         await this.linkRegistryProject(entity);
@@ -139,7 +139,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         if (validated.publicKey && !isHex(validated.publicKey)) {
             validated.publicKey = Buffer
-                .from(validated.publicKey, 'utf8').toHex();
+                .from(validated.publicKey, 'utf8').toString('hex');
         }
 
         const entity = await this.repository.findOneWithExternalName(id);

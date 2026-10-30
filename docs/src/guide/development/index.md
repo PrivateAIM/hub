@@ -9,7 +9,7 @@ Welcome to the FLAME Hub development guide. This section covers contributing to 
 
 ## Quick Start
 
-Node.js **≥24.0.0** and npm are required for all workspaces.
+Node.js **≥26.0.0** and npm are required for all workspaces.
 
 ```bash
 npm ci          # Install dependencies

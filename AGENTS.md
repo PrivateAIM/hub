@@ -24,7 +24,7 @@ npm run dev --workspace=apps/server-core-worker # Worker service
 npm run dev --workspace=docs                    # Documentation site
 ```
 
-- **Node.js**: ≥24.0.0 (declared in root and workspace `engines`)
+- **Node.js**: ≥26.0.0 (declared in root and workspace `engines`)
 - **Package manager**: npm (workspaces)
 - **Build orchestration**: Nx 22
 

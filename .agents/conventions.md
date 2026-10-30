@@ -29,9 +29,10 @@ Config: `eslint.config.js` — extends `@tada5hi/eslint-config` with Vue-specifi
 The shared config enforces statement/class-member spacing, `I`-prefixed interfaces,
 exported type declarations in `types.ts`, and no external-package re-exports in
 barrels. Existing public names that are not `I`-prefixed use type aliases instead.
-Node 24 does not provide the new `Uint8Array` hex/base64 methods; the corresponding
-Unicorn preferences are disabled for server code and the isomorphic `kit` package.
-The root and every workspace declare `engines.node: >=24.0.0`.
+Buffer encoding APIs and existing base64 conversions are retained; the corresponding
+Unicorn preferences stay disabled for server code and the isomorphic `kit` package.
+CI, release, documentation builds and the Docker image use Node 26.
+The root and every workspace declare `engines.node: >=26.0.0`.
 
 ## Pre-commit Hooks
 
