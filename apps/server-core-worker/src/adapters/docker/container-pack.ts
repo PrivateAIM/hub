@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Readable } from 'node:stream';
+import { Readable } from 'node:stream';
 import tar from 'tar-stream';
 import type { DockerContainerPackOptions, DockerContainerPackTarget } from './types.ts';
 
@@ -176,7 +176,7 @@ export async function packDockerContainerWithTarStream(
             });
 
             stream.on('end', () => {
-                entry.end();
+                entry.end(undefined);
             });
 
             stream.on('error', (err) => {
@@ -196,7 +196,7 @@ export async function packDockerContainerWithTarStream(
             pack.finalize();
         });
 
-        container.putArchive(pack, { path: options.path })
+        container.putArchive(Readable.from(pack), { path: options.path })
             .then(() => resolve())
             .catch(fail);
 
