@@ -119,7 +119,6 @@ export class MasterImageService extends AbstractEntityService implements IMaster
 
                 // persist STARTING before dispatching, or a fast worker event
                 // could be overwritten by this save.
-                let previous: MasterImage['buildStatus'] = null;
                 const entity = await this.repository.updateLocked(id, (locked) => {
                     // Only one active build may claim the row. An old build
                     // may be taken over because master images have no check command.
@@ -130,7 +129,6 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                         throw new BadRequestError('The master image build is already in progress.');
                     }
 
-                    previous = locked.buildStatus;
                     locked.buildStatus = ProcessStatus.STARTING;
                     // A stale STARTING takeover otherwise saves no change and retains its old claim time.
                     locked.updatedAt = new Date().toISOString();
@@ -142,24 +140,9 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                     throw new EntityNotFoundError({ entity: 'master-image' });
                 }
 
-                try {
-                    await this.builderDispatcher.dispatchExecute({ id: entity.id });
-                } catch (e) {
-                    // presumably nothing was dispatched, so no worker event will
-                    // move STARTING on — but a publish can fail after the broker
-                    // took the message, so revert only a row still STARTING.
-                    await this.repository.updateLocked(id, (locked) => {
-                        if (locked.buildStatus !== ProcessStatus.STARTING) {
-                            return false;
-                        }
-
-                        locked.buildStatus = previous;
-
-                        return true;
-                    });
-
-                    throw e;
-                }
+                // A rejected publish may already have reached a worker. Keep the
+                // claim active so its events apply and an immediate retry cannot duplicate it.
+                await this.builderDispatcher.dispatchExecute({ id: entity.id });
 
                 return entity;
             }
