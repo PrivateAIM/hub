@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ConfigInjectionKey, LoggerInjectionKey } from '@privateaim/server-kit';
+import { ConfigInjectionKey, LoggerInjectionKey, startApplication } from '@privateaim/server-kit';
 import { createApplication } from '../app/index.ts';
 
 export async function startCommand() {
     const app = createApplication();
 
-    await app.setup();
+    await startApplication(app);
 
     const logger = app.container.resolve(LoggerInjectionKey);
     const config = app.container.resolve(ConfigInjectionKey);
