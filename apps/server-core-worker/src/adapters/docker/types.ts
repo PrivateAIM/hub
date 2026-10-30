@@ -6,7 +6,7 @@
  */
 
 import type { Readable } from 'node:stream';
-import type { Headers } from 'tar-stream';
+import type { Header } from 'tar-stream';
 
 /**
  * The slice of dockerode's Container this needs. Declared structurally so the
@@ -19,11 +19,11 @@ export type DockerContainerPackTarget = {
 export type DockerContainerPackOptions = {
     path: string,
 
-    validateEntry?: (entry: Headers) => void,
+    validateEntry?: (entry: Partial<Header> & Pick<Header, 'name'>) => void,
 
-    onEntryPackStarted?: (entry: Headers) => void,
-    onEntryPackFinished?: (entry: Headers) => void,
-    onEntryPackFailed?: (error: Error, entry: Headers) => void,
+    onEntryPackStarted?: (entry: Partial<Header> & Pick<Header, 'name'>) => void,
+    onEntryPackFinished?: (entry: Partial<Header> & Pick<Header, 'name'>) => void,
+    onEntryPackFailed?: (error: Error, entry: Partial<Header> & Pick<Header, 'name'>) => void,
 };
 
 export type DockerAuthConfig = {
