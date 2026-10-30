@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-10-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* All workspaces and service deployments now require Node.js >=26.0.0.
+* Node.js >=24.0.0 is required. Import forwarded error helpers from @ebec/core, theme helpers from @authup/client-web-kit-theme, and permission evaluator test helpers from @authup/server-test-kit instead of the PrivateAIM barrels.
+
+### Bug Fixes
+
+* **deps-dev:** bump fast-uri from 3.1.6 to 3.1.9 ([#1987](https://github.com/PrivateAIM/hub/issues/1987)) ([08099c6](https://github.com/PrivateAIM/hub/commit/08099c6689b4866e033f9bc0685c2c6c3c1d43b2))
+* **deps-dev:** bump serialize-javascript from 7.1.2 to 7.1.4 ([#1985](https://github.com/PrivateAIM/hub/issues/1985)) ([e5fd935](https://github.com/PrivateAIM/hub/commit/e5fd935103fd0d94cd819940ff2a2b72f2076adb))
+* **server-core-worker:** finalize symmetric crypto synchronously ([179beb9](https://github.com/PrivateAIM/hub/commit/179beb9307091596a1e58e6e54719ee46274861c))
+
+
+### Build System
+
+* require Node 26 across workspaces and CI ([3b1989e](https://github.com/PrivateAIM/hub/commit/3b1989eb5bdb44ca91c95092d0de38f8d3700153))
+* upgrade eslint config to v3 and require Node 24 ([652d794](https://github.com/PrivateAIM/hub/commit/652d794c872bf59177512a2a8ad10f26bb5545f1))
+
 ## [0.19.2](https://github.com/PrivateAIM/hub/compare/v0.19.1...v0.19.2) (2026-10-27)
 
 

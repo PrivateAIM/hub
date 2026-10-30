@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-10-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* All workspaces and service deployments now require Node.js >=26.0.0.
+* Node.js >=24.0.0 is required. Import forwarded error helpers from @ebec/core, theme helpers from @authup/client-web-kit-theme, and permission evaluator test helpers from @authup/server-test-kit instead of the PrivateAIM barrels.
+
+### Build System
+
+* require Node 26 across workspaces and CI ([3b1989e](https://github.com/PrivateAIM/hub/commit/3b1989eb5bdb44ca91c95092d0de38f8d3700153))
+* upgrade eslint config to v3 and require Node 24 ([652d794](https://github.com/PrivateAIM/hub/commit/652d794c872bf59177512a2a8ad10f26bb5545f1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/core-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/core-realtime-kit bumped from ^0.18.3 to ^0.19.0
+    * @privateaim/kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/storage-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/telemetry-kit bumped from ^0.19.2 to ^0.20.0
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/core-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/storage-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/telemetry-kit bumped from ^0.19.2 to ^0.20.0
+
 ## [0.19.2](https://github.com/PrivateAIM/hub/compare/v0.19.1...v0.19.2) (2026-10-27)
 
 
