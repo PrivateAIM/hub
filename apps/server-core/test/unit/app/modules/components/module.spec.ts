@@ -14,12 +14,12 @@ import {
     RemoteMessageBusInjectionKey,
 } from '@privateaim/server-kit';
 import { RemoteWorker } from 'hubwire';
-import { 
-    beforeEach, 
-    describe, 
-    expect, 
-    it, 
-    vi, 
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
 } from 'vitest';
 import { AnalysisReconciler } from '../../../../../src/core/services/analysis-reconciler/index.ts';
 import { createAnalysisReconcilerComponent } from '../../../../../src/app/components/analysis-reconciler/module.ts';

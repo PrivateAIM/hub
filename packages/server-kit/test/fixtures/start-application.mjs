@@ -18,7 +18,7 @@ if (mode === 'setup-fail' || mode === 'ready-fail') {
 
                 process.send('starting');
                 await new Promise((resolve) => {
-                    setTimeout(resolve, 50); 
+                    setTimeout(resolve, 50);
                 });
 
                 throw new Error('ready failed');
@@ -34,7 +34,7 @@ if (mode === 'setup-fail' || mode === 'ready-fail') {
             async setup() {
                 process.send('starting');
                 await new Promise((resolve) => {
-                    setTimeout(resolve, 50); 
+                    setTimeout(resolve, 50);
                 });
 
                 throw new Error('setup failed');
@@ -62,7 +62,7 @@ if (mode === 'setup-fail' || mode === 'ready-fail') {
 
             process.send('starting');
             await new Promise((resolve) => {
-                setTimeout(resolve, 50); 
+                setTimeout(resolve, 50);
             });
             process.send('setup-finished');
         },
@@ -74,7 +74,7 @@ if (mode === 'setup-fail' || mode === 'ready-fail') {
             }
 
             await new Promise((resolve) => {
-                setTimeout(resolve, 50); 
+                setTimeout(resolve, 50);
             });
 
             if (process.argv[2] === 'fail') {
@@ -102,4 +102,3 @@ if (mode === 'setup-fail' || mode === 'ready-fail') {
     keepAlive = setInterval(() => {}, 1_000);
     process.send('ready');
 }
-

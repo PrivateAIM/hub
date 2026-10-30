@@ -25,7 +25,7 @@ describe('startApplication', () => {
         });
 
         const code = await new Promise<number | null>((resolve) => {
-            child.on('exit', resolve); 
+            child.on('exit', resolve);
         });
 
         expect(code).toBe(0);
@@ -45,7 +45,7 @@ describe('startApplication', () => {
         });
 
         const code = await new Promise<number | null>((resolve) => {
-            child.on('exit', resolve); 
+            child.on('exit', resolve);
         });
 
         expect(code).toBe(0);
@@ -64,7 +64,7 @@ describe('startApplication', () => {
         });
 
         const code = await new Promise<number | null>((resolve) => {
-            child.on('exit', resolve); 
+            child.on('exit', resolve);
         });
 
         expect(code).toBe(1);
@@ -95,7 +95,7 @@ describe('startApplication', () => {
         let output = '';
 
         child.stdout!.on('data', (chunk) => {
-            output += chunk; 
+            output += chunk;
         });
         child.on('message', (message: string) => {
             if (message === 'ready') {
@@ -121,7 +121,7 @@ describe('startApplication', () => {
         });
 
         const code = await new Promise<number | null>((resolve) => {
-            child.on('exit', resolve); 
+            child.on('exit', resolve);
         });
 
         expect(code).toBe(1);
