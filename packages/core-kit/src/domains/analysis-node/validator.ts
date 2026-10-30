@@ -29,25 +29,25 @@ export class AnalysisNodeValidator extends TypedContainer<AnalysisNode> {
 
         this.mount(
             'executionStatus',
-            { optional: true },
+            { group: ValidatorGroup.UPDATE, optional: true },
             createValidator(z.enum(ProcessStatus).nullable()),
         );
 
         this.mount(
             'executionProgress',
-            { optional: true },
+            { group: ValidatorGroup.UPDATE, optional: true },
             createValidator(z.number().int().min(0).max(100).nullable()),
         );
 
         this.mount(
             'approvalStatus',
-            { optional: true },
+            { group: ValidatorGroup.UPDATE, optional: true },
             createValidator(z.enum(AnalysisNodeApprovalStatus).nullable()),
         );
 
         this.mount(
             'comment',
-            { optional: true },
+            { group: ValidatorGroup.UPDATE, optional: true },
             createValidator(z.string().nullable()),
         );
     }

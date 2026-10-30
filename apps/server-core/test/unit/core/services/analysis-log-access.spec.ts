@@ -32,6 +32,7 @@ const PENDING_REALM = randomUUID();
 const OTHER_REALM = randomUUID();
 
 const ANALYSIS_ID = randomUUID();
+const OTHER_ANALYSIS_ID = randomUUID();
 const APPROVED_NODE = randomUUID();
 const PENDING_NODE = randomUUID();
 const APPROVED_NODE_CLIENT = randomUUID();
@@ -70,7 +71,10 @@ describe('AnalysisLogAccessService', () => {
     beforeEach(() => {
         const analysisRepository = new FakeAnalysisRepository();
 
-        analysisRepository.seed(analysisRepository.create({ id: ANALYSIS_ID, realmId: OWNER_REALM }));
+        analysisRepository.seed([
+            analysisRepository.create({ id: ANALYSIS_ID, realmId: OWNER_REALM }),
+            analysisRepository.create({ id: OTHER_ANALYSIS_ID, realmId: OWNER_REALM }),
+        ]);
 
         const nodeRepository = new FakeNodeRepository();
 
@@ -296,6 +300,35 @@ describe('AnalysisLogAccessService', () => {
                 APPROVED_NODE,
                 createScopedActor({ realmId: OWNER_REALM, realmScope: 'own' }),
             )).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('rejects a bound client writing to an unrelated existing analysis', async () => {
+            await expect(service.assertAnalysisNodeLogCreate(
+                OTHER_ANALYSIS_ID,
+                APPROVED_NODE,
+                boundClientOf(APPROVED_NODE_CLIENT, APPROVED_REALM),
+            )).rejects.toThrow(ValidupError);
+        });
+
+        it('allows a bound client to write before participation is approved', async () => {
+            await expect(service.assertAnalysisNodeLogCreate(
+                ANALYSIS_ID,
+                PENDING_NODE,
+                boundClientOf(PENDING_NODE_CLIENT, PENDING_REALM),
+            )).resolves.toBeUndefined();
+        });
+
+        it('checks authorization before revealing whether the pair participates', async () => {
+            await expect(service.assertAnalysisNodeLogCreate(
+                OTHER_ANALYSIS_ID,
+                APPROVED_NODE,
+                createScopedActor({ realmId: OTHER_REALM, realmScope: 'own' }),
+            )).rejects.toThrow(PermissionDeniedError);
+            await expect(service.assertAnalysisNodeLogCreate(
+                OTHER_ANALYSIS_ID,
+                APPROVED_NODE,
+                createDenyAllActor(OTHER_REALM),
+            )).rejects.toThrow(PermissionError);
         });
 
         it('rejects an unknown node or analysis', async () => {
