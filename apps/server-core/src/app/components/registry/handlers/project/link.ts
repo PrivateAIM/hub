@@ -6,6 +6,8 @@
  */
 import { buildRegistryClientConnectionStringFromRegistry } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
+import { withDataSourceLock } from '@privateaim/server-db-kit';
+import type { DataSource } from 'typeorm';
 import type { Logger } from '@privateaim/server-kit';
 import type { ComponentHandler } from 'hubwire';
 import type { Client as AuthupClient } from '@authup/core-http-kit';
@@ -41,6 +43,20 @@ export class RegistryProjectLinkHandler implements ComponentHandler<
         value: RegistryProjectLinkPayload,
     ): Promise<void> {
         const dataSource = await useDataSource();
+        const project = await dataSource.getRepository(RegistryProjectEntity).findOneBy({ id: value.id });
+
+        if (!project) {
+            return;
+        }
+
+        // Re-read under the migration lock: a delayed ordinary link must not
+        // persist its source snapshot over a completed migration's credentials.
+        await withDataSourceLock(dataSource, `server-core:registry-migration:${project.registryId}`, async () => {
+            await this.link(dataSource, value);
+        });
+    }
+
+    private async link(dataSource: DataSource, value: RegistryProjectLinkPayload): Promise<void> {
         const repository = dataSource.getRepository(RegistryProjectEntity);
         const entity = await repository.createQueryBuilder('registryProject')
             .addSelect([

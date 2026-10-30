@@ -6,7 +6,9 @@
  */
 
 import { faker } from '@faker-js/faker';
-import type { DataSource, Repository } from 'typeorm';
+import type { RegistryProject } from '@privateaim/core-kit';
+import { DataSource } from 'typeorm';
+import type { Repository } from 'typeorm';
 import {
     afterAll,
     afterEach,
@@ -14,11 +16,90 @@ import {
     describe,
     expect,
     it,
+    vi,
 } from 'vitest';
-import { RegistryEntity } from '../../../../../src/adapters/database/entities/index.ts';
+import { RegistryEntity, RegistryProjectEntity } from '../../../../../src/adapters/database/entities/index.ts';
 import { DatabaseInjectionKey } from '../../../../../src/app/modules/database/index.ts';
 import { RegistryManagerAdapter } from '../../../../../src/app/modules/registry/index.ts';
 import { createTestDatabaseApplication } from '../../../../app';
+import { RegistryCommand } from '../../../../../src/core/domains/index.ts';
+
+describe('RegistryManagerAdapter relink dispatch', () => {
+    it('should use the migration lock key and release its runner', async () => {
+        const dataSource = new DataSource({ type: 'postgres' });
+        const runner = dataSource.createQueryRunner();
+        const query = vi.spyOn(runner, 'query').mockResolvedValue([{ acquired: true, released: true }]);
+        const release = vi.spyOn(runner, 'release').mockResolvedValue();
+        const manager = new RegistryManagerAdapter({ dataSource });
+
+        vi.spyOn(dataSource, 'createQueryRunner').mockReturnValue(runner);
+
+        const result = await manager.withRegistryLock('registry-id', async () => {
+            expect(query).toHaveBeenCalledTimes(1);
+            expect(release).not.toHaveBeenCalled();
+
+            return 'saved';
+        });
+
+        expect(result).toBe('saved');
+        expect(query).toHaveBeenCalledTimes(2);
+        expect(query.mock.calls.map((call) => call[1])).toEqual([
+            ['server-core:registry-migration:registry-id'],
+            ['server-core:registry-migration:registry-id'],
+        ]);
+        expect(release).toHaveBeenCalledOnce();
+    });
+
+    it('should reserve a new project name under the registry migration lock', async () => {
+        const dataSource = new DataSource({ type: 'postgres' });
+        const runner = dataSource.createQueryRunner();
+        const query = vi.spyOn(runner, 'query').mockResolvedValue([{ acquired: true, released: true }]);
+        const release = vi.spyOn(runner, 'release').mockResolvedValue();
+        const repository = dataSource.getRepository(RegistryProjectEntity);
+        const entity = Object.assign(new RegistryProjectEntity(), { registryId: 'registry-id', externalName: 'new-name' });
+
+        vi.spyOn(dataSource, 'createQueryRunner').mockReturnValue(runner);
+        vi.spyOn(repository, 'create').mockReturnValue(entity);
+        vi.spyOn(repository, 'save').mockImplementation(async () => {
+            expect(query).toHaveBeenCalledTimes(1);
+            expect(release).not.toHaveBeenCalled();
+
+            return entity;
+        });
+
+        const manager = new RegistryManagerAdapter({ dataSource });
+
+        expect(await manager.createProject(entity)).toBe(entity);
+        expect(query.mock.calls[0][1]).toEqual(['server-core:registry-migration:registry-id']);
+        expect(repository.save).toHaveBeenCalledOnce();
+        expect(release).toHaveBeenCalledOnce();
+    });
+
+    it('should dispatch the active source and a separate required target name', async () => {
+        const dispatch = vi.fn(async () => {});
+        const manager = new RegistryManagerAdapter({
+            dataSource: new DataSource({ type: 'postgres' }),
+            registryComponentDispatcher: { dispatch },
+        });
+        const project = {
+            id: 'source-id',
+            registryId: 'registry-id',
+            externalName: 'source-name',
+            accountId: 'source-account',
+        } as RegistryProject;
+
+        await manager.relinkProject(project, 'target-name');
+
+        expect(dispatch).toHaveBeenCalledExactlyOnceWith(RegistryCommand.PROJECT_RELINK, {
+            id: project.id,
+            registryId: project.registryId,
+            externalName: 'source-name',
+            accountId: 'source-account',
+            targetExternalName: 'target-name',
+        }, {});
+        expect(project.externalName).toBe('source-name');
+    });
+});
 
 describe('RegistryManagerAdapter', () => {
     const suite = createTestDatabaseApplication();

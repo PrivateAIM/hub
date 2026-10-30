@@ -14,6 +14,21 @@ These variables are shared across all services:
 | `AMQP_URL` | No | RabbitMQ connection URL |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
 
+## Graceful shutdown
+
+The core, storage, telemetry and messenger CLI starts, and the worker entrypoint,
+handle `SIGINT` and `SIGTERM` by awaiting application teardown once. A signal during
+startup waits for setup before teardown; a failed setup also triggers cleanup.
+Shutdown has a **30-second deadline**, including handles left alive after teardown;
+expiry or a rejected setup/teardown exits with code 1. Successful cleanup lets buffered
+output drain before the process exits. Allow more than 30 seconds of termination grace
+in your process supervisor so Hub's deadline can run before a forced kill.
+Scheduled components finish an in-flight pass before their dependencies close.
+Core closes its Socket.IO clients before the HTTP listener. The installed Orkos
+lifecycle catches individual module teardown errors, so exit code 0 is not proof
+that every module cleaned up successfully; detecting those failures requires an
+upstream lifecycle change.
+
 ## Message delivery (RabbitMQ)
 
 When `AMQP_URL` is set, commands to the worker, storage and telemetry services
@@ -44,15 +59,14 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   link/relink/unlink, registry setup/cleanup/delete, webhook processing). They
   used to run inside server-core's request first and reach the queue only if that
   call threw. They are now only queued and run by the registry consumer, which
-  retries a command that throws. The Harbor handlers still log a Harbor error and
-  give up rather than throw, so a Harbor outage leaves the project unlinked, as
-  before, until the next link (e.g. a node or registry project update). A node's
-  robot account and registry credentials appear shortly after the node is
-  created rather than with the response. Renaming a registry project's
-  `externalName` is one relink command, so its unlink of the old Harbor project
-  and its link of the new one cannot run out of order. Without a message bus
-  server-core runs them in-process; a command sent before the registry consumer
-  has started waits in the queue.
+  retries a command that throws. Ordinary link/unlink handlers still log Harbor
+  errors and give up; the migration handler throws failures for retry. A node's
+  robot account and registry credentials appear shortly after creation rather
+  than with the response. Renaming a registry project's `externalName` queues a
+  non-destructive copy, verification and credential cutover; see
+  [Registry project renames](#registry-project-renames). Without a message bus
+  server-core runs commands in-process; a command sent before the registry
+  consumer has started waits in the queue.
 - **Set RabbitMQ's `consumer_timeout` above your longest analysis or master-image
   build.** A command is acknowledged only once its handler finishes. If a build
   outlasts the timeout (RabbitMQ default: 30 minutes), the broker closes the
@@ -124,6 +138,60 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   requests (an unlink, then a link) can run on two replicas at once, so wait
   for the first to finish before sending the second.
 - Failure events carry the error's `name`, `message` and `code` instead of `{}`.
+
+## Registry project renames
+
+Changing a node's `externalName`, or renaming a registry project directly, queues
+an asynchronous **same-registry** migration. Hub keeps the active registry-project
+name, Harbor ID and credentials at the source until it has copied and verified
+the destination and provisioned destination access. Poll the registry-project
+record to observe cutover; the update response still contains the active source
+name. Master-image project renames are refused because workers use their fixed
+namespace.
+
+Before renaming:
+
+1. **Drain/stop old server-core registry consumers before deploying this change.**
+   Old consumers interpret relink as destructive unlink/link. New consumers refuse
+   legacy relink messages without an explicit destination. Do not allow old and
+   new consumers to handle the new migration commands together.
+2. **Pause all registry writers and drain in-flight distributions**, including
+   queued/retried worker commands and external clients. Harbor has no per-project
+   read-only switch. Inventory verification detects changes during copying, but
+   it is not a write fence: a push after verification can remain source-only.
+   Do not resume writers until the active binding has switched and clients have
+   refreshed their namespace and credentials.
+3. Do not issue link/unlink/delete, registry reassignment, or overlapping rename
+   requests during migration. A competing rename is refused once its expected
+   source no longer matches; it is not a last-request-wins operation. Retry from
+   the currently active project after investigating the failure.
+
+The migration copies manifests by digest, preserves tags and verifies the result
+before local cutover. It does **not** clone arbitrary project configuration such
+as memberships, retention/immutability rules or scan history. A conflicting
+unowned destination is refused rather than adopted. Copy, provisioning or
+verification failure leaves the active source binding and its credentials intact;
+marked partial destinations are retained for a verified retry. A crash between
+project creation and marker creation leaves an unowned target; recovery is
+manual rather than silently adopting it. Check registry error logs
+if the active name does not change after the message's bounded retries. Retry a
+failed node-triggered rename through the registry-project update endpoint with
+the desired target: resubmitting an unchanged node name is intentionally a no-op.
+If writers added an accessory after its subject was copied, Harbor may refuse
+to backfill it into an existing destination; verification stops cutover. Such a
+partial target needs operator recovery after writers are drained, not a forced
+cutover.
+
+**The source project and its robot account are retained**, so cached URLs and
+credentials continue to work. Migration robot descriptions are durable retention
+records binding source and destination Harbor project IDs. Registry cleanup
+honours them and takes the same registry-level lock as migration; it refuses to
+continue if a migration record is malformed or unreadable. Do not remove or edit
+these robots as routine cleanup. Retention is indefinite: reclaim an old project
+only after confirming all readers/writers have switched and reconciling any
+late source writes. There is no automatic retirement or live-writer convergence.
+Explicit project deletion and cross-registry reassignment are separate destructive
+operations, not this migration protocol.
 
 ## Authup upgrade to beta.68
 
@@ -462,7 +530,7 @@ Behaviour changes on top:
 - **Node clients** hold `analysis_read`, `node_read` and the new
   `analysis_node_log_create`, all at `realm_scope: none`, and no longer
   `analysis_update`. Their own node is authorized by binding: a node's client
-  reports execution status on its own analysis-node rows, writes its run's logs
+  reports execution status and progress on its own analysis-node rows, writes its run's logs
   and reads them, but cannot change other analyses of its realm. The background
   sync rewrites existing grants.
 - **Analysis clients'** permissions are created at `realm_scope: none`.
@@ -473,7 +541,16 @@ Behaviour changes on top:
   needs the new credentials.
 - **Writing a node's logs** (`POST /analysis-node-logs`) needs
   `analysis_node_log_create`: the node's own client, or a grant reaching the
-  node's realm. Telemetry's `log_create` is not given to nodes.
+  node's realm. The `(analysisId, nodeId)` participation row must exist;
+  pending participants may write logs, so approval is not required. Telemetry's
+  `log_create` is not given to nodes.
+- **Execution progress**, like execution status, requires authority over the
+  node (its bound client or `analysis_update` reaching the node's realm).
+  Authority over only the analysis owner's realm does not permit either field.
+  Both remain on the existing `POST /analysis-nodes/:id` update endpoint.
+  Creating an assignment accepts only `analysisId` and `nodeId`; supplied execution,
+  approval and comment fields are ignored. Set those fields through the authorized
+  update route, not by seeding them when attaching a node.
 - **Registry credentials of a node** need `node_update` or `registry_manage`
   reaching the node's realm.
 - **Deleting a realm-less telemetry event** needs `event_delete` at `ownOrNull`

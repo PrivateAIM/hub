@@ -149,6 +149,10 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
         ) {
             throw new PermissionDeniedError('You are not permitted to write logs of this node.');
         }
+
+        if (!await this.analysisNodeRepository.findOneBy({ analysisId, nodeId })) {
+            throw buildAttributeError('analysisId');
+        }
     }
 
     protected async isNodeClientOfApprovedRun(analysisId: string, nodeId: string, actor: ActorContext): Promise<boolean> {

@@ -22,6 +22,9 @@ export interface INodeRepository extends IEntityRepository<Node> {
 }
 
 export interface IRegistryManager {
+    /** Serialize project reads and saves with registry migration and cleanup. Dispatch after release. */
+    withRegistryLock<T>(registryId: string, fn: () => Promise<T>): Promise<T>;
+
     findDefaultRegistryId(): Promise<string | null>;
 
     createProject(data: Partial<RegistryProject>): Promise<RegistryProject>;
@@ -30,7 +33,8 @@ export interface IRegistryManager {
     removeProject(project: RegistryProject): Promise<void>;
 
     linkProject(id: string): Promise<void>;
-    relinkProject(project: RegistryProject): Promise<void>;
+    /** Dispatch an asynchronous migration; the source stays active until the target is verified. */
+    relinkProject(project: RegistryProject, targetExternalName: string): Promise<void>;
     unlinkProject(project: RegistryProject): Promise<void>;
 }
 

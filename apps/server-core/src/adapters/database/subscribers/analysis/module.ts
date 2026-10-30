@@ -68,14 +68,16 @@ export class AnalysisSubscriber extends BaseSubscriber<
     async afterUpdate(event: UpdateEvent<AnalysisEntity>): Promise<any> {
         await super.afterUpdate(event);
 
-        await this.assignClient(
-            {
-                ...(event.databaseEntity || {}),
-                ...event.entity,
-            } as AnalysisEntity,
-            event.manager,
-            false,
-        );
+        const entity = {
+            ...(event.databaseEntity || {}),
+            ...event.entity,
+        } as AnalysisEntity;
+
+        if (entity.clientId && entity.clientId === event.databaseEntity?.clientId) {
+            return;
+        }
+
+        await this.assignClient(entity, event.manager, false);
     }
 
     async afterRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
@@ -88,9 +90,10 @@ export class AnalysisSubscriber extends BaseSubscriber<
 
     /**
      * Ensure the analysis owns an Authup client. On insert the default
-     * self-capabilities are granted; on update we only (re)create a missing
-     * client and never touch its permissions, so admin-configured capabilities
-     * (plan 010, phase 2) are preserved.
+     * self-capabilities are granted; updates only provision a missing binding
+     * or check an explicitly changed client. An unchanged binding is not checked
+     * for remote deletion here: status/heartbeat saves may hold a row lock.
+     * Updates never touch permissions, preserving admin-configured capabilities.
      */
     protected async assignClient(
         entity: AnalysisEntity,

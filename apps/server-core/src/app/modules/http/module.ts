@@ -71,6 +71,8 @@ export class HTTPModule implements IModule {
 
     private instance: HTTPServer | undefined;
 
+    private socket: ReturnType<typeof createSocketServer> | undefined;
+
     constructor(options: HTTPModuleOptions = {}) {
         this.options = options;
     }
@@ -188,7 +190,7 @@ export class HTTPModule implements IModule {
                 const redisPubResult = container.tryResolve(RedisPublishClientInjectionKey);
                 const redisSubResult2 = container.tryResolve(RedisSubscribeClientInjectionKey);
 
-                createSocketServer(server.node!.server as Server, {
+                this.socket = createSocketServer(server.node!.server as Server, {
                     config,
                     authupClient: authupResult.success ? authupResult.data : undefined,
                     logger,
@@ -197,7 +199,10 @@ export class HTTPModule implements IModule {
                 });
             }
         } catch (e) {
+            await this.socket?.close().catch(() => undefined);
+            this.socket = undefined;
             await server.close().catch(() => undefined);
+            this.instance = undefined;
 
             throw e;
         }
@@ -212,7 +217,12 @@ export class HTTPModule implements IModule {
 
         container.unregister(HTTPInjectionKey.Server);
 
-        await this.instance.close();
-        this.instance = undefined;
+        try {
+            await this.socket?.close();
+        } finally {
+            this.socket = undefined;
+            await this.instance.close();
+            this.instance = undefined;
+        }
     }
 }

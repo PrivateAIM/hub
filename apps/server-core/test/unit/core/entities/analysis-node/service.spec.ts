@@ -35,19 +35,35 @@ import { FakeAnalysisNodeRepository } from './fake-repository.ts';
 import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../../utils/domains/index.ts';
 
-function createFakeAnalysisNodeRepository(projectId: string) {
-    const repo = new FakeAnalysisNodeRepository();
+class FakeAnalysisNodeServiceRepository extends FakeAnalysisNodeRepository {
+    constructor(private readonly fixture: {
+        projectId: string,
+        analysisRealmId?: string,
+        nodeRealmId?: string,
+        nodeType?: NodeType,
+    }) {
+        super();
+    }
 
-    const originalValidateJoinColumns = repo.validateJoinColumns.bind(repo);
+    create(data: Partial<AnalysisNode>): AnalysisNode {
+        // Mirror the database column defaults for newly assigned nodes.
+        return super.create({
+            approvalStatus: null,
+            executionStatus: null,
+            executionProgress: null,
+            comment: null,
+            ...data,
+        });
+    }
 
-    repo.validateJoinColumns = async (data: Partial<AnalysisNode>) => {
-        await originalValidateJoinColumns(data);
+    async validateJoinColumns(data: Partial<AnalysisNode>): Promise<void> {
+        await super.validateJoinColumns(data);
 
         if (!data.analysis) {
             data.analysis = {
                 id: data.analysisId,
-                realmId: 'realm-1',
-                projectId,
+                realmId: this.fixture.analysisRealmId ?? 'realm-1',
+                projectId: this.fixture.projectId,
                 configurationLocked: false,
             } as Analysis;
         }
@@ -56,20 +72,19 @@ function createFakeAnalysisNodeRepository(projectId: string) {
             data.node = {
                 id: data.nodeId,
                 name: 'test-node',
-                type: NodeType.DEFAULT,
-                realmId: 'realm-1',
+                type: this.fixture.nodeType ?? NodeType.DEFAULT,
+                realmId: this.fixture.nodeRealmId ?? 'realm-1',
                 registryId: 'registry-1',
             } as Node;
         }
-    };
-
-    return repo;
+    }
 }
 
 describe('AnalysisNodeService', () => {
     let repository: FakeAnalysisNodeRepository;
     let analysisRepository: FakeEntityRepository<Analysis>;
     let nodeRepository: FakeEntityRepository<Node>;
+    let projectNodeRepository: FakeProjectNodeRepository;
     let recalculator: FakeAnalysisNodeMetadataRecalculator;
     let service: AnalysisNodeService;
     let analysisId: string;
@@ -81,9 +96,9 @@ describe('AnalysisNodeService', () => {
 
         const projectId = randomUUID();
 
-        repository = createFakeAnalysisNodeRepository(projectId);
+        repository = new FakeAnalysisNodeServiceRepository({ projectId });
 
-        const projectNodeRepository = new FakeProjectNodeRepository();
+        projectNodeRepository = new FakeProjectNodeRepository();
 
         analysisRepository = new FakeEntityRepository<Analysis>();
         nodeRepository = new FakeEntityRepository<Node>();
@@ -184,6 +199,76 @@ describe('AnalysisNodeService', () => {
     });
 
     describe('create', () => {
+        it.each([
+            {
+                nodeType: NodeType.DEFAULT,
+                skipAnalysisApproval: false,
+                approvalStatus: null,
+            },
+            {
+                nodeType: NodeType.DEFAULT,
+                skipAnalysisApproval: true,
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            },
+            {
+                nodeType: NodeType.AGGREGATOR,
+                skipAnalysisApproval: false,
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+            },
+        ])('ignores node-controlled CREATE fields ($nodeType, skip approval: $skipAnalysisApproval)', async ({
+            nodeType,
+            skipAnalysisApproval,
+            approvalStatus,
+        }) => {
+            const foreignNodeId = randomUUID();
+            const projectNode = await projectNodeRepository.findOneBy({ nodeId });
+
+            projectNodeRepository.seed({
+                id: randomUUID(),
+                projectId: projectNode.projectId,
+                nodeId: foreignNodeId,
+            } as ProjectNode);
+
+            repository = new FakeAnalysisNodeServiceRepository({
+                projectId: projectNode.projectId,
+                nodeRealmId: 'foreign-realm',
+                nodeType,
+            });
+            service = new AnalysisNodeService({
+                repository,
+                analysisRepository,
+                projectNodeRepository,
+                recalculator,
+                reach: new AnalysisReachService({
+                    analysisNodeRepository: repository,
+                    analysisRepository,
+                    nodeRepository,
+                }),
+                skipAnalysisApproval,
+            });
+
+            const result = await service.create({
+                analysisId,
+                nodeId: foreignNodeId,
+                approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
+                executionStatus: ProcessStatus.EXECUTED,
+                executionProgress: 100,
+                comment: 'forged',
+            }, createPermissionActor({
+                realm: { id: 'realm-1' },
+                permissions: [PermissionName.ANALYSIS_UPDATE],
+            }));
+
+            expect(result.nodeRealmId).toBe('foreign-realm');
+
+            const persisted = await repository.findOneBy({ id: result.id });
+
+            expect(persisted.approvalStatus).toBe(approvalStatus);
+            expect(persisted.executionStatus).toBeNull();
+            expect(persisted.executionProgress).toBeNull();
+            expect(persisted.comment).toBeNull();
+        });
+
         it('should deny an analysis of a realm out of reach', async () => {
             await expect(service.create(
                 { analysisId, nodeId },
@@ -354,6 +439,38 @@ describe('AnalysisNodeService', () => {
             expect(result.executionStatus).toBe(ProcessStatus.EXECUTING);
         });
 
+        it.each([0, 50, null])('should reject owner-only execution progress %s and leave the row unchanged', async (executionProgress) => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+                executionProgress: 10,
+            });
+
+            repository.seed(node);
+
+            await expect(service.update(node.id, { executionProgress }, createScopedActor({ realmId: 'realm-1', realmScope: 'own' })))
+                .rejects.toThrow(PermissionDeniedError);
+            expect(repository.getAll()[0].executionProgress).toBe(10);
+            expect(recalculator.getDebouncedCallCount()).toBe(0);
+        });
+
+        it('should let the node realm update execution progress without a status', async () => {
+            const node = createTestAnalysisNode({
+                analysisId,
+                analysisRealmId: 'realm-1',
+                nodeRealmId: 'realm-2',
+                executionProgress: 10,
+            });
+
+            repository.seed(node);
+
+            const result = await service.update(node.id, { executionProgress: 50 }, createScopedActor({ realmId: 'realm-2', realmScope: 'own' }));
+
+            expect(result.executionProgress).toBe(50);
+            expect(recalculator.getDebouncedCallCount()).toBe(1);
+        });
+
         it('should deny an actor reaching neither realm', async () => {
             const node = createTestAnalysisNode({
                 analysisId,
@@ -437,6 +554,14 @@ describe('AnalysisNodeService', () => {
 
             expect(result.executionStatus).toBe(ProcessStatus.EXECUTING);
             expect(result.executionProgress).toBe(10);
+        });
+
+        it.each([0, 50, null])('should let the node\'s own client set progress %s without analysis_update', async (executionProgress) => {
+            const row = seedClientNode({});
+
+            const result = await service.update(row.id, { executionProgress }, createClientActor('realm-2'));
+
+            expect(result.executionProgress).toBe(executionProgress);
         });
 
         it('should not let the node\'s own client approve', async () => {
