@@ -43,15 +43,20 @@ describe('src/core/crypto', () => {
         expect(symmetricKeyDecrypted).toEqual(symmetricKey);
     });
 
-    it('should symmetric encrypt & decrypt buffer', async () => {
+    it.each([0, 1, 15, 16, 17, 128, 129])('should symmetric encrypt & decrypt a %i-byte buffer', (length) => {
         const symmetricKey = crypto.randomBytes(32);
         const symmetricKeyIv = crypto.randomBytes(16);
 
-        const buff = crypto.randomBytes(128);
+        const buff = crypto.randomBytes(length);
 
         const symmetricEncrypted = encryptSymmetric(symmetricKey, symmetricKeyIv, buff);
         const symmetricDecrypted = decryptSymmetric(symmetricKey, symmetricEncrypted);
 
+        expect(symmetricEncrypted.length).toBe(16 + (Math.floor(length / 16) + 1) * 16);
         expect(symmetricDecrypted).toEqual(buff);
+    });
+
+    it('should throw synchronously for invalid padding', () => {
+        expect(() => decryptSymmetric(Buffer.alloc(32), Buffer.alloc(16))).toThrow();
     });
 });
