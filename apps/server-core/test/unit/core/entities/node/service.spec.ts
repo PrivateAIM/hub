@@ -377,6 +377,34 @@ describe('NodeService', () => {
             expect(registryManager.getLinkCalls()).toContain(projects[0].id);
         });
 
+        it('should relink with the old external name while saving the new one', async () => {
+            const registryId = randomUUID();
+            const registryProject = createTestRegistryProject({ registryId, externalName: 'old-name' });
+            const node = createTestNode({
+                registryId,
+                registryProjectId: registryProject.id,
+                externalName: 'old-name',
+            });
+
+            registryManager.seedProject(registryProject);
+            repository.seed(node);
+
+            const result = await service.update(node.id, { externalName: 'new-name' }, createAllowAllActor());
+
+            const saved = registryManager.getProjects()[0];
+            const relink = registryManager.getRelinkCalls();
+
+            expect(result.externalName).toBe('new-name');
+            expect(saved.externalName).toBe('new-name');
+            expect(relink).toHaveLength(1);
+            expect(relink[0]).toMatchObject({
+                id: saved.id,
+                registryId,
+                externalName: 'old-name',
+            });
+            expect(relink[0]).not.toBe(saved);
+        });
+
         it('should keep the existing registry project when the registry is unchanged', async () => {
             const registryId = randomUUID();
 

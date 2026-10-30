@@ -311,11 +311,14 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         if (registryProject) {
             if (registryProject.externalName !== externalName) {
+                const previousExternalName = registryProject.externalName;
+
                 registryProject.externalName = externalName;
                 registryProject.realmId = entity.realmId;
 
-                await this.registryManager.saveProject(registryProject);
-                await this.registryManager.relinkProject(registryProject);
+                const saved = await this.registryManager.saveProject(registryProject);
+
+                await this.registryManager.relinkProject({ ...saved, externalName: previousExternalName });
             }
         } else {
             registryProject = await this.registryManager.createProject({
