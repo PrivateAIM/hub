@@ -7,7 +7,9 @@
 
 import { faker } from '@faker-js/faker';
 import type { Analysis } from '@privateaim/core-kit';
-import { AnalysisError } from '@privateaim/core-kit';
+import { AnalysisError, MasterImageCommand } from '@privateaim/core-kit';
+import { BadRequestError } from '@privateaim/errors';
+import { createAllowAllActor } from '@privateaim/server-test-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type { AnalysisBuilderExecutionProgressPayload } from '@privateaim/server-core-worker-kit';
 import {
@@ -29,6 +31,9 @@ import { AnalysisInjectionKey } from '../../../../src/app/modules/analysis/index
 import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index.ts';
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
 import { MasterImageBuilderService } from '../../../../src/core/services/master-image/index.ts';
+import { MasterImageService } from '../../../../src/core/entities/master-image/service.ts';
+import { FakeMasterImageBuilderDispatcher } from '../../core/entities/master-image/fake-builder-dispatcher.ts';
+import { FakeMasterImageSynchronizerDispatcher } from '../../core/entities/master-image/fake-synchronizer-dispatcher.ts';
 import { createTestDatabaseApplication } from '../../../app/index.ts';
 import { FakeAnalysisBuilderDispatcher } from '../../core/services/helpers/fake-builder-dispatcher.ts';
 import { FakeAnalysisMetadataRecalculator } from '../../core/entities/analysis/fake-metadata-recalculator.ts';
@@ -87,6 +92,40 @@ describe('status transition row lock', () => {
 
     afterAll(async () => {
         await suite.teardown();
+    });
+
+    it('should renew a stale STARTING master-image claim before rejecting an immediate duplicate', async () => {
+        const imageRepository = dataSource.getRepository(MasterImageEntity);
+        const staleUpdatedAt = new Date(Date.now() - 16 * 60 * 1000).toISOString();
+        const name = faker.string.alpha({ length: 16, casing: 'lower' });
+        const image = await imageRepository.save(imageRepository.create({
+            name,
+            virtualPath: `group/${name}`,
+            groupVirtualPath: 'group',
+            buildStatus: ProcessStatus.STARTING,
+            updatedAt: staleUpdatedAt,
+        }));
+        const builderDispatcher = new FakeMasterImageBuilderDispatcher();
+        const service = new MasterImageService({
+            repository: suite.container.resolve(DatabaseInjectionKey.MasterImageRepository),
+            builderDispatcher,
+            synchronizerDispatcher: new FakeMasterImageSynchronizerDispatcher(),
+            masterImagesConfig: {
+                owner: 'privateaim',
+                repository: 'artifacts',
+                branch: 'main',
+            },
+        });
+
+        await service.executeCommand(MasterImageCommand.BUILD, { id: image.id }, createAllowAllActor());
+
+        const claimed = await imageRepository.findOneByOrFail({ id: image.id });
+
+        expect(new Date(claimed.updatedAt).getTime()).toBeGreaterThan(new Date(staleUpdatedAt).getTime());
+        await expect(
+            service.executeCommand(MasterImageCommand.BUILD, { id: image.id }, createAllowAllActor()),
+        ).rejects.toThrow(BadRequestError);
+        expect(builderDispatcher.getCallCount()).toBe(1);
     });
 
     it.skipIf(!lockable)('should dispatch exactly one of several concurrent build starts', async () => {

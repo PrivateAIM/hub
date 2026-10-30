@@ -170,9 +170,6 @@ describe('MasterImageService', () => {
             it('should reject a second build while the first is starting', async () => {
                 repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
                 await service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor());
-                // the fake does not stamp updatedAt; a fresh claim is "now"
-                await repository.save({ ...repository.getAll()[0], updatedAt: new Date().toISOString() });
-
                 await expect(
                     service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor()),
                 ).rejects.toThrow(BadRequestError);
@@ -189,7 +186,38 @@ describe('MasterImageService', () => {
                 }));
 
                 await service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor());
+                await expect(
+                    service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor()),
+                ).rejects.toThrow(BadRequestError);
 
+                expect(builderDispatcher.getCallCount()).toBe(1);
+            });
+
+            it('should reject another build while the first is started', async () => {
+                repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.STARTED }));
+
+                await expect(
+                    service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor()),
+                ).rejects.toThrow(BadRequestError);
+
+                expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.STARTED);
+                expect(builderDispatcher.getCallCount()).toBe(0);
+            });
+
+            it('should allow takeover of a stale started build', async () => {
+                repository.seed(createTestMasterImage({
+                    id: 'mi-1',
+                    buildStatus: ProcessStatus.STARTED,
+                    updatedAt: new Date(Date.now() - 16 * 60 * 1000),
+                }));
+
+                const result = await service.executeCommand(
+                    MasterImageCommand.BUILD,
+                    { id: 'mi-1' },
+                    createAllowAllActor(),
+                );
+
+                expect(result?.buildStatus).toBe(ProcessStatus.STARTING);
                 expect(builderDispatcher.getCallCount()).toBe(1);
             });
 

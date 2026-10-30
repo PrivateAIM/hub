@@ -13,6 +13,7 @@ import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@privateaim/server-kit';
 import { decodeQuery } from '../../query/index.ts';
+import { isProcessStatusInProgress } from '../../services/helpers.ts';
 import { masterImageSchema } from './schema.ts';
 import type {
     IMasterImageBuilderDispatcher,
@@ -120,21 +121,19 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                 // could be overwritten by this save.
                 let previous: MasterImage['buildStatus'] = null;
                 const entity = await this.repository.updateLocked(id, (locked) => {
-                    // one STARTING owner at a time, so the rollback below can
-                    // only revert its own claim. A claim older than the
-                    // threshold is presumed dead (no worker event moved it on)
-                    // and may be taken over — master images have no check
-                    // command to recover it otherwise.
-                    // ponytail: age-based, until the reconciler (plan 018 F14) exists.
+                    // Only one active build may claim the row. An old build
+                    // may be taken over because master images have no check command.
                     if (
-                        locked.buildStatus === ProcessStatus.STARTING &&
+                        isProcessStatusInProgress(locked.buildStatus) &&
                         Date.now() - new Date(locked.updatedAt).getTime() < MASTER_IMAGE_BUILD_CLAIM_STALE_MS
                     ) {
-                        throw new BadRequestError('The master image build is already starting.');
+                        throw new BadRequestError('The master image build is already in progress.');
                     }
 
                     previous = locked.buildStatus;
                     locked.buildStatus = ProcessStatus.STARTING;
+                    // A stale STARTING takeover otherwise saves no change and retains its old claim time.
+                    locked.updatedAt = new Date().toISOString();
 
                     return true;
                 });

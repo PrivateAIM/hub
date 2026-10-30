@@ -14,7 +14,7 @@ import type {
 } from '@privateaim/server-core-worker-kit';
 import { MasterImageBuilderEvent } from '@privateaim/server-core-worker-kit';
 import type { IMasterImageRepository } from '../../../entities/master-image/types.ts';
-import { isProcessStatusTerminal } from '../../helpers.ts';
+import { isProcessStatusInProgress } from '../../helpers.ts';
 import type { MasterImageBuilderServiceContext } from './types.ts';
 
 export class MasterImageBuilderService {
@@ -32,13 +32,11 @@ export class MasterImageBuilderService {
         key: keyof MasterImageBuilderEventMap,
         value: MasterImageBuilderBasePayload,
     ): Promise<MasterImage | null> {
-        // the whole read-check-mutate-save runs on the locked row, so a terminal
-        // status is checked against the row as it is now, not as it was read
-        // before a concurrent handler (another replica) committed.
+        // Check the current status under the lock, not a stale pre-lock read.
         return this.imageRepository.updateLocked(value.id, (entity) => {
             switch (key) {
                 case MasterImageBuilderEvent.EXECUTION_STARTED: {
-                    if (isProcessStatusTerminal(entity.buildStatus)) {
+                    if (!isProcessStatusInProgress(entity.buildStatus)) {
                         return false;
                     }
 
@@ -48,7 +46,7 @@ export class MasterImageBuilderService {
                     break;
                 }
                 case MasterImageBuilderEvent.EXECUTION_PROGRESS: {
-                    if (isProcessStatusTerminal(entity.buildStatus)) {
+                    if (!isProcessStatusInProgress(entity.buildStatus)) {
                         return false;
                     }
 
@@ -64,11 +62,19 @@ export class MasterImageBuilderService {
                     break;
                 }
                 case MasterImageBuilderEvent.EXECUTION_FAILED: {
+                    if (!isProcessStatusInProgress(entity.buildStatus)) {
+                        return false;
+                    }
+
                     entity.buildStatus = ProcessStatus.FAILED;
 
                     break;
                 }
                 case MasterImageBuilderEvent.EXECUTION_FINISHED: {
+                    if (!isProcessStatusInProgress(entity.buildStatus)) {
+                        return false;
+                    }
+
                     entity.buildStatus = ProcessStatus.EXECUTED;
                     entity.buildProgress = 100;
                 }
