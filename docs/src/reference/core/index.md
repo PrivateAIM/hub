@@ -117,10 +117,29 @@ already marked `failed` (or reset): only a process still `starting`/`started` ca
 Master-image builds are not covered: they have no check command, and starting a new build takes
 over one that has been stale for 15 minutes. A fresh `starting` **or** `started` build refuses
 another BUILD. A takeover renews the claim timestamp even if it was already `starting`.
+A dispatch error leaves that fresh claim active: the broker may have accepted the
+command despite a missing confirmation. Worker outcomes are still recorded after
+the request fails. If nothing was delivered, retry only after the 15-minute stale
+threshold; an immediate retry is refused to avoid launching a second build.
 Worker start/progress/failure/finish events apply only while the build is active;
 late events cannot overwrite a terminal or reset state. Master-image workers do not send the
 analysis heartbeat: a healthy Docker step silent for over 15 minutes can still be reclaimed.
 Events still have no run identifier, so a previous run's delayed event can affect a later active run.
+
+## Registry project renames
+
+Updates to a node or registry project's `externalName` start an asynchronous
+same-registry migration: copy and verify artifacts, provision destination
+credentials, then switch the active registry-project binding. Until success,
+record reads and credential requests continue to return the source namespace.
+The source project and its robot remain available after cutover; consumers
+derive image locations from the binding rather than a stored image URL column.
+Master-image project renames are rejected.
+
+Pause writers and drain distributions before renaming. Source inventory checks
+are not a fence against concurrent external pushes. See
+[Registry project renames](/guide/deployment/configuration#registry-project-renames)
+for rollout, retries, retained sources and manual retirement requirements.
 
 ## Approval Workflows
 

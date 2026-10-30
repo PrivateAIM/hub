@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import { BuiltInPolicyType, PermissionError } from '@authup/access';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { RegistryProjectType } from '@privateaim/core-kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import { eq } from '@rapiq/core';
 import {
@@ -17,6 +17,7 @@ import {
     describe,
     expect,
     it,
+    vi,
 } from 'vitest';
 import { RegistryProjectService } from '../../../../../src/core/entities/registry-project/service.ts';
 import {
@@ -422,18 +423,47 @@ describe('RegistryProjectService', () => {
             expect(repository.getAll()).toHaveLength(1);
         });
 
-        it('should link project via registryManager after save', async () => {
+        it('should reserve the name under the migration lock and link after release', async () => {
+            const registryId = randomUUID();
+            const save = repository.save.bind(repository);
+            const link = registryManager.linkProject.bind(registryManager);
+
+            vi.spyOn(repository, 'save').mockImplementation(async (...args) => {
+                expect(registryManager.isRegistryLocked(registryId)).toBe(true);
+
+                return save(...args);
+            });
+            vi.spyOn(registryManager, 'linkProject').mockImplementation(async (...args) => {
+                expect(registryManager.isRegistryLocked(registryId)).toBe(false);
+
+                await link(...args);
+            });
+
             await service.create(
                 {
                     name: 'new-project',
                     type: RegistryProjectType.DEFAULT,
                     externalName: 'ext',
-                    registryId: randomUUID(),
+                    registryId,
                 },
                 createAllowAllActor(),
             );
 
+            expect(repository.save).toHaveBeenCalledOnce();
             expect(registryManager.getLinkCalls()).toHaveLength(1);
+        });
+
+        it('should retain standalone creates without a registry manager', async () => {
+            const standalone = new RegistryProjectService({ repository });
+            const result = await standalone.create({
+                name: 'new-project',
+                type: RegistryProjectType.DEFAULT,
+                externalName: 'ext',
+                registryId: randomUUID(),
+            }, createAllowAllActor());
+
+            expect(result.name).toBe('new-project');
+            expect(repository.getAll()).toHaveLength(1);
         });
 
         it('should deny when actor lacks permission', async () => {
@@ -541,21 +571,165 @@ describe('RegistryProjectService', () => {
             expect(names).toEqual(['test-project', 'updated-project']);
         });
 
-        it('should relink with the previous externalName when it changes', async () => {
-            const project = createTestRegistryProject({ externalName: 'old-name' });
+        it('should authorize the rename target but retain the active source until migration completes', async () => {
+            const project = createTestRegistryProject({
+                externalName: 'old-name',
+                externalId: '42',
+                accountId: '7',
+                accountSecret: 'source-secret',
+            });
 
             repository.seed(project);
 
-            await service.update(
+            const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+            const result = await service.update(
                 project.id,
-                { externalName: 'new-name' },
+                { name: 'updated-project', externalName: 'new-name' },
+                actor,
+            );
+
+            const names = actor.permissionEvaluator.evaluateCalls
+                .map((call) => call.data?.get<RegistryProject>(BuiltInPolicyType.ATTRIBUTES)?.externalName);
+
+            expect(names).toEqual(['old-name', 'new-name']);
+            expect(result).toMatchObject({
+                id: project.id,
+                name: 'updated-project',
+                externalName: 'old-name',
+                externalId: '42',
+                accountId: '7',
+                accountSecret: 'source-secret',
+            });
+            expect(await repository.findOneById(project.id)).toEqual(result);
+            expect(registryManager.getRelinkCalls()).toEqual([{
+                project: result,
+                targetExternalName: 'new-name',
+            }]);
+            expect(registryManager.getUnlinkCalls()).toHaveLength(0);
+            expect(registryManager.getLinkCalls()).toHaveLength(0);
+        });
+
+        it.each([undefined, 'next-name'])('should preserve a concurrent cutover when updating externalName to %s', async (externalName) => {
+            const project = createTestRegistryProject({ externalName: 'source-name' });
+
+            repository.seed(project);
+
+            const loaded = Promise.withResolvers<void>();
+            const release = Promise.withResolvers<void>();
+            const findOneBy = repository.findOneBy.bind(repository);
+
+            vi.spyOn(repository, 'findOneBy').mockImplementation(async (where) => {
+                const result = await findOneBy(where);
+
+                loaded.resolve();
+
+                return result;
+            });
+
+            const actor = createAllowAllActor();
+            const evaluate = actor.permissionEvaluator.evaluate.bind(actor.permissionEvaluator);
+
+            vi.spyOn(actor.permissionEvaluator, 'evaluate').mockImplementation(async (...args) => {
+                expect(registryManager.isRegistryLocked(project.registryId)).toBe(true);
+
+                return evaluate(...args);
+            });
+
+            const save = repository.save.bind(repository);
+
+            vi.spyOn(repository, 'save').mockImplementation(async (...args) => {
+                expect(registryManager.isRegistryLocked(project.registryId)).toBe(true);
+
+                return save(...args);
+            });
+
+            const linkProject = registryManager.linkProject.bind(registryManager);
+            const relinkProject = registryManager.relinkProject.bind(registryManager);
+
+            vi.spyOn(registryManager, 'linkProject').mockImplementation(async (...args) => {
+                expect(registryManager.isRegistryLocked(project.registryId)).toBe(false);
+                await linkProject(...args);
+            });
+            vi.spyOn(registryManager, 'relinkProject').mockImplementation(async (...args) => {
+                expect(registryManager.isRegistryLocked(project.registryId)).toBe(false);
+                await relinkProject(...args);
+            });
+
+            const cutover = registryManager.withRegistryLock(project.registryId, async () => {
+                await release.promise;
+                await save({
+                    ...project,
+                    externalName: 'cutover-name',
+                    externalId: 'target-id',
+                    accountId: 'target-account',
+                    accountName: 'target-account-name',
+                    accountSecret: 'target-secret',
+                });
+            });
+            const update = service.update(project.id, { name: 'updated-project', externalName }, actor);
+
+            await loaded.promise;
+            expect(repository.save).not.toHaveBeenCalled();
+            release.resolve();
+            await cutover;
+
+            const result = await update;
+
+            expect(repository.findOneBy).toHaveBeenCalledTimes(2);
+            expect(result).toMatchObject({
+                name: 'updated-project',
+                externalName: 'cutover-name',
+                externalId: 'target-id',
+                accountId: 'target-account',
+                accountName: 'target-account-name',
+                accountSecret: 'target-secret',
+            });
+            expect(await repository.findOneById(project.id)).toEqual(result);
+
+            if (externalName) {
+                expect(registryManager.getRelinkCalls()).toEqual([{ project: result, targetExternalName: externalName }]);
+            } else {
+                expect(registryManager.getLinkCalls()).toEqual([project.id]);
+            }
+        });
+
+        it('should retain standalone updates without a registry manager', async () => {
+            const project = createTestRegistryProject();
+            const standalone = new RegistryProjectService({ repository });
+
+            repository.seed(project);
+
+            const result = await standalone.update(project.id, { name: 'updated-project' }, createAllowAllActor());
+
+            expect(result.name).toBe('updated-project');
+        });
+
+        it('should ignore registry reassignment on update because registryId is create-only', async () => {
+            const project = createTestRegistryProject();
+
+            repository.seed(project);
+
+            const result = await service.update(
+                project.id,
+                { name: 'updated-project', registryId: randomUUID() },
                 createAllowAllActor(),
             );
 
-            // one command, so its unlink cannot run after its link on another consumer.
-            expect(registryManager.getRelinkCalls()).toHaveLength(1);
-            expect(registryManager.getRelinkCalls()[0]).toMatchObject({ id: project.id, externalName: 'old-name' });
-            expect(registryManager.getUnlinkCalls()).toHaveLength(0);
+            expect(result.registryId).toBe(project.registryId);
+        });
+
+        it('should reject renaming the hardcoded master images project', async () => {
+            const project = createTestRegistryProject({ type: RegistryProjectType.MASTER_IMAGES });
+
+            repository.seed(project);
+
+            await expect(service.update(
+                project.id,
+                { externalName: 'new-name' },
+                createAllowAllActor(),
+            )).rejects.toThrow(BadRequestError);
+            expect(await repository.findOneById(project.id)).toEqual(project);
+            expect(registryManager.getRelinkCalls()).toHaveLength(0);
             expect(registryManager.getLinkCalls()).toHaveLength(0);
         });
 

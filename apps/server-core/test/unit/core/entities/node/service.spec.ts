@@ -16,6 +16,7 @@ import {
     describe,
     expect,
     it,
+    vi,
 } from 'vitest';
 import { NodeService } from '../../../../../src/core/entities/node/service.ts';
 import {
@@ -377,9 +378,156 @@ describe('NodeService', () => {
             expect(registryManager.getLinkCalls()).toContain(projects[0].id);
         });
 
-        it('should relink with the old external name while saving the new one', async () => {
+        it('should retain the active source while dispatching a rename and saving realm changes', async () => {
             const registryId = randomUUID();
-            const registryProject = createTestRegistryProject({ registryId, externalName: 'old-name' });
+            const registryProject = createTestRegistryProject({
+                registryId,
+                externalName: 'old-name',
+                externalId: '42',
+                accountId: '7',
+                accountSecret: 'source-secret',
+            });
+            const node = createTestNode({
+                registryId,
+                registryProjectId: registryProject.id,
+                externalName: 'old-name',
+                realmId: 'realm-2',
+            });
+
+            registryManager.seedProject(registryProject);
+            repository.seed(node);
+
+            const result = await service.update(
+                node.id,
+                { externalName: 'new-name' },
+                createAllowAllActor(),
+            );
+
+            const saved = registryManager.getProjects()[0];
+            const relink = registryManager.getRelinkCalls();
+
+            expect(result.externalName).toBe('new-name');
+            expect(saved).toMatchObject({
+                id: registryProject.id,
+                externalName: 'old-name',
+                externalId: '42',
+                accountId: '7',
+                accountSecret: 'source-secret',
+                realmId: 'realm-2',
+            });
+            expect(relink).toEqual([{ project: saved, targetExternalName: 'new-name' }]);
+            expect(registryManager.getUnlinkCalls()).toHaveLength(0);
+            expect(registryManager.getLinkCalls()).toHaveLength(0);
+        });
+
+        it('should re-read after cutover before saving a project realm and dispatch outside the lock', async () => {
+            const registryId = randomUUID();
+            const project = createTestRegistryProject({ registryId, externalName: 'source-name' });
+            const node = createTestNode({
+                registryId,
+                registryProjectId: project.id,
+                externalName: 'source-name',
+                realmId: 'realm-2',
+            });
+
+            registryManager.seedProject(project);
+            repository.seed(node);
+
+            const loaded = Promise.withResolvers<void>();
+            const release = Promise.withResolvers<void>();
+            const findProject = registryManager.findProject.bind(registryManager);
+
+            vi.spyOn(registryManager, 'findProject').mockImplementation(async (id) => {
+                const result = await findProject(id);
+
+                loaded.resolve();
+
+                return result;
+            });
+
+            const relinkProject = registryManager.relinkProject.bind(registryManager);
+
+            vi.spyOn(registryManager, 'relinkProject').mockImplementation(async (...args) => {
+                expect(registryManager.isRegistryLocked(registryId)).toBe(false);
+                await relinkProject(...args);
+            });
+
+            const cutover = registryManager.withRegistryLock(registryId, async () => {
+                await release.promise;
+                await registryManager.saveProject({
+                    ...project,
+                    externalName: 'cutover-name',
+                    externalId: 'target-id',
+                    accountId: 'target-account',
+                    accountName: 'target-account-name',
+                    accountSecret: 'target-secret',
+                });
+            });
+            const update = service.update(node.id, { externalName: 'next-name' }, createAllowAllActor());
+
+            await loaded.promise;
+            expect(registryManager.getRelinkCalls()).toHaveLength(0);
+            release.resolve();
+            await Promise.all([cutover, update]);
+
+            expect(registryManager.findProject).toHaveBeenCalledTimes(2);
+
+            const saved = registryManager.getProjects()[0];
+
+            expect(saved).toMatchObject({
+                externalName: 'cutover-name',
+                externalId: 'target-id',
+                accountId: 'target-account',
+                accountName: 'target-account-name',
+                accountSecret: 'target-secret',
+                realmId: 'realm-2',
+            });
+            expect(registryManager.getRelinkCalls()).toEqual([{ project: saved, targetExternalName: 'next-name' }]);
+        });
+
+        it('should not resurrect a project removed before acquiring the registry lock', async () => {
+            const registryId = randomUUID();
+            const project = createTestRegistryProject({ registryId });
+            const node = createTestNode({ registryId, registryProjectId: project.id });
+
+            repository.seed(node);
+            vi.spyOn(registryManager, 'findProject')
+                .mockResolvedValueOnce(project)
+                .mockResolvedValueOnce(null);
+
+            const save = vi.spyOn(registryManager, 'saveProject');
+
+            await expect(service.update(node.id, { name: 'updated-node' }, createAllowAllActor()))
+                .rejects.toThrow(EntityNotFoundError);
+            expect(save).not.toHaveBeenCalled();
+            expect(registryManager.getRelinkCalls()).toHaveLength(0);
+        });
+
+        it('should save a project realm change without relinking an unchanged name', async () => {
+            const registryId = randomUUID();
+            const registryProject = createTestRegistryProject({ registryId, externalName: 'same-name' });
+            const node = createTestNode({
+                registryId,
+                registryProjectId: registryProject.id,
+                externalName: 'same-name',
+                realmId: 'realm-2',
+            });
+
+            registryManager.seedProject(registryProject);
+            repository.seed(node);
+
+            await service.update(node.id, { name: 'updated-node' }, createAllowAllActor());
+
+            expect(registryManager.getProjects()[0]).toMatchObject({
+                externalName: 'same-name',
+                realmId: 'realm-2',
+            });
+            expect(registryManager.getRelinkCalls()).toHaveLength(0);
+        });
+
+        it.each([{}, { externalName: 'old-name' }])('should not undo a project rename on an unrelated node update: %j', async (data) => {
+            const registryId = randomUUID();
+            const registryProject = createTestRegistryProject({ registryId, externalName: 'migrated-name' });
             const node = createTestNode({
                 registryId,
                 registryProjectId: registryProject.id,
@@ -389,20 +537,10 @@ describe('NodeService', () => {
             registryManager.seedProject(registryProject);
             repository.seed(node);
 
-            const result = await service.update(node.id, { externalName: 'new-name' }, createAllowAllActor());
+            await service.update(node.id, { ...data, name: 'updated-node' }, createAllowAllActor());
 
-            const saved = registryManager.getProjects()[0];
-            const relink = registryManager.getRelinkCalls();
-
-            expect(result.externalName).toBe('new-name');
-            expect(saved.externalName).toBe('new-name');
-            expect(relink).toHaveLength(1);
-            expect(relink[0]).toMatchObject({
-                id: saved.id,
-                registryId,
-                externalName: 'old-name',
-            });
-            expect(relink[0]).not.toBe(saved);
+            expect(registryManager.getProjects()[0].externalName).toBe('migrated-name');
+            expect(registryManager.getRelinkCalls()).toHaveLength(0);
         });
 
         it('should keep the existing registry project when the registry is unchanged', async () => {

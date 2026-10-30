@@ -148,6 +148,9 @@ export class NodeService extends AbstractEntityService implements INodeService {
             throw new EntityNotFoundError({ entity: 'node' });
         }
 
+        const externalNameChanged = typeof validated.externalName !== 'undefined' &&
+            validated.externalName !== entity.externalName;
+
         // Snapshot the stored row: typeorm's merge() writes into `entity`.
         const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
@@ -166,7 +169,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         // Detach + persist before tearing the old project down: the node must
         // never be left referencing a row that is about to disappear.
-        const orphaned = await this.syncRegistryProject(merged, registryCleared);
+        const orphaned = await this.syncRegistryProject(merged, registryCleared, externalNameChanged);
 
         const saved = await this.repository.save(merged, { data: actor.metadata });
 
@@ -259,6 +262,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
     private async syncRegistryProject(
         entity: Node,
         cleared: boolean,
+        externalNameChanged: boolean,
     ): Promise<RegistryProject | undefined> {
         if (!this.registryManager) {
             return undefined;
@@ -310,15 +314,27 @@ export class NodeService extends AbstractEntityService implements INodeService {
         }
 
         if (registryProject) {
-            if (registryProject.externalName !== externalName) {
-                const previousExternalName = registryProject.externalName;
+            const { registryManager } = this;
+            const projectId = registryProject.id;
 
-                registryProject.externalName = externalName;
-                registryProject.realmId = entity.realmId;
+            registryProject = await registryManager.withRegistryLock(entity.registryId, async () => {
+                const current = await registryManager.findProject(projectId);
 
-                const saved = await this.registryManager.saveProject(registryProject);
+                if (!current) {
+                    throw new EntityNotFoundError({ entity: 'registry-project' });
+                }
 
-                await this.registryManager.relinkProject({ ...saved, externalName: previousExternalName });
+                if (current.realmId !== entity.realmId) {
+                    current.realmId = entity.realmId;
+
+                    return registryManager.saveProject(current);
+                }
+
+                return current;
+            });
+
+            if (externalNameChanged && registryProject.externalName !== externalName) {
+                await this.registryManager.relinkProject(registryProject, externalName);
             }
         } else {
             registryProject = await this.registryManager.createProject({

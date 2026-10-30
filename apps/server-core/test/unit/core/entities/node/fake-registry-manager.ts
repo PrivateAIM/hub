@@ -18,11 +18,39 @@ export class FakeRegistryManager implements IRegistryManager {
 
     private unlinkCalls: RegistryProject[] = [];
 
-    private relinkCalls: RegistryProject[] = [];
+    private relinkCalls: { project: RegistryProject; targetExternalName: string }[] = [];
 
     private removeCalls: RegistryProject[] = [];
 
     private removeObserver?: (project: RegistryProject) => void;
+
+    private registryLocks = new Map<string, Promise<void>>();
+
+    private lockedRegistries = new Set<string>();
+
+    async withRegistryLock<T>(registryId: string, fn: () => Promise<T>): Promise<T> {
+        const previous = this.registryLocks.get(registryId);
+        const { promise, resolve } = Promise.withResolvers<void>();
+
+        this.registryLocks.set(registryId, promise);
+        await previous;
+        this.lockedRegistries.add(registryId);
+
+        try {
+            return await fn();
+        } finally {
+            this.lockedRegistries.delete(registryId);
+            resolve();
+
+            if (this.registryLocks.get(registryId) === promise) {
+                this.registryLocks.delete(registryId);
+            }
+        }
+    }
+
+    isRegistryLocked(registryId: string): boolean {
+        return this.lockedRegistries.has(registryId);
+    }
 
     setDefaultRegistryId(id: string | null): void {
         this.defaultRegistryId = id;
@@ -44,7 +72,9 @@ export class FakeRegistryManager implements IRegistryManager {
     }
 
     async findProject(id: string): Promise<RegistryProject | null> {
-        return this.projects.find((p) => p.id === id) ?? null;
+        const project = this.projects.find((p) => p.id === id);
+
+        return project ? { ...project } : null;
     }
 
     async saveProject(project: RegistryProject): Promise<RegistryProject> {
@@ -69,8 +99,8 @@ export class FakeRegistryManager implements IRegistryManager {
         this.linkCalls.push(id);
     }
 
-    async relinkProject(project: RegistryProject): Promise<void> {
-        this.relinkCalls.push(project);
+    async relinkProject(project: RegistryProject, targetExternalName: string): Promise<void> {
+        this.relinkCalls.push({ project: { ...project }, targetExternalName });
     }
 
     async unlinkProject(project: RegistryProject): Promise<void> {
@@ -87,7 +117,7 @@ export class FakeRegistryManager implements IRegistryManager {
         return [...this.unlinkCalls];
     }
 
-    getRelinkCalls(): RegistryProject[] {
+    getRelinkCalls(): { project: RegistryProject; targetExternalName: string }[] {
         return [...this.relinkCalls];
     }
 
