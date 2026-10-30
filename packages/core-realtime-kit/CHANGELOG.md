@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.3...v0.19.0) (2026-10-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* All workspaces and service deployments now require Node.js >=26.0.0.
+* Node.js >=24.0.0 is required. Import forwarded error helpers from @ebec/core, theme helpers from @authup/client-web-kit-theme, and permission evaluator test helpers from @authup/server-test-kit instead of the PrivateAIM barrels.
+
+### Features
+
+* migrate to esm & replace jest with vitest ([#1368](https://github.com/PrivateAIM/hub/issues/1368)) ([5a4d9d1](https://github.com/PrivateAIM/hub/commit/5a4d9d1ce118f65740aa49caf948208eac299032))
+
+
+### Bug Fixes
+
+* **build:** replace __dirname with import.meta.dirname and enable tsdown shims ([b08de35](https://github.com/PrivateAIM/hub/commit/b08de35f59d325fda2222a3290b75561936e88e1))
+* ship dist directory in published kit packages ([#1719](https://github.com/PrivateAIM/hub/issues/1719)) ([576dcc4](https://github.com/PrivateAIM/hub/commit/576dcc481e9677c0b33fbbf148ce2b1d1c3300c1))
+* socket resources nsp pattern + project master-image requirement ([2d7be7f](https://github.com/PrivateAIM/hub/commit/2d7be7f333e6c06074f2ba9c5489f6685a6ab2ec))
+* submit and process socket events ([0240664](https://github.com/PrivateAIM/hub/commit/02406645a5171a235845935b03f189517c0331cb))
+
+
+### Build System
+
+* require Node 26 across workspaces and CI ([3b1989e](https://github.com/PrivateAIM/hub/commit/3b1989eb5bdb44ca91c95092d0de38f8d3700153))
+* upgrade eslint config to v3 and require Node 24 ([652d794](https://github.com/PrivateAIM/hub/commit/652d794c872bf59177512a2a8ad10f26bb5545f1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/kit bumped from ^0.19.2 to ^0.20.0
+  * peerDependencies
+    * @privateaim/core-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/kit bumped from ^0.19.2 to ^0.20.0
+
 ## [0.18.3](https://github.com/PrivateAIM/hub/compare/v0.18.2...v0.18.3) (2026-10-27)
 
 
