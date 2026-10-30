@@ -179,6 +179,13 @@ that short-circuit, keeping enforcement and client-provisioning decoupled.
 Hub fakes at three different depths. They are complementary — pick by what the
 code under test actually talks to, and do not migrate one layer into another.
 
+Prefer real modules/components with fake implementations of their dependency ports
+or transport clients. Do not intercept constructors or replace imported modules with
+`vi.mock` to test wiring: exercise observable behavior through the real container and
+lifecycle instead. For adapter behavior that depends on the transport (e.g. closing
+live WebSockets), use the real adapter in an integration test rather than mocking it.
+Do not add production injection options solely to support a test.
+
 | Layer | Seam | Used for | Needs Docker |
 |---|---|---|---|
 | **Port fakes** | The domain port interface (`IEntityRepository`, `IPermissionEvaluator`, …) | Entity/business services in `core/` | no |

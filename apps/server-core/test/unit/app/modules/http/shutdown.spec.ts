@@ -5,129 +5,73 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Server as HTTPServer } from 'node:http';
-import type { AddressInfo } from 'node:net';
-import type { IContainer } from 'eldin';
-import type * as Routup from 'routup';
-import type * as ServerHTTPKit from '@privateaim/server-http-kit';
-import { EnvironmentName, LoggerInjectionKey } from '@privateaim/server-kit';
-import { Server } from 'socket.io';
-import {
-    describe,
-    expect,
-    it,
-    vi,
-} from 'vitest';
-import { HTTPModule } from '../../../../../src/app/modules/http/module.ts';
-import { ConfigInjectionKey } from '../../../../../src/app/modules/config/constants.ts';
-import { HTTPInjectionKey } from '../../../../../src/app/modules/http/constants.ts';
-
-const state = vi.hoisted(() => ({ order: [] as string[] }));
-
-vi.mock('routup', async (original) => {
-    const actual = await original<typeof Routup>();
-
-    return {
-        ...actual,
-        serve: (...args: Parameters<typeof actual.serve>) => {
-            const server = actual.serve(...args);
-            const close = server.close.bind(server);
-
-            server.close = async (...closeArgs) => {
-                state.order.push('http');
-
-                return close(...closeArgs);
-            };
-
-            return server;
-        },
-    };
-});
-
-vi.mock('@privateaim/server-http-kit', async (original) => ({
-    ...await original<typeof ServerHTTPKit>(),
-    mountMiddlewares: vi.fn(),
-    mountErrorMiddleware: vi.fn(),
-    createAuthupTokenVerifier: vi.fn(),
-}));
-
-vi.mock('../../../../../src/app/modules/http/controller.ts', () => ({ createControllers: () => [] }));
-
-vi.mock('../../../../../src/adapters/socket/server.ts', () => ({
-    createSocketServer: (httpServer: HTTPServer) => {
-        const socket = new Server(httpServer);
-        const close = socket.close.bind(socket);
-
-        socket.close = async (...args) => {
-            state.order.push('socket');
-
-            return close(...args);
-        };
-
-        return socket;
-    },
-}));
+import { createAdminAccessToken } from '@privateaim/server-test-kit';
+import { describe, expect, it } from 'vitest';
+import { HTTPInjectionKey, HTTPModule } from '../../../../../src/app/modules/http/index.ts';
+import { createTestApplication } from '../../../../app/index.ts';
 
 describe('HTTPModule shutdown', () => {
-    it('disconnects an upgraded socket before closing HTTP', async () => {
-        state.order.length = 0;
+    it('completes teardown and disconnects a live WebSocket', async () => {
+        const suite = createTestApplication();
 
-        const entries = new Map<unknown, unknown>();
-        const container = {
-            resolve: (key: unknown) => {
-                if (key === ConfigInjectionKey) {
-                    return { env: EnvironmentName.TEST, port: 0 };
-                }
+        suite.addModule(new HTTPModule({ socket: true }));
 
-                if (key === LoggerInjectionKey) {
-                    return { debug: vi.fn() };
-                }
-
-                return {};
-            },
-            tryResolve: () => ({ success: false }),
-            register: (key: unknown, value: { useValue: unknown }) => entries.set(key, value.useValue),
-            unregister: (key: unknown) => entries.delete(key),
-        } as unknown as IContainer;
-        const module = new HTTPModule({ socket: true });
-
-        await module.setup(container);
-
-        const http = entries.get(HTTPInjectionKey.Server) as { node: { server: HTTPServer } };
-        const address = http.node.server.address() as AddressInfo;
-        const client = new WebSocket(`ws://127.0.0.1:${address.port}/socket.io/?EIO=4&transport=websocket`);
-
+        let client: WebSocket | undefined;
+        let teardown: Promise<void> | undefined;
         let timeout: ReturnType<typeof setTimeout> | undefined;
 
         try {
-            await new Promise<void>((resolve, reject) => {
-                client.onerror = () => reject(new Error('WebSocket connection failed'));
-                client.onmessage = (event) => {
-                    if (String(event.data).startsWith('0')) {
-                        client.send('40');
-                    }
+            await suite.setup();
 
-                    if (String(event.data).startsWith('40')) {
+            const server = suite.container.resolve(HTTPInjectionKey.Server);
+            const url = new URL('/socket.io/?EIO=4&transport=websocket', server.url);
+
+            url.protocol = 'ws:';
+
+            const token = await createAdminAccessToken();
+            const socket = new WebSocket(url);
+
+            client = socket;
+
+            await new Promise<void>((resolve, reject) => {
+                timeout = setTimeout(() => reject(new Error('WebSocket connection did not settle')), 5000);
+                socket.onerror = () => reject(new Error('WebSocket connection failed'));
+                socket.onmessage = (event) => {
+                    const packet = String(event.data);
+
+                    if (packet.startsWith('0')) {
+                        socket.send(`40/resources,${JSON.stringify({ token })}`);
+                    } else if (packet.startsWith('40/resources,')) {
                         resolve();
+                    } else if (packet.startsWith('44/resources,')) {
+                        reject(new Error(`WebSocket authorization failed: ${packet}`));
                     }
                 };
             });
+            clearTimeout(timeout);
+
+            expect(socket.readyState).toBe(WebSocket.OPEN);
 
             const disconnected = new Promise<void>((resolve) => {
-                client.onclose = () => resolve();
+                socket.onclose = () => resolve();
             });
 
+            teardown = suite.teardown();
+
             await Promise.race([
-                Promise.all([module.teardown(container), disconnected]),
+                Promise.all([teardown, disconnected]),
                 new Promise<never>((_resolve, reject) => {
                     timeout = setTimeout(() => reject(new Error('Socket shutdown did not settle')), 1000);
                 }),
             ]);
-            expect(state.order).toEqual(['socket', 'http']);
+
+            expect(socket.readyState).toBe(WebSocket.CLOSED);
+            expect(server.node!.server.listening).toBe(false);
+            expect(suite.container.tryResolve(HTTPInjectionKey.Server).success).toBe(false);
         } finally {
             clearTimeout(timeout);
-            client.close();
-            await module.teardown(container);
+            client?.close();
+            await (teardown ?? suite.teardown());
         }
-    }, 5000);
+    });
 });

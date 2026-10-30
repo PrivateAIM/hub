@@ -35,19 +35,35 @@ import { FakeAnalysisNodeRepository } from './fake-repository.ts';
 import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../../utils/domains/index.ts';
 
-function createFakeAnalysisNodeRepository(projectId: string) {
-    const repo = new FakeAnalysisNodeRepository();
+class FakeAnalysisNodeServiceRepository extends FakeAnalysisNodeRepository {
+    constructor(private readonly fixture: {
+        projectId: string,
+        analysisRealmId?: string,
+        nodeRealmId?: string,
+        nodeType?: NodeType,
+    }) {
+        super();
+    }
 
-    const originalValidateJoinColumns = repo.validateJoinColumns.bind(repo);
+    create(data: Partial<AnalysisNode>): AnalysisNode {
+        // Mirror the database column defaults for newly assigned nodes.
+        return super.create({
+            approvalStatus: null,
+            executionStatus: null,
+            executionProgress: null,
+            comment: null,
+            ...data,
+        });
+    }
 
-    repo.validateJoinColumns = async (data: Partial<AnalysisNode>) => {
-        await originalValidateJoinColumns(data);
+    async validateJoinColumns(data: Partial<AnalysisNode>): Promise<void> {
+        await super.validateJoinColumns(data);
 
         if (!data.analysis) {
             data.analysis = {
                 id: data.analysisId,
-                realmId: 'realm-1',
-                projectId,
+                realmId: this.fixture.analysisRealmId ?? 'realm-1',
+                projectId: this.fixture.projectId,
                 configurationLocked: false,
             } as Analysis;
         }
@@ -56,14 +72,12 @@ function createFakeAnalysisNodeRepository(projectId: string) {
             data.node = {
                 id: data.nodeId,
                 name: 'test-node',
-                type: NodeType.DEFAULT,
-                realmId: 'realm-1',
+                type: this.fixture.nodeType ?? NodeType.DEFAULT,
+                realmId: this.fixture.nodeRealmId ?? 'realm-1',
                 registryId: 'registry-1',
             } as Node;
         }
-    };
-
-    return repo;
+    }
 }
 
 describe('AnalysisNodeService', () => {
@@ -82,7 +96,7 @@ describe('AnalysisNodeService', () => {
 
         const projectId = randomUUID();
 
-        repository = createFakeAnalysisNodeRepository(projectId);
+        repository = new FakeAnalysisNodeServiceRepository({ projectId });
 
         projectNodeRepository = new FakeProjectNodeRepository();
 
@@ -215,23 +229,10 @@ describe('AnalysisNodeService', () => {
                 nodeId: foreignNodeId,
             } as ProjectNode);
 
-            const validateJoinColumns = repository.validateJoinColumns.bind(repository);
-
-            repository.validateJoinColumns = async (data) => {
-                await validateJoinColumns(data);
-                data.node.realmId = 'foreign-realm';
-                data.node.type = nodeType;
-            };
-
-            // Mirror the database column defaults, which the repository fake does not apply.
-            const create = repository.create.bind(repository);
-
-            repository.create = (data) => create({
-                approvalStatus: null,
-                executionStatus: null,
-                executionProgress: null,
-                comment: null,
-                ...data,
+            repository = new FakeAnalysisNodeServiceRepository({
+                projectId: projectNode.projectId,
+                nodeRealmId: 'foreign-realm',
+                nodeType,
             });
             service = new AnalysisNodeService({
                 repository,
