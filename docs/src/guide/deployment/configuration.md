@@ -14,6 +14,21 @@ These variables are shared across all services:
 | `AMQP_URL` | No | RabbitMQ connection URL |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
 
+## Graceful shutdown
+
+The core, storage, telemetry and messenger CLI starts, and the worker entrypoint,
+handle `SIGINT` and `SIGTERM` by awaiting application teardown once. A signal during
+startup waits for setup before teardown; a failed setup also triggers cleanup.
+Shutdown has a **30-second deadline**, including handles left alive after teardown;
+expiry or a rejected setup/teardown exits with code 1. Successful cleanup lets buffered
+output drain before the process exits. Allow more than 30 seconds of termination grace
+in your process supervisor so Hub's deadline can run before a forced kill.
+Scheduled components finish an in-flight pass before their dependencies close.
+Core closes its Socket.IO clients before the HTTP listener. The installed Orkos
+lifecycle catches individual module teardown errors, so exit code 0 is not proof
+that every module cleaned up successfully; detecting those failures requires an
+upstream lifecycle change.
+
 ## Message delivery (RabbitMQ)
 
 When `AMQP_URL` is set, commands to the worker, storage and telemetry services
@@ -462,7 +477,7 @@ Behaviour changes on top:
 - **Node clients** hold `analysis_read`, `node_read` and the new
   `analysis_node_log_create`, all at `realm_scope: none`, and no longer
   `analysis_update`. Their own node is authorized by binding: a node's client
-  reports execution status on its own analysis-node rows, writes its run's logs
+  reports execution status and progress on its own analysis-node rows, writes its run's logs
   and reads them, but cannot change other analyses of its realm. The background
   sync rewrites existing grants.
 - **Analysis clients'** permissions are created at `realm_scope: none`.
@@ -473,7 +488,16 @@ Behaviour changes on top:
   needs the new credentials.
 - **Writing a node's logs** (`POST /analysis-node-logs`) needs
   `analysis_node_log_create`: the node's own client, or a grant reaching the
-  node's realm. Telemetry's `log_create` is not given to nodes.
+  node's realm. The `(analysisId, nodeId)` participation row must exist;
+  pending participants may write logs, so approval is not required. Telemetry's
+  `log_create` is not given to nodes.
+- **Execution progress**, like execution status, requires authority over the
+  node (its bound client or `analysis_update` reaching the node's realm).
+  Authority over only the analysis owner's realm does not permit either field.
+  Both remain on the existing `POST /analysis-nodes/:id` update endpoint.
+  Creating an assignment accepts only `analysisId` and `nodeId`; supplied execution,
+  approval and comment fields are ignored. Set those fields through the authorized
+  update route, not by seeding them when attaching a node.
 - **Registry credentials of a node** need `node_update` or `registry_manage`
   reaching the node's realm.
 - **Deleting a realm-less telemetry event** needs `event_delete` at `ownOrNull`

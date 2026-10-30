@@ -91,8 +91,17 @@ The Core API follows the [hexagonal architecture](/getting-started/architecture)
 
 A build or distribution that stays `starting`/`started` while its analysis has not been
 written for 15 minutes is treated as orphaned (e.g. the worker died mid-run). Every 5 minutes —
-and once at start — server-core re-runs the build/distribution check for such analyses. If the
+and once at start — server-core re-runs the build/distribution check for such analyses **when
+AMQP is configured**. Without AMQP the reconciler is not scheduled: no external worker can
+consume its checks from the local memory bus. If the
 image is not there, the check result marks the process `failed`, so it can be started again.
+Ordinary status and heartbeat saves no longer query Authup for an unchanged, non-null analysis
+client binding. Creating an analysis or saving it with a missing/changed binding still provisions
+or checks its client. Deleting a client remotely is not repaired by an unrelated status save.
+The public analysis update API does not accept `clientId`, so recovery requires administrative
+intervention; do not rely on background progress traffic to repair deleted clients.
+This fast path covers saves of loaded rows, not arbitrary partial TypeORM saves.
+
 A running worker keeps its analysis fresh with progress events and a 5-minute heartbeat, so a
 long build or push is not mistaken for a stuck one; a worker progress event that changes nothing
 writes the analysis at most once a minute. The heartbeat stops once a single step has sent no
@@ -106,7 +115,12 @@ missing image. A late finish from the worker does not revive a build or distribu
 already marked `failed` (or reset): only a process still `starting`/`started` can finish.
 
 Master-image builds are not covered: they have no check command, and starting a new build takes
-over one that has been stale for 15 minutes.
+over one that has been stale for 15 minutes. A fresh `starting` **or** `started` build refuses
+another BUILD. A takeover renews the claim timestamp even if it was already `starting`.
+Worker start/progress/failure/finish events apply only while the build is active;
+late events cannot overwrite a terminal or reset state. Master-image workers do not send the
+analysis heartbeat: a healthy Docker step silent for over 15 minutes can still be reclaimed.
+Events still have no run identifier, so a previous run's delayed event can affect a later active run.
 
 ## Approval Workflows
 
