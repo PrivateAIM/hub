@@ -51,7 +51,7 @@ a Nuxt frontend, 19 shared TypeScript libraries, and the documentation site.
 
 ## Quick start
 
-Requires **Node.js 24**, npm, and Docker.
+Requires **Node.js ≥24.0.0**, npm, and Docker.
 
 ```bash
 npm ci          # install

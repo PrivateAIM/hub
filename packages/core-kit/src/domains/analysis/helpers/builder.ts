@@ -6,7 +6,7 @@
  */
 
 import { ProcessStatus } from '@privateaim/kit';
-import type { Analysis } from '../entity';
+import type { Analysis } from '../types';
 import { AnalysisError } from '../error';
 
 export class AnalysisBuilderCommandChecker {
@@ -20,14 +20,8 @@ export class AnalysisBuilderCommandChecker {
             throw AnalysisError.configurationNotLocked();
         }
 
-        if (!entity.buildStatus) {
-            return;
-        }
-
-        if (
-            entity.buildStatus === ProcessStatus.FAILED ||
-            entity.buildStatus === ProcessStatus.STOPPED
-        ) {
+        if (!entity.buildStatus || entity.buildStatus === ProcessStatus.FAILED ||
+            entity.buildStatus === ProcessStatus.STOPPED) {
             return;
         }
 

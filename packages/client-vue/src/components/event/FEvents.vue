@@ -83,13 +83,13 @@ export default defineComponent({
 
         const handleDeleted = (input: Event) => {
             const index = data.value.findIndex((el) => el.id === input.id);
+
             if (index !== -1) {
                 data.value.splice(index, 1);
             }
         };
 
-        Promise.resolve()
-            .then(() => resolve(props.query));
+        Promise.try(() => resolve(props.query));
 
         return {
             handleDeleted,

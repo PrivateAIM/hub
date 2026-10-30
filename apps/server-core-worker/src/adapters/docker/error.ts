@@ -14,7 +14,7 @@
  * @param statusCode
  */
 export function isDockerErrorWithStatusCode(error: unknown, statusCode: number): boolean {
-    return error instanceof Error &&
+    return Error.isError(error) &&
         'statusCode' in error &&
         error.statusCode === statusCode;
 }

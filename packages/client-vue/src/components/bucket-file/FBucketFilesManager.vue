@@ -71,6 +71,7 @@ export default defineComponent({
 
         const handleDeleted = (entity: BucketFile) => {
             const selectedIndex = selected.value.indexOf(entity.id);
+
             if (selectedIndex !== -1) {
                 selected.value.splice(selectedIndex, 1);
             }
@@ -101,7 +102,9 @@ export default defineComponent({
         };
 
         const selectAll = () => {
-            if (!vNode.value) return;
+            if (!vNode.value) {
+                return;
+            }
 
             const ids = (vNode.value.data as unknown as BucketFile[])
                 .map((file) => file.id);
@@ -114,7 +117,9 @@ export default defineComponent({
         };
 
         const dropSelected = wrapFnWithBusyState(busy, async () => {
-            if (selected.value.length === 0 || !vNode.value) return;
+            if (selected.value.length === 0 || !vNode.value) {
+                return;
+            }
 
             const promises = selected.value.map((item) => vNode.value!.delete(item));
 
@@ -141,6 +146,7 @@ export default defineComponent({
 
         const toggleFile = (file: BucketFile) => {
             const index = selected.value.findIndex((el) => el === file.id);
+
             if (index === -1) {
                 selected.value.push(file.id);
             } else {

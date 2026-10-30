@@ -12,3 +12,14 @@ export type ActionCommandProperties = {
     withIcon: boolean,
     withText: boolean
 };
+
+export type ActionCommandSlotsType = {
+    default: {
+        commandText: string,
+        isDisabled: boolean,
+        isAllowed: boolean,
+        iconName: string,
+        iconClass: string[],
+        execute: () => Promise<any>
+    }
+};

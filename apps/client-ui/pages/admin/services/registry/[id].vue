@@ -60,6 +60,7 @@ export default defineComponent({
 
         if (!manager.data.value) {
             await navigateTo({ path: '/admin/services/registry' });
+
             throw createError({});
         }
 

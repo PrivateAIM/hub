@@ -33,16 +33,7 @@ type Context = {
     slots: Slots
 };
 
-export type ActionCommandSlotsType = {
-    default: {
-        commandText: string,
-        isDisabled: boolean,
-        isAllowed: boolean,
-        iconName: string,
-        iconClass: string[],
-        execute: () => Promise<any>
-    }
-};
+
 
 export function renderActionCommand(ctx: Context) : VNodeChild {
     if (!ctx.isAllowed) {
@@ -56,6 +47,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
     };
 
     const iconClasses : string[] = [];
+
     if (ctx.withIcon && ctx.withText) {
         iconClasses.push('me-1');
     }
@@ -68,6 +60,7 @@ export function renderActionCommand(ctx: Context) : VNodeChild {
 
     if (ctx.elementType === 'dropDownItem') {
         const component = resolveDynamicComponent('VCDropdownMenuItem');
+
         if (isObject(component)) {
             tag = component as Component;
             iconClasses.push('ps-1', resolveTextColorClass(ctx.classSuffix));

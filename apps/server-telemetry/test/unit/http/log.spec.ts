@@ -65,6 +65,7 @@ describe('log HTTP endpoints', () => {
             });
 
             const body = await response.json();
+
             expect(body.meta).toEqual({});
             expect(body.data.time).toBeDefined();
             expect(body.data.message).toBe(logPayload.message);
@@ -88,6 +89,7 @@ describe('log HTTP endpoints', () => {
 
             let response = await query();
             let body = await response.json();
+
             for (let attempt = 0; attempt < 30 && response.status === 200 && body.data?.length === 0; attempt++) {
                 await wait(500);
                 response = await query();
@@ -128,6 +130,7 @@ describe('log HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data.length).toBeLessThanOrEqual(1);
             expect(body.meta.limit).toBe(1);
             expect(body.meta.offset).toBe(0);

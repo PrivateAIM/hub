@@ -12,6 +12,7 @@ export default defineNuxtPlugin((ctx) => {
     const runtimeConfig = useRuntimeConfig();
 
     let coreURL : string | undefined;
+
     if (runtimeConfig.coreUrl) {
         coreURL = runtimeConfig.coreUrl as string;
     } else {
@@ -19,6 +20,7 @@ export default defineNuxtPlugin((ctx) => {
     }
 
     let storageURL : string | undefined;
+
     if (runtimeConfig.coreUrl) {
         storageURL = runtimeConfig.storageUrl as string;
     } else {
@@ -26,6 +28,7 @@ export default defineNuxtPlugin((ctx) => {
     }
 
     let telemetryURL : string | undefined;
+
     if (runtimeConfig.coreUrl) {
         telemetryURL = runtimeConfig.telemetryUrl as string;
     } else {

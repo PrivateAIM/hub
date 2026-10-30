@@ -47,11 +47,13 @@ export class BucketRepositoryAdapter implements IBucketRepository {
 
     async findOneByIdOrName(id: string): Promise<Bucket | null> {
         const qb = this.repository.createQueryBuilder('bucket');
+
         if (isUUID(id)) {
             qb.where('bucket.id = :id', { id });
         } else {
             qb.where('bucket.name = :name', { name: id });
         }
+
         return qb.getOne();
     }
 

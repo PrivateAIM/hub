@@ -15,6 +15,7 @@ export async function pushDockerImage(
     authConfig: AuthConfig,
 ) {
     let imageLatest : Image;
+
     if (typeof input === 'string') {
         imageLatest = docker.getImage(input);
     } else {

@@ -8,3 +8,5 @@
 export * from './constants';
 export * from './di-module';
 export * from './module';
+
+export * from './types';

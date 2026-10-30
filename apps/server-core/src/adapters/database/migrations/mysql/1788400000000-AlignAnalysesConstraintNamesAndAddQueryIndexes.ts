@@ -130,6 +130,7 @@ export class AlignAnalysesConstraintNamesAndAddQueryIndexes1788400000000 impleme
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Part 1 — align stale `analyses` constraint names.
         await queryRunner.query('SET FOREIGN_KEY_CHECKS = 0');
+
         try {
             await queryRunner.query('ALTER TABLE `analyses` RENAME INDEX `IDX_58c16da85a656098fb826879e8` TO `IDX_e88e9ad94114fc10e281e86f87`');
             await queryRunner.query('ALTER TABLE `analyses` RENAME INDEX `IDX_4b581389a4832bbcf2d6a6c4be` TO `IDX_9a94f99b9efa17f2e4cc1966c4`');
@@ -506,6 +507,7 @@ export class AlignAnalysesConstraintNamesAndAddQueryIndexes1788400000000 impleme
 
         // Part 1 reversed — restore the seven stale constraint names.
         await queryRunner.query('SET FOREIGN_KEY_CHECKS = 0');
+
         try {
             await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_344d29541553fb6bce75ce4cd32`, ADD CONSTRAINT `FK_37a6c8ecb809264b56dce20f906` FOREIGN KEY (`master_image_id`) REFERENCES `master_images`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION');
             await queryRunner.query('ALTER TABLE `analyses` DROP FOREIGN KEY `FK_e0554a6544a95c16e3fe1214489`, ADD CONSTRAINT `FK_d469a78183831f52c8372f6739d` FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION');

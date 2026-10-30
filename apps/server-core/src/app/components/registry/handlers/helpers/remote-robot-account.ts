@@ -54,6 +54,7 @@ export async function ensureRemoteRegistryProjectAccount(
                     });
 
                 [robotAccount] = response.data;
+
                 if (robotAccount) {
                     const { secret } = await httpClient.robot.updateSecret(
                         robotAccount.id,

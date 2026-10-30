@@ -43,6 +43,7 @@ export function createApplication() {
             const handlers = [];
 
             const redisResult = container.tryResolve(RedisClientInjectionKey);
+
             if (redisResult.success) {
                 handlers.push(new EntityEventRedisHandler(redisResult.data));
                 handlers.push(new EntityEventSocketHandler(redisResult.data));
@@ -50,8 +51,10 @@ export function createApplication() {
 
             // only over AMQP: server-telemetry consumes entity events, nothing in-process does
             const messageBusResult = container.tryResolve(RemoteMessageBusInjectionKey);
+
             if (messageBusResult.success) {
                 const loggerResult = container.tryResolve(LoggerInjectionKey);
+
                 handlers.push(new EntityEventHandler({
                     eventComponentDispatcher: new EventComponentDispatcher({ messageBus: messageBusResult.data }),
                     logger: loggerResult.success ? loggerResult.data : undefined,
@@ -74,9 +77,14 @@ export function createApplication() {
                     if (!logDispatcher) {
                         // only over AMQP: no in-process consumer takes a log line here
                         const result = app?.container.tryResolve(RemoteMessageBusInjectionKey);
-                        if (!result?.success) return;
+
+                        if (!result?.success) {
+                            return;
+                        }
+
                         logDispatcher = new LogComponentDispatcher({ messageBus: result.data });
                     }
+
                     await logDispatcher.dispatchWrite(data);
                 },
             }),

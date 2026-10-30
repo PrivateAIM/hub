@@ -29,6 +29,7 @@ export async function uploadRequestFilesToBucket(
     bucketFileEventDispatcher?: BucketFileEventDispatcher,
 ) {
     const contentType = event.headers.get('content-type');
+
     if (!contentType || !contentType.startsWith('multipart/')) {
         throw new BadRequestError('A multipart content-type header is required.');
     }
@@ -52,6 +53,7 @@ export async function uploadRequestFilesToBucket(
         instance.on('file', (_, file, info) => {
             if (typeof info.filename === 'undefined') {
                 file.resume();
+
                 return;
             }
 
@@ -88,6 +90,7 @@ export async function uploadRequestFilesToBucket(
 
                                 if (childContext.key === BucketFileEvent.CREATION_FINISHED) {
                                     fileResolve(childValue as BucketFileCreationFinishedEventPayload);
+
                                     return;
                                 }
 

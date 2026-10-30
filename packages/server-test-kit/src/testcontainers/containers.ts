@@ -183,6 +183,7 @@ export async function startAuthupContainer(
 
     if (databaseEnv.DB_TYPE !== 'better-sqlite3') {
         const network = await new Network().start();
+
         networks.push(network);
 
         resolvedDatabaseEnv = await startAuthupDatabaseContainer(databaseEnv.DB_TYPE, network);
@@ -194,6 +195,7 @@ export async function startAuthupContainer(
     builder = builder.withLogConsumer((stream) => {
         stream.on('data', (line: Buffer | string) => {
             logs.push(`${line}`.trimEnd());
+
             if (logs.length > AUTHUP_LOG_TAIL) {
                 logs.shift();
             }
@@ -201,6 +203,7 @@ export async function startAuthupContainer(
     });
 
     let container: StartedTestContainer;
+
     try {
         container = await builder
             .withEnvironment({
@@ -223,7 +226,7 @@ export async function startAuthupContainer(
             .withStartupTimeout(STARTUP_TIMEOUT)
             .start();
     } catch (e) {
-        const message = e instanceof Error ? e.message : String(e);
+        const message = Error.isError(e) ? e.message : String(e);
         throw new Error(
             `The Authup container (${AUTHUP_IMAGE}) did not become ready: ${message}\n` +
             `--- last ${logs.length} Authup log lines ---\n${logs.join('\n')}`,

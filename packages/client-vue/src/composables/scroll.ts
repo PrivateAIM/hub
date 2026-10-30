@@ -44,6 +44,7 @@ export function useScrollPreserver(refKey: string) {
         await nextTick();
 
         const target = element.value;
+
         if (!target) {
             return;
         }

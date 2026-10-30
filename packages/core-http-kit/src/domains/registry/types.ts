@@ -6,7 +6,7 @@
  */
 
 import type { Registry } from '@privateaim/core-kit';
-import type { IEntityAPI } from '../types-base';
+import type { IEntityAPI } from '../types';
 
 export type RegistryCreatePayload =    & Pick<Registry, 'name' | 'host'> &
     Partial<Pick<Registry, 'accountName' | 'accountSecret'>>;

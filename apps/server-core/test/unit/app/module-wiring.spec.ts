@@ -51,6 +51,7 @@ describe('DI module wiring', () => {
 
         for (const key of keys) {
             const result = suite.container.tryResolve(key);
+
             expect(result.success, `Failed to resolve ${String(key.id)}`).toBe(true);
         }
     });
@@ -59,21 +60,25 @@ describe('DI module wiring', () => {
 
     it('should resolve AnalysisBuilder', () => {
         const builder = suite.container.resolve(AnalysisInjectionKey.Builder);
+
         expect(builder).toBeInstanceOf(AnalysisBuilder);
     });
 
     it('should resolve AnalysisConfigurator', () => {
         const configurator = suite.container.resolve(AnalysisInjectionKey.Configurator);
+
         expect(configurator).toBeInstanceOf(AnalysisConfigurator);
     });
 
     it('should resolve AnalysisDistributor', () => {
         const distributor = suite.container.resolve(AnalysisInjectionKey.Distributor);
+
         expect(distributor).toBeInstanceOf(AnalysisDistributor);
     });
 
     it('should resolve AnalysisStorageManager', () => {
         const storageManager = suite.container.resolve(AnalysisInjectionKey.StorageManager);
+
         expect(storageManager).toBeInstanceOf(AnalysisStorageManager);
     });
 
@@ -81,16 +86,19 @@ describe('DI module wiring', () => {
 
     it('should resolve AnalysisRecalculator', () => {
         const recalculator = suite.container.resolve(AnalysisInjectionKey.AnalysisRecalculator);
+
         expect(recalculator).toBeDefined();
     });
 
     it('should resolve NodeRecalculator', () => {
         const recalculator = suite.container.resolve(AnalysisInjectionKey.NodeRecalculator);
+
         expect(recalculator).toBeDefined();
     });
 
     it('should resolve FileRecalculator', () => {
         const recalculator = suite.container.resolve(AnalysisInjectionKey.FileRecalculator);
+
         expect(recalculator).toBeDefined();
     });
 
@@ -98,6 +106,7 @@ describe('DI module wiring', () => {
 
     it('should resolve RegistryManager', () => {
         const result = suite.container.tryResolve(DatabaseInjectionKey.RegistryManager);
+
         expect(result.success).toBe(true);
     });
 });

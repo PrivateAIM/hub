@@ -76,8 +76,10 @@ export class MessageBusModule implements IModule {
                 createMessageBusLogHooks(logger, { silentRoutings: this.options.silentRoutings }) :
                 undefined,
         });
+
         this.messageBus = bus;
         container.register(MessageBusInjectionKey, { useValue: bus });
+
         if (!(driver instanceof MemoryMessageBusDriver)) {
             container.register(RemoteMessageBusInjectionKey, { useValue: bus });
         }
@@ -85,6 +87,7 @@ export class MessageBusModule implements IModule {
 
     async teardown(): Promise<void> {
         const { messageBus } = this;
+
         this.messageBus = undefined;
         await messageBus?.close();
     }

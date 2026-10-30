@@ -6,8 +6,8 @@
  */
 
 import type { BucketFile } from '../bucket-file';
-import type { EntityCollectionResponse, EntityRecordResponse, IEntityAPI } from '../types-base';
-import type { Bucket } from './entity.ts';
+import type { EntityCollectionResponse, EntityRecordResponse, IEntityAPI } from '../types';
+import type { Realm } from '@authup/core-kit';
 
 export type BucketCreatePayload =    & Pick<Bucket, 'name'> &
     Partial<Pick<Bucket, 'region' | 'realmId' | 'refType' | 'refId'>>;
@@ -28,3 +28,46 @@ export interface IBucketAPI extends IEntityAPI<Bucket, BucketCreatePayload, Part
     getStreamURL(id: Bucket['id']) : string;
     stream(id: Bucket['id']) : Promise<ReadableStream<any>>;
 }
+
+export type Bucket = {
+    id: string;
+
+    name: string;
+
+    region: string | null;
+
+    // ------------------------------------------------------------------
+
+    createdAt: string;
+
+    updatedAt: string;
+
+    // ------------------------------------------------------------------
+
+    actorId: string | null;
+
+    actorType: string | null;
+
+    // ------------------------------------------------------------------
+
+    realmId: Realm['id'] | null;
+
+    // ------------------------------------------------------------------
+
+    /**
+     * eg. analysis
+     *
+     * Deliberately free-form, mirroring telemetry-kit's `Event.refType`: the
+     * vocabulary is whatever the creating service's own `DomainType` names,
+     * and typing it here would make this Layer-0 package depend on core-kit.
+     * Nullable — unlike an event, a bucket the HTTP `POST /buckets` route
+     * creates directly has no natural owning resource to name.
+     */
+    refType: string | null;
+
+    /**
+     * eg. uuid
+     */
+    refId: string | null;
+
+};

@@ -8,7 +8,7 @@
 import type { RequestBaseOptions } from 'hapic';
 import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityRecordResponse, IEntityAPI } from '../types-base';
+import type { EntityRecordResponse, IEntityAPI } from '../types';
 
 export type AnalysisCreatePayload =    & Pick<Analysis, 'projectId'> &
     Partial<Pick<Analysis, 'name' | 'displayName' | 'description' | 'masterImageId' | 'registryId' | 'imageCommandArguments'>>;

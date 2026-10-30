@@ -72,6 +72,7 @@ export default defineComponent({
 
         if (!manager.data.value) {
             await navigateTo({ path: '/admin/nodes' });
+
             throw createError({});
         }
 

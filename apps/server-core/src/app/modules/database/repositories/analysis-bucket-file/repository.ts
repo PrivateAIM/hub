@@ -35,6 +35,7 @@ export class AnalysisBucketFileRepositoryAdapter implements IAnalysisBucketFileR
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>> {
         const qb = this.repository.createQueryBuilder('analysisBucketFile');
+
         qb.groupBy('analysisBucketFile.id');
 
         const { pagination } = applyQuery(qb, query);

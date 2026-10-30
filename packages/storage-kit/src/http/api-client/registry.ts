@@ -5,19 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type {
+    ClientEntityAPIKey,
+    ClientEntityAPIRegistry,
+    EntityAPIDispatch,
+    IStorageClient,
+} from './types';
 import { hasOwnProperty } from '@privateaim/kit';
 import type { ObjectLiteral } from '@rapiq/core';
-import type { DomainTypeMap, IEntityAPI } from '../../domains';
-import type { IStorageClient } from './types';
-
-export type ClientEntityAPIKey = keyof IStorageClient & keyof DomainTypeMap;
-
-/** Verbs are OPTIONAL — callers guard the ones they use. See core-http-kit. */
-export type EntityAPIDispatch<T extends ObjectLiteral> = Partial<IEntityAPI<T, any, any>>;
-
-export type ClientEntityAPIRegistry = {
-    [K in ClientEntityAPIKey]: EntityAPIDispatch<DomainTypeMap[K]>
-};
 
 /**
  * RUNTIME allow-list. `Record<ClientEntityAPIKey, true>` keeps it exhaustive in

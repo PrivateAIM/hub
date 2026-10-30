@@ -88,16 +88,18 @@ export default defineComponent({
             const { entity } = props;
 
             let configuration : AnalysisStage;
+
             if (entity.configurationLocked) {
                 configuration = {
-                    key: 'configuration', 
-                    label: 'Configuration', 
-                    state: 'done', 
-                    sub: 'locked', 
+                    key: 'configuration',
+                    label: 'Configuration',
+                    state: 'done',
+                    sub: 'locked',
                     icon: null,
                 };
             } else {
                 let sub = 'unlocked';
+
                 if (!entity.configurationImageValid) {
                     sub = 'image missing';
                 } else if (!entity.configurationEntrypointValid) {
@@ -107,51 +109,56 @@ export default defineComponent({
                 }
 
                 configuration = {
-                    key: 'configuration', 
-                    label: 'Configuration', 
-                    state: 'wait', 
-                    sub, 
+                    key: 'configuration',
+                    label: 'Configuration',
+                    state: 'wait',
+                    sub,
                     icon: 'fa6-solid:lock-open',
                 };
             }
 
             let approval : AnalysisStage;
+
             if (!entity.nodes) {
                 approval = {
-                    key: 'approval', 
-                    label: 'Approval', 
-                    state: 'idle', 
-                    sub: 'no nodes', 
+                    key: 'approval',
+                    label: 'Approval',
+                    state: 'idle',
+                    sub: 'no nodes',
                     icon: null,
                 };
             } else if (entity.nodesApproved >= entity.nodes) {
                 approval = {
-                    key: 'approval', 
-                    label: 'Approval', 
-                    state: 'done', 
-                    sub: `${entity.nodesApproved} of ${entity.nodes}`, 
+                    key: 'approval',
+                    label: 'Approval',
+                    state: 'done',
+                    sub: `${entity.nodesApproved} of ${entity.nodes}`,
                     icon: 'fa6-solid:thumbs-up',
                 };
             } else {
                 approval = {
-                    key: 'approval', 
-                    label: 'Approval', 
-                    state: 'wait', 
-                    sub: `${entity.nodesApproved} of ${entity.nodes}`, 
+                    key: 'approval',
+                    label: 'Approval',
+                    state: 'wait',
+                    sub: `${entity.nodesApproved} of ${entity.nodes}`,
                     icon: null,
                 };
             }
 
             const build = resolveProcessStage(entity.buildStatus, entity.buildProgress);
             let buildSub = build.sub;
+
             if (build.state === 'done') {
                 const parts : string[] = [];
+
                 if (entity.buildOs) {
                     parts.push(entity.buildOs);
                 }
+
                 if (entity.buildSize) {
                     parts.push(formatByteSize(entity.buildSize));
                 }
+
                 if (parts.length > 0) {
                     buildSub = parts.join(' · ');
                 }
@@ -164,17 +171,17 @@ export default defineComponent({
                 configuration,
                 approval,
                 {
-                    key: 'build', 
-                    label: 'Build', 
-                    state: build.state, 
-                    sub: buildSub, 
+                    key: 'build',
+                    label: 'Build',
+                    state: build.state,
+                    sub: buildSub,
                     icon: null,
                 },
                 {
-                    key: 'distribution', 
-                    label: 'Distribution', 
-                    state: distribution.state, 
-                    sub: distribution.sub, 
+                    key: 'distribution',
+                    label: 'Distribution',
+                    state: distribution.state,
+                    sub: distribution.sub,
                     icon: null,
                 },
                 {

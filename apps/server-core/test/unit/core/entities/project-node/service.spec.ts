@@ -33,6 +33,7 @@ function createFakeProjectNodeRepository(projectRealmId: string, nodeRealmId: st
     const repo = new FakeProjectNodeRepository();
 
     const originalValidateJoinColumns = repo.validateJoinColumns.bind(repo);
+
     repo.validateJoinColumns = async (data: Partial<ProjectNode>) => {
         await originalValidateJoinColumns(data);
 
@@ -110,6 +111,7 @@ describe('ProjectNodeService', () => {
             ]);
 
             const result = await service.getMany({});
+
             expect(result.data).toHaveLength(2);
         });
     });
@@ -117,9 +119,11 @@ describe('ProjectNodeService', () => {
     describe('getOne', () => {
         it('should return entity by ID', async () => {
             const pn = createTestProjectNode({ id: 'pn-1' });
+
             repository.seed(pn);
 
             const result = await service.getOne('pn-1');
+
             expect(result.id).toBe('pn-1');
         });
 
@@ -177,6 +181,7 @@ describe('ProjectNodeService', () => {
                 { projectId, nodeId },
                 createPermissionActor({ realm, permissions: [PermissionName.PROJECT_UPDATE] }),
             );
+
             expect(result.id).toBeDefined();
         });
 
@@ -206,6 +211,7 @@ describe('ProjectNodeService', () => {
                 { projectId, nodeId },
                 createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
             );
+
             expect(result.nodeRealmId).toBe('other-realm');
         });
 
@@ -227,8 +233,10 @@ describe('ProjectNodeService', () => {
         it('should auto-approve for aggregator nodes', async () => {
             const aggregatorRepo = createFakeProjectNodeRepository('realm-1', 'realm-1');
             const origValidate = aggregatorRepo.validateJoinColumns.bind(aggregatorRepo);
+
             aggregatorRepo.validateJoinColumns = async (data: Partial<ProjectNode>) => {
                 await origValidate(data);
+
                 if (data.node) {
                     data.node.type = NodeType.AGGREGATOR;
                 }
@@ -255,6 +263,7 @@ describe('ProjectNodeService', () => {
             );
 
             const project = await projectRepository.findOneBy({ id: projectId });
+
             expect(project!.nodes).toBe(1);
         });
     });
@@ -262,6 +271,7 @@ describe('ProjectNodeService', () => {
     describe('update', () => {
         it('should update existing entity', async () => {
             const pn = createTestProjectNode({ nodeRealmId: 'realm-1' });
+
             repository.seed(pn);
 
             const result = await service.update(
@@ -281,6 +291,7 @@ describe('ProjectNodeService', () => {
 
         it('should deny when actor lacks permission', async () => {
             const pn = createTestProjectNode();
+
             repository.seed(pn);
 
             await expect(
@@ -291,6 +302,7 @@ describe('ProjectNodeService', () => {
         // Approval is the node's decision: reaching the project realm is not enough.
         it('should deny approving when the grant does not reach the node realm', async () => {
             const pn = createTestProjectNode({ nodeRealmId: 'other-realm', projectRealmId: 'realm-1' });
+
             repository.seed(pn);
 
             await expect(
@@ -305,13 +317,16 @@ describe('ProjectNodeService', () => {
 
         it('should evaluate both the stored and the merged row', async () => {
             const pn = createTestProjectNode({ nodeRealmId: 'realm-1' });
+
             repository.seed(pn);
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+
             await service.update(pn.id, { approvalStatus: ProjectNodeApprovalStatus.APPROVED }, actor);
 
             const statuses = actor.permissionEvaluator.evaluateCalls
                 .map((call) => call.data?.get<ProjectNode>(BuiltInPolicyType.ATTRIBUTES)?.approvalStatus);
+
             expect(statuses).toEqual([null, ProjectNodeApprovalStatus.APPROVED]);
         });
     });
@@ -323,15 +338,18 @@ describe('ProjectNodeService', () => {
                 nodeRealmId: 'realm-1',
                 projectRealmId: 'realm-1',
             });
+
             repository.seed(pn);
 
             const result = await service.delete(pn.id, createAllowAllActor());
+
             expect(result.id).toBe(pn.id);
             expect(repository.getAll()).toHaveLength(0);
         });
 
         it('should deny when actor lacks permission', async () => {
             const pn = createTestProjectNode();
+
             repository.seed(pn);
 
             await expect(
@@ -341,6 +359,7 @@ describe('ProjectNodeService', () => {
 
         it('should delete when the actor holds PROJECT_UPDATE', async () => {
             const pn = createTestProjectNode({ projectId });
+
             repository.seed(pn);
 
             const result = await service.delete(
@@ -350,6 +369,7 @@ describe('ProjectNodeService', () => {
                     permissions: [PermissionName.PROJECT_UPDATE],
                 }),
             );
+
             expect(result.id).toBe(pn.id);
         });
 
@@ -357,6 +377,7 @@ describe('ProjectNodeService', () => {
         // must not detach nodes from projects the actor cannot update.
         it('should deny delete when the actor holds only PROJECT_CREATE', async () => {
             const pn = createTestProjectNode({ projectId });
+
             repository.seed(pn);
 
             await expect(
@@ -382,6 +403,7 @@ describe('ProjectNodeService', () => {
                 nodeRealmId: 'other-realm',
                 projectRealmId: 'another-realm',
             });
+
             repository.seed(pn);
 
             await expect(
@@ -396,9 +418,11 @@ describe('ProjectNodeService', () => {
                 nodeRealmId: 'realm-1',
                 projectRealmId: 'other-realm',
             });
+
             repository.seed(pn);
 
             const result = await service.delete(pn.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' }));
+
             expect(result.id).toBe(pn.id);
         });
 
@@ -408,14 +432,17 @@ describe('ProjectNodeService', () => {
                 nodeRealmId: 'other-realm',
                 projectRealmId: 'realm-1',
             });
+
             repository.seed(pn);
 
             const result = await service.delete(pn.id, createScopedActor({ realmId: 'realm-1', realmScope: 'own' }));
+
             expect(result.id).toBe(pn.id);
         });
 
         it('should decrement project nodes count', async () => {
             const project = await projectRepository.findOneBy({ id: projectId });
+
             project!.nodes = 3;
             await projectRepository.save(project!);
 
@@ -423,11 +450,13 @@ describe('ProjectNodeService', () => {
                 projectId,
                 nodeRealmId: 'realm-1',
             });
+
             repository.seed(pn);
 
             await service.delete(pn.id, createAllowAllActor());
 
             const updated = await projectRepository.findOneBy({ id: projectId });
+
             expect(updated!.nodes).toBe(2);
         });
     });

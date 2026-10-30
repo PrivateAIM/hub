@@ -5,8 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type {
+    FakeAuthupClientOptions,
+    FakeAuthupHandler,
+    FakeAuthupHandlerMap,
+    FakeAuthupRequest,
+} from './types.ts';
+
 import { fakeResponse, matchRoute } from '@privateaim/core-http-kit/testing';
-import type { FakeHandler, FakeHandlerMap, FakeRequest } from '@privateaim/core-http-kit/testing';
 import { AuthupClient } from '@privateaim/server-kit';
 import { MemoryTransport } from 'hapic';
 import type { MemoryResponseInit, TransportRequest } from 'hapic';
@@ -22,15 +28,11 @@ import type { MemoryResponseInit, TransportRequest } from 'hapic';
  * The `Authup`-prefixed aliases are kept so a spec can import both this and a
  * kit's `createFakeClient` without a name collision.
  */
-export type FakeAuthupRequest = FakeRequest;
-export type FakeAuthupHandler = FakeHandler;
-export type FakeAuthupHandlerMap = FakeHandlerMap;
 
-export type FakeAuthupClientOptions = {
-    baseURL?: string,
-    handlers?: FakeAuthupHandlerMap,
-    fallback?: FakeAuthupHandler
-};
+
+
+
+
 
 const defaultFallback : FakeAuthupHandler = () => ({ data: [], meta: { total: 0 } });
 
@@ -78,9 +80,9 @@ export class FakeAuthupClient extends AuthupClient {
 
     constructor(options: FakeAuthupClientOptions = {}) {
         const {
-            handlers, 
-            fallback, 
-            ...clientOptions 
+            handlers,
+            fallback,
+            ...clientOptions
         } = options;
 
         const requests : FakeAuthupRequest[] = [];
@@ -94,6 +96,7 @@ export class FakeAuthupClient extends AuthupClient {
                 const match = matchRoute(method, url, map);
 
                 const headers : Record<string, string> = {};
+
                 new Headers(req.headers).forEach((value, key) => {
                     headers[key.toLowerCase()] = value;
                 });
@@ -105,6 +108,7 @@ export class FakeAuthupClient extends AuthupClient {
                     params: match ? match.params : {},
                     headers,
                 };
+
                 requests.push(request);
 
                 const data = match ?

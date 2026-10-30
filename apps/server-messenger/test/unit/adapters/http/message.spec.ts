@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { WakeupEventName } from '@privateaim/messenger-kit';
@@ -35,9 +35,11 @@ describe('adapters/http/message', () => {
         // is deterministic on the shared/persistent CI database (backlog may exceed one page)
         for (;;) {
             const leftover = await app.client.message.pull({ limit: 100 });
+
             if (leftover.messages.length === 0) {
                 break;
             }
+
             await app.client.message.ack({ ids: leftover.messages.map((m) => m.id) });
         }
     });
@@ -54,9 +56,11 @@ describe('adapters/http/message', () => {
             data: 'hello over http',
             metadata: { analysisId: 'analysis-1' },
         });
+
         expect(ids).toHaveLength(1);
 
         const pulled = await client.message.pull();
+
         expect(pulled.messages).toHaveLength(1);
         expect(pulled.messages[0].data).toBe('hello over http');
         expect(pulled.messages[0].senderId).toBe(SELF_ID);
@@ -65,6 +69,7 @@ describe('adapters/http/message', () => {
         await client.message.ack({ ids: pulled.messages.map((m) => m.id) });
 
         const after = await client.message.pull();
+
         expect(after.messages).toHaveLength(0);
     });
 
@@ -86,6 +91,7 @@ describe('adapters/http/message', () => {
         const reader = res.body.getReader();
         const { value } = await reader.read();
         const text = new TextDecoder().decode(value);
+
         await reader.cancel();
 
         expect(text).toContain(WakeupEventName.MESSAGE_PENDING);

@@ -25,21 +25,23 @@ const permissions: Record<string, { id: string, name: string }> = {
 };
 
 type ExistingGrant = {
-    id: string, 
-    permission: { name: string }, 
-    realmScope: string 
+    id: string,
+    permission: { name: string },
+    realmScope: string
 };
 
 function createRepository(nodes: Partial<Node>[]) {
     const repository = new FakeNodeRepository();
+
     repository.seed(nodes as Node[]);
+
     return repository;
 }
 
 function createAuthup(options: {
-    missing?: string[], 
-    failingClients?: string[], 
-    existing?: ExistingGrant[] 
+    missing?: string[],
+    failingClients?: string[],
+    existing?: ExistingGrant[]
 } = {}) {
     const existing = options.existing ?? [];
 
@@ -49,6 +51,7 @@ function createAuthup(options: {
             'DELETE /client-permissions/:id': (req) => ({ data: { id: req.params.id }, meta: {} }),
             'GET /permissions/:id': (req) => {
                 const permission = permissions[req.params.id];
+
                 if (!permission || options.missing?.includes(req.params.id)) {
                     return fakeAuthupResponse(404, { message: 'not found' });
                 }
@@ -57,6 +60,7 @@ function createAuthup(options: {
             },
             'POST /client-permissions': (req) => {
                 const body = req.body as { clientId: string, permissionId: string };
+
                 if (options.failingClients?.includes(body.clientId)) {
                     return fakeAuthupResponse(400, { message: 'client does not exist' });
                 }
@@ -71,9 +75,9 @@ function grants(authup: ReturnType<typeof createAuthup>) {
     return authup.requests
         .filter((req) => req.method === 'POST')
         .map((req) => req.body as {
-            clientId: string, 
-            permissionId: string, 
-            realmScope?: string 
+            clientId: string,
+            permissionId: string,
+            realmScope?: string
         });
 }
 
@@ -88,19 +92,19 @@ describe('syncNodeClientPermissions', () => {
         const authup = createAuthup();
         const repository = createRepository([
             {
-                id: 'node-1', 
-                name: 'node-1', 
-                clientId: 'client-1', 
+                id: 'node-1',
+                name: 'node-1',
+                clientId: 'client-1',
             },
             {
-                id: 'node-2', 
-                name: 'node-2', 
-                clientId: 'client-2', 
+                id: 'node-2',
+                name: 'node-2',
+                clientId: 'client-2',
             },
             {
-                id: 'node-3', 
-                name: 'node-3', 
-                clientId: null, 
+                id: 'node-3',
+                name: 'node-3',
+                clientId: null,
             },
         ]);
 
@@ -112,19 +116,19 @@ describe('syncNodeClientPermissions', () => {
         expect(result).toEqual({ synced: 2, failed: 0 });
         expect(grants(authup)).toEqual(['client-1', 'client-2'].flatMap((clientId) => [
             {
-                clientId, 
-                permissionId: 'perm-analysis-read', 
-                realmScope: 'none', 
+                clientId,
+                permissionId: 'perm-analysis-read',
+                realmScope: 'none',
             },
             {
-                clientId, 
-                permissionId: 'perm-node-read', 
-                realmScope: 'none', 
+                clientId,
+                permissionId: 'perm-node-read',
+                realmScope: 'none',
             },
             {
-                clientId, 
-                permissionId: 'perm-node-log-create', 
-                realmScope: 'none', 
+                clientId,
+                permissionId: 'perm-node-log-create',
+                realmScope: 'none',
             },
         ]));
     });
@@ -133,14 +137,14 @@ describe('syncNodeClientPermissions', () => {
         const authup = createAuthup({ failingClients: ['client-1'] });
         const repository = createRepository([
             {
-                id: 'node-1', 
-                name: 'node-1', 
-                clientId: 'client-1', 
+                id: 'node-1',
+                name: 'node-1',
+                clientId: 'client-1',
             },
             {
-                id: 'node-2', 
-                name: 'node-2', 
-                clientId: 'client-2', 
+                id: 'node-2',
+                name: 'node-2',
+                clientId: 'client-2',
             },
         ]);
 
@@ -157,9 +161,9 @@ describe('syncNodeClientPermissions', () => {
         const authup = createAuthup({ missing: [PermissionName.NODE_READ] });
         const repository = createRepository([
             {
-                id: 'node-1', 
-                name: 'node-1', 
-                clientId: 'client-1', 
+                id: 'node-1',
+                name: 'node-1',
+                clientId: 'client-1',
             },
         ]);
 
@@ -177,24 +181,24 @@ describe('NodeClientService.assignPermissions', () => {
         const authup = createAuthup({
             existing: [
                 {
-                    id: 'cp-update', 
-                    permission: { name: PermissionName.ANALYSIS_UPDATE }, 
-                    realmScope: 'none', 
+                    id: 'cp-update',
+                    permission: { name: PermissionName.ANALYSIS_UPDATE },
+                    realmScope: 'none',
                 },
                 {
-                    id: 'cp-read', 
-                    permission: { name: PermissionName.ANALYSIS_READ }, 
-                    realmScope: 'own', 
+                    id: 'cp-read',
+                    permission: { name: PermissionName.ANALYSIS_READ },
+                    realmScope: 'own',
                 },
                 {
-                    id: 'cp-node', 
-                    permission: { name: PermissionName.NODE_READ }, 
-                    realmScope: 'none', 
+                    id: 'cp-node',
+                    permission: { name: PermissionName.NODE_READ },
+                    realmScope: 'none',
                 },
                 {
-                    id: 'cp-log', 
-                    permission: { name: PermissionName.ANALYSIS_NODE_LOG_CREATE }, 
-                    realmScope: 'any', 
+                    id: 'cp-log',
+                    permission: { name: PermissionName.ANALYSIS_NODE_LOG_CREATE },
+                    realmScope: 'any',
                 },
             ],
         });
@@ -205,14 +209,14 @@ describe('NodeClientService.assignPermissions', () => {
         expect(revocations(authup)).toEqual(['cp-read', 'cp-log', 'cp-update']);
         expect(grants(authup)).toEqual([
             {
-                clientId: 'client-1', 
-                permissionId: 'perm-analysis-read', 
-                realmScope: 'none', 
+                clientId: 'client-1',
+                permissionId: 'perm-analysis-read',
+                realmScope: 'none',
             },
             {
-                clientId: 'client-1', 
-                permissionId: 'perm-node-log-create', 
-                realmScope: 'none', 
+                clientId: 'client-1',
+                permissionId: 'perm-node-log-create',
+                realmScope: 'none',
             },
         ]);
     });
@@ -221,19 +225,19 @@ describe('NodeClientService.assignPermissions', () => {
         const authup = createAuthup({
             existing: [
                 {
-                    id: 'cp-read', 
-                    permission: { name: PermissionName.ANALYSIS_READ }, 
-                    realmScope: 'none', 
+                    id: 'cp-read',
+                    permission: { name: PermissionName.ANALYSIS_READ },
+                    realmScope: 'none',
                 },
                 {
-                    id: 'cp-node', 
-                    permission: { name: PermissionName.NODE_READ }, 
-                    realmScope: 'none', 
+                    id: 'cp-node',
+                    permission: { name: PermissionName.NODE_READ },
+                    realmScope: 'none',
                 },
                 {
-                    id: 'cp-log', 
-                    permission: { name: PermissionName.ANALYSIS_NODE_LOG_CREATE }, 
-                    realmScope: 'none', 
+                    id: 'cp-log',
+                    permission: { name: PermissionName.ANALYSIS_NODE_LOG_CREATE },
+                    realmScope: 'none',
                 },
             ],
         });

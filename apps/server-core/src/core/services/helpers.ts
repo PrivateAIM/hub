@@ -33,6 +33,7 @@ export function isProcessStatusInProgress(status: `${ProcessStatus}` | null | un
  */
 export function isProcessStale(updatedAt: string, now: Date = new Date()): boolean {
     const updatedAtMs = new Date(updatedAt).getTime();
+
     if (Number.isNaN(updatedAtMs)) {
         return false;
     }
@@ -46,6 +47,7 @@ export function isProcessStale(updatedAt: string, now: Date = new Date()): boole
  */
 export function isProcessHeartbeatDue(updatedAt: string, now: Date = new Date()): boolean {
     const updatedAtMs = new Date(updatedAt).getTime();
+
     if (Number.isNaN(updatedAtMs)) {
         return true;
     }

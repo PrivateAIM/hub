@@ -7,10 +7,10 @@
 
 import type { BaseServerConfig } from '@privateaim/server-kit';
 
-export interface Config extends BaseServerConfig {
-    authupURL: string;
-    rabbitMqConnectionString: string;
+export type Config = BaseServerConfig & {
+    authupURL: string,
+    rabbitMqConnectionString: string,
 
-    coreURL: string;
-    storageURL: string;
-}
+    coreURL: string,
+    storageURL: string,
+};

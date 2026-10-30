@@ -8,8 +8,6 @@
 import type { RequestIdentity } from '@privateaim/server-http-kit';
 import type { Bucket } from '@privateaim/storage-kit';
 
-export { toBucketName } from '../../../core/utils/bucket-name.ts';
-
 export function isBucketOwnedByIdentity(entity: Bucket, actor: RequestIdentity) {
     return entity.actorType === actor.type &&
         entity.actorId === actor.id;

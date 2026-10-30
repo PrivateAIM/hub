@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { DataSourceOptionsEntities, DataSourceOptionsSubscribers } from './types.ts';
+
 import type { DataSourceOptions } from 'typeorm';
 import {
     CodeTransformation,
@@ -14,8 +16,8 @@ import {
     transformFilePath,
 } from 'typeorm-extension';
 
-export type DataSourceOptionsEntities = DataSourceOptions['entities'];
-export type DataSourceOptionsSubscribers = DataSourceOptions['subscribers'];
+
+
 
 export class DataSourceOptionsBuilder {
     protected entities : DataSourceOptionsEntities;
@@ -90,6 +92,7 @@ export class DataSourceOptionsBuilder {
 
         if (options.type === 'mysql' || options.type === 'postgres') {
             let migrationPath = `${this.migrationDirectory}/${options.type}/*.{ts,js,mjs}`;
+
             if (!isCodeTransformation(CodeTransformation.JUST_IN_TIME)) {
                 migrationPath = transformFilePath(migrationPath, './dist', './src');
             }

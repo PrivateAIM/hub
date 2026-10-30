@@ -76,6 +76,7 @@ export function defineCLIMigrationCommand() {
                     ...options,
                     logging: ['error', 'schema', 'migration'],
                 });
+
                 try {
                     await dataSource.initialize();
 

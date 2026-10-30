@@ -10,8 +10,8 @@ import { useDataSource } from 'typeorm-extension';
 import type { Logger } from '@privateaim/server-kit';
 import type { ComponentHandler } from 'hubwire';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../../adapters/database/index.ts';
-import { RegistryCommand } from '../../constants.ts';
-import type { RegistryEventMap, RegistryProjectUnlinkPayload } from '../../type.ts';
+import { RegistryCommand } from '../../../../../core/domains/index.ts';
+import type { RegistryEventMap, RegistryProjectUnlinkPayload } from '../../types.ts';
 import { createBasicHarborAPIClient } from '../utils.ts';
 
 export class RegistryProjectUnlinkHandler implements ComponentHandler<
@@ -87,22 +87,26 @@ export class RegistryProjectUnlinkHandler implements ComponentHandler<
             }
         }
 
-        if (value.id) {
-            const projectRepository = dataSource.getRepository(RegistryProjectEntity);
-            const project = await projectRepository.findOneBy({ id: value.id });
-
-            if (project) {
-                project.externalId = null;
-
-                project.accountId = null;
-                project.accountName = null;
-                project.accountSecret = null;
-
-                project.webhookExists = false;
-                project.webhookName = null;
-
-                await projectRepository.save(project);
-            }
+        if (!value.id) {
+            return;
         }
+
+        const projectRepository = dataSource.getRepository(RegistryProjectEntity);
+        const project = await projectRepository.findOneBy({ id: value.id });
+
+        if (!project) {
+            return;
+        }
+
+        project.externalId = null;
+
+        project.accountId = null;
+        project.accountName = null;
+        project.accountSecret = null;
+
+        project.webhookExists = false;
+        project.webhookName = null;
+
+        await projectRepository.save(project);
     }
 }

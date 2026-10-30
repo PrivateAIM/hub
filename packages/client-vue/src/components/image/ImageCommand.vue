@@ -45,7 +45,7 @@ export default defineComponent({
                 return [];
             }
 
-            return filterImageCommandArgumentsForPosition(props.commandArguments, 'before')
+            return filterImageCommandArgumentsForPosition(props.commandArguments)
                 .map((item) => item.value);
         });
 

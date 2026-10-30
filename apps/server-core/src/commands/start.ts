@@ -10,6 +10,7 @@ import { createApplication } from '../app/index.ts';
 
 export async function startCommand() {
     const app = createApplication();
+
     await app.setup();
 
     const logger = app.container.resolve(LoggerInjectionKey);

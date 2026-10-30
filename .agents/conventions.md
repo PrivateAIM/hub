@@ -17,7 +17,7 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`, `ci`
 
 ## Linting
 
-ESLint 10 with `@tada5hi/eslint-config` (flat config):
+ESLint 10 with `@tada5hi/eslint-config` 3 (flat config):
 
 ```bash
 npm run lint          # Check
@@ -25,6 +25,13 @@ npm run lint:fix      # Auto-fix
 ```
 
 Config: `eslint.config.js` — extends `@tada5hi/eslint-config` with Vue-specific overrides (`no-explicit-any` off for `.vue` files). Ignores: `dist`, `*.d.ts`, `node_modules`, `.nuxt`, `.nx`, `writable`, `.output`.
+
+The shared config enforces statement/class-member spacing, `I`-prefixed interfaces,
+exported type declarations in `types.ts`, and no external-package re-exports in
+barrels. Existing public names that are not `I`-prefixed use type aliases instead.
+Node 24 does not provide the new `Uint8Array` hex/base64 methods; the corresponding
+Unicorn preferences are disabled for server code and the isomorphic `kit` package.
+The root and every workspace declare `engines.node: >=24.0.0`.
 
 ## Pre-commit Hooks
 

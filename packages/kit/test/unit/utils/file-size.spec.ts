@@ -92,6 +92,7 @@ describe('humanFileSize', () => {
         it('parses values up to Number.MAX_SAFE_INTEGER', () => {
             // 9_007_199_254_740_991 bytes ≈ 8 PiB — upper end of safe integer
             const safeMax = String(Number.MAX_SAFE_INTEGER);
+
             expect(humanFileSize(safeMax)).toBe('8.0 PiB');
         });
     });
@@ -109,6 +110,7 @@ describe('humanFileSize', () => {
             // Above MAX_SAFE_INTEGER, Number() loses precision but the label
             // (in PiB/EiB) is still meaningful for human display.
             const huge = BigInt(Number.MAX_SAFE_INTEGER) * 4n;
+
             expect(humanFileSize(huge)).toBe('32.0 PiB');
         });
     });

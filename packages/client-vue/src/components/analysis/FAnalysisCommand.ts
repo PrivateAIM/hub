@@ -16,15 +16,15 @@ import {
 } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import {
-    computed, 
-    defineComponent, 
-    ref, 
+    computed,
+    defineComponent,
+    ref,
     toRef,
 } from 'vue';
 import {
-    ActionCommandElementType, 
-    injectCoreHTTPClient, 
-    renderActionCommand, 
+    ActionCommandElementType,
+    injectCoreHTTPClient,
+    renderActionCommand,
     wrapFnWithBusyState,
 } from '../../core';
 
@@ -67,7 +67,7 @@ const FAnalysisCommand = defineComponent({
                 emit('executed', props.command);
                 emit('updated', response);
             } catch (e) {
-                if (e instanceof Error) {
+                if (Error.isError(e)) {
                     emit('failed', e);
                 }
             }
@@ -82,26 +82,32 @@ const FAnalysisCommand = defineComponent({
                     switch (props.command) {
                         case AnalysisCommand.BUILD_START:
                             AnalysisBuilderCommandChecker.canStart(entity.value);
+
                             return true;
 
                         case AnalysisCommand.BUILD_CHECK:
                             AnalysisBuilderCommandChecker.canCheck(entity.value);
+
                             return true;
 
                         case AnalysisCommand.DISTRIBUTION_START:
                             AnalysisDistributorCommandChecker.canStart(entity.value);
+
                             return true;
 
                         case AnalysisCommand.DISTRIBUTION_CHECK:
                             AnalysisDistributorCommandChecker.canCheck(entity.value);
+
                             return true;
 
                         case AnalysisCommand.CONFIGURATION_LOCK:
                             AnalysisConfiguratorCommandChecker.canLock(entity.value);
+
                             return true;
 
                         case AnalysisCommand.CONFIGURATION_UNLOCK:
                             AnalysisConfiguratorCommandChecker.canUnlock(entity.value);
+
                             return true;
                     }
                 } catch {

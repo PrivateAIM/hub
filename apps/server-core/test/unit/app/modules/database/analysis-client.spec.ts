@@ -47,6 +47,7 @@ describe('AnalysisClientService', () => {
             const client = await service.assign(entity);
 
             const created = bodiesOf(authup, 'POST', '/clients');
+
             expect(created).toHaveLength(1);
             expect(created[0]).toMatchObject({
                 name: entity.id,
@@ -102,6 +103,7 @@ describe('AnalysisClientService', () => {
             const service = new AnalysisClientService(authup);
 
             const entity = createAnalysisEntity({ clientId: 'client-x' });
+
             await service.dismiss(entity);
 
             expect(authup.requests.map((request) => request.method)).toEqual(['DELETE']);
@@ -124,6 +126,7 @@ describe('AnalysisClientService', () => {
             const service = new AnalysisClientService(authup);
 
             const entity = createAnalysisEntity({ clientId: 'client-gone' });
+
             await service.dismiss(entity);
 
             expect(entity.clientId).toBeNull();
@@ -134,6 +137,7 @@ describe('AnalysisClientService', () => {
             const service = new AnalysisClientService(authup);
 
             const entity = createAnalysisEntity({ clientId: 'client-x' });
+
             await expect(service.dismiss(entity)).rejects.toThrow();
             expect(entity.clientId).toBe('client-x');
         });
@@ -156,6 +160,7 @@ describe('AnalysisClientService', () => {
             await service.assignDefaultPermissions({ id: 'client-1' } as Client);
 
             const created = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.permissionId);
+
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_SELF_STORAGE_USE}`);
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`);
             expect(created).toContain(`perm-${PermissionName.ANALYSIS_READ}`);
@@ -178,6 +183,7 @@ describe('AnalysisClientService', () => {
             await service.assignDefaultPermissions({ id: 'client-1' } as Client);
 
             const scopes = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.realmScope);
+
             expect(scopes).toEqual(['none', 'none', 'none']);
         });
 
@@ -202,6 +208,7 @@ describe('AnalysisClientService', () => {
             await service.assignDefaultPermissions({ id: 'client-1' } as Client);
 
             const created = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.permissionId);
+
             expect(created).toEqual([
                 `perm-${PermissionName.ANALYSIS_READ}`,
                 `perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`,
@@ -228,6 +235,7 @@ describe('AnalysisClientService', () => {
             await service.assignDefaultPermissions({ id: 'client-1' } as Client);
 
             const created = bodiesOf(authup, 'POST', '/client-permissions').map((body) => body.permissionId);
+
             expect(created).toEqual([
                 `perm-${PermissionName.ANALYSIS_READ}`,
                 `perm-${PermissionName.ANALYSIS_SELF_MESSAGE_BROKER_USE}`,
@@ -250,6 +258,7 @@ describe('AnalysisClientService', () => {
             await service.assignDefaultPermissions({ id: 'client-42' } as Client);
 
             const query = decodeURIComponent(authup.requests[0].url);
+
             expect(query).toContain('client-42');
             expect(query).toContain('permission');
         });

@@ -17,7 +17,7 @@ import type {
 import { buildDomainEventFullName } from '@privateaim/kit';
 import type { FiltersBuildInput } from '@rapiq/core';
 import {
-    defineComponent, 
+    defineComponent,
     h,
 } from 'vue';
 import type {
@@ -158,6 +158,7 @@ export default defineComponent({
                             }),
                         ]);
                     }
+
                     if (props.target === Target.NODE) {
                         return h('div', [
                             manager.data.value?.node.name,

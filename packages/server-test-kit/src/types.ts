@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { FakeHandler, FakeHandlerMap, FakeRequest } from '@privateaim/core-http-kit/testing';
+
 import type { RealmScope } from '@authup/access';
 import type { FakePermissionEvaluator } from '@authup/server-test-kit';
 import type { ActorContext } from '@privateaim/server-kit';
@@ -31,4 +33,29 @@ export type ScopedActorOptions = {
     realmScope: `${RealmScope}`;
     /** Defaults to a user of `realmId`. */
     identity?: ActorContext['identity'];
+};
+
+export type ColumnNamingViolation = {
+    table: string,
+    property: string,
+    column: string,
+    reason: string,
+};
+
+export type FakeAuthupRequest = FakeRequest;
+
+export type FakeAuthupHandler = FakeHandler;
+
+export type FakeAuthupHandlerMap = FakeHandlerMap;
+
+export type FakeAuthupClientOptions = {
+    baseURL?: string,
+    handlers?: FakeAuthupHandlerMap,
+    fallback?: FakeAuthupHandler
+};
+
+export type QueryIndexInvariantDescription = {
+    indexes?: string[][] | null,
+    filters?: { allowed?: readonly string[] | null },
+    sorts?: { allowed?: readonly string[] | null },
 };

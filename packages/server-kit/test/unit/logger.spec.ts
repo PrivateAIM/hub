@@ -23,6 +23,7 @@ describe('src/logger', () => {
         logger.info('This is a log message', { foo: 'bar' });
 
         const [item] = memoryTransport.items;
+
         expect(item).toBeDefined();
         expect(item.message).toEqual('This is a log message');
         expect(item.foo).toEqual('bar');
@@ -38,12 +39,14 @@ describe('src/logger', () => {
         });
 
         const error = new CustomError('This is a log message');
+
         logger.info({
             message: error,
             foo: 'bar',
         });
 
         const [item] = memoryTransport.items;
+
         expect(item).toBeDefined();
 
         expect(item.message?.message).toEqual(error.message);

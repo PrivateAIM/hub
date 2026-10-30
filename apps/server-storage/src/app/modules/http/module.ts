@@ -25,7 +25,7 @@ import {
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { createControllers } from './controller.ts';
-import type { HTTPServer } from './constants.ts';
+import type { HTTPServer } from './types.ts';
 import { HTTPInjectionKey } from './constants.ts';
 
 export class HTTPModule implements IModule {
@@ -58,6 +58,7 @@ export class HTTPModule implements IModule {
         const isTestEnvironment = config.env === EnvironmentName.TEST;
 
         let swagger: MiddlewareSwaggerOptions | boolean;
+
         if (!isTestEnvironment) {
             swagger = { baseURL: config.publicURL };
         } else {
@@ -124,6 +125,7 @@ export class HTTPModule implements IModule {
             container.register(HTTPInjectionKey.Server, { useValue: server });
         } catch (e) {
             await server.close().catch(() => undefined);
+
             throw e;
         }
     }
@@ -131,7 +133,9 @@ export class HTTPModule implements IModule {
     async teardown(container: IContainer): Promise<void> {
         container.unregister(HTTPInjectionKey.App);
 
-        if (!this.instance) return;
+        if (!this.instance) {
+            return;
+        }
 
         container.unregister(HTTPInjectionKey.Server);
 

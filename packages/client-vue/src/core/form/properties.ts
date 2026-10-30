@@ -14,6 +14,7 @@ export function initFormAttributesFromSource(
     }
 
     const keys = Object.keys(form);
+
     for (const key of keys) {
         if (Object.prototype.hasOwnProperty.call(source, key)) {
             form[key] = source[key] ?? '';

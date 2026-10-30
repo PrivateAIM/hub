@@ -33,6 +33,7 @@ describe('src/controllers/core/analysis-log', () => {
         telemetryHandlers: {
             'GET /logs': (req) => {
                 telemetryRequests.push({ url: req.url });
+
                 return {
                     data: [{ message: 'hello from the analysis', level: 'info' }],
                     meta: { total: 1 },
@@ -40,6 +41,7 @@ describe('src/controllers/core/analysis-log', () => {
             },
             'DELETE /logs': (req) => {
                 telemetryRequests.push({ url: req.url });
+
                 return undefined;
             },
         },
@@ -54,8 +56,11 @@ describe('src/controllers/core/analysis-log', () => {
 
         const { client } = suite;
         const { data: project } = await client.project.create(createTestProject());
+
         PROJECT_ID = project.id;
+
         const { data: analysis } = await client.analysis.create({ projectId: project.id });
+
         ANALYSIS_ID = analysis.id;
     });
 
@@ -70,6 +75,7 @@ describe('src/controllers/core/analysis-log', () => {
             if (ANALYSIS_ID) {
                 await suite.client.analysis.delete(ANALYSIS_ID);
             }
+
             if (PROJECT_ID) {
                 await suite.client.project.delete(PROJECT_ID);
             }
@@ -90,7 +96,9 @@ describe('src/controllers/core/analysis-log', () => {
         // The controller must translate `analysisId` into the telemetry
         // LABELS the log store actually indexes.
         expect(telemetryRequests).toHaveLength(1);
+
         const query = decodeURIComponent(telemetryRequests[0].url);
+
         expect(query).toContain(LogFlag.REF_TYPE);
         expect(query).toContain(DomainType.ANALYSIS);
         expect(query).toContain(ANALYSIS_ID);
@@ -116,7 +124,9 @@ describe('src/controllers/core/analysis-log', () => {
         await client.analysisLog.delete({ filters: { analysisId: ANALYSIS_ID } });
 
         expect(telemetryRequests).toHaveLength(1);
+
         const query = decodeURIComponent(telemetryRequests[0].url);
+
         expect(query).toContain(ANALYSIS_ID);
     });
 
@@ -132,6 +142,7 @@ describe('src/controllers/core/analysis-log', () => {
     const request = async (method: string, path: string, token: string) => {
         const baseURL = suite.client.getBaseURL().replace(/\/+$/, '');
         const response = await fetch(`${baseURL}${path}`, { method, headers: { authorization: `Bearer ${token}` } });
+
         return response.status;
     };
 

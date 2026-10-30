@@ -9,7 +9,7 @@ import type { Realm } from '@authup/core-kit';
 import type { Registry } from '../registry';
 import type { RegistryProjectType } from './constants';
 
-export interface RegistryProject {
+export type RegistryProject = {
     id: string;
 
     name: string;
@@ -54,4 +54,4 @@ export interface RegistryProject {
     createdAt: string;
 
     updatedAt: string;
-}
+};

@@ -24,9 +24,9 @@ export default defineComponent({
             return () => h(
                 VCAlert,
                 {
-                    color: 'warning', 
-                    variant: 'soft', 
-                    size: 'sm', 
+                    color: 'warning',
+                    variant: 'soft',
+                    size: 'sm',
                     class: 'mb-3',
                 },
                 () => [
@@ -39,9 +39,9 @@ export default defineComponent({
             return () => h(
                 VCAlert,
                 {
-                    color: 'warning', 
-                    variant: 'soft', 
-                    size: 'sm', 
+                    color: 'warning',
+                    variant: 'soft',
+                    size: 'sm',
                     class: 'mb-3',
                 },
                 () => [
@@ -66,7 +66,9 @@ export default defineComponent({
                     emit('failed', e);
                 },
                 onResolved: (entity?: RegistryProject) => {
-                    if (!entity) { return; }
+                    if (!entity) {
+                        return;
+                    }
 
                     if (props.entity.registryProjectId !== entity.id) {
                         emit('updated', {

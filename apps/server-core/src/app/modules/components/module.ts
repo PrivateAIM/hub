@@ -53,6 +53,7 @@ export class ComponentsModule implements IModule {
 
         // Create and register component dispatchers
         const registryComponentDispatcher = new RegistryComponentDispatcher(registryComponent, { messageBus });
+
         container.register(ComponentsInjectionKey.RegistryComponentDispatcher, { useValue: registryComponentDispatcher });
 
         // Start task consumers and background components
@@ -80,6 +81,7 @@ export class ComponentsModule implements IModule {
         // Without an Authup client there are no node clients to sync.
         if (authupResult.success) {
             const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
+
             this.components.push(createNodeClientComponent({
                 lock: (fn) => withDataSourceLock(dataSource, NODE_CLIENT_SYNC_DATABASE_LOCK, fn),
                 repository: container.resolve(DatabaseInjectionKey.NodeRepository),
@@ -96,6 +98,7 @@ export class ComponentsModule implements IModule {
 
     async teardown(): Promise<void> {
         const { components } = this;
+
         this.components = [];
 
         await Promise.all(components.map((c) => c.stop()));

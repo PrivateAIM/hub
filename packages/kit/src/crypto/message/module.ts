@@ -17,33 +17,40 @@ function toBytes(input: MessageSealInput): Uint8Array<ArrayBuffer> {
     if (typeof input === 'string') {
         return new TextEncoder().encode(input);
     }
+
     if (ArrayBuffer.isView(input)) {
         // These crypto payloads are never backed by a SharedArrayBuffer.
         return new Uint8Array(input.buffer as ArrayBuffer, input.byteOffset, input.byteLength);
     }
+
     return new Uint8Array(input);
 }
 
 function bytesToBase64(bytes: Uint8Array): string {
     let binary = '';
     const chunkSize = 0x8000;
+
     for (let i = 0; i < bytes.length; i += chunkSize) {
         binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
     }
+
     return btoa(binary);
 }
 
 function base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
+
     for (let i = 0; i < binary.length; i++) {
         bytes[i] = binary.charCodeAt(i);
     }
+
     return bytes;
 }
 
 function curveBitLength(key: CryptoKey): number {
     const named = (key.algorithm as EcKeyAlgorithm).namedCurve;
+
     switch (named) {
         case 'P-384':
             return 384;
@@ -112,6 +119,7 @@ export async function sealMessage(ctx: SealMessageContext): Promise<string> {
     );
 
     const frame = new Uint8Array(salt.length + iv.length + ciphertext.length);
+
     frame.set(salt, 0);
     frame.set(iv, salt.length);
     frame.set(ciphertext, salt.length + iv.length);
@@ -125,6 +133,7 @@ export async function sealMessage(ctx: SealMessageContext): Promise<string> {
  */
 export async function openMessage(ctx: OpenMessageContext): Promise<Uint8Array> {
     const frame = base64ToBytes(ctx.payload);
+
     if (frame.length < MESSAGE_SEAL_SALT_LENGTH + MESSAGE_SEAL_IV_LENGTH) {
         throw new Error('The sealed message frame is malformed.');
     }

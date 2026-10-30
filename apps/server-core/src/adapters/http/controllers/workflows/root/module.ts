@@ -28,6 +28,7 @@ export class RootController {
     async status(): Promise<EndpointInfo> {
         if (typeof info === 'undefined') {
             const pkgJson = await read(path.join(process.cwd(), 'package.json'));
+
             info = {
                 version: pkgJson.version,
                 timestamp: Date.now(),

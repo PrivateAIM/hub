@@ -15,23 +15,25 @@ export async function handleAuthupRealmEvent(
     context: EventRecord<EntityType.REALM, Realm>,
     repositories: AuthupAggregatorRepositories,
 ) {
-    if (!context.data.id) {
+    if (!context.data.id || (context.event !== 'deleted')) {
         return;
     }
 
-    if (context.event === 'deleted') {
-        const where = { realmId: context.data.id };
+    const where = { realmId: context.data.id };
 
-        const projects = await repositories.projectRepository.findManyBy(where);
-        await repositories.projectRepository.removeMany(projects);
+    const projects = await repositories.projectRepository.findManyBy(where);
 
-        const registryProjects = await repositories.registryProjectRepository.findManyBy(where);
-        await repositories.registryProjectRepository.removeMany(registryProjects);
+    await repositories.projectRepository.removeMany(projects);
 
-        const nodes = await repositories.nodeRepository.findManyBy(where);
-        await repositories.nodeRepository.removeMany(nodes);
+    const registryProjects = await repositories.registryProjectRepository.findManyBy(where);
 
-        const analyses = await repositories.analysisRepository.findManyBy(where);
-        await repositories.analysisRepository.removeMany(analyses);
-    }
+    await repositories.registryProjectRepository.removeMany(registryProjects);
+
+    const nodes = await repositories.nodeRepository.findManyBy(where);
+
+    await repositories.nodeRepository.removeMany(nodes);
+
+    const analyses = await repositories.analysisRepository.findManyBy(where);
+
+    await repositories.analysisRepository.removeMany(analyses);
 }

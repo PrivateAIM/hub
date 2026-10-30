@@ -5,20 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ObjectLiteral } from '@privateaim/kit';
-import { buildDomainEventFullName } from '@privateaim/kit';
-import type { Logger } from '../logger';
 import type {
     EntityEventDestination,
     EntityEventHandleOptions,
     EntityEventPublishOptions,
+    EntityEventPublisherContext,
     IEntityEventHandler,
     IEntityEventPublisher,
 } from './types';
 
-export type EntityEventPublisherContext = {
-    logger?: Logger;
-};
+import type { ObjectLiteral } from '@privateaim/kit';
+import { buildDomainEventFullName } from '@privateaim/kit';
+import type { Logger } from '../logger';
+
+
 
 export class EntityEventPublisher implements IEntityEventPublisher {
     protected handlers : Set<IEntityEventHandler>;
@@ -70,6 +70,7 @@ export class EntityEventPublisher implements IEntityEventPublisher {
         // later ones (the telemetry audit bridge) from running.
         let error : unknown;
         let failed = false;
+
         for (const handler of this.handlers) {
             try {
                 await handler.handle(consumeContext);

@@ -6,9 +6,9 @@
  */
 
 import type {
-    Registry, 
-    RegistryAPICommand, 
-    RegistryProject, 
+    Registry,
+    RegistryAPICommand,
+    RegistryProject,
     ServiceID,
 } from '@privateaim/core-kit';
 

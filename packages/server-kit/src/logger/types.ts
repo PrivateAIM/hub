@@ -23,11 +23,11 @@ type LogEntry = {
     [key: string]: any
 };
 
-export interface LoggerLevelFn<OUT = any> {
+export type LoggerLevelFn<OUT = any> = {
     (message: string, ...meta: Omit<LogEntry, 'message'>[]): OUT,
     (message: LogEntry): OUT,
     (message:string): OUT,
-}
+};
 
 export type Logger = {
     emerg: LoggerLevelFn<Logger>,
@@ -39,3 +39,5 @@ export type Logger = {
     info: LoggerLevelFn<Logger>,
     debug: LoggerLevelFn<Logger>,
 };
+
+export type LoggerModuleOptions = LoggerCreateContext;

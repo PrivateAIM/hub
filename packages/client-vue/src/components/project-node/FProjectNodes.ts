@@ -21,12 +21,12 @@ import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent, h } from 'vue';
 import type { ListSlotsType } from '../../core';
 import {
-    createList, 
-    defineListEvents, 
+    createList,
+    defineListEvents,
     defineListProps,
 } from '../../core';
 import FDisplayName from '../FDisplayName';
-import type { DomainDetailsSlotProps } from '../type';
+import type { DomainDetailsSlotProps } from '../types';
 import FProjectNode from './FProjectNode';
 
 enum Direction {
@@ -168,6 +168,7 @@ export default defineComponent({
             },
             query: () => {
                 const include : string[] = [];
+
                 if (props.target === DomainType.NODE || props.includeNode) {
                     include.push('node');
                 }

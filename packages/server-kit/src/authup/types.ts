@@ -20,3 +20,17 @@ export type AuthupTokenSubjectData = Pick<
 > & {
     permissions: OAuth2TokenPermission[],
 };
+
+export type AuthupClientTokenCreatorCreateContext = {
+    baseURL: string,
+    clientId: string,
+    clientSecret: string,
+    realm: string,
+};
+
+export type AuthupUserTokenCreatorCreateContext = {
+    baseURL: string,
+    name: string,
+    password: string,
+    realm: string,
+};

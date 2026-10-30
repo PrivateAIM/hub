@@ -73,7 +73,10 @@ export default defineComponent({
 
         const connect = wrapFnWithBusyState(busy, async () => {
             const id = selectedId.value;
-            if (!id) return;
+
+            if (!id) {
+                return;
+            }
 
             await manager.update({ registryId: id });
 

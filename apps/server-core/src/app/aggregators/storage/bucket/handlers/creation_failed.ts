@@ -34,6 +34,7 @@ export class StorageBucketCreationFailedHandler implements ComponentHandler<
 
         if (!parsed || parsed.analysisId !== payload.refId) {
             this.logger?.error(message);
+
             return;
         }
 

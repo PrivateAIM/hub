@@ -50,5 +50,8 @@
         "build:types": "tsc --noEmit -p tsconfig.build.json",
         "build": "npm run build:js && npm run build:types",
         "start": "node dist/index.mjs"
+    },
+    "engines": {
+        "node": ">=24.0.0"
     }
 }

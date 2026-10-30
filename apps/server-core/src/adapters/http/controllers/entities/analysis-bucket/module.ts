@@ -48,6 +48,7 @@ export class AnalysisBucketController {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query, actor);
+
         return { data, meta: { ...meta, schema: describeQuerySchema(analysisBucketSchema) } };
     }
 
@@ -70,7 +71,9 @@ export class AnalysisBucketController {
     ): Promise<EntityRecordResponse<AnalysisBucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
+
         event.response.status = 201;
+
         return { data: entity, meta: {} };
     }
 
@@ -82,7 +85,9 @@ export class AnalysisBucketController {
     ): Promise<EntityRecordResponse<AnalysisBucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
+
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 
@@ -93,7 +98,9 @@ export class AnalysisBucketController {
     ): Promise<EntityRecordResponse<AnalysisBucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
+
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 }

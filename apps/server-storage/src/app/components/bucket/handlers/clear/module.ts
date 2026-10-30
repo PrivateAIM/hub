@@ -18,7 +18,7 @@ import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
 import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity, BucketFileEntity } from '../../../../../adapters/database/index.ts';
-import { toBucketName } from '../../../../domains/bucket/utils.ts';
+import { toBucketName } from '../../../../../core/utils/bucket-name.ts';
 
 /**
  * Empties a bucket — every stored object and every bucket-file row — while
@@ -114,7 +114,7 @@ export class BucketClearHandler implements ComponentHandler<
                     // the rows are gone, so the clear stands; leftovers go with the bucket delete.
                     this.logger?.warn({
                         message: `Cleared bucket, but ${files.length} stored objects could not be removed`,
-                        error: e instanceof Error ? e.message : String(e),
+                        error: Error.isError(e) ? e.message : String(e),
                         [LogFlag.REF_ID]: entity.id,
                         [LogFlag.REF_TYPE]: DomainType.BUCKET,
                     });

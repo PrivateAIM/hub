@@ -22,6 +22,7 @@ export class FsStorageAdapter implements IStorageAdapter {
     async bucketExists(name: string): Promise<boolean> {
         try {
             await fs.access(path.join(this.basePath, name));
+
             return true;
         } catch {
             return false;
@@ -38,7 +39,9 @@ export class FsStorageAdapter implements IStorageAdapter {
 
     async putObject(bucket: string, key: string, data: Buffer | Readable): Promise<void> {
         const filePath = path.join(this.basePath, bucket, key);
+
         await fs.mkdir(path.dirname(filePath), { recursive: true });
+
         if (data instanceof Readable) {
             await pipeline(data, createWriteStream(filePath));
         } else {
@@ -48,7 +51,9 @@ export class FsStorageAdapter implements IStorageAdapter {
 
     async getObject(bucket: string, key: string): Promise<Readable> {
         const filePath = path.join(this.basePath, bucket, key);
+
         await fs.access(filePath);
+
         return createReadStream(filePath);
     }
 
@@ -59,6 +64,7 @@ export class FsStorageAdapter implements IStorageAdapter {
             if (err && typeof err === 'object' && 'code' in err && err.code === 'ENOENT') {
                 return;
             }
+
             throw err;
         }
     }
@@ -69,8 +75,10 @@ export class FsStorageAdapter implements IStorageAdapter {
 
     async listObjects(bucket: string, prefix?: string): Promise<string[]> {
         const dir = path.join(this.basePath, bucket);
+
         try {
             const entries = await fs.readdir(dir, { recursive: true });
+
             return prefix ? entries.filter((e) => e.startsWith(prefix)) : entries;
         } catch {
             return [];

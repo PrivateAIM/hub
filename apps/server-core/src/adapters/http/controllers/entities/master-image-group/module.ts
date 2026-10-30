@@ -41,6 +41,7 @@ export class MasterImageGroupController {
     ): Promise<EntityCollectionResponse<MasterImageGroup>> {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query, buildActorContext(event));
+
         return { data, meta: { ...meta, schema: describeQuerySchema(masterImageGroupSchema) } };
     }
 
@@ -65,7 +66,9 @@ export class MasterImageGroupController {
     ): Promise<EntityRecordResponse<MasterImageGroup>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
+
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 }

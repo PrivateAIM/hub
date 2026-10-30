@@ -133,6 +133,7 @@ export function sanitizeError(input: unknown): HubError {
 
     if (isValidupError(input)) {
         const paths = input.issues.map((issue) => stringifyPath(issue.path));
+
         return new BadRequestError({
             stack: input.stack,
             message: input.message || buildErrorMessageForAttributes(paths),

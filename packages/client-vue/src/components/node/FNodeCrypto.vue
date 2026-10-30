@@ -64,6 +64,7 @@ export default defineComponent({
                 clipboard.copy(privateKey.value);
 
                 emit('keyCopied');
+
                 return;
             }
 
@@ -78,7 +79,10 @@ export default defineComponent({
         const busy = ref(false);
 
         const save = async () => {
-            if (busy.value) return;
+            if (busy.value) {
+                return;
+            }
+
             busy.value = true;
 
             try {
@@ -93,7 +97,9 @@ export default defineComponent({
         };
 
         const generate = async () => {
-            if (busy.value) return;
+            if (busy.value) {
+                return;
+            }
 
             busy.value = true;
 

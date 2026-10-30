@@ -6,8 +6,8 @@
  */
 
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { Log, LogInput } from './entity';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { LogChannel, LogLevel } from './constants';
 
 /**
  * Cannot extend `IEntityAPI<Log>`: the log store is append-and-query only.
@@ -19,3 +19,40 @@ export interface ILogAPI {
     deleteMany(options?: EntityQueryInput<Log>) : Promise<void>;
     create(data: LogInput) : Promise<EntityRecordResponse<Log>>;
 }
+
+// todo: update logger-transport on new top level log flags
+export type Log = {
+    /**
+     * ISO String
+     */
+    time: string,
+
+    /**
+     *  message
+     */
+    message: string,
+
+    /**
+     * level
+     */
+    level: `${LogLevel}`,
+
+    /**
+     * service
+     */
+    service: string,
+
+    /**
+     * channel
+     */
+    channel: `${LogChannel}`,
+
+    /**
+     * additional labels
+     */
+    labels: Record<string, string>
+};
+
+type RequiredTypes = ('message' | 'level' | 'service' | 'channel');
+
+export type LogInput = Pick<Log, RequiredTypes & keyof Log> & Partial<Omit<Log, RequiredTypes & keyof Log>>;

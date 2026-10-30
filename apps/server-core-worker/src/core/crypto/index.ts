@@ -8,4 +8,4 @@
 export * from './asymmetric';
 export * from './hash';
 export * from './symmetric';
-export * from './type';
+export * from './types';

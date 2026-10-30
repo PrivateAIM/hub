@@ -44,6 +44,7 @@ export function registerRepositories(container: IContainer, dataSource: DataSour
             // `RegistryManagerAdapter`.
             registryComponentDispatcher: () => {
                 const result = container.tryResolve(ComponentsInjectionKey.RegistryComponentDispatcher);
+
                 return result.success ? result.data : undefined;
             },
         }),

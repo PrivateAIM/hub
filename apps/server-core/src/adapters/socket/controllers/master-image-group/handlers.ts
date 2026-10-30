@@ -25,7 +25,9 @@ import { assertSocketSubscribeReach } from '../../reach.ts';
 import type { Socket } from '../../types.ts';
 
 export function registerMasterImageGroupSocketHandlers(socket: Socket) {
-    if (!isSocketAuthenticated(socket)) return;
+    if (!isSocketAuthenticated(socket)) {
+        return;
+    }
 
     socket.on(
         buildDomainEventFullName(DomainType.MASTER_IMAGE_GROUP, DomainEventSubscriptionName.SUBSCRIBE),

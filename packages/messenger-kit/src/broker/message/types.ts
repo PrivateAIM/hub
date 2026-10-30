@@ -37,7 +37,7 @@ export type MessageMetadata = {
  * field); delivery is delete-on-ack, so `id` is the ack key and the recipient's
  * dedup key across at-least-once redelivery.
  */
-export interface Message {
+export type Message = {
     id: string;
 
     senderType: `${MessagePartyKind}`;
@@ -55,7 +55,7 @@ export interface Message {
 
     /** ISO-8601 timestamp; serialized form crossing every transport (HTTP/AMQP/socket) */
     createdAt: string;
-}
+};
 
 /**
  * Send request (`POST /messages`). The sender is the authenticated identity;

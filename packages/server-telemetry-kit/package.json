@@ -42,5 +42,8 @@
         "build:types": "tsc --noEmit -p tsconfig.build.json",
         "build": "npm run build:js && npm run build:types",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
+    },
+    "engines": {
+        "node": ">=24.0.0"
     }
 }

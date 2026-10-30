@@ -6,7 +6,7 @@
  */
 
 import { ProcessStatus } from '@privateaim/kit';
-import type { Analysis } from '../entity';
+import type { Analysis } from '../types';
 import { AnalysisError } from '../error';
 
 export class AnalysisDistributorCommandChecker {

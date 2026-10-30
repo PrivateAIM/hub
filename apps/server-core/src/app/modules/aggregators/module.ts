@@ -164,6 +164,7 @@ export class AggregatorsModule implements IModule {
 
     async teardown(): Promise<void> {
         const { aggregators } = this;
+
         this.aggregators = [];
 
         await Promise.all(aggregators.map((a) => a.stop()));

@@ -34,6 +34,7 @@ export default defineNuxtComponent({
         }
 
         const store = injectStore();
+
         store.logout();
 
         await router.push({ path: '/login', query });

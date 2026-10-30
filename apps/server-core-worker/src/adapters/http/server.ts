@@ -9,6 +9,7 @@ import { App, defineCoreHandler } from 'routup';
 
 export function createHttpApp() : App {
     const app = new App();
+
     app.get('/', defineCoreHandler(() => ({ timestamp: Date.now() })));
 
     return app;

@@ -49,6 +49,7 @@ export class DatabaseQueryResultCache implements QueryResultCache {
         const pipeline = this.redisClient.pipeline();
 
         const keys = await this.redisClient.keys(this.buildFullQualifiedId('*'));
+
         for (const key of keys) {
             pipeline.del(key);
         }
@@ -113,13 +114,8 @@ export class DatabaseQueryResultCache implements QueryResultCache {
     async storeInCache(
         options: QueryResultCacheOptions,
     ): Promise<void> {
-        if (!this.redisClient) {
-            return;
-        }
-
         // todo: allow options.query
-
-        if (!options.identifier) {
+        if (!this.redisClient || !options.identifier) {
             return;
         }
 

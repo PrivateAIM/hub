@@ -5,17 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { EntityQueryInput } from './types';
 import { createURLCodec } from '@rapiq/codec-url';
 import { defineQuery, isQuery } from '@rapiq/core';
-import type { IQuery, ObjectLiteral, QueryBuildInput } from '@rapiq/core';
-
-/**
- * Accepted query input for entity read endpoints: either typed build input
- * (desugared via defineQuery) or an already assembled Query.
- */
-export type EntityQueryInput<
-    T extends ObjectLiteral = ObjectLiteral,
-> = QueryBuildInput<T> | IQuery;
+import type { ObjectLiteral } from '@rapiq/core';
 
 const codec = createURLCodec();
 

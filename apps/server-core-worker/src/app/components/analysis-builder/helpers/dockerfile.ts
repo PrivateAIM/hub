@@ -18,7 +18,7 @@ import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import path from 'node:path';
 import { ANALYSIS_BUILD_CONTEXT_ARCHIVE, AnalysisContainerPath } from '../constants';
 import { BuilderError } from '../error';
-import type { DockerFileAnalysis } from './type';
+import type { DockerFileAnalysis } from './types';
 
 export async function generateDockerFileContent(
     entity: DockerFileAnalysis,
@@ -31,6 +31,7 @@ export async function generateDockerFileContent(
         },
     });
     const [analysisBucket] = analysisBuckets;
+
     if (typeof analysisBucket === 'undefined') {
         throw BuilderError.entrypointNotFound();
     }
@@ -43,13 +44,16 @@ export async function generateDockerFileContent(
     });
 
     const [analysisBucketFile] = analysisBucketFiles;
+
     if (typeof analysisBucketFile === 'undefined') {
         throw BuilderError.entrypointNotFound();
     }
 
     let entryPoint : BucketFile;
+
     try {
         const { data } = await ctx.storageClient.bucketFile.getOne(analysisBucketFile.bucketFileId);
+
         entryPoint = data;
     } catch {
         throw BuilderError.entrypointNotFound();
@@ -59,6 +63,7 @@ export async function generateDockerFileContent(
 
     try {
         const { data } = await ctx.coreClient.masterImage.getOne(entity.masterImageId);
+
         masterImage = data;
     } catch {
         throw BuilderError.masterImageNotFound();
@@ -70,6 +75,7 @@ export async function generateDockerFileContent(
     );
 
     let commandArguments : MasterImageCommandArgument[];
+
     if (entity.imageCommandArguments) {
         commandArguments = entity.imageCommandArguments;
     } else if (masterImage.commandArguments) {

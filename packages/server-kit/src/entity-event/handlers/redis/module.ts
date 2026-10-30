@@ -28,6 +28,7 @@ export class EntityEventRedisHandler implements IEntityEventHandler {
         const payloadSerialized = JSON.stringify(payload);
 
         const pipeline = this.driver.pipeline();
+
         for (let i = 0; i < ctx.destinations.length; i++) {
             const destination = ctx.destinations[i];
 

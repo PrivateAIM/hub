@@ -53,11 +53,13 @@ export class MasterImageSynchronizerService {
         const updates = new Map<string, Partial<MasterImage>>();
 
         const virtualPaths = input.map((entity) => entity.virtualPath);
+
         result.deleted = entities
             .filter((image) => !virtualPaths.includes(image.virtualPath));
 
         for (const element of input) {
             const parts = element.virtualPath.split('/');
+
             parts.pop();
 
             const data: Partial<MasterImage> = {
@@ -75,6 +77,7 @@ export class MasterImageSynchronizerService {
             const index = entities.findIndex(
                 (entity) => entity.virtualPath === data.virtualPath,
             );
+
             if (index === -1) {
                 result.created.push(this.imageRepository.create(data));
             } else {
@@ -93,6 +96,7 @@ export class MasterImageSynchronizerService {
         for (const [id, data] of updates) {
             await this.imageRepository.updateLocked(id, (locked) => {
                 Object.assign(locked, data);
+
                 return true;
             });
         }
@@ -116,6 +120,7 @@ export class MasterImageSynchronizerService {
         };
 
         const dirVirtualPaths: string[] = input.map((entity) => entity.virtualPath);
+
         result.deleted = entities.filter(
             (image) => !dirVirtualPaths.includes(image.virtualPath),
         );
@@ -127,6 +132,7 @@ export class MasterImageSynchronizerService {
             };
 
             const index = entities.findIndex((dbEntity) => dbEntity.virtualPath === element.virtualPath);
+
             if (index === -1) {
                 result.created.push(this.groupRepository.create({
                     virtualPath: element.virtualPath,

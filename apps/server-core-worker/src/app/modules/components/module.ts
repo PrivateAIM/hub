@@ -171,6 +171,7 @@ export class ComponentsModule implements IModule {
 
     async teardown(): Promise<void> {
         const { components } = this;
+
         this.components = [];
 
         await Promise.all(components.map((c) => c.stop()));

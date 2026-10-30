@@ -9,4 +9,4 @@ export * from './dispatcher/index.ts';
 export * from './handlers/index.ts';
 export * from './module.ts';
 export * from './constants.ts';
-export * from './type.ts';
+export * from './types.ts';

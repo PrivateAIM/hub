@@ -95,11 +95,13 @@ describe('AnalysisService', () => {
         bucketDispatcher = new FakeBucketDispatcher();
 
         analysisNodeRepository = new FakeAnalysisNodeRepository();
+
         const registryRepository = new FakeEntityRepository<Registry>();
         const bucketRepository = new FakeEntityRepository<AnalysisBucket>();
 
         analysisRecalculator = new FakeAnalysisMetadataRecalculator(analysisRepository);
         nodeRecalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
+
         const fileRecalculator = new FakeAnalysisFileMetadataRecalculator(analysisRepository);
 
         const builder = new AnalysisBuilder({
@@ -159,9 +161,11 @@ describe('AnalysisService', () => {
             ]);
 
             const actor = createAllowAllActor();
+
             actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
 
             const result = await service.getMany({}, actor);
+
             expect(result.data).toHaveLength(2);
         });
 
@@ -195,6 +199,7 @@ describe('AnalysisService', () => {
             analysisRepository.seed(createFullAnalysis());
 
             const result = await service.getOne('analysis-1', createAllowAllActor('realm-1'));
+
             expect(result.id).toBe('analysis-1');
         });
 
@@ -220,9 +225,11 @@ describe('AnalysisService', () => {
     describe('create', () => {
         it('should call storageManager.check after save', async () => {
             const project = createTestProject();
+
             projectRepository.seed(project);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -239,9 +246,11 @@ describe('AnalysisService', () => {
 
         it('should call recalcDebounced after save', async () => {
             const project = createTestProject({ masterImageId: randomUUID() });
+
             projectRepository.seed(project);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -261,9 +270,11 @@ describe('AnalysisService', () => {
             // Stored counter starts out of sync (e.g. drifted negative); creating
             // an analysis must resync it to the real row count, not blindly add one.
             const project = createTestProject({ analyses: -3 });
+
             projectRepository.seed(project);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -275,15 +286,18 @@ describe('AnalysisService', () => {
             );
 
             const stored = await projectRepository.findOneById(project.id);
+
             expect(result.project.analyses).toBe(1);
             expect(stored?.analyses).toBe(1);
         });
 
         it('should auto-generate a url-friendly name when none is provided', async () => {
             const project = createTestProject();
+
             projectRepository.seed(project);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -301,9 +315,11 @@ describe('AnalysisService', () => {
 
         it('should generate a name when an empty name is provided', async () => {
             const project = createTestProject();
+
             projectRepository.seed(project);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -322,9 +338,11 @@ describe('AnalysisService', () => {
 
         it('should keep a provided name and displayName', async () => {
             const project = createTestProject();
+
             projectRepository.seed(project);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -354,10 +372,12 @@ describe('AnalysisService', () => {
 
         it('should assign every approved project node to the created analysis', async () => {
             const project = createTestProject({ realmId: 'analysis-realm' });
+
             projectRepository.seed(project);
 
             const aggregatorNodeId = randomUUID();
             const defaultNodeId = randomUUID();
+
             projectNodeRepository.seed([
                 {
                     id: randomUUID(),
@@ -386,6 +406,7 @@ describe('AnalysisService', () => {
             ]);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -397,6 +418,7 @@ describe('AnalysisService', () => {
             );
 
             const analysisNodes = analysisNodeRepository.getAll();
+
             expect(analysisNodes).toHaveLength(2);
             expect(analysisNodes.every((node) => node.analysisId === result.id)).toBe(true);
             expect(analysisNodes.every((node) => node.analysisRealmId === 'analysis-realm')).toBe(true);
@@ -406,6 +428,7 @@ describe('AnalysisService', () => {
             // aggregator nodes are auto-approved, default nodes stay pending (approval not skipped)
             const aggregatorNode = analysisNodes.find((node) => node.nodeId === aggregatorNodeId);
             const defaultNode = analysisNodes.find((node) => node.nodeId === defaultNodeId);
+
             expect(aggregatorNode?.approvalStatus).toBe(AnalysisNodeApprovalStatus.APPROVED);
             expect(defaultNode?.approvalStatus).toBeUndefined();
 
@@ -416,10 +439,12 @@ describe('AnalysisService', () => {
 
         it('should skip project nodes that are not approved', async () => {
             const project = createTestProject();
+
             projectRepository.seed(project);
 
             const approvedNodeId = randomUUID();
             const pendingNodeId = randomUUID();
+
             projectNodeRepository.seed([
                 {
                     id: randomUUID(),
@@ -448,6 +473,7 @@ describe('AnalysisService', () => {
             ]);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -459,15 +485,18 @@ describe('AnalysisService', () => {
             );
 
             const analysisNodes = analysisNodeRepository.getAll();
+
             expect(analysisNodes).toHaveLength(1);
             expect(analysisNodes[0].nodeId).toBe(approvedNodeId);
         });
 
         it('should not create analysis nodes when the project has no nodes', async () => {
             const project = createTestProject();
+
             projectRepository.seed(project);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -486,9 +515,11 @@ describe('AnalysisService', () => {
     describe('create (reach)', () => {
         it('should deny creating an analysis in a project of a realm out of reach', async () => {
             const project = createTestProject({ realmId: 'realm-b' });
+
             projectRepository.seed(project);
 
             const origValidate = analysisRepository.validateJoinColumns.bind(analysisRepository);
+
             analysisRepository.validateJoinColumns = async (data: Partial<Analysis>) => {
                 await origValidate(data);
                 data.project = project;
@@ -515,11 +546,13 @@ describe('AnalysisService', () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'realm-a' }));
 
             const actor = createScopedActor({ realmId: 'realm-a', realmScope: 'own' });
+
             await service.update('analysis-1', { name: 'updated' }, actor);
 
             const names = actor.permissionEvaluator.evaluateCalls
                 .filter((call) => call.name === PermissionName.ANALYSIS_UPDATE)
                 .map((call) => call.data?.get<Analysis>(BuiltInPolicyType.ATTRIBUTES).name);
+
             expect(names).toHaveLength(2);
             expect(names[1]).toBe('updated');
             expect(names[0]).not.toBe('updated');
@@ -540,7 +573,9 @@ describe('AnalysisService', () => {
             // the build finishes while the update still holds its earlier read
             analysisRepository.afterUnlockedRead = async (id) => {
                 analysisRepository.afterUnlockedRead = undefined;
+
                 const row = await analysisRepository.findOneById(id);
+
                 await analysisRepository.save({ ...row, buildStatus: ProcessStatus.EXECUTED });
             };
 
@@ -564,6 +599,7 @@ describe('AnalysisService', () => {
     describe('delete', () => {
         it('should call storageManager.remove before repository.remove', async () => {
             const project = createTestProject();
+
             project.analyses = 1;
             projectRepository.seed(project);
             analysisRepository.seed(createFullAnalysis({ project, projectId: project.id }));
@@ -571,11 +607,13 @@ describe('AnalysisService', () => {
             await service.delete('analysis-1', createAllowAllActor());
 
             const remaining = await analysisRepository.findOneById('analysis-1');
+
             expect(remaining).toBeNull();
         });
 
         it('should recompute project.analyses from the remaining rows on delete', async () => {
             const project = createTestProject();
+
             // The stored counter is deliberately wrong to prove the value is
             // recomputed from the actual rows, not merely decremented.
             project.analyses = 5;
@@ -600,6 +638,7 @@ describe('AnalysisService', () => {
 
         it('should never let project.analyses go negative when the counter is out of sync', async () => {
             const project = createTestProject();
+
             // Counter already drifted to 0 (or below) while a row still exists.
             project.analyses = 0;
             projectRepository.seed(project);
@@ -629,6 +668,7 @@ describe('AnalysisService', () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'other-realm' }));
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+
             await expect(
                 service.delete('analysis-1', actor),
             ).rejects.toThrow(PermissionError);
@@ -637,6 +677,7 @@ describe('AnalysisService', () => {
 
         it('should let a grant reaching every realm delete', async () => {
             const project = createTestProject({ analyses: 1 });
+
             projectRepository.seed(project);
             analysisRepository.seed(createFullAnalysis({
                 realmId: 'other-realm',
@@ -644,6 +685,7 @@ describe('AnalysisService', () => {
             }));
 
             const result = await service.delete('analysis-1', createScopedActor({ realmId: 'realm-master', realmScope: 'any' }));
+
             expect(result.id).toBe('analysis-1');
         });
     });
@@ -667,6 +709,7 @@ describe('AnalysisService', () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'other-realm' }));
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+
             await expect(
                 service.executeCommand('analysis-1', AnalysisCommand.STORAGE_CHECK, actor),
             ).rejects.toThrow(PermissionError);
@@ -693,6 +736,7 @@ describe('AnalysisService', () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'realm-a' }));
 
             const actor = createScopedActor({ realmId: 'realm-a', realmScope: 'own' });
+
             // the dispatched step may refuse on state; only the authorization matters here
             await service.executeCommand('analysis-1', command, actor).catch(() => undefined);
 

@@ -35,6 +35,7 @@ describe('read permission on global catalogs', () => {
 
     const status = async (path: string, token: string) => {
         const response = await fetch(`${baseURL}${path}`, { headers: { authorization: `Bearer ${token}` } });
+
         return response.status;
     };
 

@@ -16,11 +16,11 @@ import {
 import { ProcessStatus } from '@privateaim/kit';
 import type { AnalysisBuilderCheckFinishedPayload, AnalysisBuilderExecutionProgressPayload } from '@privateaim/server-core-worker-kit';
 import { AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
-import { 
-    beforeEach, 
-    describe, 
-    expect, 
-    it, 
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
 } from 'vitest';
 import { AnalysisBuilder } from '../../../../src/core/services/analysis-builder/module.ts';
 import { ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS, ANALYSIS_PROCESS_STALE_THRESHOLD_MS } from '../../../../src/core/services/helpers.ts';
@@ -61,6 +61,7 @@ describe('AnalysisBuilder', () => {
     describe('start', () => {
         it('should set buildStatus to STARTING and dispatch execute', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
 
             const result = await builder.start(analysis);
@@ -73,6 +74,7 @@ describe('AnalysisBuilder', () => {
 
         it('should call all recalculators before checking', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
 
             await builder.start(analysis);
@@ -85,6 +87,7 @@ describe('AnalysisBuilder', () => {
 
         it('should resolve entity by string ID', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
 
             const result = await builder.start('analysis-1');
@@ -95,17 +98,20 @@ describe('AnalysisBuilder', () => {
 
         it('should save entity to repository', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
 
             await builder.start(analysis);
 
             const saved = await repository.findOneById('analysis-1');
+
             expect(saved).toBeDefined();
             expect(saved!.buildStatus).toBe(ProcessStatus.STARTING);
         });
 
         it('should throw when config not locked', async () => {
             const analysis = createFullAnalysis({ configurationLocked: false });
+
             repository.seed(analysis);
 
             await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
@@ -113,6 +119,7 @@ describe('AnalysisBuilder', () => {
 
         it('should start without node approval (approval gates distribution)', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true, distributionNodesValid: false });
+
             repository.seed(analysis);
 
             const result = await builder.start(analysis);
@@ -122,6 +129,7 @@ describe('AnalysisBuilder', () => {
 
         it('should reset every non-aggregator approval, so nodes approve the new image', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.FAILED });
+
             repository.seed(analysis);
 
             const defaultNode = createTestAnalysisNode({
@@ -138,6 +146,7 @@ describe('AnalysisBuilder', () => {
                     type: NodeType.AGGREGATOR,
                 },
             });
+
             analysisNodeRepository.seed([defaultNode, aggregatorNode]);
 
             await builder.start(analysis);
@@ -151,6 +160,7 @@ describe('AnalysisBuilder', () => {
 
         it('should keep approvals when approval is ignored', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
             analysisNodeRepository.seed(createTestAnalysisNode({
                 id: 'an-default',
@@ -165,6 +175,7 @@ describe('AnalysisBuilder', () => {
 
         it('should keep approvals when the build cannot start', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTED });
+
             repository.seed(analysis);
             analysisNodeRepository.seed(createTestAnalysisNode({
                 id: 'an-default',
@@ -179,14 +190,17 @@ describe('AnalysisBuilder', () => {
 
         it('should allow retry when build FAILED', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.FAILED });
+
             repository.seed(analysis);
 
             const result = await builder.start(analysis);
+
             expect(result.buildStatus).toBe(ProcessStatus.STARTING);
         });
 
         it('should re-check canStart on the locked row, so a concurrent start does not dispatch twice', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
 
             // another replica's start commits between this start's early read and its lock
@@ -200,6 +214,7 @@ describe('AnalysisBuilder', () => {
 
         it('should throw when build already in progress', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTING });
+
             repository.seed(analysis);
 
             await expect(builder.start(analysis)).rejects.toThrow(AnalysisError);
@@ -209,6 +224,7 @@ describe('AnalysisBuilder', () => {
     describe('check', () => {
         it('should dispatch check call for in-progress build', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTED });
+
             repository.seed(analysis);
 
             const result = await builder.check(analysis);
@@ -220,9 +236,11 @@ describe('AnalysisBuilder', () => {
 
         it('should resolve entity by string ID', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.STARTED });
+
             repository.seed(analysis);
 
             const result = await builder.check('analysis-1');
+
             expect(result.id).toBe('analysis-1');
         });
 
@@ -232,6 +250,7 @@ describe('AnalysisBuilder', () => {
 
         it('should throw when config not locked', async () => {
             const analysis = createFullAnalysis({ configurationLocked: false, buildStatus: ProcessStatus.STARTED });
+
             repository.seed(analysis);
 
             await expect(builder.check(analysis)).rejects.toThrow(AnalysisError);
@@ -239,6 +258,7 @@ describe('AnalysisBuilder', () => {
 
         it('should throw when no build started', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: null });
+
             repository.seed(analysis);
 
             await expect(builder.check(analysis)).rejects.toThrow(AnalysisError);
@@ -246,6 +266,7 @@ describe('AnalysisBuilder', () => {
 
         it('should dispatch check call for EXECUTED build (reconciliation after data loss)', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true, buildStatus: ProcessStatus.EXECUTED });
+
             repository.seed(analysis);
 
             const result = await builder.check(analysis);
@@ -270,9 +291,9 @@ describe('AnalysisBuilder', () => {
             const payload: AnalysisBuilderExecutionProgressPayload = {
                 id: analysis.id,
                 progress: {
-                    current: 1, 
-                    total: 1, 
-                    percent: 40, 
+                    current: 1,
+                    total: 1,
+                    percent: 40,
                 },
             };
             const saved = await builder.applyEvent(AnalysisBuilderEvent.EXECUTION_PROGRESS, payload);
@@ -298,6 +319,7 @@ describe('AnalysisBuilder', () => {
             await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildStatus).toBe(ProcessStatus.EXECUTED);
             expect(entity.buildProgress).toBe(100);
             expect(entity.buildHash).toBe('sha256:abc');
@@ -322,6 +344,7 @@ describe('AnalysisBuilder', () => {
             await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildStatus).toBe(ProcessStatus.STARTED);
             expect(entity.buildProgress).toBe(40);
             expect(entity.buildHash).toBe('sha256:previous');
@@ -345,6 +368,7 @@ describe('AnalysisBuilder', () => {
             await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
             expect(entity.buildProgress).toBe(0);
             expect(entity.buildHash).toBeNull();
@@ -366,9 +390,11 @@ describe('AnalysisBuilder', () => {
                     percent: 40,
                 },
             };
+
             await builder.applyEvent(AnalysisBuilderEvent.EXECUTION_PROGRESS, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildProgress).toBe(40);
             expect(new Date(entity.updatedAt).getTime()).toBeGreaterThan(new Date(updatedAt).getTime());
         });
@@ -392,6 +418,7 @@ describe('AnalysisBuilder', () => {
             await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
             expect(entity.buildProgress).toBe(0);
             expect(entity.buildHash).toBeNull();
@@ -437,9 +464,9 @@ describe('AnalysisBuilder', () => {
             const payload: AnalysisBuilderExecutionProgressPayload = {
                 id: analysis.id,
                 progress: {
-                    current: 0, 
-                    total: 0, 
-                    percent: 10, 
+                    current: 0,
+                    total: 0,
+                    percent: 10,
                 },
             };
             const saved = await builder.applyEvent(event, payload);
@@ -482,6 +509,7 @@ describe('AnalysisBuilder', () => {
             await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildStatus).toBe(ProcessStatus.STARTING);
             expect(entity.buildHash).toBe('sha256:previous');
         });
@@ -495,6 +523,7 @@ describe('AnalysisBuilder', () => {
             await builder.applyEvent(AnalysisBuilderEvent.CHECK_FAILED, { id: analysis.id });
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildStatus).toBe(ProcessStatus.STARTED);
             expect(entity.buildProgress).toBe(40);
         });
@@ -505,6 +534,7 @@ describe('AnalysisBuilder', () => {
             await builder.applyEvent(AnalysisBuilderEvent.EXECUTION_FAILED, { id: analysis.id });
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
         });
     });

@@ -37,7 +37,9 @@ export class FakeRegistryManager implements IRegistryManager {
             id: randomUUID(),
             ...data,
         } as RegistryProject;
+
         this.projects.push(project);
+
         return project;
     }
 
@@ -47,11 +49,13 @@ export class FakeRegistryManager implements IRegistryManager {
 
     async saveProject(project: RegistryProject): Promise<RegistryProject> {
         const index = this.projects.findIndex((p) => p.id === project.id);
+
         if (index >= 0) {
             this.projects[index] = project;
         } else {
             this.projects.push(project);
         }
+
         return project;
     }
 

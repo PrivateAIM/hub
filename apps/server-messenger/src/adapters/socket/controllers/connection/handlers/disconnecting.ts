@@ -19,9 +19,11 @@ export function mountSocketConnectionDisconnectingHandler(socket: Socket) {
         }
 
         const roomName = buildConnectionRoomForIdentity(socket.data.identity);
+
         socket.leave(roomName);
 
         const sockets = socket.nsp.adapter.rooms.get(roomName);
+
         if (sockets && sockets.size !== 0) {
             return;
         }

@@ -17,9 +17,11 @@ type DockerImageURLBuildContext = {
 
 export function buildDockerImageURL(context: DockerImageURLBuildContext): string {
     const parts : string[] = [];
+
     if (context.hostname) {
         parts.push(getHostNameFromString(context.hostname));
     }
+
     parts.push(...[
 
         context.projectName,

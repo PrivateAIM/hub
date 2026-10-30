@@ -78,6 +78,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
         const scoped = condition ? appendQueryConditions(decoded, condition) : decoded;
         const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-node' });
         }
@@ -151,6 +152,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-node' });
         }
@@ -168,6 +170,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             entity.approvalStatus !== AnalysisNodeApprovalStatus.APPROVED
         ) {
             const analysis = await this.analysisRepository.findOneById(entity.analysisId);
+
             if (!analysis || analysis.buildStatus !== ProcessStatus.EXECUTED) {
                 throw new BadRequestError('The analysis can only be approved once its image is built.');
             }
@@ -194,6 +197,7 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
         });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-node' });
         }

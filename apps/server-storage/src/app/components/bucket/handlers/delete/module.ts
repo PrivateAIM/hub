@@ -18,7 +18,7 @@ import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
 import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity } from '../../../../../adapters/database/index.ts';
-import { toBucketName } from '../../../../domains/bucket/utils.ts';
+import { toBucketName } from '../../../../../core/utils/bucket-name.ts';
 
 export class BucketDeleteHandler implements ComponentHandler<
     BucketComponentEventMap,
@@ -82,6 +82,7 @@ export class BucketDeleteHandler implements ComponentHandler<
 
         if (exists) {
             const objects = await this.storage.listObjects(bucketName);
+
             if (objects.length > 0) {
                 await this.storage.removeObjects(bucketName, objects);
             }

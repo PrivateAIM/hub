@@ -122,6 +122,7 @@ export async function createRestrictedAccessToken(
             `permissions?filter[name]=${encodeURIComponent(permissionName)}`,
         );
         const permission = selectGlobalPermission(permissions);
+
         if (!permission) {
             throw new Error(`The global permission ${permissionName} is not provisioned — cannot grant it to ${name}.`);
         }

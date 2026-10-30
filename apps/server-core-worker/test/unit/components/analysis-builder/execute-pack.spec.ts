@@ -81,6 +81,7 @@ function forgeTypeflag(input: Buffer, typeflag: string): Buffer {
     buffer.fill(' ', 148, 156);
 
     let checksum = 0;
+
     for (let i = 0; i < 512; i++) {
         checksum += buffer[i];
     }

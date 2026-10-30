@@ -34,12 +34,9 @@ export class MemoryLogStore implements LogStore {
                 }
 
                 const labelKeys = Object.keys(options.labels);
-                for (const labelKey of labelKeys) {
-                    if (!item.labels[labelKey]) {
-                        return false;
-                    }
 
-                    if (item.labels[labelKey] !== options.labels[labelKey]) {
+                for (const labelKey of labelKeys) {
+                    if (!item.labels[labelKey] || (item.labels[labelKey] !== options.labels[labelKey])) {
                         return false;
                     }
                 }

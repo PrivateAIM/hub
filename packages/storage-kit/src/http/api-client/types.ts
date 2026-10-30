@@ -6,7 +6,13 @@
  */
 
 import type { ClientOptionsInput, IClient as IBaseClient } from 'hapic';
-import type { IBucketAPI, IBucketFileAPI } from '../../domains';
+import type {
+    DomainTypeMap,
+    IBucketAPI,
+    IBucketFileAPI,
+    IEntityAPI,
+} from '../../domains';
+import type { ObjectLiteral } from '@rapiq/core';
 
 /**
  * hapic's full construction surface, which — unlike `RequestBaseOptions` —
@@ -24,3 +30,12 @@ export interface IStorageClient extends IBaseClient {
     readonly bucket : IBucketAPI;
     readonly bucketFile : IBucketFileAPI;
 }
+
+export type ClientEntityAPIKey = keyof IStorageClient & keyof DomainTypeMap;
+
+/** Verbs are OPTIONAL — callers guard the ones they use. See core-http-kit. */
+export type EntityAPIDispatch<T extends ObjectLiteral> = Partial<IEntityAPI<T, any, any>>;
+
+export type ClientEntityAPIRegistry = {
+    [K in ClientEntityAPIKey]: EntityAPIDispatch<DomainTypeMap[K]>
+};

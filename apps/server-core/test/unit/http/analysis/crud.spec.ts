@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { createTestApplication } from '../../../app';
@@ -18,7 +18,7 @@ import { createNanoID } from '@privateaim/kit';
 import { isClientError } from 'hapic';
 import { EntityRelationLookupError } from 'typeorm-extension';
 import {
-    
+
     expectProperties,
     removeDateProperties,
 } from '../../../utils';
@@ -79,6 +79,7 @@ describe('src/controllers/core/analysis', () => {
 
     it('should update resource', async () => {
         const { client } = suite;
+
         details.name = 'test-a';
 
         const { data } = await client.analysis.update(details.id, details);
@@ -89,6 +90,7 @@ describe('src/controllers/core/analysis', () => {
     it('should delete resource', async () => {
         const { client } = suite;
         const { data: response } = await client.analysis.delete(details.id);
+
         expect(response).toBeDefined();
     });
 
@@ -105,6 +107,7 @@ describe('src/controllers/core/analysis', () => {
         } catch (e) {
             if (isClientError(e)) {
                 expect(e.response.data.message).toEqual(EntityRelationLookupError.notFound('project', ['projectId']).message);
+
                 return;
             }
 
@@ -128,6 +131,7 @@ describe('src/controllers/core/analysis', () => {
         } catch (e) {
             if (isClientError(e)) {
                 expect(e.response.data.message).toEqual(EntityRelationLookupError.notFound('masterImage', ['masterImageId']).message);
+
                 return;
             }
 

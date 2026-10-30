@@ -40,9 +40,9 @@ export class MessageService implements IMessageService {
     protected ttlMs: number;
 
     constructor(ctx: {
-        repository: IMessageRepository, 
-        wakeup?: IMessageWakeup, 
-        ttlMs?: number 
+        repository: IMessageRepository,
+        wakeup?: IMessageWakeup,
+        ttlMs?: number
     }) {
         this.repository = ctx.repository;
         this.wakeup = ctx.wakeup ?? new MemoryMessageWakeup();
@@ -89,16 +89,19 @@ export class MessageService implements IMessageService {
 
         try {
             let messages = await this.repository.findManyForRecipient(recipient, limit, new Date());
+
             if (messages.length === 0 && waitMs > 0) {
                 // long-poll: park until a message is pending for this recipient or the
                 // budget elapses, then re-query once.
                 let timer: ReturnType<typeof setTimeout> | undefined;
                 const timeout = new Promise<void>((resolve) => {
                     timer = setTimeout(resolve, waitMs);
+
                     if (typeof timer.unref === 'function') {
                         timer.unref();
                     }
                 });
+
                 try {
                     await Promise.race([pending, timeout]);
                 } finally {
@@ -106,6 +109,7 @@ export class MessageService implements IMessageService {
                         clearTimeout(timer);
                     }
                 }
+
                 messages = await this.repository.findManyForRecipient(recipient, limit, new Date());
             }
 
@@ -131,6 +135,7 @@ export class MessageService implements IMessageService {
         }
 
         const normalized = Math.floor(limit);
+
         if (normalized <= 0) {
             return DEFAULT_PULL_LIMIT;
         }

@@ -88,6 +88,7 @@ export default defineNuxtComponent({
             const response = await api.node.getMany({ filters: { realmId: realmId.value } });
 
             const node = response.data.pop();
+
             if (node) {
                 nodeId.value = node.id;
             }

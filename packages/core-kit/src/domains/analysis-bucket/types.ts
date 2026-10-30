@@ -9,7 +9,7 @@ import type { Realm } from '@authup/core-kit';
 import type { Analysis } from '../analysis';
 import type { AnalysisBucketType } from './constants';
 
-export interface AnalysisBucket {
+export type AnalysisBucket = {
     id: string;
 
     type: `${AnalysisBucketType}`;
@@ -33,4 +33,4 @@ export interface AnalysisBucket {
     createdAt: string;
 
     updatedAt: string;
-}
+};

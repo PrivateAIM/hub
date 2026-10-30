@@ -13,9 +13,9 @@ import type { CTSEvents, STCEvents } from '@privateaim/core-realtime-kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
 import { flushPromises } from '@vue/test-utils';
 import {
-    defineComponent, 
-    getCurrentInstance, 
-    h, 
+    defineComponent,
+    getCurrentInstance,
+    h,
     ref,
 } from 'vue';
 import { describe, expect, it } from 'vitest';
@@ -49,7 +49,9 @@ describe('entity socket namespace', () => {
 class OfflineClientManager extends ClientManager<STCEvents, CTSEvents> {
     override async connect(namespace?: string) {
         const socket = this.inject(namespace);
+
         socket.emitWithAck = async () => undefined;
+
         return socket;
     }
 }
@@ -67,11 +69,13 @@ describe('entity socket subscription', () => {
                 store = injectStore();
                 store.setRealmManagement({ id: 'r1', name: 'one' });
                 createEntitySocket({ type: DomainType.ANALYSIS, onCreated: () => {} });
+
                 return () => h('div');
             },
         });
 
         const { wrapper } = mountClientVueComponent(component, {}, {});
+
         await flushPromises();
         expect([listeners('r1'), listeners('r2')]).toEqual([1, 0]);
 

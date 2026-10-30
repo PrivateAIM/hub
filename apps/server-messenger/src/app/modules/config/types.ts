@@ -7,7 +7,7 @@
 
 import type { BaseServerConfig } from '@privateaim/server-kit';
 
-export interface Config extends BaseServerConfig {
+export type Config = BaseServerConfig & {
     authupURL: string;
     redisConnectionString: string;
-}
+};

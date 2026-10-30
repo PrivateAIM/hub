@@ -26,9 +26,9 @@ import {
 } from 'vitest';
 import { AnalysisBucketFileService } from '../../../../../src/core/entities/analysis-bucket-file/service.ts';
 import { AnalysisReachService } from '../../../../../src/core/services/analysis-reach/index.ts';
+import { FakePermissionEvaluator } from '@authup/server-test-kit';
 import {
     FakeEntityRepository,
-    FakePermissionEvaluator,
     createAllowAllActor,
     createDenyAllActor,
     createScopedActor,
@@ -66,6 +66,7 @@ describe('AnalysisBucketFileService', () => {
         analysisRepository.seed(analysis);
 
         buckets = {} as Record<AnalysisBucketType, AnalysisBucket>;
+
         for (const type of Object.values(AnalysisBucketType)) {
             buckets[type] = {
                 id: randomUUID(),
@@ -119,7 +120,9 @@ describe('AnalysisBucketFileService', () => {
             clientId: null,
             ...overrides,
         } as AnalysisBucketFile;
+
         repository.seed(file);
+
         return file;
     }
 
@@ -196,15 +199,18 @@ describe('AnalysisBucketFileService', () => {
 
         it('should let the analysis client add a result file', async () => {
             const actor = createAllowAllActor(OWNER_REALM);
+
             actor.identity = { id: randomUUID(), type: 'client' };
             analysis.clientId = actor.identity.id;
 
             const entity = await service.create(createPayload(AnalysisBucketType.RESULT), actor);
+
             expect(entity.clientId).toBe(actor.identity.id);
         });
 
         it('should deny another client of the owner realm a result file', async () => {
             const actor = createAllowAllActor(OWNER_REALM);
+
             actor.identity = { id: randomUUID(), type: 'client' };
             analysis.clientId = randomUUID();
 
@@ -263,6 +269,7 @@ describe('AnalysisBucketFileService', () => {
             const file = seedFile(AnalysisBucketType.CODE);
 
             const result = await service.update(file.id, { root: true }, createAllowAllActor(OWNER_REALM));
+
             expect(result.root).toBe(true);
         });
 
@@ -270,6 +277,7 @@ describe('AnalysisBucketFileService', () => {
             const file = seedFile(AnalysisBucketType.CODE);
 
             const actor = createScopedActor({ realmId: OWNER_REALM, realmScope: 'own' });
+
             await service.update(file.id, { path: 'renamed.py' }, actor);
 
             expect(actor.permissionEvaluator.evaluateCalls.map((call) => [
@@ -296,6 +304,7 @@ describe('AnalysisBucketFileService', () => {
 
         it('should reject a code file update once locked', async () => {
             const file = seedFile(AnalysisBucketType.CODE);
+
             analysis.configurationLocked = true;
 
             await expect(
@@ -356,6 +365,7 @@ describe('AnalysisBucketFileService', () => {
 
         it('should reject a code file delete once locked', async () => {
             const file = seedFile(AnalysisBucketType.CODE);
+
             analysis.configurationLocked = true;
 
             await expect(
@@ -365,6 +375,7 @@ describe('AnalysisBucketFileService', () => {
 
         it('should let the owner realm delete a result file after lock', async () => {
             const file = seedFile(AnalysisBucketType.RESULT);
+
             analysis.configurationLocked = true;
 
             await service.delete(file.id, createAllowAllActor(OWNER_REALM));
@@ -416,6 +427,7 @@ describe('AnalysisBucketFileService', () => {
     describe('unregisterUpload', () => {
         it('should remove the file and flag a code file of a locked analysis', async () => {
             const file = seedFile(AnalysisBucketType.CODE);
+
             analysis.configurationLocked = true;
 
             const removal = await service.unregisterUpload(file.bucketId, file.bucketFileId);
@@ -426,6 +438,7 @@ describe('AnalysisBucketFileService', () => {
 
         it.each([AnalysisBucketType.CODE, AnalysisBucketType.RESULT])('should not flag a %s file otherwise', async (type) => {
             const file = seedFile(type);
+
             analysis.configurationLocked = type === AnalysisBucketType.RESULT;
 
             const removal = await service.unregisterUpload(file.bucketId, file.bucketFileId);
@@ -457,7 +470,9 @@ describe('AnalysisBucketFileService', () => {
         class ResultAnyEvaluator extends FakePermissionEvaluator {
             async compile(ctx: Parameters<FakePermissionEvaluator['compile']>[0]): ReturnType<FakePermissionEvaluator['compile']> {
                 this.compileCalls.push(ctx);
+
                 const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
+
                 if (names.length === 1 && names[0] === PermissionName.ANALYSIS_RESULT_READ) {
                     return { verdict: 'allow' };
                 }
@@ -467,43 +482,57 @@ describe('AnalysisBucketFileService', () => {
         }
 
         it('should not let a wider result read reach result files of analyses the actor cannot read', async () => {
-            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+            for (const type of Object.values(AnalysisBucketType)) {
+                seedFile(type);
+            }
 
             const actor = createAllowAllActor('realm-stranger');
+
             actor.permissionEvaluator = new ResultAnyEvaluator();
 
             const { data } = await service.getMany({ include: 'analysis' }, actor);
+
             expect(data).toHaveLength(0);
         });
 
         function nodeActor(holdsResultRead = true) {
             const actor = createAllowAllActor(NODE_REALM);
+
             if (!holdsResultRead) {
                 actor.permissionEvaluator.setBehavior(({ method, ctx }) => {
                     const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
+
                     if (method === 'preEvaluateOneOf' && names.length === 1 && names[0] === PermissionName.ANALYSIS_RESULT_READ) {
                         throw PermissionError.deniedAll(names);
                     }
                 });
             }
+
             return actor;
         }
 
         async function listTypes(actor: ReturnType<typeof nodeActor>) {
             const { data } = await service.getMany({}, actor);
+
             return data.map((file) => file.analysisBucketId).map((id) => Object.values(buckets).find((b) => b.id === id).type).sort();
         }
 
         it('should show a pending node\'s realm the CODE files only', async () => {
             seedAnalysisNode(null);
-            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+
+            for (const type of Object.values(AnalysisBucketType)) {
+                seedFile(type);
+            }
 
             await expect(listTypes(nodeActor())).resolves.toEqual([AnalysisBucketType.CODE]);
         });
 
         it('should show an approved node\'s realm every file type when it holds the result read', async () => {
             seedAnalysisNode(AnalysisNodeApprovalStatus.APPROVED);
-            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+
+            for (const type of Object.values(AnalysisBucketType)) {
+                seedFile(type);
+            }
 
             await expect(listTypes(nodeActor())).resolves.toEqual([
                 AnalysisBucketType.CODE,
@@ -514,7 +543,10 @@ describe('AnalysisBucketFileService', () => {
 
         it('should leave out RESULT files without the result read, not refuse the listing', async () => {
             seedAnalysisNode(AnalysisNodeApprovalStatus.APPROVED);
-            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+
+            for (const type of Object.values(AnalysisBucketType)) {
+                seedFile(type);
+            }
 
             await expect(listTypes(nodeActor(false))).resolves.toEqual([
                 AnalysisBucketType.CODE,
@@ -524,15 +556,19 @@ describe('AnalysisBucketFileService', () => {
 
         it('should answer a RESULT file without the result read like a missing one', async () => {
             seedAnalysisNode(AnalysisNodeApprovalStatus.APPROVED);
+
             const file = seedFile(AnalysisBucketType.RESULT);
 
             await expect(service.getOne(file.id, nodeActor(false))).rejects.toThrow(EntityNotFoundError);
         });
 
         it('should show nothing to a realm that neither owns nor takes part', async () => {
-            for (const type of Object.values(AnalysisBucketType)) seedFile(type);
+            for (const type of Object.values(AnalysisBucketType)) {
+                seedFile(type);
+            }
 
             const { data } = await service.getMany({}, createAllowAllActor('realm-stranger'));
+
             expect(data).toHaveLength(0);
         });
 

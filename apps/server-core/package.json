@@ -96,5 +96,8 @@
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {
         "access": "public"
+    },
+    "engines": {
+        "node": ">=24.0.0"
     }
 }

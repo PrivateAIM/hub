@@ -21,6 +21,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
 
     const logStoreResult = container.tryResolve(LogStoreInjectionKey);
     let logStore: LogStore | undefined;
+
     if (logStoreResult.success) {
         logStore = logStoreResult.data;
     }

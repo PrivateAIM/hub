@@ -24,7 +24,9 @@ import { mountClientVueComponent } from '../../utils';
  * (which would address the COLLECTION endpoint) or a `limit: 1` collection read
  * that substitutes an arbitrary image into the form.
  */
-const flush = () => new Promise((resolve) => { setTimeout(resolve, 0); });
+const flush = () => new Promise((resolve) => {
+    setTimeout(resolve, 0);
+});
 
 describe('FMasterImagePicker', () => {
     it('should adopt nothing when the id is blank, and issue no master-image request', async () => {

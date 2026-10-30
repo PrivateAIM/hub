@@ -12,7 +12,10 @@ import { FakeEntityRepository } from '@privateaim/server-test-kit';
 export class FakeBucketRepository extends FakeEntityRepository<Bucket> implements IBucketRepository {
     async findOneByIdOrName(id: string): Promise<Bucket | null> {
         const byId = await this.findOneById(id);
-        if (byId) return byId;
+
+        if (byId) {
+            return byId;
+        }
 
         return this.findOneBy({ name: id });
     }

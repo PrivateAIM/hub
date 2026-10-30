@@ -60,6 +60,7 @@ export class AnalysisClientService {
         if (entity.clientId) {
             try {
                 const { data } = await this.authup.client.getOne(entity.clientId);
+
                 client = data;
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
@@ -107,6 +108,7 @@ export class AnalysisClientService {
 
             try {
                 const { data } = await this.authup.permission.getOne(permissionName);
+
                 permission = data;
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {

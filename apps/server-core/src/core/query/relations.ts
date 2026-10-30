@@ -23,6 +23,7 @@ export async function preEvaluateRelationReads(
 ): Promise<void> {
     for (const relation of query.relations.value) {
         const names = readPermissionsByRelation[relation.name];
+
         if (names) {
             await actor.permissionEvaluator.preEvaluateOneOf({ name: names });
         }

@@ -41,6 +41,7 @@ function withoutHiddenColumns<T extends ObjectLiteral>(
     }
 
     const hidden = metadata.columns.filter((column) => !column.isSelect);
+
     if (hidden.length === 0) {
         // keeps the copy — and its side effects — confined to secret-bearing entities
         return entity;
@@ -49,6 +50,7 @@ function withoutHiddenColumns<T extends ObjectLiteral>(
     // a COPY, never `delete` on `event.entity`: the registry project link handler
     // keeps using the live entity's secret after the save that fires this hook
     const output = { ...entity };
+
     for (const column of hidden) {
         // Take the FIRST path segment, not the whole `propertyPath`. For a plain
         // column the two are identical. For an embedded column the path is dotted

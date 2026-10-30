@@ -8,7 +8,7 @@
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
-import type { Registry } from './entity.ts';
+import type { Registry } from './types.ts';
 
 export class RegistryValidator extends TypedContainer<Registry> {
     protected override initialize() {
@@ -29,6 +29,7 @@ export class RegistryValidator extends TypedContainer<Registry> {
         );
 
         const hostValidator = createValidator(z.string().min(3).max(512));
+
         this.mount(
             'host',
             { group: ValidatorGroup.CREATE },

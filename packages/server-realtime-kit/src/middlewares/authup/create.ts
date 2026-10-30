@@ -25,6 +25,7 @@ export function createAuthorizationMiddleware(
     // rejects it as unauthenticated. There used to be a fallback that attached
     // a fixed master-realm user instead.
     const { authupClient } = options;
+
     if (!options.baseURL || !authupClient) {
         return (_socket, next) => next();
     }
@@ -47,6 +48,7 @@ export function mountAuthorizationMiddleware(
     options: AuthorizationMiddlewareRegistrationOptions,
 ) {
     const middleware = createAuthorizationMiddleware(options);
+
     nsp.use(middleware);
 
     const { logger } = options;
@@ -62,6 +64,7 @@ export function mountAuthorizationMiddleware(
             logger?.warn(`Socket/${socket.id}: Not authenticated.`, { [LogFlag.CHANNEL]: LogChannel.WEBSOCKET });
 
             next(new UnauthorizedError());
+
             return;
         }
 

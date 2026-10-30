@@ -22,6 +22,7 @@ export async function syncNodeClientPermissions(
     const nodes = await ctx.repository.findManyBy({});
 
     const result: NodeClientPermissionSyncResult = { synced: 0, failed: 0 };
+
     for (const node of nodes) {
         if (!node.clientId) {
             continue;
@@ -32,7 +33,7 @@ export async function syncNodeClientPermissions(
             result.synced++;
         } catch (e) {
             result.failed++;
-            ctx.logger?.error(`Could not sync the permissions of the client of node ${node.name}: ${e instanceof Error ? e.message : String(e)}`, {
+            ctx.logger?.error(`Could not sync the permissions of the client of node ${node.name}: ${Error.isError(e) ? e.message : String(e)}`, {
                 nodeId: node.id,
                 clientId: node.clientId,
             });

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CollectionResourceFetcher } from './types-base';
+import type { CollectionResourceFetcher } from './types';
 
 const PAGE_SIZE = 50;
 

@@ -8,3 +8,5 @@
 export * from './constants.ts';
 export * from './di-module.ts';
 export * from './setup.ts';
+
+export * from './types';

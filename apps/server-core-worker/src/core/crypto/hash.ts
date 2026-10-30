@@ -9,10 +9,11 @@ import {
     sign,
     verify,
 } from 'node:crypto';
-import type { SignatureCreateContext, SignatureVerifyContext } from './type';
+import type { SignatureCreateContext, SignatureVerifyContext } from './types';
 
 export function createSignature(context: SignatureCreateContext): string {
     let data : Buffer;
+
     if (typeof context.data === 'string') {
         data = Buffer.from(context.data, 'hex');
     } else {
@@ -26,6 +27,7 @@ export function createSignature(context: SignatureCreateContext): string {
 
 export function verifySignature(context: SignatureVerifyContext) : boolean {
     let signature : Buffer;
+
     if (typeof context.signature === 'string') {
         signature = Buffer.from(context.signature, 'hex');
     } else {
@@ -33,6 +35,7 @@ export function verifySignature(context: SignatureVerifyContext) : boolean {
     }
 
     let data : Buffer;
+
     if (typeof context.data === 'string') {
         data = Buffer.from(context.data, 'hex');
     } else {

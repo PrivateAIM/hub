@@ -40,13 +40,16 @@ describe('bucket-file stream endpoint', () => {
         const client = suite.client();
 
         const { data: bucket } = await client.bucket.create(createTestBucket());
+
         bucketId = bucket.id;
 
         const content = Buffer.from(JSON.stringify({ hello: 'world' }));
         const formData = new FormData();
+
         formData.append('file[0]', new Blob([content]), 'test-data.json');
 
         const result = await client.bucket.upload(bucketId, formData);
+
         expect(result.data.length).toBe(1);
         fileId = result.data[0].id;
     });
@@ -60,18 +63,22 @@ describe('bucket-file stream endpoint', () => {
         expect(response.status).toBe(200);
 
         const contentDisposition = response.headers.get('content-disposition');
+
         expect(contentDisposition).toBeDefined();
         expect(contentDisposition).toContain('attachment');
         expect(contentDisposition).toContain('test-data.json');
 
         const contentType = response.headers.get('content-type');
+
         expect(contentType).toBeDefined();
         expect(contentType).toContain('application/json');
 
         const body = await response.arrayBuffer();
+
         expect(body.byteLength).toBeGreaterThan(0);
 
         const text = new TextDecoder().decode(body);
+
         expect(JSON.parse(text)).toEqual({ hello: 'world' });
     });
 
@@ -89,12 +96,15 @@ describe('bucket-file stream endpoint', () => {
         expect(response.status).toBe(200);
 
         const contentEncoding = response.headers.get('content-encoding');
+
         expect(contentEncoding).toBe('gzip');
 
         const contentDisposition = response.headers.get('content-disposition');
+
         expect(contentDisposition).toContain('attachment');
 
         const body = await response.arrayBuffer();
+
         expect(body.byteLength).toBeGreaterThan(0);
     });
 
@@ -112,11 +122,13 @@ describe('bucket-file stream endpoint', () => {
         const data = await client.bucketFile.stream(fileId);
         const stream = Readable.fromWeb(data as any);
         const buffer = await streamToBuffer(stream);
+
         expect(buffer.byteLength).toBeGreaterThan(0);
     });
 
     it('should delete file and bucket', async () => {
         const client = suite.client();
+
         await client.bucketFile.delete(fileId);
         await client.bucket.delete(bucketId);
     });

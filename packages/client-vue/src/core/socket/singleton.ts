@@ -18,6 +18,7 @@ export function isSocketManagerUsable() {
     }
 
     const instance = inject(SocketSymbol);
+
     return !!instance;
 }
 
@@ -30,6 +31,7 @@ export function provideSocketManager(
 
 export function injectSocketManager(app?: App) : SocketClientManager {
     const manager = inject<SocketClientManager>(SocketSymbol, app);
+
     if (!manager) {
         throw new Error('The Socket Manager is not provided.');
     }

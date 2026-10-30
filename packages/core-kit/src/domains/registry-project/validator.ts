@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RegistryProject } from './entity.ts';
+import type { RegistryProject } from './types.ts';
 import { RegistryProjectType } from './constants.ts';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
@@ -22,6 +22,7 @@ export class RegistryProjectValidator extends TypedContainer<RegistryProject> {
         );
 
         const nameValidator = createValidator(z.string().min(5).max(128));
+
         this.mount(
             'name',
             { group: ValidatorGroup.CREATE },
@@ -38,6 +39,7 @@ export class RegistryProjectValidator extends TypedContainer<RegistryProject> {
         // pass validation and blow up in the database instead; min(3)
         // mirrors the pre-migration form rule.
         const externalNameValidator = createValidator(z.string().min(3).max(64).regex(/^[a-z0-9-_]*$/));
+
         this.mount(
             'externalName',
             { group: ValidatorGroup.CREATE },

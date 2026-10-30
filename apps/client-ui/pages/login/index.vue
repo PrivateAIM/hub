@@ -70,8 +70,10 @@ export default defineNuxtComponent({
                 // → /projects?x=1).
                 const { redirect, ...rest } = route.query;
                 let target: string | undefined;
+
                 if (typeof redirect === 'string') {
                     const url = new URL(redirect, window.location.origin);
+
                     for (const [key, value] of Object.entries(rest)) {
                         if (Array.isArray(value)) {
                             for (const entry of value) {
@@ -83,6 +85,7 @@ export default defineNuxtComponent({
                             url.searchParams.set(key, value);
                         }
                     }
+
                     target = `${url.pathname}${url.search}${url.hash}`;
                 }
 
@@ -97,6 +100,7 @@ export default defineNuxtComponent({
                 // exchange (RFC 6749 4.1.3), so build it ONCE and hand the
                 // identical value to both calls below.
                 const callback = new URL('/login/callback', window.location.origin);
+
                 if (target) {
                     callback.searchParams.set('redirect', target);
                 }
@@ -125,10 +129,11 @@ export default defineNuxtComponent({
                 // Drop the grid's auto-select skeleton so the user isn't
                 // stranded when the redirect glue fails.
                 realmGrid.value?.reset();
+
                 if (toast) {
                     toast.show({
                         variant: 'warning',
-                        body: e instanceof Error ? e.message : 'The login could not be started.',
+                        body: Error.isError(e) ? e.message : 'The login could not be started.',
                     });
                 }
             }

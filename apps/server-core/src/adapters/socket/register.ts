@@ -47,6 +47,7 @@ export function registerSocketControllers(nsp: Namespace) {
 
         // project
         registerProjectSocketHandlers(socket);
+
         if (socket.data.namespaceId) {
             registerProjectNodeForRealmSocketHandlers(socket);
         } else {

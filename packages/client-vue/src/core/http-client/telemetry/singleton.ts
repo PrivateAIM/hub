@@ -21,6 +21,7 @@ export function isTelemetryHTTPClientUsable(app?: App) : boolean {
 
 export function injectTelemetryHTTPClient(app?: App): ITelemetryClient {
     const instance = inject<ITelemetryClient>(symbol, app);
+
     if (!instance) {
         throw new Error('The Telemetry HTTP Client is not set.');
     }

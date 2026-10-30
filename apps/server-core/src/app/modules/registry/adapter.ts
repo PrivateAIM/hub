@@ -8,7 +8,7 @@
 import type { RegistryProject } from '@privateaim/core-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { RegistryEntity, RegistryProjectEntity } from '../../../adapters/database/entities/index.ts';
-import { RegistryCommand } from '../../components/index.ts';
+import { RegistryCommand } from '../../../core/domains/index.ts';
 import type { IRegistryDispatcher } from '../../../core/harbor/types.ts';
 import type { IRegistryManager } from '../../../core/index.ts';
 
@@ -69,6 +69,7 @@ export class RegistryManagerAdapter implements IRegistryManager {
 
     async createProject(data: Partial<RegistryProject>): Promise<RegistryProject> {
         const entity = this.registryProjectRepository.create(data);
+
         return this.registryProjectRepository.save(entity);
     }
 
@@ -86,6 +87,7 @@ export class RegistryManagerAdapter implements IRegistryManager {
 
     async linkProject(id: string): Promise<void> {
         const dispatcher = this.resolveRegistryComponentDispatcher();
+
         if (!dispatcher) {
             return;
         }
@@ -95,6 +97,7 @@ export class RegistryManagerAdapter implements IRegistryManager {
 
     async relinkProject(project: RegistryProject): Promise<void> {
         const dispatcher = this.resolveRegistryComponentDispatcher();
+
         if (!dispatcher) {
             return;
         }
@@ -113,6 +116,7 @@ export class RegistryManagerAdapter implements IRegistryManager {
 
     async unlinkProject(project: RegistryProject): Promise<void> {
         const dispatcher = this.resolveRegistryComponentDispatcher();
+
         if (!dispatcher) {
             return;
         }

@@ -88,7 +88,9 @@ const FAnalysisNodeApprovalCommand = defineComponent({
         }));
 
         const execute = async () => {
-            if (busy.value) return;
+            if (busy.value) {
+                return;
+            }
 
             busy.value = true;
 
@@ -97,12 +99,15 @@ const FAnalysisNodeApprovalCommand = defineComponent({
             switch (props.command) {
                 case AnalysisNodeApprovalCommand.APPROVE:
                     status = AnalysisNodeApprovalStatus.APPROVED;
+
                     break;
                 case AnalysisNodeApprovalCommand.REJECT:
                     status = AnalysisNodeApprovalStatus.REJECTED;
+
                     break;
                 default:
                     status = null;
+
                     break;
             }
 

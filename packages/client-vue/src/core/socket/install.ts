@@ -6,9 +6,9 @@
  */
 
 import {
-    StoreDispatcherEventName, 
-    injectStore, 
-    injectStoreDispatcher, 
+    StoreDispatcherEventName,
+    injectStore,
+    injectStoreDispatcher,
     storeToRefs,
 } from '@authup/client-web-kit';
 import { ClientManager } from '@authup/core-realtime-kit';
@@ -36,11 +36,11 @@ export function installSocketManager(app: App, options: SocketManagerInstallOpti
     });
 
     const storeDispatcher = injectStoreDispatcher(app);
+
     storeDispatcher.on(
         StoreDispatcherEventName.ACCESS_TOKEN_UPDATED,
         () => {
-            Promise.resolve()
-                .then(() => manager.reconnect());
+            Promise.try(() => manager.reconnect());
         },
     );
 

@@ -63,6 +63,7 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
 
     async recalc(analysisId: string): Promise<Analysis> {
         const read = await this.analysisRepository.findOneById(analysisId);
+
         if (!read) {
             throw new Error(`Analysis ${analysisId} not found`);
         }
@@ -79,6 +80,7 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
 
         for (const analysisNode of analysisNodes) {
             nodes++;
+
             if (analysisNode.approvalStatus === AnalysisNodeApprovalStatus.APPROVED) {
                 nodesApproved += 1;
             }
@@ -88,6 +90,7 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
 
             if (analysisNode.node.type === NodeType.AGGREGATOR) {
                 hasAggregator = true;
+
                 continue;
             }
 
@@ -114,11 +117,10 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
 
         // Every node idle (none pending, none running) -> intermediate files are no longer needed.
         // Deliberately not getMinProcessStatus(): it skips null and short-circuits on FAILED.
-        if (
-            this.storageManager &&
-            executionStatuses.length > 0 &&
-            executionStatuses.every((status) => IDLE_EXECUTION_STATUSES.includes(status))
-        ) {
+        const allIdle = executionStatuses.length > 0 &&
+            executionStatuses.every((status) => IDLE_EXECUTION_STATUSES.includes(status));
+
+        if (this.storageManager && allIdle) {
             // ponytail: one bus message per idle recalc (clear is idempotent);
             // gate on the transition into idle if that volume ever matters.
             try {
@@ -128,7 +130,7 @@ export class AnalysisNodeMetadataRecalculator implements IAnalysisNodeMetadataRe
                 this.logger?.error('Temp bucket of analysis could not be cleared', {
                     [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                     [LogFlag.REF_ID]: entity.id,
-                    error: e instanceof Error ? e.message : String(e),
+                    error: Error.isError(e) ? e.message : String(e),
                 });
             }
         }

@@ -26,11 +26,13 @@ export class FakeAnalysisRepository extends FakeEntityRepository<Analysis> imple
 
     async findOneBy(where: Record<string, any>): Promise<Analysis | null> {
         const row = await super.findOneBy(where);
+
         if (!row) {
             return null;
         }
 
         const copy = { ...row };
+
         await this.afterUnlockedRead?.(row.id);
 
         return copy;
@@ -64,11 +66,13 @@ export class FakeAnalysisRepository extends FakeEntityRepository<Analysis> imple
         await this.beforeLockedUpdate?.(id);
 
         const row = await this.findOneById(id);
+
         if (!row) {
             return null;
         }
 
         const entity = { ...row };
+
         if (!fn(entity)) {
             return null;
         }

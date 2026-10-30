@@ -17,6 +17,7 @@ export function getWritableDirPath() {
     }
 
     writableDirPath = path.join(CODE_PATH, '..', 'writable');
+
     return writableDirPath;
 }
 
@@ -26,5 +27,6 @@ export function getRootDirPath() {
     }
 
     rootDirPath = path.join(CODE_PATH, '..');
+
     return rootDirPath;
 }

@@ -55,6 +55,7 @@ describe('LogService', () => {
     describe('getMany', () => {
         it('should accept either LOG_READ or LOG_DELETE', async () => {
             const actor = createAllowAllActor();
+
             await service.getMany({ filter: { foo: 'bar' } }, actor);
 
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0].name)
@@ -91,6 +92,7 @@ describe('LogService', () => {
     describe('deleteMany', () => {
         it('should check LOG_DELETE and delete by labels from the given time', async () => {
             const actor = createAllowAllActor();
+
             await service.deleteMany({ filter: { foo: 'bar', time: '123' } }, actor);
 
             expect(actor.permissionEvaluator.preEvaluateCalls[0].name).toBe(PermissionName.LOG_DELETE);

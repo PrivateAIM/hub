@@ -83,11 +83,13 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async save(entity: T, ctx?: EntityPersistContext): Promise<T> {
         const index = this.store.findIndex((e) => (e as any).id === (entity as any).id);
+
         if (index >= 0) {
             this.store[index] = entity;
         } else {
             this.store.push(entity);
         }
+
         return entity;
     }
 
@@ -95,12 +97,14 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
         for (const entity of entities) {
             await this.save(entity, ctx);
         }
+
         return entities;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async remove(entity: T, ctx?: EntityPersistContext): Promise<void> {
         const index = this.store.findIndex((e) => (e as any).id === (entity as any).id);
+
         if (index >= 0) {
             this.store.splice(index, 1);
         }
@@ -132,10 +136,12 @@ export class FakeEntityRepository<T extends Record<string, any>> implements IEnt
     seed(input: T | T[]): T | T[] {
         if (Array.isArray(input)) {
             this.store.push(...input);
+
             return input;
         }
 
         this.store.push(input);
+
         return input;
     }
 

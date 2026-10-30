@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { RegistryCommand } from '../../../../../src/app/components/index.ts';
+import { RegistryCommand } from '../../../../../src/core/domains/index.ts';
 import { ComponentsInjectionKey } from '../../../../../src/app/modules/components/index.ts';
 import { DatabaseInjectionKey, registerRepositories } from '../../../../../src/app/modules/database/index.ts';
 import { createTestDatabaseApplication } from '../../../../app/index.ts';
@@ -25,12 +25,14 @@ import { FakeRegistryComponentDispatcher } from '../registry/fake-dispatcher.ts'
 describe('registerRepositories — RegistryComponentDispatcher resolution ordering', () => {
     it('should reach a RegistryComponentDispatcher that is registered after registerRepositories() has already run', async () => {
         const suite = createTestDatabaseApplication();
+
         await suite.setup();
 
         try {
             registerRepositories(suite.container, suite.dataSource);
 
             const dispatcher = new FakeRegistryComponentDispatcher();
+
             suite.container.register(ComponentsInjectionKey.RegistryComponentDispatcher, { useValue: dispatcher });
 
             const manager = suite.container.resolve(DatabaseInjectionKey.RegistryManager);
@@ -39,6 +41,7 @@ describe('registerRepositories — RegistryComponentDispatcher resolution orderi
             await manager.linkProject(projectId);
 
             const calls = dispatcher.getCalls();
+
             expect(calls).toHaveLength(1);
             expect(calls[0].command).toBe(RegistryCommand.PROJECT_LINK);
             expect(calls[0].data).toMatchObject({ id: projectId });

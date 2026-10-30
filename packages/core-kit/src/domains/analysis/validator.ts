@@ -9,7 +9,7 @@ import { BadRequestError } from '@privateaim/errors';
 import { isNameValid } from '@authup/core-kit';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
-import type { Analysis } from './entity.ts';
+import type { Analysis } from './types.ts';
 import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
 import { ImageAttributeCommandArgumentsValidator } from './validator-image-command-argument.ts';
 
@@ -38,7 +38,7 @@ export class AnalysisValidator extends TypedContainer<Analysis> {
                         ctx.issues.push({
                             input: ctx.value,
                             code: 'custom',
-                            message: e instanceof Error ? e.message : 'The analysis name is not valid.',
+                            message: Error.isError(e) ? e.message : 'The analysis name is not valid.',
                         });
                     }
                 })),
@@ -70,6 +70,7 @@ export class AnalysisValidator extends TypedContainer<Analysis> {
         );
 
         const commandArgumentValidator = new ImageAttributeCommandArgumentsValidator();
+
         // image_command_executable
         this.mount('imageCommandArguments', { optional: true }, (ctx) => {
             if (ctx.value == null) {

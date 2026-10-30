@@ -24,6 +24,7 @@ export class StorageBucketDeletionFinishedHandler implements ComponentHandler<
         // matched by bucket id alone, so a delete issued over storage's HTTP API
         // detaches the analysis bucket as well.
         const analysisBucket = await this.repository.findOneBy({ bucketId: bucket.id });
+
         if (!analysisBucket) {
             return;
         }

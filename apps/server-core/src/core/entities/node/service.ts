@@ -66,6 +66,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Node>> {
         const decoded = decodeQuery(query, { schema: nodeSchema });
+
         await preEvaluateRelationReads(decoded, actor, RELATION_READ_PERMISSIONS);
 
         const scoped = await scopeReadQuery(
@@ -81,8 +82,10 @@ export class NodeService extends AbstractEntityService implements INodeService {
         await actor.permissionEvaluator.preEvaluateOneOf({ name: NODE_READ_PERMISSIONS });
 
         let entity: Node | null;
+
         if (query) {
             const decoded = decodeQuery(query, { schema: nodeSchema, parameters: ['fields', 'relations'] });
+
             await preEvaluateRelationReads(decoded, actor, RELATION_READ_PERMISSIONS);
 
             entity = await this.repository.findMany(appendQueryConditions(decoded, eq('id', id)))
@@ -119,8 +122,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         if (entity.publicKey && !isHex(entity.publicKey)) {
             entity.publicKey = Buffer
-                .from(entity.publicKey, 'utf8')
-                .toString('hex');
+                .from(entity.publicKey, 'utf8').toHex();
         }
 
         await this.linkRegistryProject(entity);
@@ -137,11 +139,11 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
         if (validated.publicKey && !isHex(validated.publicKey)) {
             validated.publicKey = Buffer
-                .from(validated.publicKey, 'utf8')
-                .toString('hex');
+                .from(validated.publicKey, 'utf8').toHex();
         }
 
         const entity = await this.repository.findOneWithExternalName(id);
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'node' });
         }
@@ -149,6 +151,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
         // Snapshot the stored row: typeorm's merge() writes into `entity`.
         const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
+
         await evaluateRecordUpdate(actor.permissionEvaluator, {
             name: PermissionName.NODE_UPDATE,
             current,
@@ -178,6 +181,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.NODE_DELETE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'node' });
         }
@@ -202,16 +206,21 @@ export class NodeService extends AbstractEntityService implements INodeService {
     // ---------------------------------------------------------------
 
     private async linkRegistryProject(entity: Node): Promise<void> {
-        if (!this.registryManager) return;
+        if (!this.registryManager) {
+            return;
+        }
 
         let registryId: string | undefined;
+
         if (entity.registryId) {
             registryId = entity.registryId;
         } else {
             registryId = await this.registryManager.findDefaultRegistryId() ?? undefined;
         }
 
-        if (!registryId) return;
+        if (!registryId) {
+            return;
+        }
 
         // Record the assignment, including when it came from the default
         // registry. Leaving `registryId` null while a project exists is an
@@ -220,6 +229,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
         entity.registryId = registryId;
 
         const externalName = entity.externalName || createNanoID();
+
         entity.externalName = externalName;
 
         const registryProject = await this.registryManager.createProject({
@@ -250,10 +260,14 @@ export class NodeService extends AbstractEntityService implements INodeService {
         entity: Node,
         cleared: boolean,
     ): Promise<RegistryProject | undefined> {
-        if (!this.registryManager) return undefined;
+        if (!this.registryManager) {
+            return undefined;
+        }
 
         if (!entity.registryId) {
-            if (!cleared) return undefined;
+            if (!cleared) {
+                return undefined;
+            }
 
             // Disconnected — detach the node from its project and hand the
             // project back for teardown. Without this the node keeps a dangling
@@ -265,7 +279,9 @@ export class NodeService extends AbstractEntityService implements INodeService {
 
             entity.registryProjectId = null;
 
-            if (!current) return undefined;
+            if (!current) {
+                return undefined;
+            }
 
             await this.registryManager.unlinkProject(current);
 
@@ -273,6 +289,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
         }
 
         let registryProject: RegistryProject | undefined;
+
         if (entity.registryProjectId) {
             registryProject = await this.registryManager.findProject(entity.registryProjectId) ?? undefined;
         }
@@ -285,6 +302,7 @@ export class NodeService extends AbstractEntityService implements INodeService {
         // otherwise the node keeps resolving its credentials (and host) from the
         // old registry.
         let orphaned: RegistryProject | undefined;
+
         if (registryProject && registryProject.registryId !== entity.registryId) {
             await this.registryManager.unlinkProject(registryProject);
             orphaned = registryProject;
@@ -319,10 +337,15 @@ export class NodeService extends AbstractEntityService implements INodeService {
     }
 
     private async unlinkRegistryProject(entity: Node): Promise<void> {
-        if (!this.registryManager || !entity.registryProjectId) return;
+        if (!this.registryManager || !entity.registryProjectId) {
+            return;
+        }
 
         const registryProject = await this.registryManager.findProject(entity.registryProjectId);
-        if (!registryProject) return;
+
+        if (!registryProject) {
+            return;
+        }
 
         await this.registryManager.unlinkProject(registryProject);
         await this.registryManager.removeProject(registryProject);

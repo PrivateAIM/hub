@@ -49,6 +49,7 @@ describe('startHeartbeat', () => {
         let beats = 0;
         const { stop } = startHeartbeat(async () => {
             beats++;
+
             throw new Error('bus down');
         });
 
@@ -65,6 +66,7 @@ describe('startHeartbeat', () => {
         });
 
         const perSilence = Math.floor(ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS / ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS);
+
         await vi.advanceTimersByTimeAsync(ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS * 2);
         expect(beats).toBe(perSilence);
 

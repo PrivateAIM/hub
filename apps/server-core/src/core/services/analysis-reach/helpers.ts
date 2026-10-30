@@ -7,13 +7,7 @@
 
 import type { ICondition } from '@rapiq/core';
 import { and, inArray, or } from '@rapiq/core';
-import type { AnalysisBucketType } from '@privateaim/core-kit';
-
-export type AnalysisBucketTypeReach = {
-    types: `${AnalysisBucketType}`[];
-    /** `undefined`: every analysis; `null`: none — the types are excluded. */
-    reach: ICondition | undefined | null;
-};
+import type { AnalysisBucketTypeReach } from './types.ts';
 
 /**
  * One condition over rows of several bucket types, each reached differently
@@ -24,7 +18,9 @@ export function buildAnalysisBucketTypeReach(
     typeAttributeName: string,
     branches: AnalysisBucketTypeReach[],
 ): ICondition | undefined {
-    if (branches.every((branch) => branch.reach === undefined)) {
+    const reachesEveryAnalysis = branches.every((branch) => branch.reach === undefined);
+
+    if (reachesEveryAnalysis) {
         return undefined;
     }
 

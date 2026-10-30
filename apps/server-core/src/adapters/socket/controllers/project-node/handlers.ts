@@ -27,7 +27,9 @@ import type {
 } from '../../types.ts';
 
 export function registerProjectNodeSocketHandlers(socket: Socket) {
-    if (!isSocketAuthenticated(socket)) return;
+    if (!isSocketAuthenticated(socket)) {
+        return;
+    }
 
     // ------------------------------------------------------------
 
@@ -63,7 +65,9 @@ export function registerProjectNodeSocketHandlers(socket: Socket) {
 }
 
 export function registerProjectNodeForRealmSocketHandlers(socket: Socket) {
-    if (!isSocketAuthenticated(socket)) return;
+    if (!isSocketAuthenticated(socket)) {
+        return;
+    }
 
     // The realm namespace already isolates events by realm (project realm vs. node realm
     // are distinct namespaces), so all directional subscriptions join the base entity room —

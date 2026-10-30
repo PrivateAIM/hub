@@ -35,6 +35,7 @@ export class AddDisplayName1780300000000 implements MigrationInterface {
             // the string, so this is defensive, but it keeps the write safe even
             // for unexpectedly long pre-existing values.
             let next = row.name ? slugify(row.name).slice(0, 128) : '';
+
             if (next.length < 3) {
                 next = generateName();
             }
@@ -70,11 +71,14 @@ export class AddDisplayName1780300000000 implements MigrationInterface {
         `);
 
         const usedProjectNames = new Set<string>(projectRows.map((row) => row.name));
+
         for (const row of projectRows) {
             let next = generateName();
+
             while (usedProjectNames.has(next)) {
                 next = generateName();
             }
+
             usedProjectNames.add(next);
 
             await queryRunner.query(

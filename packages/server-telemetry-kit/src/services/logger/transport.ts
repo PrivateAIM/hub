@@ -7,7 +7,7 @@
 import type { LogInput } from '@privateaim/telemetry-kit';
 import { LogChannel, LogFlag, LogLevel } from '@privateaim/telemetry-kit';
 import WinstonTransport from 'winston-transport';
-import type { LoggerTransportOptions, LoggerTransportSaveFn } from './type';
+import type { LoggerTransportOptions, LoggerTransportSaveFn } from './types';
 
 export class LoggerTransport extends WinstonTransport {
     protected labels: Record<string, string>;
@@ -24,20 +24,20 @@ export class LoggerTransport extends WinstonTransport {
     log(info: Record<PropertyKey, any>, next: () => void): any {
         const payload = this.normalizeInput(info);
 
-        Promise.resolve()
-            .then(() => this.save(payload))
+        Promise.try(() => this.save(payload))
             .finally(() => next());
     }
 
     protected normalizeInput(info: Record<PropertyKey, any>) : LogInput {
         const {
-            message, 
-            timestamp, 
-            stack, 
+            message,
+            timestamp,
+            stack,
             ...data
         } = info;
 
         let date : Date;
+
         if (typeof timestamp === 'string') {
             date = new Date(`${timestamp}`);
         } else {
@@ -60,8 +60,10 @@ export class LoggerTransport extends WinstonTransport {
         ]) as string[];
 
         let keys = Object.keys(output.labels);
+
         for (const key of keys) {
             const index = flags.indexOf(key);
+
             if (index !== -1) {
                 output[key] = output.labels[key];
                 delete output.labels[key];
@@ -69,6 +71,7 @@ export class LoggerTransport extends WinstonTransport {
         }
 
         keys = Object.keys(data);
+
         for (const key of keys) {
             if (typeof key !== 'string') {
                 continue;
@@ -85,6 +88,7 @@ export class LoggerTransport extends WinstonTransport {
             }
 
             const index = flags.indexOf(key);
+
             if (index === -1) {
                 output.labels[key] = `${value}`;
             } else {

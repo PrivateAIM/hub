@@ -239,6 +239,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
         await image.inspect();
 
         const tags : string[] = [];
+
         for (const node of nodes) {
             // A node's registry project is optional and can be detached
             // (SET NULL) when the project is deleted, so the relation may be
@@ -296,6 +297,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         const calcForIndex = (value: number, index: number) => {
             const current = (index + 1) * value;
+
             if (current === 0) {
                 return 0;
             }
@@ -314,7 +316,9 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
                 await waitForStream(this.docker, stream, {
                     onPushing: async (process) => {
-                        if (!options.stream.onPushing) return;
+                        if (!options.stream.onPushing) {
+                            return;
+                        }
 
                         await options.stream.onPushing({
                             percent: calcForIndex(process.percent, i),

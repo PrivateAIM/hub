@@ -18,49 +18,97 @@ import { STORAGE_INSUFFICIENT_ERROR_INSTANCE, type StorageInsufficientError } fr
 import { UNAUTHORIZED_ERROR_INSTANCE, type UnauthorizedError } from './unauthorized.ts';
 
 export function isBadRequestError(input: unknown): input is BadRequestError {
-    if (hasInstanceof(input, BAD_REQUEST_ERROR_INSTANCE)) return true;
-    if (!isHubError(input)) return false;
+    if (hasInstanceof(input, BAD_REQUEST_ERROR_INSTANCE)) {
+        return true;
+    }
+
+    if (!isHubError(input)) {
+        return false;
+    }
+
     return input.code === ErrorCode.BAD_REQUEST;
 }
 
 export function isUnauthorizedError(input: unknown): input is UnauthorizedError {
-    if (hasInstanceof(input, UNAUTHORIZED_ERROR_INSTANCE)) return true;
-    if (!isHubError(input)) return false;
+    if (hasInstanceof(input, UNAUTHORIZED_ERROR_INSTANCE)) {
+        return true;
+    }
+
+    if (!isHubError(input)) {
+        return false;
+    }
+
     return input.code === ErrorCode.IDENTITY_UNAUTHORIZED;
 }
 
 export function isInternalError(input: unknown): input is InternalError {
-    if (hasInstanceof(input, INTERNAL_ERROR_INSTANCE)) return true;
-    if (!isHubError(input)) return false;
+    if (hasInstanceof(input, INTERNAL_ERROR_INSTANCE)) {
+        return true;
+    }
+
+    if (!isHubError(input)) {
+        return false;
+    }
+
     return input.code === ErrorCode.INTERNAL_ERROR;
 }
 
 export function isEntityNotFoundError(input: unknown): input is EntityNotFoundError {
-    if (hasInstanceof(input, ENTITY_NOT_FOUND_ERROR_INSTANCE)) return true;
-    if (!isHubError(input)) return false;
+    if (hasInstanceof(input, ENTITY_NOT_FOUND_ERROR_INSTANCE)) {
+        return true;
+    }
+
+    if (!isHubError(input)) {
+        return false;
+    }
+
     return input.code === ErrorCode.ENTITY_NOT_FOUND;
 }
 
 export function isEntityConflictError(input: unknown): input is EntityConflictError {
-    if (hasInstanceof(input, ENTITY_CONFLICT_ERROR_INSTANCE)) return true;
-    if (!isHubError(input)) return false;
+    if (hasInstanceof(input, ENTITY_CONFLICT_ERROR_INSTANCE)) {
+        return true;
+    }
+
+    if (!isHubError(input)) {
+        return false;
+    }
+
     return input.code === ErrorCode.ENTITY_CONFLICT;
 }
 
 export function isEntityRelationInvalidError(input: unknown): input is EntityRelationInvalidError {
-    if (hasInstanceof(input, ENTITY_RELATION_INVALID_ERROR_INSTANCE)) return true;
-    if (!isHubError(input)) return false;
+    if (hasInstanceof(input, ENTITY_RELATION_INVALID_ERROR_INSTANCE)) {
+        return true;
+    }
+
+    if (!isHubError(input)) {
+        return false;
+    }
+
     return input.code === ErrorCode.ENTITY_RELATION_INVALID;
 }
 
 export function isPermissionDeniedError(input: unknown): input is PermissionDeniedError {
-    if (hasInstanceof(input, PERMISSION_DENIED_ERROR_INSTANCE)) return true;
-    if (!isHubError(input)) return false;
+    if (hasInstanceof(input, PERMISSION_DENIED_ERROR_INSTANCE)) {
+        return true;
+    }
+
+    if (!isHubError(input)) {
+        return false;
+    }
+
     return input.code === ErrorCode.PERMISSION_DENIED;
 }
 
 export function isStorageInsufficientError(input: unknown): input is StorageInsufficientError {
-    if (hasInstanceof(input, STORAGE_INSUFFICIENT_ERROR_INSTANCE)) return true;
-    if (!isHubError(input)) return false;
+    if (hasInstanceof(input, STORAGE_INSUFFICIENT_ERROR_INSTANCE)) {
+        return true;
+    }
+
+    if (!isHubError(input)) {
+        return false;
+    }
+
     return input.code === ErrorCode.STORAGE_INSUFFICIENT;
 }

@@ -48,6 +48,7 @@ export class AnalysisClientPermissionService implements IAnalysisClientPermissio
 
     protected async resolveAnalysis(analysisId: string): Promise<Analysis> {
         const analysis = await this.analysisRepository.findOneById(analysisId);
+
         if (!analysis) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -108,9 +109,11 @@ export class AnalysisClientPermissionService implements IAnalysisClientPermissio
         }
 
         const analysis = await this.resolveAnalysis(analysisId);
+
         await this.assertWritable(analysis, actor);
 
         const permission = await this.store.getPermission(data.permissionId);
+
         if (!ANALYSIS_SELF_PERMISSION_NAMES.includes(permission.name)) {
             throw new PermissionDeniedError('Only analysis self-capabilities can be assigned to an analysis client.');
         }
@@ -120,9 +123,11 @@ export class AnalysisClientPermissionService implements IAnalysisClientPermissio
 
     async delete(analysisId: string, permissionId: string, actor: ActorContext): Promise<ClientPermission> {
         const analysis = await this.resolveAnalysis(analysisId);
+
         await this.assertWritable(analysis, actor);
 
         const clientPermission = await this.store.findOne(analysis.clientId, permissionId);
+
         if (!clientPermission) {
             throw new EntityNotFoundError({ entity: 'clientPermission' });
         }

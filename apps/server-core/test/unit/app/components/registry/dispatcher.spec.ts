@@ -14,8 +14,9 @@ import { MemoryMessageBusDriver, MessageBus, RemoteWorker } from 'hubwire';
 import { drain } from '@hubwire/test';
 import { describe, expect, it } from 'vitest';
 import { RegistryComponentDispatcher } from '../../../../../src/app/components/registry/dispatcher/index.ts';
-import { RegistryCommand, RegistryTaskMessageBusRouting } from '../../../../../src/app/components/registry/constants.ts';
-import type { RegistryEventMap } from '../../../../../src/app/components/registry/type.ts';
+import { RegistryCommand } from '../../../../../src/core/domains/index.ts';
+import { RegistryTaskMessageBusRouting } from '../../../../../src/app/components/registry/constants.ts';
+import type { RegistryEventMap } from '../../../../../src/app/components/registry/types.ts';
 
 class FakeRegistryComponent implements IComponent<RegistryEventMap> {
     readonly handled: { key: string, data: Record<string, any> }[] = [];
@@ -50,11 +51,13 @@ describe('RegistryComponentDispatcher', () => {
 
         const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
         const consumed: Message[] = [];
+
         await messageBus.consumeAny(RegistryTaskMessageBusRouting, (message) => {
             consumed.push(message);
         });
 
         const dispatcher = new RegistryComponentDispatcher(component, { messageBus });
+
         await dispatcher.dispatch(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
         await drain();
 
@@ -74,11 +77,13 @@ describe('RegistryComponentDispatcher', () => {
             consume: RegistryTaskMessageBusRouting,
             messageBus,
         });
+
         await remoteWorker.start();
 
         // a different instance: the command must arrive through the bus
         const component = new FakeRegistryComponent();
         const dispatcher = new RegistryComponentDispatcher(component, { messageBus });
+
         await dispatcher.dispatch(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
         await drain();
 
@@ -92,6 +97,7 @@ describe('RegistryComponentDispatcher', () => {
 
         const component = new FakeRegistryComponent();
         const dispatcher = new RegistryComponentDispatcher(component, { messageBus });
+
         await dispatcher.dispatch(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
 
         const worker = new FakeRegistryComponent();
@@ -99,6 +105,7 @@ describe('RegistryComponentDispatcher', () => {
             consume: RegistryTaskMessageBusRouting,
             messageBus,
         });
+
         await remoteWorker.start();
         await drain();
 
@@ -111,6 +118,7 @@ describe('RegistryComponentDispatcher', () => {
         const component = new FakeRegistryComponent();
 
         const dispatcher = new RegistryComponentDispatcher(component);
+
         await dispatcher.dispatch(RegistryCommand.PROJECT_LINK, { id: 'project-1' }, {});
 
         expect(component.handled).toEqual([{ key: RegistryCommand.PROJECT_LINK, data: { id: 'project-1' } }]);
@@ -118,6 +126,7 @@ describe('RegistryComponentDispatcher', () => {
 
     it('should surface a direct call failure without a message bus', async () => {
         const component = new FakeRegistryComponent();
+
         component.failing = true;
 
         const dispatcher = new RegistryComponentDispatcher(component);

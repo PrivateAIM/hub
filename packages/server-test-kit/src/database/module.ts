@@ -51,6 +51,7 @@ export function buildSuiteDatabaseName(base: string | undefined, suite: string):
  */
 export function readDatabaseConnectionEnv(): DatabaseConnection | undefined {
     const type = process.env.DB_TYPE;
+
     if (!isServerDatabaseType(type)) {
         return undefined;
     }
@@ -84,8 +85,8 @@ export async function recreateDatabase(connection: DatabaseConnection): Promise<
 
     await dropDatabase({ options, ifExist: true });
     await createDatabase({
-        options, 
-        ifNotExist: true, 
-        synchronize: false, 
+        options,
+        ifNotExist: true,
+        synchronize: false,
     });
 }

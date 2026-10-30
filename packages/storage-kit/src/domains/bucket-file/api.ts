@@ -8,14 +8,14 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { BucketFile } from './entity';
-import type { IBucketFileAPI } from './types';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { BucketFile, IBucketFileAPI } from './types';
 import { BaseAPI } from '../base';
 
 export class BucketFileAPI extends BaseAPI implements IBucketFileAPI {
     async getMany(record?: EntityQueryInput<BucketFile>): Promise<EntityCollectionResponse<BucketFile>> {
         const response = await this.client.get(`bucket-files${buildQueryString(record)}`);
+
         return response.data;
     }
 
@@ -33,11 +33,13 @@ export class BucketFileAPI extends BaseAPI implements IBucketFileAPI {
 
     async delete(id: BucketFile['id']): Promise<EntityRecordResponse<BucketFile>> {
         const response = await this.client.delete(`bucket-files/${id}`);
+
         return response.data;
     }
 
     async update(id: BucketFile['id'], data: Record<string, any>): Promise<EntityRecordResponse<BucketFile>> {
         const response = await this.client.post(`bucket-files/${id}`, nullifyEmptyObjectProperties(data));
+
         return response.data;
     }
 

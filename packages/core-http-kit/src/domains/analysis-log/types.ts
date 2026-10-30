@@ -8,7 +8,7 @@
 import type { AnalysisLog } from '@privateaim/core-kit';
 import type { Log } from '@privateaim/telemetry-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse } from '../types-base';
+import type { EntityCollectionResponse } from '../types';
 
 /**
  * STANDALONE — deliberately not `IEntityAPISlim`. Two shapes make analysis

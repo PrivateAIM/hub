@@ -64,6 +64,7 @@ describe('app/components/event-cleaner', () => {
         await component.start();
 
         const [call] = repository.deleteExpiredCalls;
+
         expect(call.now).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
@@ -72,6 +73,7 @@ describe('app/components/event-cleaner', () => {
         await component.stop();
 
         const status = component.status();
+
         expect(status.lastSuccessAt).toBeTypeOf('number');
         expect(status.runningSince).toBeUndefined();
         expect(repository.deleteExpiredCalls).toHaveLength(1);

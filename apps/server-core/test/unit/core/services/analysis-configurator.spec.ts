@@ -49,6 +49,7 @@ describe('AnalysisConfigurator', () => {
     describe('lock', () => {
         it('should set configurationLocked to true', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             const result = await configurator.lock(analysis);
@@ -58,6 +59,7 @@ describe('AnalysisConfigurator', () => {
 
         it('should call recalculators before locking', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             await configurator.lock(analysis);
@@ -69,24 +71,29 @@ describe('AnalysisConfigurator', () => {
 
         it('should resolve entity by string ID', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             const result = await configurator.lock('analysis-1');
+
             expect(result.configurationLocked).toBe(true);
         });
 
         it('should save entity to repository', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             await configurator.lock(analysis);
 
             const saved = await repository.findOneById('analysis-1');
+
             expect(saved!.configurationLocked).toBe(true);
         });
 
         it('should throw when already locked', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
 
             await expect(configurator.lock(analysis)).rejects.toThrow(AnalysisError);
@@ -94,6 +101,7 @@ describe('AnalysisConfigurator', () => {
 
         it('should throw when build already initialized', async () => {
             const analysis = createFullAnalysis({ buildStatus: ProcessStatus.STARTING });
+
             repository.seed(analysis);
 
             await expect(configurator.lock(analysis)).rejects.toThrow(AnalysisError);
@@ -101,6 +109,7 @@ describe('AnalysisConfigurator', () => {
 
         it('should throw when default node invalid', async () => {
             const analysis = createFullAnalysis({ configurationNodeDefaultValid: false });
+
             repository.seed(analysis);
 
             await expect(configurator.lock(analysis)).rejects.toThrow(AnalysisError);
@@ -108,6 +117,7 @@ describe('AnalysisConfigurator', () => {
 
         it('should throw when entrypoint invalid', async () => {
             const analysis = createFullAnalysis({ configurationEntrypointValid: false });
+
             repository.seed(analysis);
 
             await expect(configurator.lock(analysis)).rejects.toThrow(AnalysisError);
@@ -120,6 +130,7 @@ describe('AnalysisConfigurator', () => {
                 configurationLocked: true,
                 buildStatus: ProcessStatus.FAILED,
             });
+
             repository.seed(analysis);
 
             const result = await configurator.unlock(analysis);
@@ -133,6 +144,7 @@ describe('AnalysisConfigurator', () => {
                 configurationLocked: true,
                 buildStatus: ProcessStatus.FAILED,
             });
+
             repository.seed(analysis);
 
             // another replica's build start commits between this unlock's read and its lock
@@ -149,9 +161,11 @@ describe('AnalysisConfigurator', () => {
 
         it('should resolve entity by string ID', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
 
             const result = await configurator.unlock('analysis-1');
+
             expect(result.configurationLocked).toBe(false);
         });
 
@@ -161,6 +175,7 @@ describe('AnalysisConfigurator', () => {
 
         it('should throw when not locked', async () => {
             const analysis = createFullAnalysis({ configurationLocked: false });
+
             repository.seed(analysis);
 
             await expect(configurator.unlock(analysis)).rejects.toThrow(AnalysisError);
@@ -171,6 +186,7 @@ describe('AnalysisConfigurator', () => {
                 configurationLocked: true,
                 buildStatus: ProcessStatus.STARTING,
             });
+
             repository.seed(analysis);
 
             await expect(configurator.unlock(analysis)).rejects.toThrow(AnalysisError);
@@ -178,6 +194,7 @@ describe('AnalysisConfigurator', () => {
 
         it('should reset approvalStatus on non-aggregator nodes', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
 
             const defaultNode = createTestAnalysisNode({
@@ -202,18 +219,21 @@ describe('AnalysisConfigurator', () => {
                     registryId: 'registry-1',
                 } as AnalysisNode['node'],
             });
+
             analysisNodeRepository.seed([defaultNode, aggregatorNode]);
 
             await configurator.unlock(analysis);
 
             const savedDefault = await analysisNodeRepository.findOneById('an-default');
             const savedAggregator = await analysisNodeRepository.findOneById('an-aggregator');
+
             expect(savedDefault!.approvalStatus).toBeNull();
             expect(savedAggregator!.approvalStatus).toBe(AnalysisNodeApprovalStatus.APPROVED);
         });
 
         it('should skip approval reset when ignoreApproval is true', async () => {
             const analysis = createFullAnalysis({ configurationLocked: true });
+
             repository.seed(analysis);
 
             const defaultNode = createTestAnalysisNode({
@@ -221,11 +241,13 @@ describe('AnalysisConfigurator', () => {
                 analysisId: 'analysis-1',
                 approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
             });
+
             analysisNodeRepository.seed(defaultNode);
 
             await configurator.unlock(analysis, { ignoreApproval: true });
 
             const saved = await analysisNodeRepository.findOneById('an-default');
+
             expect(saved!.approvalStatus).toBe(AnalysisNodeApprovalStatus.APPROVED);
         });
     });

@@ -19,6 +19,7 @@ export class FakeMasterImageRepository extends FakeEntityRepository<MasterImage>
 
     async findManyBy(where: Record<string, any>): Promise<MasterImage[]> {
         const rows = (await super.findManyBy(where)).map((row) => ({ ...row }));
+
         await this.afterUnlockedRead?.();
 
         return rows;
@@ -34,11 +35,13 @@ export class FakeMasterImageRepository extends FakeEntityRepository<MasterImage>
         ctx?: EntityPersistContext,
     ): Promise<MasterImage | null> {
         const row = await this.findOneById(id);
+
         if (!row) {
             return null;
         }
 
         const entity = { ...row };
+
         if (!fn(entity)) {
             return null;
         }

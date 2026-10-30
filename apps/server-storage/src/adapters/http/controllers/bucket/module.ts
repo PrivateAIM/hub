@@ -119,11 +119,13 @@ export class BucketController {
     ) {
         const actor = buildActorContext(event);
         const entity = await this.service.getOne(id);
+
         await this.service.checkUploadAccess(entity, actor);
 
         const files = await uploadRequestFilesToBucket(event, entity, this.bucketFileComponent, this.bucketFileEventDispatcher);
 
         event.response.status = 201;
+
         return {
             data: files,
             meta: { total: files.length },
@@ -137,7 +139,9 @@ export class BucketController {
     ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.clear(id, actor);
+
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 
@@ -163,7 +167,9 @@ export class BucketController {
     ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
+
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 
@@ -174,7 +180,9 @@ export class BucketController {
     ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
+
         event.response.status = 201;
+
         return { data: entity, meta: {} };
     }
 
@@ -185,7 +193,9 @@ export class BucketController {
     ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
+
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 }

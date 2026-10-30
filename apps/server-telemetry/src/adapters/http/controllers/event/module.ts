@@ -47,6 +47,7 @@ export class EventController {
     ): Promise<EntityRecordResponse<Event>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
+
         event.response.status = 201;
 
         return { data: entity, meta: {} };
@@ -84,6 +85,7 @@ export class EventController {
     ): Promise<EntityRecordResponse<Event>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
+
         event.response.status = 202;
 
         return { data: entity, meta: {} };

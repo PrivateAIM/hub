@@ -36,11 +36,13 @@ const ne = (field: string, value: string) => new Filter(FilterFieldOperator.NOT_
 describe('collectRootFilterValues', () => {
     it('collects positive equality leaves under AND', () => {
         const result = collectRootFilterValues(query(and(eq('analysisId', 'X'), eq('level', 'info'))));
+
         expect(result).toEqual({ analysisId: 'X', level: 'info' });
     });
 
     it('walks nested AND groups', () => {
         const result = collectRootFilterValues(query(and(eq('analysisId', 'X'), and(eq('nodeId', 'N')))));
+
         expect(result).toEqual({ analysisId: 'X', nodeId: 'N' });
     });
 

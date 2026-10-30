@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import {
@@ -47,6 +47,7 @@ describe('controllers/bucket', () => {
     it('should get collection', async () => {
         const client = suite.client();
         const { data } = await client.bucket.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -59,6 +60,7 @@ describe('controllers/bucket', () => {
 
     it('should delete resource', async () => {
         const client = suite.client();
+
         await client.bucket.delete(details.id);
     });
 });

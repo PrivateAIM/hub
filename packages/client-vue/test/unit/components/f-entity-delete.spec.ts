@@ -24,15 +24,17 @@ describe('FEntityDelete', () => {
         const { wrapper, coreClient } = mountClientVueComponent(
             FEntityDelete,
             {
-                entityId: 'abc', 
-                entityType: 'project', 
-                withPrompt: false, 
+                entityId: 'abc',
+                entityType: 'project',
+                withPrompt: false,
             },
             { core: { 'DELETE /projects/:id': () => ({ data: { id: 'abc' }, meta: {} }) } },
         );
 
         await wrapper.trigger('click');
-        await new Promise((resolve) => { setTimeout(resolve, 0); });
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
 
         expect(coreClient.requests).toHaveLength(1);
         expect(coreClient.requests[0]).toMatchObject({
@@ -45,15 +47,17 @@ describe('FEntityDelete', () => {
         const { wrapper } = mountClientVueComponent(
             FEntityDelete,
             {
-                entityId: 'abc', 
-                entityType: 'project', 
-                withPrompt: false, 
+                entityId: 'abc',
+                entityType: 'project',
+                withPrompt: false,
             },
             { core: { 'DELETE /projects/:id': () => ({ data: { name: 'demo' }, meta: {} }) } },
         );
 
         await wrapper.trigger('click');
-        await new Promise((resolve) => { setTimeout(resolve, 0); });
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
 
         expect(wrapper.emitted('deleted')).toBeTruthy();
         expect(wrapper.emitted('deleted')[0][0]).toEqual({ name: 'demo', id: 'abc' });
@@ -61,22 +65,24 @@ describe('FEntityDelete', () => {
 
     it('should dispatch to the storage client when service is storage', async () => {
         const {
-            wrapper, 
-            coreClient, 
-            storageClient, 
+            wrapper,
+            coreClient,
+            storageClient,
         } = mountClientVueComponent(
             FEntityDelete,
             {
-                entityId: 'xyz', 
-                entityType: 'bucket', 
-                service: 'storage', 
+                entityId: 'xyz',
+                entityType: 'bucket',
+                service: 'storage',
                 withPrompt: false,
             },
             { storage: { 'DELETE /buckets/:id': () => ({ data: { id: 'xyz' }, meta: {} }) } },
         );
 
         await wrapper.trigger('click');
-        await new Promise((resolve) => { setTimeout(resolve, 0); });
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
 
         expect(storageClient.requests).toHaveLength(1);
         expect(storageClient.requests[0]).toMatchObject({ method: 'DELETE', params: { id: 'xyz' } });
@@ -87,15 +93,17 @@ describe('FEntityDelete', () => {
         const { wrapper, coreClient } = mountClientVueComponent(
             FEntityDelete,
             {
-                entityId: 'abc', 
-                entityType: 'project', 
-                withPrompt: false, 
+                entityId: 'abc',
+                entityType: 'project',
+                withPrompt: false,
             },
             { core: { 'DELETE /projects/:id': () => new Response(JSON.stringify({ message: 'nope' }), { status: 403, headers: { 'content-type': 'application/json' } }) } },
         );
 
         await wrapper.trigger('click');
-        await new Promise((resolve) => { setTimeout(resolve, 0); });
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
 
         expect(coreClient.requests).toHaveLength(1);
         expect(wrapper.emitted('failed')).toBeTruthy();
@@ -115,7 +123,9 @@ describe('FEntityDelete', () => {
         );
 
         await wrapper.trigger('click');
-        await new Promise((resolve) => { setTimeout(resolve, 0); });
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
 
         expect(telemetryClient.requests).toHaveLength(1);
         expect(telemetryClient.requests[0]).toMatchObject({ method: 'DELETE', params: { id: 'ev-1' } });
@@ -135,7 +145,9 @@ describe('FEntityDelete', () => {
         );
 
         await wrapper.trigger('click');
-        await new Promise((resolve) => { setTimeout(resolve, 0); });
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
 
         expect(coreClient.requests).toHaveLength(0);
         expect(wrapper.emitted('deleted')).toBeFalsy();
@@ -158,7 +170,9 @@ describe('FEntityDelete', () => {
         );
 
         await wrapper.trigger('click');
-        await new Promise((resolve) => { setTimeout(resolve, 0); });
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
 
         expect(telemetryClient.requests).toHaveLength(0);
         expect(wrapper.emitted('deleted')).toBeFalsy();

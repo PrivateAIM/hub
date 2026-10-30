@@ -50,6 +50,7 @@ class FakeTokenVerifier implements ITokenVerifier {
 
 async function requestWithScope(scope: string): Promise<number> {
     const app = new App();
+
     mountAuthorizationMiddleware(app, {
         authupClient: new Client({
             baseURL: 'http://authup.test',
@@ -60,17 +61,20 @@ async function requestWithScope(scope: string): Promise<number> {
     app.get('/', defineCoreHandler(async (event) => {
         try {
             await useRequestPermissionEvaluator(event).preEvaluate({ name: 'node_update' });
+
             return { granted: true };
         } catch (e) {
             // Only a permission DENIAL answers 403. Anything else (a TypeError,
             // a validation error, a stale catalog) would answer 500 in
             // production, so it must not pass for the gate working.
             event.response.status = isPermissionError(e) ? 403 : 500;
+
             return { granted: false };
         }
     }));
 
     const response = await app.fetch(new Request('http://hub.test/', { headers: { authorization: `Bearer ${TOKEN}` } }));
+
     return response.status;
 }
 

@@ -34,9 +34,8 @@ import { ConfigInjectionKey } from '../config/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { TelemetryClientInjectionKey } from '../telemetry-client/constants.ts';
 import { createControllers } from './controller.ts';
-import type { HTTPServer } from './constants.ts';
+import type { HTTPModuleOptions, HTTPServer  } from './types.ts';
 import { HTTPInjectionKey } from './constants.ts';
-import type { HTTPModuleOptions } from './types.ts';
 
 export class HTTPModule implements IModule {
     readonly name = 'http';
@@ -85,6 +84,7 @@ export class HTTPModule implements IModule {
         const isTestEnvironment = config.env === EnvironmentName.TEST;
 
         let swagger: MiddlewareSwaggerOptions | boolean;
+
         if (!isTestEnvironment) {
             swagger = { baseURL: config.publicURL };
         } else {
@@ -105,9 +105,9 @@ export class HTTPModule implements IModule {
             analysisNodeRepository,
             nodeRepository,
             reach: new AnalysisReachService({
-                analysisNodeRepository, 
-                analysisRepository, 
-                nodeRepository, 
+                analysisNodeRepository,
+                analysisRepository,
+                nodeRepository,
             }),
         });
 
@@ -160,49 +160,55 @@ export class HTTPModule implements IModule {
 
         container.register(HTTPInjectionKey.App, { useValue: app });
 
-        if (!this.options.skipServer) {
-            logger.debug('Starting http server...');
+        if (this.options.skipServer) {
+            return;
+        }
 
-            const server = serve(app, {
-                port: config.port,
-                hostname: '0.0.0.0',
-                silent: true,
-                gracefulShutdown: false,
-            });
+        logger.debug('Starting http server...');
 
-            try {
-                await server.ready();
+        const server = serve(app, {
+            port: config.port,
+            hostname: '0.0.0.0',
+            silent: true,
+            gracefulShutdown: false,
+        });
 
-                this.instance = server;
+        try {
+            await server.ready();
 
-                if (server.url) {
-                    logger.debug(`Listening on ${server.url}`);
-                }
+            this.instance = server;
 
-                container.register(HTTPInjectionKey.Server, { useValue: server });
-
-                if (this.options.socket) {
-                    const redisPubResult = container.tryResolve(RedisPublishClientInjectionKey);
-                    const redisSubResult2 = container.tryResolve(RedisSubscribeClientInjectionKey);
-                    createSocketServer(server.node!.server as Server, {
-                        config,
-                        authupClient: authupResult.success ? authupResult.data : undefined,
-                        logger,
-                        redisPublishClient: redisPubResult.success ? redisPubResult.data : undefined,
-                        redisSubscribeClient: redisSubResult2.success ? redisSubResult2.data : undefined,
-                    });
-                }
-            } catch (e) {
-                await server.close().catch(() => undefined);
-                throw e;
+            if (server.url) {
+                logger.debug(`Listening on ${server.url}`);
             }
+
+            container.register(HTTPInjectionKey.Server, { useValue: server });
+
+            if (this.options.socket) {
+                const redisPubResult = container.tryResolve(RedisPublishClientInjectionKey);
+                const redisSubResult2 = container.tryResolve(RedisSubscribeClientInjectionKey);
+
+                createSocketServer(server.node!.server as Server, {
+                    config,
+                    authupClient: authupResult.success ? authupResult.data : undefined,
+                    logger,
+                    redisPublishClient: redisPubResult.success ? redisPubResult.data : undefined,
+                    redisSubscribeClient: redisSubResult2.success ? redisSubResult2.data : undefined,
+                });
+            }
+        } catch (e) {
+            await server.close().catch(() => undefined);
+
+            throw e;
         }
     }
 
     async teardown(container: IContainer): Promise<void> {
         container.unregister(HTTPInjectionKey.App);
 
-        if (!this.instance) return;
+        if (!this.instance) {
+            return;
+        }
 
         container.unregister(HTTPInjectionKey.Server);
 

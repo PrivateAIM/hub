@@ -45,6 +45,7 @@ type Release = () => void;
 
 function hangAfterProgress(onProgress: ((progress: Progress) => void) | undefined, setRelease: (release: Release) => void) {
     onProgress?.(PROGRESS);
+
     return new Promise<void>((resolve) => {
         setRelease(resolve);
     });

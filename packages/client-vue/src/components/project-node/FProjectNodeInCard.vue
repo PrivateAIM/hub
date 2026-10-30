@@ -14,9 +14,9 @@ import type { MasterImage, ProjectNode } from '@privateaim/core-kit';
 import { NodeType, ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import type { PropType, Ref } from 'vue';
 import {
-    computed, 
-    defineComponent, 
-    onMounted, 
+    computed,
+    defineComponent,
+    onMounted,
     ref,
 } from 'vue';
 import FDisplayName from '../FDisplayName';
@@ -71,6 +71,7 @@ export default defineComponent({
         const loadMasterImage = async (id: MasterImage['id']) => {
             try {
                 const response = await client.masterImage.getOne(id);
+
                 masterImage.value = response.data;
             } catch {
                 // the image chip is a progressive enhancement — without it
@@ -80,6 +81,7 @@ export default defineComponent({
 
         onMounted(() => {
             const masterImageId = props.entity.project?.masterImageId;
+
             if (masterImageId) {
                 loadMasterImage(masterImageId);
             }

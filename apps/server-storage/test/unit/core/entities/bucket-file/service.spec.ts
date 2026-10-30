@@ -63,6 +63,7 @@ describe('BucketFileService', () => {
             ]);
 
             const result = await service.getMany({});
+
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
         });
@@ -71,9 +72,11 @@ describe('BucketFileService', () => {
     describe('getOne', () => {
         it('should return entity by ID', async () => {
             const file = createTestBucketFile({ id: 'bf-1' });
+
             repository.seed(file);
 
             const result = await service.getOne('bf-1');
+
             expect(result.id).toBe('bf-1');
         });
 
@@ -85,9 +88,11 @@ describe('BucketFileService', () => {
     describe('delete', () => {
         it('should delete and delegate to dispatcher', async () => {
             const file = createTestBucketFile();
+
             repository.seed(file);
 
             const result = await service.delete(file.id, createAllowAllActor());
+
             expect(result.id).toBe(file.id);
             expect(dispatcher.getDeleteCalls()).toHaveLength(1);
             expect(dispatcher.getDeleteCalls()[0]).toBe(file.id);
@@ -107,12 +112,15 @@ describe('BucketFileService', () => {
                 actorType: 'user',
                 realmId: 'other-realm',
             });
+
             repository.seed(file);
 
             const actor = createDenyAllActor();
+
             actor.identity = { id: actorId, type: 'user' };
 
             const result = await service.delete(file.id, actor);
+
             expect(result.id).toBe(file.id);
         });
 
@@ -127,12 +135,15 @@ describe('BucketFileService', () => {
                     actorType: 'user',
                 } as Bucket,
             });
+
             repository.seed(file);
 
             const actor = createDenyAllActor();
+
             actor.identity = { id: actorId, type: 'user' };
 
             const result = await service.delete(file.id, actor);
+
             expect(result.id).toBe(file.id);
         });
 
@@ -143,6 +154,7 @@ describe('BucketFileService', () => {
                 realmId: 'other-realm',
                 bucket: null,
             });
+
             repository.seed(file);
 
             await expect(
@@ -159,12 +171,15 @@ describe('BucketFileService', () => {
                 realmId: 'realm-1',
                 bucket: null,
             });
+
             repository.seed(file);
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+
             await service.delete(file.id, actor);
 
             const [call] = actor.permissionEvaluator.evaluateCalls;
+
             expect(call.name).toBe(PermissionName.BUCKET_UPDATE);
             expect(call.data!.get(BuiltInPolicyType.REALM_MATCH)).toBe('realm-1');
             expect(repository.getAll()).toHaveLength(0);
@@ -177,6 +192,7 @@ describe('BucketFileService', () => {
                 realmId: 'other-realm',
                 bucket: null,
             });
+
             repository.seed(file);
 
             await service.delete(file.id, createScopedActor({ realmId: 'realm-1', realmScope: 'any' }));
@@ -190,6 +206,7 @@ describe('BucketFileService', () => {
                 realmId: 'realm-1',
                 bucket: null,
             });
+
             repository.seed(file);
 
             await expect(

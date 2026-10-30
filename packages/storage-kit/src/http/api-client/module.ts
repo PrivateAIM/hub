@@ -6,10 +6,7 @@
  */
 
 import { Client, HookName, isClientError } from 'hapic';
-import {
-    BucketAPI,
-    BucketFileAPI,
-} from '../../domains';
+import { BucketAPI, BucketFileAPI } from '../../domains';
 import type { ClientOptions, IStorageClient } from './types';
 
 export class APIClient extends Client implements IStorageClient {

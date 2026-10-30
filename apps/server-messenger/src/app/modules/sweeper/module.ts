@@ -40,6 +40,7 @@ export class SweeperModule implements IModule {
             hooks: logger ? createScheduledComponentLogHooks(logger, 'message-sweeper') : undefined,
             run: async () => {
                 const removed = await repository.deleteExpired(new Date());
+
                 if (removed > 0) {
                     logger?.debug(`Swept ${removed} expired message(s)`);
                 }
@@ -51,6 +52,7 @@ export class SweeperModule implements IModule {
 
     async teardown(): Promise<void> {
         const { component } = this;
+
         this.component = undefined;
 
         await component?.stop();

@@ -7,11 +7,11 @@
 
 import type { RequestBaseOptions } from 'hapic';
 import type { EntityQueryInput } from '../../utils';
-import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
 import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { AnalysisCreatePayload, AnalysisUpdatePayload, IAnalysisAPI  } from './types';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { AnalysisCreatePayload, AnalysisUpdatePayload, IAnalysisAPI } from './types';
 
 export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
     // todo: we properly don't need this anymore
@@ -41,6 +41,7 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
         options?: EntityQueryInput<Analysis>,
     ): Promise<EntityCollectionResponse<Analysis>> {
         const { data: response } = await this.client.get(`analyses${buildQueryString(options)}`);
+
         return response;
     }
 

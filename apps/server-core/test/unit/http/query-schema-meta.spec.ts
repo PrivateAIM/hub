@@ -152,12 +152,15 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
 
     it('should not describe mutations', async () => {
         const created = await suite.client.node.create(createTestNode());
+
         expect(created.meta).toEqual({});
 
         const updated = await suite.client.node.update(created.data.id, { hidden: true });
+
         expect(updated.meta).toEqual({});
 
         const deleted = await suite.client.node.delete(created.data.id);
+
         expect(deleted.meta).toEqual({});
     });
 });

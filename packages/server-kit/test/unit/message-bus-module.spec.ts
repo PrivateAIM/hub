@@ -45,6 +45,7 @@ describe('src/message-bus/di-module', () => {
     it('should not register the remote bus on the memory driver, so nothing publishes to another service', async () => {
         const container = new Container();
         const module = new MessageBusModule();
+
         await module.setup(container);
 
         expect(container.tryResolve(MessageBusInjectionKey).success).toBe(true);
@@ -56,6 +57,7 @@ describe('src/message-bus/di-module', () => {
     it('should not register the remote bus for a memory driver from a factory', async () => {
         const container = new Container();
         const module = new MessageBusModule({ driverFactory: () => new MemoryMessageBusDriver() });
+
         await module.setup(container);
 
         expect(container.tryResolve(RemoteMessageBusInjectionKey).success).toBe(false);
@@ -67,9 +69,11 @@ describe('src/message-bus/di-module', () => {
         const container = new Container();
         const driver = new RecordingDriver();
         const module = new MessageBusModule({ driverFactory: () => driver });
+
         await module.setup(container);
 
         const remote = container.tryResolve(RemoteMessageBusInjectionKey);
+
         expect(remote.success).toBe(true);
         expect(remote.success && remote.data).toBe(container.resolve(MessageBusInjectionKey));
 

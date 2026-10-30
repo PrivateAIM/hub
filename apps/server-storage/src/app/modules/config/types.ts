@@ -7,8 +7,8 @@
 
 import type { BaseServerConfig } from '@privateaim/server-kit';
 
-export interface Config extends BaseServerConfig {
+export type Config = BaseServerConfig & {
     publicURL: string;
     minioConnectionString?: string;
     storagePath?: string;
-}
+};

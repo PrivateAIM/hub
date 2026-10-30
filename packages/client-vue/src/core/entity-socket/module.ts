@@ -22,16 +22,16 @@ import type {
     STCEventRecord,
 } from '@privateaim/core-realtime-kit';
 import {
-    computed, 
-    isRef, 
-    onMounted, 
-    onUnmounted, 
+    computed,
+    isRef,
+    onMounted,
+    onUnmounted,
     unref,
     watch,
 } from 'vue';
 import type { MaybeRef } from 'vue';
 import { injectStore, storeToRefs } from '@authup/client-web-kit';
-import type { EntitySocket, EntitySocketContext } from './type';
+import type { EntitySocket, EntitySocketContext } from './types';
 import { injectSocketManager, isSocketManagerUsable } from '../socket';
 
 /**
@@ -106,11 +106,7 @@ export function createEntitySocket<
         }
 
         if (ctx.target) {
-            if (!targetId.value || !event.meta.refId) {
-                return false;
-            }
-
-            if (targetId.value !== event.meta.refId) {
+            if (!targetId.value || !event.meta.refId || (targetId.value !== event.meta.refId)) {
                 return false;
             }
         }
@@ -178,7 +174,9 @@ export function createEntitySocket<
 
             emitEventRetryCount += 1;
 
-            await new Promise((resolve) => { setTimeout(resolve, 0); });
+            await new Promise((resolve) => {
+                setTimeout(resolve, 0);
+            });
 
             await emitEvent(socket, event);
         }
@@ -199,6 +197,7 @@ export function createEntitySocket<
 
         const socket = await socketManager.connect(buildDomainNamespaceName(activeRealmId));
         let event : DomainEventFullName<string, DomainEventSubscriptionName> | undefined;
+
         if (ctx.buildSubscribeEventName) {
             event = ctx.buildSubscribeEventName(activeRealmId);
         } else {
@@ -242,6 +241,7 @@ export function createEntitySocket<
         const socket = await socketManager.connect(buildDomainNamespaceName(activeRealmId));
 
         let event : DomainEventFullName<string, DomainEventSubscriptionName>;
+
         if (ctx.buildUnsubscribeEventName) {
             event = ctx.buildUnsubscribeEventName(activeRealmId);
         } else {
@@ -276,19 +276,21 @@ export function createEntitySocket<
     };
 
     let isMounted : boolean = false;
+
     onMounted(() => {
         isMounted = true;
+
         return subscribe();
     });
     onUnmounted(() => {
         isMounted = false;
+
         return unsubscribe();
     });
 
     watch([targetId, realmId], ([val, realm], [oldValue, oldRealm]) => {
         if ((val !== oldValue || realm !== oldRealm) && isMounted) {
-            Promise.resolve()
-                .then(() => unsubscribe())
+            Promise.try(() => unsubscribe())
                 .then(() => subscribe());
         }
     });

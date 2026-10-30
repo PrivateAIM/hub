@@ -52,6 +52,7 @@ export function describeQuerySchema(
     parameters?: `${Parameter}`[],
 ) : SchemaDescription {
     let bySignature = cache.get(schema);
+
     if (!bySignature) {
         bySignature = new Map();
         cache.set(schema, bySignature);
@@ -60,6 +61,7 @@ export function describeQuerySchema(
     const signature = parameters ? [...parameters].sort().join(',') : '*';
 
     let output = bySignature.get(signature);
+
     if (!output) {
         output = deepFreeze(schema.describe(parameters ? { parameters } : {}));
         bySignature.set(signature, output);

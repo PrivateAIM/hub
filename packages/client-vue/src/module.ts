@@ -14,7 +14,7 @@ import {
     installTelemetryHTTPClient,
     installTranslator,
 } from './core';
-import type { Options } from './type';
+import type { Options } from './types';
 
 export function install(app: App, options: Options): void {
     installCoreHTTPClient(app, { baseURL: options.coreURL, client: options.coreHTTPClient });
@@ -31,22 +31,25 @@ export function install(app: App, options: Options): void {
 
     installTranslator(app, { locale: options.translatorLocale });
 
-    if (options.components) {
-        let componentsSelected: undefined | string[];
-        if (typeof options.components !== 'boolean') {
-            componentsSelected = options.components;
-        }
-
-        Object.entries(components)
-            .forEach(([componentName, component]) => {
-                if (
-                    !Array.isArray(componentsSelected) ||
-                    componentsSelected.includes(componentName)
-                ) {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    app.component(componentName, component as Component);
-                }
-            });
+    if (!options.components) {
+        return;
     }
+
+    let componentsSelected: undefined | string[];
+
+    if (typeof options.components !== 'boolean') {
+        componentsSelected = options.components;
+    }
+
+    Object.entries(components)
+        .forEach(([componentName, component]) => {
+            if (
+                !Array.isArray(componentsSelected) ||
+                componentsSelected.includes(componentName)
+            ) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                app.component(componentName, component as Component);
+            }
+        });
 }

@@ -28,6 +28,7 @@ function createRecordingLogger() {
         error: noop,
         warn: (message: unknown) => {
             warnings.push(String(message));
+
             return logger;
         },
         notice: noop,

@@ -118,9 +118,11 @@ describe('src/adapters/http/controllers (query schema meta)', () => {
         const client = suite.client();
 
         const created = await client.event.create(eventPayload);
+
         expect(created.meta).toEqual({});
 
         const deleted = await client.event.delete(created.data.id);
+
         expect(deleted.meta).toEqual({});
 
         // POST /logs is record-shaped too and carries the envelope with an
@@ -131,6 +133,7 @@ describe('src/adapters/http/controllers (query schema meta)', () => {
             service: 'test-service',
             channel: LogChannel.HTTP,
         });
+
         expect(log.meta).toEqual({});
         expect(log.data.message).toEqual('query schema meta mutation probe');
     });

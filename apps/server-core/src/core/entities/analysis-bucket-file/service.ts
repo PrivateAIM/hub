@@ -87,6 +87,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         );
 
         const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
         }
@@ -105,6 +106,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         const temp = await this.reach.resolve(actor, REACH_TARGET, { approvedOnly: true });
 
         let result: ICondition | undefined | null;
+
         try {
             result = await this.reach.resolve(actor, REACH_TARGET, {
                 names: [PermissionName.ANALYSIS_RESULT_READ],
@@ -143,6 +145,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         await this.repository.validateJoinColumns(validated);
 
         const { bucket, analysis } = await this.resolveScope(validated.analysisBucketId);
+
         validated.realmId = bucket.realmId;
         validated.analysisId = bucket.analysisId;
 
@@ -171,10 +174,12 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         switch (actor.identity.type) {
             case 'user': {
                 validated.userId = actor.identity.id;
+
                 break;
             }
             case 'client': {
                 validated.clientId = actor.identity.id;
+
                 break;
             }
             default: {
@@ -197,6 +202,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
         }
@@ -206,8 +212,10 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         // The analysis' realm writes the file, before and after (D3). The stored
         // row is snapshotted, since typeorm's merge() writes into `entity`.
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
+
         const current = { realm: analysis.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
+
         await evaluateRecordUpdate(actor.permissionEvaluator, {
             name: PermissionName.ANALYSIS_UPDATE,
             current,
@@ -229,12 +237,14 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
     async delete(id: string, actor: ActorContext): Promise<AnalysisBucketFile> {
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
         }
 
         // ponytail: a node deleting its OWN result upload needs the plan-021 client binding.
         const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
+
         await this.assertOwner(actor, analysis, entity);
         await this.assertBucketWritable(actor, bucket, analysis);
 
@@ -261,11 +271,13 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
      */
     async registerUpload(file: BucketFile): Promise<AnalysisBucketUploadResult | null> {
         const bucket = await this.analysisBucketRepository.findOneBy({ bucketId: file.bucketId });
+
         if (!bucket) {
             return null;
         }
 
         const rejection = await this.rejectUpload(file, bucket);
+
         if (rejection) {
             return { bucket, rejection };
         }
@@ -292,6 +304,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
     async unregisterUpload(bucketId: string, bucketFileId: string): Promise<AnalysisBucketUploadRemoval | null> {
         // bucketFileId alone is caller-supplied on HTTP create, so it is not unique.
         const entity = await this.repository.findOneBy({ bucketId, bucketFileId });
+
         if (!entity) {
             return null;
         }
@@ -317,6 +330,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
             }
 
             const analysis = await this.analysisRepository.findOneById(bucket.analysisId);
+
             return analysis?.configurationLocked ? 'the analysis configuration is locked' : undefined;
         }
 
@@ -359,6 +373,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
     protected async resolveScope(analysisBucketId: string): Promise<{ bucket: AnalysisBucket, analysis: Analysis }> {
         const bucket = await this.analysisBucketRepository.findOneById(analysisBucketId);
         const analysis = bucket ? await this.analysisRepository.findOneById(bucket.analysisId) : null;
+
         if (!bucket || !analysis) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }

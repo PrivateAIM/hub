@@ -68,6 +68,7 @@ export class AnalysisDistributor {
 
         await this.analysisRecalculator.recalc(entityId);
         await this.nodeRecalculator.recalc(entityId);
+
         const entity = await this.fileRecalculator.recalc(entityId);
 
         AnalysisDistributorCommandChecker.canStart(entity);
@@ -82,6 +83,7 @@ export class AnalysisDistributor {
 
             locked.registryId ??= entity.registryId;
             locked.distributionStatus = ProcessStatus.STARTING;
+
             return true;
         }, persistCtx);
 
@@ -96,8 +98,10 @@ export class AnalysisDistributor {
 
     async check(input: string | Analysis) {
         const entity = await this.resolve(input);
+
         AnalysisDistributorCommandChecker.canCheck(entity);
         await this.dispatcher.dispatchCheck({ id: entity.id });
+
         return entity;
     }
 
@@ -124,6 +128,7 @@ export class AnalysisDistributor {
 
                     entity.distributionStatus = ProcessStatus.STARTED;
                     entity.distributionProgress = 0;
+
                     break;
                 }
                 case AnalysisDistributorEvent.EXECUTION_PROGRESS: {
@@ -136,6 +141,7 @@ export class AnalysisDistributor {
 
                     const temp = value as AnalysisDistributorExecutionProgressPayload;
                     const previous = entity.distributionProgress;
+
                     if (
                         !entity.distributionProgress ||
                         temp.progress.percent >= entity.distributionProgress
@@ -155,6 +161,7 @@ export class AnalysisDistributor {
 
                         entity.updatedAt = new Date().toISOString();
                     }
+
                     break;
                 }
                 case AnalysisDistributorEvent.CHECK_FAILED: {
@@ -169,6 +176,7 @@ export class AnalysisDistributor {
                     }
 
                     entity.distributionStatus = ProcessStatus.FAILED;
+
                     break;
                 }
                 case AnalysisDistributorEvent.EXECUTION_FINISHED: {
@@ -184,10 +192,12 @@ export class AnalysisDistributor {
 
                     entity.distributionStatus = ProcessStatus.EXECUTED;
                     entity.distributionProgress = 100;
+
                     break;
                 }
                 case AnalysisDistributorEvent.CHECK_FINISHED: {
                     const temp = value as AnalysisDistributorCheckFinishedPayload;
+
                     if (!temp.status || isCheckVerdictStale(temp.checkedAt, entity.updatedAt)) {
                         return false;
                     }
@@ -244,11 +254,14 @@ export class AnalysisDistributor {
     protected async resolve(input: string | Analysis): Promise<Analysis> {
         if (typeof input === 'string') {
             const entity = await this.repository.findOneById(input);
+
             if (!entity) {
                 throw new BadRequestError('Analysis could not be found.');
             }
+
             return entity;
         }
+
         return input;
     }
 }

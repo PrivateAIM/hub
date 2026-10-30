@@ -6,12 +6,33 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { Event } from '@privateaim/telemetry-kit';
+import type { ProcessStatus } from '@privateaim/kit';
 import type { Node } from '../node';
 import type { Analysis } from '../analysis';
+import type { AnalysisNodeApprovalStatus } from './constants';
 
-export interface AnalysisNodeEvent {
+export type AnalysisNode = {
     id: string;
+
+    // ------------------------------------------------------------------
+
+    approvalStatus: AnalysisNodeApprovalStatus | null;
+
+    // ------------------------------------------------------------------
+
+    executionStatus: ProcessStatus | null;
+
+    executionProgress: number | null;
+
+    // ------------------------------------------------------------------
+
+    comment: string;
+
+    // ------------------------------------------------------------------
+
+    artifactTag: string | null;
+
+    artifactDigest: string | null;
 
     // ------------------------------------------------------------------
 
@@ -20,8 +41,6 @@ export interface AnalysisNodeEvent {
     updatedAt: string;
 
     // ------------------------------------------------------------------
-
-    eventId: Event['id'];
 
     analysisId: Analysis['id'];
 
@@ -34,4 +53,4 @@ export interface AnalysisNodeEvent {
     node: Node;
 
     nodeRealmId: Realm['id'];
-}
+};

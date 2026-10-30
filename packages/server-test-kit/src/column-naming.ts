@@ -5,15 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ColumnNamingViolation } from './types.ts';
+
 import type { DataSource, DataSourceOptions } from 'typeorm';
 import { snakeCase } from 'typeorm/util/StringUtils.js';
 
-export type ColumnNamingViolation = {
-    table: string,
-    property: string,
-    column: string,
-    reason: string,
-};
+
 
 /**
  * Turn a service's production DataSource options into ones that can be
@@ -57,10 +54,10 @@ export function collectUncoveredColumns(
     schema: { fields?: { default?: readonly string[], allowed?: readonly string[] } },
     metadata: {
         columns: readonly {
-            propertyName: string, 
-            isSelect: boolean, 
-            relationMetadata?: unknown 
-        }[] 
+            propertyName: string,
+            isSelect: boolean,
+            relationMetadata?: unknown
+        }[]
     },
     exclusions: readonly string[] = [],
 ): string[] {
@@ -110,6 +107,7 @@ export function collectColumnNamingViolations(dataSource: DataSource): ColumnNam
                     ...base,
                     reason: 'column name is not snake_case — a missing @Column({ name })',
                 });
+
                 continue;
             }
 

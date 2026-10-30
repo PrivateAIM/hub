@@ -5,6 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Logger } from '../logger';
+
+import type { IContainer } from 'eldin';
+
 import type { DomainEventName, ObjectLiteral } from '@privateaim/kit';
 
 export type EntityEventDestination = {
@@ -66,3 +70,12 @@ export type EntityEventHandleOptions<
 export interface IEntityEventHandler {
     handle(ctx: EntityEventHandleOptions) : Promise<void>;
 }
+
+export type EntityEventModuleOptions = {
+    handlers?: IEntityEventHandler[];
+    handlerFactory?: (container: IContainer) => IEntityEventHandler[];
+};
+
+export type EntityEventPublisherContext = {
+    logger?: Logger;
+};

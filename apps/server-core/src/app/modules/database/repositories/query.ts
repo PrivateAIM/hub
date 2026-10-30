@@ -43,11 +43,11 @@ export function applyQuery(
     // column (500). The reach conditions join `analysis` on every family read.
     // ponytail: belongs in rapiq's fields adapter (always project the primary key).
     const { selects, mainAlias } = queryBuilder.expressionMap;
-    if (
-        mainAlias &&
-        selects.length > 0 &&
-        selects.every(({ selection }) => !(selection === mainAlias.name || selection === `${mainAlias.name}.id`))
-    ) {
+
+    const needsId = mainAlias && selects.length > 0 &&
+        selects.every(({ selection }) => !(selection === mainAlias.name || selection === `${mainAlias.name}.id`));
+
+    if (needsId) {
         queryBuilder.addSelect(`${mainAlias.name}.id`);
     }
 

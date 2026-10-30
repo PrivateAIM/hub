@@ -9,6 +9,8 @@ Welcome to the FLAME Hub development guide. This section covers contributing to 
 
 ## Quick Start
 
+Node.js **≥24.0.0** and npm are required for all workspaces.
+
 ```bash
 npm ci          # Install dependencies
 npm run build   # Build all packages
@@ -35,7 +37,26 @@ refactor(server-storage): extract bucket validation to core layer
 
 ## Code Style
 
-ESLint 10 with `@tada5hi/eslint-config`. Husky pre-commit hooks automatically lint staged files.
+ESLint 10 with `@tada5hi/eslint-config` 3. Husky pre-commit hooks automatically lint staged files.
+Exported type declarations live in `types.ts`, interfaces use an `I` prefix, and
+barrels export local modules rather than forwarding external packages. Existing
+public type names are retained as type aliases where possible.
+
+### Package import changes
+
+The lint-rule migration removes external-package forwarding exports. Consumers
+should import these helpers from their owning packages:
+
+- `BASE_ERROR_INSTANCE`, `INSTANCEOF_PROPERTY`, `hasInstanceof` and `markInstanceof`
+  from `@ebec/core`, not `@privateaim/errors`.
+- The default `clientWebKitTheme` export and named `merge` export from
+  `@authup/client-web-kit-theme`, not `@privateaim/client-vue-theme`.
+- `FakePermissionEvaluator`, `EvaluatorBehavior`, `EvaluatorCall` and
+  `EvaluatorMethodName` from `@authup/server-test-kit`, not
+  `@privateaim/server-test-kit`.
+
+Entity and other public type names remain available at their existing package roots;
+internal source files have been consolidated into `types.ts`.
 
 ```bash
 npm run lint          # Check

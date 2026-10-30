@@ -30,6 +30,7 @@ type ErrorMiddlewareOptions = {
 export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions = {}) {
     app.use(defineErrorHandler((error, event) => {
         let next: HubError;
+
         if (error.cause) {
             next = sanitizeError(error.cause);
         } else {
@@ -46,6 +47,7 @@ export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions =
         };
 
         const isServerError = status >= 500 && status < 600;
+
         if (isServerError && options.logger) {
             if (error.cause && isObject(error.cause)) {
                 options.logger.error({
@@ -60,12 +62,14 @@ export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions =
             }
         } else if (isObject(next.data)) {
             const keys = Object.keys(next.data);
+
             for (const key of keys) {
                 payload[key] = next.data[key];
             }
         }
 
         event.response.status = status;
+
         return payload;
     }));
 }

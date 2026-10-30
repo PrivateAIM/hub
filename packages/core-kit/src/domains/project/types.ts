@@ -5,14 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    Client, 
-    Realm, 
-    User,
-} from '@authup/core-kit';
+import type { Client, Realm, User } from '@authup/core-kit';
 import type { MasterImage } from '../master-image';
 
-export interface Project {
+export type Project = {
     id: string;
 
     /**
@@ -53,4 +49,4 @@ export interface Project {
     masterImageId: MasterImage['id'] | null;
 
     masterImage: MasterImage | null;
-}
+};

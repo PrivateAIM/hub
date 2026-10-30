@@ -22,7 +22,8 @@ class FakeReconciler implements IAnalysisReconciler {
 
     async reconcile(): Promise<AnalysisReconcileResult> {
         this.calls++;
-        if (this.result instanceof Error) {
+
+        if (Error.isError(this.result)) {
             throw this.result;
         }
 
@@ -42,6 +43,7 @@ describe('createAnalysisReconcilerComponent', () => {
 
     it('should reconcile once at start', async () => {
         const reconciler = new FakeReconciler();
+
         component = createAnalysisReconcilerComponent({ reconciler });
 
         await component.start();
@@ -53,6 +55,7 @@ describe('createAnalysisReconcilerComponent', () => {
 
     it('should not report success when a check failed', async () => {
         const reconciler = new FakeReconciler();
+
         reconciler.result = { checked: 1, failed: 1 };
         component = createAnalysisReconcilerComponent({ reconciler });
 
@@ -63,6 +66,7 @@ describe('createAnalysisReconcilerComponent', () => {
 
     it('should not reject start when the pass itself fails', async () => {
         const reconciler = new FakeReconciler();
+
         reconciler.result = new Error('database down');
         component = createAnalysisReconcilerComponent({ reconciler });
 

@@ -14,8 +14,8 @@ import { VCAlert } from '@vuecs/elements';
 import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import {
-    defineComponent, 
-    ref, 
+    defineComponent,
+    ref,
     useTemplateRef,
 } from 'vue';
 import { type EntityManagerResolveContext, injectCoreHTTPClient, wrapFnWithBusyState } from '../../core';
@@ -59,7 +59,7 @@ export default defineComponent({
                 emit('executed', AnalysisCommand.STORAGE_CHECK);
                 emit('updated', response);
             } catch (e) {
-                if (e instanceof Error) {
+                if (Error.isError(e)) {
                     emit('failed', e);
                 }
             }
@@ -72,8 +72,7 @@ export default defineComponent({
         };
 
         const retry = () => {
-            Promise.resolve()
-                .then(() => execute())
+            Promise.try(() => execute())
                 .then(() => refresh());
         };
 

@@ -6,7 +6,7 @@
  */
 
 import type { Project } from '@privateaim/core-kit';
-import type { IEntityAPI } from '../types-base';
+import type { IEntityAPI } from '../types';
 
 export type ProjectCreatePayload =    Partial<Pick<Project, 'name' | 'displayName' | 'description' | 'masterImageId'>>;
 

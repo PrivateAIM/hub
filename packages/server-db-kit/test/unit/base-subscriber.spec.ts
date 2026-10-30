@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { 
-    describe, 
-    expect, 
-    it, 
-    vi, 
+import {
+    describe,
+    expect,
+    it,
+    vi,
 } from 'vitest';
 import type { IEntityEventPublisher } from '@privateaim/server-kit';
 import { DomainEventName } from '@privateaim/kit';
@@ -57,7 +57,9 @@ describe('src/subscriber/base', () => {
         await subscriber.afterInsert(createMockInsertEvent({ id: '1' }));
 
         expect(publisher.safePublish).toHaveBeenCalledOnce();
+
         const ctx = (publisher.safePublish as any).mock.calls[0][0];
+
         expect(ctx.metadata.refType).toBe('testEntity');
         expect(ctx.metadata.event).toBe(DomainEventName.CREATED);
     });
@@ -109,6 +111,7 @@ describe('src/subscriber/base', () => {
         expect(publisher.safePublish).toHaveBeenCalledTimes(3);
 
         const { calls } = (publisher.safePublish as any).mock;
+
         expect(calls[0][0].metadata.event).toBe(DomainEventName.CREATED);
         expect(calls[1][0].metadata.event).toBe(DomainEventName.UPDATED);
         expect(calls[1][0].dataPrevious).toEqual({ id: '1', name: 'old' });
@@ -141,6 +144,7 @@ describe('src/subscriber/base', () => {
         });
 
         const entity = { id: '1', accountSecret: 'NEW' };
+
         await subscriber.afterUpdate({
             entity,
             databaseEntity: { id: '1', accountSecret: 'OLD' },
@@ -154,6 +158,7 @@ describe('src/subscriber/base', () => {
         } as any);
 
         const ctx = (publisher.safePublish as any).mock.calls[0][0];
+
         expect(ctx.data).toEqual({ id: '1' });
         expect(ctx.dataPrevious).toEqual({ id: '1' });
         // negative control: a copy, not a mutation — the registry link handler

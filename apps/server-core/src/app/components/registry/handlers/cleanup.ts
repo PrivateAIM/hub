@@ -12,8 +12,9 @@ import {
 import { useDataSource } from 'typeorm-extension';
 import type { ComponentHandler, ComponentHandlerContext } from 'hubwire';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../adapters/database/index.ts';
-import { RegistryCommand } from '../constants.ts';
-import type { RegistryCleanupPayload, RegistryEventMap } from '../type.ts';
+import { RegistryCommand } from '../../../../core/domains/index.ts';
+import type { RegistryEventMap } from '../types.ts';
+import type { Registry } from '@privateaim/core-kit';
 import { createBasicHarborAPIClient } from './utils.ts';
 
 export class RegistryCleanupHandler implements ComponentHandler<
@@ -21,7 +22,7 @@ export class RegistryCleanupHandler implements ComponentHandler<
     RegistryCommand.CLEANUP
 > {
     async handle(
-        value: RegistryCleanupPayload,
+        value: Pick<Registry, 'id'>,
         context: ComponentHandlerContext<RegistryEventMap, RegistryCommand.CLEANUP>,
     ): Promise<void> {
         const dataSource = await useDataSource();
@@ -48,11 +49,8 @@ export class RegistryCleanupHandler implements ComponentHandler<
 
         for (const project of projects) {
             const index = projectEntityExternalNames.indexOf(`${project.name}`);
-            if (index !== -1) {
-                continue;
-            }
 
-            if (project.name === REGISTRY_MASTER_IMAGE_PROJECT_NAME) {
+            if ((index !== -1) || (project.name === REGISTRY_MASTER_IMAGE_PROJECT_NAME)) {
                 continue;
             }
 

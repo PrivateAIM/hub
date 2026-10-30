@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { 
-    beforeEach, 
-    describe, 
-    expect, 
-    it, 
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
 } from 'vitest';
 import { LogChannel, LogLevel } from '@privateaim/telemetry-kit';
 import { MemoryLogStore } from '../../src/adapters/telemetry/memory.ts';
@@ -52,56 +52,59 @@ describe('MemoryLogStore', () => {
     describe('query', () => {
         it('should return all items with no filter', async () => {
             await store.write({
-                message: 'a', 
-                level: LogLevel.INFORMATIONAL, 
-                channel: LogChannel.SYSTEM, 
-                service: 'svc', 
-                labels: {}, 
+                message: 'a',
+                level: LogLevel.INFORMATIONAL,
+                channel: LogChannel.SYSTEM,
+                service: 'svc',
+                labels: {},
             });
             await store.write({
-                message: 'b', 
-                level: LogLevel.ERROR, 
-                channel: LogChannel.SYSTEM, 
-                service: 'svc', 
-                labels: {}, 
+                message: 'b',
+                level: LogLevel.ERROR,
+                channel: LogChannel.SYSTEM,
+                service: 'svc',
+                labels: {},
             });
 
             const [results, count] = await store.query();
+
             expect(results).toHaveLength(2);
             expect(count).toBe(2);
         });
 
         it('should filter by labels', async () => {
             await store.write({
-                message: 'a', 
-                level: LogLevel.INFORMATIONAL, 
-                channel: LogChannel.SYSTEM, 
-                service: 'svc', 
-                labels: { nodeId: 'node-1' }, 
+                message: 'a',
+                level: LogLevel.INFORMATIONAL,
+                channel: LogChannel.SYSTEM,
+                service: 'svc',
+                labels: { nodeId: 'node-1' },
             });
             await store.write({
-                message: 'b', 
-                level: LogLevel.INFORMATIONAL, 
-                channel: LogChannel.SYSTEM, 
-                service: 'svc', 
-                labels: { nodeId: 'node-2' }, 
+                message: 'b',
+                level: LogLevel.INFORMATIONAL,
+                channel: LogChannel.SYSTEM,
+                service: 'svc',
+                labels: { nodeId: 'node-2' },
             });
 
             const [results] = await store.query({ labels: { nodeId: 'node-1' } });
+
             expect(results).toHaveLength(1);
             expect(results[0].message).toBe('a');
         });
 
         it('should return empty for non-matching labels', async () => {
             await store.write({
-                message: 'a', 
-                level: LogLevel.INFORMATIONAL, 
-                channel: LogChannel.SYSTEM, 
-                service: 'svc', 
-                labels: { nodeId: 'node-1' }, 
+                message: 'a',
+                level: LogLevel.INFORMATIONAL,
+                channel: LogChannel.SYSTEM,
+                service: 'svc',
+                labels: { nodeId: 'node-1' },
             });
 
             const [results] = await store.query({ labels: { nodeId: 'nonexistent' } });
+
             expect(results).toHaveLength(0);
         });
 
@@ -112,9 +115,11 @@ describe('MemoryLogStore', () => {
                 channel: LogChannel.SYSTEM,
                 service: 'svc',
             });
+
             delete (log as { labels?: Record<string, unknown> }).labels;
 
             const [results] = await store.query({ labels: { nodeId: 'node-1' } });
+
             expect(results).toHaveLength(0);
         });
     });

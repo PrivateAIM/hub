@@ -88,6 +88,7 @@ describe('AnalysisBuilderExecuteHandler failure classification', () => {
             docker: new FakeDockerClient({ inspectError: new FakeDockerError(404) }) as unknown as DockerClient,
         });
         const context = new FakeComponentHandlerContext(AnalysisBuilderCommand.EXECUTE);
+
         context.metadata.delivery = { attempt, maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS };
 
         return { promise: handler.handle({ id: ANALYSIS_ID }, context), context };

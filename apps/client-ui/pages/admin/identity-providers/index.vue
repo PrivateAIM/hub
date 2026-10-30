@@ -20,9 +20,9 @@ import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
     components: {
-        FContentAction, 
-        VCBreadcrumb, 
-        VCIcon, 
+        FContentAction,
+        VCBreadcrumb,
+        VCIcon,
     },
     setup() {
         definePageMeta({
@@ -38,20 +38,20 @@ export default defineNuxtComponent({
 
         const breadcrumbItems = useSectionBreadcrumb({
             root: {
-                label: 'Admin', 
-                url: '/admin', 
-                icon: 'fa6-solid:gear', 
+                label: 'Admin',
+                url: '/admin',
+                icon: 'fa6-solid:gear',
             },
             section: {
-                label: 'Identity Providers', 
-                url: '/admin/identity-providers', 
-                icon: 'fa6-solid:atom', 
+                label: 'Identity Providers',
+                url: '/admin/identity-providers',
+                icon: 'fa6-solid:atom',
             },
             children: [
                 {
-                    url: '/admin/identity-providers/add', 
-                    label: 'Add', 
-                    icon: 'fa6-solid:plus', 
+                    url: '/admin/identity-providers/add',
+                    label: 'Add',
+                    icon: 'fa6-solid:plus',
                 },
             ],
         });
@@ -60,11 +60,13 @@ export default defineNuxtComponent({
 
         const handleDeleted = (e: IdentityProvider) => {
             const toast = useToast();
+
             toast.show({ variant: 'success', body: `The identity-provider ${e.name} was successfully deleted.` });
         };
 
         const handleFailed = (e: Error) => {
             const toast = useToast();
+
             toast.show({ variant: 'warning', body: e.message });
         };
 

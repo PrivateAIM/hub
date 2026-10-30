@@ -7,8 +7,6 @@
 
 import { MessageRoutingType } from 'hubwire';
 
-export { RegistryCommand, RegistryHookEvent } from '../../../core/domains/index.ts';
-
 export const RegistryTaskMessageBusRouting = {
     type: MessageRoutingType.WORK,
     key: 'registryCommands',

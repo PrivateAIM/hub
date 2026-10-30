@@ -7,7 +7,7 @@
 
 import type { Client } from '@authup/core-kit';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
-import type { EntityRecordResponse, IEntityAPI } from '../types-base';
+import type { EntityRecordResponse, IEntityAPI } from '../types';
 
 export type NodeCreatePayload =    & Pick<Node, 'name'> &
     Partial<Pick<Node, 'type' | 'hidden' | 'publicKey' | 'externalName' | 'registryId' | 'clientId' | 'realmId'>>;

@@ -135,10 +135,10 @@ export function mountClientVueComponent(
     options: MountOptions = {},
 ) {
     const {
-        plugins, 
-        coreClient, 
-        storageClient, 
-        telemetryClient, 
+        plugins,
+        coreClient,
+        storageClient,
+        telemetryClient,
         pinia,
     } = createPluginStack(handlers, options);
 
@@ -183,14 +183,15 @@ export function createClientVueApp(
     options: MountOptions = {},
 ) {
     const {
-        plugins, 
-        coreClient, 
-        storageClient, 
-        telemetryClient, 
+        plugins,
+        coreClient,
+        storageClient,
+        telemetryClient,
         pinia,
     } = createPluginStack(handlers, options);
 
     const app : App = createSSRApp(component, props);
+
     for (const [plugin, pluginOptions] of plugins) {
         app.use(plugin, pluginOptions);
     }

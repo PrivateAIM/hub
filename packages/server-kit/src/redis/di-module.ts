@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { RedisModuleOptions } from './types';
+
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../config/constants';
@@ -16,9 +18,7 @@ import {
 } from './constants';
 import { createRedisClient } from './module';
 
-export type RedisModuleOptions = {
-    connectionString?: string;
-};
+
 
 export class RedisModule implements IModule {
     readonly name = REDIS_MODULE_NAME;
@@ -38,6 +38,7 @@ export class RedisModule implements IModule {
 
         if (!connectionString) {
             const configResult = container.tryResolve(ConfigInjectionKey);
+
             if (configResult.success) {
                 connectionString = configResult.data.redisConnectionString;
             }
@@ -48,6 +49,7 @@ export class RedisModule implements IModule {
         }
 
         const client = createRedisClient({ connectionString });
+
         container.register(RedisClientInjectionKey, { useValue: client });
         container.register(RedisPublishClientInjectionKey, { useFactory: () => client.duplicate() });
         container.register(RedisSubscribeClientInjectionKey, { useFactory: () => client.duplicate() });

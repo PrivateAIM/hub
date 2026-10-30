@@ -52,6 +52,7 @@ export class ServiceController {
         await this.registryDispatcher.dispatch('HOOK_PROCESS', data, {});
 
         event.response.status = 202;
+
         return null;
     }
 
@@ -71,9 +72,11 @@ export class ServiceController {
         }
 
         const actor = buildActorContext(event);
+
         await this.registryService.executeCommand(data.command, data, actor);
 
         event.response.status = 202;
+
         return null;
     }
 }

@@ -29,6 +29,7 @@ export function getMinProcessStatus(
         }
 
         const rank = ProcessStatusRank[status];
+
         if (rank === -1) {
             return ProcessStatus.FAILED;
         }

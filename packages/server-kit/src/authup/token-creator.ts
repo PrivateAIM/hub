@@ -5,15 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { AuthupClientTokenCreatorCreateContext, AuthupUserTokenCreatorCreateContext } from './types';
+
 import type { TokenCreator } from '@authup/core-http-kit';
 import { OAuth2Client } from '@hapic/oauth2';
 
-export type AuthupClientTokenCreatorCreateContext = {
-    baseURL: string,
-    clientId: string,
-    clientSecret: string,
-    realm: string,
-};
+
 
 export function createAuthupClientTokenCreator(ctx: AuthupClientTokenCreatorCreateContext): TokenCreator {
     const client = new OAuth2Client({ request: { baseURL: ctx.baseURL } });
@@ -26,12 +23,7 @@ export function createAuthupClientTokenCreator(ctx: AuthupClientTokenCreatorCrea
     });
 }
 
-export type AuthupUserTokenCreatorCreateContext = {
-    baseURL: string,
-    name: string,
-    password: string,
-    realm: string,
-};
+
 
 export function createAuthupUserTokenCreator(ctx: AuthupUserTokenCreatorCreateContext): TokenCreator {
     const client = new OAuth2Client({ request: { baseURL: ctx.baseURL } });

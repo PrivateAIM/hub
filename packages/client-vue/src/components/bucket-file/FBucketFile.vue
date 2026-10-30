@@ -51,6 +51,7 @@ export default defineComponent({
             try {
                 if (props.entity) {
                     data.value = props.entity;
+
                     return;
                 }
 
@@ -67,11 +68,12 @@ export default defineComponent({
             }
         };
 
-        Promise.resolve()
-            .then(() => resolve());
+        Promise.try(() => resolve());
 
         const drop = async () => {
-            if (busy.value || !data.value) return;
+            if (busy.value || !data.value) {
+                return;
+            }
 
             try {
                 await storage.bucketFile.delete(data.value.id);

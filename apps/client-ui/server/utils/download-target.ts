@@ -27,6 +27,7 @@ export function resolveDownloadTarget(type?: string, id?: string): string | unde
     }
 
     const target = type ? TARGETS.get(type) : undefined;
+
     if (!target) {
         return undefined;
     }

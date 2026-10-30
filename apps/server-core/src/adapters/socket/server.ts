@@ -80,6 +80,7 @@ export function createSocketServer(
     nsp.use(async (socket: Socket, next) => {
         if (!socket.data.identity) {
             next();
+
             return;
         }
 
@@ -94,6 +95,7 @@ export function createSocketServer(
             });
 
             next(buildSocketSubscribeError(e));
+
             return;
         }
 

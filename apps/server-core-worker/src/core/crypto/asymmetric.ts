@@ -22,6 +22,7 @@ export async function generateRSAKeyPair() : Promise<{ privateKey: string, publi
         }, (err: (Error | null), publicKey: string, privateKey: string) => {
             if (err) {
                 reject(err);
+
                 return;
             }
 

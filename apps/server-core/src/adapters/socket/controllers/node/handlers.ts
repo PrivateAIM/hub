@@ -25,7 +25,9 @@ import { assertSocketSubscribeReach } from '../../reach.ts';
 import type { Socket } from '../../types.ts';
 
 export function registerNodeSocketHandlers(socket: Socket) {
-    if (!isSocketAuthenticated(socket)) return;
+    if (!isSocketAuthenticated(socket)) {
+        return;
+    }
 
     socket.on(
         buildDomainEventFullName(DomainType.NODE, DomainEventSubscriptionName.SUBSCRIBE),

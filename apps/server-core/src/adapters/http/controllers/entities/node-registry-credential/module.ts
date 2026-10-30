@@ -38,6 +38,7 @@ export class NodeRegistryCredentialController {
         @DContext() event: IAppEvent,
     ): Promise<RegistryCredentials> {
         const actor = buildActorContext(event);
+
         return this.service.getCredentials(id, actor);
     }
 }

@@ -24,7 +24,7 @@ import { pipeline } from 'node:stream/promises';
 import { useDataSource } from 'typeorm-extension';
 import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity, BucketFileEntity } from '../../../../../adapters/database/index.ts';
-import { toBucketName } from '../../../../domains/bucket/utils.ts';
+import { toBucketName } from '../../../../../core/utils/bucket-name.ts';
 
 export class BucketFileCreateHandler implements ComponentHandler<
     BucketFileComponentEventMap,
@@ -90,6 +90,7 @@ export class BucketFileCreateHandler implements ComponentHandler<
         const dataSource = await useDataSource();
 
         let bucket : BucketEntity;
+
         if (bucketRelation) {
             bucket = bucketRelation;
         } else {
@@ -122,8 +123,10 @@ export class BucketFileCreateHandler implements ComponentHandler<
             if (!counter.destroyed) {
                 counter.destroy(err);
             }
+
             throw err;
         });
+
         await Promise.all([
             uploadPromise,
             pipeline(data, counter),

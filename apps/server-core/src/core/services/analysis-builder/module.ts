@@ -64,6 +64,7 @@ export class AnalysisBuilder {
 
         await this.analysisRecalculator.recalc(entityId);
         await this.nodeRecalculator.recalc(entityId);
+
         const entity = await this.fileRecalculator.recalc(entityId);
 
         // early, so approvals are not reset for a build that cannot start
@@ -81,6 +82,7 @@ export class AnalysisBuilder {
 
             locked.buildStatus = ProcessStatus.STARTING;
             locked.buildProgress = null;
+
             return true;
         }, options.persistCtx);
 
@@ -95,8 +97,10 @@ export class AnalysisBuilder {
 
     async check(input: string | Analysis) {
         const entity = await this.resolve(input);
+
         AnalysisBuilderCommandChecker.canCheck(entity);
         await this.dispatcher.dispatchCheck({ id: entity.id });
+
         return entity;
     }
 
@@ -123,6 +127,7 @@ export class AnalysisBuilder {
 
                     entity.buildStatus = ProcessStatus.STARTED;
                     entity.buildProgress = 0;
+
                     break;
                 }
                 case AnalysisBuilderEvent.EXECUTION_PROGRESS: {
@@ -135,6 +140,7 @@ export class AnalysisBuilder {
 
                     const temp = value as AnalysisBuilderExecutionProgressPayload;
                     const previous = entity.buildProgress;
+
                     if (
                         !entity.buildProgress ||
                         temp.progress.percent >= entity.buildProgress
@@ -154,6 +160,7 @@ export class AnalysisBuilder {
 
                         entity.updatedAt = new Date().toISOString();
                     }
+
                     break;
                 }
                 case AnalysisBuilderEvent.CHECK_FAILED: {
@@ -168,6 +175,7 @@ export class AnalysisBuilder {
                     }
 
                     entity.buildStatus = ProcessStatus.FAILED;
+
                     break;
                 }
                 case AnalysisBuilderEvent.EXECUTION_FINISHED: {
@@ -188,10 +196,12 @@ export class AnalysisBuilder {
                     entity.buildSize = temp.size ?? null;
                     entity.buildStatus = ProcessStatus.EXECUTED;
                     entity.buildProgress = 100;
+
                     break;
                 }
                 case AnalysisBuilderEvent.CHECK_FINISHED: {
                     const temp = value as AnalysisBuilderCheckFinishedPayload;
+
                     if (!temp.status || isCheckVerdictStale(temp.checkedAt, entity.updatedAt)) {
                         return false;
                     }
@@ -250,11 +260,14 @@ export class AnalysisBuilder {
     protected async resolve(input: string | Analysis): Promise<Analysis> {
         if (typeof input === 'string') {
             const entity = await this.repository.findOneById(input);
+
             if (!entity) {
                 throw new EntityNotFoundError({ entity: 'analysis' });
             }
+
             return entity;
         }
+
         return input;
     }
 }

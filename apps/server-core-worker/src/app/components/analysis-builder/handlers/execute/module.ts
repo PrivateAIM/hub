@@ -293,6 +293,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
         });
 
         const [analysisBucket] = analysisBuckets;
+
         if (!analysisBucket) {
             throw BuilderError.entrypointNotFound();
         }
@@ -327,6 +328,7 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                     }
 
                     const index = analysisBucketFiles.findIndex((analysisBucketFile) => analysisBucketFile.path === entry.name);
+
                     if (index === -1) {
                         throw new Error(`Bucket file ${entry.name} is not a valid analysis bucket file.`);
                     }

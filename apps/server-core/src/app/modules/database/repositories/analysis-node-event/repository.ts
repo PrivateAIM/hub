@@ -29,6 +29,7 @@ export class AnalysisNodeEventRepositoryAdapter implements IAnalysisNodeEventRep
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<AnalysisNodeEvent>> {
         const qb = this.repository.createQueryBuilder('e');
+
         qb.groupBy('e.id');
 
         const { pagination } = applyQuery(qb, query);

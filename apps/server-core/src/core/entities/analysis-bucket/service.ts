@@ -61,6 +61,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
         );
 
         const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
@@ -109,6 +110,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
 
     async update(id: string, data: Partial<AnalysisBucket>, actor: ActorContext): Promise<AnalysisBucket> {
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
@@ -120,6 +122,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
         // Snapshot the stored row: typeorm's merge() writes into `entity`.
         const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
+
         await evaluateRecordUpdate(actor.permissionEvaluator, {
             name: PermissionName.ANALYSIS_UPDATE,
             current,
@@ -131,6 +134,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
 
     async delete(id: string, actor: ActorContext): Promise<AnalysisBucket> {
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
@@ -139,6 +143,7 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
 
         if (entity.type === AnalysisBucketType.CODE) {
             const analysis = await this.analysisRepository.findOneById(entity.analysisId);
+
             if (analysis?.configurationLocked) {
                 throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
             }

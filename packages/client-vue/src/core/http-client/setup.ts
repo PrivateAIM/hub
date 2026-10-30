@@ -13,5 +13,6 @@ import type { App } from 'vue';
 
 export function setupBaseHTTPClient(app: App, client: IBaseClient) {
     const hook = injectHTTPClientAuthenticationHook(app);
+
     hook.attach(client);
 }

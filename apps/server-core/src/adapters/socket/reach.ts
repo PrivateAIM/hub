@@ -18,6 +18,7 @@ export const SOCKET_NAMESPACE_PATTERN = /^\/resources(?:\/([a-z0-9A-Z-_]+))?$/;
 /** The realm id of a `/resources/<realmId>` namespace; `undefined` for the global one. */
 export function resolveSocketNamespaceId(name: string): string | undefined {
     const matches = name.match(SOCKET_NAMESPACE_PATTERN);
+
     return matches ? matches[1] : undefined;
 }
 
@@ -31,10 +32,11 @@ export function resolveSocketNamespaceId(name: string): string | undefined {
  */
 export async function assertSocketNamespaceReach(data: SocketReachData): Promise<void> {
     const {
-        permissionEvaluator, 
-        identity, 
-        namespaceId, 
+        permissionEvaluator,
+        identity,
+        namespaceId,
     } = data;
+
     if (!permissionEvaluator || !identity) {
         throw new PermissionDeniedError();
     }
@@ -55,6 +57,7 @@ export async function assertSocketNamespaceReach(data: SocketReachData): Promise
  */
 export async function assertSocketSubscribeReach(data: SocketReachData, names: string[]): Promise<void> {
     const { permissionEvaluator, namespaceId } = data;
+
     if (!permissionEvaluator) {
         throw new PermissionDeniedError();
     }
@@ -62,6 +65,7 @@ export async function assertSocketSubscribeReach(data: SocketReachData, names: s
     if (namespaceId) {
         // No row: an attribute policy on the grant stays pending and denies.
         await evaluateRecordOneOf(permissionEvaluator, { name: names, realm: namespaceId });
+
         return;
     }
 

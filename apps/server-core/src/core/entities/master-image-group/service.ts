@@ -68,6 +68,7 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.MASTER_IMAGE_GROUP_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'master-image-group' });
         }

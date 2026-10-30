@@ -33,6 +33,7 @@ export class RegistryRepositoryAdapter implements IRegistryRepository {
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Registry>> {
         const qb = this.repository.createQueryBuilder('registry');
+
         qb.groupBy('registry.id');
 
         const { pagination } = applyQuery(qb, query);

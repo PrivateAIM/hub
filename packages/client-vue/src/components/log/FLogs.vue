@@ -62,8 +62,7 @@ export default defineComponent({
             },
         });
 
-        Promise.resolve()
-            .then(() => resolve(props.query));
+        Promise.try(() => resolve(props.query));
 
         return {
             busy,

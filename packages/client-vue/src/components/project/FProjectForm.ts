@@ -95,7 +95,9 @@ const FProjectForm = defineComponent({
         const toSeverity = (input: Severity) => (input === 'error' || input === 'warning' ? input : undefined);
 
         const initFromProperties = () => {
-            if (!manager.data.value) return;
+            if (!manager.data.value) {
+                return;
+            }
 
             initFormAttributesFromSource(form, manager.data.value);
         };
@@ -131,7 +133,9 @@ const FProjectForm = defineComponent({
         };
 
         const submit = wrapFnWithBusyState(busy, async () => {
-            if ($v.$invalid.value) return;
+            if ($v.$invalid.value) {
+                return;
+            }
 
             // Normalize the slug like the backend (trim + lowercase) so the
             // validated value is what gets submitted and stored.
@@ -140,11 +144,13 @@ const FProjectForm = defineComponent({
             }
 
             const existed = !!manager.data.value;
+
             await manager.createOrUpdate(form);
 
             if (!existed && manager.data.value) {
                 for (let i = 0; i < nodeIds.value.length; i++) {
                     const nodeId = nodeIds.value[i];
+
                     if (!nodeId) {
                         continue;
                     }
@@ -159,6 +165,7 @@ const FProjectForm = defineComponent({
 
         const toggleNodeIds = (id: string) => {
             const index = nodeIds.value.indexOf(id);
+
             if (index === -1) {
                 nodeIds.value.push(id);
             } else {
@@ -275,10 +282,10 @@ const FProjectForm = defineComponent({
                     }),
                 }),
                 h(VCAlert, {
-                    color: 'neutral', 
-                    variant: 'soft', 
-                    size: 'sm', 
-                    class: 'mb-3', 
+                    color: 'neutral',
+                    variant: 'soft',
+                    size: 'sm',
+                    class: 'mb-3',
                 }, () => [
                     'Chose a arbitrary amount of target nodes.',
                 ]),

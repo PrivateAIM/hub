@@ -6,8 +6,8 @@
  */
 
 import type { Readable } from 'node:stream';
-import type { Headers } from 'tar-stream';
 import tar from 'tar-stream';
+import type { DockerContainerPackOptions, DockerContainerPackTarget } from './types.ts';
 
 /**
  * Mode for the directories synthesized below. The incoming stream carries file
@@ -23,6 +23,7 @@ const DIRECTORY_MODE = 0o777;
  */
 function collectDirectories(name: string, seen: Set<string>): string[] {
     const segments = name.split('/');
+
     segments.pop();
 
     const output: string[] = [];
@@ -45,24 +46,6 @@ function collectDirectories(name: string, seen: Set<string>): string[] {
 
     return output;
 }
-
-/**
- * The slice of dockerode's Container this needs. Declared structurally so the
- * pack pipeline can be exercised without a docker daemon.
- */
-export type DockerContainerPackTarget = {
-    putArchive(file: Readable, options: { path: string }): Promise<unknown>;
-};
-
-export type DockerContainerPackOptions = {
-    path: string,
-
-    validateEntry?: (entry: Headers) => void,
-
-    onEntryPackStarted?: (entry: Headers) => void,
-    onEntryPackFinished?: (entry: Headers) => void,
-    onEntryPackFailed?: (error: Error, entry: Headers) => void,
-};
 
 export async function packDockerContainerWithTarStream(
     container: DockerContainerPackTarget,
@@ -167,6 +150,7 @@ export async function packDockerContainerWithTarStream(
                         }
 
                         callback(err);
+
                         return;
                     }
 
@@ -182,10 +166,13 @@ export async function packDockerContainerWithTarStream(
 
             stream.on('data', (chunk) => {
                 const written = entry.write(chunk);
-                if (!written) {
-                    stream.pause();
-                    entry.once('drain', () => stream.resume());
+
+                if (written) {
+                    return;
                 }
+
+                stream.pause();
+                entry.once('drain', () => stream.resume());
             });
 
             stream.on('end', () => {

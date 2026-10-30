@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { createTestApplication } from '../../app';
@@ -29,6 +29,7 @@ describe('src/controllers/core/master-image', () => {
         const { client } = suite;
 
         const { data } = await client.masterImage.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(0);
     });
 });

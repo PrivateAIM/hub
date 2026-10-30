@@ -60,6 +60,7 @@ describe('core/list hydration (server)', () => {
         expect(html).toContain(entity.name);
 
         const snapshot : ListHydrationSnapshot<Analysis> | undefined = store.get(HYDRATION_KEY);
+
         expect(snapshot).toMatchObject({ total: 1, data: [{ id: entity.id }] });
     });
 
@@ -99,10 +100,11 @@ describe('core/list hydration (server)', () => {
         const inert = defineComponent({
             setup(props, setup) {
                 createList({
-                    type: DomainType.ANALYSIS_LOG, 
-                    props: {}, 
-                    setup, 
+                    type: DomainType.ANALYSIS_LOG,
+                    props: {},
+                    setup,
                 });
+
                 return () => h('div');
             },
         });
@@ -138,6 +140,7 @@ describe('core/list hydration (server)', () => {
         // realtime-created entity belongs at the top of a full first page, so
         // without this the handoff silently disables realtime inserts.
         const snapshot : ListHydrationSnapshot<Analysis> | undefined = store.get(HYDRATION_KEY);
+
         expect(snapshot?.query).toMatchObject({ sorts: { updatedAt: 'DESC' } });
     });
 

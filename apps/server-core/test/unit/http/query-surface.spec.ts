@@ -115,6 +115,7 @@ describe('src/adapters/http (query surface probes)', () => {
         for (const key of description.filters?.allowed || []) {
             const path = `${endpoint}${buildQueryString({ filters: { [key]: buildFilterValue(key) } })}`;
             const status = await requestStatus(path);
+
             if (status !== 200) {
                 offenders.push(`filters.${key} -> ${status}`);
             }
@@ -122,6 +123,7 @@ describe('src/adapters/http (query surface probes)', () => {
 
         for (const key of description.sorts?.allowed || []) {
             const status = await requestStatus(`${endpoint}?sort=-${key}`);
+
             if (status !== 200) {
                 offenders.push(`sorts.${key} -> ${status}`);
             }
@@ -162,6 +164,7 @@ describe('src/core/query (decode-level sort/filter pins)', () => {
 
                 const bound = query.sorts.value
                     .some((sort) => sort.name === key && sort.operator === direction);
+
                 if (!bound) {
                     offenders.push(`${schema.name}.sorts.${key}`);
                 }
@@ -214,15 +217,19 @@ describe('src/core/query (decode-level sort/filter pins)', () => {
             const sortable = new Set(description.sorts?.allowed || []);
 
             for (const sequence of description.indexes || []) {
-                if (sequence.length < 2 || sequence.some((key) => !sortable.has(key))) {
+                const allSortable = sequence.every((key) => sortable.has(key));
+
+                if (sequence.length < 2 || !allSortable) {
                     continue;
                 }
 
                 probed++;
+
                 const wire = sequence.map((key, i) => (i === 0 ? key : `-${key}`)).join(',');
                 const query = decodeQuery(`sort=${encodeURIComponent(wire)}`, { schema });
 
                 const bound = query.sorts.value.map((sort) => sort.name);
+
                 if (bound.join(',') !== sequence.join(',')) {
                     offenders.push(`${schema.name}.sorts.${wire}`);
                 }

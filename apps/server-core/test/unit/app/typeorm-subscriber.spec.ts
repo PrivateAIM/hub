@@ -55,6 +55,7 @@ describe('typeorm subscriber: push after initialize', () => {
             path: '/test',
             virtualPath: '/test',
         });
+
         await repo.save(entity);
 
         expect(spy.afterInsertFn).toHaveBeenCalledTimes(1);

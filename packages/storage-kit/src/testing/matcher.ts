@@ -5,12 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { FakeHandler, FakeHandlerMap } from './types';
-
-export type RouteMatch = {
-    handler: FakeHandler,
-    params: Record<string, string>
-};
+import type { FakeHandlerMap, RouteMatch } from './types';
 
 function matchPath(pattern: string, path: string) : Record<string, string> | null {
     const patternSegments = pattern.split('/').filter(Boolean);
@@ -21,6 +16,7 @@ function matchPath(pattern: string, path: string) : Record<string, string> | nul
     }
 
     const params : Record<string, string> = {};
+
     for (const [i, patternSegment] of patternSegments.entries()) {
         if (patternSegment.startsWith(':')) {
             params[patternSegment.slice(1)] = pathSegments[i];
@@ -53,22 +49,22 @@ export function matchRoute(method: string, url: string, handlers: FakeHandlerMap
     let catchAll : RouteMatch | null = null;
 
     const keys = Object.keys(handlers);
+
     for (const key of keys) {
         if (key === '*') {
             catchAll = { handler: handlers[key], params: {} };
+
             continue;
         }
 
         const separatorIndex = key.indexOf(' ');
-        if (separatorIndex === -1) {
-            continue;
-        }
 
-        if (key.slice(0, separatorIndex).toUpperCase() !== method) {
+        if ((separatorIndex === -1) || (key.slice(0, separatorIndex).toUpperCase() !== method)) {
             continue;
         }
 
         const params = matchPath(key.slice(separatorIndex + 1), path);
+
         if (params) {
             return { handler: handlers[key], params };
         }

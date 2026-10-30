@@ -7,12 +7,12 @@
 
 import { randomUUID } from 'node:crypto';
 import {
-    describe, 
-    expect, 
+    describe,
+    expect,
     it,
 } from 'vitest';
 import type { ActorContext } from '@privateaim/server-kit';
-import { FakePermissionEvaluator } from '@privateaim/server-test-kit';
+import { FakePermissionEvaluator } from '@authup/server-test-kit';
 import { MessageService } from '../../../../../src/core/entities/message/service.ts';
 import type { IMessageWakeup } from '../../../../../src/core/services/wakeup/index.ts';
 import { FakeMessageRepository } from './fake-repository.ts';
@@ -58,20 +58,23 @@ describe('core/entities/message/service', () => {
         await service.send({ recipients: [{ type: 'client', id: recipientA }], data: 'm1' }, actorFor(randomUUID(), 'user'));
         await service.send({ recipients: [{ type: 'client', id: recipientB }], data: 'm2' }, actorFor(randomUUID(), 'user'));
 
-        const recipient = actorFor(recipientA, 'client');
+        const recipient = actorFor(recipientA);
 
         const pulled = await service.pull({}, recipient);
+
         expect(pulled.messages).toHaveLength(1);
         expect(pulled.messages[0].data).toBe('m1');
 
         await service.ack({ ids: pulled.messages.map((m) => m.id) }, recipient);
 
         const after = await service.pull({}, recipient);
+
         expect(after.messages).toHaveLength(0);
     });
 
     it('should reject a send without recipients', async () => {
         const service = new MessageService({ repository: new FakeMessageRepository() });
+
         await expect(
             service.send({ recipients: [] }, actorFor(randomUUID(), 'user')),
         ).rejects.toThrow();
@@ -79,6 +82,7 @@ describe('core/entities/message/service', () => {
 
     it('should reject a recipient id that is not a uuid', async () => {
         const service = new MessageService({ repository: new FakeMessageRepository() });
+
         await expect(
             service.send({ recipients: [{ type: 'client', id: 'not-a-uuid' }] }, actorFor(randomUUID(), 'user')),
         ).rejects.toThrow();
@@ -86,8 +90,9 @@ describe('core/entities/message/service', () => {
 
     it('should reject an ack without ids', async () => {
         const service = new MessageService({ repository: new FakeMessageRepository() });
+
         await expect(
-            service.ack({ ids: [] }, actorFor(randomUUID(), 'client')),
+            service.ack({ ids: [] }, actorFor(randomUUID())),
         ).rejects.toThrow();
     });
 
@@ -96,11 +101,14 @@ describe('core/entities/message/service', () => {
         const service = new MessageService({ repository });
 
         const recipientId = randomUUID();
-        const recipient = actorFor(recipientId, 'client');
+        const recipient = actorFor(recipientId);
 
         const pullPromise = service.pull({ wait: 5000 }, recipient);
+
         // let the pull find nothing and park before the message is sent
-        await new Promise((resolve) => { setImmediate(resolve); });
+        await new Promise((resolve) => {
+            setImmediate(resolve);
+        });
 
         await service.send(
             { recipients: [{ type: 'client', id: recipientId }], data: 'delivered' },
@@ -108,6 +116,7 @@ describe('core/entities/message/service', () => {
         );
 
         const result = await pullPromise;
+
         expect(result.messages).toHaveLength(1);
         expect(result.messages[0].data).toBe('delivered');
     });
@@ -116,7 +125,8 @@ describe('core/entities/message/service', () => {
         const service = new MessageService({ repository: new FakeMessageRepository() });
 
         const start = Date.now();
-        const result = await service.pull({ wait: 30 }, actorFor(randomUUID(), 'client'));
+        const result = await service.pull({ wait: 30 }, actorFor(randomUUID()));
+
         expect(result.messages).toHaveLength(0);
         expect(Date.now() - start).toBeGreaterThanOrEqual(20);
     });
@@ -124,7 +134,9 @@ describe('core/entities/message/service', () => {
     it('should still succeed when the wakeup fails (best-effort, already-durable send)', async () => {
         const repository = new FakeMessageRepository();
         const failingWakeup: IMessageWakeup = {
-            notify: async () => { throw new Error('redis down'); },
+            notify: async () => {
+                throw new Error('redis down');
+            },
             wait: async () => {},
             subscribe: () => () => {},
         };

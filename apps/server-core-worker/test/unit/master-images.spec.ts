@@ -29,6 +29,7 @@ describe('components > master-images', () => {
             },
         );
         const finished = replies.find((reply) => reply.key === MasterImageSynchronizerEvent.EXECUTION_FINISHED);
+
         expect(finished).toBeDefined();
 
         expect(finished!.data.images.length).toBeGreaterThan(0);

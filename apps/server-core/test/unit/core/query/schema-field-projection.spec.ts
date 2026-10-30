@@ -39,6 +39,7 @@ describe('core/query default field projection', () => {
             type: 'better-sqlite3',
             database: ':memory:',
         });
+
         dataSource = new DataSource(options);
         await dataSource.initialize();
         await dataSource.synchronize();
@@ -58,10 +59,13 @@ describe('core/query default field projection', () => {
         seed: Partial<T>,
     ) => {
         const repository = dataSource.getRepository(entity);
+
         await repository.save(repository.create(seed as T));
 
         const qb = repository.createQueryBuilder('e');
+
         applyQuery(qb, decodeQuery({}, { schema }));
+
         const row = await qb.getOneOrFail();
 
         for (const [key, value] of Object.entries(seed)) {

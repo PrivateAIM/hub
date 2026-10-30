@@ -16,6 +16,7 @@ export class StorageInsufficientError extends HubError {
     constructor(input?: string | HubErrorOptions) {
         const options: HubErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
         const { message, ...rest } = options;
+
         super({
             ...rest,
             code: ErrorCode.STORAGE_INSUFFICIENT,

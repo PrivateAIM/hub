@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { createTestApplication } from '../../app';
@@ -35,9 +35,11 @@ describe('src/controllers/core/project-node', () => {
         const { client } = suite;
 
         const { data: project } = await client.project.create(createTestProject());
+
         expect(project.id).toBeDefined();
 
         const { data: node } = await client.node.create(createTestNode());
+
         expect(node.id).toBeDefined();
 
         details = (await client.projectNode.create({
@@ -50,6 +52,7 @@ describe('src/controllers/core/project-node', () => {
         const { client } = suite;
 
         const { data } = await client.projectNode.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -57,6 +60,7 @@ describe('src/controllers/core/project-node', () => {
         const { client } = suite;
 
         const { data } = await client.projectNode.getOne(details.id);
+
         expectProperties(details, data);
     });
 
@@ -69,6 +73,7 @@ describe('src/controllers/core/project-node', () => {
         const { data: current } = await client.projectNode.getOne(details.id);
 
         const matching = await client.projectNode.getMany({ filters: { approvalStatus: current.approvalStatus } });
+
         expect(matching.data.map((item) => item.id)).toContain(details.id);
 
         const nonMatching = await client.projectNode.getMany({
@@ -78,6 +83,7 @@ describe('src/controllers/core/project-node', () => {
                     null,
             },
         });
+
         expect(nonMatching.data.map((item) => item.id)).not.toContain(details.id);
     });
 

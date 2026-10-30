@@ -72,6 +72,7 @@ export default defineComponent({
             const appliedOffset = response.meta.offset ?? 0;
 
             const nextOffset = appliedOffset + appliedLimit;
+
             if (appliedLimit > 0 && response.meta.total > nextOffset) {
                 return collect(target, nextOffset);
             }
@@ -106,6 +107,7 @@ export default defineComponent({
 
             try {
                 const next : Log[] = [];
+
                 await collect(next);
                 await preserve(() => {
                     data.value = next;

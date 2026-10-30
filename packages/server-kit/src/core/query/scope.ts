@@ -62,6 +62,7 @@ export async function scopeReadQuery(
             }
 
             const realmAttributeName = options.realmAttributeName ?? 'realmId';
+
             return appendQueryConditions(query, eq(realmAttributeName, actor.realm.id));
         }
     }

@@ -95,9 +95,9 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const masterImageGroupService = new MasterImageGroupService({ repository: masterImageGroupRepository });
     const projectService = new ProjectService({ repository: projectRepository });
     const registryProjectService = new RegistryProjectService({
-        repository: registryProjectRepository, 
-        registryManager, 
-        nodeRepository, 
+        repository: registryProjectRepository,
+        registryManager,
+        nodeRepository,
     });
     const analysisReachService = new AnalysisReachService({
         analysisNodeRepository,
@@ -178,11 +178,13 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     // The analysis-client capability surface manages Authup client-permissions
     // directly, so it is only mounted when an Authup client is available.
     const authupResult = container.tryResolve(AuthupClientInjectionKey);
+
     if (authupResult.success) {
         const analysisClientPermissionService = new AnalysisClientPermissionService({
             store: new AuthupClientPermissionStore(authupResult.data),
             analysisRepository,
         });
+
         controllers.push(new AnalysisClientPermissionController({ service: analysisClientPermissionService }));
 
         const clientCredentialStore = new AuthupClientCredentialStore(authupResult.data);
@@ -193,12 +195,14 @@ export function createControllers(container: IContainer): Record<string, any>[] 
             analysisNodeRepository,
             credentialStore: clientCredentialStore,
         });
+
         controllers.push(new AnalysisClientCredentialController({ service: analysisClientCredentialService }));
 
         const nodeClientCredentialService = new NodeClientCredentialService({
             repository: nodeRepository,
             credentialStore: clientCredentialStore,
         });
+
         controllers.push(new NodeClientCredentialController({ service: nodeClientCredentialService }));
     }
 

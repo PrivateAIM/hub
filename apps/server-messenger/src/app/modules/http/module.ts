@@ -32,7 +32,7 @@ import {
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { registerControllers } from '../../../adapters/socket/register.ts';
 import { createControllers } from './controller.ts';
-import type { HTTPServer } from './constants.ts';
+import type { HTTPServer } from './types.ts';
 import { HTTPInjectionKey } from './constants.ts';
 
 export class HTTPModule implements IModule {
@@ -159,17 +159,21 @@ export class HTTPModule implements IModule {
             container.register(HTTPInjectionKey.SocketServer, { useValue: socketServer });
         } catch (e) {
             await server.close().catch(() => undefined);
+
             throw e;
         }
     }
 
     async teardown(container: IContainer): Promise<void> {
         const socketResult = container.tryResolve(HTTPInjectionKey.SocketServer);
+
         if (socketResult.success) {
             await socketResult.data.close();
         }
 
-        if (!this.instance) return;
+        if (!this.instance) {
+            return;
+        }
 
         container.unregister(HTTPInjectionKey.Server);
 

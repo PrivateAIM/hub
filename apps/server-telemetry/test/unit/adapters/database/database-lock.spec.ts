@@ -24,6 +24,7 @@ class RecordingDataSource extends DataSource {
 
     override createQueryRunner(mode?: ReplicationMode) : QueryRunner {
         this.queryRunners++;
+
         return super.createQueryRunner(mode);
     }
 }
@@ -65,12 +66,14 @@ describe('withDataSourceLock', () => {
 
         const run = (id: string) => withDataSourceLock(dataSource, name, async () => {
             events.push(`${id}:start`);
+
             // a real round-trip on another pooled connection, as a migration
             // makes. Not on sqlite: `dataSource.query()` creates a runner of
             // its own, which the no-runner assertion below must not count.
             if (lockable) {
                 await dataSource.query('SELECT 1');
             }
+
             await wait(200);
             events.push(`${id}:end`);
         });
@@ -81,12 +84,14 @@ describe('withDataSourceLock', () => {
             // no lock and no runner: one database file per container
             expect(events).toEqual(['a:start', 'b:start', 'a:end', 'b:end']);
             expect(dataSource.queryRunners).toEqual(0);
+
             return;
         }
 
         // whichever started first ends before the other starts
         const first = events[0].split(':')[0];
         const second = first === 'a' ? 'b' : 'a';
+
         expect(events).toEqual([`${first}:start`, `${first}:end`, `${second}:start`, `${second}:end`]);
     });
 

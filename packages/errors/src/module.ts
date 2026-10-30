@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { 
-    BaseError, 
-    INSTANCEOF_PROPERTY, 
-    markInstanceof, 
-    serializeInstanceofChain, 
+import {
+    BaseError,
+    INSTANCEOF_PROPERTY,
+    markInstanceof,
+    serializeInstanceofChain,
 } from '@ebec/core';
 import type { HubErrorInput } from './types.ts';
 
@@ -24,14 +24,16 @@ export class HubError extends BaseError {
         super(input);
         markInstanceof(this, HUB_ERROR_INSTANCE);
 
-        if (input && typeof input !== 'string') {
-            if (input.data) {
-                this.data = input.data;
-            }
+        if (!input || typeof input === 'string') {
+            return;
+        }
 
-            if (typeof input.status === 'number') {
-                this.status = input.status;
-            }
+        if (input.data) {
+            this.data = input.data;
+        }
+
+        if (typeof input.status === 'number') {
+            this.status = input.status;
         }
     }
 

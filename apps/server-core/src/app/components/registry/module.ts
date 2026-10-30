@@ -8,7 +8,7 @@
 import { Component } from 'hubwire';
 import type { Logger } from '@privateaim/server-kit';
 import type { Client as AuthupClient } from '@authup/core-http-kit';
-import { RegistryCommand } from './constants.ts';
+import { RegistryCommand } from '../../../core/domains/index.ts';
 import {
     RegistryCleanupHandler,
     RegistryHookHandler,
@@ -17,13 +17,13 @@ import {
     RegistryProjectUnlinkHandler,
     RegistrySetupHandler,
 } from './handlers/index.ts';
-import type { RegistryEventMap } from './type.ts';
+import type { RegistryEventMap } from './types.ts';
 
 export class RegistryComponent extends Component<RegistryEventMap> {
     constructor(ctx: {
-        publicURL: string; 
-        authupClient?: AuthupClient; 
-        logger?: Logger 
+        publicURL: string;
+        authupClient?: AuthupClient;
+        logger?: Logger
     }) {
         super();
 

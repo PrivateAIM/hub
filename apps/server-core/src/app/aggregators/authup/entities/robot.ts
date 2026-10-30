@@ -12,9 +12,7 @@ import type {
 } from '@authup/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import type { IRegistryDispatcher } from '../../../../core/harbor/types.ts';
-import {
-    RegistryCommand,
-} from '../../../components/index.ts';
+import { RegistryCommand } from '../../../../core/domains/index.ts';
 import type { AuthupAggregatorRepositories } from '../types.ts';
 
 // Since @authup v1.0.0-beta.53 robots are unified into clients — the
@@ -35,6 +33,7 @@ export async function handleAuthupRobotEvent(
     ) {
         return;
     }
+
     if (context.data.name !== ServiceID.REGISTRY) {
         return;
     }

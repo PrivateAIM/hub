@@ -18,7 +18,9 @@ import { mountClientVueComponent } from '../../utils';
  */
 const NODE_ID = 'node-1';
 
-const flush = () => new Promise((resolve) => { setTimeout(resolve, 0); });
+const flush = () => new Promise((resolve) => {
+    setTimeout(resolve, 0);
+});
 
 function mountConnection(registryId: string | null) {
     return mountClientVueComponent(
@@ -64,6 +66,7 @@ describe('FNodeRegistryConnection', () => {
         // `attributes('disabled')` is '' — falsy — on a disabled button, so the
         // DOM property is what actually separates them.
         const selectable = wrapper.findAll('button').filter((button) => !(button.element as HTMLButtonElement).disabled);
+
         await selectable[0].trigger('click');
         await flush();
 
@@ -98,6 +101,7 @@ describe('FNodeRegistryConnection', () => {
         // `attributes('disabled')` is '' — falsy — on a disabled button, so the
         // DOM property is what actually separates them.
         const selectable = wrapper.findAll('button').filter((button) => !(button.element as HTMLButtonElement).disabled);
+
         await selectable[0].trigger('click');
         await flush();
 

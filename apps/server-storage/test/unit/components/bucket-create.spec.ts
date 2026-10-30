@@ -31,6 +31,7 @@ describe('components/bucket/create', () => {
         });
 
         const failed = events.find(([key]) => key === BucketEvent.CREATION_FAILED);
+
         expect(failed?.[1]).toMatchObject({
             refType: 'analysis',
             refId,

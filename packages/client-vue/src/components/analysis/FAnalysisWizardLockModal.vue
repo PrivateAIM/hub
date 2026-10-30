@@ -57,6 +57,7 @@ export default defineComponent({
         const execute = wrapFnWithBusyState(isBusy, async () => {
             try {
                 let entity: Analysis;
+
                 if (lockIt.value) {
                     const { data } = await apiClient
                         .analysis.runCommand(props.entity.id, AnalysisCommand.CONFIGURATION_LOCK);

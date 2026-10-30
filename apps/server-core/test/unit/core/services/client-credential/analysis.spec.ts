@@ -29,9 +29,9 @@ function nodeClientActor(clientId: string, realmId = NODE_REALM_ID): ActorContex
     return createPermissionActor({
         realm: { id: realmId, name: 'node-realm' },
         identity: {
-            type: 'client', 
-            id: clientId, 
-            realmId, 
+            type: 'client',
+            id: clientId,
+            realmId,
         },
     });
 }
@@ -59,12 +59,17 @@ function buildService(opts: {
     secret?: string | null;
 }) {
     const repository = new FakeAnalysisRepository();
-    if (opts.analysis) repository.seed(repository.create(opts.analysis));
+
+    if (opts.analysis) {
+        repository.seed(repository.create(opts.analysis));
+    }
 
     const nodeRepository = new FakeNodeRepository();
+
     nodeRepository.seed((opts.nodes || []).map((node) => nodeRepository.create(node)));
 
     const analysisNodeRepository = new FakeAnalysisNodeRepository();
+
     analysisNodeRepository.seed((opts.analysisNodes || []).map((entity) => analysisNodeRepository.create(entity)));
 
     const reader = new FakeClientCredentialStore(opts.secret);
@@ -74,6 +79,7 @@ function buildService(opts: {
         analysisNodeRepository,
         credentialStore: reader,
     });
+
     return { service, reader };
 }
 
@@ -116,9 +122,9 @@ describe('AnalysisClientCredentialService', () => {
         const { service } = buildService({
             analysis: baseAnalysis(),
             nodes: [{
-                id: NODE_ID, 
-                clientId: 'node-client-1', 
-                realmId: NODE_REALM_ID, 
+                id: NODE_ID,
+                clientId: 'node-client-1',
+                realmId: NODE_REALM_ID,
             }],
             analysisNodes: [{
                 analysisId: ANALYSIS_ID,
@@ -128,6 +134,7 @@ describe('AnalysisClientCredentialService', () => {
         });
 
         const credentials = await service.getCredentials(ANALYSIS_ID, nodeClientActor('node-client-1'));
+
         expect(credentials.secret).toBe('the-secret');
     });
 
@@ -137,9 +144,9 @@ describe('AnalysisClientCredentialService', () => {
         const { service, reader } = buildService({
             analysis: baseAnalysis(),
             nodes: [{
-                id: NODE_ID, 
-                clientId: 'node-client-1', 
-                realmId: NODE_REALM_ID, 
+                id: NODE_ID,
+                clientId: 'node-client-1',
+                realmId: NODE_REALM_ID,
             }],
             analysisNodes: [{
                 analysisId: ANALYSIS_ID,
@@ -158,9 +165,9 @@ describe('AnalysisClientCredentialService', () => {
         const { service } = buildService({
             analysis: baseAnalysis(),
             nodes: [{
-                id: NODE_ID, 
-                clientId: 'node-client-1', 
-                realmId: NODE_REALM_ID, 
+                id: NODE_ID,
+                clientId: 'node-client-1',
+                realmId: NODE_REALM_ID,
             }],
             analysisNodes: [{
                 analysisId: ANALYSIS_ID,
@@ -208,11 +215,13 @@ describe('AnalysisClientCredentialService', () => {
         const actor = createScopedActor({ realmId, realmScope: 'own' });
 
         const credentials = await service.getCredentials(ANALYSIS_ID, actor);
+
         expect(credentials.secret).toBe('the-secret');
 
         // fully evaluated against the analysis, so attribute policies on the
         // grant apply to the secret read as they do to setCredentials
         const [call] = actor.permissionEvaluator.evaluateCalls;
+
         expect(call?.name).toBe(PermissionName.ANALYSIS_UPDATE);
         expect(call?.data?.get(BuiltInPolicyType.REALM_MATCH)).toBe(realmId);
         expect(call?.data?.get(BuiltInPolicyType.ATTRIBUTES)).toMatchObject({ id: ANALYSIS_ID });
@@ -268,9 +277,9 @@ describe('AnalysisClientCredentialService', () => {
             const { service, reader } = buildService({
                 analysis: baseAnalysis(),
                 nodes: [{
-                    id: NODE_ID, 
-                    clientId: 'node-client-1', 
-                    realmId: NODE_REALM_ID, 
+                    id: NODE_ID,
+                    clientId: 'node-client-1',
+                    realmId: NODE_REALM_ID,
                 }],
                 analysisNodes: [{
                     analysisId: ANALYSIS_ID,

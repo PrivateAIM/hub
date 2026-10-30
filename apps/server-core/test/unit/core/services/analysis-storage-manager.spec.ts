@@ -57,21 +57,25 @@ describe('AnalysisStorageManager', () => {
     describe('check', () => {
         it('should create buckets for all types when none exist', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             await storageManager.check(analysis);
 
             const bucketTypes = Object.values(AnalysisBucketType);
+
             expect(dispatcher.getCallsFor('dispatchCreate')).toHaveLength(bucketTypes.length);
         });
 
         it('should create bucket with correct name and realmId', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             await storageManager.check(analysis, { type: AnalysisBucketType.CODE });
 
             const createCalls = dispatcher.getCallsFor('dispatchCreate');
+
             expect(createCalls).toHaveLength(1);
             expect(createCalls[0].data).toEqual({
                 name: buildAnalysisBucketName(AnalysisBucketType.CODE, 'analysis-1'),
@@ -83,6 +87,7 @@ describe('AnalysisStorageManager', () => {
 
         it('should skip existing buckets', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
                 analysisId: 'analysis-1',
@@ -96,6 +101,7 @@ describe('AnalysisStorageManager', () => {
 
         it('should only create missing buckets when some exist', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
                 analysisId: 'analysis-1',
@@ -110,9 +116,11 @@ describe('AnalysisStorageManager', () => {
 
         it('should resolve entity by string ID', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             const result = await storageManager.check('analysis-1', { type: AnalysisBucketType.CODE });
+
             expect(result.id).toBe('analysis-1');
             expect(dispatcher.getCallCount()).toBe(1);
         });
@@ -125,6 +133,7 @@ describe('AnalysisStorageManager', () => {
     describe('remove', () => {
         it('should remove existing buckets', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
                 id: 'bucket-code',
@@ -136,12 +145,14 @@ describe('AnalysisStorageManager', () => {
             await storageManager.remove(analysis, { type: AnalysisBucketType.CODE });
 
             const deleteCalls = dispatcher.getCallsFor('dispatchDelete');
+
             expect(deleteCalls).toHaveLength(1);
             expect(deleteCalls[0].data).toEqual({ id: 'ext-code' });
         });
 
         it('should skip non-existing buckets', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             await storageManager.remove(analysis, { type: AnalysisBucketType.CODE });
@@ -151,6 +162,7 @@ describe('AnalysisStorageManager', () => {
 
         it('should remove all bucket types when no type specified', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
             bucketRepository.seed([
                 createTestBucket({
@@ -180,9 +192,11 @@ describe('AnalysisStorageManager', () => {
 
         it('should resolve entity by string ID', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             const result = await storageManager.remove('analysis-1');
+
             expect(result.id).toBe('analysis-1');
         });
 
@@ -193,6 +207,7 @@ describe('AnalysisStorageManager', () => {
     describe('clear', () => {
         it('should clear the requested bucket', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
             bucketRepository.seed(createTestBucket({
                 analysisId: 'analysis-1',
@@ -203,12 +218,14 @@ describe('AnalysisStorageManager', () => {
             await storageManager.clear(analysis, { type: AnalysisBucketType.TEMP });
 
             const clearCalls = dispatcher.getCallsFor('dispatchClear');
+
             expect(clearCalls).toHaveLength(1);
             expect(clearCalls[0].data).toEqual({ id: 'ext-temp' });
         });
 
         it('should skip non-existing buckets', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
 
             await storageManager.clear(analysis, { type: AnalysisBucketType.TEMP });
@@ -218,6 +235,7 @@ describe('AnalysisStorageManager', () => {
 
         it('should only clear the requested type', async () => {
             const analysis = createFullAnalysis();
+
             repository.seed(analysis);
             bucketRepository.seed([
                 createTestBucket({

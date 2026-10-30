@@ -6,10 +6,7 @@
  */
 
 import { Client, HookName, isClientError } from 'hapic';
-import {
-    EventAPI,
-    LogAPI,
-} from '../../domains';
+import { EventAPI, LogAPI } from '../../domains';
 import type { ClientOptions, ITelemetryClient } from './types';
 
 export class APIClient extends Client implements ITelemetryClient {

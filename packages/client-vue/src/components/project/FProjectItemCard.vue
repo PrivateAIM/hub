@@ -17,9 +17,9 @@ import { VCLink } from '@vuecs/link';
 import { VCTimeago } from '@vuecs/timeago';
 import type { PropType, Ref, SlotsType } from 'vue';
 import {
-    computed, 
-    defineComponent, 
-    onMounted, 
+    computed,
+    defineComponent,
+    onMounted,
     ref,
 } from 'vue';
 import type { EntityListSlotName } from '../../core';
@@ -99,17 +99,20 @@ export default defineComponent({
 
         const fleet = computed(() => {
             const counts = {
-                approved: 0, 
-                pending: 0, 
-                rejected: 0, 
+                approved: 0,
+                pending: 0,
+                rejected: 0,
             };
+
             for (const projectNode of projectNodes.value) {
                 switch (projectNode.approvalStatus) {
                     case ProjectNodeApprovalStatus.APPROVED:
                         counts.approved++;
+
                         break;
                     case ProjectNodeApprovalStatus.REJECTED:
                         counts.rejected++;
+
                         break;
                     default:
                         counts.pending++;

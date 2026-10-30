@@ -6,9 +6,15 @@
  */
 
 import type { ICondition } from '@rapiq/core';
-import type { Analysis, Node } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucketType, Node } from '@privateaim/core-kit';
 import type { ActorContext, IEntityRepository } from '@privateaim/server-kit';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
+
+export type AnalysisBucketTypeReach = {
+    types: `${AnalysisBucketType}`[];
+    /** `undefined`: every analysis; `null`: none — the types are excluded. */
+    reach: ICondition | undefined | null;
+};
 
 export type AnalysisReachServiceContext = {
     analysisNodeRepository: IAnalysisNodeRepository;

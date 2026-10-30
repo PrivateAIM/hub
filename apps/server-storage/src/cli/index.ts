@@ -19,8 +19,7 @@ dotenv.config({
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-Promise.resolve()
-    .then(() => createCLIEntryPointCommand())
+Promise.try(() => createCLIEntryPointCommand())
     .then((command) => runMain(command))
     .catch((err) => {
         console.error(err);

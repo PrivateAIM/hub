@@ -15,6 +15,7 @@ export const BAD_REQUEST_ERROR_INSTANCE = Symbol.for('@privateaim/errors/BadRequ
 export class BadRequestError extends HubError {
     constructor(input?: string | HubErrorOptions) {
         const options: HubErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
+
         super({
             ...options,
             code: ErrorCode.BAD_REQUEST,

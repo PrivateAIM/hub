@@ -61,7 +61,9 @@ describe('startComponentsInBackground', () => {
             new FakeComponent(new Error('ACCESS_REFUSED')),
         ], logger);
 
-        await new Promise((resolve) => { setImmediate(resolve); });
+        await new Promise((resolve) => {
+            setImmediate(resolve);
+        });
 
         expect(logger.entries).toHaveLength(1);
         expect(logger.entries[0].message).toContain('ACCESS_REFUSED');

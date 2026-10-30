@@ -14,6 +14,7 @@ export function formatByteSize(input: number) : string {
 
     let value = input;
     let unit = 0;
+
     while (value >= 1024 && unit < UNITS.length - 1) {
         value /= 1024;
         unit++;

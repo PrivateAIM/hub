@@ -34,6 +34,7 @@ export class MasterImageRepositoryAdapter implements IMasterImageRepository {
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<MasterImage>> {
         const qb = this.repository.createQueryBuilder('image');
+
         qb.groupBy('image.id');
 
         const { pagination } = applyQuery(qb, query);

@@ -19,9 +19,9 @@ import {
     scopeReadQuery,
 } from '@privateaim/server-kit';
 import {
-    evaluateRecord, 
-    evaluateRecordUpdate, 
-    isPermissionError, 
+    evaluateRecord,
+    evaluateRecordUpdate,
+    isPermissionError,
     reachesRecord,
 } from '@authup/access';
 import type { IQuery } from '@rapiq/core';
@@ -81,7 +81,9 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         const scoped = await this.scopeRead(decodeQuery(query, { schema: registryProjectSchema }), actor);
         const result = await this.repository.findMany(scoped);
 
-        if (result.data.some((e) => this.hasSecretField(e))) {
+        const hasSecrets = result.data.some((e) => this.hasSecretField(e));
+
+        if (hasSecrets) {
             await this.checkSecretFieldAccess(result.data, actor);
         }
 
@@ -95,6 +97,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         );
 
         const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
@@ -122,6 +125,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             }
 
             const ownProjectId = await this.findOwnNodeProjectId(actor);
+
             if (!ownProjectId) {
                 throw e;
             }
@@ -141,6 +145,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         }
 
         const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id, realmId: actor.identity.realmId });
+
         return node?.registryProjectId ?? undefined;
     }
 
@@ -156,6 +161,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
         // Without REGISTRY_MANAGE, a node's client may only see its own project's secret.
         const ids = new Set(entities.map((e) => e.id));
+
         if (ids.size === 1 && ids.has(await this.findOwnNodeProjectId(actor))) {
             return;
         }
@@ -180,6 +186,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             const realmId = typeof entity.realmId === 'undefined' ?
                 (await this.repository.findOneById(entity.id))?.realmId :
                 entity.realmId;
+
             if (typeof realmId === 'undefined') {
                 return false;
             }
@@ -189,6 +196,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
                 realm: realmId,
                 data: { attributes: { ...entity, realmId } },
             });
+
             if (!reached) {
                 return false;
             }
@@ -229,6 +237,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
@@ -238,6 +247,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         // Snapshot the stored row: typeorm's merge() writes into `entity`.
         const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
+
         await evaluateRecordUpdate(actor.permissionEvaluator, {
             name: PermissionName.REGISTRY_PROJECT_MANAGE,
             current,
@@ -266,6 +276,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_PROJECT_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }

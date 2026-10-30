@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { createTestApplication } from '../../app';
@@ -17,7 +17,7 @@ import type { AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import { randomUUID } from 'node:crypto';
 import {
-    
+
     expectProperties,
     removeDateProperties,
 } from '../../utils';
@@ -42,9 +42,11 @@ describe('controllers/analysis-file', () => {
         const { client } = suite;
 
         const { data: project } = await client.project.create(createTestProject());
+
         expect(project.id).toBeDefined();
 
         const { data: analysis } = await client.analysis.create({ projectId: project.id });
+
         expect(analysis.id).toBeDefined();
 
         const { data: analysisBucket } = await client.analysisBucket.create({
@@ -60,6 +62,7 @@ describe('controllers/analysis-file', () => {
         const { client } = suite;
 
         const { data } = await client.analysisBucket.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -67,6 +70,7 @@ describe('controllers/analysis-file', () => {
         const { client } = suite;
 
         const { data } = await client.analysisBucket.getOne(details.id);
+
         expectProperties(details, data);
     });
 

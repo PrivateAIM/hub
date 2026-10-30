@@ -52,7 +52,12 @@ export class MinioStorageAdapter implements IStorageAdapter {
         return new Promise((resolve, reject) => {
             const objects: string[] = [];
             const stream = this.client.listObjects(bucket, prefix || '', true);
-            stream.on('data', (obj) => { if (obj.name) objects.push(obj.name); });
+
+            stream.on('data', (obj) => {
+                if (obj.name) {
+                    objects.push(obj.name);
+                }
+            });
             stream.on('end', () => resolve(objects));
             stream.on('error', (err) => reject(err));
         });

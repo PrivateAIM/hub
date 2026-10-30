@@ -25,10 +25,10 @@ export type LogStoreDeleteOptions = {
     end?: number,
 };
 
-export interface LogStore {
+export type LogStore = {
     write(message: LogInput) : Promise<Log>;
 
     query(options?: LogStoreQueryOptions) : Promise<[Log[], number]>;
 
     delete(options?: LogStoreDeleteOptions) : Promise<void>;
-}
+};

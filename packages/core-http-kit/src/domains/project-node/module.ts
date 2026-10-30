@@ -6,11 +6,11 @@
  */
 
 import type { EntityQueryInput } from '../../utils';
-import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
 import type { ProjectNode } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { IProjectNodeAPI, ProjectNodeCreatePayload, ProjectNodeUpdatePayload  } from './types';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { IProjectNodeAPI, ProjectNodeCreatePayload, ProjectNodeUpdatePayload } from './types';
 
 export class ProjectNodeAPI extends BaseAPI implements IProjectNodeAPI {
     async getMany(data?: EntityQueryInput<ProjectNode>): Promise<EntityCollectionResponse<ProjectNode>> {

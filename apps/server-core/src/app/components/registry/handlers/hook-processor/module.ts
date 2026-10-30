@@ -7,8 +7,8 @@
 
 import type { Logger } from '@privateaim/server-kit';
 import type { ComponentHandler, ObjectLiteral } from 'hubwire';
-import type { RegistryCommand } from '../../constants.ts';
-import type { RegistryEventMap } from '../../type.ts';
+import type { RegistryCommand } from '../../../../../core/domains/index.ts';
+import type { RegistryEventMap } from '../../types.ts';
 import { RegistryHookValidator } from './validator.ts';
 
 export class RegistryHookHandler implements ComponentHandler<

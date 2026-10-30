@@ -18,6 +18,7 @@ describe('adapters/socket/error', () => {
     it('should answer an authup or hub permission denial with a 403 permission denied error', () => {
         for (const denial of [PermissionError.evaluationFailed('foo'), new PermissionDeniedError()]) {
             const error = buildSocketSubscribeError(denial);
+
             expect(error).toBeInstanceOf(PermissionDeniedError);
             expect(httpStatusFromCode(error.code)).toBe(403);
         }
@@ -25,6 +26,7 @@ describe('adapters/socket/error', () => {
 
     it('should answer any other failure with an internal error that hides its details', () => {
         const error = buildSocketSubscribeError(new Error('catalog unreachable: secret detail'));
+
         expect(JSON.parse(JSON.stringify(error))).toMatchObject({ code: ErrorCode.INTERNAL_ERROR });
         expect(JSON.stringify(error)).not.toContain('secret detail');
     });

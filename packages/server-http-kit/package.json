@@ -67,5 +67,8 @@
         "build": "npm run build:js && npm run build:types",
         "start": "node dist/index.mjs",
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
+    },
+    "engines": {
+        "node": ">=24.0.0"
     }
 }

@@ -15,6 +15,7 @@ import { FakeMasterImageRepository } from '../entities/master-image/fake-reposit
 describe('MasterImageSynchronizerService', () => {
     it('should update an image without reverting a build transition committed meanwhile', async () => {
         const imageRepository = new FakeMasterImageRepository();
+
         imageRepository.seed({
             id: 'image-1',
             name: 'old',
@@ -34,6 +35,7 @@ describe('MasterImageSynchronizerService', () => {
         // the build finishes while the sync still holds its earlier read
         imageRepository.afterUnlockedRead = async () => {
             const [row] = imageRepository.getAll();
+
             await imageRepository.save({ ...row, buildStatus: ProcessStatus.EXECUTED });
         };
 

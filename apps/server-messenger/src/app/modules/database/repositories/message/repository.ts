@@ -12,7 +12,6 @@ import { MessageEntity } from '../../../../../adapters/database/entities/message
 import { MESSAGE_SWEEP_BATCH_SIZE } from '../../../../../core/entities/message/constants.ts';
 import type {
     IMessageRepository,
-    MessageDeleteExpiredOptions,
     MessagePersistInput,
 } from '../../../../../core/entities/message/types.ts';
 
@@ -66,7 +65,7 @@ export class MessageRepositoryAdapter implements IMessageRepository {
             .execute();
     }
 
-    async deleteExpired(now: Date, options: MessageDeleteExpiredOptions = {}): Promise<number> {
+    async deleteExpired(now: Date, options: { batchSize?: number } = {}): Promise<number> {
         // A non-positive or non-integral size must never reach `take`: typeorm
         // ignores a falsy one, which would silently restore the single
         // unbounded DELETE this batching exists to prevent, and the rest reach
@@ -108,11 +107,7 @@ export class MessageRepositoryAdapter implements IMessageRepository {
 
             // Another replica's sweep already owns these rows. Stop rather than
             // re-selecting them; the next tick picks up whatever is left.
-            if (result.affected === 0) {
-                break;
-            }
-
-            if (rows.length < batchSize) {
+            if (result.affected === 0 || rows.length < batchSize) {
                 break;
             }
         }

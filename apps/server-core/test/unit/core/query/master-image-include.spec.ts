@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { DataSource } from 'typeorm';
@@ -32,6 +32,7 @@ describe('core/query analysis include=masterImage', () => {
             type: 'better-sqlite3',
             database: ':memory:',
         });
+
         dataSource = new DataSource(options);
         await dataSource.initialize();
         await dataSource.synchronize();
@@ -46,6 +47,7 @@ describe('core/query analysis include=masterImage', () => {
         }));
 
         const anRepo = dataSource.getRepository(AnalysisEntity);
+
         await anRepo.save(anRepo.create(createTestAnalysis({
             masterImageId: mi.id,
             realmId: 'realm-1',

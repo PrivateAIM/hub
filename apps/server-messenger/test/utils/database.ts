@@ -27,6 +27,7 @@ export class TestDatabase {
         const optionsBuilder = new DataSourceOptionsBuilder();
 
         let options : DataSourceOptions;
+
         try {
             options = optionsBuilder.buildWithEnv();
         } catch {
@@ -37,6 +38,7 @@ export class TestDatabase {
         }
 
         this.options = options;
+
         return this.options;
     }
 
@@ -48,14 +50,17 @@ export class TestDatabase {
         const options = await this.getOptions();
 
         const dataSource = new DataSource(options);
+
         await dataSource.initialize();
 
         this.instance = dataSource;
+
         return this.instance;
     }
 
     async setup() {
         const dataSource = await this.getDataSource();
+
         await synchronizeDatabaseSchema(dataSource);
 
         await dataSource.synchronize();
@@ -66,6 +71,7 @@ export class TestDatabase {
 
     async up() {
         const dataSource = await this.getDataSource();
+
         await dataSource.synchronize();
 
         setDataSource(dataSource);
@@ -73,6 +79,7 @@ export class TestDatabase {
 
     async down() {
         const dataSource = await this.getDataSource();
+
         await dataSource.destroy();
 
         unsetDataSource();

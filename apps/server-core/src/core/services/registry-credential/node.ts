@@ -44,6 +44,7 @@ export class NodeRegistryCredentialService extends AbstractEntityService impleme
 
     async getCredentials(nodeId: string, actor: ActorContext): Promise<RegistryCredentials> {
         const node = await this.repository.findOneById(nodeId);
+
         if (!node) {
             throw new EntityNotFoundError({ entity: 'node' });
         }
@@ -59,11 +60,13 @@ export class NodeRegistryCredentialService extends AbstractEntityService impleme
         }
 
         const registryProject = await this.registryProjectRepository.findOneWithSecret(node.registryProjectId);
+
         if (!registryProject) {
             throw new BadRequestError('The registry project of the node could not be found.');
         }
 
         const registry = await this.registryRepository.findOneById(registryProject.registryId);
+
         if (!registry) {
             throw new BadRequestError('The registry of the node could not be found.');
         }

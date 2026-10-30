@@ -59,6 +59,7 @@ describe('check verdict snapshot', () => {
         }));
 
         const repository = dataSource.getRepository(AnalysisEntity);
+
         return repository.save(repository.create({
             name: faker.string.alpha({ length: 16, casing: 'lower' }),
             realmId: project.realmId,
@@ -89,6 +90,7 @@ describe('check verdict snapshot', () => {
             await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildStatus).toBe(ProcessStatus.STARTING);
         });
 
@@ -104,6 +106,7 @@ describe('check verdict snapshot', () => {
             await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
         });
     });
@@ -124,6 +127,7 @@ describe('check verdict snapshot', () => {
             await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionStatus).toBe(ProcessStatus.STARTING);
         });
 
@@ -142,6 +146,7 @@ describe('check verdict snapshot', () => {
             await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionStatus).toBe(ProcessStatus.FAILED);
         });
     });

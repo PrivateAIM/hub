@@ -11,7 +11,7 @@ import type { MasterImage, MasterImageCommandArgument } from '../master-image';
 import type { Project } from '../project';
 import type { Registry } from '../registry';
 
-export interface Analysis {
+export type Analysis = {
     id: string;
 
     /**
@@ -153,4 +153,4 @@ export interface Analysis {
     masterImageId: MasterImage['id'] | null;
 
     masterImage: MasterImage;
-}
+};

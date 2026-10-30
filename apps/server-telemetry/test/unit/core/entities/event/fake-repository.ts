@@ -25,6 +25,7 @@ export class FakeEventRepository extends FakeEntityRepository<Event> implements 
         this.deleteExpiredCalls.push({ now, options });
 
         const before = this.rows.length;
+
         this.rows = this.rows.filter(
             (row) => !(row.expiring && row.expiresAt !== null && row.expiresAt < now),
         );

@@ -35,6 +35,7 @@ export class ProjectRepositoryAdapter implements IProjectRepository {
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Project>> {
         const qb = this.repository.createQueryBuilder('project');
+
         qb.groupBy('project.id');
 
         const { pagination } = applyQuery(qb, query);
@@ -100,6 +101,7 @@ export class ProjectRepositoryAdapter implements IProjectRepository {
             entityExisting: existing,
             dataSource: this.dataSource,
         });
+
         if (!isUnique) {
             throw new DatabaseConflictError();
         }

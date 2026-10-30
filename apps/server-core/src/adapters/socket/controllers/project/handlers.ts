@@ -26,7 +26,9 @@ import type {
 } from '../../types.ts';
 
 export function registerProjectSocketHandlers(socket: Socket) {
-    if (!isSocketAuthenticated(socket)) return;
+    if (!isSocketAuthenticated(socket)) {
+        return;
+    }
 
     socket.on(
         buildDomainEventFullName(DomainType.PROJECT, DomainEventSubscriptionName.SUBSCRIBE),

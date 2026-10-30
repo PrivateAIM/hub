@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry } from './entity';
+import type { Registry } from './types';
 
 export function buildRegistryClientConnectionStringFromRegistry(entity: Registry) {
     // todo: support other registries beside harbor and v2.0
 
     const url = `https://${entity.host}/api/v2.0/`;
+
     return `${entity.accountName}:${entity.accountSecret}@${url}`;
 }

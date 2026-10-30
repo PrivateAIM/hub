@@ -88,6 +88,7 @@ function createHandler(coreClient: ICoreClient, docker: FakeDockerClient) {
 
 function run(coreClient: ICoreClient, docker: FakeDockerClient, attempt = 1) {
     const context = new FakeComponentHandlerContext(AnalysisDistributorCommand.CHECK);
+
     context.metadata.delivery = { attempt, maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS };
 
     return createHandler(coreClient, docker)
@@ -115,11 +116,13 @@ describe('AnalysisDistributorCheckHandler', () => {
     it('should request the registry secret explicitly and pass it to docker', async () => {
         const coreClient = createCoreClient();
         const docker = new FakeDockerClient();
+
         await run(coreClient, docker);
 
         // `accountSecret` is `select: false` server-side, so the worker has to
         // opt in via `fields=+accountSecret`.
         const registryRequest = coreClient.requests.find((request) => request.url.includes('/registries/'));
+
         expect(decodeURIComponent(registryRequest.url)).toContain('accountSecret');
 
         expect(docker.calls[0].authconfig).toMatchObject({ username: 'robot', password: 'secret' });

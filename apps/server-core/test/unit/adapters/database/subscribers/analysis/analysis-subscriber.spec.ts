@@ -32,6 +32,7 @@ class FakeAnalysisClientService {
     async assign(entity: Record<string, any>): Promise<Client> {
         this.assignCalls.push({ entity });
         entity.clientId = this.nextClientId;
+
         return { id: this.nextClientId } as Client;
     }
 
@@ -67,6 +68,7 @@ function createMockRemoveEvent(overrides: Record<string, any> = {}) {
 
 function createMockInsertEvent(overrides: Record<string, any> = {}) {
     const entityId = randomUUID();
+
     return {
         entity: {
             id: entityId,
@@ -81,6 +83,7 @@ function createMockInsertEvent(overrides: Record<string, any> = {}) {
 
 function createMockUpdateEvent(overrides: Record<string, any> = {}) {
     const entityId = randomUUID();
+
     return {
         entity: {
             id: entityId,
@@ -101,6 +104,7 @@ describe('AnalysisSubscriber', () => {
             const subscriber = new AnalysisSubscriber({ analysisClientService: analysisClientService as unknown as AnalysisClientService });
 
             const event = createMockRemoveEvent();
+
             await subscriber.afterRemove(event as any);
 
             expect(analysisClientService.getDismissCalls()).toHaveLength(1);
@@ -111,6 +115,7 @@ describe('AnalysisSubscriber', () => {
             const subscriber = new AnalysisSubscriber();
 
             const event = createMockRemoveEvent();
+
             await subscriber.afterRemove(event as any);
             // no error — graceful no-op
         });
@@ -122,6 +127,7 @@ describe('AnalysisSubscriber', () => {
             const subscriber = new AnalysisSubscriber({ analysisClientService: analysisClientService as unknown as AnalysisClientService });
 
             const event = createMockInsertEvent();
+
             await subscriber.afterInsert(event as any);
 
             expect(analysisClientService.getAssignCalls()).toHaveLength(1);
@@ -132,6 +138,7 @@ describe('AnalysisSubscriber', () => {
             const subscriber = new AnalysisSubscriber({ analysisClientService: analysisClientService as unknown as AnalysisClientService });
 
             const event = createMockInsertEvent();
+
             await subscriber.afterInsert(event as any);
 
             expect(analysisClientService.getAssignDefaultPermissionsCalls()).toHaveLength(1);
@@ -142,6 +149,7 @@ describe('AnalysisSubscriber', () => {
             const subscriber = new AnalysisSubscriber();
 
             const event = createMockInsertEvent();
+
             await subscriber.afterInsert(event as any);
         });
     });
@@ -152,6 +160,7 @@ describe('AnalysisSubscriber', () => {
             const subscriber = new AnalysisSubscriber({ analysisClientService: analysisClientService as unknown as AnalysisClientService });
 
             const event = createMockUpdateEvent();
+
             await subscriber.afterUpdate(event as any);
 
             expect(analysisClientService.getAssignCalls()).toHaveLength(1);
@@ -162,6 +171,7 @@ describe('AnalysisSubscriber', () => {
             const subscriber = new AnalysisSubscriber({ analysisClientService: analysisClientService as unknown as AnalysisClientService });
 
             const event = createMockUpdateEvent();
+
             await subscriber.afterUpdate(event as any);
 
             // The key divergence from the node client: updating an analysis must
@@ -180,8 +190,17 @@ describe('AnalysisSubscriber', () => {
                     clientId: null,
                     realmId: randomUUID(),
                 },
-                manager: { getRepository: () => ({ save: async (e: Record<string, any>) => { savedEntity = e; return e; } }) },
+                manager: {
+                    getRepository: () => ({
+                        save: async (e: Record<string, any>) => {
+                            savedEntity = e;
+
+                            return e;
+                        },
+                    }),
+                },
             });
+
             await subscriber.afterUpdate(event as any);
 
             expect(savedEntity).toBeDefined();
@@ -199,8 +218,17 @@ describe('AnalysisSubscriber', () => {
                     clientId: 'client-1',
                     realmId: randomUUID(),
                 },
-                manager: { getRepository: () => ({ save: async (e: Record<string, any>) => { saveCalled = true; return e; } }) },
+                manager: {
+                    getRepository: () => ({
+                        save: async (e: Record<string, any>) => {
+                            saveCalled = true;
+
+                            return e;
+                        },
+                    }),
+                },
             });
+
             await subscriber.afterUpdate(event as any);
 
             expect(saveCalled).toBe(false);
@@ -210,6 +238,7 @@ describe('AnalysisSubscriber', () => {
             const subscriber = new AnalysisSubscriber();
 
             const event = createMockUpdateEvent();
+
             await subscriber.afterUpdate(event as any);
         });
     });

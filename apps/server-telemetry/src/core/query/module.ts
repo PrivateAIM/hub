@@ -72,6 +72,7 @@ export function decodeQuery<RECORD extends ObjectLiteral = ObjectLiteral>(
  */
 export function decodeQueryOpen(input: unknown): IQuery {
     const normalized = isObject(input) || typeof input === 'string' ? input : {};
+
     return queryCodec.decode(normalized) ?? new Query({});
 }
 
@@ -89,11 +90,13 @@ export function collectLogFilters(query: IQuery, options: { extractTime?: boolea
     for (const [key, value] of Object.entries(collectRootFilterValues(query))) {
         if (options.extractTime && key === 'time') {
             output.time = value;
+
             continue;
         }
 
         const index = key.indexOf('.');
         const label = index === -1 ? key : key.substring(index + 1);
+
         if (Object.hasOwn(output.labels, label)) {
             throw new BadRequestError(`The filter label '${label}' may only be specified once.`);
         }

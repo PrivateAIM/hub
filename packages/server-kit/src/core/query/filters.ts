@@ -42,6 +42,7 @@ export function collectRootFilterValues(query: IQuery): Record<string, string> {
         for (const condition of group.value) {
             if (isFilters(condition)) {
                 visitGroup(condition);
+
                 continue;
             }
 

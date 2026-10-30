@@ -48,7 +48,7 @@ import type {
     ListNoMoreOptions,
     ListRenderOptions,
     ListSlotProps,
-} from './type';
+} from './types';
 import {
     ListHandlers,
     mergeListOptions,
@@ -121,7 +121,9 @@ export function createListRaw<
     let queued : ListMeta<RECORD> | null = null;
 
     async function load(input: ListMeta<RECORD> = {}) {
-        if (typeof domainAPI?.getMany !== 'function') return;
+        if (typeof domainAPI?.getMany !== 'function') {
+            return;
+        }
 
         // Coalesce concurrent calls: a plain early return here silently
         // dropped a load requested while another was in flight (e.g. an
@@ -131,6 +133,7 @@ export function createListRaw<
         // when it executes, so it carries the freshest filters.
         if (busy.value) {
             queued = input;
+
             return;
         }
 
@@ -146,12 +149,14 @@ export function createListRaw<
         try {
             if (context.queryFilters) {
                 const filters = (input.filters || {}) as FiltersBuildInput<Entity<RECORD>>;
+
                 context.queryFilters(filters);
 
                 input.filters = filters;
             }
 
             query = undefined;
+
             if (context.query) {
                 if (typeof context.query === 'function') {
                     query = context.query();
@@ -208,6 +213,7 @@ export function createListRaw<
             // continuation and onLoaded — it represents newer input.
             if (queued) {
                 const next = queued;
+
                 queued = null;
                 drained = true;
                 await load(next);
@@ -239,6 +245,7 @@ export function createListRaw<
 
             return;
         }
+
         if (context.onLoaded) {
             context.onLoaded(meta.value);
         }
@@ -311,6 +318,7 @@ export function createListRaw<
             withSlotProps = true,
         ): VNodeChild | null => {
             const slot = slots[slotName];
+
             if (slot) {
                 return h(
                     opt?.tag ?? 'div',
@@ -318,14 +326,17 @@ export function createListRaw<
                     withSlotProps ? slot(slotProps()) : slot(undefined),
                 );
             }
+
             if (opt?.content) {
                 const content: VNodeArrayChildren = [
                     typeof opt.content === 'function' ?
                         opt.content() :
                         opt.content,
                 ];
+
                 return h(opt.tag ?? 'div', { class: cssClass }, content);
             }
+
             return null;
         };
 
@@ -348,6 +359,7 @@ export function createListRaw<
         // (legacy buildList contract). Used as the escape hatch for
         // consumers that want full control over the list body.
         const defaultSlot = slots[EntityListSlotName.DEFAULT];
+
         if (defaultSlot) {
             return h(VCList, listProps, () => defaultSlot(slotProps()));
         }
@@ -358,28 +370,40 @@ export function createListRaw<
             const headerVNode = options.header !== false ?
                 renderChrome(EntityListSlotName.HEADER, headerOpt, 'vc-list-header') :
                 null;
-            if (headerVNode) children.push(headerVNode);
+
+            if (headerVNode) {
+                children.push(headerVNode);
+            }
 
             // BODY slot — if provided, the consumer renders the full body
             // (e.g. a `<VCTable>` with `:columns` driving auto-render) and
             // per-item rendering is skipped. Otherwise fall back to
             // <VCListBody> + per-item <VCListItem>.
             const renderLoadingBand = (overlay: boolean) => {
-                if (options.loading === false) return null;
+                if (options.loading === false) {
+                    return null;
+                }
+
                 const slot = slots[EntityListSlotName.LOADING];
+
                 // The slot is the FIRST-PAINT skeleton: it stands in
                 // for the empty body while the initial load runs.
                 // Refresh-with-data keeps the default spinner overlay
                 // — a skeleton appended BELOW live rows would read as
                 // phantom items.
-                if (slot && !overlay) return slot(undefined);
+                if (slot && !overlay) {
+                    return slot(undefined);
+                }
+
                 if (loadingOpt?.content) {
                     return h(loadingOpt.tag ?? 'div', { class: 'vc-list-loading' }, loadingOpt.content);
                 }
+
                 return h(VCListLoading, { overlay });
             };
 
             const bodySlot = slots[EntityListSlotName.BODY];
+
             if (bodySlot) {
                 children.push(bodySlot(slotProps()));
             } else {
@@ -392,7 +416,10 @@ export function createListRaw<
                 // skeletons stand in the same grid as the rows they mimic.
                 if (busy.value && data.value.length === 0) {
                     const band = renderLoadingBand(false);
-                    if (band) children.push(h('div', { class: 'vc-list-loading-band' }, [band]));
+
+                    if (band) {
+                        children.push(h('div', { class: 'vc-list-loading-band' }, [band]));
+                    }
                 }
 
                 children.push(h(VCListBody, {}, () => {
@@ -404,9 +431,11 @@ export function createListRaw<
                         const noMoreVisible = options.noMore !== false &&
                             total.value === 0 &&
                             (!!slots[EntityListSlotName.NO_MORE] || !!noMoreOpt?.content);
+
                         if (noMoreVisible) {
                             return null;
                         }
+
                         return h(VCListEmpty);
                     }
 
@@ -423,15 +452,18 @@ export function createListRaw<
                             deleted: (next: RECORD) => handlers.deleted(next),
                             failed: () => {},
                         };
+
                         return h(VCListItem, { key: (item as any).id ?? index }, () => {
                             const itemSlot = slots[EntityListSlotName.ITEM];
                             const itemActionsSlot = slots[EntityListSlotName.ITEM_ACTIONS];
                             const itemActionsExtraSlot = slots[EntityListSlotName.ITEM_ACTIONS_EXTRA];
 
                             const actionsNodes: VNodeChild[] = [];
+
                             if (itemActionsSlot) {
                                 actionsNodes.push(itemActionsSlot(itemSlotProps));
                             }
+
                             if (itemActionsExtraSlot) {
                                 actionsNodes.push(itemActionsExtraSlot(itemSlotProps));
                             }
@@ -457,6 +489,7 @@ export function createListRaw<
                                 slot: itemSlot ? itemSlot(itemSlotProps) : undefined,
                                 get actions() {
                                     actionsConsumed = true;
+
                                     return actionsNode;
                                 },
                                 // Opt-in row marker (`item: { icon: true }`) —
@@ -469,6 +502,7 @@ export function createListRaw<
                             };
 
                             let body: VNodeChild;
+
                             if (itemSlot) {
                                 body = sections.slot;
                             } else if (itemOpt?.content) {
@@ -477,6 +511,7 @@ export function createListRaw<
                                     itemOpt.content;
                             } else {
                                 const textPropName = itemOpt?.textPropName ?? 'name';
+
                                 body = h('span', String((item as any)[textPropName] ?? (item as any).id ?? ''));
                             }
 
@@ -494,6 +529,7 @@ export function createListRaw<
                     if (busy.value) {
                         return [rows, renderLoadingBand(true)];
                     }
+
                     return rows;
                 }));
             }
@@ -506,13 +542,19 @@ export function createListRaw<
                 total.value === 0
             ) {
                 const noMoreVNode = renderChrome(EntityListSlotName.NO_MORE, noMoreOpt, 'vc-list-no-more', false);
-                if (noMoreVNode) children.push(noMoreVNode);
+
+                if (noMoreVNode) {
+                    children.push(noMoreVNode);
+                }
             }
 
             const footerVNode = options.footer !== false ?
                 renderChrome(EntityListSlotName.FOOTER, footerOpt, 'vc-list-footer') :
                 null;
-            if (footerVNode) children.push(footerVNode);
+
+            if (footerVNode) {
+                children.push(footerVNode);
+            }
 
             return h(Fragment, children);
         });
@@ -528,6 +570,7 @@ export function createListRaw<
 
     let loadOnSetup = true;
     const propLoadOnSetup = unref(context.props.loadOnSetup);
+
     if (typeof propLoadOnSetup === 'boolean') {
         loadOnSetup = propLoadOnSetup;
     }
@@ -592,6 +635,7 @@ export function createListRaw<
 
         if (hydrationStore) {
             const snapshot = hydrationStore.get<ListHydrationSnapshot<RECORD>>(hydrationKey);
+
             if (snapshot) {
                 // Consumed on read: unlike a translation, a collection goes
                 // stale, and the entry must not seed a later client-side
@@ -619,8 +663,7 @@ export function createListRaw<
             }
         }
 
-        Promise.resolve()
-            .then(() => load())
+        Promise.try(() => load())
             .catch((e) => console.log(e));
     }
 
@@ -637,13 +680,16 @@ export function createListRaw<
 
         socketContext.onCreated = (entity) => {
             const limit = meta.value?.pagination?.limit;
+
             if (typeof limit !== 'number') {
                 handlers.created(entity);
+
                 return;
             }
 
             if (total.value < limit) {
                 handlers.created(entity);
+
                 return;
             }
 

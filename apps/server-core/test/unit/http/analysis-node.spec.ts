@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { createTestApplication } from '../../app';
@@ -37,9 +37,11 @@ describe('src/controllers/core/analysis-node', () => {
         const { client } = suite;
 
         const { data: project } = await client.project.create(createTestProject());
+
         expect(project.id).toBeDefined();
 
         const { data: node } = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+
         expect(node.id).toBeDefined();
 
         await client.projectNode.create({
@@ -81,6 +83,7 @@ describe('src/controllers/core/analysis-node', () => {
         const { client } = suite;
 
         const { data } = await client.analysisNode.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -88,6 +91,7 @@ describe('src/controllers/core/analysis-node', () => {
         const { client } = suite;
 
         const { data } = await client.analysisNode.getOne(details.id);
+
         expectProperties(details, data);
     });
 

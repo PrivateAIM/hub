@@ -106,10 +106,12 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                     repository: this.masterImagesConfig.repository,
                     branch: this.masterImagesConfig.branch,
                 });
+
                 return undefined;
             }
             case MasterImageCommand.BUILD: {
                 const id = data.id as string;
+
                 if (typeof id !== 'string' || id.length === 0) {
                     throw new BadRequestError('A valid master image id is required.');
                 }
@@ -133,8 +135,10 @@ export class MasterImageService extends AbstractEntityService implements IMaster
 
                     previous = locked.buildStatus;
                     locked.buildStatus = ProcessStatus.STARTING;
+
                     return true;
                 });
+
                 if (!entity) {
                     throw new EntityNotFoundError({ entity: 'master-image' });
                 }
@@ -151,6 +155,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                         }
 
                         locked.buildStatus = previous;
+
                         return true;
                     });
 
@@ -169,6 +174,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.MASTER_IMAGE_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'master-image' });
         }

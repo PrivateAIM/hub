@@ -29,6 +29,7 @@ export function mountMessagingController(socket: Socket, options?: { logger?: Lo
             if (typeof cb === 'function') {
                 cb(new Error('You are not authenticated as client or user.'));
             }
+
             return;
         }
 

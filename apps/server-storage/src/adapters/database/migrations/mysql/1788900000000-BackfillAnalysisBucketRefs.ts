@@ -34,9 +34,9 @@ export class BackfillAnalysisBucketRefs1788900000000 implements MigrationInterfa
         ];
 
         const rows: {
-            id: string, 
-            name: string, 
-            ref_type: string | null 
+            id: string,
+            name: string,
+            ref_type: string | null
         }[] = await queryRunner.query(`
             SELECT \`id\`, \`name\`, \`ref_type\`
             FROM \`buckets\`
@@ -45,6 +45,7 @@ export class BackfillAnalysisBucketRefs1788900000000 implements MigrationInterfa
         `);
 
         const taken = new Set<string>();
+
         for (const row of rows) {
             if (row.ref_type !== null) {
                 taken.add(row.name);
@@ -57,11 +58,13 @@ export class BackfillAnalysisBucketRefs1788900000000 implements MigrationInterfa
             }
 
             const prefix = prefixes.find((p) => row.name.length > p.length && row.name.startsWith(p));
+
             if (!prefix) {
                 continue;
             }
 
             const refId = row.name.slice(prefix.length);
+
             if (refId.length > 64) {
                 continue;
             }

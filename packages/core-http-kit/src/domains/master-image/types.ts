@@ -7,7 +7,7 @@
 
 import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 
 /**
  * Cannot extend `IEntityAPISlim`: master images are created by the catalog

@@ -17,6 +17,7 @@ export class LogComponent extends Component {
         super();
 
         const logStore = ctx?.logStore ?? new MemoryLogStore();
+
         this.mount(LogCommand.WRITE, new LogComponentWriteHandler(logStore, ctx?.logger));
     }
 

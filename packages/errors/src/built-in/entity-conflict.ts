@@ -16,10 +16,11 @@ export class EntityConflictError extends HubError {
     constructor(input?: string | HubEntityErrorOptions) {
         const options: HubEntityErrorOptions = typeof input === 'string' ? { message: input } : (input ?? {});
         const {
-            entity, 
-            message, 
-            ...rest 
+            entity,
+            message,
+            ...rest
         } = options;
+
         super({
             ...rest,
             code: ErrorCode.ENTITY_CONFLICT,

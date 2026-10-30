@@ -95,9 +95,11 @@ describe('process staleness', () => {
                 percent: 40,
             },
         };
+
         await distributor.applyEvent(AnalysisDistributorEvent.EXECUTION_PROGRESS, payload);
 
         const entity = await dataSource.getRepository(AnalysisEntity).findOneByOrFail({ id: analysis.id });
+
         expect(entity.distributionProgress).toBe(40);
         expect(Date.parse(entity.updatedAt)).toBeGreaterThan(Date.now() - 60_000);
     });
@@ -113,9 +115,11 @@ describe('process staleness', () => {
             status: ProcessStatus.STARTED,
             checkedAt: analysis.updatedAt,
         };
+
         await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
 
         const entity = await dataSource.getRepository(AnalysisEntity).findOneByOrFail({ id: analysis.id });
+
         expect(entity.buildStatus).toBe(ProcessStatus.FAILED);
     });
 
@@ -130,9 +134,11 @@ describe('process staleness', () => {
             status: ProcessStatus.STARTED,
             checkedAt: analysis.updatedAt,
         };
+
         await builder.applyEvent(AnalysisBuilderEvent.CHECK_FINISHED, payload);
 
         const entity = await dataSource.getRepository(AnalysisEntity).findOneByOrFail({ id: analysis.id });
+
         expect(entity.buildStatus).toBe(ProcessStatus.STARTED);
     });
 

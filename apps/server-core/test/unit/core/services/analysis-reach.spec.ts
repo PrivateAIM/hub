@@ -95,6 +95,7 @@ describe('AnalysisReachService', () => {
 
     it('should not narrow for a grant reaching every realm', async () => {
         const actor = createAllowAllActor('realm-a');
+
         actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
 
         await expect(service.resolve(actor, ANALYSIS)).resolves.toBeUndefined();
@@ -102,6 +103,7 @@ describe('AnalysisReachService', () => {
 
     it('should match nothing when the grant reaches no realm, participation included', async () => {
         const actor = createAllowAllActor('realm-a');
+
         actor.permissionEvaluator.setCompileResult({ verdict: 'deny' });
 
         await expect(service.resolve(actor, ANALYSIS)).resolves.toEqual(inArray('id', []));
@@ -109,6 +111,7 @@ describe('AnalysisReachService', () => {
 
     it('should OR a user\'s grant reach with the analyses its realm\'s nodes take part in', async () => {
         const actor = createAllowAllActor('realm-a');
+
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-a') });
 
         await expect(service.resolve(actor, ANALYSIS)).resolves.toEqual(or(
@@ -137,6 +140,7 @@ describe('AnalysisReachService', () => {
 
     it('should re-root a grant policy onto the analysis relation of a related entity', async () => {
         const actor = createAllowAllActor('realm-b');
+
         actor.permissionEvaluator.setCompileResult({
             verdict: 'conditional',
             condition: and(eq('realmId', 'realm-b'), eq('projectId', 'p-1')),
@@ -164,6 +168,7 @@ describe('AnalysisReachService', () => {
         });
 
         const actor = createAllowAllActor('realm-a');
+
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-a') });
 
         // an-2 is pending, but a-2 stays reachable through an-3, which is approved.
@@ -198,6 +203,7 @@ describe('AnalysisReachService', () => {
 
     it('should leave participation out for grant-only reach', async () => {
         const actor = createAllowAllActor('realm-a');
+
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-a') });
 
         await expect(service.resolve(actor, ANALYSIS, { grantOnly: true })).resolves.toEqual(eq('realmId', 'realm-a'));
@@ -211,6 +217,7 @@ describe('AnalysisReachService', () => {
         } as Node);
 
         const actor = createAllowAllActor('realm-a');
+
         actor.identity = {
             id: 'client-n-a1',
             type: 'client',
@@ -229,6 +236,7 @@ describe('AnalysisReachService', () => {
         } as Node);
 
         const actor = createAllowAllActor('realm-a');
+
         actor.identity = {
             id: 'client-n-a1',
             type: 'client',
@@ -248,6 +256,7 @@ describe('AnalysisReachService', () => {
         } as Node);
 
         const actor = createAllowAllActor('realm-b');
+
         actor.identity = {
             id: 'client-n-b',
             type: 'client',
@@ -266,6 +275,7 @@ describe('AnalysisReachService', () => {
         } as Analysis);
 
         const actor = createAllowAllActor('realm-a');
+
         actor.identity = {
             id: 'client-a-9',
             type: 'client',
@@ -284,6 +294,7 @@ describe('AnalysisReachService', () => {
         } as Node);
 
         const actor = createDenyAllActor('realm-a');
+
         actor.identity = {
             id: 'client-n-a1',
             type: 'client',
@@ -295,6 +306,7 @@ describe('AnalysisReachService', () => {
 
     it('should not let any other client participate through its realm', async () => {
         const actor = createAllowAllActor('realm-a');
+
         actor.identity = {
             id: 'some-service',
             type: 'client',

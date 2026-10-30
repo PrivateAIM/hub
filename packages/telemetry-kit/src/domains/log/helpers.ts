@@ -5,7 +5,7 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
-import type { Log, LogInput } from './entity';
+import type { Log, LogInput } from './types';
 
 export function normalizeLogInput(input: LogInput) : Log {
     return {

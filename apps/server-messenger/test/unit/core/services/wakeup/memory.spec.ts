@@ -17,6 +17,7 @@ describe('core/services/wakeup/memory', () => {
         const wakeup = new MemoryMessageWakeup();
 
         const waiting = wakeup.wait(RECIPIENT, 5000);
+
         await wakeup.notify(RECIPIENT);
 
         await expect(waiting).resolves.toBeUndefined();
@@ -26,6 +27,7 @@ describe('core/services/wakeup/memory', () => {
         const wakeup = new MemoryMessageWakeup();
 
         const start = Date.now();
+
         await wakeup.wait(RECIPIENT, 30);
 
         expect(Date.now() - start).toBeGreaterThanOrEqual(20);
@@ -35,10 +37,14 @@ describe('core/services/wakeup/memory', () => {
         const wakeup = new MemoryMessageWakeup();
 
         let woke = false;
-        const waiting = wakeup.wait(RECIPIENT, 40).then(() => { woke = true; });
+        const waiting = wakeup.wait(RECIPIENT, 40).then(() => {
+            woke = true;
+        });
 
         await wakeup.notify({ type: 'user', id: randomUUID() });
-        await new Promise((resolve) => { setTimeout(resolve, 10); });
+        await new Promise((resolve) => {
+            setTimeout(resolve, 10);
+        });
 
         expect(woke).toBe(false);
 
@@ -62,7 +68,9 @@ describe('core/services/wakeup/memory', () => {
         const wakeup = new MemoryMessageWakeup();
 
         let count = 0;
-        const unsubscribe = wakeup.subscribe(RECIPIENT, () => { count += 1; });
+        const unsubscribe = wakeup.subscribe(RECIPIENT, () => {
+            count += 1;
+        });
 
         await wakeup.notify(RECIPIENT);
         await wakeup.notify(RECIPIENT);
@@ -77,7 +85,10 @@ describe('core/services/wakeup/memory', () => {
         const wakeup = new MemoryMessageWakeup();
 
         let fired = false;
-        wakeup.subscribe(RECIPIENT, () => { fired = true; });
+
+        wakeup.subscribe(RECIPIENT, () => {
+            fired = true;
+        });
 
         await wakeup.notify({ type: 'user', id: randomUUID() });
         expect(fired).toBe(false);

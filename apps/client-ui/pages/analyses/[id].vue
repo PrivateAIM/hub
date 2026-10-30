@@ -26,9 +26,9 @@ import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineComponent({
     components: {
-        FDisplayName, 
-        VCBreadcrumb, 
-        VCIcon, 
+        FDisplayName,
+        VCBreadcrumb,
+        VCIcon,
     },
     async setup() {
         definePageMeta({
@@ -77,6 +77,7 @@ export default defineComponent({
          */
         const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
             const analysis = manager.data.value;
+
             if (!analysis) {
                 return [];
             }

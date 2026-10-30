@@ -70,9 +70,9 @@ export function partitionAnalysisNodeLanes(
 ) : AnalysisNodeLanePartition {
     if (nodes.length <= budget) {
         return {
-            lanes: nodes, 
-            hidden: [], 
-            summarized: false, 
+            lanes: nodes,
+            hidden: [],
+            summarized: false,
         };
     }
 
@@ -91,9 +91,9 @@ export function partitionAnalysisNodeLanes(
     }
 
     return {
-        lanes, 
-        hidden, 
-        summarized: true, 
+        lanes,
+        hidden,
+        summarized: true,
     };
 }
 
@@ -103,14 +103,18 @@ function countBy<K extends string>(
     order: K[],
 ) : AnalysisNodeStateCount<K>[] {
     const counts = new Map<K, number>();
+
     for (const node of nodes) {
         const key = resolve(node);
+
         counts.set(key, (counts.get(key) ?? 0) + 1);
     }
 
     const output : AnalysisNodeStateCount<K>[] = [];
+
     for (const element of order) {
         const count = counts.get(element);
+
         if (count) {
             output.push({ key: element, count });
         }

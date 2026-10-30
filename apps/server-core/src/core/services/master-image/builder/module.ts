@@ -44,6 +44,7 @@ export class MasterImageBuilderService {
 
                     entity.buildStatus = ProcessStatus.STARTED;
                     entity.buildProgress = 0;
+
                     break;
                 }
                 case MasterImageBuilderEvent.EXECUTION_PROGRESS: {
@@ -59,10 +60,12 @@ export class MasterImageBuilderService {
                     ) {
                         entity.buildProgress = Math.min(temp.progress.percent, 100);
                     }
+
                     break;
                 }
                 case MasterImageBuilderEvent.EXECUTION_FAILED: {
                     entity.buildStatus = ProcessStatus.FAILED;
+
                     break;
                 }
                 case MasterImageBuilderEvent.EXECUTION_FINISHED: {

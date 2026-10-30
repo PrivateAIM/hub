@@ -38,8 +38,7 @@ export function startHeartbeat(
             return;
         }
 
-        Promise.resolve()
-            .then(beat)
+        Promise.try(beat)
             .catch((e) => logger?.warn({ message: 'Heartbeat failed', error: e }));
     }, intervalMs);
 
@@ -71,7 +70,7 @@ export function isTransientError(error: unknown): boolean {
         return error.response.status >= 500 || error.response.status === 429;
     }
 
-    if (!(error instanceof Error)) {
+    if (!(Error.isError(error))) {
         return false;
     }
 

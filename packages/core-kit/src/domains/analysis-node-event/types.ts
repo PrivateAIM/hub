@@ -6,16 +6,12 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { Project } from '../project';
+import type { Event } from '@privateaim/telemetry-kit';
 import type { Node } from '../node';
-import type { ProjectNodeApprovalStatus } from './constants';
+import type { Analysis } from '../analysis';
 
-export interface ProjectNode {
+export type AnalysisNodeEvent = {
     id: string;
-
-    approvalStatus: ProjectNodeApprovalStatus | null;
-
-    comment: string | null;
 
     // ------------------------------------------------------------------
 
@@ -25,15 +21,17 @@ export interface ProjectNode {
 
     // ------------------------------------------------------------------
 
-    projectId: Project['id'];
+    eventId: Event['id'];
 
-    project: Project;
+    analysisId: Analysis['id'];
 
-    projectRealmId: Realm['id'];
+    analysis: Analysis;
+
+    analysisRealmId: Realm['id'];
 
     nodeId: Node['id'];
 
     node: Node;
 
     nodeRealmId: Realm['id'];
-}
+};

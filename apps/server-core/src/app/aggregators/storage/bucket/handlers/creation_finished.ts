@@ -40,6 +40,7 @@ export class StorageBucketCreationFinishedHandler implements ComponentHandler<
         }
 
         const parsed = parseAnalysisBucketName(bucket.name);
+
         if (!parsed || parsed.analysisId !== bucket.refId) {
             return;
         }
@@ -64,12 +65,15 @@ export class StorageBucketCreationFinishedHandler implements ComponentHandler<
                 this.logger?.info(`Deleting duplicate ${parsed.type} bucket of analysis`, { ...meta, bucketId: bucket.id });
                 await this.bucketDispatcher.dispatchDelete({ id: bucket.id });
             }
+
             return;
         }
 
         const analysis = await this.analysisRepository.findOneById(parsed.analysisId);
+
         if (!analysis) {
             this.logger?.info(`Analysis does not exist; ${parsed.type} bucket cannot be created`, meta);
+
             return;
         }
 
@@ -78,6 +82,7 @@ export class StorageBucketCreationFinishedHandler implements ComponentHandler<
         // Defence in depth should that change: never link across realms.
         if (bucket.realmId !== analysis.realmId) {
             this.logger?.warn(`Ignoring ${parsed.type} bucket from another realm`, { ...meta, bucketId: bucket.id });
+
             return;
         }
 

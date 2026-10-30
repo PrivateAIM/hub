@@ -30,6 +30,7 @@ import { decodeQuery } from '../../../../src/core/query/index.ts';
 
 const roundTrip = (input: Parameters<typeof buildQueryString<Node>>[0]) => {
     const encoded = buildQueryString<Node>(input);
+
     return decodeQuery(encoded.slice(1), { schema: nodeSchema });
 };
 
@@ -42,6 +43,7 @@ describe('core/query codec round trip', () => {
         // The stamp is what lets the server-side codec dispatch v2 payloads
         // while still decoding legacy v1 bracket payloads from old clients.
         const encoded = buildQueryString<Node>({ filters: { name: 'x' } });
+
         expect(encoded).toContain('codec=url-expression');
     });
 
@@ -64,7 +66,9 @@ describe('core/query codec round trip', () => {
         const query = roundTrip({ filters: or(eq('name', 'a'), eq('name', 'b')) });
 
         expect(query.filters.operator).toEqual(FilterCompoundOperator.OR);
+
         const leaves = query.filters.value.filter(isFilter);
+
         expect(leaves).toHaveLength(2);
         expect(leaves.map((leaf) => leaf.value)).toEqual(['a', 'b']);
     });
@@ -93,6 +97,7 @@ describe('core/query codec round trip', () => {
             .toThrowError(ParseError);
 
         let raised: unknown;
+
         try {
             roundTrip({ filters: { publicKey: 'x' } });
         } catch (e) {
@@ -116,9 +121,11 @@ describe('core/query codec round trip', () => {
         // spelling it `sort` must keep working — and the URL parameter it
         // encodes to is `sort` either way.
         const encoded = buildQueryString<Node>({ sort: { createdAt: 'DESC' } });
+
         expect(encoded).toContain('sort=');
 
         const query = decodeQuery(encoded.slice(1), { schema: nodeSchema });
+
         expect(query.sorts.value).toEqual([{ name: 'createdAt', operator: 'DESC' }]);
     });
 

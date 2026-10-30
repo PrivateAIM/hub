@@ -40,6 +40,7 @@ describe('src/controllers/core/node', () => {
         const { client } = suite;
 
         const { data: node } = await client.node.create(createTestNode());
+
         expect(node.id).toBeDefined();
 
         details = removeDateProperties(node);
@@ -49,6 +50,7 @@ describe('src/controllers/core/node', () => {
         const { client } = suite;
 
         const { data } = await client.node.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -56,6 +58,7 @@ describe('src/controllers/core/node', () => {
         const { client } = suite;
 
         const { data } = await client.node.getOne(details.id);
+
         expectProperties(details, data, { keysExcluded: ['robotId'] });
     });
 
@@ -84,6 +87,7 @@ describe('src/controllers/core/node', () => {
         });
 
         const { data: node } = await client.node.create(createTestNode({ registryId: registry.id }));
+
         expect(node.registryId).toEqual(registry.id);
         // connecting provisions a registry project
         expect(node.registryProjectId).toBeDefined();
@@ -93,6 +97,7 @@ describe('src/controllers/core/node', () => {
         // The registry FKs detach (SET NULL) instead of cascading: the node must
         // survive the registry deletion with its references nulled.
         const { data: found } = await client.node.getOne(node.id);
+
         expect(found.id).toEqual(node.id);
         expect(found.registryId).toBeNull();
         expect(found.registryProjectId).toBeNull();
@@ -115,6 +120,7 @@ describe('src/controllers/core/node', () => {
         // still come out connected — with more than one registry configured, a
         // freshly registered node used to be left unassigned.
         const { data: node } = await client.node.create(createTestNode());
+
         expect([first.id, second.id]).toContain(node.registryId);
         expect(node.registryProjectId).not.toBeNull();
 
@@ -132,16 +138,19 @@ describe('src/controllers/core/node', () => {
         });
 
         const { data: node } = await client.node.create(createTestNode({ registryId: registry.id }));
+
         expect(node.registryProjectId).toBeDefined();
 
         // An explicit `registryId: null` disconnects — the null must survive the
         // whole HTTP path (JSON body, validator) and detach the node.
         const { data: updated } = await client.node.update(node.id, { registryId: null });
+
         expect(updated.registryId).toBeNull();
         expect(updated.registryProjectId).toBeNull();
 
         // ... and the provisioned registry project is removed, not orphaned.
         const { data: projects } = await client.registryProject.getMany({ filters: { registryId: registry.id } });
+
         expect(projects).toHaveLength(0);
 
         // Clean up: a registry left behind would make the default-registry

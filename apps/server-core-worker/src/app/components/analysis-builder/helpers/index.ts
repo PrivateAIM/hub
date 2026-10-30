@@ -7,4 +7,4 @@
 
 export * from './build-context';
 export * from './dockerfile';
-export * from './type';
+export * from './types';

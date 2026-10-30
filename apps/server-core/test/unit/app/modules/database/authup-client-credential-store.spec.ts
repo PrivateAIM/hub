@@ -111,6 +111,7 @@ describe('AuthupClientCredentialStore', () => {
         const result = await store.writeByClientId('client-2');
 
         const written = (authup.requests[0].body as Record<string, any>).secret;
+
         expect(typeof written).toBe('string');
         expect(written.length).toBeGreaterThan(0);
         expect(result).toEqual({
@@ -126,6 +127,7 @@ describe('AuthupClientCredentialStore', () => {
             handlers: {
                 'POST /clients/:id': (req) => {
                     const body = req.body as Record<string, any>;
+
                     return {
                         data: {
                             id: req.params.id,
@@ -140,9 +142,11 @@ describe('AuthupClientCredentialStore', () => {
         });
 
         const store = new AuthupClientCredentialStore(authup);
+
         await store.writeByClientId('client-3', { name: 'renamed', displayName: 'Renamed' });
 
         const body = authup.requests[0].body as Record<string, any>;
+
         // An omitted secret still rotates; the labels ride along on the update.
         expect(body.name).toBe('renamed');
         expect(body.displayName).toBe('Renamed');

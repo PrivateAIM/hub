@@ -46,7 +46,9 @@ const PAYLOAD: AnalysisBuilderCheckPayload = { id: ANALYSIS_ID };
 
 function run(coreClient: ICoreClient, docker: FakeDockerClient, attempt = 1) {
     const context = new FakeComponentHandlerContext(AnalysisBuilderCommand.CHECK);
+
     context.metadata.delivery = { attempt, maxAttempts: MESSAGE_BUS_MAX_ATTEMPTS };
+
     const handler = new AnalysisBuilderCheckHandler({
         coreClient,
         // `docken`'s Client is a concrete class, not a port, so the fake cannot
@@ -94,9 +96,11 @@ describe('AnalysisBuilderCheckHandler', () => {
                 }, 
             }),
         );
+
         expect(found.lastEvent().payload.checkedAt).toBe(updatedAt);
 
         const missing = await run(createCoreClient({ updatedAt }), new FakeDockerClient({ inspectError: IMAGE_MISSING }));
+
         expect(missing.lastEvent().payload.checkedAt).toBe(updatedAt);
     });
 

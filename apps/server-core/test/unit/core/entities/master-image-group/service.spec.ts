@@ -50,6 +50,7 @@ describe('MasterImageGroupService', () => {
 
             const actor = createAllowAllActor();
             const result = await service.getMany({}, actor);
+
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
@@ -68,6 +69,7 @@ describe('MasterImageGroupService', () => {
 
             const actor = createAllowAllActor();
             const result = await service.getOne('mig-1', actor);
+
             expect(result.id).toBe('mig-1');
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
             expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
@@ -89,6 +91,7 @@ describe('MasterImageGroupService', () => {
             repository.seed(createTestMasterImageGroup());
 
             const result = await service.delete('mig-1', createAllowAllActor());
+
             expect(result.id).toBe('mig-1');
             expect(repository.getAll()).toHaveLength(0);
         });
@@ -111,6 +114,7 @@ describe('MasterImageGroupService', () => {
             repository.seed(createTestMasterImageGroup());
 
             const result = await service.delete('mig-1', createAllowAllActor());
+
             expect(result.id).toBe('mig-1');
         });
     });

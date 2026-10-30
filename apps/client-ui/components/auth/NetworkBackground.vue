@@ -19,20 +19,21 @@ type Point = [number, number];
 // A coarse approximation of the continents — enough to read as a world map once
 // rendered as a dot field, without shipping real geo data.
 const LAND: [number, number, number, number][] = [
-    [0.20, 0.34, 0.085, 0.13], 
-    [0.255, 0.50, 0.028, 0.06], 
+    [0.20, 0.34, 0.085, 0.13],
+    [0.255, 0.50, 0.028, 0.06],
     [0.30, 0.66, 0.055, 0.15], // Americas
-    [0.495, 0.30, 0.05, 0.06], 
+    [0.495, 0.30, 0.05, 0.06],
     [0.52, 0.58, 0.07, 0.14], // Europe, Africa
-    [0.68, 0.33, 0.155, 0.13], 
+    [0.68, 0.33, 0.155, 0.13],
     [0.66, 0.48, 0.035, 0.05], // Asia, India
-    [0.78, 0.55, 0.06, 0.035], 
+    [0.78, 0.55, 0.06, 0.035],
     [0.84, 0.70, 0.06, 0.05], // SE Asia, Australia
 ];
 
 const isLand = (x: number, y: number): boolean => LAND.some(([cx, cy, rx, ry]) => {
     const dx = (x - cx) / rx;
     const dy = (y - cy) / ry;
+
     return dx * dx + dy * dy <= 1;
 });
 
@@ -97,19 +98,24 @@ export default defineComponent({
 
         const makePath = (): number[][] => {
             const src = randNode();
+
             // ~82% route on through the hub to another node; the rest stop there.
             if (Math.random() < 0.82) {
                 let dst = randNode();
+
                 while (dst === src) {
                     dst = randNode();
                 }
+
                 return [[src, 0], [0, dst]];
             }
+
             return [[src, 0]];
         };
 
         const makePacket = () => {
             const path = makePath();
+
             return {
                 path,
                 t: Math.random() * path.length, // spread so packets never bunch up
@@ -131,52 +137,68 @@ export default defineComponent({
 
         const parseRGB = (input: string): number[] | null => {
             const match = input.match(/rgba?\(([^)]+)\)/);
+
             if (!match || !match[1]) {
                 return null;
             }
+
             // Handles both legacy "r, g, b" and modern "r g b / a" syntaxes.
             const parts = match[1].split(/[\s,/]+/).map((s) => Number.parseFloat(s));
             const [r, g, b] = parts;
+
             if (
                 r !== undefined && g !== undefined && b !== undefined &&
                 !Number.isNaN(r) && !Number.isNaN(g) && !Number.isNaN(b)
             ) {
                 return [r, g, b];
             }
+
             return null;
         };
 
         const toRGB = (input: string, fallback: number[]): number[] => {
             const value = input.trim();
+
             if (!value) {
                 return fallback;
             }
+
             if (value.startsWith('#')) {
                 let hex = value.slice(1);
+
                 if (hex.length === 3) {
                     hex = hex.split('').map((c) => c + c).join('');
                 }
+
                 const n = Number.parseInt(hex, 16);
+
                 if (hex.length === 6 && !Number.isNaN(n)) {
                     return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
                 }
+
                 return fallback;
             }
+
             const direct = parseRGB(value);
+
             if (direct) {
                 return direct;
             }
+
             // General path: the theme's neutrals resolve to oklch() (Tailwind v4),
             // which neither the hex nor the rgb() branch can read. Let the browser
             // compute it on the probe — getComputedStyle always reports rgb().
             if (probe && typeof window !== 'undefined') {
                 probe.style.color = '';
                 probe.style.color = value;
+
                 const computed = parseRGB(window.getComputedStyle(probe).color);
+
                 if (computed) {
                     return computed;
                 }
             }
+
             return fallback;
         };
 
@@ -184,8 +206,10 @@ export default defineComponent({
             if (typeof window === 'undefined') {
                 return;
             }
+
             const styles = window.getComputedStyle(document.documentElement);
             const read = (name: string, fallback: number[]) => toRGB(styles.getPropertyValue(name), fallback);
+
             palette.continent = read('--vc-color-fg-muted', [150, 158, 170]);
             palette.link = read('--privateaim-brand-blue', [30, 144, 255]);
             palette.packet = read('--privateaim-brand-teal', [78, 205, 196]);
@@ -197,24 +221,30 @@ export default defineComponent({
 
         const resize = () => {
             const el = canvas.value;
+
             if (!el) {
                 return;
             }
+
             // Re-sample DPR on every resize (not just at mount) so browser zoom
             // or a move to a higher-density display re-scales the backbuffer.
             dpr = Math.min(window.devicePixelRatio || 1, 2);
+
             const rect = el.getBoundingClientRect();
+
             el.width = Math.max(1, Math.round(rect.width * dpr));
             el.height = Math.max(1, Math.round(rect.height * dpr));
         };
 
         const draw = (now: number) => {
             const el = canvas.value;
+
             if (!el || !ctx) {
                 return;
             }
 
             const dt = Math.min(0.05, (now - last) / 1000);
+
             last = now;
 
             const w = el.width;
@@ -232,11 +262,13 @@ export default defineComponent({
 
             // dotted continents (faint, behind the network)
             const step = Math.max(8 * dpr, mapW / 100);
+
             for (let py = 0; py <= mapH; py += step) {
                 for (let px = 0; px <= mapW; px += step) {
                     if (!isLand(px / mapW, py / mapH)) {
                         continue;
                     }
+
                     ctx.beginPath();
                     ctx.arc(padX + px, padY + py, 1.05 * dpr, 0, Math.PI * 2);
                     ctx.fillStyle = rgba(palette.continent, continentAlpha);
@@ -250,17 +282,19 @@ export default defineComponent({
                 const mx = (x1 + x2) / 2;
                 const my = (y1 + y2) / 2;
                 const d = Math.hypot(x2 - x1, y2 - y1);
+
                 return {
-                    x1, 
-                    y1, 
-                    x2, 
-                    y2, 
-                    cx: mx, 
+                    x1,
+                    y1,
+                    x2,
+                    y2,
+                    cx: mx,
                     cy: my - d * 0.32,
                 };
             };
             const bez = (c: ReturnType<typeof ctrl>, t: number): Point => {
                 const mt = 1 - t;
+
                 return [
                     mt * mt * c.x1 + 2 * mt * t * c.cx + t * t * c.x2,
                     mt * mt * c.y1 + 2 * mt * t * c.cy + t * t * c.y2,
@@ -271,10 +305,13 @@ export default defineComponent({
             for (const [i, j] of EDGES) {
                 const a = NODES[i];
                 const b = NODES[j];
+
                 if (!a || !b) {
                     continue;
                 }
+
                 const c = ctrl(a, b);
+
                 ctx.beginPath();
                 ctx.moveTo(c.x1, c.y1);
                 ctx.quadraticCurveTo(c.cx, c.cy, c.x2, c.y2);
@@ -287,6 +324,7 @@ export default defineComponent({
             for (const pk of packets) {
                 if (!reduced) {
                     pk.t += dt * pk.speed;
+
                     if (pk.t >= pk.path.length) {
                         // Journey complete — pick a fresh source / destination.
                         pk.path = makePath();
@@ -294,28 +332,37 @@ export default defineComponent({
                         pk.speed = 0.16 + Math.random() * 0.12;
                     }
                 }
+
                 // Current leg and the position (0..1) within it.
                 const legIndex = Math.min(Math.floor(pk.t), pk.path.length - 1);
                 const localT = pk.t - legIndex;
                 const leg = pk.path[legIndex];
                 const fromIndex = leg?.[0];
                 const toIndex = leg?.[1];
+
                 if (fromIndex === undefined || toIndex === undefined) {
                     continue;
                 }
+
                 const fromNode = NODES[fromIndex];
                 const toNode = NODES[toIndex];
+
                 if (!fromNode || !toNode) {
                     continue;
                 }
+
                 const c = ctrl(fromNode, toNode);
                 const tail = 9;
+
                 for (let k = 0; k < tail; k++) {
                     const tt = localT - k * 0.02;
+
                     if (tt < 0) {
                         continue;
                     }
+
                     const [x, y] = bez(c, tt);
+
                     ctx.beginPath();
                     ctx.arc(x, y, (2.3 - k * 0.18) * dpr, 0, Math.PI * 2);
                     ctx.fillStyle = rgba(palette.packet, (1 - k / tail) * 0.95);
@@ -328,10 +375,12 @@ export default defineComponent({
                 if (!ctx) {
                     return;
                 }
+
                 const [x, y] = toPx(n[0], n[1]);
                 const central = idx === 0;
                 const color = central ? palette.hub : palette.node;
                 const pulse = reduced ? 0.5 : Math.sin(now * 0.0018 + idx) * 0.5 + 0.5;
+
                 ctx.beginPath();
                 ctx.arc(x, y, ((central ? 9 : 5) + pulse * 4) * dpr, 0, Math.PI * 2);
                 ctx.fillStyle = rgba(color, 0.12);
@@ -356,6 +405,7 @@ export default defineComponent({
         // canvas box, so refresh the backbuffer on window resize as well.
         const onWindowResize = () => {
             resize();
+
             if (reduced) {
                 draw(last);
             }
@@ -363,9 +413,11 @@ export default defineComponent({
 
         onMounted(() => {
             const el = canvas.value;
+
             if (!el) {
                 return;
             }
+
             ctx = el.getContext('2d');
             reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -380,6 +432,7 @@ export default defineComponent({
 
             observer = new ResizeObserver(() => {
                 resize();
+
                 if (reduced) {
                     draw(0); // repaint the static frame at the new size
                 }
@@ -387,6 +440,7 @@ export default defineComponent({
             observer.observe(el);
 
             last = window.performance.now();
+
             if (reduced) {
                 draw(last); // one static frame, no loop
             } else {
@@ -398,20 +452,25 @@ export default defineComponent({
             if (raf) {
                 window.cancelAnimationFrame(raf);
             }
+
             if (observer) {
                 observer.disconnect();
                 observer = null;
             }
+
             window.removeEventListener('resize', onWindowResize);
+
             if (probe) {
                 probe.remove();
                 probe = null;
             }
+
             ctx = null;
         });
 
         watch(() => props.dark, () => {
             readPalette();
+
             if (reduced) {
                 draw(last);
             }

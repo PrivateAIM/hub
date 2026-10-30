@@ -39,6 +39,7 @@ function createFakeAnalysisNodeRepository(projectId: string) {
     const repo = new FakeAnalysisNodeRepository();
 
     const originalValidateJoinColumns = repo.validateJoinColumns.bind(repo);
+
     repo.validateJoinColumns = async (data: Partial<AnalysisNode>) => {
         await originalValidateJoinColumns(data);
 
@@ -77,10 +78,13 @@ describe('AnalysisNodeService', () => {
     beforeEach(() => {
         analysisId = randomUUID();
         nodeId = randomUUID();
+
         const projectId = randomUUID();
 
         repository = createFakeAnalysisNodeRepository(projectId);
+
         const projectNodeRepository = new FakeProjectNodeRepository();
+
         analysisRepository = new FakeEntityRepository<Analysis>();
         nodeRepository = new FakeEntityRepository<Node>();
         recalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
@@ -165,6 +169,7 @@ describe('AnalysisNodeService', () => {
             ]);
 
             const actor = createAllowAllActor('realm-a');
+
             actor.identity = {
                 id: 'client-a',
                 type: 'client',
@@ -216,6 +221,7 @@ describe('AnalysisNodeService', () => {
                 nodeRealmId: 'realm-1',
                 approvalStatus: null,
             });
+
             repository.seed(existing);
 
             // A repeated assignment must not create a duplicate, and must not be able to
@@ -247,6 +253,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-1',
             });
+
             repository.seed(node);
 
             await service.update(
@@ -265,6 +272,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-1',
             });
+
             repository.seed(node);
 
             await service.update(
@@ -286,6 +294,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-1',
             });
+
             repository.seed(node);
 
             await expect(service.update(
@@ -301,6 +310,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-2',
             });
+
             repository.seed(node);
 
             await expect(service.update(
@@ -316,6 +326,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-2',
             });
+
             repository.seed(node);
 
             await expect(service.update(
@@ -331,6 +342,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-2',
             });
+
             repository.seed(node);
 
             const result = await service.update(
@@ -348,6 +360,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-2',
             });
+
             repository.seed(node);
 
             await expect(service.update(
@@ -363,13 +376,16 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-1',
             });
+
             repository.seed(node);
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+
             await service.update(node.id, { executionStatus: ProcessStatus.EXECUTING }, actor);
 
             const states = actor.permissionEvaluator.evaluateCalls
                 .map((call) => call.data?.get<AnalysisNode>(BuiltInPolicyType.ATTRIBUTES).executionStatus);
+
             expect(states).toContain(null);
             expect(states).toContain(ProcessStatus.EXECUTING);
         });
@@ -391,6 +407,7 @@ describe('AnalysisNodeService', () => {
                     ...node,
                 } as Node,
             });
+
             repository.seed(row);
 
             return row;
@@ -456,6 +473,7 @@ describe('AnalysisNodeService', () => {
     describe('approval', () => {
         async function seedNode(buildStatus: Analysis['buildStatus']) {
             const analysis = await analysisRepository.findOneById(analysisId);
+
             await analysisRepository.save({ ...analysis!, buildStatus });
 
             const node = createTestAnalysisNode({
@@ -464,6 +482,7 @@ describe('AnalysisNodeService', () => {
                 nodeRealmId: 'realm-1',
                 approvalStatus: null,
             });
+
             repository.seed(node);
 
             return node;
@@ -493,6 +512,7 @@ describe('AnalysisNodeService', () => {
 
         it('should accept re-sending an approval the node already holds', async () => {
             const node = await seedNode(null);
+
             await repository.save({ ...node, approvalStatus: AnalysisNodeApprovalStatus.APPROVED });
 
             const result = await service.update(
@@ -524,6 +544,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-1',
             });
+
             repository.seed(node);
 
             await service.delete(node.id, createAllowAllActor());
@@ -538,6 +559,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-1',
             });
+
             repository.seed(node);
 
             await service.delete(node.id, createAllowAllActor());
@@ -551,6 +573,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-2',
             });
+
             repository.seed(node);
 
             await service.delete(node.id, createScopedActor({ realmId: 'realm-2', realmScope: 'own' }));
@@ -566,6 +589,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-2',
             });
+
             repository.seed(node);
 
             await service.delete(node.id, createPermissionActor({
@@ -582,6 +606,7 @@ describe('AnalysisNodeService', () => {
                 analysisRealmId: 'realm-1',
                 nodeRealmId: 'realm-2',
             });
+
             repository.seed(node);
 
             await expect(service.delete(node.id, createScopedActor({ realmId: 'realm-3', realmScope: 'own' })))

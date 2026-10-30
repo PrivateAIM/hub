@@ -20,6 +20,7 @@ export function setRequestIdentity(event: IAppEvent, identity: RequestIdentity) 
 
 export function useRequestIdentityOrFail(event: IAppEvent) : RequestIdentity {
     const identity = useRequestIdentity(event);
+
     if (!identity) {
         throw new UnauthorizedError();
     }

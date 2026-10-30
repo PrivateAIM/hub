@@ -23,6 +23,7 @@ export default defineNuxtComponent({
                 PermissionName.PROJECT_CREATE,
             ],
         });
+
         const handleCreated = (entity: Project) => {
             emit('created', entity);
         };

@@ -37,9 +37,15 @@ const basePayload: Partial<Event> = {
 
 async function persist(handler: EventComponentCreateHandler, payload: Partial<Event>) {
     const rows: Event[] = [];
+
     await handler.process(
         payload,
-        { ...context, handle: async (_name: string, entity: Event) => { rows.push(entity); } },
+        {
+            ...context,
+            handle: async (_name: string, entity: Event) => {
+                rows.push(entity);
+            },
+        },
     );
 
     return rows[rows.length - 1];
@@ -79,6 +85,7 @@ describe('app/components/event/handlers/create', () => {
         const expiresAt = new Date(Date.now() + 600_000).toISOString();
 
         const stamped = await persist(handler, { ...basePayload, expiresAt });
+
         expect(stamped.expiresAt).toBe(expiresAt);
         // `expiring` is the sweep predicate — an expiry with expiring:false
         // would be a row the cleaner can never delete.
@@ -86,6 +93,7 @@ describe('app/components/event/handlers/create', () => {
 
         // `expiring: false` means "keep forever" and must not be overwritten.
         const optedOut = await persist(handler, { ...basePayload, expiring: false });
+
         expect(optedOut.expiring).toBe(false);
         expect(optedOut.expiresAt ?? null).toBeNull();
     });

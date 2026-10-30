@@ -26,6 +26,7 @@ export class RootController {
     async status() {
         if (!info) {
             const pkgJson = await read(path.join(process.cwd(), 'package.json'));
+
             info = { version: pkgJson.version, timestamp: Date.now() };
         }
 

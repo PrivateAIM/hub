@@ -48,7 +48,9 @@ describe('authorization denial status', () => {
         const response = await createBucket(await createRestrictedAccessToken());
 
         expect(response.status).toBe(403);
+
         const body = await response.json();
+
         expect(body.code).toMatch(/^permission_/);
     });
 

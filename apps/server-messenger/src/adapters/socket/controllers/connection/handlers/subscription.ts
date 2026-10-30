@@ -22,6 +22,7 @@ export function mountConnectionSubscriptionHandlers(socket: Socket) {
                 // todo: custom error class with code
                 cb(new Error('Target is invalid'));
             }
+
             return;
         }
 

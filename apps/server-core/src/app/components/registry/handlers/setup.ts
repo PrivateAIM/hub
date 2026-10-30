@@ -9,26 +9,28 @@ import {
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    RegistryProjectType, 
+    RegistryProjectType,
     generateRegistryProjectId,
 } from '@privateaim/core-kit';
 import { useDataSource } from 'typeorm-extension';
 import { type ComponentHandler, type ComponentHandlerContext } from 'hubwire';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../adapters/database/index.ts';
-import { RegistryCommand } from '../constants.ts';
-import type { RegistryEventMap, RegistrySetupPayload } from '../type.ts';
+import { RegistryCommand } from '../../../../core/domains/index.ts';
+import type { RegistryEventMap } from '../types.ts';
+import type { Registry } from '@privateaim/core-kit';
 
 export class RegistrySetupHandler implements ComponentHandler<
     RegistryEventMap,
     RegistryCommand.SETUP
 > {
     async handle(
-        value: RegistrySetupPayload,
+        value: Pick<Registry, 'id'>,
         context: ComponentHandlerContext<RegistryEventMap, RegistryCommand.SETUP>,
     ): Promise<void> {
         const dataSource = await useDataSource();
         const repository = dataSource.getRepository(RegistryEntity);
         const entity = await repository.findOneBy({ id: value.id });
+
         if (!entity) {
             return;
         }
@@ -42,6 +44,7 @@ export class RegistrySetupHandler implements ComponentHandler<
             name: REGISTRY_INCOMING_PROJECT_NAME,
             registryId: entity.id,
         });
+
         if (!incomingEntity) {
             incomingEntity = projectRepository.create({
                 name: REGISTRY_INCOMING_PROJECT_NAME,
@@ -53,6 +56,7 @@ export class RegistrySetupHandler implements ComponentHandler<
         } else {
             incomingEntity = projectRepository.merge(incomingEntity, { public: false });
         }
+
         await projectRepository.save(incomingEntity);
 
         // ---------------------------------------------------------------------
@@ -62,6 +66,7 @@ export class RegistrySetupHandler implements ComponentHandler<
             name: REGISTRY_OUTGOING_PROJECT_NAME,
             registryId: entity.id,
         });
+
         if (!outgoingEntity) {
             outgoingEntity = projectRepository.create({
                 name: REGISTRY_OUTGOING_PROJECT_NAME,
@@ -73,6 +78,7 @@ export class RegistrySetupHandler implements ComponentHandler<
         } else {
             outgoingEntity = projectRepository.merge(outgoingEntity, { public: false });
         }
+
         await projectRepository.save(outgoingEntity);
 
         // -----------------------------------------------------------------------
@@ -82,6 +88,7 @@ export class RegistrySetupHandler implements ComponentHandler<
             externalName: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
             registryId: entity.id,
         });
+
         if (!masterImagesEntity) {
             masterImagesEntity = projectRepository.create({
                 name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,

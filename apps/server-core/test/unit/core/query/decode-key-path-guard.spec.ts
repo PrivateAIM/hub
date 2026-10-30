@@ -30,6 +30,7 @@ describe('core/query key-path guard', () => {
         // JSON.parse (and qs-style parsers) create it as an OWN property — the
         // shape a hostile request body/query actually arrives in.
         const malicious = JSON.parse('{"filter": {"__proto__": {"x": "1"}}}');
+
         expect(Object.prototype.hasOwnProperty.call(malicious.filter, '__proto__')).toBe(true);
 
         expect(decode(malicious)).toThrowError(ParseError);
@@ -65,6 +66,7 @@ describe('core/query key-path guard', () => {
         // Negative control for the suite: none of the rejected inputs above may
         // have polluted the prototype as a side effect of parsing-then-throwing.
         const probe: Record<string, unknown> = {};
+
         expect(probe.x).toBeUndefined();
         expect(Object.prototype.hasOwnProperty.call(Object.prototype, 'x')).toBe(false);
     });

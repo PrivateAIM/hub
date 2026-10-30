@@ -36,6 +36,7 @@ export class FakeContainerPackTarget implements DockerContainerPackTarget {
 
         this.completion = (async () => {
             const chunks : Buffer[] = [];
+
             for await (const chunk of file) {
                 chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
             }

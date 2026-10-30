@@ -30,15 +30,19 @@ import { appendQueryConditions } from '@privateaim/server-kit';
 
 const collectLeaves = (group: IFilters): IFilter[] => {
     const out: IFilter[] = [];
+
     for (const condition of group.value) {
         if (isFilters(condition)) {
             out.push(...collectLeaves(condition));
+
             continue;
         }
+
         if (isFilter(condition)) {
             out.push(condition);
         }
     }
+
     return out;
 };
 
@@ -49,6 +53,7 @@ describe('core/query appendQueryConditions', () => {
         const scoped = appendQueryConditions(query, eq('realmId', 'realm-a'));
 
         const leaves = collectLeaves(scoped.filters);
+
         expect(leaves).toHaveLength(1);
         expect(leaves[0]).toMatchObject({ field: 'realmId', value: 'realm-a' });
     });
@@ -63,9 +68,11 @@ describe('core/query appendQueryConditions', () => {
         const scoped = appendQueryConditions(query, eq('realmId', 'realm-a'));
 
         expect(scoped.filters.operator).toEqual(FilterCompoundOperator.AND);
+
         const realmValues = collectLeaves(scoped.filters)
             .filter((leaf) => leaf.field === 'realmId')
             .map((leaf) => leaf.value);
+
         expect(realmValues).toEqual(expect.arrayContaining(['realm-attacker', 'realm-a']));
         expect(realmValues).toHaveLength(2);
     });
@@ -74,6 +81,7 @@ describe('core/query appendQueryConditions', () => {
         // A client `or(...)` must stay one branch of the AND wrap — flattening
         // it into the root would turn the scope into just another alternative.
         const query = defineQuery<Node>({ filters: or(eq('name', 'a'), eq('name', 'b')) });
+
         expect(query.filters.operator).toEqual(FilterCompoundOperator.OR);
 
         const scoped = appendQueryConditions(query, eq('realmId', 'realm-a'));
@@ -82,9 +90,11 @@ describe('core/query appendQueryConditions', () => {
         expect(scoped.filters.value).toHaveLength(2);
 
         const [branch, scope] = scoped.filters.value;
+
         if (!isFilters(branch) || !isFilter(scope)) {
             throw new Error('expected the AND wrap to hold [compound branch, scope leaf]');
         }
+
         expect(branch.operator).toEqual(FilterCompoundOperator.OR);
         expect(collectLeaves(branch).map((leaf) => leaf.value)).toEqual(['a', 'b']);
         expect(scope).toMatchObject({ field: 'realmId', value: 'realm-a' });

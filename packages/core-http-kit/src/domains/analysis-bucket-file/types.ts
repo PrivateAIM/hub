@@ -6,7 +6,7 @@
  */
 
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
-import type { IEntityAPI } from '../types-base';
+import type { IEntityAPI } from '../types';
 
 export type AnalysisBucketFileCreatePayload =    & Pick<AnalysisBucketFile, 'analysisBucketId' | 'path' | 'bucketId' | 'bucketFileId'> &
     Partial<Pick<AnalysisBucketFile, 'root'>>;

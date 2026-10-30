@@ -10,4 +10,3 @@ export * from './log';
 
 export * from './constants';
 export * from './types';
-export * from './types-base';

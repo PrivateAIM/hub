@@ -31,10 +31,12 @@ describe('core/list load coalescing', () => {
             core: {
                 'GET /analyses': () => {
                     calls++;
+
                     // first request hangs until released; later ones resolve
                     if (calls === 1) {
                         return pending.then(() => ({ data: [], meta: { total: 0 } }));
                     }
+
                     return { data: [entity], meta: { total: 1 } };
                 },
             },
@@ -74,9 +76,11 @@ describe('core/list load coalescing', () => {
             core: {
                 'GET /analyses': () => {
                     calls++;
+
                     if (calls === 1) {
                         return failing;
                     }
+
                     return { data: [entity], meta: { total: 1 } };
                 },
             },

@@ -9,12 +9,12 @@ import type { QueryBuildInput } from '@rapiq/core';
 import type { PropType } from 'vue';
 import type {
     ListBodyOptions,
-    ListEventsType, 
-    ListFooterOptions, 
-    ListHeaderOptions, 
-    ListLoadingOptions, 
+    ListEventsType,
+    ListFooterOptions,
+    ListHeaderOptions,
+    ListLoadingOptions,
     ListNoMoreOptions,
-} from '../type';
+} from '../types';
 
 export function defineListEvents<T>() : ListEventsType<T> {
     return {

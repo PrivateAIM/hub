@@ -87,6 +87,7 @@ describe('crypto/message', () => {
             payload,
             info: 'message-1:analysis-1',
         });
+
         expect(decode(opened)).toBe('scoped');
     });
 
@@ -100,7 +101,9 @@ describe('crypto/message', () => {
             data: 'integrity', 
         });
         const bytes = Uint8Array.from(atob(payload), (c) => c.charCodeAt(0));
+
         bytes[bytes.length - 1] ^= 0xff;
+
         const tampered = btoa(String.fromCharCode(...bytes));
 
         await expect(openMessage({

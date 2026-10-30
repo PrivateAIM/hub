@@ -12,8 +12,8 @@ import {
 import { PermissionName } from '@privateaim/kit';
 import type { PropType } from 'vue';
 import {
-    computed, 
-    defineComponent, 
+    computed,
+    defineComponent,
     ref,
 } from 'vue';
 import {
@@ -107,12 +107,15 @@ const FProjectNodeApprovalCommand = defineComponent({
             switch (props.command) {
                 case ProjectNodeApprovalCommand.APPROVE:
                     status = ProjectNodeApprovalStatus.APPROVED;
+
                     break;
                 case ProjectNodeApprovalCommand.REJECT:
                     status = ProjectNodeApprovalStatus.REJECTED;
+
                     break;
                 default:
                     status = null;
+
                     break;
             }
 

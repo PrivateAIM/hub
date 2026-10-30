@@ -9,12 +9,12 @@ import { BadRequestError } from '@privateaim/errors';
 import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType, DomainType, buildAnalysisBucketName } from '@privateaim/core-kit';
 import type { IEntityRepository } from '@privateaim/server-kit';
-import type { 
-    AnalysisStorageMangerCheckOptions, 
+import type {
+    AnalysisStorageMangerCheckOptions,
     AnalysisStorageMangerClearOptions,
-    AnalysisStorageMangerRemoveOptions, 
+    AnalysisStorageMangerRemoveOptions,
     IAnalysisStorageManager,
-    IBucketDispatcher, 
+    IBucketDispatcher,
 } from './types.ts';
 
 type AnalysisStorageManagerContext = {
@@ -51,6 +51,7 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 analysisId: entity.id,
                 type: bucketType,
             });
+
             if (analysisBucket) {
                 continue;
             }
@@ -62,6 +63,7 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 refId: entity.id,
             });
         }
+
         return entity;
     }
 
@@ -80,6 +82,7 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 analysisId: entity.id,
                 type: bucketType,
             });
+
             if (!analysisBucket) {
                 continue;
             }
@@ -105,6 +108,7 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
                 analysisId: entity.id,
                 type: bucketType,
             });
+
             if (!analysisBucket) {
                 continue;
             }
@@ -118,11 +122,14 @@ export class AnalysisStorageManager implements IAnalysisStorageManager {
     protected async resolve(input: string | Analysis): Promise<Analysis> {
         if (typeof input === 'string') {
             const entity = await this.repository.findOneById(input);
+
             if (!entity) {
                 throw new BadRequestError('Analysis could not be found.');
             }
+
             return entity;
         }
+
         return input;
     }
 }

@@ -37,3 +37,8 @@ export type FakeClientOptions = ClientOptions & {
     handlers?: FakeHandlerMap,
     fallback?: FakeHandler
 };
+
+export type RouteMatch = {
+    handler: FakeHandler,
+    params: Record<string, string>
+};

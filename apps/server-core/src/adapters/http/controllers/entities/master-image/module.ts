@@ -43,6 +43,7 @@ export class MasterImageController {
     ): Promise<EntityCollectionResponse<MasterImage>> {
         const query = useRequestQuery(event);
         const { data, meta } = await this.service.getMany(query, buildActorContext(event));
+
         return { data, meta: { ...meta, schema: describeQuerySchema(masterImageSchema) } };
     }
 
@@ -67,6 +68,7 @@ export class MasterImageController {
     ): Promise<EntityRecordResponse<MasterImage | null>> {
         const actor = buildActorContext(event);
         const entity = await this.service.executeCommand(data.command, data, actor);
+
         event.response.status = 202;
 
         // The SYNC branch resolves without an entity — coalesce so the
@@ -81,7 +83,9 @@ export class MasterImageController {
     ): Promise<EntityRecordResponse<MasterImage>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
+
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 }

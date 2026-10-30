@@ -59,6 +59,7 @@ export function createServer<
 
     if (options.logger) {
         const { logger } = options;
+
         server.engine.on('connection_error', (err) => {
             logger.error({
                 message: err.message,

@@ -14,9 +14,11 @@ import {
 
 function createDockerError(statusCode?: number): Error {
     const error = new Error('(HTTP code) message');
+
     if (typeof statusCode !== 'undefined') {
         Object.assign(error, { statusCode });
     }
+
     return error;
 }
 

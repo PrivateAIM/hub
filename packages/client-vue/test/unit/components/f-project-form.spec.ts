@@ -9,7 +9,9 @@ import { describe, expect, it } from 'vitest';
 import { FProjectForm } from '../../../src/components/project/FProjectForm';
 import { mountClientVueComponent } from '../../utils';
 
-const flush = () => new Promise((resolve) => { setTimeout(resolve, 0); });
+const flush = () => new Promise((resolve) => {
+    setTimeout(resolve, 0);
+});
 
 /**
  * Attaching a node requires PROJECT_UPDATE server-side, so a caller holding

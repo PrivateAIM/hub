@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Logger } from '@privateaim/server-kit';
+
 import type { Event } from '@privateaim/telemetry-kit';
 
 /**
@@ -16,3 +18,8 @@ import type { Event } from '@privateaim/telemetry-kit';
 export interface IEventPublisher {
     dispatchCreate(payload: Partial<Event>): Promise<unknown>;
 }
+
+export type EntityEventHandlerContext = {
+    eventComponentDispatcher?: IEventPublisher,
+    logger?: Logger,
+};

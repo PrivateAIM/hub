@@ -13,6 +13,7 @@ export function mountForceLoggedInMiddleware(input: Namespace | Server) {
     input.use((socket, next) => {
         if (!isSocketAuthenticated(socket)) {
             next();
+
             return;
         }
 

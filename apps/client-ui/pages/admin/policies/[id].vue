@@ -42,16 +42,17 @@ export default defineComponent({
 
         const items = computed<NavigationItem[]>(() => {
             const base = `/admin/policies/${entity.value?.id}`;
+
             return [
                 {
-                    name: '', 
-                    icon: 'fa6-solid:arrow-left', 
-                    url: '/admin/policies', 
+                    name: '',
+                    icon: 'fa6-solid:arrow-left',
+                    url: '/admin/policies',
                 },
                 {
-                    name: 'General', 
-                    icon: 'fa6-solid:bars', 
-                    url: base, 
+                    name: 'General',
+                    icon: 'fa6-solid:bars',
+                    url: base,
                 },
             ];
         });

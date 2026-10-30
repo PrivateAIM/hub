@@ -6,20 +6,16 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type { Bucket } from '../bucket';
+import type { Project } from '../project';
+import type { Node } from '../node';
+import type { ProjectNodeApprovalStatus } from './constants';
 
-export interface BucketFile {
+export type ProjectNode = {
     id: string;
 
-    name: string;
+    approvalStatus: ProjectNodeApprovalStatus | null;
 
-    path: string;
-
-    hash: string;
-
-    directory: string;
-
-    size: number | null;
+    comment: string | null;
 
     // ------------------------------------------------------------------
 
@@ -29,17 +25,15 @@ export interface BucketFile {
 
     // ------------------------------------------------------------------
 
-    actorId: string;
+    projectId: Project['id'];
 
-    actorType: string;
+    project: Project;
 
-    // ------------------------------------------------------------------
+    projectRealmId: Realm['id'];
 
-    realmId: Realm['id'];
+    nodeId: Node['id'];
 
-    // ------------------------------------------------------------------
+    node: Node;
 
-    bucketId: Bucket['id'];
-
-    bucket: Bucket;
-}
+    nodeRealmId: Realm['id'];
+};

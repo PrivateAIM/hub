@@ -6,16 +6,16 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { createTestApplication } from '../../app';
 import type { Project } from '@privateaim/core-kit';
 import {
-    
+
     expectProperties,
     removeDateProperties,
 } from '../../utils';
@@ -57,6 +57,7 @@ describe('src/controllers/core/project', () => {
         const { data } = await client.project.getMany({ filters: or(contains('name', token), contains('displayName', token)) });
 
         const ids = data.map((item) => item.id);
+
         expect(ids).toContain(byName.id);
         expect(ids).toContain(byDisplayName.id);
         expect(ids).not.toContain(unrelated.id);
@@ -91,6 +92,7 @@ describe('src/controllers/core/project', () => {
         const { client } = suite;
 
         const { data: project } = await client.project.create(createTestProject());
+
         expect(project.id).toBeDefined();
 
         details = removeDateProperties(project);
@@ -100,6 +102,7 @@ describe('src/controllers/core/project', () => {
         const { client } = suite;
 
         const { data } = await client.project.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -107,6 +110,7 @@ describe('src/controllers/core/project', () => {
         const { client } = suite;
 
         const { data } = await client.project.getOne(details.id);
+
         expectProperties(details, data);
     });
 
@@ -116,6 +120,7 @@ describe('src/controllers/core/project', () => {
         details.name = 'test-a';
 
         const { data } = await client.project.update(details.id, details);
+
         expectProperties(details, data);
     });
 

@@ -33,6 +33,7 @@ export class NodeRepositoryAdapter implements INodeRepository {
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Node>> {
         const qb = this.repository.createQueryBuilder('node');
+
         qb.groupBy('node.id');
 
         const { pagination } = applyQuery(qb, query);

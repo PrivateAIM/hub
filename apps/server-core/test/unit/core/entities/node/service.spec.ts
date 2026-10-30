@@ -94,6 +94,7 @@ describe('NodeService', () => {
 
             const actor = createAllowAllActor();
             const result = await service.getMany({}, actor);
+
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
@@ -107,6 +108,7 @@ describe('NodeService', () => {
             ]);
 
             const result = await service.getMany({}, createAllowAllActor());
+
             expect(result.data).toHaveLength(2);
         });
 
@@ -119,10 +121,12 @@ describe('NodeService', () => {
     describe('getOne', () => {
         it('should return entity by ID', async () => {
             const node = createTestNode({ id: 'n-1' });
+
             repository.seed(node);
 
             const actor = createAllowAllActor();
             const result = await service.getOne('n-1', actor);
+
             expect(result.id).toBe('n-1');
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
             expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
@@ -197,6 +201,7 @@ describe('NodeService', () => {
                 { name: 'new-node' },
                 createScopedActor({ realmId, realmScope: 'own' }),
             );
+
             expect(result.realmId).toBe(realmId);
 
             await expect(
@@ -236,13 +241,14 @@ describe('NodeService', () => {
                 createAllowAllActor(),
             );
 
-            expect(result.publicKey).toBe(Buffer.from('hello', 'utf8').toString('hex'));
+            expect(result.publicKey).toBe(Buffer.from('hello', 'utf8').toHex());
         });
     });
 
     describe('update', () => {
         it('should update existing entity', async () => {
             const node = createTestNode({ realmId: 'realm-1' });
+
             repository.seed(node);
 
             const result = await service.update(
@@ -259,6 +265,7 @@ describe('NodeService', () => {
         // the node-client sync would then rewrite.
         it('should not let a caller bind the node to a client', async () => {
             const node = createTestNode({ realmId: 'realm-1', clientId: null });
+
             repository.seed(node);
 
             const result = await service.update(
@@ -278,6 +285,7 @@ describe('NodeService', () => {
 
         it('should deny when actor lacks permission', async () => {
             const node = createTestNode();
+
             repository.seed(node);
 
             await expect(
@@ -287,6 +295,7 @@ describe('NodeService', () => {
 
         it('should deny updating a node in a realm the grant does not reach', async () => {
             const node = createTestNode({ realmId: randomUUID() });
+
             repository.seed(node);
 
             await expect(
@@ -298,13 +307,16 @@ describe('NodeService', () => {
         it('should evaluate both the stored and the merged node', async () => {
             const realmId = randomUUID();
             const node = createTestNode({ realmId });
+
             repository.seed(node);
 
             const actor = createScopedActor({ realmId, realmScope: 'own' });
+
             await service.update(node.id, { name: 'updated-node' }, actor);
 
             const names = actor.permissionEvaluator.evaluateCalls
                 .map((call) => call.data?.get<Node>(BuiltInPolicyType.ATTRIBUTES)?.name);
+
             expect(names).toEqual(['test-node', 'updated-node']);
         });
 
@@ -316,6 +328,7 @@ describe('NodeService', () => {
                 registryId,
                 externalName: 'extname',
             });
+
             registryManager.seedProject(registryProject);
 
             const node = createTestNode({
@@ -324,6 +337,7 @@ describe('NodeService', () => {
                 registryProjectId: registryProject.id,
                 externalName: 'extname',
             });
+
             repository.seed(node);
 
             const result = await service.update(
@@ -338,6 +352,7 @@ describe('NodeService', () => {
 
             // ... and a fresh project is provisioned on the new registry.
             const projects = registryManager.getProjects();
+
             expect(projects).toHaveLength(1);
             expect(projects[0].id).not.toBe(registryProject.id);
             expect(projects[0].registryId).toBe(nextRegistryId);
@@ -355,6 +370,7 @@ describe('NodeService', () => {
                 registryId,
                 externalName: 'extname',
             });
+
             registryManager.seedProject(registryProject);
 
             const node = createTestNode({
@@ -363,6 +379,7 @@ describe('NodeService', () => {
                 registryProjectId: registryProject.id,
                 externalName: 'extname',
             });
+
             repository.seed(node);
 
             const result = await service.update(
@@ -383,6 +400,7 @@ describe('NodeService', () => {
                 registryId,
                 externalName: 'extname',
             });
+
             registryManager.seedProject(registryProject);
 
             const node = createTestNode({
@@ -391,6 +409,7 @@ describe('NodeService', () => {
                 registryProjectId: registryProject.id,
                 externalName: 'extname',
             });
+
             repository.seed(node);
 
             const result = await service.update(
@@ -414,6 +433,7 @@ describe('NodeService', () => {
             // assignment was recorded still carry `registryId = null` while
             // owning a project. A rename must not be read as a disconnect.
             const registryProject = createTestRegistryProject({ externalName: 'extname' });
+
             registryManager.seedProject(registryProject);
 
             const node = createTestNode({
@@ -422,6 +442,7 @@ describe('NodeService', () => {
                 registryProjectId: registryProject.id,
                 externalName: 'extname',
             });
+
             repository.seed(node);
 
             const result = await service.update(
@@ -443,6 +464,7 @@ describe('NodeService', () => {
                 registryId,
                 externalName: 'extname',
             });
+
             registryManager.seedProject(registryProject);
 
             const node = createTestNode({
@@ -451,12 +473,14 @@ describe('NodeService', () => {
                 registryProjectId: registryProject.id,
                 externalName: 'extname',
             });
+
             repository.seed(node);
 
             // `nodes.registryProjectId` is an `ON DELETE CASCADE` FK, so removing
             // the project while the stored node still points at it would delete the
             // node row. Capture what the repository holds at removal time.
             let persistedAtRemoval: Node | null = null;
+
             registryManager.observeRemoveProject(() => {
                 persistedAtRemoval = repository.getAll()
                     .find((item) => item.id === node.id) ?? null;
@@ -477,6 +501,7 @@ describe('NodeService', () => {
                 registryId,
                 externalName: 'extname',
             });
+
             registryManager.seedProject(registryProject);
 
             const node = createTestNode({
@@ -485,9 +510,11 @@ describe('NodeService', () => {
                 registryProjectId: registryProject.id,
                 externalName: 'extname',
             });
+
             repository.seed(node);
 
             let referencedAtRemoval: string | null | undefined;
+
             registryManager.observeRemoveProject(() => {
                 referencedAtRemoval = repository.getAll()
                     .find((item) => item.id === node.id)?.registryProjectId;
@@ -506,15 +533,18 @@ describe('NodeService', () => {
     describe('delete', () => {
         it('should delete existing entity', async () => {
             const node = createTestNode();
+
             repository.seed(node);
 
             const result = await service.delete(node.id, createAllowAllActor());
+
             expect(result.id).toBe(node.id);
             expect(repository.getAll()).toHaveLength(0);
         });
 
         it('should deny when actor lacks permission', async () => {
             const node = createTestNode();
+
             repository.seed(node);
 
             await expect(
@@ -530,6 +560,7 @@ describe('NodeService', () => {
 
         it('should deny deleting a node in a realm the grant does not reach', async () => {
             const node = createTestNode({ realmId: randomUUID() });
+
             repository.seed(node);
 
             await expect(
@@ -540,6 +571,7 @@ describe('NodeService', () => {
 
         it('should delete a node in another realm with an any-scoped grant', async () => {
             const node = createTestNode({ realmId: randomUUID() });
+
             repository.seed(node);
 
             await service.delete(node.id, createScopedActor({ realmScope: 'any' }));
@@ -548,12 +580,14 @@ describe('NodeService', () => {
 
         it('should unlink registry project on delete', async () => {
             const registryProjectId = randomUUID();
+
             registryManager.seedProject({
                 id: registryProjectId,
                 externalName: 'test',
             } as any);
 
             const node = createTestNode({ registryProjectId });
+
             repository.seed(node);
 
             await service.delete(node.id, createAllowAllActor());

@@ -47,8 +47,11 @@ describe('event read permission', () => {
                 ...(realmId ? { realmId } : {}),
             }),
         });
+
         expect(response.status).toBe(201);
+
         const { data: { id } } = await response.json();
+
         return id;
     };
 
@@ -75,8 +78,10 @@ describe('event read permission', () => {
         const response = await getEvents(token, `?filter[refId]=${refId}`);
 
         expect(response.status).toBe(200);
+
         const { data } = await response.json();
         const ids = data.map((event: { id: string }) => event.id);
+
         expect(ids).toContain(ownId);
         expect(ids).not.toContain(foreignId);
     });

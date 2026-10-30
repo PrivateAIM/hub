@@ -103,6 +103,7 @@ describe('FakeClient', () => {
             handlers: {
                 'GET /projects': async () => {
                     await Promise.resolve();
+
                     return { data: [{ id: 'a' }], meta: { total: 1 } };
                 },
             },

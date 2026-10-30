@@ -7,7 +7,7 @@
 
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 
 /** Read-only: node events are emitted by the platform, never authored over HTTP. */
 export interface IAnalysisNodeEventAPI {

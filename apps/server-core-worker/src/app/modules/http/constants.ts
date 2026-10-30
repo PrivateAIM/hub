@@ -6,9 +6,7 @@
  */
 
 import { TypedToken } from 'eldin';
-import type { serve } from 'routup';
-
-export type HTTPServer = ReturnType<typeof serve>;
+import type { HTTPServer } from './types.ts';
 
 export const HTTPInjectionKey : {
     Server: TypedToken<HTTPServer>,

@@ -37,9 +37,9 @@ import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default defineComponent({
     components: {
-        FDisplayName, 
-        VCBreadcrumb, 
-        VCIcon, 
+        FDisplayName,
+        VCBreadcrumb,
+        VCIcon,
     },
     async setup() {
         definePageMeta({
@@ -76,6 +76,7 @@ export default defineComponent({
 
         if (!manager.data.value) {
             await navigateTo({ path: '/projects' });
+
             throw createError({});
         }
 
@@ -120,6 +121,7 @@ export default defineComponent({
          */
         const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
             const project = manager.data.value;
+
             if (!project) {
                 return [];
             }
@@ -139,24 +141,24 @@ export default defineComponent({
             const base = `/projects/${project.id}`;
             const sections = [
                 {
-                    url: `${base}/analyses`, 
-                    label: 'Analyses', 
-                    icon: 'fa6-solid:microscope', 
+                    url: `${base}/analyses`,
+                    label: 'Analyses',
+                    icon: 'fa6-solid:microscope',
                 },
                 {
-                    url: `${base}/analyses/in`, 
-                    label: 'Incoming', 
-                    icon: 'fa6-solid:file-import', 
+                    url: `${base}/analyses/in`,
+                    label: 'Incoming',
+                    icon: 'fa6-solid:file-import',
                 },
                 {
-                    url: `${base}/analyses/add`, 
-                    label: 'Add', 
-                    icon: 'fa6-solid:plus', 
+                    url: `${base}/analyses/add`,
+                    label: 'Add',
+                    icon: 'fa6-solid:plus',
                 },
                 {
-                    url: `${base}/settings`, 
-                    label: 'Settings', 
-                    icon: 'fa6-solid:gear', 
+                    url: `${base}/settings`,
+                    label: 'Settings',
+                    icon: 'fa6-solid:gear',
                 },
             ];
 

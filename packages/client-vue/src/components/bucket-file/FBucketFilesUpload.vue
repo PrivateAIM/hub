@@ -37,12 +37,15 @@ function readAllEntries(reader: FileSystemDirectoryReader): Promise<FileSystemEn
             reader.readEntries((batch) => {
                 if (batch.length === 0) {
                     resolve(entries);
+
                     return;
                 }
+
                 entries.push(...batch);
                 readBatch();
             }, reject);
         };
+
         readBatch();
     });
 }
@@ -50,15 +53,20 @@ function readAllEntries(reader: FileSystemDirectoryReader): Promise<FileSystemEn
 async function collectEntry(entry: FileSystemEntry, out: StagedFile[]): Promise<void> {
     if (entry.isFile) {
         const file = await readEntryFile(entry as FileSystemFileEntry);
+
         out.push({ file, path: entry.fullPath.replace(/^\/+/, '') });
+
         return;
     }
 
-    if (entry.isDirectory) {
-        const children = await readAllEntries((entry as FileSystemDirectoryEntry).createReader());
-        for (const child of children) {
-            await collectEntry(child, out);
-        }
+    if (!entry.isDirectory) {
+        return;
+    }
+
+    const children = await readAllEntries((entry as FileSystemDirectoryEntry).createReader());
+
+    for (const child of children) {
+        await collectEntry(child, out);
     }
 }
 
@@ -93,6 +101,7 @@ export default defineComponent({
         // duplicate row and a 409 on upload — drop it here instead.
         const addStaged = (staged: StagedFile[]) => {
             const existing = new Set(tempFiles.value.map((item) => item.path));
+
             for (const item of staged) {
                 if (!existing.has(item.path)) {
                     tempFiles.value.push(item);
@@ -116,6 +125,7 @@ export default defineComponent({
 
         const checkTempFiles = (event: Event) => {
             const target = event.target as HTMLInputElement;
+
             addFileList(target.files);
             target.value = '';
         };
@@ -142,11 +152,13 @@ export default defineComponent({
             // await, then traverse them asynchronously.
             const items = event.dataTransfer?.items;
             const entries: FileSystemEntry[] = [];
+
             if (items) {
                 for (const item of Array.from(items)) {
                     const entry = typeof item.webkitGetAsEntry === 'function' ?
                         item.webkitGetAsEntry() :
                         null;
+
                     if (entry) {
                         entries.push(entry);
                     }
@@ -156,15 +168,18 @@ export default defineComponent({
             if (entries.length > 0) {
                 try {
                     const collected: StagedFile[] = [];
+
                     for (const entry of entries) {
                         await collectEntry(entry, collected);
                     }
+
                     addStaged(collected);
                 } catch (e) {
                     // Entry-API traversal can reject (read errors, permissions)
                     // — surface it instead of failing the drop silently.
                     emit('failed', e);
                 }
+
                 return;
             }
 
@@ -174,6 +189,7 @@ export default defineComponent({
 
         const dropTempFile = (file: File) => {
             const index = tempFiles.value.findIndex((el) => el.file === file);
+
             if (index !== -1) {
                 tempFiles.value.splice(index, 1);
             }
@@ -184,17 +200,22 @@ export default defineComponent({
         };
 
         const upload = wrapFnWithBusyState(busy, async () => {
-            if (tempFiles.value.length === 0) return;
+            if (tempFiles.value.length === 0) {
+                return;
+            }
 
             try {
                 const formData = new FormData();
+
                 for (let i = 0; i < tempFiles.value.length; i++) {
                     const tempFile = tempFiles.value[i];
+
                     if (!tempFile) {
                         continue;
                     }
 
                     const { file, path } = tempFile;
+
                     // 3rd arg sets the multipart filename — send the relative
                     // path so the directory structure survives to the server.
                     formData.append(`files[${i}]`, file, path);

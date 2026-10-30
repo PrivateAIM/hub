@@ -91,6 +91,7 @@ describe('MasterImageBuilderExecuteHandler', () => {
         // still emits EXECUTION_FINISHED, so the emitted events look identical
         // whether the build worked or not — only the image proves it did.
         const image = await docker.getImage(TAG).inspect();
+
         expect(image.RepoTags).toContain(TAG);
 
         expect(context.eventsOf(MasterImageBuilderEvent.EXECUTION_FINISHED)).toHaveLength(1);

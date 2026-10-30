@@ -81,5 +81,8 @@
         "vue-tsc": "^3.3.13",
         "zod": "^4.5.1"
     },
-    "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7"
+    "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
+    "engines": {
+        "node": ">=24.0.0"
+    }
 }

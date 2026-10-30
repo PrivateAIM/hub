@@ -11,7 +11,7 @@ import { serve } from 'routup';
 import { LoggerInjectionKey } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { createHttpApp } from '../../../adapters/http/index.ts';
-import type { HTTPServer } from './constants.ts';
+import type { HTTPServer } from './types.ts';
 import { HTTPInjectionKey } from './constants.ts';
 
 export class HTTPModule implements IModule {
@@ -48,12 +48,15 @@ export class HTTPModule implements IModule {
             container.register(HTTPInjectionKey.Server, { useValue: server });
         } catch (e) {
             await server.close().catch(() => undefined);
+
             throw e;
         }
     }
 
     async teardown(container: IContainer): Promise<void> {
-        if (!this.instance) return;
+        if (!this.instance) {
+            return;
+        }
 
         container.unregister(HTTPInjectionKey.Server);
 

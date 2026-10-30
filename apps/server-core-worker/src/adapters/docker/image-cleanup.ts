@@ -10,6 +10,7 @@ import type { Image } from 'dockerode';
 
 export async function cleanupDockerImage(docker: Client, input: string | Image) : Promise<boolean> {
     let image : Image;
+
     if (typeof input === 'string') {
         image = docker.getImage(input);
     } else {

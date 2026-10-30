@@ -74,5 +74,8 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts",
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage",
         "test:schema-drift": "node scripts/assert-schema-drift.mjs"
+    },
+    "engines": {
+        "node": ">=24.0.0"
     }
 }

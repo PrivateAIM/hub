@@ -21,7 +21,7 @@ import { LogFlag } from '@privateaim/telemetry-kit';
 import { useDataSource } from 'typeorm-extension';
 import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketFileEntity } from '../../../../../adapters/database/index.ts';
-import { toBucketName } from '../../../../domains/bucket/utils.ts';
+import { toBucketName } from '../../../../../core/utils/bucket-name.ts';
 
 export class BucketFileDeleteHandler implements ComponentHandler<
     BucketFileComponentEventMap,

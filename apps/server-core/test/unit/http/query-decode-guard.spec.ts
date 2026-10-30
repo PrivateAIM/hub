@@ -42,7 +42,9 @@ describe('src/adapters/http (query decode guard)', () => {
     const requestErrorBody = async (path: string): Promise<Record<string, any>> => suite.client
         .get(path)
         .then(
-            () => { throw new Error(`Expected ${path} to be rejected.`); },
+            () => {
+                throw new Error(`Expected ${path} to be rejected.`);
+            },
             (error) => error.response.data,
         );
 

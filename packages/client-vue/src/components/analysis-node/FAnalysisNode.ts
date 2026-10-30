@@ -159,6 +159,7 @@ export default defineComponent({
                             }),
                         ]);
                     }
+
                     if (props.target === Target.NODE) {
                         return h('div', [
                             manager.data.value?.node.name,

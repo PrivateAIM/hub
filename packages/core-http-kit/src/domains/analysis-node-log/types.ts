@@ -8,7 +8,7 @@
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import type { Log } from '@privateaim/telemetry-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 
 /**
  * STANDALONE, for the same reasons as {@see IAnalysisLogAPI}: a query-keyed

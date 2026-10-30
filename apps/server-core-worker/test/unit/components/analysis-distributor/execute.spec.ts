@@ -61,6 +61,7 @@ async function run(docker: FakeDockerClient) {
     });
 
     let error: unknown;
+
     try {
         await handler.handle({ id: ANALYSIS_ID }, context);
     } catch (e) {

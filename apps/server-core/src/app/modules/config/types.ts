@@ -7,7 +7,7 @@
 
 import type { BaseServerConfig } from '@privateaim/server-kit';
 
-export interface Config extends BaseServerConfig {
+export type Config = BaseServerConfig & {
     publicURL: string;
 
     vaultConnectionString?: string;
@@ -21,4 +21,4 @@ export interface Config extends BaseServerConfig {
 
     skipProjectApproval: boolean;
     skipAnalysisApproval: boolean;
-}
+};

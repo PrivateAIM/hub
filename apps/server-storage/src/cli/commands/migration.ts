@@ -70,9 +70,9 @@ export function defineCLIMigrationCommand() {
 
                 if (!check.exists) {
                     await createDatabase({
-                        options, 
-                        synchronize: false, 
-                        ifNotExist: true, 
+                        options,
+                        synchronize: false,
+                        ifNotExist: true,
                     });
                 }
 
@@ -80,6 +80,7 @@ export function defineCLIMigrationCommand() {
                     ...options,
                     logging: ['error', 'schema', 'migration'],
                 });
+
                 try {
                     await dataSource.initialize();
 
@@ -129,6 +130,7 @@ export function defineCLIMigrationCommand() {
 
             for (const connection of connections) {
                 const dataSourceOptions = optionsBuilder.buildWith(connection);
+
                 logOptions(dataSourceOptions);
 
                 const directoryPath = path.join(baseDirectory, dataSourceOptions.type);

@@ -8,11 +8,11 @@
 import type { Plugin } from 'vue';
 import './css';
 import { install } from './module';
-import type { Options } from './type';
+import type { Options } from './types';
 
 export default { install } satisfies Plugin<Options | undefined>;
 
 export * from './components';
 export * from './core';
 export * from './module';
-export * from './type';
+export * from './types';

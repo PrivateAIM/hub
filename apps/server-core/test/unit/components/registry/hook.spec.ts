@@ -35,6 +35,7 @@ describe('src/components/registry/hook', () => {
         const validator = new RegistryHookValidator();
 
         const output = await validator.run(payload);
+
         expect(output.type).toEqual('PUSH_ARTIFACT');
         expect(output.operator).toEqual('admin');
         expect(output.event_data.repository.name).toEqual('debian');

@@ -15,10 +15,10 @@ import { FakeStorageAdapter } from '../core/entities/bucket/fake-storage.ts';
 const BUCKET = 'bucket-1';
 
 type Entry = {
-    name: string, 
-    type: string | undefined, 
-    mode: number | undefined, 
-    content: string 
+    name: string,
+    type: string | undefined,
+    mode: number | undefined,
+    content: string
 };
 
 function createFile(path: string, content: string): BucketFileEntity {
@@ -40,6 +40,7 @@ async function readEntries(readable: Readable): Promise<Entry[]> {
 
     extract.on('entry', (headers, stream, callback) => {
         const chunks : Buffer[] = [];
+
         stream.on('data', (chunk) => {
             chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
         });
@@ -67,11 +68,14 @@ async function readEntries(readable: Readable): Promise<Entry[]> {
 
 async function pack(files: { path: string, content: string }[]): Promise<Entry[]> {
     const storage = new FakeStorageAdapter();
+
     storage.addBucket(BUCKET);
 
     const entities : BucketFileEntity[] = [];
+
     for (const file of files) {
         const entity = createFile(file.path, file.content);
+
         await storage.putObject(BUCKET, entity.hash, Buffer.from(file.content));
         entities.push(entity);
     }
@@ -121,9 +125,11 @@ describe('adapters/bucket-stream', () => {
 
     it('should reject a file whose size was never recorded', async () => {
         const storage = new FakeStorageAdapter();
+
         storage.addBucket(BUCKET);
 
         const entity = createFile('entrypoint.py', 'x');
+
         entity.size = null;
 
         const webStream = packBucketFiles(BUCKET, [entity], storage);

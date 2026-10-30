@@ -5,18 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export interface MasterImageGroup {
+export type Registry = {
     id: string;
 
     name: string;
 
-    path: string;
+    host: string;
 
-    virtualPath: string;
+    // ------------------------------------------------------------------
+
+    accountName: string | null;
+
+    accountSecret: string | null;
 
     // ------------------------------------------------------------------
 
     createdAt: string;
 
     updatedAt: string;
-}
+};

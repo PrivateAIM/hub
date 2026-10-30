@@ -23,5 +23,4 @@ export * from './node';
 export * from './service';
 export * from './constants';
 export * from './types';
-export * from './types-base';
 export * from './utils';

@@ -8,7 +8,7 @@
 import { createValidator } from '@validup/zod';
 import zod from 'zod';
 import { BadRequestError } from '@privateaim/errors';
-import type { Bucket } from './entity.ts';
+import type { Bucket } from './types.ts';
 import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
 
 export class BucketValidator extends TypedContainer<Partial<Bucket>> {

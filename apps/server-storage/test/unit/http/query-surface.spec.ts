@@ -103,6 +103,7 @@ describe('src/adapters/http/controllers (query surface)', () => {
         if (!baseURL) {
             baseURL = suite.client().getBaseURL().replace(/\/+$/, '');
         }
+
         return baseURL;
     }
 
@@ -120,10 +121,12 @@ describe('src/adapters/http/controllers (query surface)', () => {
 
         it('should accept every advertised filter key', async () => {
             const allowed = description.filters?.allowed || [];
+
             expect(allowed.length).toBeGreaterThan(0);
 
             for (const key of allowed) {
                 const value = FILTER_PROBE_VALUES[name]?.[key];
+
                 expect(value, `no probe value declared for ${name}.${key}`).toBeDefined();
 
                 const response = await fetch(
@@ -137,6 +140,7 @@ describe('src/adapters/http/controllers (query surface)', () => {
 
         it('should accept every advertised sort key', async () => {
             const allowed = description.sorts?.allowed || [];
+
             expect(allowed.length).toBeGreaterThan(0);
 
             for (const key of allowed) {
@@ -192,6 +196,7 @@ describe('src/core/query (decode-level sort pins)', () => {
 
                 const bound = query.sorts.value
                     .some((sort) => sort.name === key && sort.operator === direction);
+
                 if (!bound) {
                     offenders.push(`${schema.name}.sorts.${key}`);
                 }

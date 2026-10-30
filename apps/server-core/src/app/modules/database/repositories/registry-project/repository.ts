@@ -31,6 +31,7 @@ export class RegistryProjectRepositoryAdapter implements IRegistryProjectReposit
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
         const qb = this.repository.createQueryBuilder('registryProject');
+
         qb.groupBy('registryProject.id');
 
         const { pagination } = applyQuery(qb, query);

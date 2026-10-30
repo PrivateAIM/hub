@@ -12,7 +12,7 @@ import {
     createAuthupClientAuthenticationHook,
     createAuthupUserTokenCreator,
 } from '@privateaim/server-kit';
-import type { HTTPServer } from '../../src/app/modules/http/constants.ts';
+import type { HTTPServer } from '../../src/app/modules/http/types.ts';
 import { HTTPInjectionKey } from '../../src/app/modules/http/index.ts';
 import { TestApplication } from './module.ts';
 
@@ -35,6 +35,7 @@ export class TestHTTPApplication extends TestApplication {
         const client = new Client({ baseURL });
 
         const config = this.container.resolve(ConfigInjectionKey);
+
         if (config.authupURL) {
             const hook = createAuthupClientAuthenticationHook({
                 tokenCreator: createAuthupUserTokenCreator({

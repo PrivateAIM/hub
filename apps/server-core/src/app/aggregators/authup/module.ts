@@ -35,19 +35,23 @@ export function createAuthupAggregator(ctx: AuthupAggregatorContext) : IComponen
 
     const onMessage = async (channel: string, message: string) => {
         logger?.debug(`Received event from channel ${channel}`);
+
         const event = JSON.parse(message);
 
         switch (event.type) {
             case EntityType.REALM: {
                 await handleAuthupRealmEvent(event, ctx);
+
                 break;
             }
             case EntityType.CLIENT: {
                 await handleAuthupRobotEvent(event, ctx, ctx.registryComponentDispatcher);
+
                 break;
             }
             case EntityType.USER: {
                 await handleAuthupUserEvent(event, ctx);
+
                 break;
             }
         }

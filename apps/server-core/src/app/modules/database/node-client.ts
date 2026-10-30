@@ -41,6 +41,7 @@ export class NodeClientService {
         if (entity.clientId) {
             try {
                 const { data } = await this.authup.client.getOne(entity.clientId);
+
                 client = data;
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
@@ -94,15 +95,19 @@ export class NodeClientService {
         const assigned = new Set<string>();
         const rescoped: string[] = [];
         const revoked: string[] = [];
+
         for (const clientPermission of clientPermissions) {
             const { name } = clientPermission.permission;
+
             if (!permissionNames.includes(name)) {
                 revoked.push(clientPermission.id);
+
                 continue;
             }
 
             if (clientPermission.realmScope !== REALM_SCOPE.NONE) {
                 rescoped.push(clientPermission.id);
+
                 continue;
             }
 
@@ -115,6 +120,7 @@ export class NodeClientService {
         // stripped node_read from every node client on an upgrade that ran
         // before analysis_read was provisioned).
         const permissions = new Map<string, Permission>();
+
         for (const permissionName of permissionNames) {
             if (!assigned.has(permissionName)) {
                 permissions.set(permissionName, await this.resolvePermission(permissionName));
@@ -145,6 +151,7 @@ export class NodeClientService {
     protected async resolvePermission(permissionName: string): Promise<Permission> {
         try {
             const { data } = await this.authup.permission.getOne(permissionName);
+
             return data;
         } catch (e) {
             if (!isClientErrorWithStatusCode(e, 404)) {

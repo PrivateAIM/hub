@@ -18,6 +18,7 @@ describe('src/app/modules/http/dispatchers/bucket-file-dispatcher', () => {
     it('should forward every event of one command with one correlationId', async () => {
         const messageBus = new MessageBus({ driver: new MemoryMessageBusDriver() });
         const messages: Message[] = [];
+
         await messageBus.consumeAny(BucketFileEventMessageBusRouting, async (message) => {
             messages.push(message);
         });
@@ -29,7 +30,9 @@ describe('src/app/modules/http/dispatchers/bucket-file-dispatcher', () => {
 
         // unknown id: DELETION_STARTED, then DELETION_FAILED
         await expect(adapter.delete(randomUUID())).rejects.toBeDefined();
-        await new Promise((resolve) => { setImmediate(resolve); });
+        await new Promise((resolve) => {
+            setImmediate(resolve);
+        });
 
         expect(messages).toHaveLength(2);
         expect(messages[0].metadata.correlationId).toBeTypeOf('string');

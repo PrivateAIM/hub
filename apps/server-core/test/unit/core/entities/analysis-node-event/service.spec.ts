@@ -49,7 +49,9 @@ describe('AnalysisNodeEventService', () => {
 
     const allowAll = () => {
         const actor = createAllowAllActor();
+
         actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
         return actor;
     };
 
@@ -74,12 +76,14 @@ describe('AnalysisNodeEventService', () => {
             ]);
 
             const result = await service.getMany({}, allowAll());
+
             expect(result.data).toHaveLength(3);
             expect(result.meta.total).toBe(3);
         });
 
         it('should return empty when no entities exist', async () => {
             const result = await service.getMany({}, allowAll());
+
             expect(result.data).toHaveLength(0);
             expect(result.meta.total).toBe(0);
         });
@@ -91,6 +95,7 @@ describe('AnalysisNodeEventService', () => {
             ]);
 
             const result = await service.getMany({}, createAllowAllActor('realm-a'));
+
             expect(result.data.map((e) => e.id)).toEqual(['own']);
         });
 
@@ -102,9 +107,11 @@ describe('AnalysisNodeEventService', () => {
     describe('getOne', () => {
         it('should return entity by ID', async () => {
             const event = createTestAnalysisNodeEvent({ id: 'ane-1' });
+
             repository.seed(event);
 
             const result = await service.getOne('ane-1', allowAll());
+
             expect(result.id).toBe('ane-1');
             expect(result.analysisId).toBe(event.analysisId);
         });

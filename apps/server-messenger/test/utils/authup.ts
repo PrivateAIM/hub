@@ -31,6 +31,7 @@ export async function resolveTokenSubject(token: string, baseURL = process.env.A
     }
 
     const body: { active?: boolean, sub?: string } = await response.json();
+
     if (!body.active || !body.sub) {
         throw new Error('Authup reported the access token as inactive.');
     }

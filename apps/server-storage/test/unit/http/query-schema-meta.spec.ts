@@ -106,12 +106,15 @@ describe('src/adapters/http/controllers (query schema meta)', () => {
         const client = suite.client();
 
         const created = await client.bucket.create(createTestBucket());
+
         expect(created.meta).toEqual({});
 
         const updated = await client.bucket.update(created.data.id, { region: 'eu-west' });
+
         expect(updated.meta).toEqual({});
 
         const deleted = await client.bucket.delete(created.data.id);
+
         expect(deleted.meta).toEqual({});
     });
 });

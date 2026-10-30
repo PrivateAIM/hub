@@ -8,8 +8,9 @@
 import type { ICallable, IDispatcher } from 'hubwire';
 import { LocalDispatcher, RemoteDispatcher } from 'hubwire';
 import type { IRegistryDispatcher } from '../../../../core/harbor/types.ts';
-import type { RegistryEventMap } from '../type.ts';
-import { RegistryCommand, RegistryTaskMessageBusRouting } from '../constants.ts';
+import type { RegistryEventMap } from '../types.ts';
+import { RegistryCommand } from '../../../../core/domains/index.ts';
+import { RegistryTaskMessageBusRouting } from '../constants.ts';
 import type { RegistryComponentDispatcherContext } from './types.ts';
 
 function isRegistryCommand(input: string): input is RegistryCommand {

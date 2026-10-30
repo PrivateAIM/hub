@@ -5,15 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type ProxyConnectionConfig = {
-    protocol: 'http' | 'https',
-    host: string,
-    port: number,
-    auth: {
-        username: string,
-        password: string,
-    }
-};
+import type { ProxyConnectionConfig } from './types';
 
 export function parseProxyConnectionString(connectionStr: string) : ProxyConnectionConfig | undefined {
     const match = connectionStr
@@ -24,6 +16,7 @@ export function parseProxyConnectionString(connectionStr: string) : ProxyConnect
     }
 
     const [, protocol, username, password, host, port] = match;
+
     if (!protocol || !host || !port || !username || !password) {
         return undefined;
     }

@@ -15,6 +15,7 @@ type RequestRealm = {
 
 export function useRequestIdentityRealm(event: IAppEvent) : RequestRealm | undefined {
     const identity = useRequestIdentity(event);
+
     if (!identity) {
         return undefined;
     }

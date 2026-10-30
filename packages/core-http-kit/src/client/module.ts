@@ -9,7 +9,7 @@ import { Client as BaseClient, HookName, isClientError } from 'hapic';
 import {
     AnalysisAPI,
     AnalysisBucketAPI,
-    AnalysisBucketFileAPI, 
+    AnalysisBucketFileAPI,
     AnalysisLogAPI,
     AnalysisNodeAPI,
     AnalysisNodeEventAPI,

@@ -30,6 +30,7 @@ export class ServerStorageApplicationBuilder extends BaseApplicationBuilder {
         }
 
         this.modules.push(instance ?? factory());
+
         return this;
     }
 }

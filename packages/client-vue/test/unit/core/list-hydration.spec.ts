@@ -6,18 +6,18 @@
  */
 
 import {
-    describe, 
-    expect, 
-    it, 
+    describe,
+    expect,
+    it,
     vi,
 } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import type { Analysis } from '@privateaim/core-kit';
-import { 
-    defineComponent, 
-    h, 
-    nextTick, 
-    useId, 
+import {
+    defineComponent,
+    h,
+    nextTick,
+    useId,
 } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import FAnalyses from '../../../src/components/analysis/FAnalyses';
@@ -50,9 +50,9 @@ function createSnapshot(entity: Analysis) : ListHydrationSnapshot<Analysis> {
         data: [entity],
         total: 1,
         meta: {
-            pagination: { limit: 10, offset: 0 }, 
-            total: 1, 
-            busy: false, 
+            pagination: { limit: 10, offset: 0 },
+            total: 1,
+            busy: false,
         },
     };
 }
@@ -137,9 +137,12 @@ describe('core/list hydration (round trip)', () => {
         // unsetting the global is what puts `createListRaw` on its server branch.
         // The DOM stays available, which `renderToString` does not touch anyway.
         let html : string;
+
         vi.stubGlobal('window', undefined);
+
         try {
             const server = createClientVueApp(host, {}, handlers, { hydrationStore: store });
+
             html = await renderToString(server.app);
         } finally {
             // In a `finally` because vitest only auto-restores stubs when
@@ -152,6 +155,7 @@ describe('core/list hydration (round trip)', () => {
         expect(html).toContain(entity.name);
 
         const container = document.createElement('div');
+
         container.innerHTML = html;
         document.body.appendChild(container);
 
@@ -162,6 +166,7 @@ describe('core/list hydration (round trip)', () => {
         // separates the two: a hydrating mount adopts the server's DOM nodes,
         // a fresh one replaces them.
         const rowBefore = container.querySelector('.test-item');
+
         expect(rowBefore).not.toBeNull();
 
         // Vue reports a mismatch through `console.error`, NOT through
@@ -175,6 +180,7 @@ describe('core/list hydration (round trip)', () => {
         });
 
         const client = createClientVueApp(host, {}, handlers, { hydrationStore: store });
+
         try {
             client.app.mount(container, true);
             await nextTick();
@@ -217,6 +223,7 @@ describe('core/list hydration (round trip)', () => {
         const inner = defineComponent({
             setup() {
                 const id = useId();
+
                 return () => h('span', { class: 'inner' }, id);
             },
         });
@@ -231,9 +238,12 @@ describe('core/list hydration (round trip)', () => {
         });
 
         let html : string;
+
         vi.stubGlobal('window', undefined);
+
         try {
             const server = createClientVueApp(host2, {}, handlers, { hydrationStore: store });
+
             html = await renderToString(server.app);
         } finally {
             vi.unstubAllGlobals();
@@ -243,10 +253,12 @@ describe('core/list hydration (round trip)', () => {
         expect(store.size).toBe(2);
 
         const container = document.createElement('div');
+
         container.innerHTML = html;
         document.body.appendChild(container);
 
         const client = createClientVueApp(host2, {}, handlers, { hydrationStore: store });
+
         client.app.mount(container, true);
         await nextTick();
         await flushPromises();

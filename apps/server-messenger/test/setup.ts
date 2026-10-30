@@ -21,6 +21,7 @@ async function setup(project: TestProject) {
     // create the schema once so the per-test-app synchronizes are no-ops
     // (avoids concurrent CREATE TABLE races on the shared CI matrix database)
     const database = new TestDatabase();
+
     await database.setup();
 }
 

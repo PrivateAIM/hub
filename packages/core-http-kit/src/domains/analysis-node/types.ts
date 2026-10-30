@@ -6,7 +6,7 @@
  */
 
 import type { AnalysisNode } from '@privateaim/core-kit';
-import type { IEntityAPI } from '../types-base';
+import type { IEntityAPI } from '../types';
 
 export type AnalysisNodeCreatePayload =    & Pick<AnalysisNode, 'nodeId' | 'analysisId'> &
     Partial<Pick<AnalysisNode, 'executionStatus' | 'executionProgress' | 'approvalStatus' | 'comment'>>;

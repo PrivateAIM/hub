@@ -22,10 +22,13 @@ export class FakeAnalysisMetadataRecalculator implements IAnalysisMetadataRecalc
 
     async recalc(analysisId: string): Promise<Analysis> {
         this.calls.push(analysisId);
+
         const entity = await this.repository.findOneById(analysisId);
+
         if (!entity) {
             throw new Error(`Analysis ${analysisId} not found`);
         }
+
         return entity;
     }
 

@@ -24,11 +24,13 @@ export class AnalysisRecalcQueue {
         this.pending.add(analysisId);
 
         const existing = this.promises.get(analysisId);
+
         if (existing) {
             return existing;
         }
 
         const promise = this.processNext(analysisId);
+
         this.promises.set(analysisId, promise);
 
         return promise;
@@ -80,13 +82,16 @@ export async function saveAnalysisPatch(
     patch: Partial<Analysis>,
 ): Promise<Analysis> {
     const cloned = { ...entity };
+
     Object.assign(entity, patch);
+
     if (!hasAnalysisChanged(cloned, entity)) {
         return entity;
     }
 
     const saved = await repository.updateLocked(entity.id, (locked) => {
         Object.assign(locked, patch);
+
         return true;
     });
 

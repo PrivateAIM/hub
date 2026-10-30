@@ -66,6 +66,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         }
 
         const validated = await this.validator.run(data, { group: ValidatorGroup.CREATE });
+
         assertBucketRefPairing(validated);
 
         // a refId names another service's resource, which storage cannot check ownership of:
@@ -97,17 +98,20 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
         let entity = await this.repository.findOneByIdOrName(id);
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'bucket' });
         }
 
         const isOwner = this.isOwnedByActor(entity, actor);
+
         if (!isOwner) {
             await actor.permissionEvaluator.preEvaluate({ name: PermissionName.BUCKET_UPDATE });
         }
 
         // Snapshot the stored row: typeorm's merge() writes into `entity`.
         const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
+
         entity = this.repository.merge(entity, validated);
 
         // Attribute policies bind the target state as well as the stored one.
@@ -123,6 +127,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         const bucketName = toBucketName(entity.id);
         const hasBucket = await this.storage.bucketExists(bucketName);
+
         if (!hasBucket) {
             if (entity.region) {
                 await this.storage.makeBucket(bucketName, entity.region);
@@ -136,6 +141,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
     async delete(id: string, actor: ActorContext): Promise<Bucket> {
         const entity = await this.repository.findOneByIdOrName(id);
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'bucket' });
         }
@@ -154,6 +160,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
     async clear(id: string, actor: ActorContext): Promise<Bucket> {
         const entity = await this.repository.findOneByIdOrName(id);
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'bucket' });
         }
@@ -176,11 +183,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         // evaluate; server-core checks those uploads after the fact. A synchronous gate
         // for them is plan 012 (analysis capability tokens) — until then a rejected
         // RESULT/TEMP upload stays in storage.
-        if (entity.refId) {
-            return;
-        }
-
-        if (this.isOwnedByActor(entity, actor)) {
+        if (entity.refId || this.isOwnedByActor(entity, actor)) {
             return;
         }
 
@@ -192,7 +195,10 @@ export class BucketService extends AbstractEntityService implements IBucketServi
     }
 
     private isOwnedByActor(entity: Bucket, actor: ActorContext): boolean {
-        if (!actor.identity) return false;
+        if (!actor.identity) {
+            return false;
+        }
+
         return entity.actorType === actor.identity.type &&
             entity.actorId === actor.identity.id;
     }

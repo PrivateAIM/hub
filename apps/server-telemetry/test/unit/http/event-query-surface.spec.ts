@@ -90,6 +90,7 @@ describe('event HTTP query surface', () => {
 
         it('should probe exactly the allowed filter keys', () => {
             const description = eventSchema.describe();
+
             expect(Object.keys(filterProbes).sort())
                 .toEqual([...description.filters?.allowed || []].sort());
             expect(Object.keys(filterMisses).sort())
@@ -103,6 +104,7 @@ describe('event HTTP query surface', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data.map((entry: { id: string }) => entry.id)).toContain(createdId);
         });
 
@@ -116,6 +118,7 @@ describe('event HTTP query surface', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data.map((entry: { id: string }) => entry.id)).not.toContain(createdId);
         });
     });
@@ -139,6 +142,7 @@ describe('event HTTP query surface', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data.map((entry: { id: string }) => entry.id)).toContain(createdId);
         });
 
@@ -166,6 +170,7 @@ describe('event HTTP query surface', () => {
 
             // the rapiq parse trace is forwarded, naming the offending key
             const body = await response.json();
+
             expect(JSON.stringify(body)).toContain('createdAt');
         });
     });
@@ -181,6 +186,7 @@ describe('event HTTP query surface', () => {
                 filters: and(inArray('realmId', [createdRealmId, null]), contains('name', 'upd')),
                 sorts: ['-createdAt'],
             }));
+
             expect(encoded).toBeTruthy();
 
             const response = await getEvents(String(encoded));
@@ -188,6 +194,7 @@ describe('event HTTP query surface', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data.map((entry: { id: string }) => entry.id)).toContain(createdId);
         });
     });

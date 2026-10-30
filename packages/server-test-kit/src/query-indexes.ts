@@ -5,15 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { QueryIndexInvariantDescription } from './types.ts';
+
 /**
  * The subset of a rapiq `SchemaDescription` this guard reads: the declared
  * index sequences plus the filter/sort allow-lists.
  */
-export type QueryIndexInvariantDescription = {
-    indexes?: string[][] | null,
-    filters?: { allowed?: readonly string[] | null },
-    sorts?: { allowed?: readonly string[] | null },
-};
+
 
 /**
  * Issue #1842 invariant: every allow-listed filter and sort key must LEAD

@@ -22,6 +22,7 @@ describe('messaging > validator', () => {
         };
 
         const output = await validator.run(message);
+
         expect(output).toBeDefined();
     });
 
@@ -36,6 +37,7 @@ describe('messaging > validator', () => {
         };
 
         const output = await validator.run(message);
+
         expect(output).toBeDefined();
     });
 

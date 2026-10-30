@@ -7,27 +7,15 @@
  * remains: it wires `@vuecs/forms`' `useSubmitButton` (label / icon / color /
  * loading / disabled resolution) which is non-trivial and shared across forms.
  */
-import type { MaybeRef, VNodeChild } from 'vue';
+
+import type { FormSubmitOptionsInput } from './types';
+import type { VNodeChild } from 'vue';
 import { h, unref } from 'vue';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
 import { useSubmitButton } from '@vuecs/forms';
 
-export type FormSubmitOptionsInput = {
-    submit: () => void | Promise<void>;
-    busy?: MaybeRef<boolean>;
-    invalid?: boolean;
-    isEditing?: boolean;
-    createText?: string;
-    updateText?: string;
-    /** Iconify name rendered before the label in create mode. */
-    createIcon?: string;
-    /** Iconify name rendered before the label in update mode. */
-    updateIcon?: string;
-    type?: string;
-    /** Set to `false` to suppress the leading icon entirely. Defaults to `true`. */
-    icon?: boolean;
-};
+
 
 export function buildFormSubmit(input: FormSubmitOptionsInput): VNodeChild {
     // Delegate label / icon / color resolution to @vuecs/forms's
@@ -45,10 +33,12 @@ export function buildFormSubmit(input: FormSubmitOptionsInput): VNodeChild {
     const label = (isEditing ? input.updateText : input.createText) ?? resolved.label;
 
     let iconLeft: string | undefined;
+
     if (input.icon === false) {
         iconLeft = undefined;
     } else {
         const iconOverride = isEditing ? input.updateIcon : input.createIcon;
+
         iconLeft = iconOverride ?? resolved.iconLeft;
     }
 
@@ -64,7 +54,9 @@ export function buildFormSubmit(input: FormSubmitOptionsInput): VNodeChild {
             // form-group root so the submit button sits at one consistent
             // gap below the last form field.
             class: 'mt-3',
-            onClick: () => { void input.submit(); },
+            onClick: () => {
+                void input.submit();
+            },
         },
         () => [
             iconLeft ? h(VCIcon, { name: iconLeft, class: 'pe-1' }) : null,

@@ -56,6 +56,7 @@ export class AnalysisConfigurator {
             AnalysisConfiguratorCommandChecker.canLock(locked);
 
             locked.configurationLocked = true;
+
             return true;
         }, options.persistCtx);
 
@@ -98,6 +99,7 @@ export class AnalysisConfigurator {
 
             locked.configurationLocked = false;
             locked.buildStatus = null;
+
             return true;
         }, options.persistCtx);
 
@@ -111,11 +113,14 @@ export class AnalysisConfigurator {
     protected async resolve(input: string | Analysis): Promise<Analysis> {
         if (typeof input === 'string') {
             const entity = await this.repository.findOneById(input);
+
             if (!entity) {
                 throw new EntityNotFoundError({ entity: 'analysis' });
             }
+
             return entity;
         }
+
         return input;
     }
 }

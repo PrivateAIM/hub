@@ -50,15 +50,12 @@ const BASE64URL_SEGMENT = /^[A-Za-z0-9_-]+$/;
  * round-trip for a token that cannot be valid.
  */
 export function isIntrospectableToken(token: unknown): token is string {
-    if (typeof token !== 'string') {
-        return false;
-    }
-
-    if (token.length < TOKEN_MIN_LENGTH || token.length > TOKEN_MAX_LENGTH) {
+    if ((typeof token !== 'string') || token.length < TOKEN_MIN_LENGTH || token.length > TOKEN_MAX_LENGTH) {
         return false;
     }
 
     const segments = token.split('.');
+
     if (segments.length !== 3) {
         return false;
     }

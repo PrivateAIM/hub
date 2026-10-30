@@ -151,6 +151,7 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         if (!analysis.registryId) {
             if (inProgressStatus) {
                 await finishUndecidable();
+
                 return;
             }
 
@@ -165,10 +166,12 @@ export class AnalysisDistributorCheckHandler implements ComponentHandler<Analysi
         // narrowed relation is collected alongside each node so the docker loop
         // never re-dereferences the nullable relation.
         const checks: { node: Node; registryProject: RegistryProject }[] = [];
+
         for (const node of nodes) {
             if (!node.registryProject) {
                 if (inProgressStatus) {
                     await finishUndecidable();
+
                     return;
                 }
 

@@ -11,6 +11,7 @@ import { createApplication } from './app';
 
 async function start() {
     const app = createApplication();
+
     await app.setup();
 
     const logger = app.container.resolve(LoggerInjectionKey);

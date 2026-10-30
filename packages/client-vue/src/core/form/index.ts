@@ -7,3 +7,5 @@
 
 export * from './properties';
 export * from './submit';
+
+export * from './types';

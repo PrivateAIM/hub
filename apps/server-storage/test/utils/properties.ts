@@ -13,6 +13,7 @@ export function expectPropertiesEqualToSrc(
     dest: Record<string, any>,
 ) {
     const keys = Object.keys(src);
+
     for (const key of keys) {
         if (isObject(src[key])) {
             continue;

@@ -6,7 +6,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type { CollectionResourcePage, EntityCollectionResponse } from '../../src/domains/types-base';
+import type { CollectionResourcePage, EntityCollectionResponse } from '../../src/domains/types';
 import { getManyAll } from '../../src/domains/helpers';
 
 type Item = { id: number };

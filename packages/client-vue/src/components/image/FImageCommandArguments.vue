@@ -122,6 +122,7 @@ export default defineComponent({
 
         const resetItemsForPosition = async (position: 'before' | 'after') => {
             let next : MasterImageCommandArgument[];
+
             if (position === 'before') {
                 next = [
                     ...extractItemsByPosition(itemsPropRef.value || [], 'before'),

@@ -9,14 +9,8 @@ import type { MessageParty } from '@privateaim/messenger-kit';
 import type { Logger } from '@privateaim/server-kit';
 import type { Client as RedisClient } from 'redis-extension';
 import { AbstractMessageWakeup } from '../../../core/services/wakeup/index.ts';
-import type { MessageWakeupContext } from '../../../core/services/wakeup/index.ts';
+import type { RedisMessageWakeupContext } from './types.ts';
 import { MESSAGE_WAKEUP_CHANNEL } from './constants.ts';
-
-export type RedisMessageWakeupContext = MessageWakeupContext & {
-    publishClient: RedisClient,
-    subscribeClient: RedisClient,
-    logger?: Logger
-};
 
 /**
  * Cross-instance wakeup over redis pub/sub. `notify` publishes a payload-free
@@ -53,6 +47,7 @@ export class RedisMessageWakeup extends AbstractMessageWakeup {
 
             try {
                 const parsed = JSON.parse(payload) as { recipient?: MessageParty };
+
                 if (parsed.recipient) {
                     this.dispatch(parsed.recipient);
                 }

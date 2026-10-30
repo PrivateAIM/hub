@@ -6,5 +6,5 @@
  */
 
 export * from './base';
-export * from './types-base';
+export * from './types';
 export * from './message';

@@ -68,6 +68,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
             actor,
             { names: REGISTRY_READ_PERMISSIONS, compile: false },
         );
+
         await this.checkSecretFieldAccess(query, actor);
 
         return this.repository.findMany(scoped);
@@ -93,6 +94,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
 
     private async checkSecretFieldAccess(query: Record<string, any>, actor: ActorContext): Promise<void> {
         const { fields } = query;
+
         if (!fields) {
             return;
         }
@@ -107,6 +109,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
                 Object.values(v).forEach(collect);
             }
         };
+
         collect(fields);
 
         const requestsSecret = tokens
@@ -142,6 +145,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         }
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry' });
         }
@@ -155,6 +159,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.REGISTRY_MANAGE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry' });
         }
@@ -184,6 +189,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
             case RegistryAPICommand.CLEANUP:
             case RegistryAPICommand.DELETE: {
                 const entity = await this.repository.findOneWithSecret(data.id);
+
                 if (!entity) {
                     throw new EntityNotFoundError({ entity: 'registry' });
                 }
@@ -195,6 +201,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
                 };
 
                 await this.registryDispatcher.dispatch(commandMap[command], { id: entity.id }, {});
+
                 break;
             }
             case RegistryAPICommand.PROJECT_LINK:
@@ -204,6 +211,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
                 }
 
                 const entity = await this.registryProjectRepository.findOneBy({ id: data.id });
+
                 if (!entity) {
                     throw new EntityNotFoundError({ entity: 'registry-project' });
                 }
@@ -226,6 +234,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
                         {},
                     );
                 }
+
                 break;
             }
             default: {

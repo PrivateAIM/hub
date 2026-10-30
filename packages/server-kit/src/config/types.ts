@@ -7,7 +7,7 @@
 
 import type { EnvironmentName } from '../constants';
 
-export interface BaseServerConfig {
+export type BaseServerConfig = {
     env: `${EnvironmentName}`;
     port: number;
 
@@ -28,4 +28,4 @@ export interface BaseServerConfig {
      * `packages/server-http-kit/src/middlewares/authup/types.ts`.
      */
     cookiePrefix?: string;
-}
+};

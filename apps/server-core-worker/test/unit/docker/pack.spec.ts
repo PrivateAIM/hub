@@ -15,6 +15,7 @@ describe('docker/pack', () => {
         const docker = createClient();
 
         const pullStream = await docker.pull('alpine:latest');
+
         await waitForModemStream(docker.modem, pullStream);
 
         const container = await docker
@@ -52,6 +53,7 @@ describe('docker/pack', () => {
             const size = await new Promise<Buffer>(
                 (resolve, reject) => {
                     const data : Buffer[] = [];
+
                     stream.on('data', (chunk) => {
                         const buffer = Buffer.isBuffer(chunk) ?
                             chunk :

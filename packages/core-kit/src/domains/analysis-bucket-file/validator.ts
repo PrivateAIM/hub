@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisBucketFile } from './entity.ts';
+import type { AnalysisBucketFile } from './types.ts';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { TypedContainer, ValidatorGroup } from '@privateaim/kit';
@@ -21,6 +21,7 @@ export class AnalysisBucketFileValidator extends TypedContainer<AnalysisBucketFi
         );
 
         const pathValidator = createValidator(z.string());
+
         this.mount(
             'path',
             { group: ValidatorGroup.CREATE },

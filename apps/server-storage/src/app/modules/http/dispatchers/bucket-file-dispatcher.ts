@@ -41,11 +41,13 @@ export class BucketFileDispatcherAdapter implements IBucketFileDispatcher {
                             );
                         } catch (err) {
                             reject(err);
+
                             return;
                         }
 
                         if (childContext.key === BucketFileEvent.DELETION_FINISHED) {
                             resolve();
+
                             return;
                         }
 

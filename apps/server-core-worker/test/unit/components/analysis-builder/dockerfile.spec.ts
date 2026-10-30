@@ -27,6 +27,7 @@ async function readEntries(readable: Readable): Promise<Entry[]> {
 
     extract.on('entry', (headers, stream, callback) => {
         const chunks : Buffer[] = [];
+
         stream.on('data', (chunk) => {
             chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
         });

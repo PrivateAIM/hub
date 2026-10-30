@@ -43,13 +43,17 @@ const NODE_ID = randomUUID();
 
 function buildService(opts: { node?: Partial<Node>; secret?: string | null }) {
     const repository = new FakeNodeRepository();
-    if (opts.node) repository.seed(repository.create(opts.node));
+
+    if (opts.node) {
+        repository.seed(repository.create(opts.node));
+    }
 
     const reader = new FakeClientCredentialStore(opts.secret);
     const service = new NodeClientCredentialService({
         repository,
         credentialStore: reader,
     });
+
     return { service, reader };
 }
 
@@ -81,6 +85,7 @@ describe('NodeClientCredentialService', () => {
         const { service } = buildService({ node: baseNode({ realmId: 'realm-b' }) });
 
         const credentials = await service.getCredentials(NODE_ID, realmManagerActor('realm-b'));
+
         expect(credentials.secret).toBe('the-secret');
     });
 
@@ -143,6 +148,7 @@ describe('NodeClientCredentialService', () => {
         const { service, reader } = buildService({ node: baseNode() });
         const failure = new Error('catalog unreachable');
         const actor = createDenyAllActor();
+
         actor.permissionEvaluator.denyAll(failure);
 
         await expect(service.getCredentials(NODE_ID, actor)).rejects.toBe(failure);

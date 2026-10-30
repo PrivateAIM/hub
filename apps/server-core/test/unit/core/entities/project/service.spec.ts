@@ -54,6 +54,7 @@ describe('ProjectService', () => {
             ]);
 
             const result = await service.getMany({});
+
             expect(result.data).toHaveLength(2);
         });
     });
@@ -63,6 +64,7 @@ describe('ProjectService', () => {
             repository.seed(createTestProject());
 
             const result = await service.getOne('project-1');
+
             expect(result.id).toBe('project-1');
         });
 
@@ -107,6 +109,7 @@ describe('ProjectService', () => {
             const realmId = randomUUID();
 
             const result = await service.create({}, createScopedActor({ realmId, realmScope: 'own' }));
+
             expect(result.realmId).toBe(realmId);
 
             await expect(
@@ -127,13 +130,16 @@ describe('ProjectService', () => {
 
         it('should evaluate both the stored and the merged project', async () => {
             const realmId = randomUUID();
+
             repository.seed(createTestProject({ realmId }));
 
             const actor = createScopedActor({ realmId, realmScope: 'own' });
+
             await service.update('project-1', { displayName: 'renamed' }, actor);
 
             const displayNames = actor.permissionEvaluator.evaluateCalls
                 .map((call) => call.data?.get<Project>(BuiltInPolicyType.ATTRIBUTES)?.displayName);
+
             expect(displayNames).toEqual([undefined, 'renamed']);
         });
     });
@@ -141,15 +147,18 @@ describe('ProjectService', () => {
     describe('delete', () => {
         it('should delete project with no analyses', async () => {
             const project = createTestProject();
+
             project.analyses = 0;
             repository.seed(project);
 
             const result = await service.delete('project-1', createAllowAllActor());
+
             expect(result.id).toBe('project-1');
         });
 
         it('should throw BadRequestError when project still has analyses', async () => {
             const project = createTestProject();
+
             project.analyses = 3;
             repository.seed(project);
 
@@ -185,6 +194,7 @@ describe('ProjectService', () => {
             repository.seed(createTestProject({ realmId: randomUUID() }));
 
             const result = await service.delete('project-1', createScopedActor({ realmScope: 'any' }));
+
             expect(result.id).toBe('project-1');
         });
     });

@@ -90,7 +90,9 @@ const FProjectInForm = defineComponent({
         });
 
         const submit = wrapFnWithBusyState(busy, async () => {
-            if ($v.$invalid.value) return;
+            if ($v.$invalid.value) {
+                return;
+            }
 
             await manager.createOrUpdate(form);
         });
@@ -150,10 +152,10 @@ const FProjectInForm = defineComponent({
                 'div',
                 [
                     h(VCAlert, {
-                        color: 'info', 
-                        variant: 'soft', 
-                        size: 'sm', 
-                        class: 'mb-3', 
+                        color: 'info',
+                        variant: 'soft',
+                        size: 'sm',
+                        class: 'mb-3',
                     }, () => [
                         'You have to approve the project, so the project owner can target you as a node for the analysis.',
                     ]),

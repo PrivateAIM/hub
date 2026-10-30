@@ -79,7 +79,9 @@ export class AnalysisSubscriber extends BaseSubscriber<
     }
 
     async afterRemove(event: RemoveEvent<AnalysisEntity>): Promise<any> {
-        if (!this.analysisClientService) return;
+        if (!this.analysisClientService) {
+            return;
+        }
 
         await this.analysisClientService.dismiss(event.entity || event.databaseEntity);
     }
@@ -95,13 +97,17 @@ export class AnalysisSubscriber extends BaseSubscriber<
         manager: EntityManager,
         assignDefaultPermissions: boolean,
     ): Promise<void> {
-        if (!this.analysisClientService) return;
+        if (!this.analysisClientService) {
+            return;
+        }
 
         const prevId = entity.clientId;
 
         const client = await this.analysisClientService.assign(entity);
+
         if (client.id !== prevId) {
             const repository = manager.getRepository(AnalysisEntity);
+
             await repository.save(entity);
         }
 

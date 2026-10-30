@@ -37,6 +37,7 @@ export class ComponentsModule implements IModule {
     async setup(container: IContainer): Promise<void> {
         let logStore: LogStore | undefined;
         const logStoreResult = container.tryResolve(LogStoreInjectionKey);
+
         if (logStoreResult.success) {
             logStore = logStoreResult.data;
         }
@@ -76,6 +77,7 @@ export class ComponentsModule implements IModule {
 
     async teardown(): Promise<void> {
         const { components } = this;
+
         this.components = [];
 
         await Promise.all(components.map((c) => c.stop()));

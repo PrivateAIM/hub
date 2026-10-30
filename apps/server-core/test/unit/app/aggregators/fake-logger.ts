@@ -18,26 +18,43 @@ export class FakeLogger implements Logger {
 
     protected record(level: keyof Logger, message: string | Record<string, any>, meta: Record<string, any>[]): Logger {
         this.entries.push({
-            level, 
-            message, 
-            meta: Object.assign({}, ...meta), 
+            level,
+            message,
+            meta: Object.assign({}, ...meta),
         });
+
         return this;
     }
 
-    emerg(message: string | Record<string, any>, ...meta: Record<string, any>[]) { return this.record('emerg', message, meta); }
+    emerg(message: string | Record<string, any>, ...meta: Record<string, any>[]) {
+        return this.record('emerg', message, meta);
+    }
 
-    alert(message: string | Record<string, any>, ...meta: Record<string, any>[]) { return this.record('alert', message, meta); }
+    alert(message: string | Record<string, any>, ...meta: Record<string, any>[]) {
+        return this.record('alert', message, meta);
+    }
 
-    crit(message: string | Record<string, any>, ...meta: Record<string, any>[]) { return this.record('crit', message, meta); }
+    crit(message: string | Record<string, any>, ...meta: Record<string, any>[]) {
+        return this.record('crit', message, meta);
+    }
 
-    error(message: string | Record<string, any>, ...meta: Record<string, any>[]) { return this.record('error', message, meta); }
+    error(message: string | Record<string, any>, ...meta: Record<string, any>[]) {
+        return this.record('error', message, meta);
+    }
 
-    warn(message: string | Record<string, any>, ...meta: Record<string, any>[]) { return this.record('warn', message, meta); }
+    warn(message: string | Record<string, any>, ...meta: Record<string, any>[]) {
+        return this.record('warn', message, meta);
+    }
 
-    notice(message: string | Record<string, any>, ...meta: Record<string, any>[]) { return this.record('notice', message, meta); }
+    notice(message: string | Record<string, any>, ...meta: Record<string, any>[]) {
+        return this.record('notice', message, meta);
+    }
 
-    info(message: string | Record<string, any>, ...meta: Record<string, any>[]) { return this.record('info', message, meta); }
+    info(message: string | Record<string, any>, ...meta: Record<string, any>[]) {
+        return this.record('info', message, meta);
+    }
 
-    debug(message: string | Record<string, any>, ...meta: Record<string, any>[]) { return this.record('debug', message, meta); }
+    debug(message: string | Record<string, any>, ...meta: Record<string, any>[]) {
+        return this.record('debug', message, meta);
+    }
 }

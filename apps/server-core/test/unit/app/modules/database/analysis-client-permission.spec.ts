@@ -13,8 +13,8 @@ import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@pr
 import type { FakeAuthupClient } from '@privateaim/server-test-kit';
 import {
     createAllowAllActor,
-    createDenyAllActor, 
-    createFakeAuthupClient, 
+    createDenyAllActor,
+    createFakeAuthupClient,
     createScopedActor,
     fakeAuthupResponse,
 } from '@privateaim/server-test-kit';
@@ -55,6 +55,7 @@ const APPROVE_PERMISSION = { id: 'perm-approve', name: PermissionName.ANALYSIS_A
 function permissionHandler(...permissions: { id: string, name: string }[]) {
     return (req: { params: Record<string, string> }) => {
         const permission = permissions.find((entry) => entry.id === req.params.id);
+
         if (!permission) {
             // A real 404, not a bare throw: a throwing handler becomes an
             // unhandled rejection on a fire-and-forget path.
@@ -73,9 +74,9 @@ describe('AnalysisClientPermissionService', () => {
                 handlers: {
                     'GET /client-permissions': () => ({
                         data: [{
-                            id: 'cp-1', 
-                            clientId: 'client-1', 
-                            permission: { name: STORAGE_PERMISSION.name }, 
+                            id: 'cp-1',
+                            clientId: 'client-1',
+                            permission: { name: STORAGE_PERMISSION.name },
                         }],
                         meta: { total: 1 },
                     }),
@@ -91,6 +92,7 @@ describe('AnalysisClientPermissionService', () => {
             // The scoping that keeps other clients' rows out is the FILTER the
             // service sends — assert that, not a re-implementation of it.
             const query = decodeURIComponent(authup.requests[0].url);
+
             expect(query).toContain('client-1');
             expect(query).toContain('permission');
         });
@@ -132,6 +134,7 @@ describe('AnalysisClientPermissionService', () => {
             await service.create(analysis.id!, { permissionId: STORAGE_PERMISSION.id }, createAllowAllActor());
 
             const created = authup.requests.filter((request) => request.method === 'POST');
+
             expect(created).toHaveLength(1);
             expect(created[0].body).toMatchObject({
                 clientId: 'client-1',
@@ -238,9 +241,9 @@ describe('AnalysisClientPermissionService', () => {
                 handlers: {
                     'GET /client-permissions': () => ({
                         data: [{
-                            id: 'cp-1', 
-                            clientId: 'client-1', 
-                            permissionId: STORAGE_PERMISSION.id, 
+                            id: 'cp-1',
+                            clientId: 'client-1',
+                            permissionId: STORAGE_PERMISSION.id,
                         }],
                         meta: { total: 1 },
                     }),
@@ -252,11 +255,13 @@ describe('AnalysisClientPermissionService', () => {
             await service.delete(analysis.id!, STORAGE_PERMISSION.id, createAllowAllActor());
 
             const deleted = authup.requests.filter((request) => request.method === 'DELETE');
+
             expect(deleted).toHaveLength(1);
             expect(deleted[0].params.id).toBe('cp-1');
 
             // The lookup must be scoped by BOTH the client and the permission.
             const query = decodeURIComponent(authup.requests[0].url);
+
             expect(query).toContain('client-1');
             expect(query).toContain(STORAGE_PERMISSION.id);
         });

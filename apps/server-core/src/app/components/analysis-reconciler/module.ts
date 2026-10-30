@@ -33,16 +33,20 @@ export function createAnalysisReconcilerComponent(ctx: AnalysisReconcilerCompone
         schedule: ANALYSIS_RECONCILER_SCHEDULE,
         run: async () => {
             let result: AnalysisReconcileResult;
+
             try {
                 result = await ctx.reconciler.reconcile();
             } catch (e) {
-                ctx.logger?.error(`Reconciling stuck analysis processes failed: ${e instanceof Error ? e.message : String(e)}`);
+                ctx.logger?.error(`Reconciling stuck analysis processes failed: ${Error.isError(e) ? e.message : String(e)}`);
+
                 throw e;
             }
 
             const { checked, failed } = result;
+
             if (failed > 0) {
                 ctx.logger?.error(`Checked ${checked} stuck analysis processes, ${failed} failed.`);
+
                 throw new Error(`${failed} stuck analysis process checks failed.`);
             }
 

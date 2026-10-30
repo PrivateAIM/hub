@@ -57,6 +57,7 @@ describe('core/query (select:false columns are root-only)', () => {
             const schema = entitySchemas.find(
                 (candidate) => `${candidate.name.charAt(0).toUpperCase()}${candidate.name.slice(1)}Entity` === entity,
             );
+
             expect(schema, `no schema for ${entity}`).toBeDefined();
 
             expect(await schema.fields.validate(field, undefined, ''), `${entity}.${field} at the root`).toBeTruthy();

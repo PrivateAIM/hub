@@ -55,7 +55,9 @@ export class MessageController {
     ) {
         const actor = buildActorContext(event);
         const messages = await this.service.send(data, actor);
+
         event.response.status = 202;
+
         return { data: messages.map((message) => message.id) };
     }
 
@@ -65,6 +67,7 @@ export class MessageController {
     ) {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
+
         return this.service.pull(this.parsePullQuery(query), actor);
     }
 
@@ -74,8 +77,10 @@ export class MessageController {
         @DContext() event: IAppEvent,
     ) {
         const actor = buildActorContext(event);
+
         await this.service.ack(data, actor);
         event.response.status = 202;
+
         return { data: data.ids };
     }
 
@@ -87,6 +92,7 @@ export class MessageController {
     @DGet('/stream', [ForceLoggedInMiddleware])
     async stream(@DContext() event: IAppEvent) {
         const actor = buildActorContext(event);
+
         if (!actor.identity) {
             throw new BadRequestError('The request is not associated with an authenticated identity.');
         }
@@ -107,11 +113,14 @@ export class MessageController {
         const heartbeat = setInterval(() => {
             // `write` returns false once the client disconnects — use it to drive cleanup
             const alive = stream.write({ event: 'ping', data: `${Date.now()}` });
-            if (!alive) {
-                clearInterval(heartbeat);
-                unsubscribe();
-                stream.end();
+
+            if (alive) {
+                return;
             }
+
+            clearInterval(heartbeat);
+            unsubscribe();
+            stream.end();
         }, SSE_HEARTBEAT_MS);
 
         if (typeof heartbeat.unref === 'function') {
@@ -126,6 +135,7 @@ export class MessageController {
 
         if (typeof query.limit !== 'undefined') {
             const limit = Number(query.limit);
+
             if (!Number.isNaN(limit)) {
                 result.limit = limit;
             }
@@ -133,6 +143,7 @@ export class MessageController {
 
         if (typeof query.wait !== 'undefined') {
             const wait = Number(query.wait);
+
             if (!Number.isNaN(wait)) {
                 result.wait = wait;
             }

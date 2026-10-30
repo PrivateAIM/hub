@@ -126,6 +126,7 @@ export class AnalysisNodeLogController {
         };
 
         const keys = Object.keys(labelsRaw);
+
         for (const key of keys) {
             if (typeof labelsRaw[key] === 'string') {
                 labels[key] = labelsRaw[key];
@@ -146,6 +147,7 @@ export class AnalysisNodeLogController {
         }
 
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 
@@ -185,6 +187,7 @@ export class AnalysisNodeLogController {
         }
 
         event.response.status = 202;
+
         return null;
     }
 }

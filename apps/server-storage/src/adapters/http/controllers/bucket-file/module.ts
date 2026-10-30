@@ -94,6 +94,7 @@ export class BucketFileController {
         });
 
         const nodeStream = await this.storage.getObject(bucketName, entity.hash);
+
         nodeStream.on('end', () => {
             this.logger?.debug(`Streamed file ${entity.path}`, {
                 [LogFlag.REF_TYPE]: DomainType.BUCKET_FILE,
@@ -112,7 +113,9 @@ export class BucketFileController {
 
         if (gzipSupported) {
             event.response.headers.set('content-encoding', 'gzip');
+
             const gzipped = nodeStream.pipe(createGzip());
+
             return sendStream(event, Readable.toWeb(gzipped) as ReadableStream);
         }
 
@@ -140,7 +143,9 @@ export class BucketFileController {
     ): Promise<EntityRecordResponse<BucketFile>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
+
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 }

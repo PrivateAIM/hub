@@ -62,6 +62,7 @@ describe('RegistryService', () => {
             ]);
 
             const result = await service.getMany({}, createAllowAllActor());
+
             expect(result.data).toHaveLength(2);
         });
 
@@ -69,6 +70,7 @@ describe('RegistryService', () => {
             repository.seed(createTestRegistry());
 
             const actor = createAllowAllActor();
+
             await service.getMany(
                 { fields: '+accountSecret' },
                 actor,
@@ -83,6 +85,7 @@ describe('RegistryService', () => {
             // The read gate (preEvaluateOneOf) passes; only the REGISTRY_MANAGE
             // check guarding the secret (preEvaluate) is denied.
             const actor = createAllowAllActor();
+
             actor.permissionEvaluator.deny('preEvaluate');
 
             await expect(
@@ -94,6 +97,7 @@ describe('RegistryService', () => {
             repository.seed(createTestRegistry());
 
             const actor = createAllowAllActor();
+
             await service.getMany({}, actor);
 
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls).toEqual([{ name: READ_PERMISSIONS }]);
@@ -110,10 +114,12 @@ describe('RegistryService', () => {
     describe('getOne', () => {
         it('should return entity by ID', async () => {
             const registry = createTestRegistry({ id: 'r-1' });
+
             repository.seed(registry);
 
             const actor = createAllowAllActor();
             const result = await service.getOne('r-1', actor);
+
             expect(result.id).toBe('r-1');
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls).toEqual([{ name: READ_PERMISSIONS }]);
             expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
@@ -133,9 +139,11 @@ describe('RegistryService', () => {
 
         it('should check permission when query requests secret field', async () => {
             const registry = createTestRegistry({ id: 'r-1' });
+
             repository.seed(registry);
 
             const actor = createAllowAllActor();
+
             await service.getOne('r-1', actor, { fields: '+accountSecret' });
 
             expect(actor.permissionEvaluator.preEvaluateCalls.length).toBeGreaterThan(0);
@@ -175,6 +183,7 @@ describe('RegistryService', () => {
     describe('update', () => {
         it('should update existing entity', async () => {
             const registry = createTestRegistry();
+
             repository.seed(registry);
 
             const result = await service.update(
@@ -194,6 +203,7 @@ describe('RegistryService', () => {
 
         it('should deny when actor lacks permission', async () => {
             const registry = createTestRegistry();
+
             repository.seed(registry);
 
             await expect(
@@ -203,6 +213,7 @@ describe('RegistryService', () => {
 
         it('should extract hostname on update', async () => {
             const registry = createTestRegistry();
+
             repository.seed(registry);
 
             const result = await service.update(
@@ -218,15 +229,18 @@ describe('RegistryService', () => {
     describe('delete', () => {
         it('should delete existing entity', async () => {
             const registry = createTestRegistry();
+
             repository.seed(registry);
 
             const result = await service.delete(registry.id, createAllowAllActor());
+
             expect(result.id).toBe(registry.id);
             expect(repository.getAll()).toHaveLength(0);
         });
 
         it('should deny when actor lacks permission', async () => {
             const registry = createTestRegistry();
+
             repository.seed(registry);
 
             await expect(
@@ -245,6 +259,7 @@ describe('RegistryService', () => {
         describe('SETUP/CLEANUP/DELETE', () => {
             it('should call registryDispatcher for SETUP command', async () => {
                 const registry = createTestRegistry({ id: 'r-1' });
+
                 repository.seed(registry);
 
                 await service.executeCommand(
@@ -259,6 +274,7 @@ describe('RegistryService', () => {
 
             it('should call registryDispatcher for CLEANUP command', async () => {
                 const registry = createTestRegistry({ id: 'r-1' });
+
                 repository.seed(registry);
 
                 await service.executeCommand(
@@ -289,6 +305,7 @@ describe('RegistryService', () => {
                     externalName: 'ext',
                     accountId: 'acc-1',
                 } as RegistryProject;
+
                 registryProjectRepository.seed(project);
 
                 await service.executeCommand(
@@ -308,6 +325,7 @@ describe('RegistryService', () => {
                     externalName: 'ext',
                     accountId: 'acc-1',
                 } as RegistryProject;
+
                 registryProjectRepository.seed(project);
 
                 await service.executeCommand(

@@ -148,13 +148,16 @@ export default defineComponent({
         });
 
         const submit = wrapFnWithBusyState(busy, async () => {
-            if ($v.$invalid.value) return;
+            if ($v.$invalid.value) {
+                return;
+            }
 
             await manager.createOrUpdate(form as Partial<Node>);
         });
 
         return () => {
             let realm : VNodeArrayChildren = [];
+
             if (!isRealmLocked.value) {
                 realm = [
                     h(

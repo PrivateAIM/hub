@@ -6,11 +6,11 @@
  */
 
 import type { EntityQueryInput } from '../../utils';
-import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { AnalysisBucketFileCreatePayload, AnalysisBucketFileUpdatePayload, IAnalysisBucketFileAPI  } from './types';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { AnalysisBucketFileCreatePayload, AnalysisBucketFileUpdatePayload, IAnalysisBucketFileAPI } from './types';
 
 export class AnalysisBucketFileAPI extends BaseAPI implements IAnalysisBucketFileAPI {
     async getMany(

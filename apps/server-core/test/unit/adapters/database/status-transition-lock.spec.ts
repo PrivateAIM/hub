@@ -60,6 +60,7 @@ class BarrierFileMetadataRecalculator extends FakeAnalysisFileMetadataRecalculat
         const entity = await super.recalc(analysisId);
 
         this.arrived++;
+
         if (this.arrived === CONCURRENCY) {
             this.release();
         }
@@ -123,13 +124,16 @@ describe('status transition row lock', () => {
         );
 
         const rejected = results.filter((result): result is PromiseRejectedResult => result.status === 'rejected');
+
         expect(dispatcher.getCallsFor('dispatchExecute')).toHaveLength(1);
         expect(rejected).toHaveLength(CONCURRENCY - 1);
+
         for (const result of rejected) {
             expect(result.reason).toBeInstanceOf(AnalysisError);
         }
 
         const entity = await analysisRepository.findOneByOrFail({ id: analysis.id });
+
         expect(entity.buildStatus).toBe(ProcessStatus.STARTING);
     });
 
@@ -147,6 +151,7 @@ describe('status transition row lock', () => {
         run: () => Promise<unknown>,
     ) {
         const queryRunner = dataSource.createQueryRunner();
+
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
@@ -156,11 +161,15 @@ describe('status transition row lock', () => {
                 .setLock('pessimistic_write')
                 .whereInIds(id)
                 .getOneOrFail();
+
             await queryRunner.manager.save(target, { ...row, ...patch });
 
             const pending = run();
+
             // let the handler reach its read (unlocked) or block on the lock (locked)
-            await new Promise((resolve) => { setTimeout(resolve, 250); });
+            await new Promise((resolve) => {
+                setTimeout(resolve, 250);
+            });
 
             await queryRunner.commitTransaction();
             await pending;
@@ -168,6 +177,7 @@ describe('status transition row lock', () => {
             if (queryRunner.isTransactionActive) {
                 await queryRunner.rollbackTransaction();
             }
+
             await queryRunner.release();
         }
     }

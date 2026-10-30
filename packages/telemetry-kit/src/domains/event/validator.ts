@@ -9,7 +9,7 @@ import { createValidator } from '@validup/zod';
 import { TypedContainer, isObject } from '@privateaim/kit';
 import zod from 'zod';
 import { EventScope } from './constants';
-import type { Event, EventData } from './entity';
+import type { Event, EventData } from './types';
 
 /**
  * Secret denylist for event `data` keys, applied at BOTH ends of the audit
@@ -37,16 +37,13 @@ function isScalar(value: unknown): value is string | number | boolean | null {
  */
 function sanitizeDiff(input: unknown) {
     const output: Record<string, { next: unknown, previous: unknown }> = {};
+
     if (!isObject(input)) {
         return output;
     }
 
     for (const [key, entry] of Object.entries(input)) {
-        if (EVENT_DATA_SECRET_KEY_REGEX.test(key) || !isObject(entry)) {
-            continue;
-        }
-
-        if (!isScalar(entry.next) || !isScalar(entry.previous)) {
+        if (EVENT_DATA_SECRET_KEY_REGEX.test(key) || !isObject(entry) || !isScalar(entry.next) || !isScalar(entry.previous)) {
             continue;
         }
 
@@ -76,6 +73,7 @@ export function sanitizeEventData(input: unknown): EventData | null {
 
         if (key === 'diff') {
             output.diff = sanitizeDiff(value);
+
             continue;
         }
 

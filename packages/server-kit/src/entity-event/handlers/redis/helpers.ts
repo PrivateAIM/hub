@@ -16,6 +16,7 @@ export function buildEntityEventRedisChannel(
     const channelNormalized = stringify(channel);
 
     let namespaceNormalized : string | undefined;
+
     if (namespace) {
         namespaceNormalized = stringify(namespace);
     }

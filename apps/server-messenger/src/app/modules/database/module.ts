@@ -61,12 +61,14 @@ export class DatabaseModule implements IModule {
             if (dataSource.isInitialized) {
                 await dataSource.destroy();
             }
+
             throw e;
         }
     }
 
     async teardown(container: IContainer): Promise<void> {
         const result = container.tryResolve(DatabaseInjectionKey.DataSource);
+
         if (result.success && result.data.isInitialized) {
             await result.data.destroy();
         }

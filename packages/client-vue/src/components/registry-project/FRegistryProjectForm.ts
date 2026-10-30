@@ -112,7 +112,9 @@ export default defineComponent({
         };
 
         const resetAlias = () => {
-            if (!manager.data.value) return;
+            if (!manager.data.value) {
+                return;
+            }
 
             form.externalName = manager.data.value.externalName;
         };

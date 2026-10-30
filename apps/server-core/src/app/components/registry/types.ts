@@ -8,15 +8,7 @@
 import type { Registry, RegistryProject } from '@privateaim/core-kit';
 import type { ObjectLiteralKeys } from '@privateaim/kit';
 import type { ComponentMetadata, ObjectLiteral } from 'hubwire';
-import type { RegistryCommand } from './constants.ts';
-
-export type RegistrySetupPayload = {
-    id: Registry['id']
-};
-
-export type RegistryCleanupPayload = {
-    id: Registry['id']
-};
+import type { RegistryCommand } from '../../../core/domains/index.ts';
 
 export type RegistryProjectLinkPayload = {
     id: RegistryProject['id'],
@@ -35,10 +27,10 @@ export type RegistryProjectRelinkPayload = RegistryProjectUnlinkPayload & {
 };
 
 export type RegistryEventMap = ObjectLiteralKeys<{
-    [RegistryCommand.SETUP]: [RegistrySetupPayload, ComponentMetadata],
+    [RegistryCommand.SETUP]: [Pick<Registry, 'id'>, ComponentMetadata],
     [RegistryCommand.HOOK_PROCESS]: [ObjectLiteral, ComponentMetadata],
-    [RegistryCommand.DELETE]: [RegistrySetupPayload, ComponentMetadata],
-    [RegistryCommand.CLEANUP]: [RegistryCleanupPayload, ComponentMetadata],
+    [RegistryCommand.DELETE]: [Pick<Registry, 'id'>, ComponentMetadata],
+    [RegistryCommand.CLEANUP]: [Pick<Registry, 'id'>, ComponentMetadata],
     [RegistryCommand.PROJECT_LINK]: [RegistryProjectLinkPayload, ComponentMetadata],
     [RegistryCommand.PROJECT_UNLINK]: [RegistryProjectUnlinkPayload, ComponentMetadata],
     [RegistryCommand.PROJECT_RELINK]: [RegistryProjectRelinkPayload, ComponentMetadata],

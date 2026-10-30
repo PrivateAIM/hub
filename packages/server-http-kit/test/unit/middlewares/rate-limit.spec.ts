@@ -19,6 +19,7 @@ async function limitFor(
     compiled?: PermissionCompileResult | FakePermissionEvaluator,
 ): Promise<string | null> {
     const app = new App();
+
     app.use(defineCoreHandler((event) => {
         if (identity) {
             setRequestIdentity(event, {
@@ -33,6 +34,7 @@ async function limitFor(
             setRequestEnv(event, 'permissionEvaluator', compiled);
         } else if (compiled) {
             const evaluator = new FakePermissionEvaluator();
+
             evaluator.setCompileResult(compiled);
             setRequestEnv(event, 'permissionEvaluator', evaluator);
         }
@@ -43,7 +45,9 @@ async function limitFor(
     app.get('/', defineCoreHandler(() => ({})));
 
     const response = await app.fetch(new Request('http://hub.test/'));
+
     expect(response.status).toBe(200);
+
     return response.headers.get('ratelimit-limit');
 }
 
@@ -55,7 +59,11 @@ class AllowAllButEvaluator extends FakePermissionEvaluator {
 
     override async compile(ctx: PermissionCompileContext): Promise<PermissionCompileResult> {
         const names = Array.isArray(ctx.name) ? ctx.name : [ctx.name];
-        return { verdict: names.some((name) => !this.excluded.includes(name)) ? 'allow' : 'deny' };
+        const { excluded } = this;
+
+        const allowed = names.some((name) => !excluded.includes(name));
+
+        return { verdict: allowed ? 'allow' : 'deny' };
     }
 }
 
@@ -70,6 +78,7 @@ describe('rate limiter', () => {
 
     it('limits a client whose unbounded reach covers only some permissions', async () => {
         const evaluator = new AllowAllButEvaluator([PermissionName.ANALYSIS_UPDATE]);
+
         expect(await limitFor({ type: 'client' }, evaluator)).toBe(String(60 * 1000));
     });
 

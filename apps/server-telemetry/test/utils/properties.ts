@@ -16,9 +16,11 @@ export function expectPropertiesEqualToSrc<
     ignore?: (keyof T)[],
 ) {
     const keys = Object.keys(src);
+
     for (const key of keys) {
         if (typeof ignore !== 'undefined') {
             const index = ignore.indexOf(key);
+
             if (index !== -1) {
                 continue;
             }

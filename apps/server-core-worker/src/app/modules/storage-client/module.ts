@@ -26,6 +26,7 @@ export class StorageClientModule implements IModule {
         const client = new APIClient({ baseURL: config.storageURL });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
+
         if (hookResult.success) {
             hookResult.data.attach(client);
         }

@@ -5,30 +5,30 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { 
-    APagination, 
-    ASearch, 
-    SlotName, 
-    defineEntityCollectionVEmitOptions, 
-    defineEntityCollectionVProps, 
-    renderToggleButton, 
+import {
+    APagination,
+    ASearch,
+    SlotName,
+    defineEntityCollectionVEmitOptions,
+    defineEntityCollectionVProps,
+    renderToggleButton,
 } from '@authup/client-web-kit';
 import type {
-    PropType, 
-    Ref, 
+    PropType,
+    Ref,
     VNodeChild,
 } from 'vue';
 import {
-    computed, 
-    h, 
-    mergeProps, 
-    ref, 
-    toRef, 
+    computed,
+    h,
+    mergeProps,
+    ref,
+    toRef,
     watch,
 } from 'vue';
 import type { EntityCollectionVSlots } from '@authup/client-web-kit';
 import {
-    hasNormalizedSlot, 
+    hasNormalizedSlot,
     normalizeSlot,
 } from '../slot';
 import type { EntityPickerContext, EntityPickerVEmitOptions, RecordWithID } from './types';
@@ -148,6 +148,7 @@ export function defineEntityPicker<T extends RecordWithID>({
                 slotProps: EntityCollectionVSlots<RecordWithID>['itemActions'],
             ) => {
                 let content : VNodeChild | undefined;
+
                 if (hasNormalizedSlot(SlotName.ITEM_ACTIONS, setup.slots)) {
                     content = normalizeSlot(SlotName.ITEM_ACTIONS, {
                         ...slotProps,

@@ -41,6 +41,7 @@ export async function applyTokenVerificationData(
     const scopes = unwrapOAuth2Scope(data.scope || []);
 
     const permissionEvaluator = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject(data));
+
     setRequestEnv(event, 'permissionEvaluator', permissionEvaluator);
 
     setRequestEnv(event, 'identity', {

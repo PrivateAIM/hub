@@ -107,6 +107,7 @@ export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
         };
 
         const result = await scanDirectory(directoryPath);
+
         for (let i = 0; i < result.images.length; i++) {
             const attributes = await this.imageValidator.run(result.images[i].attributes);
 
@@ -123,10 +124,12 @@ export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
             const attributes = await this.groupValidator.run(result.groups[i].attributes);
 
             let name : string;
+
             if (attributes.name) {
                 name = attributes.name;
             } else {
                 const parts = result.groups[i].path.split('/');
+
                 name = parts.slice(0, -1).join('/');
             }
 

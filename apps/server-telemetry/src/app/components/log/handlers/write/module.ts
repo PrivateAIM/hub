@@ -35,6 +35,7 @@ export class LogComponentWriteHandler implements ComponentHandler {
         input: LogWriteCommandPayload,
     ): Promise<void> {
         let data: LogInput;
+
         try {
             data = await this.validate(input);
         } catch (e) {
@@ -55,7 +56,7 @@ export class LogComponentWriteHandler implements ComponentHandler {
             // prefetch slot through its backoff, so a store outage would cut
             // throughput to a few lines a minute and pile up every service's
             // log lines in the broker. A lost log line is the cheaper failure.
-            this.logger?.warn(`Dropping log line, the log store rejected it: ${e instanceof Error ? e.message : String(e)}`);
+            this.logger?.warn(`Dropping log line, the log store rejected it: ${Error.isError(e) ? e.message : String(e)}`);
         }
     }
 

@@ -14,6 +14,7 @@ export function extendObjectProperties<T extends Record<string, any>>(
     }
 
     const keys : (keyof T)[] = Object.keys(input);
+
     for (const key of keys) {
         src[key] = input[key] as T[keyof T];
     }

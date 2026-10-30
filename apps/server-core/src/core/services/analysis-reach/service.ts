@@ -61,6 +61,7 @@ export class AnalysisReachService implements IAnalysisReachService {
         await actor.permissionEvaluator.preEvaluateOneOf({ name: names });
 
         const binding = await this.resolveClientBinding(actor, target, approval);
+
         if (binding) {
             return options.grantOnly ? matchNothing() : binding;
         }
@@ -68,6 +69,7 @@ export class AnalysisReachService implements IAnalysisReachService {
         const compiled = await actor.permissionEvaluator.compile({ name: names });
 
         let grant: ICondition;
+
         switch (compiled.verdict) {
             case 'allow':
                 return undefined;
@@ -75,6 +77,7 @@ export class AnalysisReachService implements IAnalysisReachService {
                 return matchNothing();
             case 'conditional':
                 grant = prefixConditionFields(compiled.condition, target.analysisPath);
+
                 break;
             default:
                 // `post`: a grant policy that cannot lower — narrowed to the
@@ -89,6 +92,7 @@ export class AnalysisReachService implements IAnalysisReachService {
         }
 
         const ids = await this.analysisNodeRepository.findAnalysisIds({ nodeRealmId: actor.realm.id, ...approval });
+
         if (ids.length === 0) {
             return grant;
         }
@@ -112,12 +116,15 @@ export class AnalysisReachService implements IAnalysisReachService {
         const { id: clientId, realmId } = actor.identity;
 
         const node = await this.nodeRepository.findOneBy({ clientId, realmId });
+
         if (node) {
             const ids = await this.analysisNodeRepository.findAnalysisIds({ nodeId: node.id, ...approval });
+
             return inArray(target.analysisIdAttributeName, ids);
         }
 
         const analysis = await this.analysisRepository.findOneBy({ clientId, realmId });
+
         if (analysis) {
             return eq(target.analysisIdAttributeName, analysis.id);
         }

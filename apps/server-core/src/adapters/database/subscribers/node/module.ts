@@ -78,19 +78,25 @@ export class NodeSubscriber extends BaseSubscriber<NodeEntity> implements Entity
     }
 
     async afterRemove(event: RemoveEvent<NodeEntity>): Promise<any> {
-        if (!this.nodeClientService) return;
+        if (!this.nodeClientService) {
+            return;
+        }
 
         await this.nodeClientService.dismiss(event.entity || event.databaseEntity);
     }
 
     protected async assignClient(entity: NodeEntity, manager: EntityManager): Promise<void> {
-        if (!this.nodeClientService) return;
+        if (!this.nodeClientService) {
+            return;
+        }
 
         const prevId = entity.clientId;
 
         const client = await this.nodeClientService.assign(entity);
+
         if (client.id !== prevId) {
             const repository = manager.getRepository(NodeEntity);
+
             await repository.save(entity);
         }
 

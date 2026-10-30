@@ -30,6 +30,7 @@ export class ServerTelemetryApplicationBuilder extends BaseApplicationBuilder {
         }
 
         this.modules.push(instance ?? factory());
+
         return this;
     }
 }

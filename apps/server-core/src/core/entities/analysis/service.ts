@@ -118,6 +118,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
 
         const scoped = condition ? appendQueryConditions(decoded, condition) : decoded;
         const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -131,6 +132,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         // (non-empty) name, so it passes validation instead of being rejected
         // as null/empty before generation could happen.
         const input: Partial<Analysis> = { ...data };
+
         if (!input.name) {
             input.name = generateName();
         }
@@ -203,6 +205,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         const approvedProjectNodes = projectNodes.filter(
             (projectNode) => projectNode.approvalStatus === ProjectNodeApprovalStatus.APPROVED,
         );
+
         if (approvedProjectNodes.length === 0) {
             return;
         }
@@ -236,6 +239,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         await this.repository.validateJoinColumns(validated);
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -249,6 +253,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         // The stored row and the target state (merged into a copy: the row
         // itself is written through the lock below).
         const next = this.repository.merge({ ...entity }, validated);
+
         await evaluateRecordUpdate(actor.permissionEvaluator, {
             name: PermissionName.ANALYSIS_UPDATE,
             current: { realm: entity.realmId, data: { attributes: entity } },
@@ -269,8 +274,10 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
             }
 
             Object.assign(locked, validated);
+
             return true;
         }, { data: actor.metadata });
+
         if (!saved) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -284,6 +291,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_DELETE });
 
         const entity = await this.repository.findOneWithProject(id);
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -323,6 +331,7 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         await actor.permissionEvaluator.preEvaluate({ name: permissionName });
 
         let entity = await this.repository.findOneById(id);
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -338,33 +347,40 @@ export class AnalysisService extends AbstractEntityService implements IAnalysisS
         switch (command) {
             case AnalysisCommand.BUILD_CHECK:
                 entity = await this.builder.check(entity);
+
                 break;
             case AnalysisCommand.BUILD_START:
                 entity = await this.builder.start(entity, {
                     ignoreApproval: this.skipAnalysisApproval,
                     persistCtx,
                 });
+
                 break;
             case AnalysisCommand.CONFIGURATION_LOCK:
                 entity = await this.configurator.lock(entity, {
                     ignoreApproval: this.skipAnalysisApproval,
                     persistCtx,
                 });
+
                 break;
             case AnalysisCommand.CONFIGURATION_UNLOCK:
                 entity = await this.configurator.unlock(entity, {
                     ignoreApproval: this.skipAnalysisApproval,
                     persistCtx,
                 });
+
                 break;
             case AnalysisCommand.DISTRIBUTION_CHECK:
                 entity = await this.distributor.check(entity);
+
                 break;
             case AnalysisCommand.DISTRIBUTION_START:
                 entity = await this.distributor.start(entity, persistCtx);
+
                 break;
             case AnalysisCommand.STORAGE_CHECK:
                 entity = await this.storageManager.check(entity);
+
                 break;
         }
 

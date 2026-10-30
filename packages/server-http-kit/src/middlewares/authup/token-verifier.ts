@@ -62,7 +62,7 @@ export class IntrospectableTokenVerifier extends TokenVerifier {
  */
 function toUpstreamError(input: unknown): unknown {
     if (
-        input instanceof Error &&
+        Error.isError(input) &&
         isVouchlyError(input.cause) &&
         input.cause.code === VouchlyErrorCode.INTROSPECTION_FAILED
     ) {
@@ -99,6 +99,7 @@ export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext): 
     }
 
     let cache : ITokenCache;
+
     if (ctx.cache) {
         cache = ctx.cache;
     } else if (ctx.redisClient) {

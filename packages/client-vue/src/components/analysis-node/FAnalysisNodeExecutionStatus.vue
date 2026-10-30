@@ -26,6 +26,7 @@ export default defineComponent({
             if (props.status) {
                 return props.status;
             }
+
             return 'unknown';
         });
 

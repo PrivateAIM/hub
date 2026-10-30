@@ -66,6 +66,7 @@ describe('database/message-repository', () => {
     it('should pull recipient-scoped messages and delete them on ack', async () => {
         const recipientA = randomUUID();
         const recipientB = randomUUID();
+
         await repository.createMany([
             persistInput(recipientA, 'x'),
             persistInput(recipientA, 'y'),
@@ -73,19 +74,24 @@ describe('database/message-repository', () => {
         ]);
 
         const forA = await repository.findManyForRecipient({ type: 'client', id: recipientA }, 50, new Date());
+
         expect(forA.map((m) => m.data).sort()).toEqual(['x', 'y']);
 
         const forB = await repository.findManyForRecipient({ type: 'client', id: recipientB }, 50, new Date());
+
         expect(forB).toHaveLength(1);
 
         await repository.ackByIds({ type: 'client', id: recipientA }, [forA[0].id]);
+
         const afterAck = await repository.findManyForRecipient({ type: 'client', id: recipientA }, 50, new Date());
+
         expect(afterAck).toHaveLength(1);
         expect(afterAck[0].id).toBe(forA[1].id);
     });
 
     it('should respect the pull limit', async () => {
         const recipient = randomUUID();
+
         await repository.createMany([
             persistInput(recipient, '1'),
             persistInput(recipient, '2'),
@@ -93,31 +99,37 @@ describe('database/message-repository', () => {
         ]);
 
         const limited = await repository.findManyForRecipient({ type: 'client', id: recipient }, 2, new Date());
+
         expect(limited).toHaveLength(2);
     });
 
     it('should not pull an expired message the sweep has not removed yet', async () => {
         const recipient = randomUUID();
+
         await repository.createMany([
             persistInput(recipient, 'expired', Date.now() - 60_000),
             persistInput(recipient, 'fresh', Date.now() + 60_000),
         ]);
 
         const pulled = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50, new Date());
+
         expect(pulled.map((m) => m.data)).toEqual(['fresh']);
     });
 
     it('should sweep expired messages and keep unexpired ones', async () => {
         const recipient = randomUUID();
+
         await repository.createMany([
             persistInput(recipient, 'expired', Date.now() - 60_000),
             persistInput(recipient, 'fresh', Date.now() + 60_000),
         ]);
 
         const removed = await repository.deleteExpired(new Date());
+
         expect(removed).toBeGreaterThanOrEqual(1);
 
         const remaining = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50, new Date());
+
         expect(remaining.map((m) => m.data)).toEqual(['fresh']);
     });
 
@@ -132,16 +144,19 @@ describe('database/message-repository', () => {
             // the sweep runs every 60s on every replica; a bounded statement
             // that does not loop would leave a permanent backlog behind.
             const recipient = randomUUID();
+
             await seedExpired(recipient, 5);
 
             await repository.deleteExpired(new Date(), { batchSize: 2 });
 
             const remaining = await repository.findManyForRecipient({ type: 'client', id: recipient }, 50, new Date());
+
             expect(remaining).toHaveLength(0);
         });
 
         it('should bound each statement to the batch size', async () => {
             const recipient = randomUUID();
+
             await seedExpired(recipient, 5);
 
             const ormRepository = app.dataSource.getRepository(MessageEntity);
@@ -156,6 +171,7 @@ describe('database/message-repository', () => {
             expect(deleteSpy.mock.calls.length).toBeGreaterThanOrEqual(3);
             // asserted so the bound check below can never pass vacuously
             expect(findSpy).toHaveBeenCalled();
+
             for (const [options] of findSpy.mock.calls) {
                 expect(options?.take).toEqual(2);
             }
@@ -171,6 +187,7 @@ describe('database/message-repository', () => {
                 // falsy take, silently restoring the unbounded sweep this
                 // batching exists to prevent.
                 const recipient = randomUUID();
+
                 await seedExpired(recipient, 1);
 
                 const ormRepository = app.dataSource.getRepository(MessageEntity);
@@ -180,6 +197,7 @@ describe('database/message-repository', () => {
                 await adapter.deleteExpired(new Date(), { batchSize });
 
                 expect(findSpy).toHaveBeenCalled();
+
                 for (const [options] of findSpy.mock.calls) {
                     expect(options?.take).toEqual(MESSAGE_SWEEP_BATCH_SIZE);
                 }

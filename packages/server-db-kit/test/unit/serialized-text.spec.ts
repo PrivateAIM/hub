@@ -31,6 +31,7 @@ describe('serializedTextTransformer', () => {
     // false / 0 pin `?? null` rather than `||`; string primitives must keep their type.
     it('round-trips real values unchanged, incl. falsy ones and a raw base64 string', () => {
         const values: unknown[] = [{ a: 1 }, [{ position: 'after' }], {}, 'YmFzZTY0', '123', 'true', 'null', 'undefined', '', false, 0];
+
         for (const value of values) {
             expect(serializedTextTransformer.from(serializedTextTransformer.to(value))).toEqual(value);
         }

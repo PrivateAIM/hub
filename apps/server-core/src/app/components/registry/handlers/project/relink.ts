@@ -6,8 +6,8 @@
  */
 
 import type { ComponentHandler, ComponentHandlerContext } from 'hubwire';
-import type { RegistryEventMap, RegistryProjectRelinkPayload } from '../../type.ts';
-import { RegistryCommand } from '../../constants.ts';
+import type { RegistryEventMap, RegistryProjectRelinkPayload } from '../../types.ts';
+import { RegistryCommand } from '../../../../../core/domains/index.ts';
 
 export class RegistryProjectRelinkHandler implements ComponentHandler<
     RegistryEventMap,

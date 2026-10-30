@@ -37,6 +37,7 @@ export class LogService implements ILogService {
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.LOG_CREATE });
 
         const validated = await this.validator.run(data);
+
         return this.store.write(validated);
     }
 
@@ -50,6 +51,7 @@ export class LogService implements ILogService {
         const decoded = decodeQueryOpen(query);
 
         const { labels } = collectLogFilters(decoded);
+
         this.assertLabels(labels);
 
         const requestedLimit = decoded.pagination.limit;
@@ -81,8 +83,10 @@ export class LogService implements ILogService {
         const { labels, time } = collectLogFilters(decodeQueryOpen(query), { extractTime: true });
 
         let start: number | undefined;
+
         if (typeof time !== 'undefined') {
             start = Number(time);
+
             if (!Number.isFinite(start)) {
                 throw new BadRequestError('Filter time must be a finite unix timestamp.');
             }

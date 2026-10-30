@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type HumanFileSizeInput = number | bigint | string | null | undefined;
+import type { HumanFileSizeInput } from './types';
 
 /**
  * Format a byte count for human-readable display.
@@ -24,6 +24,7 @@ export function humanFileSize(bytes: HumanFileSizeInput, si: boolean = false, dp
     }
 
     let value: number;
+
     if (typeof bytes === 'number') {
         value = bytes;
     } else if (typeof bytes === 'bigint') {
@@ -34,6 +35,7 @@ export function humanFileSize(bytes: HumanFileSizeInput, si: boolean = false, dp
         if (bytes.trim() === '') {
             return '';
         }
+
         value = Number(bytes);
     }
 

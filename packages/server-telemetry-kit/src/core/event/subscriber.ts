@@ -5,13 +5,14 @@
  *  view the LICENSE file that was distributed with this source code.
  */
 
+import type { EntityEventHandlerContext, IEventPublisher  } from './types.ts';
+
 import { isEqual } from 'smob';
 import type { EntityEventHandleOptions, IEntityEventHandler, Logger } from '@privateaim/server-kit';
 import type { Event, EventData } from '@privateaim/telemetry-kit';
 import { DomainType, EVENT_DATA_SECRET_KEY_REGEX } from '@privateaim/telemetry-kit';
 import type { ObjectDiff, ObjectLiteral } from '@privateaim/kit';
 import { DomainEventName, isObject } from '@privateaim/kit';
-import type { IEventPublisher } from './types.ts';
 
 /**
  * Entity timestamp properties, excluded from an update diff so a save does not
@@ -28,10 +29,7 @@ import type { IEventPublisher } from './types.ts';
  */
 const TIMESTAMP_KEYS = new Set<string>(['createdAt', 'updatedAt', 'expiresAt']);
 
-export type EntityEventHandlerContext = {
-    eventComponentDispatcher?: IEventPublisher,
-    logger?: Logger,
-};
+
 
 export class EntityEventHandler implements IEntityEventHandler {
     protected eventComponentDispatcher?: IEventPublisher;
@@ -91,14 +89,13 @@ export class EntityEventHandler implements IEntityEventHandler {
         ) {
             const diff : ObjectDiff = {};
             const keys = Object.keys(ctx.data);
+
             for (const key of keys) {
                 // skip date changes. An explicit set rather than a suffix test:
                 // the previous `key.endsWith('_at')` silently matched nothing
                 // once the properties became camelCase, so every update event
                 // started carrying timestamp churn in its diff.
-                if (TIMESTAMP_KEYS.has(key)) {
-                    continue;
-                }
+                const timestamp = TIMESTAMP_KEYS.has(key);
 
                 // Never audit a credential. `ctx.data` is the incoming save
                 // payload, so a `select: false` column such as
@@ -106,18 +103,20 @@ export class EntityEventHandler implements IEntityEventHandler {
                 // `ctx.dataPrevious` (loaded from the database without
                 // select:false columns) is NOT — the value therefore always
                 // compares as changed and would always be recorded.
-                if (EVENT_DATA_SECRET_KEY_REGEX.test(key)) {
+                const secret = EVENT_DATA_SECRET_KEY_REGEX.test(key);
+                const value = ctx.data[key];
+
+                if (timestamp || secret || isObject(value) || Array.isArray(value)) {
                     continue;
                 }
 
-                if (isObject(ctx.data[key]) || Array.isArray(ctx.data[key])) {
-                    continue;
-                }
+                const next = value;
+                const previous = ctx.dataPrevious[key];
 
-                if (!isEqual(ctx.data[key], ctx.dataPrevious[key])) {
+                if (!isEqual(next, previous)) {
                     diff[key] = {
-                        next: ctx.data[key],
-                        previous: ctx.dataPrevious[key],
+                        next,
+                        previous,
                     };
                 }
             }

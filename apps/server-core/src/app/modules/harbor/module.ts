@@ -22,13 +22,17 @@ export class HarborModule implements IModule {
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
 
-        if (!config.harborURL) return;
+        if (!config.harborURL) {
+            return;
+        }
 
         const logger = container.resolve(LoggerInjectionKey);
+
         logger.debug('Executing harbor service setup...');
 
         const dataSource = container.resolve(DatabaseInjectionKey.DataSource);
         const registryRepository = container.resolve(DatabaseInjectionKey.RegistryRepository);
+
         await withDataSourceLock(
             dataSource,
             HARBOR_SETUP_DATABASE_LOCK,

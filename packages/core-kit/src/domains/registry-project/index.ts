@@ -6,7 +6,7 @@
  */
 
 export * from './constants';
-export * from './entity';
+export * from './types';
 export * from './socket';
 export * from './utils';
 export * from './validator';

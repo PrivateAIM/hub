@@ -86,6 +86,7 @@ describe('VictoriaLogsLogStore', () => {
     describe('buildQuery', () => {
         it('should build query with valid labels', () => {
             const query = store.testBuildQuery({ channel: 'system', level: 'error' });
+
             expect(query).toContain('channel:="system"');
             expect(query).toContain('level:="error"');
             expect(query).toContain(' AND ');
@@ -93,6 +94,7 @@ describe('VictoriaLogsLogStore', () => {
 
         it('should return wildcard for empty labels', () => {
             const query = store.testBuildQuery({});
+
             expect(query).toMatch(/^\* \| sort by/);
         });
 
@@ -102,6 +104,7 @@ describe('VictoriaLogsLogStore', () => {
                 'invalid key': 'injected',
                 'key"quote': 'injected',
             });
+
             expect(query).toContain('valid_key:="ok"');
             expect(query).not.toContain('invalid key');
             expect(query).not.toContain('key"quote');
@@ -109,6 +112,7 @@ describe('VictoriaLogsLogStore', () => {
 
         it('should escape values in query', () => {
             const query = store.testBuildQuery({ channel: 'value"with"quotes' });
+
             expect(query).toContain('channel:="value\\"with\\"quotes"');
         });
 

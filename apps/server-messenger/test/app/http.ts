@@ -12,7 +12,7 @@ import {
     createAuthupUserTokenCreator,
 } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../../src/app/modules/config/index.ts';
-import type { HTTPServer } from '../../src/app/modules/http/constants.ts';
+import type { HTTPServer } from '../../src/app/modules/http/types.ts';
 import { HTTPInjectionKey } from '../../src/app/modules/http/index.ts';
 import { TestApplication } from './module.ts';
 
@@ -21,6 +21,7 @@ export class TestHTTPApplication extends TestApplication {
 
     get baseURL(): string {
         const server = this.container.resolve<HTTPServer>(HTTPInjectionKey.Server);
+
         // server binds 0.0.0.0; connecting to that hangs on macOS — target loopback
         return (server.url ?? '').replace('0.0.0.0', '127.0.0.1');
     }
@@ -56,6 +57,7 @@ export class TestHTTPApplication extends TestApplication {
                 realm: 'master',
             }),
         });
+
         hook.attach(client);
 
         return client;

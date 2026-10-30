@@ -21,6 +21,7 @@ export function mountAuthorizationMiddleware(
     // There used to be a fallback that attached a fixed master-realm user to
     // EVERY request instead — server-messenger ran on it in production.
     const { authupClient } = options;
+
     if (!authupClient) {
         return;
     }
@@ -33,6 +34,7 @@ export function mountAuthorizationMiddleware(
                 tokenVerifier,
                 tokenByRequest: () => {
                     const cookieToken = useRequestCookie(event, resolveAccessTokenCookieName(options.cookiePrefix));
+
                     if (cookieToken) {
                         return cookieToken;
                     }

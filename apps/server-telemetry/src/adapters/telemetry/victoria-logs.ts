@@ -81,6 +81,7 @@ export class VictoriaLogsLogStore implements LogStore {
         } of data) {
             const labels : Record<string, string> = {};
             const keys = Object.keys(labelsRaw);
+
             for (const key of keys) {
                 if (key.startsWith('_')) {
                     continue;
@@ -125,6 +126,7 @@ export class VictoriaLogsLogStore implements LogStore {
             }
 
             const value = this.escapeQueryValue(labels[key]);
+
             filters.push(`${key}:="${value}"`);
         }
 

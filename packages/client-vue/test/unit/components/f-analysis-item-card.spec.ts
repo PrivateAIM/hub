@@ -69,6 +69,7 @@ describe('components/FAnalysisItemCard', () => {
         const expander = wrapper.findAll('button').find(
             (button) => button.text().includes('more nodes'),
         );
+
         expect(expander).toBeDefined();
 
         await expander!.trigger('click');

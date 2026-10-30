@@ -70,20 +70,20 @@ export class GitHubClient extends Client {
             });
 
             writable.on('finish', () => {
-                Promise.resolve()
-                    .then(() => extract({
-                        file: tmpFilePath,
-                        cwd: options.destination,
-                        onReadEntry(entry) {
-                            entry.path = entry.path.split('/').splice(1).join('/');
-                        },
-                    }))
+                Promise.try(() => extract({
+                    file: tmpFilePath,
+                    cwd: options.destination,
+                    onReadEntry(entry) {
+                        entry.path = entry.path.split('/').splice(1).join('/');
+                    },
+                }))
                     .then(() => fs.promises.rm(tmpFilePath))
                     .then(() => resolve(options.destination))
                     .catch((e) => reject(e));
             });
 
             const readStream = Readable.fromWeb(stream as any);
+
             readStream.pipe(writable);
         });
     }

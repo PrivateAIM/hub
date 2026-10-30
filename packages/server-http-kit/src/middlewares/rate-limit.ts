@@ -19,6 +19,7 @@ export function mountRateLimiterMiddleware(app: App) {
         async skip(event: IAppEvent) {
             const identity = useRequestIdentity(event);
             const permissionEvaluator = useRequestEnv(event, 'permissionEvaluator');
+
             if (!identity || identity.type !== 'client' || !permissionEvaluator) {
                 return false;
             }
@@ -29,10 +30,12 @@ export function mountRateLimiterMiddleware(app: App) {
             const verdicts = await Promise.all(PERMISSION_NAMES.map(
                 (name) => hasUnboundedReach(permissionEvaluator, name),
             ));
+
             return verdicts.every(Boolean);
         },
         max(event: IAppEvent) {
             const identity = useRequestIdentity(event);
+
             if (identity && identity.type === 'user') {
                 return 60 * 100; // 100 req p. sec
             }

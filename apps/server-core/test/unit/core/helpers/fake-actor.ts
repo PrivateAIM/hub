@@ -8,7 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import { PermissionError } from '@authup/access';
 import type { FakeActorContext } from '@privateaim/server-test-kit';
-import { FakePermissionEvaluator } from '@privateaim/server-test-kit';
+import { FakePermissionEvaluator } from '@authup/server-test-kit';
 import type { PermissionActorOptions } from './types.ts';
 
 /**

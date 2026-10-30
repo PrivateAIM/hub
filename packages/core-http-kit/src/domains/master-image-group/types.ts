@@ -7,7 +7,7 @@
 
 import type { MasterImageGroup } from '@privateaim/core-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 
 /** Read + delete only — groups appear through master-image catalog sync. */
 export interface IMasterImageGroupAPI {

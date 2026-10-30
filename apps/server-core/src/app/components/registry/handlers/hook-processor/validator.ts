@@ -59,6 +59,7 @@ class RegistryHookEventDataValidator extends TypedContainer<RegistryHookEventDat
         this.mount('repository', new RegistryHookRepositoryValidator());
 
         const resourceValidator = new RegistryHookResourceValidator();
+
         this.mount('resources', (ctx) => {
             if (!Array.isArray(ctx.value)) {
                 return undefined;

@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import fs from 'node:fs';
@@ -47,9 +47,11 @@ describe('controllers/bucket-file', () => {
         const file = await fs.promises.readFile(filePath);
 
         const formData = new FormData();
+
         formData.append('file[0]', new Blob([file as BlobPart]), 'file.json');
 
         const bucketFiles = await client.bucket.upload(bucket.id, formData);
+
         expect(bucketFiles.data.length).toBeGreaterThanOrEqual(1);
 
         details = removeDateProperties((bucketFiles.data)[0]);
@@ -75,6 +77,7 @@ describe('controllers/bucket-file', () => {
         const data = await client.bucketFile.stream(details.id);
         const stream = Readable.fromWeb(data as any);
         const buffer = await streamToBuffer(stream);
+
         expect(buffer.byteLength).toBeGreaterThan(0);
     });
 
@@ -110,6 +113,7 @@ describe('controllers/bucket-file', () => {
 
     it('should delete resource', async () => {
         const client = suite.client();
+
         await client.bucketFile.delete(details.id);
     });
 });

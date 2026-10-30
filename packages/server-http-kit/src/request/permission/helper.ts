@@ -18,6 +18,7 @@ import { useRequestEnv } from '../env';
  */
 export function useRequestPermissionEvaluator(event: IAppEvent) : IPermissionEvaluator {
     const evaluator = useRequestEnv(event, 'permissionEvaluator');
+
     if (!evaluator) {
         throw new BadRequestError('The request permission evaluator is not initialized.');
     }

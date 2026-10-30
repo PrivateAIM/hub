@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { AnalysisNode } from './entity.ts';
+import type { AnalysisNode } from './types.ts';
 import { AnalysisNodeApprovalStatus } from './constants.ts';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';

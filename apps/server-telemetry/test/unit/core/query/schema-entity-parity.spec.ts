@@ -185,6 +185,7 @@ describe('core/query (schema ↔ entity parity)', () => {
                 // direction separates a bound entry from the substituted
                 // default.
                 const [permitted] = allowed;
+
                 expect(permitted, 'schema declares no sort key to control against').toBeDefined();
 
                 const defaults = description.sorts?.default || {};
@@ -194,9 +195,11 @@ describe('core/query (schema ↔ entity parity)', () => {
                 const control = decodeQuery({ sort: wire }, { schema });
                 const bound = (control.sorts?.value || [])
                     .some((sort) => sort.name === permitted && sort.operator === direction);
+
                 expect(bound).toBe(true);
 
                 const parsed = decodeQuery({ sort: 'totallyBogusColumn' }, { schema });
+
                 expect(JSON.stringify(parsed.sorts ?? null)).not.toContain('totallyBogusColumn');
             },
         );

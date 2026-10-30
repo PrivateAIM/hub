@@ -38,9 +38,14 @@ export function createApplication() {
                         if (!logDispatcher) {
                             // only over AMQP: no in-process consumer takes a log line here
                             const result = app?.container.tryResolve(RemoteMessageBusInjectionKey);
-                            if (!result?.success) return;
+
+                            if (!result?.success) {
+                                return;
+                            }
+
                             logDispatcher = new LogComponentDispatcher({ messageBus: result.data });
                         }
+
                         await logDispatcher.dispatchWrite(data);
                     },
                 }),

@@ -37,6 +37,7 @@ describe('src/message-bus/hooks', () => {
         expect(transport.items).toHaveLength(0);
 
         const message = buildMessage({ type: 'execute', metadata: { routing: taskRouting } });
+
         await bus.publish(message);
         expect(transport.items).toHaveLength(1);
         expect(transport.items[0].level).toEqual('debug');
@@ -67,6 +68,7 @@ describe('src/message-bus/hooks', () => {
         await drain();
 
         const errors = transport.items.filter((item) => item.level === 'error');
+
         expect(errors.map((item) => item.message)).toEqual(['Handling queue message execute in task failed: boom']);
     });
 });

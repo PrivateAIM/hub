@@ -84,6 +84,7 @@ describe('storage bucket aggregator', () => {
             realmId: faker.string.uuid(),
         }));
         const analysisRepository = dataSource.getRepository(AnalysisEntity);
+
         return analysisRepository.save(analysisRepository.create({
             name: faker.string.alpha({ length: 16, casing: 'lower' }),
             realmId: project.realmId,
@@ -142,6 +143,7 @@ describe('storage bucket aggregator', () => {
 
     async function findFileIds(bucketId: string): Promise<string[]> {
         const entities = await dataSource.getRepository(AnalysisBucketFileEntity).findBy({ bucketId });
+
         return entities.map((entity) => entity.id).sort();
     }
 
@@ -167,11 +169,13 @@ describe('storage bucket aggregator', () => {
 
         const deletionHandler = new StorageBucketDeletionFinishedHandler(ctx);
         const { fileIds, ...bucket } = createPayload(deleted.bucket, []);
+
         expect(fileIds).toEqual([]);
 
         await deletionHandler.handle(bucket);
 
         const repository = dataSource.getRepository(AnalysisBucketEntity);
+
         expect(await repository.findOneBy({ id: deleted.bucket.id })).toBeNull();
         expect(await repository.findOneBy({ id: kept.bucket.id })).not.toBeNull();
     });
@@ -180,6 +184,7 @@ describe('storage bucket aggregator', () => {
         function createHandler() {
             const bucketDispatcher = new FakeBucketDispatcher();
             const handler = new StorageBucketCreationFinishedHandler({ ...ctx, bucketDispatcher });
+
             return { bucketDispatcher, handler };
         }
 
@@ -195,6 +200,7 @@ describe('storage bucket aggregator', () => {
             await handler.handle(bucket);
 
             const entities = await findAnalysisBuckets(analysis.id);
+
             expect(entities).toHaveLength(1);
             expect(entities[0]).toMatchObject({
                 type: AnalysisBucketType.RESULT,
@@ -230,6 +236,7 @@ describe('storage bucket aggregator', () => {
             await handler.handle(orphan);
 
             const entities = await findAnalysisBuckets(analysis.id);
+
             expect(entities).toHaveLength(1);
             expect(entities[0].bucketId).toEqual(linked.id);
             expect(bucketDispatcher.getCalls()).toEqual([{ method: 'dispatchDelete', data: { id: orphan.id } }]);

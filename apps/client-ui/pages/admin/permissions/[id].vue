@@ -50,26 +50,27 @@ export default defineComponent({
 
         const items = computed<NavigationItem[]>(() => {
             const base = `/admin/permissions/${entity.value?.id}`;
+
             return [
                 {
-                    name: '', 
-                    icon: 'fa6-solid:arrow-left', 
-                    url: '/admin/permissions', 
+                    name: '',
+                    icon: 'fa6-solid:arrow-left',
+                    url: '/admin/permissions',
                 },
                 {
-                    name: 'General', 
-                    icon: 'fa6-solid:bars', 
-                    url: base, 
+                    name: 'General',
+                    icon: 'fa6-solid:bars',
+                    url: base,
                 },
                 {
-                    name: 'Policies', 
-                    icon: 'fa6-solid:shield-halved', 
-                    url: `${base}/policies`, 
+                    name: 'Policies',
+                    icon: 'fa6-solid:shield-halved',
+                    url: `${base}/policies`,
                 },
                 {
-                    name: 'Users', 
-                    icon: 'fa6-solid:user', 
-                    url: `${base}/users`, 
+                    name: 'Users',
+                    icon: 'fa6-solid:user',
+                    url: `${base}/users`,
                 },
                 {
                     name: 'Clients',
@@ -77,9 +78,9 @@ export default defineComponent({
                     url: `${base}/clients`,
                 },
                 {
-                    name: 'Roles', 
-                    icon: 'fa6-solid:user-group', 
-                    url: `${base}/roles`, 
+                    name: 'Roles',
+                    icon: 'fa6-solid:user-group',
+                    url: `${base}/roles`,
                 },
             ];
         });

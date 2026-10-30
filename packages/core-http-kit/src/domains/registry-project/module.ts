@@ -6,11 +6,11 @@
  */
 
 import type { EntityQueryInput } from '../../utils';
-import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
 import type { RegistryProject } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
-import type { IRegistryProjectAPI, RegistryProjectCreatePayload, RegistryProjectUpdatePayload  } from './types';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { IRegistryProjectAPI, RegistryProjectCreatePayload, RegistryProjectUpdatePayload } from './types';
 
 export class RegistryProjectAPI extends BaseAPI implements IRegistryProjectAPI {
     async getMany(options?: EntityQueryInput<RegistryProject>): Promise<EntityCollectionResponse<RegistryProject>> {

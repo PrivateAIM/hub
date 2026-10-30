@@ -25,7 +25,8 @@ export async function startComponentsInBackground(
     // each failure is logged as it happens: a start that never settles must
     // not hold back the error of one that already failed.
     await Promise.allSettled(components.map((component) => component.start().catch((e: unknown) => {
-        const reason = e instanceof Error ? e.message : String(e);
+        const reason = Error.isError(e) ? e.message : String(e);
+
         logger?.error(`A component failed to start and will not process any message: ${reason}`);
     })));
 }

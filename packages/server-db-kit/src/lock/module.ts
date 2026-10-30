@@ -42,6 +42,7 @@ export async function withDataSourceLock<T>(
     }
 
     const queryRunner = dataSource.createQueryRunner();
+
     try {
         return await withDatabaseLock(queryRunner, name, fn, { timeout: options.timeout ?? DATA_SOURCE_LOCK_TIMEOUT });
     } finally {

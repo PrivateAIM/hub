@@ -66,6 +66,7 @@ export default defineComponent({
 
         const handleCreated = (input: BucketFile) => {
             const index = data.value.findIndex((el) => el.id === input.id);
+
             if (index === -1) {
                 data.value.push(input);
             }
@@ -75,6 +76,7 @@ export default defineComponent({
 
         const handleDeleted = (input: BucketFile) => {
             const index = data.value.findIndex((el) => el.id === input.id);
+
             if (index !== -1) {
                 data.value.splice(index, 1);
             }
@@ -83,12 +85,15 @@ export default defineComponent({
         };
 
         const remove = async (id: string) => {
-            if (busy.value) return;
+            if (busy.value) {
+                return;
+            }
 
             busy.value = true;
 
             try {
                 const { data: entity } = await httpClient.bucketFile.delete(id);
+
                 handleDeleted(entity);
             } catch (e) {
                 emit('failed', e);
@@ -105,8 +110,7 @@ export default defineComponent({
             handleDeleted,
         });
 
-        Promise.resolve()
-            .then(() => resolve(props.query));
+        Promise.try(() => resolve(props.query));
 
         return {
             handleDeleted,

@@ -51,6 +51,7 @@ export class AnalysisNodeEventService extends AbstractEntityService implements I
 
         const scoped = condition ? appendQueryConditions(decoded, condition) : decoded;
         const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-node-event' });
         }

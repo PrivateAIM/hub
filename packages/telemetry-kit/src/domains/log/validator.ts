@@ -9,7 +9,7 @@ import { createValidator } from '@validup/zod';
 import { TypedContainer } from '@privateaim/kit';
 import zod from 'zod';
 import { LogChannel, LogLevel } from './constants';
-import type { LogInput } from './entity';
+import type { LogInput } from './types';
 
 export class LogValidator extends TypedContainer<LogInput> {
     protected override initialize() {

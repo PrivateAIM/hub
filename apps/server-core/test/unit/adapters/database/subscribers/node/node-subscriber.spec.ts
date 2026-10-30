@@ -32,6 +32,7 @@ class FakeNodeClientService {
     async assign(entity: Record<string, any>): Promise<Client> {
         this.assignCalls.push({ entity });
         entity.clientId = this.nextClientId;
+
         return { id: this.nextClientId } as Client;
     }
 
@@ -55,9 +56,9 @@ class FakeNodeClientService {
 function createMockRemoveEvent(overrides: Record<string, any> = {}) {
     return {
         entity: {
-            id: randomUUID(), 
-            clientId: 'existing-client', 
-            realmId: randomUUID(), 
+            id: randomUUID(),
+            clientId: 'existing-client',
+            realmId: randomUUID(),
         },
         databaseEntity: null,
         queryRunner: { data: {} },
@@ -67,11 +68,12 @@ function createMockRemoveEvent(overrides: Record<string, any> = {}) {
 
 function createMockInsertEvent(overrides: Record<string, any> = {}) {
     const entityId = randomUUID();
+
     return {
         entity: {
-            id: entityId, 
-            clientId: null, 
-            realmId: randomUUID(), 
+            id: entityId,
+            clientId: null,
+            realmId: randomUUID(),
         },
         queryRunner: { data: {} },
         manager: { getRepository: () => ({ save: async (e: Record<string, any>) => e }) },
@@ -81,11 +83,12 @@ function createMockInsertEvent(overrides: Record<string, any> = {}) {
 
 function createMockUpdateEvent(overrides: Record<string, any> = {}) {
     const entityId = randomUUID();
+
     return {
         entity: {
-            id: entityId, 
-            clientId: null, 
-            realmId: randomUUID(), 
+            id: entityId,
+            clientId: null,
+            realmId: randomUUID(),
         },
         databaseEntity: { id: entityId },
         queryRunner: { data: {} },
@@ -101,6 +104,7 @@ describe('NodeSubscriber', () => {
             const subscriber = new NodeSubscriber({ nodeClientService: nodeClientService as unknown as NodeClientService });
 
             const event = createMockRemoveEvent();
+
             await subscriber.afterRemove(event as any);
 
             expect(nodeClientService.getDismissCalls()).toHaveLength(1);
@@ -111,6 +115,7 @@ describe('NodeSubscriber', () => {
             const subscriber = new NodeSubscriber();
 
             const event = createMockRemoveEvent();
+
             await subscriber.afterRemove(event as any);
             // no error — graceful no-op
         });
@@ -122,6 +127,7 @@ describe('NodeSubscriber', () => {
             const subscriber = new NodeSubscriber({ nodeClientService: nodeClientService as unknown as NodeClientService });
 
             const event = createMockInsertEvent();
+
             await subscriber.afterInsert(event as any);
 
             expect(nodeClientService.getAssignCalls()).toHaveLength(1);
@@ -132,6 +138,7 @@ describe('NodeSubscriber', () => {
             const subscriber = new NodeSubscriber({ nodeClientService: nodeClientService as unknown as NodeClientService });
 
             const event = createMockInsertEvent();
+
             await subscriber.afterInsert(event as any);
 
             expect(nodeClientService.getAssignPermissionsCalls()).toHaveLength(1);
@@ -142,6 +149,7 @@ describe('NodeSubscriber', () => {
             const subscriber = new NodeSubscriber();
 
             const event = createMockInsertEvent();
+
             await subscriber.afterInsert(event as any);
         });
     });
@@ -152,6 +160,7 @@ describe('NodeSubscriber', () => {
             const subscriber = new NodeSubscriber({ nodeClientService: nodeClientService as unknown as NodeClientService });
 
             const event = createMockUpdateEvent();
+
             await subscriber.afterUpdate(event as any);
 
             expect(nodeClientService.getAssignCalls()).toHaveLength(1);
@@ -162,6 +171,7 @@ describe('NodeSubscriber', () => {
             const subscriber = new NodeSubscriber({ nodeClientService: nodeClientService as unknown as NodeClientService });
 
             const event = createMockUpdateEvent();
+
             await subscriber.afterUpdate(event as any);
 
             expect(nodeClientService.getAssignPermissionsCalls()).toHaveLength(1);
@@ -175,12 +185,21 @@ describe('NodeSubscriber', () => {
             let savedEntity: Record<string, any> | undefined;
             const event = createMockUpdateEvent({
                 entity: {
-                    id: randomUUID(), 
-                    clientId: null, 
-                    realmId: randomUUID(), 
+                    id: randomUUID(),
+                    clientId: null,
+                    realmId: randomUUID(),
                 },
-                manager: { getRepository: () => ({ save: async (e: Record<string, any>) => { savedEntity = e; return e; } }) },
+                manager: {
+                    getRepository: () => ({
+                        save: async (e: Record<string, any>) => {
+                            savedEntity = e;
+
+                            return e;
+                        },
+                    }),
+                },
             });
+
             await subscriber.afterUpdate(event as any);
 
             expect(savedEntity).toBeDefined();
@@ -194,12 +213,21 @@ describe('NodeSubscriber', () => {
             let saveCalled = false;
             const event = createMockUpdateEvent({
                 entity: {
-                    id: randomUUID(), 
-                    clientId: 'client-1', 
-                    realmId: randomUUID(), 
+                    id: randomUUID(),
+                    clientId: 'client-1',
+                    realmId: randomUUID(),
                 },
-                manager: { getRepository: () => ({ save: async (e: Record<string, any>) => { saveCalled = true; return e; } }) },
+                manager: {
+                    getRepository: () => ({
+                        save: async (e: Record<string, any>) => {
+                            saveCalled = true;
+
+                            return e;
+                        },
+                    }),
+                },
             });
+
             await subscriber.afterUpdate(event as any);
 
             expect(saveCalled).toBe(false);
@@ -210,6 +238,7 @@ describe('NodeSubscriber', () => {
             const subscriber = new NodeSubscriber();
 
             const event = createMockUpdateEvent();
+
             await subscriber.afterUpdate(event as any);
         });
     });

@@ -65,6 +65,7 @@ describe('BucketService', () => {
             ]);
 
             const result = await service.getMany({});
+
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
         });
@@ -73,17 +74,21 @@ describe('BucketService', () => {
     describe('getOne', () => {
         it('should return entity by ID', async () => {
             const bucket = createTestBucket({ id: 'b-1' });
+
             repository.seed(bucket);
 
             const result = await service.getOne('b-1');
+
             expect(result.id).toBe('b-1');
         });
 
         it('should return entity by name', async () => {
             const bucket = createTestBucket({ name: 'my-bucket' });
+
             repository.seed(bucket);
 
             const result = await service.getOne('my-bucket');
+
             expect(result.name).toBe('my-bucket');
         });
 
@@ -111,9 +116,9 @@ describe('BucketService', () => {
         it('should reject a refId, which only the owning service sets over the bus', async () => {
             await expect(service.create(
                 {
-                    name: 'new-bucket', 
-                    refType: 'analysis', 
-                    refId: randomUUID(), 
+                    name: 'new-bucket',
+                    refType: 'analysis',
+                    refId: randomUUID(),
                 },
                 createAllowAllActor('realm-1'),
             )).rejects.toThrow(BadRequestError);
@@ -128,6 +133,7 @@ describe('BucketService', () => {
 
         it('should throw PermissionDeniedError when actor has no identity', async () => {
             const actor = createAllowAllActor();
+
             actor.identity = undefined;
 
             await expect(
@@ -141,6 +147,7 @@ describe('BucketService', () => {
             await service.create({ name: 'new-bucket' }, actor);
 
             const call = dispatcher.getCreateCalls()[0];
+
             expect(call.realmId).toBe('my-realm');
         });
 
@@ -150,6 +157,7 @@ describe('BucketService', () => {
             await service.create({ name: 'new-bucket' }, actor);
 
             const [call] = actor.permissionEvaluator.evaluateCalls;
+
             expect(call.name).toBe(PermissionName.BUCKET_CREATE);
             expect(call.data!.get(BuiltInPolicyType.REALM_MATCH)).toBe(actor.realm!.id);
             expect(dispatcher.getCreateCalls()[0].realmId).toBe(actor.realm!.id);
@@ -185,6 +193,7 @@ describe('BucketService', () => {
             );
 
             const call = dispatcher.getCreateCalls()[0];
+
             expect(call.refType).toBe('analysis');
             expect(call.refId).toBeUndefined();
         });
@@ -202,9 +211,11 @@ describe('BucketService', () => {
     describe('update', () => {
         it('should update existing entity', async () => {
             const bucket = createTestBucket();
+
             repository.seed(bucket);
 
             const result = await service.update(bucket.id, {}, createAllowAllActor());
+
             expect(result.id).toBe(bucket.id);
         });
 
@@ -221,17 +232,21 @@ describe('BucketService', () => {
                 actorType: 'user',
                 realmId: 'other-realm',
             });
+
             repository.seed(bucket);
 
             const actor = createDenyAllActor();
+
             actor.identity = { id: actorId, type: 'user' };
 
             const result = await service.update(bucket.id, {}, actor);
+
             expect(result.id).toBe(bucket.id);
         });
 
         it('should deny when the grant does not reach the bucket realm', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
+
             repository.seed(bucket);
 
             await expect(
@@ -241,20 +256,25 @@ describe('BucketService', () => {
 
         it('should update a bucket of another realm with an any-scoped grant', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
+
             repository.seed(bucket);
 
             const result = await service.update(bucket.id, {}, createScopedActor({ realmId: 'realm-1', realmScope: 'any' }));
+
             expect(result.id).toBe(bucket.id);
         });
 
         it('should evaluate BUCKET_UPDATE against both the stored and the merged row', async () => {
             const bucket = createTestBucket({ realmId: 'realm-1' });
+
             repository.seed(bucket);
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+
             await service.update(bucket.id, {}, actor);
 
             const calls = actor.permissionEvaluator.evaluateCalls;
+
             expect(calls.map((call) => call.name)).toEqual([PermissionName.BUCKET_UPDATE, PermissionName.BUCKET_UPDATE]);
             expect(calls.map((call) => call.data!.get(BuiltInPolicyType.REALM_MATCH))).toEqual(['realm-1', 'realm-1']);
             // The fake merge restamps updatedAt, so the second call carries the merged row.
@@ -264,6 +284,7 @@ describe('BucketService', () => {
 
         it('should create minio bucket if it does not exist', async () => {
             const bucket = createTestBucket();
+
             repository.seed(bucket);
 
             await service.update(bucket.id, {}, createAllowAllActor());
@@ -274,6 +295,7 @@ describe('BucketService', () => {
 
         it('should not recreate minio bucket if it already exists', async () => {
             const bucket = createTestBucket();
+
             repository.seed(bucket);
 
             const bucketName = bucket.id
@@ -281,6 +303,7 @@ describe('BucketService', () => {
                 .replace(/[^a-z0-9.-]/g, '')
                 .slice(0, 63)
                 .replace(/[^a-z0-9]+$/g, '');
+
             storage.addBucket(bucketName);
 
             await service.update(bucket.id, {}, createAllowAllActor());
@@ -293,9 +316,11 @@ describe('BucketService', () => {
     describe('delete', () => {
         it('should delegate to dispatcher', async () => {
             const bucket = createTestBucket();
+
             repository.seed(bucket);
 
             const result = await service.delete(bucket.id, createAllowAllActor());
+
             expect(result.id).toBe(bucket.id);
             expect(dispatcher.getDeleteCalls()).toHaveLength(1);
         });
@@ -312,17 +337,21 @@ describe('BucketService', () => {
                 actorId,
                 actorType: 'user',
             });
+
             repository.seed(bucket);
 
             const actor = createDenyAllActor();
+
             actor.identity = { id: actorId, type: 'user' };
 
             const result = await service.delete(bucket.id, actor);
+
             expect(result.id).toBe(bucket.id);
         });
 
         it('should deny when the grant does not reach the bucket realm', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
+
             repository.seed(bucket);
 
             await expect(
@@ -333,9 +362,11 @@ describe('BucketService', () => {
 
         it('should delete a bucket of the own realm with an own-scoped grant', async () => {
             const bucket = createTestBucket({ realmId: 'realm-1' });
+
             repository.seed(bucket);
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
+
             await service.delete(bucket.id, actor);
 
             expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_DELETE);
@@ -346,9 +377,11 @@ describe('BucketService', () => {
     describe('clear', () => {
         it('should delegate to dispatcher', async () => {
             const bucket = createTestBucket();
+
             repository.seed(bucket);
 
             const result = await service.clear(bucket.id, createAllowAllActor());
+
             expect(result.id).toBe(bucket.id);
             expect(dispatcher.getClearCalls()).toEqual([bucket.id]);
             expect(dispatcher.getDeleteCalls()).toHaveLength(0);
@@ -366,17 +399,21 @@ describe('BucketService', () => {
                 actorId,
                 actorType: 'user',
             });
+
             repository.seed(bucket);
 
             const actor = createDenyAllActor();
+
             actor.identity = { id: actorId, type: 'user' };
 
             const result = await service.clear(bucket.id, actor);
+
             expect(result.id).toBe(bucket.id);
         });
 
         it('should deny when non-owner lacks permission', async () => {
             const bucket = createTestBucket();
+
             repository.seed(bucket);
 
             await expect(
@@ -387,6 +424,7 @@ describe('BucketService', () => {
 
         it('should deny when the grant does not reach the bucket realm', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
+
             repository.seed(bucket);
 
             await expect(
@@ -397,9 +435,11 @@ describe('BucketService', () => {
 
         it('should clear a bucket of another realm with an any-scoped grant', async () => {
             const bucket = createTestBucket({ realmId: 'other-realm' });
+
             repository.seed(bucket);
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'any' });
+
             await service.clear(bucket.id, actor);
 
             expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_DELETE);

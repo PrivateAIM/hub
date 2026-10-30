@@ -51,6 +51,7 @@ export class BucketDispatcherAdapter implements IBucketDispatcher {
         if (finished) {
             // in-process run: forward to the bus, so server-core drops its analysis bucket row too.
             await this.eventDispatcher?.dispatch(BucketEvent.DELETION_FINISHED, finished.data, {});
+
             return finished.data;
         }
 
@@ -69,9 +70,11 @@ export class BucketDispatcherAdapter implements IBucketDispatcher {
         if (finished) {
             // in-process run: forward to the bus, so server-core drops its file mirror rows too.
             await this.eventDispatcher?.dispatch(BucketEvent.CLEARING_FINISHED, finished.data, {});
+
             // HTTP callers get the bare bucket; fileIds is bus-only
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { fileIds, ...bucket } = finished.data;
+
             return bucket;
         }
 

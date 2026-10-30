@@ -9,7 +9,7 @@ import { isNameValid } from '@authup/core-kit';
 import { TypedContainer } from '@privateaim/kit';
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
-import type { Project } from './entity.ts';
+import type { Project } from './types.ts';
 
 export class ProjectValidator extends TypedContainer<Project> {
     protected override initialize() {
@@ -28,10 +28,11 @@ export class ProjectValidator extends TypedContainer<Project> {
                     ctx.issues.push({
                         input: ctx.value,
                         code: 'custom',
-                        message: e instanceof Error ? e.message : 'The project name is not valid.',
+                        message: Error.isError(e) ? e.message : 'The project name is not valid.',
                     });
                 }
             }));
+
         this.mount(
             'name',
             { optional: true },

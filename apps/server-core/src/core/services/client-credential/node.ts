@@ -41,6 +41,7 @@ export class NodeClientCredentialService implements INodeClientCredentialService
 
     async getCredentials(nodeId: string, actor: ActorContext): Promise<ClientCredentials> {
         const node = await this.repository.findOneById(nodeId);
+
         if (!node) {
             throw new EntityNotFoundError({ entity: 'node' });
         }
@@ -64,6 +65,7 @@ export class NodeClientCredentialService implements INodeClientCredentialService
         actor: ActorContext,
     ): Promise<ClientCredentials> {
         const node = await this.repository.findOneById(nodeId);
+
         if (!node) {
             throw new EntityNotFoundError({ entity: 'node' });
         }

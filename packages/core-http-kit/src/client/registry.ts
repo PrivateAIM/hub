@@ -5,36 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type {
+    ClientEntityAPIKey,
+    ClientEntityAPIRegistry,
+    EntityAPIDispatch,
+    ICoreClient,
+} from './types';
 import type { ObjectLiteral } from '@rapiq/core';
 import { hasOwnProperty } from '@privateaim/kit';
-import type { DomainTypeMap } from '@privateaim/core-kit';
-import type { IEntityAPI } from '../domains';
-import type { ICoreClient } from './types';
-
-/**
- * The `DomainType` values that name a conforming entity API on `ICoreClient`.
- *
- * `service` and the four `DomainSubType` keys drop out of the intersection on
- * their own. `analysisLog` / `analysisNodeLog` have to be excluded EXPLICITLY:
- * both expose `delete(query): Promise<void>` — unassignable to
- * `delete(id): Promise<EntityRecordResponse<T>>`, and `Partial<>` does not
- * rescue it because it makes members optional rather than relaxing a present
- * member's signature. Both also `getMany` telemetry-kit's `Log` rather than
- * their own entity, and neither entity declares an `id`, so `DomainEntityID<T>`
- * resolves to `never`.
- */
-export type ClientEntityAPIKey =    Exclude<keyof ICoreClient & keyof DomainTypeMap, 'analysisLog' | 'analysisNodeLog'>;
-
-/**
- * Every verb is OPTIONAL: read-only APIs (`analysisNodeEvent`) and no-create
- * APIs (`masterImage`, `masterImageGroup`) are members too. Callers guard per
- * method, exactly as the client-vue dispatch sites already do.
- */
-export type EntityAPIDispatch<T extends ObjectLiteral> = Partial<IEntityAPI<T, any, any>>;
-
-export type ClientEntityAPIRegistry = {
-    [K in ClientEntityAPIKey]: EntityAPIDispatch<DomainTypeMap[K]>
-};
 
 /**
  * RUNTIME allow-list of the registry keys.

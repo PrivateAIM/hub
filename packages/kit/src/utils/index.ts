@@ -20,4 +20,5 @@ export * from './proxy-connection-string';
 export * from './regex-patterns';
 export * from './process-status';
 export * from './slugify';
+export * from './types';
 export * from './wait';

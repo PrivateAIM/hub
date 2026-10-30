@@ -57,7 +57,9 @@ describe('storage bucket-file aggregator', () => {
         await suite.setup();
         dataSource = suite.container.resolve(DatabaseInjectionKey.DataSource);
         bucketFileDispatcher = new FakeBucketFileDispatcher();
+
         const analysisRepository = suite.container.resolve(DatabaseInjectionKey.AnalysisRepository);
+
         handler = new StorageBucketFileCreationFinishedHandler({
             service: new AnalysisBucketFileService({
                 repository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository),
@@ -93,6 +95,7 @@ describe('storage bucket-file aggregator', () => {
             configurationLocked,
         }));
         const bucketRepository = dataSource.getRepository(AnalysisBucketEntity);
+
         return bucketRepository.save(bucketRepository.create({
             type,
             bucketId: faker.string.uuid(),
@@ -108,6 +111,7 @@ describe('storage bucket-file aggregator', () => {
             realmId: nodeRealmId,
         }));
         const analysisNodeRepository = dataSource.getRepository(AnalysisNodeEntity);
+
         await analysisNodeRepository.save(analysisNodeRepository.create({
             analysisId: bucket.analysisId,
             analysisRealmId: bucket.realmId,
@@ -146,6 +150,7 @@ describe('storage bucket-file aggregator', () => {
         await handler.handle(payload);
 
         const files = await findFiles(bucket.bucketId);
+
         expect(files).toHaveLength(1);
         expect(files[0].userId).toBe(payload.actorId);
         expect(files[0].realmId).toBe(bucket.realmId);
@@ -174,12 +179,15 @@ describe('storage bucket-file aggregator', () => {
     it('should register a result file from an approved node realm and map a client uploader', async () => {
         const bucket = await createBucket(AnalysisBucketType.RESULT, true);
         const nodeRealmId = faker.string.uuid();
+
         await seedAnalysisNode(bucket, nodeRealmId, AnalysisNodeApprovalStatus.APPROVED);
+
         const payload = createPayload(bucket, 'client', nodeRealmId);
 
         await handler.handle(payload);
 
         const files = await findFiles(bucket.bucketId);
+
         expect(files).toHaveLength(1);
         expect(files[0].clientId).toBe(payload.actorId);
         expect(files[0].userId).toBeNull();
@@ -188,7 +196,9 @@ describe('storage bucket-file aggregator', () => {
     it.each([AnalysisBucketType.RESULT, AnalysisBucketType.TEMP])('should not register, but keep, a %s file from a non-participant realm', async (type) => {
         const bucket = await createBucket(type, true);
         const nodeRealmId = faker.string.uuid();
+
         await seedAnalysisNode(bucket, nodeRealmId, null);
+
         const payload = createPayload(bucket, 'client', nodeRealmId);
 
         await handler.handle(payload);
@@ -199,8 +209,11 @@ describe('storage bucket-file aggregator', () => {
 
     it('should not match any approved node when the uploader has no realm', async () => {
         const bucket = await createBucket(AnalysisBucketType.RESULT, true);
+
         await seedAnalysisNode(bucket, faker.string.uuid(), AnalysisNodeApprovalStatus.APPROVED);
+
         const payload = createPayload(bucket, 'client', undefined);
+
         payload.realmId = undefined;
 
         await handler.handle(payload);
@@ -211,6 +224,7 @@ describe('storage bucket-file aggregator', () => {
     it('should register a result file from the analysis client', async () => {
         const bucket = await createBucket(AnalysisBucketType.RESULT, true);
         const payload = createPayload(bucket, 'client');
+
         await dataSource.getRepository(AnalysisEntity).update({ id: bucket.analysisId }, { clientId: payload.actorId });
 
         await handler.handle(payload);

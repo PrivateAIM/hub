@@ -39,6 +39,7 @@ export class DockenImageAttributesValidator extends TypedContainer<DockenImageAt
         );
 
         const commandArgumentValidator = new DockenImageAttributeCommandArguments();
+
         this.mount('commandArguments', { optional: true }, (ctx) => {
             if (!Array.isArray(ctx.value)) {
                 // todo: throw error

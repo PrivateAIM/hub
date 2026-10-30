@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { AuthupClientModuleOptions } from './types';
+
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../../config/constants';
@@ -12,9 +14,7 @@ import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } f
 import { AUTHUP_CLIENT_MODULE_NAME, AuthupClientInjectionKey } from './constants';
 import { AuthupClient } from './module';
 
-export type AuthupClientModuleOptions = {
-    baseURL?: string;
-};
+
 
 export class AuthupClientModule implements IModule {
     readonly name = AUTHUP_CLIENT_MODULE_NAME;
@@ -35,13 +35,10 @@ export class AuthupClientModule implements IModule {
 
         if (!baseURL) {
             const configResult = container.tryResolve(ConfigInjectionKey);
+
             if (configResult.success) {
                 baseURL = configResult.data.authupURL;
             }
-        }
-
-        if (!baseURL) {
-            return;
         }
 
         // Fake-wins guard. This module is MANDATORY in every app harness (it
@@ -60,6 +57,7 @@ export class AuthupClientModule implements IModule {
         const client = new AuthupClient({ baseURL });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
+
         if (hookResult.success) {
             hookResult.data.attach(client);
         }

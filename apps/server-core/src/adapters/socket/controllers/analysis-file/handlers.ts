@@ -26,7 +26,9 @@ import type {
 } from '../../types.ts';
 
 export function registerAnalysisFileSocketHandlers(socket: Socket) {
-    if (!isSocketAuthenticated(socket)) return;
+    if (!isSocketAuthenticated(socket)) {
+        return;
+    }
 
     socket.on(
         buildDomainEventFullName(DomainType.ANALYSIS_BUCKET_FILE, DomainEventSubscriptionName.SUBSCRIBE),

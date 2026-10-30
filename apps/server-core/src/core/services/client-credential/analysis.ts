@@ -54,6 +54,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
 
     async getCredentials(analysisId: string, actor: ActorContext): Promise<ClientCredentials> {
         const analysis = await this.repository.findOneById(analysisId);
+
         if (!analysis) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -62,6 +63,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
         // caller can never infer it from BadRequest vs PermissionDenied. (The
         // existence 404 above is unavoidable — authorization needs the entity.)
         const authorized = await this.isAuthorized(analysis, actor);
+
         if (!authorized) {
             throw new PermissionDeniedError('You are not permitted to read the credentials of this analysis client.');
         }
@@ -83,6 +85,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
 
         const analysis = await this.repository.findOneById(analysisId);
+
         if (!analysis) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
@@ -121,6 +124,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
                 clientId: actor.identity.id,
                 realmId: actor.identity.realmId,
             });
+
             if (node) {
                 const analysisNode = await this.analysisNodeRepository.findOneBy({
                     analysisId: analysis.id,

@@ -17,10 +17,10 @@ export type STCEventContext<T extends Record<string, any>> = T & {
 };
 
 export type EventTarget = string | number | undefined;
-export interface EventCallback<T = any> {
+export type EventCallback<T = any> = {
     (error: Error | null) : void;
     (error: Error | null, data: T) : void;
-}
+};
 
 export type STSEvents = {
     [event: string]: (...args: any[]) => void;

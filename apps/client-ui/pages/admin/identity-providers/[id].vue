@@ -52,16 +52,17 @@ export default defineComponent({
 
         const items = computed<NavigationItem[]>(() => {
             const base = `/admin/identity-providers/${entity.value?.id}`;
+
             return [
                 {
-                    name: '', 
-                    icon: 'fa6-solid:arrow-left', 
-                    url: '/admin/identity-providers', 
+                    name: '',
+                    icon: 'fa6-solid:arrow-left',
+                    url: '/admin/identity-providers',
                 },
                 {
-                    name: 'General', 
-                    icon: 'fa6-solid:bars', 
-                    url: base, 
+                    name: 'General',
+                    icon: 'fa6-solid:bars',
+                    url: base,
                 },
             ];
         });

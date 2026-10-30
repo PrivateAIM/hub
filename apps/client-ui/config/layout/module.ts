@@ -92,6 +92,7 @@ export class Navigation {
 
         const authenticated = this.store.status === StoreAuthStatus.AUTHENTICATED;
         let identity: IdentityPolicyData | undefined;
+
         if (this.store.userId) {
             identity = {
                 type: 'user',
@@ -125,6 +126,7 @@ export class Navigation {
             if (permissions.length > 0) {
                 try {
                     const data = new PolicyData();
+
                     data.set(BuiltInPolicyType.IDENTITY, identity);
                     await this.store.permissionEvaluator.preEvaluateOneOf({
                         name: permissions,

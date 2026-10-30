@@ -68,6 +68,7 @@ export function useAccountConsoleURL() : (options?: AccountConsoleURLOptions) =>
         const normalized = path.startsWith('/') ? path : `/${path}`;
 
         let query = `?ref=${ref}`;
+
         if (options.realmId) {
             query += `&realmId=${encodeURIComponent(options.realmId)}`;
         }

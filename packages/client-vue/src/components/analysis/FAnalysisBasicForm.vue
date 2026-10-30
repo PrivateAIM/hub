@@ -80,7 +80,9 @@ export default defineComponent({
         }
 
         const initFromProperties = () => {
-            if (!manager.data.value) return;
+            if (!manager.data.value) {
+                return;
+            }
 
             initFormAttributesFromSource(form, manager.data.value);
         };

@@ -26,16 +26,20 @@ export function createNodeClientComponent(ctx: NodeClientComponentContext): ISch
         schedule: NODE_CLIENT_SYNC_SCHEDULE,
         run: async () => {
             let result: NodeClientPermissionSyncResult;
+
             try {
                 result = await ctx.lock(() => syncNodeClientPermissions(ctx));
             } catch (e) {
-                ctx.logger?.error(`Syncing the node client permissions failed: ${e instanceof Error ? e.message : String(e)}`);
+                ctx.logger?.error(`Syncing the node client permissions failed: ${Error.isError(e) ? e.message : String(e)}`);
+
                 throw e;
             }
 
             const { synced, failed } = result;
+
             if (failed > 0) {
                 ctx.logger?.error(`Synced the permissions of ${synced} node clients, ${failed} failed.`);
+
                 throw new Error(`${failed} node clients failed to sync.`);
             }
 

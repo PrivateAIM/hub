@@ -28,25 +28,30 @@ export class VictoriaLogsModule implements IModule {
 
         if (!baseURL && !ingestorURL && !querierURL) {
             container.register(LogStoreInjectionKey, { useValue: new MemoryLogStore() });
+
             return;
         }
 
         const config: ConfigInput = {};
+
         if (baseURL) {
             config.request = { baseURL };
         }
 
         if (ingestorURL || querierURL) {
             config.options = {};
+
             if (ingestorURL) {
                 config.options.ingesterURL = ingestorURL;
             }
+
             if (querierURL) {
                 config.options.querierURL = querierURL;
             }
         }
 
         const client = new VictoriaLogsClient(config);
+
         container.register(VictoriaLogsClientInjectionKey, { useValue: client });
         container.register(LogStoreInjectionKey, { useValue: new VictoriaLogsLogStore(client) });
     }

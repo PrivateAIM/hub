@@ -33,7 +33,9 @@ export default defineComponent({
         const busy = ref(false);
 
         const setup = async () => {
-            if (busy.value) return;
+            if (busy.value) {
+                return;
+            }
 
             busy.value = true;
 
@@ -42,7 +44,7 @@ export default defineComponent({
 
                 emit('executed');
             } catch (e) {
-                if (e instanceof Error) {
+                if (Error.isError(e)) {
                     emit('failed', e);
                 }
             }

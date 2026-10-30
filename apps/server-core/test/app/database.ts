@@ -53,6 +53,7 @@ export function createTestDatabaseModule(): IModule {
             // already per data source).
             if (options.type === 'mysql' || options.type === 'postgres') {
                 const workerId = process.env.VITEST_POOL_ID ?? process.env.VITEST_WORKER_ID;
+
                 if (workerId) {
                     options = {
                         ...options,
@@ -71,6 +72,7 @@ export function createTestDatabaseModule(): IModule {
             }
 
             const dataSource = new DataSource(options);
+
             await dataSource.initialize();
             await dataSource.synchronize();
 
@@ -98,6 +100,7 @@ export function createTestDatabaseModule(): IModule {
 
         async teardown(container: IContainer): Promise<void> {
             const result = container.tryResolve(DatabaseInjectionKey.DataSource);
+
             if (result.success && result.data.isInitialized) {
                 await result.data.destroy();
             }
@@ -116,6 +119,7 @@ export function createTestDatabaseModuleForSetup(): IModule {
 
 
             const dataSource = new DataSource(options);
+
             await dataSource.initialize();
 
             await synchronizeDatabaseSchema(dataSource);

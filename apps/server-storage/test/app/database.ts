@@ -28,6 +28,7 @@ export function createTestDatabaseModule(): IModule {
             const optionsBuilder = new DataSourceOptionsBuilder();
 
             let options;
+
             try {
                 options = optionsBuilder.buildWithEnv();
             } catch {
@@ -39,6 +40,7 @@ export function createTestDatabaseModule(): IModule {
 
 
             const dataSource = new DataSource(options);
+
             await dataSource.initialize();
             await dataSource.synchronize();
 
@@ -57,6 +59,7 @@ export function createTestDatabaseModule(): IModule {
 
         async teardown(container: IContainer): Promise<void> {
             const result = container.tryResolve(DatabaseInjectionKey.DataSource);
+
             if (result.success && result.data.isInitialized) {
                 await result.data.destroy();
             }

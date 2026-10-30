@@ -7,8 +7,6 @@
 
 import { defineTheme, extend } from '@vuecs/core';
 
-export { default as clientWebKitTheme, merge } from '@authup/client-web-kit-theme';
-
 /**
  * App-level theme. Layers PrivateAIM app-specific concerns (Bootstrap-compat
  * class shims, heading scale, brand tokens) on top of the kit theme.

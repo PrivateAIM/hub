@@ -7,17 +7,17 @@
 
 import type { IModule } from 'orkos';
 import { Application } from 'orkos';
-import type { AuthupHookModuleOptions } from '../authup/client-hook/di-module';
+import type { AuthupHookModuleOptions } from '../authup/client-hook/types';
 import { AuthupHookModule } from '../authup/client-hook/di-module';
-import type { AuthupClientModuleOptions } from '../authup/client/di-module';
+import type { AuthupClientModuleOptions } from '../authup/client/types';
 import { AuthupClientModule } from '../authup/client/di-module';
-import type { EntityEventModuleOptions } from '../entity-event/di-module';
+import type { EntityEventModuleOptions } from '../entity-event/types';
 import { EntityEventModule } from '../entity-event/di-module';
-import type { LoggerModuleOptions } from '../logger/di-module';
+import type { LoggerModuleOptions } from '../logger/types';
 import { LoggerModule } from '../logger/di-module';
 import type { MessageBusModuleOptions } from '../message-bus/types';
 import { MessageBusModule } from '../message-bus/di-module';
-import type { RedisModuleOptions } from '../redis/di-module';
+import type { RedisModuleOptions } from '../redis/types';
 import { RedisModule } from '../redis/di-module';
 
 export class BaseApplicationBuilder {
@@ -27,6 +27,7 @@ export class BaseApplicationBuilder {
         if (options !== false) {
             this.modules.push(new LoggerModule(options));
         }
+
         return this;
     }
 
@@ -34,6 +35,7 @@ export class BaseApplicationBuilder {
         if (options !== false) {
             this.modules.push(new RedisModule(options));
         }
+
         return this;
     }
 
@@ -41,6 +43,7 @@ export class BaseApplicationBuilder {
         if (options !== false) {
             this.modules.push(new MessageBusModule(options));
         }
+
         return this;
     }
 
@@ -48,6 +51,7 @@ export class BaseApplicationBuilder {
         if (options !== false) {
             this.modules.push(new AuthupHookModule(options));
         }
+
         return this;
     }
 
@@ -55,6 +59,7 @@ export class BaseApplicationBuilder {
         if (options !== false) {
             this.modules.push(new AuthupClientModule(options));
         }
+
         return this;
     }
 
@@ -62,6 +67,7 @@ export class BaseApplicationBuilder {
         if (options !== false) {
             this.modules.push(new EntityEventModule(options));
         }
+
         return this;
     }
 

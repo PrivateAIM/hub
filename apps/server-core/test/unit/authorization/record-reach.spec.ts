@@ -54,6 +54,7 @@ describe('record reach against a real Authup', () => {
             headers: { 'content-type': 'application/json', authorization: `Bearer ${adminToken}` },
             body: body ? JSON.stringify(body) : undefined,
         });
+
         if (!response.ok) {
             throw new Error(`Authup ${method} ${path} failed (${response.status}): ${await response.text()}`);
         }
@@ -72,14 +73,15 @@ describe('record reach against a real Authup', () => {
         });
         const { data: rows } = await request<{ data: AuthupPermissionRow[] }>('GET', `permissions?filter[name]=${NAME}`);
         const permission = selectGlobalPermission(rows);
+
         if (!permission) {
             throw new Error(`${NAME} is not provisioned.`);
         }
 
         await request('POST', 'user-permissions', {
-            userId: user.id, 
-            permissionId: permission.id, 
-            realmScope, 
+            userId: user.id,
+            permissionId: permission.id,
+            realmScope,
         });
 
         const { access_token: token } = await createAuthupUserTokenCreator({
@@ -111,6 +113,7 @@ describe('record reach against a real Authup', () => {
         });
 
         const { data: realm } = await request<{ data: { id: string } }>('POST', 'realms', { name: `other-${randomUUID().slice(0, 6)}` });
+
         otherRealmId = realm.id;
     }, 120_000);
 
@@ -122,6 +125,7 @@ describe('record reach against a real Authup', () => {
         await expect(actor.permissionEvaluator.preEvaluate({ name: NAME })).resolves.toBeUndefined();
 
         const { permissionEvaluator } = actor;
+
         await expect(reachesRecord(permissionEvaluator, { name: NAME, realm: actor.realm.id })).resolves.toBe(own);
         await expect(reachesRecord(permissionEvaluator, { name: NAME, realm: otherRealmId })).resolves.toBe(other);
         await expect(reachesRecord(permissionEvaluator, { name: NAME, realm: null })).resolves.toBe(realmless);

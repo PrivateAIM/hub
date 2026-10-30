@@ -41,6 +41,7 @@ export class AnalysisClientPermissionController {
     ) {
         const actor = buildActorContext(event);
         const { data, meta } = await this.service.getMany(id, actor);
+
         return { data, meta };
     }
 
@@ -52,7 +53,9 @@ export class AnalysisClientPermissionController {
     ): Promise<EntityRecordResponse<ClientPermission>> {
         const actor = buildActorContext(event);
         const entity = await this.service.create(id, data, actor);
+
         event.response.status = 201;
+
         return { data: entity, meta: {} };
     }
 
@@ -64,7 +67,9 @@ export class AnalysisClientPermissionController {
     ): Promise<EntityRecordResponse<ClientPermission>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, permissionId, actor);
+
         event.response.status = 202;
+
         return { data: entity, meta: {} };
     }
 }

@@ -57,6 +57,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
         // when the caller did not provide a (non-empty) name, so it passes
         // validation instead of being rejected as null/empty.
         const input: Partial<Project> = { ...data };
+
         if (!input.name) {
             input.name = generateName();
         }
@@ -81,10 +82,12 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
         switch (actor.identity?.type) {
             case 'user': {
                 validated.userId = actor.identity.id;
+
                 break;
             }
             case 'client': {
                 validated.clientId = actor.identity.id;
+
                 break;
             }
             default: {
@@ -105,6 +108,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'project' });
         }
@@ -112,6 +116,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
         // Snapshot the stored row: typeorm's merge() writes into `entity`.
         const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
+
         await evaluateRecordUpdate(actor.permissionEvaluator, {
             name: PermissionName.PROJECT_UPDATE,
             current,
@@ -127,6 +132,7 @@ export class ProjectService extends AbstractEntityService implements IProjectSer
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_DELETE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'project' });
         }

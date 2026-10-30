@@ -21,4 +21,4 @@ export * from './analysis-node-event';
 export * from './analysis-node-log';
 export * from './service';
 export * from './helpers';
-export * from './types-base';
+export * from './types';

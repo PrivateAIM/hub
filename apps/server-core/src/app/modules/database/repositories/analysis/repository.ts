@@ -36,6 +36,7 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Analysis>> {
         const qb = this.repository.createQueryBuilder('analysis');
+
         qb.groupBy('analysis.id');
 
         const { pagination } = applyQuery(qb, query);

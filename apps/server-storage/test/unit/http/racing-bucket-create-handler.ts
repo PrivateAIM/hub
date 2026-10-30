@@ -17,6 +17,7 @@ export class RacingBucketCreateHandler extends BucketCreateHandler {
     protected override async findExisting(...input: Parameters<BucketCreateHandler['findExisting']>) {
         if (!this.missed) {
             this.missed = true;
+
             return null;
         }
 

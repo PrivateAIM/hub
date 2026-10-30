@@ -5,15 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { AuthupHookModuleOptions } from './types';
+
 import type { IContainer } from 'eldin';
-import type { ClientAuthenticationHookOptions } from '@authup/core-http-kit';
 import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../../config/constants';
 import { createAuthupClientTokenCreator } from '../token-creator';
 import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey  } from './constants';
 import { createAuthupClientAuthenticationHook } from './setup';
 
-export type AuthupHookModuleOptions = ClientAuthenticationHookOptions;
+
 
 export class AuthupHookModule implements IModule {
     readonly name = AUTHUP_HOOK_MODULE_NAME;
@@ -33,11 +34,13 @@ export class AuthupHookModule implements IModule {
 
         if (!options) {
             const configResult = container.tryResolve(ConfigInjectionKey);
+
             if (!configResult.success || !configResult.data.authupURL) {
                 return;
             }
 
             const config = configResult.data;
+
             options = {
                 tokenCreator: createAuthupClientTokenCreator({
                     baseURL: config.authupURL,
@@ -49,6 +52,7 @@ export class AuthupHookModule implements IModule {
         }
 
         const hook = createAuthupClientAuthenticationHook(options);
+
         container.register(AuthupClientAuthenticationHookInjectionKey, { useValue: hook });
     }
 }

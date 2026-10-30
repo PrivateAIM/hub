@@ -35,6 +35,7 @@ describe('scopeReadQuery', () => {
 
     it('pre-gates the names as a disjunction and throws on a missing grant', async () => {
         const actor = createActor({ id: 'r1', name: 'r1' });
+
         actor.permissionEvaluator.denyAll(new Error('denied'));
 
         await expect(scopeReadQuery(new Query({}), actor, { names })).rejects.toThrow('denied');
@@ -52,7 +53,9 @@ describe('scopeReadQuery', () => {
 
     it('returns the query unchanged on an allow verdict', async () => {
         const actor = createActor({ id: 'r1', name: 'r1' });
+
         actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
         const query = new Query({});
 
         await expect(scopeReadQuery(query, actor, { names })).resolves.toBe(query);
@@ -63,17 +66,21 @@ describe('scopeReadQuery', () => {
     it('appends the compiled reach on a conditional verdict', async () => {
         const actor = createActor({ id: 'r1', name: 'r1' });
         const condition = eq('realmId', 'r2');
+
         actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition });
 
         const scoped = await scopeReadQuery(new Query({}), actor, { names });
+
         expect(appendedCondition(scoped)).toEqual(condition);
     });
 
     it('matches nothing on a deny verdict', async () => {
         const actor = createActor({ id: 'r1', name: 'r1' });
+
         actor.permissionEvaluator.setCompileResult({ verdict: 'deny' });
 
         const scoped = await scopeReadQuery(new Query({}), actor, { names });
+
         expect(appendedCondition(scoped)).toEqual(inArray('id', []));
     });
 
@@ -81,12 +88,14 @@ describe('scopeReadQuery', () => {
         const actor = createActor({ id: 'r1', name: 'r1' });
 
         const scoped = await scopeReadQuery(new Query({}), actor, { names, realmAttributeName: 'nodeRealmId' });
+
         expect(appendedCondition(scoped)).toEqual(eq('nodeRealmId', 'r1'));
         expect(actor.permissionEvaluator.compileCalls[0]).toEqual({ name: names, realmAttributeName: 'nodeRealmId' });
     });
 
     it('narrows a post verdict to nothing for an actor without a realm', async () => {
         const scoped = await scopeReadQuery(new Query({}), createActor(), { names });
+
         expect(appendedCondition(scoped)).toEqual(inArray('id', []));
     });
 });

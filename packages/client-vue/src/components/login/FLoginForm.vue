@@ -83,7 +83,7 @@ export default defineComponent({
 
                 emit('done');
             } catch (e: any) {
-                if (e instanceof Error) {
+                if (Error.isError(e)) {
                     emit('failed', e);
                 }
             }

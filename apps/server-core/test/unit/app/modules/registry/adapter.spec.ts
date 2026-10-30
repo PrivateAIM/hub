@@ -93,6 +93,7 @@ describe('RegistryManagerAdapter', () => {
 
         it('should return the oldest registry when several exist', async () => {
             const oldest = await createRegistry('2020-01-01T00:00:00.000Z');
+
             await createRegistry('2021-01-01T00:00:00.000Z');
             await createRegistry('2022-01-01T00:00:00.000Z');
 

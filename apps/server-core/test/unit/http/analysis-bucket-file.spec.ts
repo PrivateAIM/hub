@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import { createTestApplication } from '../../app';
@@ -17,7 +17,7 @@ import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import { randomUUID } from 'node:crypto';
 import {
-    
+
     expectProperties,
     removeDateProperties,
 } from '../../utils';
@@ -42,9 +42,11 @@ describe('controllers/analysis-bucket-file', () => {
         const { client } = suite;
 
         const { data: project } = await client.project.create(createTestProject());
+
         expect(project.id).toBeDefined();
 
         const { data: analysis } = await client.analysis.create({ projectId: project.id });
+
         expect(analysis.id).toBeDefined();
 
         const { data: analysisBucket } = await client.analysisBucket.create({
@@ -52,6 +54,7 @@ describe('controllers/analysis-bucket-file', () => {
             analysisId: analysis.id,
             type: AnalysisBucketType.CODE,
         });
+
         expect(analysisBucket.id).toBeDefined();
 
         const { data: analysisBucketFile } = await client.analysisBucketFile.create({
@@ -69,6 +72,7 @@ describe('controllers/analysis-bucket-file', () => {
         const { client } = suite;
 
         const { data } = await client.analysisBucketFile.getOne(details.id);
+
         expectProperties(details, data);
     });
 
@@ -83,6 +87,7 @@ describe('controllers/analysis-bucket-file', () => {
         const { client } = suite;
 
         const { data } = await client.analysisBucketFile.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 

@@ -25,6 +25,7 @@ export class StorageBucketFileDeletionFinishedHandler implements ComponentHandle
 
     async handle(data: BucketFile): Promise<void> {
         const removal = await this.service.unregisterUpload(data.bucketId, data.id);
+
         if (!removal) {
             return;
         }

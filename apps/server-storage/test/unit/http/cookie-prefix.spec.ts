@@ -36,6 +36,7 @@ describe('authup middleware cookie-fallback with COOKIE_PREFIX', () => {
         accessToken = await createAdminAccessToken();
 
         const { data: bucket } = await suite.client().bucket.create(createTestBucket());
+
         bucketId = bucket.id;
     });
 

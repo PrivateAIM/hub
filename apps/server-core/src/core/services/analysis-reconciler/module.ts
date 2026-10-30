@@ -33,9 +33,11 @@ export class AnalysisReconciler implements IAnalysisReconciler {
         const analyses = await this.ctx.repository.findManyInProgressUpdatedBefore(updatedBefore);
 
         const result: AnalysisReconcileResult = { checked: 0, failed: 0 };
+
         for (const analysis of analyses) {
             if (isProcessStatusInProgress(analysis.buildStatus)) {
                 await this.check(this.ctx.builder, analysis, 'build', result);
+
                 // a distribution requires an EXECUTED build — while the build
                 // is in progress, a distribution check only fails in canCheck.
                 continue;
@@ -64,7 +66,7 @@ export class AnalysisReconciler implements IAnalysisReconciler {
             result.checked++;
         } catch (e) {
             result.failed++;
-            this.ctx.logger?.error(`Could not check the stuck ${process} of an analysis: ${e instanceof Error ? e.message : String(e)}`, {
+            this.ctx.logger?.error(`Could not check the stuck ${process} of an analysis: ${Error.isError(e) ? e.message : String(e)}`, {
                 [LogFlag.REF_TYPE]: DomainType.ANALYSIS,
                 [LogFlag.REF_ID]: analysis.id,
             });

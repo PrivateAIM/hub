@@ -18,6 +18,7 @@ export class FakeBucketDispatcher implements IBucketDispatcher {
 
     async create(data: Record<string, any>): Promise<Bucket> {
         this.createCalls.push(data);
+
         return {
             id: randomUUID(),
             ...data,
@@ -28,11 +29,13 @@ export class FakeBucketDispatcher implements IBucketDispatcher {
 
     async delete(id: string): Promise<Bucket> {
         this.deleteCalls.push(id);
+
         return { id } as Bucket;
     }
 
     async clear(id: string): Promise<Bucket> {
         this.clearCalls.push(id);
+
         return { id } as Bucket;
     }
 

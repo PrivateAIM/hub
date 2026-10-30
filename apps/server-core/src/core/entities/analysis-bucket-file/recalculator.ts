@@ -30,6 +30,7 @@ export class AnalysisFileMetadataRecalculator implements IAnalysisFileMetadataRe
 
     async recalc(analysisId: string): Promise<Analysis> {
         const entity = await this.analysisRepository.findOneById(analysisId);
+
         if (!entity) {
             throw new Error(`Analysis ${analysisId} not found`);
         }

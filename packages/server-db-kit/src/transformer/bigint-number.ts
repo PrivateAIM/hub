@@ -26,6 +26,7 @@ export const bigintNumberTransformer: ValueTransformer = {
                 `bigint value "${value}" exceeds Number.MAX_SAFE_INTEGER and cannot be represented as a JS number`,
             );
         }
+
         return value;
     },
     from(value: string | number | null | undefined): number | null {
@@ -34,6 +35,7 @@ export const bigintNumberTransformer: ValueTransformer = {
         }
 
         const parsed = typeof value === 'number' ? value : Number(value);
+
         if (!Number.isSafeInteger(parsed)) {
             throw new Error(
                 `bigint value "${value}" exceeds Number.MAX_SAFE_INTEGER and cannot be represented as a JS number`,

@@ -73,6 +73,7 @@ describe('event HTTP endpoints', () => {
             });
 
             const body = await response.json();
+
             expect(body.meta).toEqual({});
             expect(body.data.id).toBeDefined();
             expect(body.data.createdAt).toBeDefined();
@@ -92,6 +93,7 @@ describe('event HTTP endpoints', () => {
             });
 
             const body = await response.json();
+
             expect(body.data.scope).toBe(eventPayload.scope);
             expect(body.data.name).toBe(eventPayload.name);
             expect(body.data.refType).toBe(eventPayload.refType);
@@ -120,6 +122,7 @@ describe('event HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data).toBeDefined();
             expect(Array.isArray(body.data)).toBe(true);
             expect(body.meta).toBeDefined();
@@ -133,6 +136,7 @@ describe('event HTTP endpoints', () => {
 
             const body = await response.json();
             const found = body.data.find((e: any) => e.id === createdId);
+
             expect(found).toBeDefined();
             expect(found.scope).toBe(eventPayload.scope);
             expect(found.name).toBe(eventPayload.name);
@@ -149,6 +153,7 @@ describe('event HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data.id).toBe(createdId);
             expect(body.data.scope).toBe(eventPayload.scope);
             expect(body.data.name).toBe(eventPayload.name);
@@ -207,6 +212,7 @@ describe('event HTTP endpoints', () => {
             });
 
             const body = await response.json();
+
             expect(body.data.id).toBe(created.data.id);
             expect(body.data.scope).toBe(eventPayload.scope);
             expect(body.meta).toEqual({});

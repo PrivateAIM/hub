@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import type { Event } from '@privateaim/telemetry-kit';
@@ -68,6 +68,7 @@ describe('controllers/event', () => {
         };
 
         const { data } = await client.event.create(input);
+
         expect(data.id).toBeDefined();
 
         expectPropertiesEqualToSrc(
@@ -82,6 +83,7 @@ describe('controllers/event', () => {
     it('should get collection', async () => {
         const client = suite.client();
         const { data } = await client.event.getMany();
+
         expect(data.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -97,6 +99,7 @@ describe('controllers/event', () => {
 
     it('should delete resource', async () => {
         const client = suite.client();
+
         await client.event.delete(details.id);
     });
 });

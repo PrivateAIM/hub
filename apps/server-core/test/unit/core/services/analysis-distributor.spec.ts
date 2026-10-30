@@ -82,13 +82,16 @@ describe('AnalysisDistributor', () => {
             buildHash: 'abc123',
             ...overrides,
         });
+
         repository.seed(analysis);
+
         return analysis;
     }
 
     describe('start', () => {
         it('should set distributionStatus to STARTING and dispatch execute', async () => {
             const analysis = seedBuiltAnalysis();
+
             registryRepository.seed(createTestRegistry());
             analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
@@ -101,6 +104,7 @@ describe('AnalysisDistributor', () => {
 
         it('should call recalculators before starting', async () => {
             const analysis = seedBuiltAnalysis();
+
             registryRepository.seed(createTestRegistry());
             analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
@@ -117,15 +121,18 @@ describe('AnalysisDistributor', () => {
             analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
             const result = await distributor.start('analysis-1');
+
             expect(result.distributionStatus).toBe(ProcessStatus.STARTING);
         });
 
         it('should auto-assign first registry when registryId is null', async () => {
             const analysis = seedBuiltAnalysis({ registryId: null });
+
             registryRepository.seed(createTestRegistry({ id: 'auto-registry' }));
             analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
             const result = await distributor.start(analysis);
+
             expect(result.registryId).toBe('auto-registry');
         });
 
@@ -143,6 +150,7 @@ describe('AnalysisDistributor', () => {
 
         it('should throw when not every node approved the built image', async () => {
             const analysis = seedBuiltAnalysis({ distributionNodesValid: false });
+
             registryRepository.seed(createTestRegistry());
 
             await expect(distributor.start(analysis)).rejects.toThrow(AnalysisError.nodesApprovalRequired().message);
@@ -157,6 +165,7 @@ describe('AnalysisDistributor', () => {
 
         it('should re-check canStart on the locked row, so a concurrent start does not dispatch twice', async () => {
             const analysis = seedBuiltAnalysis();
+
             registryRepository.seed(createTestRegistry());
             analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
@@ -184,15 +193,18 @@ describe('AnalysisDistributor', () => {
 
         it('should allow retry when distribution FAILED', async () => {
             const analysis = seedBuiltAnalysis({ distributionStatus: ProcessStatus.FAILED });
+
             registryRepository.seed(createTestRegistry());
             analysisNodeRepository.seed(createTestAnalysisNode({ analysisId: 'analysis-1' }));
 
             const result = await distributor.start(analysis);
+
             expect(result.distributionStatus).toBe(ProcessStatus.STARTING);
         });
 
         it('should throw when a node has no registry assigned', async () => {
             const analysis = seedBuiltAnalysis();
+
             registryRepository.seed(createTestRegistry());
             analysisNodeRepository.seed(createTestAnalysisNode({
                 analysisId: 'analysis-1',
@@ -222,6 +234,7 @@ describe('AnalysisDistributor', () => {
             seedBuiltAnalysis({ distributionStatus: ProcessStatus.STARTED });
 
             const result = await distributor.check('analysis-1');
+
             expect(result.id).toBe('analysis-1');
         });
 
@@ -305,6 +318,7 @@ describe('AnalysisDistributor', () => {
             await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionStatus).toBe(ProcessStatus.EXECUTED);
             expect(entity.distributionProgress).toBe(100);
         });
@@ -324,6 +338,7 @@ describe('AnalysisDistributor', () => {
             await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionStatus).toBe(ProcessStatus.FAILED);
             expect(entity.distributionProgress).toBe(0);
         });
@@ -343,6 +358,7 @@ describe('AnalysisDistributor', () => {
             await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionStatus).toBe(ProcessStatus.STARTED);
             expect(entity.distributionProgress).toBe(40);
         });
@@ -363,6 +379,7 @@ describe('AnalysisDistributor', () => {
             await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionStatus).toBe(ProcessStatus.FAILED);
             expect(entity.distributionProgress).toBe(0);
         });
@@ -384,9 +401,11 @@ describe('AnalysisDistributor', () => {
                     percent: 40,
                 },
             };
+
             await distributor.applyEvent(AnalysisDistributorEvent.EXECUTION_PROGRESS, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionProgress).toBe(40);
             expect(new Date(entity.updatedAt).getTime()).toBeGreaterThan(new Date(updatedAt).getTime());
         });
@@ -427,9 +446,9 @@ describe('AnalysisDistributor', () => {
             const payload: AnalysisDistributorExecutionProgressPayload = {
                 id: analysis.id,
                 progress: {
-                    current: 0, 
-                    total: 0, 
-                    percent: 10, 
+                    current: 0,
+                    total: 0,
+                    percent: 10,
                 },
             };
             const saved = await distributor.applyEvent(event, payload);
@@ -474,6 +493,7 @@ describe('AnalysisDistributor', () => {
             await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FINISHED, payload);
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionStatus).toBe(ProcessStatus.STARTING);
         });
 
@@ -487,6 +507,7 @@ describe('AnalysisDistributor', () => {
             await distributor.applyEvent(AnalysisDistributorEvent.CHECK_FAILED, { id: analysis.id });
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionStatus).toBe(ProcessStatus.STARTED);
             expect(entity.distributionProgress).toBe(40);
         });
@@ -500,6 +521,7 @@ describe('AnalysisDistributor', () => {
             await distributor.applyEvent(AnalysisDistributorEvent.EXECUTION_FAILED, { id: analysis.id });
 
             const entity = await findAnalysis(analysis.id);
+
             expect(entity.distributionStatus).toBe(ProcessStatus.FAILED);
         });
     });

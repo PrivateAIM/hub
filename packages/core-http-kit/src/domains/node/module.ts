@@ -6,10 +6,10 @@
  */
 
 import type { EntityQueryInput } from '../../utils';
-import { buildQueryString, nullifyEmptyObjectProperties  } from '../../utils';
+import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
 import type { Node } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 import type {
     INodeAPI,
     NodeClientCredentials,

@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type { PermissionCompileResult } from '@authup/access';
 import { BuiltInPolicyType, PermissionError, realmScopeMatches } from '@authup/access';
 import { eq, or } from '@rapiq/core';
-import { FakePermissionEvaluator } from './fake-permission-evaluator.ts';
+import { FakePermissionEvaluator } from '@authup/server-test-kit';
 import type { FakeActorContext, ScopedActorOptions } from './types.ts';
 
 /**
@@ -19,12 +19,15 @@ import type { FakeActorContext, ScopedActorOptions } from './types.ts';
  */
 function createDenyingEvaluator(): FakePermissionEvaluator {
     const evaluator = new FakePermissionEvaluator();
+
     evaluator.denyAll();
+
     return evaluator;
 }
 
 export function createAllowAllActor(realmId?: string): FakeActorContext {
     const id = realmId ?? randomUUID();
+
     return {
         permissionEvaluator: new FakePermissionEvaluator(),
         realm: { id, name: 'test-realm' },
@@ -35,6 +38,7 @@ export function createAllowAllActor(realmId?: string): FakeActorContext {
 
 export function createDenyAllActor(realmId?: string): FakeActorContext {
     const id = realmId ?? randomUUID();
+
     return {
         permissionEvaluator: createDenyingEvaluator(),
         realm: { id, name: 'test-realm' },
@@ -58,19 +62,21 @@ export function createScopedActor(options: ScopedActorOptions): FakeActorContext
         }
 
         const resourceRealmId = ctx.data.get<string | null>(BuiltInPolicyType.REALM_MATCH);
+
         if (!realmScopeMatches(options.realmScope, resourceRealmId, id)) {
             throw PermissionError.evaluationFailed(ctx.name);
         }
     });
+
     permissionEvaluator.setCompileResult(compileRealmScope(options.realmScope, id));
 
     return {
         permissionEvaluator,
         realm: { id, name: 'test-realm' },
         identity: options.identity ?? {
-            id: randomUUID(), 
-            type: 'user', 
-            realmId: id, 
+            id: randomUUID(),
+            type: 'user',
+            realmId: id,
         },
         metadata: {},
     };

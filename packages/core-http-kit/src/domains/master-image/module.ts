@@ -10,12 +10,13 @@ import { buildQueryString } from '../../utils';
 
 import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types-base';
+import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 import type { IMasterImageAPI } from './types';
 
 export class MasterImageAPI extends BaseAPI implements IMasterImageAPI {
     async getMany(data?: EntityQueryInput<MasterImage>): Promise<EntityCollectionResponse<MasterImage>> {
         const response = await this.client.get(`master-images${buildQueryString(data)}`);
+
         return response.data;
     }
 
@@ -24,11 +25,13 @@ export class MasterImageAPI extends BaseAPI implements IMasterImageAPI {
         data?: EntityQueryInput<MasterImage>,
     ): Promise<EntityRecordResponse<MasterImage>> {
         const response = await this.client.get(`master-images/${id}${buildQueryString(data)}`);
+
         return response.data;
     }
 
     async delete(id: MasterImage['id']): Promise<EntityRecordResponse<MasterImage>> {
         const response = await this.client.delete(`master-images/${id}`);
+
         return response.data;
     }
 

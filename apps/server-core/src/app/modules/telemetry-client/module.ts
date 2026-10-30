@@ -22,6 +22,7 @@ export class TelemetryClientModule implements IModule {
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
+
         if (!config.telemetryURL) {
             return;
         }
@@ -29,6 +30,7 @@ export class TelemetryClientModule implements IModule {
         const client = new APIClient({ baseURL: config.telemetryURL });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
+
         if (hookResult.success) {
             hookResult.data.attach(client);
         }

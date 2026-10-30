@@ -21,6 +21,7 @@ function probeSocketManager(realtime?: boolean) {
     const component = defineComponent({
         setup() {
             usable = isSocketManagerUsable();
+
             return () => h('div');
         },
     });

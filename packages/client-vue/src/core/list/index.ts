@@ -8,4 +8,4 @@
 export * from './utils';
 export * from './module';
 export * from './constants';
-export * from './type';
+export * from './types';

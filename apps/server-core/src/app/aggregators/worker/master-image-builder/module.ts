@@ -19,6 +19,7 @@ export class MasterImageBuilderAggregator extends Component<MasterImageBuilderEv
 
         const handler = async (value, context) => {
             const saved = await ctx.service.applyEvent(context.key, value);
+
             if (!saved) {
                 return;
             }

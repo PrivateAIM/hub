@@ -69,17 +69,22 @@ describe('EventService', () => {
 
         it('should return events of every realm on an allow verdict', async () => {
             seedEventsAcrossRealms();
+
             const actor = createAllowAllActor();
+
             actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
 
             const result = await service.getMany({}, actor);
+
             expect(sortedIds(result)).toEqual(['e-1', 'e-2', 'e-3']);
             expect(result.meta.total).toBe(3);
         });
 
         it('should return only matching events on a conditional verdict', async () => {
             seedEventsAcrossRealms();
+
             const actor = createAllowAllActor();
+
             actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition: eq('realmId', 'realm-2') });
 
             expect(sortedIds(await service.getMany({}, actor))).toEqual(['e-2']);
@@ -93,7 +98,9 @@ describe('EventService', () => {
 
         it('should return nothing on a deny verdict', async () => {
             seedEventsAcrossRealms();
+
             const actor = createAllowAllActor();
+
             actor.permissionEvaluator.setCompileResult({ verdict: 'deny' });
 
             expect(sortedIds(await service.getMany({}, actor))).toEqual([]);
@@ -101,10 +108,12 @@ describe('EventService', () => {
 
         it('should accept either EVENT_READ or EVENT_DELETE as read permission', async () => {
             const actor = createAllowAllActor();
+
             await service.getMany({}, actor);
 
             // Pin the one-of: dropping EVENT_DELETE would 403 delete-only roles.
             const names = [PermissionName.EVENT_READ, PermissionName.EVENT_DELETE];
+
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0].name).toEqual(names);
             expect(actor.permissionEvaluator.compileCalls[0].name).toEqual(names);
         });
@@ -119,9 +128,11 @@ describe('EventService', () => {
     describe('getOne', () => {
         it('should return entity by ID', async () => {
             const event = createTestEvent({ id: 'e-1' });
+
             repository.seed(event);
 
             const result = await service.getOne('e-1', createAllowAllActor('realm-1'));
+
             expect(result.id).toBe('e-1');
         });
 
@@ -141,6 +152,7 @@ describe('EventService', () => {
 
         it('should deny when actor lacks permission', async () => {
             const event = createTestEvent({ id: 'e-1' });
+
             repository.seed(event);
 
             await expect(
@@ -207,6 +219,7 @@ describe('EventService', () => {
             );
 
             const [call] = actor.permissionEvaluator.evaluateCalls;
+
             expect(call.name).toBe(PermissionName.EVENT_CREATE);
             expect(call.data!.get(BuiltInPolicyType.REALM_MATCH)).toBe(actor.realm!.id);
             expect(result.realmId).toBe(actor.realm!.id);
@@ -270,15 +283,18 @@ describe('EventService', () => {
     describe('delete', () => {
         it('should delete existing entity', async () => {
             const event = createTestEvent();
+
             repository.seed(event);
 
             const result = await service.delete(event.id, createAllowAllActor());
+
             expect(result.id).toBe(event.id);
             expect(repository.getAll()).toHaveLength(0);
         });
 
         it('should deny when actor lacks permission', async () => {
             const event = createTestEvent();
+
             repository.seed(event);
 
             await expect(
@@ -294,6 +310,7 @@ describe('EventService', () => {
 
         it('should deny when the grant does not reach the event realm', async () => {
             const event = createTestEvent({ realmId: 'other-realm' });
+
             repository.seed(event);
 
             await expect(
@@ -304,6 +321,7 @@ describe('EventService', () => {
 
         it('should delete an event of another realm with an any-scoped grant', async () => {
             const event = createTestEvent({ realmId: 'other-realm' });
+
             repository.seed(event);
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'any' });
@@ -315,6 +333,7 @@ describe('EventService', () => {
 
         it('should deny for a realm-less event with an own-scoped grant', async () => {
             const event = createTestEvent({ realmId: null });
+
             repository.seed(event);
 
             await expect(
@@ -325,6 +344,7 @@ describe('EventService', () => {
 
         it('should delete a realm-less event with an ownOrNull-scoped grant', async () => {
             const event = createTestEvent({ realmId: null });
+
             repository.seed(event);
 
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'ownOrNull' });

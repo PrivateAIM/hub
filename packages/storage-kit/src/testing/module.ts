@@ -10,9 +10,9 @@ import type { MemoryResponseInit, TransportRequest } from 'hapic';
 import { APIClient } from '../http/api-client';
 import { matchRoute } from './matcher';
 import type {
-    FakeClientOptions, 
-    FakeHandler, 
-    FakeHandlerMap, 
+    FakeClientOptions,
+    FakeHandler,
+    FakeHandlerMap,
     FakeRequest,
 } from './types';
 
@@ -78,9 +78,9 @@ export class FakeClient extends APIClient {
 
     constructor(options: FakeClientOptions = {}) {
         const {
-            handlers, 
-            fallback, 
-            ...clientOptions 
+            handlers,
+            fallback,
+            ...clientOptions
         } = options;
 
         const requests : FakeRequest[] = [];
@@ -100,6 +100,7 @@ export class FakeClient extends APIClient {
                 // the keys, and client-level defaults (setAuthorizationHeader)
                 // are already present.
                 const headers : Record<string, string> = {};
+
                 new Headers(req.headers).forEach((value, key) => {
                     headers[key.toLowerCase()] = value;
                 });
@@ -111,6 +112,7 @@ export class FakeClient extends APIClient {
                     params: match ? match.params : {},
                     headers,
                 };
+
                 requests.push(request);
 
                 const data = match ?

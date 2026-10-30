@@ -47,6 +47,7 @@ function clientOf(clientId: string, realmId: string, actor = createAllowAllActor
         type: 'client',
         realmId,
     };
+
     return actor;
 }
 
@@ -68,9 +69,11 @@ describe('AnalysisLogAccessService', () => {
 
     beforeEach(() => {
         const analysisRepository = new FakeAnalysisRepository();
+
         analysisRepository.seed(analysisRepository.create({ id: ANALYSIS_ID, realmId: OWNER_REALM }));
 
         const nodeRepository = new FakeNodeRepository();
+
         nodeRepository.seed([
             nodeRepository.create({
                 id: APPROVED_NODE,
@@ -85,6 +88,7 @@ describe('AnalysisLogAccessService', () => {
         ]);
 
         const analysisNodeRepository = new FakeAnalysisNodeRepository();
+
         analysisNodeRepository.seed([
             createTestAnalysisNode({
                 analysisId: ANALYSIS_ID,
@@ -134,6 +138,7 @@ describe('AnalysisLogAccessService', () => {
 
         it('lets only the owner side delete, with ANALYSIS_UPDATE', async () => {
             const owner = userOf(OWNER_REALM);
+
             await expect(service.assertAnalysisLogAccess(ANALYSIS_ID, owner, LogAccessIntent.DELETE))
                 .resolves.toBeUndefined();
             expect(owner.permissionEvaluator.preEvaluateOneOfCalls[0].name).toEqual([PermissionName.ANALYSIS_UPDATE]);
@@ -153,6 +158,7 @@ describe('AnalysisLogAccessService', () => {
     describe('analysis-node logs', () => {
         it('requires ANALYSIS_UPDATE or ANALYSIS_APPROVE to read', async () => {
             const actor = userOf(OWNER_REALM);
+
             await service.assertAnalysisNodeLogAccess(ANALYSIS_ID, PENDING_NODE, actor, LogAccessIntent.READ);
 
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0].name).toEqual([
@@ -236,6 +242,7 @@ describe('AnalysisLogAccessService', () => {
                 await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, randomUUID(), userOf(OWNER_REALM), intent))
                     .rejects.toThrow(EntityNotFoundError);
             }
+
             await expect(service.assertAnalysisNodeLogAccess(ANALYSIS_ID, 'abc', userOf(OWNER_REALM), LogAccessIntent.READ))
                 .rejects.toThrow(BadRequestError);
         });
@@ -244,12 +251,14 @@ describe('AnalysisLogAccessService', () => {
     describe('analysis-node log writes', () => {
         it('requires ANALYSIS_NODE_LOG_CREATE', async () => {
             const actor = boundClientOf(APPROVED_NODE_CLIENT, APPROVED_REALM);
+
             await service.assertAnalysisNodeLogCreate(ANALYSIS_ID, APPROVED_NODE, actor);
 
             expect(actor.permissionEvaluator.preEvaluateCalls.map((call) => call.name))
                 .toEqual([PermissionName.ANALYSIS_NODE_LOG_CREATE]);
 
             const denied = clientOf(APPROVED_NODE_CLIENT, APPROVED_REALM, createDenyAllActor(APPROVED_REALM));
+
             await expect(service.assertAnalysisNodeLogCreate(ANALYSIS_ID, APPROVED_NODE, denied))
                 .rejects.toThrow(PermissionError);
         });

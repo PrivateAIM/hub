@@ -30,6 +30,7 @@ export class StorageBucketClearingFinishedHandler implements ComponentHandler<
         }
 
         const entities = await this.repository.findManyByBucketFiles(payload.id, payload.fileIds);
+
         if (entities.length === 0) {
             return;
         }

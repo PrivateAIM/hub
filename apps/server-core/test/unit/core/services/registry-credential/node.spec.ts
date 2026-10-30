@@ -11,7 +11,8 @@ import { REALM_MASTER_NAME } from '@authup/core-kit';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { FakePermissionEvaluator, createAllowAllActor, createScopedActor  } from '@privateaim/server-test-kit';
+import { FakePermissionEvaluator } from '@authup/server-test-kit';
+import { createAllowAllActor, createScopedActor } from '@privateaim/server-test-kit';
 import { PermissionName } from '@privateaim/kit';
 import { describe, expect, it } from 'vitest';
 import { NodeRegistryCredentialService } from '../../../../../src/core/services/registry-credential/index.ts';
@@ -99,12 +100,19 @@ function buildService(opts: {
     registryProject?: Partial<RegistryProject>;
 }) {
     const repository = new FakeNodeRepository();
-    if (opts.node) repository.seed(repository.create(opts.node));
+
+    if (opts.node) {
+        repository.seed(repository.create(opts.node));
+    }
 
     const registryRepository = new FakeRegistryRepository();
-    if (opts.registry) registryRepository.seed(registryRepository.create(opts.registry));
+
+    if (opts.registry) {
+        registryRepository.seed(registryRepository.create(opts.registry));
+    }
 
     const registryProjectRepository = new FakeRegistryProjectRepository();
+
     if (opts.registryProject) {
         registryProjectRepository.seed(registryProjectRepository.create(opts.registryProject));
     }
@@ -230,6 +238,7 @@ describe('NodeRegistryCredentialService', () => {
         const service = fullSetup();
 
         const credentials = await service.getCredentials(NODE_ID, registryManagerActor());
+
         expect(credentials.accountSecret).toBe('the-secret');
     });
 

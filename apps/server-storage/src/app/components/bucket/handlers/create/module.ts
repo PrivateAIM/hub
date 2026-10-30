@@ -19,7 +19,7 @@ import { IsNull, QueryFailedError } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity } from '../../../../../adapters/database/index.ts';
-import { toBucketName } from '../../../../domains/bucket/utils.ts';
+import { toBucketName } from '../../../../../core/utils/bucket-name.ts';
 import { ValidatorGroup } from '@privateaim/kit';
 
 export class BucketCreateHandler implements ComponentHandler<
@@ -77,6 +77,7 @@ export class BucketCreateHandler implements ComponentHandler<
         );
 
         const data = await this.validator.run(value, { group: ValidatorGroup.CREATE });
+
         assertBucketRefPairing(data);
 
         // The validator mounts no actor (a client must not name one): take it from the
@@ -89,8 +90,10 @@ export class BucketCreateHandler implements ComponentHandler<
 
         // idempotent per (refType, refId, name): a repeated create replies with the existing bucket.
         const existing = await this.findExisting(repository, data);
+
         if (existing) {
             await this.finish(existing, context);
+
             return;
         }
 
@@ -101,11 +104,13 @@ export class BucketCreateHandler implements ComponentHandler<
         } catch (e) {
             // a concurrent create won the unique (refType, refId, name).
             const winner = isUniqueViolation(e) ? await this.findExisting(repository, data) : null;
+
             if (!winner) {
                 throw e;
             }
 
             await this.finish(winner, context);
+
             return;
         }
 
@@ -113,6 +118,7 @@ export class BucketCreateHandler implements ComponentHandler<
             await this.makeStorageBucket(entity);
         } catch (e) {
             await repository.remove(entity);
+
             throw e;
         }
 

@@ -102,6 +102,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_APPROVE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'project-node' });
         }
@@ -110,6 +111,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
         // The stored row is snapshotted, since typeorm's merge() writes into `entity`.
         const current = { realm: entity.nodeRealmId, data: { attributes: { ...entity } } };
         const merged = this.repository.merge(entity, validated);
+
         await evaluateRecordUpdate(actor.permissionEvaluator, {
             name: PermissionName.PROJECT_APPROVE,
             current,
@@ -125,6 +127,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
         await actor.permissionEvaluator.preEvaluate({ name: PermissionName.PROJECT_UPDATE });
 
         const entity = await this.repository.findOneBy({ id });
+
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'project-node' });
         }
@@ -153,6 +156,7 @@ export class ProjectNodeService extends AbstractEntityService implements IProjec
         entity.id = entityId;
 
         const project = await this.projectRepository.findOneBy({ id: entity.projectId });
+
         if (project) {
             project.nodes -= 1;
             await this.projectRepository.save(project, { data: actor.metadata });

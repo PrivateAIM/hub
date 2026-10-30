@@ -96,6 +96,7 @@ export default defineComponent({
                 // exact failure this re-read exists to prevent — and a response for a
                 // previously displayed record could overwrite the current one.
                 secretRefreshToken += 1;
+
                 const token = secretRefreshToken;
 
                 void apiClient.registryProject
@@ -116,7 +117,9 @@ export default defineComponent({
         await manager.resolve({ query: { fields: ['+accountId', '+accountName', '+accountSecret'] } });
 
         const execute = async (command: RegistryAPICommand) => wrapFnWithBusyState(busy, async () => {
-            if (!manager.data.value) return;
+            if (!manager.data.value) {
+                return;
+            }
 
             try {
                 await apiClient.service.runCommand(ServiceID.REGISTRY, command, {
@@ -126,7 +129,7 @@ export default defineComponent({
 
                 setup.emit('updated', manager.data.value);
             } catch (e) {
-                if (e instanceof Error) {
+                if (Error.isError(e)) {
                     setup.emit('failed', e);
                 }
             }
@@ -136,10 +139,10 @@ export default defineComponent({
             return () => h(
                 VCAlert,
                 {
-                    color: 'warning', 
-                    variant: 'soft', 
-                    size: 'sm', 
-                    class: 'mb-3', 
+                    color: 'warning',
+                    variant: 'soft',
+                    size: 'sm',
+                    class: 'mb-3',
                 },
                 () => [
                     'The registry-project details can not be displayed.',
@@ -204,10 +207,10 @@ export default defineComponent({
                 h('div', { class: 'flex flex-wrap -mx-2' }, [
                     h('div', { class: 'flex-1 basis-0 px-2' }, [
                         h(VCAlert, {
-                            color: 'info', 
-                            variant: 'soft', 
-                            size: 'sm', 
-                            class: 'mb-3', 
+                            color: 'info',
+                            variant: 'soft',
+                            size: 'sm',
+                            class: 'mb-3',
                         }, () => [
                             'Connect the database entity to the registry.',
                         ]),
@@ -229,10 +232,10 @@ export default defineComponent({
                     ]),
                     h('div', { class: 'flex-1 basis-0 px-2' }, [
                         h(VCAlert, {
-                            color: 'warning', 
-                            variant: 'soft', 
-                            size: 'sm', 
-                            class: 'mb-3', 
+                            color: 'warning',
+                            variant: 'soft',
+                            size: 'sm',
+                            class: 'mb-3',
                         }, () => [
                             'Disconnect the database entity of the registry.',
                         ]),
@@ -243,6 +246,7 @@ export default defineComponent({
                                 disabled: busy.value,
                                 onClick($event: any) {
                                     $event.preventDefault();
+
                                     return execute(RegistryAPICommand.PROJECT_UNLINK);
                                 },
                             }, () => [

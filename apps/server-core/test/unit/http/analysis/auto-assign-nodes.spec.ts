@@ -35,11 +35,13 @@ describe('analysis: auto-assign project nodes', () => {
         // Aggregator project nodes are approved on creation, so they are eligible for
         // auto-assignment to a newly created analysis.
         const { data: aggregatorNode } = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+
         await client.projectNode.create({ nodeId: aggregatorNode.id, projectId: project.id });
 
         const { data: analysis } = await client.analysis.create({ projectId: project.id });
 
         const { data: persisted } = await client.analysis.getOne(analysis.id);
+
         expect(persisted.nodes).toBe(1);
         expect(persisted.nodesApproved).toBe(1);
         expect(persisted.configurationNodeAggregatorValid).toBe(true);
@@ -56,6 +58,7 @@ describe('analysis: auto-assign project nodes', () => {
         const { data: project } = await client.project.create(createTestProject());
 
         const { data: aggregatorNode } = await client.node.create(createTestNode({ type: NodeType.AGGREGATOR }));
+
         await client.projectNode.create({ nodeId: aggregatorNode.id, projectId: project.id });
 
         const { data: analysis } = await client.analysis.create({ projectId: project.id });
@@ -65,9 +68,11 @@ describe('analysis: auto-assign project nodes', () => {
             analysisId: analysis.id,
             nodeId: aggregatorNode.id,
         });
+
         expect(analysisNode.id).toBeDefined();
 
         const { data: persisted } = await client.analysis.getOne(analysis.id);
+
         expect(persisted.nodes).toBe(1);
     });
 });

@@ -42,6 +42,14 @@ export default [
         },
     },
     {
+        // Node 24 does not implement Uint8Array's hex/base64 methods yet.
+        files: ['apps/server-*/**/*.ts', 'packages/server-*/**/*.ts', 'packages/kit/**/*.ts'],
+        rules: {
+            'unicorn/prefer-uint8array-hex': 'off',
+            'unicorn/prefer-uint8array-base64': 'off',
+        },
+    },
+    {
         // SFCs are browser/SSR code — the shared config only registers Node
         // globals for `.vue` files, so DOM-only globals (DragEvent, FileList,
         // HTMLInputElement, …) otherwise trip `no-undef`.

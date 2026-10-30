@@ -12,6 +12,5 @@ export * from './column-naming.ts';
 export * from './database/index.ts';
 export * from './fake-entity-repository.ts';
 export * from './query-indexes.ts';
-export * from './fake-permission-evaluator.ts';
 export * from './testcontainers/index.ts';
 export * from './types.ts';

@@ -28,8 +28,10 @@ export class StorageBucketFileCreationFinishedHandler implements ComponentHandle
 
     async handle(data: BucketFile): Promise<void> {
         const result = await this.service.registerUpload(data);
+
         if (!result) {
             this.logger?.debug(`Can not associate ${data.path} to an analysis bucket`);
+
             return;
         }
 

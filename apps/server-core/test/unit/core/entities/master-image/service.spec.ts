@@ -77,6 +77,7 @@ describe('MasterImageService', () => {
 
             const actor = createAllowAllActor();
             const result = await service.getMany({}, actor);
+
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
@@ -92,10 +93,12 @@ describe('MasterImageService', () => {
     describe('getOne', () => {
         it('should return entity by ID', async () => {
             const image = createTestMasterImage({ id: 'mi-1' });
+
             repository.seed(image);
 
             const actor = createAllowAllActor();
             const result = await service.getOne('mi-1', actor);
+
             expect(result.id).toBe('mi-1');
             expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0]).toEqual({ name: READ_PERMISSIONS });
             expect(actor.permissionEvaluator.compileCalls).toHaveLength(0);
@@ -149,6 +152,7 @@ describe('MasterImageService', () => {
         describe('BUILD', () => {
             it('should call builderDispatcher and set buildStatus to STARTING', async () => {
                 const image = createTestMasterImage({ id: 'mi-1' });
+
                 repository.seed(image);
 
                 const result = await service.executeCommand(
@@ -268,15 +272,18 @@ describe('MasterImageService', () => {
     describe('delete', () => {
         it('should delete with correct permission', async () => {
             const image = createTestMasterImage();
+
             repository.seed(image);
 
             const result = await service.delete(image.id, createAllowAllActor());
+
             expect(result.id).toBe(image.id);
             expect(repository.getAll()).toHaveLength(0);
         });
 
         it('should deny when actor lacks permission', async () => {
             const image = createTestMasterImage();
+
             repository.seed(image);
 
             await expect(

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import 'reflect-metadata';
+import './types.ts';
 
 import type { TestProject } from 'vitest/node';
 import { GenericContainer, Wait } from 'testcontainers';
@@ -14,13 +15,6 @@ import { provideAuthup, provideDatabase, stopTestContainers } from '@privateaim/
 import { Application } from 'orkos';
 import { ConfigModule } from '../src/app/modules/config/index.ts';
 import { createTestDatabaseModule } from './app/database.ts';
-
-declare module 'vitest' {
-    export interface ProvidedContext {
-        VL_CONTAINER_HOST: string
-        VL_CONTAINER_PORT: number
-    }
-}
 
 // The permissions server-telemetry's authorization middleware checks.
 const PERMISSIONS: PermissionName[] = [

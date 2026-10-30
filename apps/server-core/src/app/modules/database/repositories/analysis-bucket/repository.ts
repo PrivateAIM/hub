@@ -33,6 +33,7 @@ export class AnalysisBucketRepositoryAdapter implements IAnalysisBucketRepositor
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<AnalysisBucket>> {
         const qb = this.repository.createQueryBuilder('analysisBucket');
+
         qb.groupBy('analysisBucket.id');
 
         const { pagination } = applyQuery(qb, query);

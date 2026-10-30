@@ -35,6 +35,7 @@ export function parseAnalysisBucketName(
 ): { type: `${AnalysisBucketType}`, analysisId: Analysis['id'] } | null {
     for (const type of Object.values(AnalysisBucketType)) {
         const prefix = buildAnalysisBucketName(type, '');
+
         if (name.length > prefix.length && name.startsWith(prefix)) {
             return { type, analysisId: name.slice(prefix.length) };
         }

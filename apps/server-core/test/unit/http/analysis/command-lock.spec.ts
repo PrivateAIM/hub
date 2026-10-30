@@ -6,10 +6,10 @@
  */
 
 import {
-    afterAll, 
-    beforeAll, 
-    describe, 
-    expect, 
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import type { Analysis, Node } from '@privateaim/core-kit';
@@ -76,6 +76,7 @@ describe('analysis/command-lock', () => {
         } catch (e) {
             if (isClientError(e)) {
                 expect(e.response.data.message).toEqual(extractErrorMessage(AnalysisError.defaultNodeRequired()));
+
                 return;
             }
 
@@ -101,6 +102,7 @@ describe('analysis/command-lock', () => {
         } catch (e) {
             if (isClientError(e)) {
                 expect(e.response.data.message).toEqual(extractErrorMessage(AnalysisError.aggregatorNodeRequired()));
+
                 return;
             }
 
@@ -126,6 +128,7 @@ describe('analysis/command-lock', () => {
         } catch (e) {
             if (isClientError(e)) {
                 expect(e.response.data.message).toEqual(extractErrorMessage(AnalysisError.entrypointRequired()));
+
                 return;
             }
 

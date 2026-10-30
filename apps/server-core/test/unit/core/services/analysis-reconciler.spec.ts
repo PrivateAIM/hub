@@ -34,6 +34,7 @@ class FakeProcessChecker implements IAnalysisProcessChecker {
         }
 
         this.checked.push(input.id);
+
         return input;
     }
 }

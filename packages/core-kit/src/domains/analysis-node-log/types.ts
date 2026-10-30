@@ -6,12 +6,10 @@
  */
 
 import type { Realm } from '@authup/core-kit';
-import type {
-    Analysis,
-} from '../analysis';
+import type { Analysis } from '../analysis';
 import type { Node } from '../node';
 
-export interface AnalysisNodeLog {
+export type AnalysisNodeLog = {
     message: string,
 
     level: string,
@@ -37,4 +35,4 @@ export interface AnalysisNodeLog {
     nodeId: Node['id'];
 
     nodeRealmId: Realm['id'];
-}
+};

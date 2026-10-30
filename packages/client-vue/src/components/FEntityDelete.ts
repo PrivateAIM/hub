@@ -118,7 +118,9 @@ export default defineComponent({
         const busy = ref(false);
 
         const submit = async () => {
-            if (busy.value) return;
+            if (busy.value) {
+                return;
+            }
 
             // Each client resolves its own sub-API registry, so the lookup is
             // typed and the own-property check lives in the kit rather than
@@ -127,17 +129,21 @@ export default defineComponent({
             // REQUIRED `id`, so `DomainEntityID<T>` collapses to `never` and `delete`
             // becomes uncallable.
             let domainAPI : EntityAPIDispatch<DomainEntityWithID> | undefined;
+
             switch (props.service) {
                 case 'core': {
                     domainAPI = pickCoreEntityAPI(coreClient, props.entityType);
+
                     break;
                 }
                 case 'storage': {
                     domainAPI = pickStorageEntityAPI(storageClient, props.entityType);
+
                     break;
                 }
                 case 'telemetry': {
                     domainAPI = pickTelemetryEntityAPI(telemetryClient, props.entityType);
+
                     break;
                 }
             }
@@ -150,6 +156,7 @@ export default defineComponent({
 
             try {
                 const response = await domainAPI.delete(props.entityId);
+
                 ctx.emit('deleted', { ...response.data, id: props.entityId });
             } catch (e) {
                 ctx.emit('failed', e);
@@ -212,7 +219,9 @@ export default defineComponent({
                 // it is still set. No await between the release and submit(), so
                 // no re-entrancy window reopens.
                 busy.value = true;
+
                 let confirmed: boolean;
+
                 try {
                     confirmed = await confirmDialog({
                         title: promptTitle.value,
@@ -253,6 +262,7 @@ export default defineComponent({
             // Link / dropdown-item paths keep the bare element — their call
             // sites style them as nav/dropdown entries, not buttons.
             let tag : Component | string = 'a';
+
             if (props.elementType === ElementType.DROP_DOWN_ITEM) {
                 if (
                     instance &&
@@ -263,6 +273,7 @@ export default defineComponent({
             }
 
             let icon : VNodeArrayChildren = [];
+
             if (props.elementIcon) {
                 icon = [
                     h(VCIcon, {
@@ -273,6 +284,7 @@ export default defineComponent({
             }
 
             let text : VNodeArrayChildren = [];
+
             if (props.withText) {
                 text = [
                     translation.value,

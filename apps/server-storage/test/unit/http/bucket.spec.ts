@@ -47,29 +47,41 @@ class FailingStorageAdapter implements IStorageAdapter {
         if (this.failOn === 'bucketExists') {
             throw new Error('storage unavailable');
         }
+
         return this.inner.bucketExists(name);
     }
 
-    makeBucket(name: string, region?: string) { return this.inner.makeBucket(name, region); }
+    makeBucket(name: string, region?: string) {
+        return this.inner.makeBucket(name, region);
+    }
 
-    removeBucket(name: string) { return this.inner.removeBucket(name); }
+    removeBucket(name: string) {
+        return this.inner.removeBucket(name);
+    }
 
     putObject(bucket: string, key: string, data: Buffer | Readable, size?: number) {
         return this.inner.putObject(bucket, key, data, size);
     }
 
-    getObject(bucket: string, key: string) { return this.inner.getObject(bucket, key); }
+    getObject(bucket: string, key: string) {
+        return this.inner.getObject(bucket, key);
+    }
 
-    removeObject(bucket: string, key: string) { return this.inner.removeObject(bucket, key); }
+    removeObject(bucket: string, key: string) {
+        return this.inner.removeObject(bucket, key);
+    }
 
     async removeObjects(bucket: string, keys: string[]): Promise<void> {
         if (this.failOn === 'removeObjects') {
             throw new Error('storage unavailable');
         }
+
         return this.inner.removeObjects(bucket, keys);
     }
 
-    listObjects(bucket: string, prefix?: string) { return this.inner.listObjects(bucket, prefix); }
+    listObjects(bucket: string, prefix?: string) {
+        return this.inner.listObjects(bucket, prefix);
+    }
 }
 
 describe('bucket HTTP endpoints', () => {
@@ -92,6 +104,7 @@ describe('bucket HTTP endpoints', () => {
         if (!baseURL) {
             baseURL = suite.client().getBaseURL().replace(/\/+$/, '');
         }
+
         return baseURL;
     }
 
@@ -111,6 +124,7 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(201);
 
             const body = await response.json();
+
             expect(body.meta).toEqual({});
             expect(body.data.id).toBeDefined();
             expect(body.data.name).toBe(input.name);
@@ -132,6 +146,7 @@ describe('bucket HTTP endpoints', () => {
             });
 
             const body = await response.json();
+
             expect(body.data.id).toBeDefined();
             expect(typeof body.data.id).toBe('string');
             expect(body.data.name).toBe(input.name);
@@ -202,6 +217,7 @@ describe('bucket HTTP endpoints', () => {
             const actorId = crypto.randomUUID();
             let created: Record<string, any> | undefined;
             const handler = new BucketCreateHandler({ storage: suite.storage() });
+
             await handler.handle({
                 ...createTestBucket(),
                 actorId,
@@ -232,6 +248,7 @@ describe('bucket HTTP endpoints', () => {
 
             const first = await create();
             const second = await create();
+
             expect(first.data.id).not.toBe(second.data.id);
         });
     });
@@ -243,6 +260,7 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data).toBeDefined();
             expect(Array.isArray(body.data)).toBe(true);
             expect(body.meta).toBeDefined();
@@ -256,6 +274,7 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data).toBeDefined();
             expect(body.data.length).toBeLessThanOrEqual(1);
             expect(body.meta).toBeDefined();
@@ -269,6 +288,7 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data.id).toBe(bucketId);
             expect(body.data.name).toBeDefined();
             expect(body.data.region).toBe('eu-west');
@@ -298,11 +318,13 @@ describe('bucket HTTP endpoints', () => {
                 body: JSON.stringify(input),
             });
             const bucket = await createResponse.json();
+
             streamBucketId = bucket.data.id;
 
             const filePath = path.join(import.meta.dirname, '../../data/file.json');
             const fileContent = await fs.promises.readFile(filePath);
             const formData = new FormData();
+
             formData.append('file[0]', new Blob([fileContent]), 'test-stream.json');
 
             await fetch(`${getBaseURL()}/buckets/${streamBucketId}/upload`, {
@@ -316,6 +338,7 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const contentDisposition = response.headers.get('content-disposition');
+
             expect(contentDisposition).toBeDefined();
             expect(contentDisposition).toContain('attachment');
             expect(contentDisposition).toContain('.tar');
@@ -327,6 +350,7 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const contentType = response.headers.get('content-type');
+
             expect(contentType).toBeDefined();
             expect(contentType).toContain('application/x-tar');
         });
@@ -337,6 +361,7 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.arrayBuffer();
+
             expect(body.byteLength).toBeGreaterThan(0);
         });
     });
@@ -346,6 +371,7 @@ describe('bucket HTTP endpoints', () => {
             const filePath = path.join(import.meta.dirname, '../../data/file.json');
             const fileContent = await fs.promises.readFile(filePath);
             const formData = new FormData();
+
             formData.append('file[0]', new Blob([fileContent]), 'upload-test.json');
 
             const response = await fetch(`${getBaseURL()}/buckets/${bucketId}/upload`, {
@@ -361,6 +387,7 @@ describe('bucket HTTP endpoints', () => {
             const filePath = path.join(import.meta.dirname, '../../data/file.json');
             const fileContent = await fs.promises.readFile(filePath);
             const formData = new FormData();
+
             formData.append('file[0]', new Blob([fileContent]), 'upload-test-2.json');
 
             const response = await fetch(`${getBaseURL()}/buckets/${bucketId}/upload`, {
@@ -370,6 +397,7 @@ describe('bucket HTTP endpoints', () => {
             });
 
             const body = await response.json();
+
             expect(body.data).toBeDefined();
             expect(Array.isArray(body.data)).toBe(true);
             expect(body.data.length).toBeGreaterThanOrEqual(1);
@@ -394,6 +422,7 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(202);
 
             const body = await response.json();
+
             expect(body.data.id).toBe(bucketId);
             expect(body.meta).toEqual({});
         });
@@ -405,8 +434,11 @@ describe('bucket HTTP endpoints', () => {
             const context: ComponentHandlerContext<BucketComponentEventMap, BucketCommand.CLEAR> = {
                 key: BucketCommand.CLEAR,
                 metadata: {},
-                handle: async (key) => { emitted.push(key); },
+                handle: async (key) => {
+                    emitted.push(key);
+                },
             };
+
             return { context, emitted };
         }
 
@@ -414,14 +446,18 @@ describe('bucket HTTP endpoints', () => {
             const handler = new BucketClearHandler({ storage: new FailingStorageAdapter(suite.storage(), 'bucketExists') });
             const { context, emitted } = createClearContext();
             const before = await suite.client().bucketFile.getMany({ filters: { bucketId } });
+
             expect(before.data.length).toBeGreaterThanOrEqual(1);
 
             await expect(handler.handle({ id: bucketId }, context)).rejects.toThrow('storage unavailable');
             expect(emitted).toContain(BucketEvent.CLEARING_FAILED);
 
             const after = await suite.client().bucketFile.getMany({ filters: { bucketId } });
+
             expect(after.meta.total).toBe(before.meta.total);
+
             const keys = before.data.map((file) => file.hash);
+
             expect(await suite.storage().listObjects(toBucketName(bucketId))).toEqual(expect.arrayContaining(keys));
         });
 
@@ -438,29 +474,37 @@ describe('bucket HTTP endpoints', () => {
             const bucketName = toBucketName(bucketId);
 
             const before = await client.bucketFile.getMany({ filters: { bucketId } });
+
             expect(before.data.length).toBeGreaterThanOrEqual(1);
+
             const keys = before.data.map((file) => file.hash);
+
             expect(await suite.storage().listObjects(bucketName)).toEqual(expect.arrayContaining(keys));
 
             const response = await client.bucket.clear(bucketId);
+
             expect(response.data.id).toBe(bucketId);
             expect(response.data).not.toHaveProperty('fileIds');
             expect(response.meta).toEqual({});
 
             const bucket = await client.bucket.getOne(bucketId);
+
             expect(bucket.data.id).toBe(bucketId);
 
             const after = await client.bucketFile.getMany({ filters: { bucketId } });
+
             expect(after.data).toEqual([]);
             expect(after.meta.total).toBe(0);
 
             const remaining = await suite.storage().listObjects(bucketName);
+
             expect(remaining.filter((key) => keys.includes(key))).toEqual([]);
         });
 
         it('should still clear the rows when object removal fails (no broken files)', async () => {
             const filePath = path.join(import.meta.dirname, '../../data/file.json');
             const formData = new FormData();
+
             formData.append('file[0]', new Blob([await fs.promises.readFile(filePath)]), 'clear-leftover.json');
             await fetch(`${getBaseURL()}/buckets/${bucketId}/upload`, {
                 method: 'POST',
@@ -469,6 +513,7 @@ describe('bucket HTTP endpoints', () => {
             });
 
             const before = await suite.client().bucketFile.getMany({ filters: { bucketId } });
+
             expect(before.data.length).toBe(1);
 
             const handler = new BucketClearHandler({ storage: new FailingStorageAdapter(suite.storage(), 'removeObjects') });
@@ -479,6 +524,7 @@ describe('bucket HTTP endpoints', () => {
             expect(emitted).not.toContain(BucketEvent.CLEARING_FAILED);
 
             const after = await suite.client().bucketFile.getMany({ filters: { bucketId } });
+
             expect(after.meta.total).toBe(0);
 
             // the object is a harmless leftover, removed with the bucket.
@@ -505,6 +551,7 @@ describe('bucket HTTP endpoints', () => {
             expect(response.status).toBe(202);
 
             const body = await response.json();
+
             expect(body.data.id).toBe(bucketId);
             expect(body.meta).toEqual({});
         });
@@ -540,8 +587,11 @@ describe('bucket HTTP endpoints', () => {
                 actorId: spoofed,
                 actorType: 'client',
             });
+
             expect(created.status).toBe(201);
+
             const { data: bucket } = await created.json();
+
             expect(bucket.actorType).toBe('user');
             expect(bucket.actorId).toBeTruthy();
             expect(bucket.actorId).not.toBe(spoofed);
@@ -553,6 +603,7 @@ describe('bucket HTTP endpoints', () => {
         describe('upload', () => {
             const upload = async (token: string, id: string) => {
                 const formData = new FormData();
+
                 formData.append('file[0]', new Blob([await fs.promises.readFile(path.join(import.meta.dirname, '../../data/file.json'))]), `${crypto.randomUUID()}.json`);
 
                 return fetch(`${getBaseURL()}/buckets/${id}/upload`, {
@@ -564,6 +615,7 @@ describe('bucket HTTP endpoints', () => {
 
             const countFiles = async (id: string) => {
                 const { meta } = await suite.client().bucketFile.getMany({ filters: { bucketId: id } });
+
                 return meta.total;
             };
 
@@ -572,6 +624,7 @@ describe('bucket HTTP endpoints', () => {
             beforeAll(async () => {
                 const creator = await createRestrictedAccessToken([PermissionName.BUCKET_CREATE]);
                 const created = await request(creator, 'POST', '/buckets', createTestBucket());
+
                 expect(created.status).toBe(201);
                 refLessBucketId = (await created.json()).data.id;
 
@@ -595,6 +648,7 @@ describe('bucket HTTP endpoints', () => {
             it('should leave uploads to a bucket with a ref to the owning service', async () => {
                 let bucketId: string | undefined;
                 const handler = new BucketCreateHandler({ storage: suite.storage() });
+
                 await handler.handle(createTestBucket({ refType: 'analysis', refId: crypto.randomUUID() }), {
                     key: BucketCommand.CREATE,
                     metadata: {},
@@ -607,6 +661,7 @@ describe('bucket HTTP endpoints', () => {
                 expect(bucketId).toBeDefined();
 
                 const stranger = await createRestrictedAccessToken();
+
                 expect((await upload(stranger, bucketId!)).status).toBe(201);
             });
         });

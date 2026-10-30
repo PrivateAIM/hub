@@ -31,6 +31,7 @@ export class ServerCoreApplicationBuilder extends BaseApplicationBuilder {
         }
 
         this.modules.push(instance ?? factory());
+
         return this;
     }
 }

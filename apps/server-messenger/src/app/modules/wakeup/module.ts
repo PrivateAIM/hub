@@ -38,12 +38,14 @@ export class WakeupModule implements IModule {
 
         const onPending = (recipient: MessageParty) => {
             const socketResult = container.tryResolve(HTTPInjectionKey.SocketServer);
+
             if (!socketResult.success) {
                 return;
             }
 
             try {
                 const room = buildConnectionRoomForIdentity(recipient);
+
                 // `.local`: every instance already receives the wakeup via our own pub/sub and
                 // emits to its own sockets — bypass the socket.io redis adapter to avoid duplicates.
                 socketResult.data.local.in(room).emit(WakeupEventName.MESSAGE_PENDING, { recipient });
@@ -56,6 +58,7 @@ export class WakeupModule implements IModule {
         const redisResult = container.tryResolve(RedisClientInjectionKey);
 
         let wakeup: IMessageWakeup;
+
         if (redisResult.success) {
             const redis = new RedisMessageWakeup({
                 publishClient: redisResult.data,
@@ -63,6 +66,7 @@ export class WakeupModule implements IModule {
                 onPending,
                 logger,
             });
+
             try {
                 await redis.start();
                 this.wakeup = redis;

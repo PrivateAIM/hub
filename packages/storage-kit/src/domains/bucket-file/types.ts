@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IEntityAPI } from '../types-base';
-import type { BucketFile } from './entity';
+import type { IEntityAPI } from '../types';
+import type { Realm } from '@authup/core-kit';
+import type { Bucket } from '../bucket';
 
 /**
  * Bucket files are created by uploading to their bucket, so `create`/`update`
@@ -17,3 +18,39 @@ export interface IBucketFileAPI extends IEntityAPI<BucketFile, Record<string, an
     getStreamURL(id: BucketFile['id']) : string;
     stream(id: BucketFile['id']) : Promise<ReadableStream<any>>;
 }
+
+export type BucketFile = {
+    id: string;
+
+    name: string;
+
+    path: string;
+
+    hash: string;
+
+    directory: string;
+
+    size: number | null;
+
+    // ------------------------------------------------------------------
+
+    createdAt: string;
+
+    updatedAt: string;
+
+    // ------------------------------------------------------------------
+
+    actorId: string;
+
+    actorType: string;
+
+    // ------------------------------------------------------------------
+
+    realmId: Realm['id'];
+
+    // ------------------------------------------------------------------
+
+    bucketId: Bucket['id'];
+
+    bucket: Bucket;
+};

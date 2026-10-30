@@ -32,6 +32,7 @@ function createFakeAnalysisBucketRepository() {
     const repo = new FakeEntityRepository<AnalysisBucket>();
 
     const originalValidateJoinColumns = repo.validateJoinColumns.bind(repo);
+
     repo.validateJoinColumns = async (data: Partial<AnalysisBucket>) => {
         await originalValidateJoinColumns(data);
 
@@ -93,9 +94,11 @@ describe('AnalysisBucketService', () => {
             ]);
 
             const actor = createAllowAllActor();
+
             actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
 
             const result = await service.getMany({}, actor);
+
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
         });
@@ -134,6 +137,7 @@ describe('AnalysisBucketService', () => {
             }));
 
             const pending = await service.getMany({}, createAllowAllActor('realm-a'));
+
             expect(pending.data.map((e) => e.id)).toEqual(['code']);
 
             await analysisNodeRepository.save({
@@ -142,6 +146,7 @@ describe('AnalysisBucketService', () => {
             });
 
             const approved = await service.getMany({}, createAllowAllActor('realm-a'));
+
             expect(approved.data.map((e) => e.id).sort()).toEqual(['code', 'result', 'temp']);
         });
 
@@ -168,6 +173,7 @@ describe('AnalysisBucketService', () => {
             ]);
 
             const result = await service.getMany({}, createAllowAllActor('realm-a'));
+
             expect(result.data.map((e) => e.id).sort()).toEqual(['code', 'result']);
         });
     });
@@ -175,9 +181,11 @@ describe('AnalysisBucketService', () => {
     describe('getOne', () => {
         it('should return entity by ID', async () => {
             const bucket = createTestAnalysisBucket({ id: 'ab-1' });
+
             repository.seed(bucket);
 
             const result = await service.getOne('ab-1', createAllowAllActor('realm-1'));
+
             expect(result.id).toBe('ab-1');
         });
 
@@ -262,6 +270,7 @@ describe('AnalysisBucketService', () => {
 
         it('should reject a second bucket of the same type for an analysis', async () => {
             const existing = createTestAnalysisBucket({ type: AnalysisBucketType.CODE });
+
             repository.seed(existing);
 
             await expect(service.create(
@@ -277,6 +286,7 @@ describe('AnalysisBucketService', () => {
 
         it('should reject a storage bucket already bound to an analysis bucket', async () => {
             const existing = createTestAnalysisBucket({ type: AnalysisBucketType.RESULT });
+
             repository.seed(existing);
 
             await expect(service.create(
@@ -304,9 +314,11 @@ describe('AnalysisBucketService', () => {
     describe('update', () => {
         it('should update existing entity', async () => {
             const bucket = createTestAnalysisBucket();
+
             repository.seed(bucket);
 
             const result = await service.update(bucket.id, {}, createAllowAllActor());
+
             expect(result.id).toBe(bucket.id);
         });
 
@@ -318,6 +330,7 @@ describe('AnalysisBucketService', () => {
 
         it('should deny a bucket of a realm out of reach', async () => {
             const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
+
             repository.seed(bucket);
 
             await expect(
@@ -327,6 +340,7 @@ describe('AnalysisBucketService', () => {
 
         it('should deny the owner realm without analysis_update', async () => {
             const bucket = createTestAnalysisBucket();
+
             repository.seed(bucket);
 
             await expect(
@@ -336,9 +350,11 @@ describe('AnalysisBucketService', () => {
 
         it('should evaluate both the stored and the merged row', async () => {
             const bucket = createTestAnalysisBucket();
+
             repository.seed(bucket);
 
             const actor = createScopedActor({ realmId: bucket.realmId, realmScope: 'own' });
+
             await service.update(bucket.id, {}, actor);
 
             expect(actor.permissionEvaluator.evaluateCalls.map((call) => call.data?.get(BuiltInPolicyType.REALM_MATCH)))
@@ -347,9 +363,11 @@ describe('AnalysisBucketService', () => {
 
         it('should let a grant reaching every realm update any entity', async () => {
             const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
+
             repository.seed(bucket);
 
             const result = await service.update(bucket.id, {}, createScopedActor({ realmId: 'realm-master', realmScope: 'any' }));
+
             expect(result.id).toBe(bucket.id);
         });
     });
@@ -357,9 +375,11 @@ describe('AnalysisBucketService', () => {
     describe('delete', () => {
         it('should delete existing entity', async () => {
             const bucket = createTestAnalysisBucket();
+
             repository.seed(bucket);
 
             const result = await service.delete(bucket.id, createAllowAllActor());
+
             expect(result.id).toBe(bucket.id);
             expect(repository.getAll()).toHaveLength(0);
         });
@@ -372,6 +392,7 @@ describe('AnalysisBucketService', () => {
 
         it('should deny a bucket of a realm out of reach', async () => {
             const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
+
             repository.seed(bucket);
 
             await expect(
@@ -381,6 +402,7 @@ describe('AnalysisBucketService', () => {
 
         it('should deny the owner realm without analysis_update', async () => {
             const bucket = createTestAnalysisBucket();
+
             repository.seed(bucket);
 
             await expect(
@@ -391,6 +413,7 @@ describe('AnalysisBucketService', () => {
 
         it('should reject deleting a code bucket once the configuration is locked', async () => {
             const bucket = createTestAnalysisBucket({ type: AnalysisBucketType.CODE });
+
             repository.seed(bucket);
             analysisRepository.seed({ id: bucket.analysisId, configurationLocked: true } as Analysis);
 
@@ -402,6 +425,7 @@ describe('AnalysisBucketService', () => {
 
         it('should delete a result bucket of a locked analysis', async () => {
             const bucket = createTestAnalysisBucket({ type: AnalysisBucketType.RESULT });
+
             repository.seed(bucket);
             analysisRepository.seed({ id: bucket.analysisId, configurationLocked: true } as Analysis);
 
@@ -411,9 +435,11 @@ describe('AnalysisBucketService', () => {
 
         it('should let a grant reaching every realm delete any entity', async () => {
             const bucket = createTestAnalysisBucket({ realmId: 'other-realm' });
+
             repository.seed(bucket);
 
             const result = await service.delete(bucket.id, createScopedActor({ realmId: 'realm-master', realmScope: 'any' }));
+
             expect(result.id).toBe(bucket.id);
         });
     });

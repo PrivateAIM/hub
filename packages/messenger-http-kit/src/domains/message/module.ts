@@ -20,14 +20,17 @@ function buildPullQuery(query?: MessagePullQuery): string {
     }
 
     const params = new URLSearchParams();
+
     if (typeof query.limit !== 'undefined') {
         params.set('limit', `${query.limit}`);
     }
+
     if (typeof query.wait !== 'undefined') {
         params.set('wait', `${query.wait}`);
     }
 
     const serialized = params.toString();
+
     return serialized.length > 0 ? `?${serialized}` : '';
 }
 
@@ -40,6 +43,7 @@ export class MessageAPI extends BaseAPI implements IMessageAPI {
      */
     async send(data: SendMessageRequest): Promise<string[]> {
         const { data: response } = await this.client.post('messages', data);
+
         return response.data ?? [];
     }
 
@@ -49,6 +53,7 @@ export class MessageAPI extends BaseAPI implements IMessageAPI {
      */
     async pull(query?: MessagePullQuery): Promise<MessagePullResponse> {
         const { data } = await this.client.get(`messages${buildPullQuery(query)}`);
+
         return { messages: Array.isArray(data.messages) ? data.messages : [] };
     }
 

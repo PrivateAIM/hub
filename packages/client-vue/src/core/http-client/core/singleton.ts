@@ -21,6 +21,7 @@ export function isCoreHTTPClientUsable(app?: App) : boolean {
 
 export function injectCoreHTTPClient(app?: App): ICoreClient {
     const instance = inject<ICoreClient>(symbol, app);
+
     if (!instance) {
         throw new Error('The Core HTTP Client is not set.');
     }

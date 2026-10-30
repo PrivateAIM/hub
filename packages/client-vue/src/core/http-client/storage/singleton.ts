@@ -21,6 +21,7 @@ export function isStorageHTTPClientUsable(app?: App) : boolean {
 
 export function injectStorageHTTPClient(app?: App): IStorageClient {
     const instance = inject<IStorageClient>(symbol, app);
+
     if (!instance) {
         throw new Error('The Storage HTTP Client is not set.');
     }

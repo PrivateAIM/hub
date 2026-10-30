@@ -41,6 +41,7 @@ async function packFile(
         // and has to be able to read and execute the code it was handed.
         mode: 0o755,
     });
+
     await pipeline(source, entry);
 }
 
@@ -67,6 +68,7 @@ export function packBucketFiles(
     // PassThrough -> pack -> packFile pipeline -> MinIO source) and
     // propagate errors in both directions.
     const wrapper = new PassThrough({ highWaterMark: 16384 });
+
     pipeline(pack, wrapper).catch(() => {
         // error already surfaces via wrapper destruction
     });

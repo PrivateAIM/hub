@@ -8,9 +8,9 @@
 import { AnalysisBucketType, DomainType } from '@privateaim/core-kit';
 import type { Analysis, AnalysisBucketFile, MasterImage } from '@privateaim/core-kit';
 import {
-    type PropType, 
-    computed, 
-    defineComponent, 
+    type PropType,
+    computed,
+    defineComponent,
     watch,
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
@@ -84,8 +84,7 @@ export default defineComponent({
             },
         });
 
-        Promise.resolve()
-            .then(() => analysisManager.resolve());
+        Promise.try(() => analysisManager.resolve());
 
         const setAnalysisBucketFile = (entity: AnalysisBucketFile | null) => {
             analysisBucketFileManager.data.value = entity;
@@ -112,12 +111,14 @@ export default defineComponent({
         });
 
         const updatedAt = useUpdatedAt(props.entity);
+
         watch(updatedAt, (value, oldValue) => {
             if (!value || !oldValue) {
                 return;
             }
 
             const entity = props.entity as Analysis;
+
             if (entity.masterImageId) {
                 if (entity.masterImage) {
                     masterImageManager.data.value = entity.masterImage;

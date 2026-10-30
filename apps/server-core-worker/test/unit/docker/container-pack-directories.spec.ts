@@ -34,6 +34,7 @@ function buildStream(entries: {
                 type: 'directory', 
                 mode: entry.mode, 
             }, Buffer.alloc(0));
+
             continue;
         }
 
@@ -51,6 +52,7 @@ async function readEntries(readable: Readable): Promise<Entry[]> {
 
     extract.on('entry', (headers, stream, callback) => {
         const chunks : Buffer[] = [];
+
         stream.on('data', (chunk) => {
             chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
         });
@@ -79,6 +81,7 @@ async function readEntries(readable: Readable): Promise<Entry[]> {
 
 async function pack(entries: Parameters<typeof buildStream>[0], path = '/opt/code/') {
     const target = new FakeContainerPackTarget();
+
     await packDockerContainerWithTarStream(target, buildStream(entries), { path });
 
     return { target, entries: await readEntries(target.archive()) };
@@ -103,7 +106,9 @@ describe('docker/container-pack: directory synthesis', () => {
         ]);
 
         const directories = entries.filter((entry) => entry.type === 'directory');
+
         expect(directories).toHaveLength(2);
+
         for (const directory of directories) {
             expect(directory.mode).toBe(0o777);
         }
@@ -182,6 +187,7 @@ describe('docker/container-pack: directory synthesis', () => {
         }]);
 
         const file = entries.find((entry) => entry.name === 'sub/entrypoint.py');
+
         expect(file).toBeDefined();
         expect(file?.mode).toBe(0o755);
         expect(file?.content).toBe('print("hello")');

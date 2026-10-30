@@ -21,6 +21,7 @@ describe('generateName', () => {
 
     it('is practically unique across calls', () => {
         const names = new Set(Array.from({ length: 200 }, () => generateName()));
+
         expect(names.size).toBeGreaterThan(195);
     });
 });

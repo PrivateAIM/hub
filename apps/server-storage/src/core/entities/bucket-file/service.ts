@@ -79,13 +79,19 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
     }
 
     private isOwnedByActor(entity: BucketFile, actor: ActorContext): boolean {
-        if (!actor.identity) return false;
+        if (!actor.identity) {
+            return false;
+        }
+
         return entity.actorType === actor.identity.type &&
             entity.actorId === actor.identity.id;
     }
 
     private isBucketOwnedByActor(entity: BucketFile, actor: ActorContext): boolean {
-        if (!actor.identity || !entity.bucket) return false;
+        if (!actor.identity || !entity.bucket) {
+            return false;
+        }
+
         return entity.bucket.actorType === actor.identity.type &&
             entity.bucket.actorId === actor.identity.id;
     }

@@ -22,6 +22,7 @@ export async function setupHarborService(ctx: SetupHarborContext) {
     const host = getHostNameFromString(connection.host);
 
     let entity = await ctx.registryRepository.findOneBy({ name: 'default' });
+
     if (entity) {
         entity.accountName = connection.user;
         entity.accountSecret = connection.password;

@@ -23,8 +23,3 @@ export interface IMessageWakeup {
      */
     subscribe(recipient: MessageParty, listener: () => void): () => void;
 }
-
-export type MessageWakeupContext = {
-    /** fired when a wakeup for `recipient` is observed on this instance (drives the socket emit) */
-    onPending?: (recipient: MessageParty) => void
-};

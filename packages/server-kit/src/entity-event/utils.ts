@@ -10,8 +10,10 @@ import { isObject } from '@privateaim/kit';
 export function transformEntityEventData<T>(input: T) : T {
     if (isObject(input)) {
         const keys = Object.keys(input);
+
         for (const key of keys) {
             const value = input[key];
+
             if (value instanceof Date) {
                 input[key] = value.toISOString();
             }

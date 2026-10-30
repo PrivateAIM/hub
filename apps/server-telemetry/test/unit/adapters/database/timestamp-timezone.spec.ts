@@ -51,7 +51,9 @@ describe.skipIf(type !== 'mysql' && type !== 'postgres')('adapters/database (utc
 
     async function stamp(options: DataSourceOptions) : Promise<Stamp> {
         const dataSource = new DataSource(options);
+
         await dataSource.initialize();
+
         try {
             const repository = dataSource.getRepository(EventEntity);
             const saved = await repository.save(repository.create({
@@ -92,11 +94,13 @@ describe.skipIf(type !== 'mysql' && type !== 'postgres')('adapters/database (utc
                 'WHERE d.datname = current_database() AND s.setrole = 0',
             );
             const setting = rows.find((row) => row.setting.toLowerCase().startsWith('timezone='));
+
             previousDatabaseZone = setting?.setting.slice('timezone='.length);
 
             await admin.query(`ALTER DATABASE "${env.database}" SET timezone TO 'Pacific/Kiritimati'`);
         } else {
             const [row] = await admin.query('SELECT @@GLOBAL.time_zone AS zone');
+
             previousZone = row.zone;
             await admin.query('SET GLOBAL time_zone = \'+14:00\'');
         }

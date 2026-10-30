@@ -26,6 +26,7 @@ export class CoreClientModule implements IModule {
         const client = new Client({ baseURL: config.coreURL });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
+
         if (hookResult.success) {
             hookResult.data.attach(client);
         }

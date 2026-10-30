@@ -44,6 +44,7 @@ describe('src/app/modules/http/module', () => {
         });
 
         await app.setup();
+
         try {
             expect(httpSetUp).toBe(false);
         } finally {

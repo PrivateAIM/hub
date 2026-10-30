@@ -10,7 +10,7 @@ import type { RegistryProject } from '../registry-project';
 import type { Registry } from '../registry';
 import type { NodeType } from './constants';
 
-export interface Node {
+export type Node = {
     id: string;
 
     externalName: string | null;
@@ -53,4 +53,4 @@ export interface Node {
     createdAt: string;
 
     updatedAt: string;
-}
+};

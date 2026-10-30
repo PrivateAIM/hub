@@ -43,6 +43,7 @@ import { DataSourceOptionsBuilder } from '../dist/app/modules/database/index.mjs
 // prints success having compared nothing. Anchor cwd to the app root so the
 // result cannot depend on where the script was invoked from.
 const appRoot = fileURLToPath(new URL('..', import.meta.url));
+
 process.chdir(appRoot);
 
 const options = new DataSourceOptionsBuilder().buildWithEnv();
@@ -53,6 +54,7 @@ const options = new DataSourceOptionsBuilder().buildWithEnv();
 // the build did not run, so fail loudly instead of comparing nothing.
 if (options.type !== 'better-sqlite3') {
     const migrationDirectory = path.resolve(appRoot, path.dirname(options.migrations[0]));
+
     if (!fs.existsSync(migrationDirectory) || fs.readdirSync(migrationDirectory).length === 0) {
         throw new Error(`[schema-drift] no compiled migrations in ${migrationDirectory} — run the build first`);
     }

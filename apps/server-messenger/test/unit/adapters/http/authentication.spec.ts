@@ -94,9 +94,11 @@ describe('adapters/http/message authentication', () => {
         // Negative control: the recipient does see it, so the empty pull
         // below is isolation, not a message that never arrived.
         const forBob = await bob.message.pull();
+
         expect(forBob.messages.map((m) => m.id)).toContain(id);
 
         const forAlice = await alice.message.pull();
+
         expect(forAlice.messages.map((m) => m.id)).not.toContain(id);
     });
 });

@@ -14,6 +14,7 @@ import type { MiddlewareSwaggerOptions } from './types';
 
 export function mountSwaggerMiddleware(app: App, options: MiddlewareSwaggerOptions = {}) {
     let document : any;
+
     if (options.cwd) {
         document = readSync(path.join(options.cwd, 'swagger.json'));
     } else {

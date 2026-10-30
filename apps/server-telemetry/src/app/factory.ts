@@ -39,6 +39,7 @@ export function createApplication() {
             const handlers = [];
 
             const redisResult = container.tryResolve(RedisClientInjectionKey);
+
             if (redisResult.success) {
                 handlers.push(new EntityEventRedisHandler(redisResult.data));
                 handlers.push(new EntityEventSocketHandler(redisResult.data));
@@ -47,6 +48,7 @@ export function createApplication() {
             const eventDispatcher = new EventComponentDispatcher({ messageBus: container.resolve(MessageBusInjectionKey) });
 
             const loggerResult = container.tryResolve(LoggerInjectionKey);
+
             handlers.push(new EntityEventHandler({
                 eventComponentDispatcher: eventDispatcher,
                 logger: loggerResult.success ? loggerResult.data : undefined,
@@ -67,6 +69,7 @@ export function createApplication() {
                 save: async (value) => {
                     try {
                         const component = new LogComponentWriteHandler();
+
                         await component.handle(value);
                     } catch (e) {
                         console.error(e);

@@ -6,6 +6,7 @@
  */
 
 import { inject } from 'vitest';
+import type {} from './provided-context.d.ts';
 import type { TestProject } from 'vitest/node';
 import { buildSuiteDatabaseName, readDatabaseConnectionEnv, recreateDatabase } from '../database/index.ts';
 import { startAuthupContainer, startPostgresContainer } from './containers.ts';
@@ -18,12 +19,6 @@ import {
 } from './env.ts';
 import type { DatabaseConnection } from './types.ts';
 
-declare module 'vitest' {
-    interface ProvidedContext {
-        AUTHUP_URL: string
-        DATABASE_CONNECTION: DatabaseConnection | null
-    }
-}
 
 /**
  * Global-setup helper: resolve the database server — the externally configured
@@ -39,10 +34,13 @@ declare module 'vitest' {
  */
 export async function provideDatabase(project: TestProject, suite: string): Promise<void> {
     let connection: DatabaseConnection | undefined;
+
     if (hasDatabaseEnv()) {
         connection = readDatabaseConnectionEnv();
+
         if (!connection) {
             project.provide('DATABASE_CONNECTION', null);
+
             return;
         }
     } else {
@@ -73,6 +71,7 @@ export async function provideAuthup(project: TestProject, permissionNames: strin
         await assertAuthupProvisioning(externalURL, permissionNames);
 
         project.provide('AUTHUP_URL', externalURL);
+
         return;
     }
 
@@ -93,11 +92,13 @@ export async function provideAuthup(project: TestProject, permissionNames: strin
  */
 export function hydrateTestEnv(): void {
     const connection = inject('DATABASE_CONNECTION');
+
     if (connection) {
         applyDatabaseConnectionEnv(connection);
     }
 
     const authupURL = inject('AUTHUP_URL');
+
     if (authupURL) {
         process.env.AUTHUP_URL = authupURL;
     }

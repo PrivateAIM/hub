@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { 
-    describe, 
-    expect, 
-    it, 
-    vi, 
+import {
+    describe,
+    expect,
+    it,
+    vi,
 } from 'vitest';
 import { DomainEventName } from '@privateaim/kit';
 import { EntityEventPublisher } from '../../src';
@@ -58,6 +58,7 @@ describe('src/entity-event/publisher', () => {
         const handler2: IEntityEventHandler = { handle: vi.fn() };
 
         const publisher = new EntityEventPublisher();
+
         publisher.register(handler1);
         publisher.register(handler2);
 
@@ -79,6 +80,7 @@ describe('src/entity-event/publisher', () => {
         const handler: IEntityEventHandler = { handle: handleMock };
 
         const publisher = new EntityEventPublisher();
+
         publisher.register(handler);
 
         const ctx = {
@@ -93,6 +95,7 @@ describe('src/entity-event/publisher', () => {
         await publisher.publish(ctx);
 
         const passedCtx = handleMock.mock.calls[0][0] as EntityEventHandleOptions;
+
         expect(passedCtx.destinations).toHaveLength(2);
         expect(passedCtx.destinations[0].channel).toBe('ch1');
         expect(passedCtx.destinations[0].namespace).toBe('ns1');
@@ -103,6 +106,7 @@ describe('src/entity-event/publisher', () => {
         const handler: IEntityEventHandler = { handle: handleMock };
 
         const publisher = new EntityEventPublisher();
+
         publisher.register(handler);
 
         const ctx = {
@@ -116,6 +120,7 @@ describe('src/entity-event/publisher', () => {
         await publisher.publish(ctx);
 
         const passedCtx = handleMock.mock.calls[0][0] as EntityEventHandleOptions;
+
         expect(passedCtx.destinations).toHaveLength(1);
         expect(passedCtx.destinations[0].channel).toBe('realm/realm-abc');
     });
@@ -127,6 +132,7 @@ describe('src/entity-event/publisher', () => {
         const failingHandler: IEntityEventHandler = { handle: vi.fn().mockRejectedValue(new Error('handler failed')) };
 
         const publisher = new EntityEventPublisher({ logger });
+
         publisher.register(failingHandler);
 
         // should not throw
@@ -154,6 +160,7 @@ describe('src/entity-event/publisher', () => {
         const failingHandler: IEntityEventHandler = { handle: vi.fn().mockRejectedValue(new Error('handler failed')) };
 
         const publisher = new EntityEventPublisher();
+
         publisher.register(failingHandler);
 
         await expect(publisher.publish(createTestPublishContext())).rejects.toThrow('handler failed');

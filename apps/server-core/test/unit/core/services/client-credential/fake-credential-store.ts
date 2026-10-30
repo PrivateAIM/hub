@@ -25,6 +25,7 @@ export class FakeClientCredentialStore implements IClientCredentialStore {
 
     async readByClientId(clientId: string): Promise<ClientCredentials> {
         this.calls.push(clientId);
+
         return {
             id: clientId,
             name: this.name,
@@ -35,6 +36,7 @@ export class FakeClientCredentialStore implements IClientCredentialStore {
 
     async writeByClientId(clientId: string, data?: ClientCredentialsUpdate): Promise<ClientCredentials> {
         this.writes.push({ clientId, data });
+
         return {
             id: clientId,
             name: data?.name ?? this.name,

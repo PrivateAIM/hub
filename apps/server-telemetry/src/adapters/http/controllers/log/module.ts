@@ -64,6 +64,7 @@ export class LogController {
         await this.service.deleteMany(useRequestQuery(event), buildActorContext(event));
 
         event.response.status = 202;
+
         return null;
     }
 }

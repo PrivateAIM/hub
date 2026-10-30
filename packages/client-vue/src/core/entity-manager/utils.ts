@@ -12,7 +12,7 @@ import type {
     EntityManager,
     EntityManagerEventsType,
     EntityManagerSlotProps,
-} from './type';
+} from './types';
 
 /**
  * Was an entity id supplied at all?
@@ -58,6 +58,7 @@ export function hasQuerySelector<T extends Record<string, any>>(
     }
 
     const { filters } = query;
+
     if (!filters || typeof filters !== 'object') {
         return false;
     }

@@ -61,6 +61,7 @@ describe('app/modules/database/repositories/event', () => {
             // holds if the loop also DRAINS — a single bounded statement would
             // silently leave a permanent backlog behind.
             const refId = `sweep-batch-${randomUUID()}`;
+
             for (let i = 0; i < 5; i++) {
                 await record(refId, { expiring: true, expiresAt: past() });
             }
@@ -76,6 +77,7 @@ describe('app/modules/database/repositories/event', () => {
 
         it('bounds each statement to the batch size', async () => {
             const refId = `sweep-bound-${randomUUID()}`;
+
             for (let i = 0; i < 5; i++) {
                 await record(refId, { expiring: true, expiresAt: past() });
             }
@@ -92,6 +94,7 @@ describe('app/modules/database/repositories/event', () => {
             expect(deleteSpy).toHaveBeenCalledTimes(3);
             // asserted so the bound check below can never pass vacuously
             expect(findSpy).toHaveBeenCalledTimes(3);
+
             for (const [options] of findSpy.mock.calls) {
                 expect(options?.take).toEqual(2);
             }
@@ -109,6 +112,7 @@ describe('app/modules/database/repositories/event', () => {
                 // would reach the driver as invalid SQL. Neither is reachable
                 // today, but the option sits on a port, so pin the fallback.
                 const refId = `sweep-guard-${randomUUID()}`;
+
                 await record(refId, { expiring: true, expiresAt: past() });
 
                 const ormRepository = app.dataSource.getRepository(EventEntity);
@@ -117,6 +121,7 @@ describe('app/modules/database/repositories/event', () => {
                 await adapter.deleteExpired(new Date().toISOString(), { batchSize });
 
                 expect(findSpy).toHaveBeenCalled();
+
                 for (const [options] of findSpy.mock.calls) {
                     expect(options?.take).toEqual(EVENT_RETENTION_SWEEP_BATCH_SIZE);
                 }

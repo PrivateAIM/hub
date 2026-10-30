@@ -33,6 +33,7 @@ export default defineNuxtComponent({
 
         const generatedUrl = computed(() => {
             const link = new URL('authorize', config.public.authupUrl);
+
             link.searchParams.set('client_id', props.entity.id);
 
             if (scopes.value.length > 0) {
@@ -48,6 +49,7 @@ export default defineNuxtComponent({
 
         const toggleScope = (scope: string) => {
             const index = scopes.value.indexOf(scope);
+
             if (index === -1) {
                 scopes.value.push(scope);
             } else {

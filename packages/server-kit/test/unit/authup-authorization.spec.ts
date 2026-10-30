@@ -38,6 +38,7 @@ describe('Authup authorization catalog', () => {
                 fetch: (request) => {
                     expect(new URL(request.url).pathname).toBe('/authorization');
                     requests += 1;
+
                     return { status: 200, body: catalog };
                 },
             }),
@@ -54,8 +55,11 @@ describe('Authup authorization catalog', () => {
             [BuiltInPolicyType.REALM_MATCH]: realm,
             [BuiltInPolicyType.ATTRIBUTES]: { name },
         });
+
         await expect(evaluator.evaluate({ name: 'node_update', data: data('00000000-0000-4000-8000-000000000002', 'allowed') })).resolves.toBeUndefined();
+
         const denial = (promise: Promise<void>) => promise.then(() => undefined, (e: unknown) => e);
+
         expect(isPermissionError(await denial(evaluator.evaluate({ name: 'node_update', data: data('00000000-0000-4000-8000-000000000003', 'allowed') })))).toBe(true);
         expect(isPermissionError(await denial(evaluator.evaluate({ name: 'node_update', data: data('00000000-0000-4000-8000-000000000002', 'denied') })))).toBe(true);
         expect(requests).toBe(1);
@@ -63,6 +67,7 @@ describe('Authup authorization catalog', () => {
 
     it('fails closed when the catalog cannot be loaded', async () => {
         const client = new Client({ baseURL: 'http://authup.test', transport: new MemoryTransport({ fetch: () => ({ status: 403 }) }) });
+
         await expect(createAuthupPermissionEvaluator(client, { identity, grants: [] })).rejects.toThrow();
     });
 
@@ -82,9 +87,11 @@ describe('Authup authorization catalog', () => {
 
         it('places the identity and its grants for a global-scoped token', async () => {
             const subject = resolveAuthupPolicySubject(token('global openid'));
+
             expect(subject.identity).toEqual({ ...identity, clientId: null });
 
             const evaluator = await createAuthupPermissionEvaluator(client(), subject);
+
             await expect(evaluator.preEvaluate({ name: 'node_update' })).resolves.toBeUndefined();
         });
 
@@ -94,12 +101,14 @@ describe('Authup authorization catalog', () => {
         // evaluated with its full grants.
         it('keeps the identity but withholds the grants for a token without global scope', async () => {
             const subject = resolveAuthupPolicySubject(token('openid'));
+
             expect(subject).toEqual({ identity: { ...identity, clientId: null }, grants: [] });
 
             const evaluator = await createAuthupPermissionEvaluator(client(), subject);
             // A permission DENIAL specifically (answered 403), not just any
             // throw: a TypeError or validation error here would answer 500.
             const error = await evaluator.preEvaluate({ name: 'node_update' }).then(() => undefined, (e: unknown) => e);
+
             expect(isPermissionError(error)).toBe(true);
         });
 
@@ -124,6 +133,7 @@ describe('Authup authorization catalog', () => {
             });
 
             const evaluator = await createAuthupPermissionEvaluator(identityClient, resolveAuthupPolicySubject(token('openid')));
+
             await expect(evaluator.evaluate({ name: 'user_only' })).resolves.toBeUndefined();
 
             // Negative control: the same definition denies a client identity,
@@ -133,6 +143,7 @@ describe('Authup authorization catalog', () => {
                 resolveAuthupPolicySubject(token('openid', 'client')),
             );
             const error = await clientEvaluator.evaluate({ name: 'user_only' }).then(() => undefined, (e: unknown) => e);
+
             expect(isPermissionError(error)).toBe(true);
         });
     });

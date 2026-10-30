@@ -27,13 +27,13 @@ export type SocketData = {
     roomSubscriptions: Record<string, number>,
 };
 
-export interface EventsMap {
+export type EventsMap = {
     [p: string]: any
-}
+};
 
-export interface DefaultEventsMap {
+export type DefaultEventsMap = {
     [p: string]: (...args: any[]) => void
-}
+};
 
 export type Server<
     ListenEvents extends EventsMap = DefaultEventsMap,

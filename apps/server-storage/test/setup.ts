@@ -5,19 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import 'reflect-metadata';
+import './types.ts';
 
 import type { TestProject } from 'vitest/node';
 import { GenericContainer } from 'testcontainers';
 import { PermissionName } from '@privateaim/kit';
 import { provideAuthup, provideDatabase, stopTestContainers } from '@privateaim/server-test-kit';
 import { TestDatabase } from './utils/index.ts';
-
-declare module 'vitest' {
-    export interface ProvidedContext {
-        MINIO_CONTAINER_HOST: string
-        MINIO_CONTAINER_PORT: number
-    }
-}
 
 // The permissions server-storage's authorization middleware checks.
 const PERMISSIONS: PermissionName[] = [
@@ -47,6 +41,7 @@ async function setup(project: TestProject) {
     await provideAuthup(project, PERMISSIONS);
 
     const database = new TestDatabase();
+
     await database.setup();
 }
 

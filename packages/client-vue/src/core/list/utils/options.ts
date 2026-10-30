@@ -6,7 +6,7 @@
  */
 
 import { merge } from 'smob';
-import type { ListProps, ListRenderOptions } from '../type';
+import type { ListProps, ListRenderOptions } from '../types';
 
 function mergeListOption<T extends boolean | Record<string, any> | undefined>(
     primary: T,

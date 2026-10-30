@@ -41,20 +41,25 @@ export class FakeStorageAdapter implements IStorageAdapter {
 
     async putObject(bucket: string, key: string, data: Buffer | Readable): Promise<void> {
         let buffer: Buffer;
+
         if (Buffer.isBuffer(data)) {
             buffer = data;
         } else {
             const chunks: Buffer[] = [];
+
             for await (const chunk of data) {
                 chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
             }
+
             buffer = Buffer.concat(chunks);
         }
+
         this.objects.set(`${bucket}/${key}`, buffer);
     }
 
     async getObject(bucket: string, key: string): Promise<Readable> {
         const data = this.objects.get(`${bucket}/${key}`);
+
         if (!data) {
             throw new Error(`Object not found: ${bucket}/${key}`);
         }
@@ -75,14 +80,17 @@ export class FakeStorageAdapter implements IStorageAdapter {
     async listObjects(bucket: string, prefix?: string): Promise<string[]> {
         const bucketPrefix = `${bucket}/`;
         const result: string[] = [];
+
         for (const key of this.objects.keys()) {
             if (key.startsWith(bucketPrefix)) {
                 const objectKey = key.substring(bucketPrefix.length);
+
                 if (!prefix || objectKey.startsWith(prefix)) {
                     result.push(objectKey);
                 }
             }
         }
+
         return result;
     }
 

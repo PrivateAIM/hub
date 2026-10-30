@@ -41,6 +41,7 @@ describe('bucket-file HTTP endpoints', () => {
         if (!baseURL) {
             baseURL = suite.client().getBaseURL().replace(/\/+$/, '');
         }
+
         return baseURL;
     }
 
@@ -48,14 +49,17 @@ describe('bucket-file HTTP endpoints', () => {
         const client = suite.client();
 
         const { data: bucket } = await client.bucket.create(createTestBucket());
+
         bucketId = bucket.id;
 
         const filePath = path.join(import.meta.dirname, '../../data/file.json');
         const fileContent = await fs.promises.readFile(filePath);
         const formData = new FormData();
+
         formData.append('file[0]', new Blob([fileContent]), 'test-file.json');
 
         const result = await client.bucket.upload(bucketId, formData);
+
         expect(result.data.length).toBe(1);
         fileId = result.data[0].id;
     });
@@ -67,6 +71,7 @@ describe('bucket-file HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data).toBeDefined();
             expect(Array.isArray(body.data)).toBe(true);
             expect(body.data.length).toBeGreaterThanOrEqual(1);
@@ -84,6 +89,7 @@ describe('bucket-file HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data.map((item: { id: string }) => item.id)).toEqual([fileId]);
             expect(body.data[0].bucket.id).toBe(bucketId);
             expect(body.meta.total).toBe(1);
@@ -97,6 +103,7 @@ describe('bucket-file HTTP endpoints', () => {
             expect(response.status).toBe(200);
 
             const body = await response.json();
+
             expect(body.data.id).toBe(fileId);
             expect(body.data.bucketId).toBe(bucketId);
             expect(body.data.name).toBe('test-file.json');
@@ -119,6 +126,7 @@ describe('bucket-file HTTP endpoints', () => {
             const filePath = path.join(import.meta.dirname, '../../data/file.json');
             const fileContent = await fs.promises.readFile(filePath);
             const formData = new FormData();
+
             formData.append('file[0]', new Blob([fileContent]), 'to-delete.json');
 
             const uploadResponse = await fetch(`${getBaseURL()}/buckets/${bucketId}/upload`, {
@@ -137,6 +145,7 @@ describe('bucket-file HTTP endpoints', () => {
             expect(response.status).toBe(202);
 
             const body = await response.json();
+
             expect(body.data.id).toBe(deleteFileId);
             expect(body.meta).toEqual({});
         });
@@ -144,6 +153,7 @@ describe('bucket-file HTTP endpoints', () => {
 
     it('should cleanup', async () => {
         const client = suite.client();
+
         await client.bucketFile.delete(fileId);
         await client.bucket.delete(bucketId);
     });

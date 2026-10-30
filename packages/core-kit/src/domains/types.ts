@@ -8,7 +8,7 @@
 import type { AnalysisBucket } from './analysis-bucket';
 import type { AnalysisNodeEvent } from './analysis-node-event';
 import type { AnalysisNodeLog } from './analysis-node-log';
-import type { DomainSubType, DomainType } from './constants';
+import type { DomainEventName, DomainSubType, DomainType } from './constants';
 import type { MasterImage } from './master-image';
 import type { MasterImageGroup } from './master-image-group';
 import type { Project } from './project';
@@ -44,4 +44,17 @@ type DomainTypeMapRaw = {
 
 export type DomainTypeMap = {
     [K in keyof DomainTypeMapRaw as `${K}`]: DomainTypeMapRaw[K]
+};
+
+export type DomainEntityWithID = {
+    [key: string]: any,
+    id: any
+};
+export type DomainEntityID<T> = T extends DomainEntityWithID ?
+    T['id'] :
+    never;
+
+export type DomainEventBaseContext = {
+    event: `${DomainEventName}`,
+    type: string
 };

@@ -135,6 +135,7 @@ export class AnalysisLogController {
         }
 
         event.response.status = 202;
+
         return null;
     }
 }

@@ -6,7 +6,7 @@
  */
 
 import type { AnalysisBucket } from '@privateaim/core-kit';
-import type { IEntityAPISlim } from '../types-base';
+import type { IEntityAPISlim } from '../types';
 
 export type AnalysisBucketCreatePayload = Pick<AnalysisBucket, 'analysisId' | 'bucketId' | 'type'>;
 

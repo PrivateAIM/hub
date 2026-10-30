@@ -30,6 +30,7 @@ export class StorageModule implements IModule {
 
         if (config.minioConnectionString) {
             const connectionConfig = parseProxyConnectionString(config.minioConnectionString);
+
             if (!connectionConfig) {
                 throw new InternalError('Invalid MINIO_CONNECTION_STRING format.');
             }
@@ -46,6 +47,7 @@ export class StorageModule implements IModule {
         } else {
             const basePath = config.storagePath ||
                 path.join(process.cwd(), 'writable', 'storage');
+
             adapter = new FsStorageAdapter(basePath);
         }
 

@@ -16,6 +16,7 @@ export class FakeLogStore extends MemoryLogStore {
 
     async query(options: LogStoreQueryOptions = {}): Promise<[Log[], number]> {
         this.queryCalls.push(options);
+
         return super.query(options);
     }
 

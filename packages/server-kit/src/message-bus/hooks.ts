@@ -16,7 +16,7 @@ import type { Logger } from '../logger';
 import type { MessageBusLogHooksOptions } from './types';
 
 function toErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : String(error);
+    return Error.isError(error) ? error.message : String(error);
 }
 
 function isSameRouting(a: MessageRouting, b: MessageRouting): boolean {
@@ -39,11 +39,15 @@ export function createMessageBusLogHooks(
     return {
         onPublish(message) {
             const { routing } = message.metadata;
-            if (silentRoutings.some((silent) => isSameRouting(silent, routing))) {
+            const { key } = routing;
+
+            const silent = silentRoutings.some((entry) => isSameRouting(entry, routing));
+
+            if (silent) {
                 return;
             }
 
-            logger.debug(`Publishing queue message ${message.type} in ${routing.key}`, { messageId: message.id });
+            logger.debug(`Publishing queue message ${message.type} in ${key}`, { messageId: message.id });
         },
         onConsume(message, routing) {
             logger.debug(`Consuming queue message ${message.type} in ${routing.key}`, { messageId: message.id });
@@ -63,16 +67,16 @@ export function createMessageBusLogHooks(
 export function createAmqpDriverLogHooks(logger: Logger): AmqpMessageBusDriverHooks {
     return {
         onRetry({
-            message, 
-            routing, 
-            attempt, 
+            message,
+            routing,
+            attempt,
         }) {
             logger.warn(`Retrying message ${message.type} in ${routing.key}.`, { messageId: message.id, attempt });
         },
         onDrop({
-            message, 
-            routing, 
-            attempt, 
+            message,
+            routing,
+            attempt,
         }) {
             logger.error(
                 `Dropping message ${message.type} in ${routing.key} after ${attempt} attempts.`,
@@ -82,6 +86,7 @@ export function createAmqpDriverLogHooks(logger: Logger): AmqpMessageBusDriverHo
         onMalformed({ routing, error }) {
             if (error) {
                 logger.warn(`Could not parse message in ${routing.key}.`);
+
                 return;
             }
 

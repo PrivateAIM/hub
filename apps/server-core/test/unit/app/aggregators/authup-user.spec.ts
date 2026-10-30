@@ -90,31 +90,34 @@ describe('authup user aggregator', () => {
         }));
 
         return {
-            project, 
-            analysis, 
-            file, 
+            project,
+            analysis,
+            file,
         };
     }
 
     it('should detach a deleted user from projects, analyses and bucket files', async () => {
         const userId = faker.string.uuid();
         const {
-            project, 
-            analysis, 
-            file, 
+            project,
+            analysis,
+            file,
         } = await createOwnedAnalysis(userId);
 
         await handleAuthupUserEvent(createDeletedEvent(userId), repositories);
 
         const projectAfter = await dataSource.getRepository(ProjectEntity).findOneBy({ id: project.id });
+
         expect(projectAfter?.userId).toBeNull();
 
         const analysisAfter = await dataSource.getRepository(AnalysisEntity).findOneBy({ id: analysis.id });
+
         expect(analysisAfter?.userId).toBeNull();
 
         // the file belongs to an analysis that outlives its uploader, so it is
         // detached, never removed.
         const fileAfter = await dataSource.getRepository(AnalysisBucketFileEntity).findOneBy({ id: file.id });
+
         expect(fileAfter).not.toBeNull();
         expect(fileAfter?.userId).toBeNull();
     });
@@ -126,9 +129,11 @@ describe('authup user aggregator', () => {
         await handleAuthupUserEvent(createDeletedEvent(faker.string.uuid()), repositories);
 
         const analysisAfter = await dataSource.getRepository(AnalysisEntity).findOneBy({ id: analysis.id });
+
         expect(analysisAfter?.userId).toEqual(userId);
 
         const fileAfter = await dataSource.getRepository(AnalysisBucketFileEntity).findOneBy({ id: file.id });
+
         expect(fileAfter?.userId).toEqual(userId);
     });
 });

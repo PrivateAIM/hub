@@ -13,15 +13,15 @@ import {
 import { PermissionName } from '@privateaim/kit';
 import type { PropType, SlotsType } from 'vue';
 import {
-    computed, 
-    defineComponent, 
+    computed,
+    defineComponent,
     ref,
 } from 'vue';
 import type { ActionCommandSlotsType } from '../../core';
 import {
-    ActionCommandElementType, 
-    injectCoreHTTPClient, 
-    renderActionCommand, 
+    ActionCommandElementType,
+    injectCoreHTTPClient,
+    renderActionCommand,
     wrapFnWithBusyState,
 } from '../../core';
 
@@ -60,7 +60,7 @@ export default defineComponent({
                 emit('executed', props.command);
                 emit('updated', response);
             } catch (e) {
-                if (e instanceof Error) {
+                if (Error.isError(e)) {
                     emit('failed', e);
                 }
             }

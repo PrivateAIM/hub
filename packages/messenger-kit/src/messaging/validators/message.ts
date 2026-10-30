@@ -47,6 +47,7 @@ export class CTSMessagingMessageValidator extends TypedContainer<CTSMessagingMes
             );
 
             const output = (await validator.run(ctx)) as unknown[];
+
             return Promise.all(output.map((el) => partyValidator.run(el, {
                 path: ctx.path,
                 group: ctx.group,

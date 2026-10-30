@@ -53,6 +53,7 @@ describe('nested secret fields', () => {
             accountName: 'admin',
             accountSecret: REGISTRY_SECRET,
         });
+
         registryId = registry.id;
 
         const registryProject = await dataSource.getRepository(RegistryProjectEntity).save({
@@ -63,6 +64,7 @@ describe('nested secret fields', () => {
             accountSecret: PROJECT_SECRET,
             realmId: masterRealms.data[0].id,
         });
+
         registryProjectId = registryProject.id;
     });
 
@@ -74,9 +76,11 @@ describe('nested secret fields', () => {
         // not be a no-op.
         try {
             const { dataSource } = suite;
+
             if (registryProjectId) {
                 await dataSource.getRepository(RegistryProjectEntity).delete({ id: registryProjectId });
             }
+
             if (registryId) {
                 await dataSource.getRepository(RegistryEntity).delete({ id: registryId });
             }
@@ -87,6 +91,7 @@ describe('nested secret fields', () => {
 
     const get = async (path: string, token: string) => {
         const response = await fetch(`${baseURL}${path}`, { headers: { authorization: `Bearer ${token}` } });
+
         return { status: response.status, text: await response.text() };
     };
 

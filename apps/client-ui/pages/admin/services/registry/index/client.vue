@@ -25,6 +25,7 @@ export default defineNuxtComponent({
             });
 
             const client = response.data.pop();
+
             if (!client) {
                 throw new Error('The client was not found.');
             }
@@ -32,6 +33,7 @@ export default defineNuxtComponent({
             entity.value = client;
         } catch {
             await navigateTo({ path: '/admin/services' });
+
             throw createError({});
         }
 

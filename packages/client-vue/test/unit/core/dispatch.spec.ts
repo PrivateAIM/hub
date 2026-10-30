@@ -29,6 +29,7 @@ function mountWith(
     const component = defineComponent({
         setup(_props, ctx) {
             setup(ctx as SetupContext<any>);
+
             return () => h('div');
         },
     });
@@ -49,6 +50,7 @@ describe('createList dispatch', () => {
                 // and make the count assertion ambiguous.
                 props: { loadOnSetup: false },
             });
+
             load = list.load;
         }, { 'GET /projects': () => ({ data: [{ id: 'p-1' }], meta: { total: 1 } }) });
 
@@ -68,10 +70,11 @@ describe('createList dispatch', () => {
 
         const { coreClient } = mountWith((ctx) => {
             const list = createList({
-                type: 'analysisLog', 
-                setup: ctx, 
-                props: {}, 
+                type: 'analysisLog',
+                setup: ctx,
+                props: {},
             });
+
             load = list.load;
         });
 
@@ -87,6 +90,7 @@ describe('createEntityManager dispatch', () => {
 
         const { coreClient } = mountWith(() => {
             const manager = createEntityManager({ type: 'project' });
+
             create = manager.create;
         }, { 'POST /projects': () => ({ data: { id: 'p-1', name: 'demo' }, meta: {} }) });
 
@@ -102,6 +106,7 @@ describe('createEntityManager dispatch', () => {
 
         const { coreClient } = mountWith(() => {
             const manager = createEntityManager({ type: 'project' });
+
             resolve = manager.resolve;
         }, { 'GET /projects/:id': (req: any) => ({ data: { id: req.params.id }, meta: {} }) });
 
@@ -119,6 +124,7 @@ describe('createEntityManager dispatch', () => {
 
         const { coreClient } = mountWith(() => {
             const manager = createEntityManager({ type: 'masterImage' });
+
             create = manager.create;
         });
 
@@ -132,6 +138,7 @@ describe('createEntityManager dispatch', () => {
 
         const { coreClient } = mountWith(() => {
             const manager = createEntityManager({ type: 'analysisNodeLog' });
+
             create = manager.create;
             resolve = manager.resolve;
         });

@@ -40,6 +40,7 @@ export class AnalysisClientCredentialController {
         @DContext() event: IAppEvent,
     ): Promise<ClientCredentials> {
         const actor = buildActorContext(event);
+
         return this.service.getCredentials(id, actor);
     }
 
@@ -50,6 +51,7 @@ export class AnalysisClientCredentialController {
         @DContext() event: IAppEvent,
     ): Promise<ClientCredentials> {
         const actor = buildActorContext(event);
+
         return this.service.setCredentials(id, data?.secret, actor);
     }
 }

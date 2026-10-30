@@ -6,11 +6,11 @@
  */
 
 import type { Node } from '@privateaim/core-kit';
-import { 
-    afterEach, 
-    describe, 
-    expect, 
-    it, 
+import {
+    afterEach,
+    describe,
+    expect,
+    it,
 } from 'vitest';
 import type { IComponent } from 'hubwire';
 import { createNodeClientComponent } from '../../../../../src/app/components/node-client/index.ts';
@@ -32,13 +32,15 @@ class FakeNodeClientService {
 
 function createRepository() {
     const repository = new FakeNodeRepository();
+
     repository.seed([
         {
-            id: 'node-1', 
-            name: 'node-1', 
-            clientId: 'client-1', 
+            id: 'node-1',
+            name: 'node-1',
+            clientId: 'client-1',
         },
     ] as Node[]);
+
     return repository;
 }
 
@@ -61,6 +63,7 @@ describe('createNodeClientComponent', () => {
             nodeClientService,
             lock: async (fn) => {
                 locked++;
+
                 return fn();
             },
         });
@@ -75,6 +78,7 @@ describe('createNodeClientComponent', () => {
 
     it('should not report success when a node fails', async () => {
         const nodeClientService = new FakeNodeClientService();
+
         nodeClientService.failing = true;
 
         component = createNodeClientComponent({

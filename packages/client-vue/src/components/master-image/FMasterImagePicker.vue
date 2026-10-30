@@ -94,8 +94,7 @@ export default defineComponent({
             form.masterImageId = props.entity.id;
         }
 
-        Promise.resolve()
-            .then(() => manager.resolve());
+        Promise.try(() => manager.resolve());
 
         const v = useValidup(new MasterImagePickerValidator(), form, { detached: true });
 
@@ -126,8 +125,10 @@ export default defineComponent({
             if (!input) {
                 form.masterImageId = '';
                 form.groupVirtualPath = '';
+
                 return;
             }
+
             form.groupVirtualPath = input;
 
             form.masterImageId = '';

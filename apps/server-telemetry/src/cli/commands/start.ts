@@ -14,6 +14,7 @@ export function defineCLIStartCommand() {
         meta: { name: 'start' },
         async setup() {
             const app = createApplication();
+
             await app.setup();
 
             const logger = app.container.resolve(LoggerInjectionKey);

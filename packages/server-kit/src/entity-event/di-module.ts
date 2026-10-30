@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { EntityEventModuleOptions  } from './types';
+
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency  } from 'orkos';
 import { LOGGER_MODULE_NAME, LoggerInjectionKey } from '../logger/constants';
@@ -12,12 +14,8 @@ import { MESSAGE_BUS_MODULE_NAME } from '../message-bus/constants';
 import { REDIS_MODULE_NAME } from '../redis/constants';
 import { ENTITY_EVENT_MODULE_NAME, EntityEventPublisherInjectionKey } from './constants';
 import { EntityEventPublisher } from './module';
-import type { IEntityEventHandler } from './types';
 
-export type EntityEventModuleOptions = {
-    handlers?: IEntityEventHandler[];
-    handlerFactory?: (container: IContainer) => IEntityEventHandler[];
-};
+
 
 export class EntityEventModule implements IModule {
     readonly name = ENTITY_EVENT_MODULE_NAME;
@@ -41,6 +39,7 @@ export class EntityEventModule implements IModule {
 
         if (this.options.handlerFactory) {
             const handlers = this.options.handlerFactory(container);
+
             for (const handler of handlers) {
                 publisher.register(handler);
             }

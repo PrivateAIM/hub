@@ -6,7 +6,7 @@
  */
 
 import type { MessageParty } from '@privateaim/messenger-kit';
-import type { IMessageWakeup, MessageWakeupContext } from './types.ts';
+import type { IMessageWakeup } from './types.ts';
 
 /**
  * Shared parking logic for the wakeup implementations: a registry of locally
@@ -21,7 +21,7 @@ export abstract class AbstractMessageWakeup implements IMessageWakeup {
 
     protected onPending: ((recipient: MessageParty) => void) | undefined;
 
-    constructor(ctx: MessageWakeupContext = {}) {
+    constructor(ctx: { onPending?: (recipient: MessageParty) => void } = {}) {
         this.onPending = ctx.onPending;
     }
 
@@ -31,6 +31,7 @@ export abstract class AbstractMessageWakeup implements IMessageWakeup {
         return new Promise<void>((resolve) => {
             const key = this.keyFor(recipient);
             let set = this.waiters.get(key);
+
             if (!set) {
                 set = new Set();
                 this.waiters.set(key, set);
@@ -41,11 +42,14 @@ export abstract class AbstractMessageWakeup implements IMessageWakeup {
                 if (settled) {
                     return;
                 }
+
                 settled = true;
                 set.delete(settle);
+
                 if (set.size === 0) {
                     this.waiters.delete(key);
                 }
+
                 clearTimeout(timer);
                 resolve();
             };
@@ -53,6 +57,7 @@ export abstract class AbstractMessageWakeup implements IMessageWakeup {
             set.add(settle);
 
             const timer = setTimeout(settle, Math.max(0, timeoutMs));
+
             if (typeof timer.unref === 'function') {
                 timer.unref();
             }
@@ -62,14 +67,17 @@ export abstract class AbstractMessageWakeup implements IMessageWakeup {
     subscribe(recipient: MessageParty, listener: () => void): () => void {
         const key = this.keyFor(recipient);
         let set = this.listeners.get(key);
+
         if (!set) {
             set = new Set();
             this.listeners.set(key, set);
         }
+
         set.add(listener);
 
         return () => {
             set.delete(listener);
+
             if (set.size === 0) {
                 this.listeners.delete(key);
             }
@@ -81,6 +89,7 @@ export abstract class AbstractMessageWakeup implements IMessageWakeup {
         const key = this.keyFor(recipient);
 
         const waiterSet = this.waiters.get(key);
+
         if (waiterSet) {
             for (const settle of [...waiterSet]) {
                 settle();
@@ -88,6 +97,7 @@ export abstract class AbstractMessageWakeup implements IMessageWakeup {
         }
 
         const listenerSet = this.listeners.get(key);
+
         if (listenerSet) {
             for (const listener of [...listenerSet]) {
                 try {

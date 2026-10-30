@@ -8,17 +8,17 @@
 import { hasOwnProperty } from '@privateaim/kit';
 import { pickEntityAPI } from '@privateaim/core-http-kit';
 import type {
-    DomainEntityID, 
+    DomainEntityID,
     DomainTypeMap,
 } from '@privateaim/core-kit';
 import type { QueryBuildInput } from '@rapiq/core';
 import { isObject } from 'smob';
 import type { Ref, VNodeChild } from 'vue';
 import {
-    computed, 
-    isRef, 
-    ref, 
-    toRef, 
+    computed,
+    isRef,
+    ref,
+    toRef,
     watch,
 } from 'vue';
 import { injectCoreHTTPClient } from '../http-client';
@@ -27,11 +27,11 @@ import { createEntitySocket } from '../entity-socket';
 import { extendObjectProperties } from '../object';
 import { hasNormalizedSlot, normalizeSlot } from '../slot';
 import type {
-    EntityManager, 
-    EntityManagerContext, 
-    EntityManagerRenderFn, 
+    EntityManager,
+    EntityManagerContext,
+    EntityManagerRenderFn,
     EntityManagerResolveContext,
-} from './type';
+} from './types';
 import {
     buildEntityManagerSlotProps,
     hasQuerySelector,
@@ -167,7 +167,7 @@ export function createEntityManager<
 
             updated(entity.value as RECORD);
         } catch (e) {
-            if (e instanceof Error) {
+            if (Error.isError(e)) {
                 failed(e);
             }
         } finally {
@@ -193,7 +193,7 @@ export function createEntityManager<
 
             deleted(response.data);
         } catch (e) {
-            if (e instanceof Error) {
+            if (Error.isError(e)) {
                 failed(e);
             }
         } finally {
@@ -218,7 +218,7 @@ export function createEntityManager<
 
             created(response.data);
         } catch (e) {
-            if (e instanceof Error) {
+            if (Error.isError(e)) {
                 failed(e);
             }
         } finally {
@@ -269,6 +269,7 @@ export function createEntityManager<
     ) : Promise<RECORD | null> => {
         if (entity.value && !resolveCtx.reset) {
             resolved(entity.value);
+
             return null;
         }
 
@@ -299,7 +300,7 @@ export function createEntityManager<
 
                     return entity.value;
                 } catch (e) {
-                    if (e instanceof Error) {
+                    if (Error.isError(e)) {
                         error.value = e;
                     }
                 }
@@ -334,7 +335,7 @@ export function createEntityManager<
 
                 return entity.value;
             } catch (e) {
-                if (e instanceof Error) {
+                if (Error.isError(e)) {
                     error.value = e;
                 }
             }
@@ -377,6 +378,7 @@ export function createEntityManager<
     if (ctx.props) {
         const propEntityRef = toRef(ctx.props, 'entity');
         const propsEntityId = computed(() => (propEntityRef.value ? propEntityRef.value.id : undefined));
+
         watch(propsEntityId, (val) => {
             entity.value = propEntityRef.value;
 
@@ -404,6 +406,7 @@ export function createEntityManager<
         entity.value = null;
 
         let query : (QueryBuildInput<RECORD, 3>) | undefined;
+
         if (resolveCtx.query) {
             query = resolveCtx.query;
         }
@@ -412,6 +415,7 @@ export function createEntityManager<
 
         if (ctx.props) {
             const propsResult = resolveByProps(resolveCtx);
+
             if (propsResult) {
                 return propsResult;
             }
@@ -496,7 +500,9 @@ export function createEntityManager<
             return typeof content === 'function' ?
                 content() :
                 content;
-        } if (
+        }
+
+        if (
             isObject(error) &&
             hasNormalizedSlot('error', ctx.setup.slots)
         ) {

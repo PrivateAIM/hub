@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- **Node.js** 24+
+- **Node.js** ≥24.0.0
 - **npm** (ships with Node.js)
 - **Docker** and **Docker Compose** (for database services)
 
@@ -72,6 +72,22 @@ npm run test:coverage
 
 # Single package
 npx nx test server-core
+```
+
+### Permission evaluator test imports
+
+`@privateaim/server-test-kit` no longer re-exports `FakePermissionEvaluator`,
+`EvaluatorBehavior`, `EvaluatorCall`, or `EvaluatorMethodName`. Import these
+symbols directly from `@authup/server-test-kit` instead. The evaluator itself is
+unchanged; Hub's actor factories still expose it through `permissionEvaluator`.
+
+```ts
+import { FakePermissionEvaluator } from '@authup/server-test-kit';
+import type {
+    EvaluatorBehavior,
+    EvaluatorCall,
+    EvaluatorMethodName,
+} from '@authup/server-test-kit';
 ```
 
 ## Linting

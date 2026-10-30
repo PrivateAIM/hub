@@ -11,6 +11,7 @@ export function getHostNameFromString(value: string) : string {
         value.startsWith('https://')
     ) {
         const url = new URL(value);
+
         value = url.hostname;
     }
 

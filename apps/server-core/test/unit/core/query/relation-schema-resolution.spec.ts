@@ -28,16 +28,20 @@ function filterFields(query: IQuery): string[] {
         for (const condition of group.value) {
             if (isFilters(condition)) {
                 walk(condition);
+
                 continue;
             }
+
             if (isFilter(condition)) {
                 out.push(condition.field);
             }
         }
     };
+
     if (isFilters(query.filters)) {
         walk(query.filters);
     }
+
     return out;
 }
 
@@ -50,6 +54,7 @@ describe('relation schema resolution', () => {
                 { filter: { 'analysis.name': 'foo' }, include: 'analysis' },
                 { schema: analysisNodeSchema },
             );
+
             expect(filterFields(query)).toContain('analysis.name');
         });
 
@@ -61,6 +66,7 @@ describe('relation schema resolution', () => {
                 { filter: { 'analysis.clientId': '6d2ddc5e-8f7a-4f6e-9c0b-2c1e6f1c9a3b' }, include: 'analysis' },
                 { schema: analysisNodeSchema },
             );
+
             expect(filterFields(query)).toContain('analysis.clientId');
         });
 
@@ -69,6 +75,7 @@ describe('relation schema resolution', () => {
                 { filter: { 'node.name': 'bar' }, include: 'node' },
                 { schema: analysisNodeSchema },
             );
+
             expect(filterFields(query)).toContain('node.name');
         });
 
@@ -77,6 +84,7 @@ describe('relation schema resolution', () => {
                 { sort: 'analysis.name', include: 'analysis' },
                 { schema: analysisNodeSchema },
             );
+
             expect(sortNames(query)).toContain('analysis.name');
         });
 
@@ -87,6 +95,7 @@ describe('relation schema resolution', () => {
                 { filter: { 'analysis.buildHash': 'x' }, include: 'analysis' },
                 { schema: analysisNodeSchema },
             );
+
             expect(filterFields(query)).not.toContain('analysis.buildHash');
         });
 
@@ -95,6 +104,7 @@ describe('relation schema resolution', () => {
                 { filter: { executionStatus: 'running' } },
                 { schema: analysisNodeSchema },
             );
+
             expect(filterFields(query)).toContain('executionStatus');
         });
     });
@@ -105,6 +115,7 @@ describe('relation schema resolution', () => {
                 { sort: 'project.name', include: 'project' },
                 { schema: projectNodeSchema },
             );
+
             expect(sortNames(query)).toContain('project.name');
         });
 
@@ -113,6 +124,7 @@ describe('relation schema resolution', () => {
                 { filter: { 'project.displayName': 'p' }, include: 'project' },
                 { schema: projectNodeSchema },
             );
+
             expect(filterFields(query)).toContain('project.displayName');
         });
     });

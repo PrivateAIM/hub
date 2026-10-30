@@ -40,6 +40,7 @@ export class ServerMessengerApplicationBuilder extends BaseApplicationBuilder {
         }
 
         this.modules.push(instance ?? factory());
+
         return this;
     }
 }

@@ -12,9 +12,9 @@ import type { AddressInfo } from 'node:net';
 import type { ITokenCache } from '@authup/server-adapter-kit';
 import { isHubError, isUnauthorizedError } from '@privateaim/errors';
 import {
-    afterEach, 
-    describe, 
-    expect, 
+    afterEach,
+    describe,
+    expect,
     it,
 } from 'vitest';
 import {
@@ -44,6 +44,7 @@ describe('createAuthupTokenVerifier', () => {
             baseURL: 'http://authup.invalid',
             creator: async () => {
                 minted += 1;
+
                 throw new Error('introspection must not be reached');
             },
         });
@@ -65,6 +66,7 @@ describe('createAuthupTokenVerifier', () => {
         const verifier = createAuthupTokenVerifier({
             creator: async () => {
                 minted += 1;
+
                 throw new Error('introspection must not be reached');
             },
         });
@@ -134,13 +136,15 @@ async function serveAuthup(status: number, body: Record<string, any>): Promise<S
         res.end(JSON.stringify(req.url?.startsWith('/token/introspect') ?
             body :
             {
-                access_token: 'service-token', 
-                expires_in: 3600, 
-                token_type: 'Bearer', 
+                access_token: 'service-token',
+                expires_in: 3600,
+                token_type: 'Bearer',
             }));
     });
+
     server.listen(0, '127.0.0.1');
     await once(server, 'listening');
+
     return server;
 }
 
@@ -166,14 +170,15 @@ describe('createAuthupTokenVerifier upstream failures', () => {
 
     async function verifyAgainst(status: number, body: Record<string, any>): Promise<unknown> {
         const server = await serveAuthup(status, body);
+
         servers.push(server);
 
         const verifier = createAuthupTokenVerifier({
             baseURL: urlOf(server),
             creator: async () => ({
-                access_token: 'service-token', 
-                expires_in: 3600, 
-                token_type: 'Bearer', 
+                access_token: 'service-token',
+                expires_in: 3600,
+                token_type: 'Bearer',
             }),
         });
 
@@ -191,9 +196,9 @@ describe('createAuthupTokenVerifier upstream failures', () => {
         const verifier = createAuthupTokenVerifier({
             baseURL: 'http://127.0.0.1:1/',
             creator: async () => ({
-                access_token: 'service-token', 
-                expires_in: 3600, 
-                token_type: 'Bearer', 
+                access_token: 'service-token',
+                expires_in: 3600,
+                token_type: 'Bearer',
             }),
         });
 
@@ -220,6 +225,7 @@ describe('createAuthupTokenVerifier cache namespace wiring', () => {
         const cache: ITokenCache = {
             get: async (key) => {
                 keys.push(key);
+
                 return undefined;
             },
             set: async () => undefined,
@@ -229,14 +235,15 @@ describe('createAuthupTokenVerifier cache namespace wiring', () => {
             const verifier = createAuthupTokenVerifier({
                 baseURL: 'http://127.0.0.1:1/',
                 creator: async () => ({
-                    access_token: 'service-token', 
-                    expires_in: 3600, 
-                    token_type: 'Bearer', 
+                    access_token: 'service-token',
+                    expires_in: 3600,
+                    token_type: 'Bearer',
                 }),
                 clientId,
                 realm: 'master',
                 cache,
             });
+
             await verifier.verify(jws).catch(() => undefined);
         }
 

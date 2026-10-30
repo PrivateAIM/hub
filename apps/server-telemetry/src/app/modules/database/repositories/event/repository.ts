@@ -113,11 +113,7 @@ export class EventRepositoryAdapter implements IEventRepository {
 
             // Another replica's sweep already owns these rows. Stop rather than
             // re-selecting them; the next tick picks up whatever is left.
-            if (result.affected === 0) {
-                break;
-            }
-
-            if (rows.length < batchSize) {
+            if (result.affected === 0 || rows.length < batchSize) {
                 break;
             }
         }

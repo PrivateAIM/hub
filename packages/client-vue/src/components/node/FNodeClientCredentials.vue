@@ -68,13 +68,16 @@ export default defineComponent({
             if (!props.entity.clientId) {
                 busy.value = false;
                 loaded.value = true;
+
                 return;
             }
 
             busy.value = true;
             loaded.value = false;
+
             try {
                 const credentials = await httpClient.node.getClientCredentials(nodeId);
+
                 if (token !== loadToken) {
                     // A newer load() superseded this request — drop the result.
                     return;
@@ -132,8 +135,10 @@ export default defineComponent({
             };
 
             busy.value = true;
+
             try {
                 const credentials = await httpClient.node.setClientCredentials(nodeId, data);
+
                 if (token !== loadToken) {
                     return;
                 }

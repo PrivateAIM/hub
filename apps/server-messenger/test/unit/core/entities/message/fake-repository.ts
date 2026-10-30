@@ -19,13 +19,16 @@ export class FakeMessageRepository implements IMessageRepository {
     async createMany(input: MessagePersistInput[]): Promise<Message[]> {
         return input.map((item) => {
             this.counter += 1;
+
             const message: StoredMessage = {
                 ...item,
                 id: randomUUID(),
                 // monotonic ISO timestamp so ordering is deterministic in tests
                 createdAt: new Date(Date.now() + this.counter).toISOString(),
             };
+
             this.messages.push(message);
+
             return message;
         });
     }
@@ -40,6 +43,7 @@ export class FakeMessageRepository implements IMessageRepository {
 
     async ackByIds(recipient: MessageParty, ids: string[]): Promise<void> {
         const set = new Set(ids);
+
         this.messages = this.messages.filter(
             (message) => !(
                 message.recipientType === recipient.type &&
@@ -52,7 +56,9 @@ export class FakeMessageRepository implements IMessageRepository {
     async deleteExpired(now: Date): Promise<number> {
         const before = this.messages.length;
         const cutoff = now.getTime();
+
         this.messages = this.messages.filter((message) => new Date(message.expiresAt).getTime() >= cutoff);
+
         return before - this.messages.length;
     }
 }

@@ -27,7 +27,9 @@ import type {
 } from '../../types.ts';
 
 export function registerAnalysisNodeSocketHandlers(socket: Socket) {
-    if (!isSocketAuthenticated(socket)) return;
+    if (!isSocketAuthenticated(socket)) {
+        return;
+    }
 
     socket.on(
         buildDomainEventFullName(DomainType.ANALYSIS_NODE, DomainEventSubscriptionName.SUBSCRIBE),
@@ -61,7 +63,9 @@ export function registerAnalysisNodeSocketHandlers(socket: Socket) {
 }
 
 export function registerAnalysisNodeForRealmSocketHandlers(socket: Socket) {
-    if (!isSocketAuthenticated(socket)) return;
+    if (!isSocketAuthenticated(socket)) {
+        return;
+    }
 
     // The realm namespace already isolates events by realm (analysis realm vs. node realm
     // are distinct namespaces), so all directional subscriptions join the base entity room —

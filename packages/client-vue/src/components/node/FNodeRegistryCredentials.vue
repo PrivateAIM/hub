@@ -61,6 +61,7 @@ export default defineComponent({
 
         const load = async (attempt = 0) => {
             clearTimeout(retryTimer);
+
             const token = ++loadToken;
             const nodeId = props.entity.id;
 
@@ -75,14 +76,18 @@ export default defineComponent({
             if (!props.entity.registryProjectId) {
                 busy.value = false;
                 loaded.value = true;
+
                 return;
             }
 
             busy.value = true;
             loaded.value = false;
+
             let retrying = false;
+
             try {
                 const credentials = await httpClient.node.getRegistryCredentials(nodeId);
+
                 if (token !== loadToken) {
                     // A newer load() superseded this request — drop the result.
                     return;

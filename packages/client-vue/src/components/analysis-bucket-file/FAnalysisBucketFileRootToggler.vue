@@ -41,7 +41,9 @@ export default defineComponent({
         });
 
         const toggle = () => {
-            if (isBlocked.value) return;
+            if (isBlocked.value) {
+                return;
+            }
 
             isBlocked.value = true;
 
@@ -50,6 +52,7 @@ export default defineComponent({
                 root: !isRoot.value,
             });
         };
+
         return {
             isRoot,
             toggle,

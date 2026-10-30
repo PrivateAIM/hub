@@ -29,6 +29,7 @@ export class ProjectNodeRepositoryAdapter implements IProjectNodeRepository {
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<ProjectNode>> {
         const qb = this.repository.createQueryBuilder('projectNode');
+
         qb.groupBy('projectNode.id');
 
         const { pagination } = applyQuery(qb, query);

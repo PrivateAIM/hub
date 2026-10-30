@@ -15,9 +15,9 @@ import type {
 import { RegistryProjectForm, createEntityManager } from '@privateaim/client-vue';
 import { useToast } from '#imports';
 import {
-    createError, 
-    defineNuxtComponent, 
-    navigateTo, 
+    createError,
+    defineNuxtComponent,
+    navigateTo,
     useRoute,
 } from '#app';
 
@@ -70,6 +70,7 @@ export default defineNuxtComponent({
 
         if (!manager.data.value) {
             await navigateTo({ path: `/admin/services/registry/${route.params.id}/projects` });
+
             throw createError({});
         }
 
