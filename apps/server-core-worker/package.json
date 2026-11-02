@@ -40,7 +40,7 @@
         "@privateaim/server-telemetry-kit": "^0.19.2",
         "@privateaim/storage-kit": "^0.19.2",
         "@privateaim/telemetry-kit": "^0.19.2",
-        "@validup/zod": "^2.0.1",
+        "@validup/zod": "^2.0.2",
         "docken": "^2.0.2",
         "dockerode": "^5.0.1",
         "dotenv": "^18.0.9",
