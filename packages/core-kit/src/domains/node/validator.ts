@@ -48,7 +48,7 @@ export class NodeValidator extends TypedContainer<Node> {
         this.mount(
             'externalName',
             { optional: true },
-            createValidator(z.string().min(1).max(64).regex(/^[a-z0-9-_]*$/).nullable()),
+            createValidator(z.string().min(1).max(64).regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/).nullable()),
         );
 
         this.mount(
