@@ -71,7 +71,18 @@ describe('HTTPModule shutdown', () => {
         } finally {
             clearTimeout(timeout);
             client?.close();
-            await (teardown ?? suite.teardown());
+
+            // A hung teardown is the regression under test: bound the cleanup
+            // wait, or it would mask the failure above behind the test timeout.
+            let cleanupTimeout: ReturnType<typeof setTimeout> | undefined;
+
+            await Promise.race([
+                teardown ?? suite.teardown(),
+                new Promise<void>((resolve) => {
+                    cleanupTimeout = setTimeout(resolve, 5000);
+                }),
+            ]);
+            clearTimeout(cleanupTimeout);
         }
     });
 });
