@@ -139,68 +139,6 @@ export class NodeService extends AbstractEntityService implements INodeService {
 }
 ```
 
-## Thin Controller Pattern
-
-Controllers only: extract request → build actor → delegate → shape the response. No validation, no business logic.
-
-**The controller owns the wire shape; services keep returning bare domain entities.** Every entity **record** response is the `{ data, meta }` envelope (`EntityRecordResponse<T>` from the matching HTTP kit) and every collection response is `EntityCollectionResponse<T>`. Hub uses no `send()`/`sendCreated()` helpers — the decorated method returns a value that routup serializes, and the status is set imperatively via `event.response.status`.
-
-```typescript
-// adapters/http/controllers/entities/node/module.ts
-import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
-import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
-import { nodeSchema } from '../../../../../core/index.ts';
-
-@DController('/nodes')
-export class NodeController {
-    constructor(ctx: { service: INodeService }) { ... }
-
-    @DGet('', [ForceLoggedInMiddleware])
-    async getMany(@DContext() event: IAppEvent): Promise<EntityCollectionResponse<Node>> {
-        const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query);
-        return { data, meta: { ...meta, schema: describeQuerySchema(nodeSchema) } };
-    }
-
-    @DPost('', [ForceLoggedInMiddleware])
-    async add(@DBody() data: NodeCreatePayload, @DContext() event: IAppEvent): Promise<EntityRecordResponse<Node>> {
-        const actor = buildActorContext(event);
-        const entity = await this.service.create(data, actor);
-        event.response.status = 201;
-        return { data: entity, meta: {} };
-    }
-}
-```
-
-GET endpoints also pass `ActorContext` when the entity has permission-gated fields (e.g. `accountSecret`), and a record read advertises only the `fields` + `relations` subset:
-
-```typescript
-@DGet('/:id', [ForceLoggedInMiddleware])
-async getOne(@DPath('id') id: string, @DContext() event: IAppEvent): Promise<EntityRecordResponse<Registry>> {
-    const actor = buildActorContext(event);
-    const query = useRequestQuery(event);
-    const entity = await this.service.getOne(id, actor, Object.keys(query).length > 0 ? query : undefined);
-
-    return { data: entity, meta: { schema: describeQuerySchema(registrySchema, RECORD_QUERY_PARAMETERS) } };
-}
-```
-
-## Response Envelope & Query Capability Discovery
-
-Contract, uniform across server-core, server-storage and server-telemetry:
-
-- **Record responses** — `{ data: <entity>, meta: {…} }`. Mutations (`POST`, `DELETE`, command routes) carry `meta: {}` — never omitted, never `undefined`.
-- **Collection responses** — `{ data: <entity>[], meta: { total, limit?, offset?, schema? } }`. Unchanged by the envelope work apart from `schema`.
-- **`meta.schema`** — every query-capable `GET` publishes its rapiq vocabulary via `describeQuerySchema()` (`@privateaim/server-kit`, `src/core/query/describe.ts`). Collections get the full description; record reads get `describeQuerySchema(x, RECORD_QUERY_PARAMETERS)` (fields + relations). It is the **static** allow-list upper bound — actor-dependent gates (the `accountSecret` field gate, realm scoping) are deliberately not reflected. Relation vocabulary is **referenced, not expanded**: `relations.schemas` names each relation's target schema.
-- Every entity schema declares `indexes` — **query-surface-only** property-name sequences, each a leftmost prefix of a real PK/unique/`@Index` — and opts into rapiq's indexed policies, so the description carries the real sequences plus `filters.indexed: 'anchor'` and `sorts.indexed: true` (#1842). Anchor mode rejects an expression-dialect filter whose and-group contains no key leading a declared sequence; the invariant that every `filters.allowed`/`sorts.allowed` key leads one is enforced by each service's `schema-entity-parity.spec.ts` — see [conventions.md](conventions.md#column-naming).
-- Descriptions are memoized **and deep-frozen**. Always spread — `meta: { ...meta, schema: … }`; `meta.schema = …` throws.
-- Controllers import the schema **object** from the `core` barrel — every entity barrel re-exports its `schema.ts` (server-core: `core/entities/<x>/index.ts` ×14; server-storage and server-telemetry: the single `core/entities/index.ts`). Never deep-import a `schema.ts` from a controller.
-- Return-type annotations are load-bearing: trapi derives the OpenAPI response schema from the method signature, so every method — including `getMany` — must be annotated.
-
-**Endpoints that deliberately stay flat** (protocol, credential, stream and bespoke shapes): `GET /` on all three services; `POST /services/:id/hook` and `POST /services/:id/command`; the node/analysis client-credential and node registry-credential routes; `DELETE /analysis-logs`, `DELETE /analysis-node-logs`, `DELETE /logs`; `GET /buckets/:id/stream` and `GET /bucket-files/:id/stream`; the entire `server-messenger` message surface. `POST /buckets/:id/upload` stays a **collection** (it uploads many files), not a record envelope.
-
-**Collections without `schema`:** `GET /logs` (telemetry) — decoded with `decodeQueryOpen()`, its filters are dynamic VictoriaLogs labels, so there is nothing to describe; `GET /analyses/:id/client/permissions` — proxies Authup records with no Hub-side schema; `POST /buckets/:id/upload`.
-
 ## Wiring Pattern
 
 DI modules resolve repositories from the container, create services, then controllers:
@@ -238,141 +176,17 @@ client permissions through `AnalysisClientPermissionService` behind an
 `IClientPermissionStore` port. Socket subscribe handlers answer a permission denial
 with `PermissionDeniedError` (403) and any other failure with `InternalError`.
 
-## Domain Events & Messaging
-
-TypeORM subscribers in `adapters/database/subscribers/` (grouped by domain: `analysis/`, `node/`, `project/`, `registry/`, `master-image/`) publish domain events via the entity event system. Events flow through Redis pub/sub and AMQP (RabbitMQ).
-
-AMQP consumers are wired via two DI modules:
-- **AggregatorsModule** (`app/modules/aggregators/`) — Starts AMQP event consumers that react to events from other services (builder, distributor, storage, master-image, authup). Aggregators depend only on core services and repository ports (resolved from `AnalysisInjectionKey` / `DatabaseInjectionKey`), never on a `DataSource`: the worker status rules (event → status transition, `isProcessStatusTerminal`, `isCheckVerdictStale`) live in core as `AnalysisBuilder.applyEvent` / `AnalysisDistributor.applyEvent` / `MasterImageBuilderService.applyEvent`, while the storage-bucket and authup handlers keep their orchestration in app over the ports. Storage-bucket replies are correlated by the bucket itself (`refType`/`refId` + `parseAnalysisBucketName(name)`), not by a task store.
-- **ComponentsModule** (`app/modules/components/`) — Registers `RegistryComponentDispatcher` in the container: with a message bus it only dispatches to the `registryCommands` queue through a `RemoteDispatcher` (the registry consumer runs it; a throwing command is retried, but the Harbor handlers log and swallow Harbor errors), and calls the component in-process through a `LocalDispatcher` only when there is no bus. A work queue keeps a command until a consumer takes it — the memory driver too — so a command dispatched before the registry consumer subscribed is not lost. Starts task consumer workers (registry) and the background components: node-client permission sync and the analysis reconciler (depends on `analysis` for the builder/distributor). Both modules start their components fire-and-forget; `teardown()` `stop()`s each (a `RemoteWorker`'s `stop()` waits for its own start, the authup aggregator listens before it subscribes), then awaits `settled?.()` on each (a scheduled component's covers the first pass).
-
-**The bus is hubwire's `MessageBus`.** server-kit's `MessageBusModule` always registers one,
-typed `IMessageBus`, under `MessageBusInjectionKey`: with `@hubwire/amqp`'s `AmqpMessageBusDriver`
-(topic exchange `MESSAGE_BUS_TOPIC_EXCHANGE` = `FLAME`) when a RabbitMQ connection string is
-configured, else the in-process `MemoryMessageBusDriver`; its `teardown()` closes the bus
-(`IMessageBus.close()`, which closes the driver). Every driver keeps one delivery contract:
-`publish()` resolves once the transport took the message and never waits for (or sees) a
-handler, a WORK message waits in its queue until a consumer takes it, and a handler reads its
-attempt from `metadata.delivery = { attempt, maxAttempts }`. Dispatchers and workers require a
-bus, so every module that builds one declares the `messageBus` dependency and
-`resolve`s it. A publisher whose only consumer is another service — the log transports and
-entity-event handlers (server-telemetry consumes them; telemetry itself is the exception),
-server-storage's bucket and file events, the worker's analysis log lines — resolves
-`RemoteMessageBusInjectionKey` instead, which `MessageBusModule` registers only for a driver
-other than the memory driver, and is not built without it: the memory driver would keep every
-such message in the heap until `close()`. hubwire logs nothing itself: hub passes `hooks` built by server-kit's
-`message-bus/hooks.ts` factories, and `silentRoutings` (server-telemetry-kit's
-`TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS`) keeps the publish of a log line or audit event out of
-the log. WORK routings are
-retried by amqp-extension (counter in the `x-attempt` header, `MESSAGE_BUS_MAX_ATTEMPTS` = 5 attempts, exponential backoff
-capped at 30s, then dropped) with an in-process redelivery guard; delivery is at-least-once.
-Hub-specific policy stays in hub: the routings, `ordered` reply queues and the exchange name.
-
-**Process-status transitions are row-locked.** Any read-check-mutate-save of a
-`buildStatus`/`distributionStatus` (command starts, configuration lock/unlock, the master-image rollback,
-the worker aggregators) goes through `updateLockedEntity` (`adapters/database/locked-update.ts`)
-— `core/` reaches it as `IAnalysisRepository` / `IMasterImageRepository` `.updateLocked(id, fn)`.
-It holds the row with `SELECT … FOR UPDATE` and saves through the transaction manager, so
-subscribers still publish; never replace it with `repository.update()`. `fn` is synchronous
-and returns `true` to save; dispatch to the worker only after it resolves. A CHECK_FINISHED
-verdict whose `checkedAt` predates the locked row's `updatedAt` is dropped — any write
-counts. Every other writer of these rows must not `save()` a copy read earlier either: the
-recalculators apply their derived fields via `saveAnalysisPatch`; `AnalysisService.update` and
-the master-image synchronizer `Object.assign` into the locked row.
-
-**Stuck processes are judged and recovered by server-core** (plan 018 F13/F14). The worker's
-check reports an in-progress (STARTING/STARTED) build/distribution whose image is not there as
-it is; `applyEvent` turns that verdict into FAILED when the locked row is older than
-`ANALYSIS_PROCESS_STALE_THRESHOLD_MS` (15 min, `core/services/helpers.ts`). Running workers keep
-the row fresh: an EXECUTION_PROGRESS that leaves the percent unchanged stamps `updatedAt`
-explicitly once the row is older than `ANALYSIS_PROCESS_HEARTBEAT_STAMP_MS` (1 min) and is
-otherwise a no-op (typeorm skips a no-op save, and a heartbeat repeats the last percent), and
-the analysis builder/distributor execute handlers re-emit their last progress every 5 min —
-until no real progress arrived for 2 h, so a hung docker stream goes stale. Stale is not
-recovered: with one worker the CHECK waits behind the hung EXECUTE on the same prefetch-1 queue,
-so recovery needs a worker restart, a second worker replica, or RabbitMQ's `consumer_timeout`.
-Every EXECUTION_* event (STARTED, PROGRESS, FAILED, FINISHED) applies only while the locked row is STARTING/STARTED, so a late finish cannot
-resurrect a run already FAILED or reset to null (full fix: run ids). The distributor check reports
-an in-progress status for permanently missing preconditions (no nodes, no registry, no registry
-project), so the stale rule fails such a run. `AnalysisReconciler.reconcile()`
-(`core/services/analysis-reconciler/`) selects in-progress rows older than the threshold
-(`IAnalysisRepository.findManyInProgressUpdatedBefore`, a `Raw` bound `Date` — the
-timestamp-filter trap) and dispatches the existing check commands; the app component
-(`app/components/analysis-reconciler/`) runs it at start and every 5 min on every replica,
-without a lock — a duplicate verdict is dropped by `isCheckVerdictStale` (CHECKs carry no TTL, so
-they queue up while no worker consumes). Rollout: workers before server-core — an old worker has no
-heartbeat and judges staleness itself, so the reconciler's checks would fail its long builds. Master images are
-out of scope: they have no check command, and BUILD takes over a 15-min-stale build itself.
-
-Implementation classes live in `app/aggregators/` and `app/components/`.
-
 ## Authentication — Authup
 
 All services integrate with **Authup** (OAuth2 identity provider):
 - `@authup/server-adapter` middleware validates tokens on incoming requests
 - `@authup/access` handles per-realm permission checks via `IPermissionEvaluator`
-- `ActorContext.permissionEvaluator` IS authup's `IPermissionEvaluator` — hub has no port of its own (plan 016)
+- `ActorContext.permissionEvaluator` IS authup's `IPermissionEvaluator` — hub has no port of its own
 - Two-phase permission: `preEvaluate` (fast fail) then `evaluate` (with PolicyData attributes)
-
-### Authorization catalog (Authup beta.68)
-
-HTTP and socket middleware use the service Authup client to fetch `GET /authorization`
-once per authenticated request/connection, then `createAuthupPermissionEvaluator`
-(`server-kit/src/authup/authorization.ts`) combines it with the caller's complete
-introspection grants and identity. Do not flatten grants to permission names: that
-loses definition policies, junction policies and realm reach. Scope restricts what a
-caller can do, not who it is: `resolveAuthupPolicySubject` always places the identity and
-places its grants only for a token scoped `global` (`[]` otherwise), so the binding policy
-denies every permission (403) while identity-reading policies — and hub's identity-based
-checks (credential ownership, the messenger mailbox, bucket ownership, socket rooms) — still
-see the real caller. Authup applies the same rule since authup#3723 (`useRequestPolicyGrants`).
-The credential needs
-`permission_read` at `ownOrNull` or wider. Fetch failures propagate; no cross-request
-catalog cache or name-only fallback is installed. The catalog read leaves socket
-connection lifetimes unchanged; token-verifier caching is described under
-[Token verification](#token-verification-authup-beta70).
-
-### Token verification (Authup beta.70)
-
-Every service builds its verifier with `createAuthupTokenVerifier`
-(`server-http-kit/src/middlewares/authup/token-verifier.ts`). It passes a `creator`, so
-authup's vouchly-based `TokenVerifier` runs in remote mode (introspection), with a result
-cache (Redis, else memory) kept until the token's `exp`. Its namespace
-(`buildAuthupTokenCacheNamespace`) adds the service's Authup client and realm to authup's
-default `authup:remote:<baseURL>`, because authup answers `active: false` to a client that
-may not introspect a token: a result is valid only for the client that asked. Services on one
-Redis share results only when they introspect as the same client.
-
-- **Keep `IntrospectableTokenVerifier`.** In remote mode vouchly forwards every non-empty
-  string to introspection, compact or not. Only an Authup server ≥ beta.70 (authup#3724)
-  answers a malformed token `active: false`. An unguarded verifier against a beta.69 server
-  accepts `not-a-token` as the `system` client (verified). Hub requires a beta.70+ server, so
-  the guard is defence in depth: it covers a deployment that upgraded hub before Authup, and
-  spares the mint and the introspection round-trip for a token that cannot be valid.
-- **No `AUTHUP_URL`, no `TokenVerifier`.** beta.70's constructor derives the introspection
-  endpoint eagerly and throws without a base URL, so `createAuthupTokenVerifier` returns an
-  `UnconfiguredTokenVerifier` (refuses every token) instead. Without this, a service booted
-  without Authup would crash instead of answering 401.
-- A failed introspection request (Authup down, 5xx, 429, refused service credential) surfaces from vouchly as `invalid_token`; `IntrospectableTokenVerifier` rethrows it as `upstream_error` → 502, so client hooks do not drop a session over an outage. A judged token (inactive, expired) stays 401.
-
-The evaluator enforces the data a call supplies. A service using only `preEvaluate`
-still has only a pre-gate.
-
-Reads that need scoping go through `scopeReadQuery` (`server-kit/src/core/query/scope.ts`):
-
-- It pre-evaluates a one-of of the entity's read and write names; holding none is a 403.
-- It then lowers `compile()` into the query. A `post` verdict narrows to the actor's own
-  realm; `compile: false` skips this step, leaving a capability gate only (the global
-  catalogs).
-- Record reads reuse the scoped query with `eq('id', id)`, so a row out of reach is a 404,
-  the same as a missing one.
-
-The Vue store handles batch verdict fetching and expiry; `store.permissionRevision` must
-be watched by custom async navigation resolvers.
 
 ## Realm Scoping
 
-Entities are scoped to realms via `realmId`. There is no master-realm bypass (plan 021, D5):
+Entities are scoped to realms via `realmId`. There is no master-realm bypass:
 reach comes from each grant's `realm_scope` (`any` / `ownOrNull` / `own` / `none`).
 
 - **Writes on one record** (create with its target realm, update, delete, commands) go
@@ -415,124 +229,20 @@ reach comes from each grant's `realm_scope` (`any` / `ownOrNull` / `own` / `none
 | `Registry`          | Docker registry configuration                   |
 | `RegistryProject`   | Project within a Docker registry                 |
 
-## Per-Service Architecture
+## Cross-cutting Rules
 
-### server-telemetry
+Invariants a change outside the owning area breaks silently. Details and reasons are in the topic file named on each line.
 
-Manages log aggregation via VictoriaLogs and event tracking via TypeORM.
-
-**Core port:** `LogStore` interface (`core/services/log-store/types.ts`) — defines `query`, `write`, `delete` operations for log storage. No TypeORM or VictoriaLogs imports.
-
-**Adapters:**
-- `VictoriaLogsLogStore` (`adapters/telemetry/victoria-logs.ts`) — implements `LogStore` via VictoriaLogs HTTP API. Includes query injection protection (`isValidLabelKey`, `escapeQueryValue`).
-- `MemoryLogStore` (`adapters/telemetry/memory.ts`) — in-memory fallback for components that run before VictoriaLogs is available.
-- `EventController` / `LogController` — thin HTTP controllers receiving dependencies via constructor.
-
-**Service-specific modules:**
-- `VictoriaLogsModule` — registers VictoriaLogs client + `LogStore` in container
-- `ComponentsModule` — resolves `EventRepository` from the container and starts
-  EventComponent + LogComponent via `RemoteWorker` (hubwire), plus the
-  event cleaner; all three sit in one `IComponent[]`; `teardown()` stops them, then awaits `settled?.()` on each
-
-**Event retention sweep:** `createEventCleanerComponent` (`app/components/event-cleaner/`,
-a hubwire scheduled component: once at start, then daily at 01:00; no longer an
-`EventCommand`, so a failing first pass is logged instead of failing boot) drops every `expiring` row whose `expiresAt` has passed. The window is
-stamped at **ingest** by `EventComponentCreateHandler` from `EVENT_RETENTION_DAYS`
-(default 7 days; `0` keeps rows forever) — publishers no longer stamp, and an
-explicit `expiresAt`, or `expiring: false`, from the publisher wins. The component owns only the
-schedule: the sweep itself is `IEventRepository.deleteExpired(now, { batchSize })`,
-so nothing in `app/components/` reaches for a `DataSource`.
-
-The delete is **batched** (`EVENT_RETENTION_SWEEP_BATCH_SIZE`, 1000). Steady state
-removes a trickle, but the first sweep after a retention change — or the day a full
-window first matures — can match millions of rows, and the cleaner runs on every
-replica. Batching selects ids then deletes by id, because `DELETE ... LIMIT` is
-MySQL-only; the loop drains, and a batch that removes nothing means another
-replica's sweep owns those rows, so it stops and the next tick takes the remainder.
-A `batchSize` that is not a positive safe integer falls back to the default —
-typeorm ignores a falsy `take`, which would silently restore the unbounded select.
-
-Selecting **ids only** matters twice over: the row carries a `text` `data` blob
-behind a deserialize transformer, and a delete-by-id does not fire
-`BaseSubscriber.beforeRemove`, so the sweep no longer publishes one `DELETED`
-domain event per expired row. Nothing in hub subscribes to the telemetry `EVENT`
-channel, so that traffic was pure Redis noise.
-
-**Special concern:** The telemetry service IS the log writer, so its own logger cannot use a `LogComponentDispatcher` (circular). The `LogComponentWriteHandler` accepts an optional `LogStore` param with `MemoryLogStore` fallback.
-
-### server-storage
-
-File/object storage service, backed by MinIO/S3 or the local filesystem behind a
-common `IStorageAdapter` port.
-
-**Adapters:**
-- `BucketEntity` / `BucketFileEntity` — TypeORM entities in `adapters/database/entities/`
-- `BucketSubscriber` / `BucketFileSubscriber` — pre-instantiated in `DatabaseModule` (no `@EventSubscriber()`)
-- `BucketController` / `BucketFileController` — thin HTTP controllers with upload/stream endpoints
-
-**Service-specific modules:**
-- `StorageModule` — selects the storage backend from config and registers it under
-  `StorageInjectionKey` as an `IStorageAdapter` port: `MinioStorageAdapter` (MinIO/S3)
-  or `FsStorageAdapter` (local filesystem). Controllers and components depend on the
-  port, not on a MinIO client.
-- `ComponentsModule` — resolves the storage adapter from the container, starts the
-  bucket + bucket-file consumers via `RemoteWorker` (hubwire)
-
-### server-core-worker
-
-Background worker executing Docker containers. No database entities — purely queue-driven.
-
-**Core layer:** Docker utilities, crypto helpers, GitHub/Harbor integrations. Uses module-level variables (`setCoreClient`/`useCoreClient`) for API client access.
-
-**Adapters:**
-- `adapters/http/server.ts` — minimal health-check HTTP server
-
-**Service-specific modules:**
-- `CoreClientModule` — sets up core API client via `setCoreClient()`
-- `StorageClientModule` — sets up storage API client via `setStorageClient()`
-- `ComponentsModule` — starts all 4 worker components (analysis-builder, analysis-distributor, master-image-builder, master-image-synchronizer)
-
-**Failure classification:** every check/execute handler rethrows a failure for which
-`isRetryableFailure(e, context.metadata)` (`app/components/helpers.ts`) holds — a transient
-error (`isTransientError`: hapic network error or 5xx/429, dockerode `statusCode` ≥ 500, node
-socket codes, `ENOENT` only on `connect`) before the last attempt (`metadata.delivery.attempt` <
-`metadata.delivery.maxAttempts`, which the driver sets on consume: `@hubwire/amqp` from the
-`x-attempt` header and `MESSAGE_BUS_MAX_ATTEMPTS`, the memory driver `1/1`; without a delivery
-every attempt is the last) — so the AMQP driver retries it; everything else
-emits `*_FAILED`. A permanent error misread as transient costs only the backoff. The
-distributor keeps the local analysis image while a retry is pending (it re-tags from it) and
-removes it otherwise. Errors inside a docker build/push stream are permanent.
-
-**Entry point:** Uses `src/index.ts` with `dotenv/config` directly (no citty CLI).
-
-### server-messenger
-
-Durable store-and-forward message broker (plan 013). It is **no longer** the
-database-less Socket.io relay: messages are persisted to a mailbox and delivered by
-`send` / `pull` / `ack` over REST, with the socket reduced to a payload-free wakeup
-signal. The legacy relay/presence surface is kept alongside it for coexistence until
-decommission (plan 013 phase 5).
-
-**Adapters:**
-- `adapters/database/entities/` — the message mailbox entity (+ `migrations/{mysql,postgres}/`)
-- `adapters/http/controllers/message/` — REST message surface (send/pull/ack). **Not**
-  an entity API: no `{ data, meta }` envelope.
-- `adapters/socket/controllers/connection/` — Socket.io connection lifecycle handlers
-- `adapters/socket/controllers/messaging/` — legacy relay handlers
-- `adapters/socket/register.ts` — controller registration helper
-
-**Service-specific modules:**
-- `DatabaseModule` — `DataSource` + `MessageRepository`
-- `WakeupModule` — redis pub/sub when redis is present (cross-instance), else an
-  in-process fallback; emits the payload-free `messagePending` into the recipient's
-  local socket room
-- `SweeperModule` — a hubwire scheduled component (`'* * * * *'`, `runOnStart: false`; `teardown()` awaits its `settled?.()` after `stop()`) deleting messages past their absolute `expiresAt`,
-  via the same batched `deleteExpired(now, { batchSize })` shape as the telemetry
-  event sweep (`MESSAGE_SWEEP_BATCH_SIZE`, 1000). The id select uses `Raw`, not
-  `LessThan`: `expires_at` is a datetime column behind a `string`-typed property,
-  and `now` must stay a bound `Date` — an ISO string satisfies the property type
-  but MySQL truncates the trailing `Z` when casting it
-- `HTTPModule` — HTTP server + Socket.io server with Authup auth middleware
+- **Authorization** ([authorization](topics/authorization.md)): use the `@authup/access` record helpers with `actor.permissionEvaluator`; their plain variants take an array of names as ALL-of, so "any of" needs the `*OneOf` variant. Pass a stored row's realm raw (`entity.realmId`). Only authup's `PermissionError` counts as a denial. Reads are scoped through `scopeReadQuery` / `AnalysisReachService`, so list and record cannot disagree; a family table's own `realmId` is the uploader's, never the owner's. Keep `IntrospectableTokenVerifier` in front of vouchly, and an introspection outage answers 502, not 401.
+- **Messaging** ([messaging](topics/messaging.md), [messaging-delivery](topics/messaging-delivery.md)): a publisher whose only consumer is another service resolves `RemoteMessageBusInjectionKey`, never the always-registered bus. Every module that starts components stops them, then awaits `settled?.()`. A `buildStatus`/`distributionStatus` change goes through `updateLocked`, never a `save()` of an earlier read and never `repository.update()` (it skips the subscribers). An `ordered` routing declares `x-single-active-consumer` on publish and consume alike (the broker answers 406 otherwise). Roll out workers and storage before server-core.
+- **HTTP API** ([http-api](topics/http-api.md)): controllers stay thin and own the `{ data, meta }` envelope; mutations carry `meta: {}`; `meta.schema` is deep-frozen, so spread it; annotate every return type (trapi reads it). A secret column needs all of `select: false`, absence from `fields.default`, and `createRootOnlyFieldsGate`.
+- **Query surface** ([query-surface](topics/query-surface.md)): the `QueryBuildInput<T, 3>` depth bound is permanent (authup's components declare the same bound). Every allow-listed filter/sort key leads a declared `indexes` sequence, so a new key needs its entity index and migration in the same change. Never allow-list a filter on a column behind `dateToISOStringTransformer`.
+- **Database** ([database](topics/database.md)): snake_case exists only in column names and migrations; every camelCase property carries `@Column({ name })` and there is no naming strategy. Migrations ship in both dialects, named for everything they do; released migrations are immutable. Build a `DataSource` only through `DataSourceOptionsBuilder` (UTC pin), and run boot passes under `withDataSourceLock` (lock names are a deployment contract).
+- **Dependencies** ([dependencies](topics/dependencies.md)): no `--force`, `--legacy-peer-deps`, root `overrides` or `npm install --package-lock-only`; check for a split tree after every bump. TypeScript stays on 6.0.3 until vue-tsc, typescript-eslint and @trapi support 7.
+- **Telemetry** ([server-telemetry](topics/server-telemetry.md)): an audit event validator degrades a client-controlled field, never the whole record; retention is stamped once, at ingest.
+- **Frontend** ([frontend](topics/frontend.md)): an id-driven `createEntityManager` resolve never falls back to the collection; icon names are literals; authenticated routes get no `swr`/`isr` route rule; a collection query never requests a permission-gated column (the rows land in the SSR payload).
+- **Tests against Authup** ([testcontainers](topics/testcontainers.md)): each service provisions exactly the permission names it checks in `test/setup.ts`; the Authup image is tagged with the installed `@authup/core-kit` version.
+- **Per-service layout and DI modules**: [server-core](topics/server-core.md), [server-telemetry](topics/server-telemetry.md), [server-storage](topics/server-storage.md), [server-core-worker](topics/server-core-worker.md), [server-messenger](topics/server-messenger.md).
 
 ## Configuration
 
@@ -546,3 +256,25 @@ Environment-based via `envix`, managed by `ConfigModule` in `app/modules/config/
 | `REDIS_URL`     | Redis for pub/sub and caching     |
 | `AMQP_URL`      | RabbitMQ connection               |
 | `MINIO_*`       | MinIO/S3 storage credentials      |
+
+## Topic Files
+
+Read on demand; never imported by `CLAUDE.md`.
+
+| File | Covers |
+|---|---|
+| [authorization](topics/authorization.md) | Authorization catalog, token verification, read scoping, record reach, analysis reach, Authup beta.68 to beta.70 |
+| [messaging](topics/messaging.md) | Domain events, hubwire bus, dispatchers, workers, aggregators, scheduled components, process-status locking |
+| [messaging-delivery](topics/messaging-delivery.md) | Retry, ordering, redelivery, race-safe status transitions, reconciler, bucket reply correlation |
+| [http-api](topics/http-api.md) | Thin controllers, response envelope, `meta.schema`, field selection and secret gates, HTTP client kits and `FakeClient` |
+| [query-surface](topics/query-surface.md) | rapiq depth bound, schema `indexes`, leading-key invariant, schema drift gate |
+| [database](topics/database.md) | Migrations, UTC timestamps and boot locks, table and column naming, migration and UTC specs |
+| [dependencies](topics/dependencies.md) | Dependency classification, root `overrides`, Authup/rapiq/validup upgrade notes, TypeScript 7 verdict |
+| [server-telemetry](topics/server-telemetry.md) | server-telemetry layout and modules, audit event hardening, retention |
+| [frontend](topics/frontend.md) | client-vue entity resolution, icons, component and build-config tests, SSR hydration |
+| [testcontainers](topics/testcontainers.md) | Testcontainers, Authup provisioning for tests |
+| [server-core](topics/server-core.md) | Directory layout, module inventory, test application |
+| [server-storage](topics/server-storage.md) | Architecture, directory layout, module inventory |
+| [server-core-worker](topics/server-core-worker.md) | Architecture, directory layout, module inventory |
+| [server-messenger](topics/server-messenger.md) | Architecture, directory layout, module inventory |
+| [docs-site](topics/docs-site.md) | Using the docs as context, docs structure |

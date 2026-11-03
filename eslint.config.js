@@ -2,7 +2,11 @@ import config from '@tada5hi/eslint-config';
 import globals from 'globals';
 
 export default [
-    ...await config(),
+    ...await config({
+        // The core CLAUDE.md imports is over the 60000-byte default; detail
+        // lives in .agents/topics/. Lower this as the core shrinks, never raise it.
+        agentDocs: { importMaxBytes: 73000 },
+    }),
     {
         ignores: [
             '**/dist/**',

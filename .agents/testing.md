@@ -40,45 +40,6 @@ export default defineConfig({
 
 Test files live in `test/unit/` and use the `.spec.ts` extension.
 
-## Test Application Pattern (server-core)
-
-Test infrastructure lives in `test/app/`, matching authup's pattern:
-
-- `test/app/module.ts` — `TestApplication extends Application` with `get dataSource()` accessor
-- `test/app/http.ts` — `TestHTTPApplication extends TestApplication` with `get client` (resolves server from container)
-- `test/app/database.ts` — `createTestDatabaseModule()` for per-test DB, `createTestDatabaseModuleForSetup()` for global setup
-- `test/app/factory.ts` — `createTestApplication()` returns `TestHTTPApplication`, `createTestDatabaseApplication()` returns `TestApplication`
-
-```typescript
-// test/app/factory.ts
-export function createTestApplication(): TestHTTPApplication {
-    process.env.PORT = '0';
-    const modules: IModule[] = [
-        new ConfigModule(),
-        new LoggerModule(),
-        createTestDatabaseModule(),
-        createTestComponentsModule(),
-        new AnalysisModule(),
-        new HTTPModule(),
-    ];
-    return new TestHTTPApplication({ modules });
-}
-```
-
-HTTP tests use the full DI-wired application — the same modules as production:
-
-```typescript
-const suite = createTestApplication();
-beforeAll(async () => { await suite.setup(); });
-afterAll(async () => { await suite.teardown(); });
-
-it('should create', async () => {
-    const { client } = suite;
-    const result = await client.node.create(createTestNode());
-    expect(result.id).toBeDefined();
-});
-```
-
 ## Test Infrastructure (all services with database)
 
 Services with databases (server-core, server-telemetry, server-storage) share the same test infrastructure pattern in `test/app/`:
@@ -91,88 +52,6 @@ Services with databases (server-core, server-telemetry, server-storage) share th
 | `test/app/factory.ts` | `createTestApplication()` returns `TestHTTPApplication` with `PORT=0` |
 
 Each test application wires the same DI modules as production but uses `createTestDatabaseModule()` instead of the real `DatabaseModule`.
-
-## Testcontainers & Always-On Authup
-
-The HTTP-facing services (`server-core`, `server-storage`, `server-telemetry`,
-`server-messenger`) run their suites against a **real Authup instance** and a
-**real database**, and the authorization middleware **actually enforces**
-permissions (`dryRun` and the no-Authup fake identity are gone from the kits
-entirely — without Authup a request gets no identity and answers 401).
-server-messenger provisions **no** permission names (it authorizes by identity
-only) and uses `createRestrictedAccessToken()` to mint distinct users for its
-mailbox-isolation spec. Each
-dependency is provided one of two ways, decided by env:
-
-| Dependency | External (used as-is)             | Otherwise (testcontainer)          |
-|------------|-----------------------------------|------------------------------------|
-| Database   | `DB_TYPE` set (CI services, `test:mysql`, `test:psql`) | PostgreSQL container |
-| Authup     | `AUTHUP_URL` set                  | `authup/authup:<@authup/core-kit version>` container |
-
-The shared helpers live in `@privateaim/server-test-kit`
-(`src/testcontainers/`, `src/authup-token.ts`, `src/setup.ts`):
-
-- `provideDatabase(project, suite)` — start a PostgreSQL container when no `DB_TYPE` is set,
-  else use the configured server. On mysql/postgres the suite gets its **own**
-  database, `<DB_DATABASE>_<suite>` (`app_core`, `app_storage`, …), dropped and
-  re-created once here in global setup, then published to the workers via vitest
-  `provide`. All four service suites run concurrently against CI's one database
-  server; sharing `app` made every worker's check-then-create `createDatabase`
-  race the other suites (`Key (datname)=(app) already exists`). Workers therefore
-  never create the suite database — only server-core's per-worker
-  `app_core_<pool>` copies, which no other process can name. SQLite is unaffected
-  (in-memory per worker).
-- `provideAuthup(project, permissionNames)` — start an Authup container (unless
-  `AUTHUP_URL` is set), provisioned with exactly the permission names the calling
-  service checks. Each service passes its own set (`server-storage` 3, `server-telemetry`
-  6, `server-core` 25), listed in its `test/setup.ts`. The built-in `admin` role's
-  `globalPermissions: ['*']` picks those up at provisioning time, so the `admin`/`master`
-  token resolves them via introspection. The generated `.mjs` is mounted at
-  `<PROVISIONING_DIRECTORY_PATH>/hub.mjs`, where `PROVISIONING_DIRECTORY_PATH` is
-  **pinned by hub** to `/etc/authup/provisioning` rather than inherited from the image.
-  Authup `1.0.0-beta.63` moved the writable directory once already (`/usr/src/app/writable`
-  → `/var/lib/authup`), and `1.0.0-beta.64`'s FHS image layout retired
-  `WRITABLE_DIRECTORY_PATH` outright, splitting it into `LOG_DIRECTORY_PATH` (what the
-  process writes) and `PROVISIONING_DIRECTORY_PATH` (what it only reads) — the latter now
-  names the provisioning directory itself, with no `provisioning/` subpath appended. A
-  provisioning file written anywhere else is simply never read — the container still
-  starts and reports healthy, and the only symptom is every endpoint in the suite later
-  failing with `The evaluation of permissions <name> failed`. Pinning it keeps the mount
-  target and the server in agreement by construction.
-- `assertAuthupProvisioning(baseURL, permissionNames)` — runs in global setup for **both**
-  the container and the external-`AUTHUP_URL` path. It mints the admin token, introspects
-  it, and diffs the resolved permission set against the suite's, so a provisioning miss
-  fails once, immediately, with the missing names — instead of as a wall of authorization
-  failures dozens of assertions away from the cause.
-- Authup runs on the **same database engine as hub** in each environment
-  (`resolveAuthupDatabaseEnv`): a dedicated `authup` database on the same
-  MySQL/PostgreSQL server (reached via `host.docker.internal`), or its own in-memory
-  SQLite on the sqlite leg. This keeps the whole stack on one engine per run.
-- `hydrateTestEnv()` — worker-side; the side-effecting `@privateaim/server-test-kit/setup`
-  module (wired into each `vitest.config` `setupFiles` alongside `reflect-metadata`)
-  copies the provided values into `process.env` before the test app is built.
-- `stopTestContainers()` — teardown.
-- `createAdminAccessToken()` / `createAdminAuthorizationHeader()` — mint a real
-  `admin`/`master` token for tests that issue raw `fetch` requests (uploads,
-  streaming) instead of the authenticated API client.
-
-The Authup image is `authup/authup`, tagged with the **installed `@authup/core-kit`
-version** — `resolveAuthupImage()` reads it from the resolved package at run time, so
-the server under test always matches the client libraries hub compiles against. Set
-`AUTHUP_IMAGE_TAG` to pin a different image.
-
-> Do **not** revert this to an untagged `authup/authup`. Untagged resolves to `latest`,
-> and testcontainers reuses a locally cached image instead of re-pulling, so a machine
-> holding an older `latest` runs the whole suite against a stale Authup — green, while
-> never exercising the version being shipped. That is exactly what happened during the
-> beta.58 → beta.59 bump: the suite passed against a cached beta.57.
-
-Each test app registers `AuthupHookModule` + `AuthupClientModule` so the middleware
-takes the real introspection path rather than the fake-identity fallback.
-
-Enabling the Authup client does **not** activate `NodeClientService` /
-`AnalysisClientService`: the test database module builds serviceless subscribers
-that short-circuit, keeping enforcement and client-provisioning decoupled.
 
 ## The Three Testing Layers
 
@@ -192,55 +71,6 @@ Do not add production injection options solely to support a test.
 | **Transport-level FakeClient** | hapic's `MemoryTransport`, under a real client | Anything that CONSUMES an HTTP client: client-vue components, worker components | no |
 | **A real docker daemon** | dockerode against the local socket | The two worker specs that pack or build an image | **yes** |
 | **Testcontainers** | The real process | HTTP integration suites for server-core / storage / telemetry, with real Authup enforcement | **yes** |
-
-### Transport-level FakeClient
-
-`@privateaim/<kit>/testing` ships a `FakeClient` that subclasses the kit's real
-client and only replaces the transport. Everything above the transport still
-runs — header merge, body transform, decode, retry, the constructor's
-`RESPONSE_ERROR` hook and any attached `ClientAuthenticationHook` — so a test
-exercises the client rather than bypassing it.
-
-```typescript
-import { createFakeClient, fakeResponse } from '@privateaim/core-http-kit/testing';
-
-const client = createFakeClient({
-    handlers: {
-        'GET /projects/:id': (req) => ({ data: { id: req.params.id }, meta: {} }),
-        'DELETE /projects/:id': () => fakeResponse(403, { message: 'forbidden' }),
-    },
-});
-
-await client.project.getOne('abc');
-expect(client.requests[0]).toMatchObject({ method: 'GET', params: { id: 'abc' } });
-```
-
-Handler-map semantics (pinned by each kit's `test/unit/fake-client.spec.ts`):
-
-- Keys are `'<METHOD> /<path>'`; a `:name` segment captures into `req.params`.
-- Method compare is case-insensitive; the segment count must match exactly.
-- The query string is ignored — the url is reduced to its **pathname**.
-- `'*'` is a catch-all that always loses to a specific pattern, whatever the key
-  order. Among specific patterns, first insertion order wins, so declare
-  `'GET /users/@me'` before `'GET /users/:id'`.
-- No match and no `'*'` falls back to `{ data: [], meta: { total: 0 } }`.
-- A handler returns the response **body**; return `fakeResponse(status, body)`
-  for a non-2xx. Prefer that over throwing — a throw on a fire-and-forget path
-  becomes an unhandled rejection and fails the run.
-
-Gotchas worth knowing before you debug one:
-
-- **A path-bearing `baseURL` shifts every pathname.** `createFakeClient({ baseURL: 'http://fake.test/api' })`
-  makes a `'GET /projects'` pattern silently fall through to the fallback. Keep
-  the default (`http://fake.test`, path-free).
-- **`getManyAll` needs consistent `meta.total`.** It pages until `offset >= total`,
-  so a handler returning a full page with an inflated or recomputed `total`
-  never terminates.
-- **`responseType: 'stream'` dispatches with `method === undefined`** and is
-  normalized to `GET` — that is what makes `AnalysisAPI.streamFiles`,
-  `BucketAPI.stream` and `BucketFileAPI.stream` match a `GET` pattern.
-- The raw, un-normalized record is still on the transport itself
-  (`MemoryTransport.requests`, plus `reset()`) if you need it.
 
 ## Database Testing
 
@@ -382,7 +212,7 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
   memory driver, since dispatchers require a bus; nothing in those suites consumes
   the commands, and `RemoteMessageBusInjectionKey` stays unbound, so server-storage
   publishes no bucket or file events (server-kit's `message-bus-module.spec.ts` pins
-  when that token is registered). The log-hook factories are pinned by server-kit's
+  when that token is registered). The log-hook factories are covered by server-kit's
   `message-bus-hooks.spec.ts` (including that a silent routing's publish is not logged).
   A scheduled-component spec (`test/unit/app/components/{node-client,analysis-reconciler}/`,
   server-telemetry's `event-cleaner.spec.ts`) asserts through `status()` and **must
@@ -391,74 +221,6 @@ GitHub Actions (`.github/workflows/main.yml`) runs:
 - `createTestApplication({ telemetryHandlers })` (server-core) opts in to a faked
   telemetry client, which is the only way to exercise `AnalysisLogController` /
   `AnalysisNodeLogController` without a live telemetry service.
-
-## Component Tests (client-vue)
-
-`packages/client-vue` is hub's only non-node vitest environment:
-`test/vitest.config.ts` uses `environment: 'happy-dom'` and `plugins: [vue()]`,
-where every other suite is `plugins: [swc.vite()]` on node.
-
-Mount through the shared harness, `packages/client-vue/test/utils/index.ts`:
-
-```typescript
-const { wrapper, coreClient } = mountClientVueComponent(
-    FEntityDelete,
-    { entityId: 'abc', entityType: 'project', withPrompt: false },
-    { core: { 'DELETE /projects/:id': () => ({ data: {}, meta: {} }) } },
-);
-
-await wrapper.trigger('click');
-expect(coreClient.requests[0]).toMatchObject({ method: 'DELETE', params: { id: 'abc' } });
-```
-
-Things the harness handles, and why they matter:
-
-- **client-vue's `install` is not self-sufficient.** `@authup/client-web-kit`
-  must be installed on the same app FIRST — `setupBaseHTTPClient` calls
-  `injectHTTPClientAuthenticationHook(app)` and the `usePermissionCheck` sites
-  call `injectStore()`. Installing only client-vue throws.
-- **Pass the client via the `client` install option, never by pre-providing it.**
-  Every `install*()` early-returns on `isXHTTPClientUsable(app)` and authup's
-  `provide()` is first-wins, so an ordering mistake fails SILENTLY with the real
-  `new Client({ baseURL })` winning.
-- **`isServer: true`** on the authup install maps to the auth hook's
-  `timer: !isServer`; without it a real refresh timer is armed in happy-dom and
-  leaks across specs. The cookie noops avoid `useCookies`.
-- **`stubs: { VCIcon: true }`.** `@vuecs/icon` resolves icon names through
-  `@iconify/vue`, which FETCHES unknown icons from the iconify API — leaving it
-  live makes every icon-rendering spec hit the network and happy-dom abort it at
-  teardown. VTU's `stubs` matches by component name, so it also intercepts the
-  `VCIcon` that `@vuecs/button` imports directly (a global `components`
-  registration does not).
-- **`realtime` is omitted** by default, so `installSocketManager` is skipped.
-  Pass `{ realtime: true }` as the harness's fourth argument to opt in —
-  `test/unit/core/realtime-gate.spec.ts` pins both sides of that gate,
-  because a consumer that forgets the option loses realtime SILENTLY.
-
-Cross-package test imports resolve through `dist`, so the kits must be built
-first. `nx.json`'s `test: { dependsOn: ["^build"] }` handles that for
-`npx nx run-many -t test`; a bare `npm run test -w packages/client-vue` on a
-cold tree does not.
-
-## Build-Config Tests (client-ui)
-
-`apps/client-ui/test/` is a plain node vitest config with no plugins — it
-renders nothing. Its one suite, `unit/icon-bundle.spec.ts`, guards the icon
-subset the app ships (see [conventions.md](conventions.md#icons)) by pinning one
-uniquely-attributable icon per scanned source, so removing any glob fails
-exactly one assertion.
-
-It drives the real `@nuxt/icon` plugin object — `load('\0virtual:nuxt-icon-bundle')`
-runs the whole scan → resolve → generate path by itself — rather than reading a
-built bundle. That is deliberate: CI's build cache carries only `**/dist/**` and
-`.nx`, so `apps/client-ui/.output` does **not** survive into the test job, and a
-spec asserting against it would either fail or need extra cache plumbing.
-Asserting a rendered page cannot work at all — `@iconify/vue` resolves icons
-client-side, so SSR output carries empty `<svg>` shells either way.
-
-Note `nuxi typecheck` (client-ui's `build:types`) **does** cover `test/**` under
-Nuxt 4 strict, unlike every other workspace, whose `tsconfig.build.json` includes
-`src/**` only.
 
 ## Fakes Over Mocks
 
@@ -484,7 +246,7 @@ Existing fakes to reuse:
 - `createScopedActor({ realmScope })` — realm-scoped actor fake (`realmMatch` enforced, `compile()` lowered per scope)
 - `createFakeAuthupClient({ handlers, fallback, baseURL })` / `FakeAuthupClient` — a REAL `AuthupClient` on a `MemoryTransport`, with `requests` and `fakeAuthupResponse(status, body)`. Use this for anything talking to authup. Deliberately **not** `@authup/core-http-kit/testing`'s `createFakeClient`: that one overrides `request()` and hard-codes a 200, so it can never drive the `isClientErrorWithStatusCode(e, 404)` branches that `AnalysisClientService` and `NodeClientService` depend on.
 
-**HTTP clients (`@privateaim/<kit>/testing`)** — see [Transport-level FakeClient](#transport-level-fakeclient):
+**HTTP clients (`@privateaim/<kit>/testing`)** — see [Transport-level FakeClient](topics/http-api.md#transport-level-fakeclient):
 - `createFakeClient({ handlers, fallback, ...clientOptions })` / `FakeClient` — a REAL client on a `MemoryTransport`, exposing `requests`: the normalized record of everything dispatched
 - `fakeResponse(status, body)` — return it from a handler to drive a non-2xx through the real error pipeline
 - `matchRoute(method, url, handlers)` — the route matcher, exported for direct testing
@@ -508,89 +270,3 @@ file needs more than one: `import { createFakeClient as createFakeCoreClient } f
 - `FakeAnalysisMetadataRecalculator` / `FakeAnalysisNodeMetadataRecalculator` / `FakeAnalysisFileMetadataRecalculator` — record `recalc()` and `recalcDebounced()` calls
 
 When a dependency has no fake yet, create one in the entity's test directory (`test/unit/core/entities/<entity>/`) implementing the port interface.
-
-## UTC & Lock Specs (server-telemetry)
-
-Two specs in `apps/server-telemetry/test/unit/adapters/database/` pin #1900
-against a real server and skip on sqlite (except the lock spec's no-runner
-check):
-
-- `timestamp-timezone.spec.ts` sets the database default to UTC+14
-  (`ALTER DATABASE … SET timezone` / `SET GLOBAL time_zone`, restored in
-  `afterAll`) and the Node process to `Etc/GMT+9` (fixed offset — a DST zone
-  makes the offset assertion seasonal), then checks that a pinned pool reads the
-  true instant and that bound `Date`s bracket it. A control pool built from the
-  raw env options proves the environment really is skewed. On mysql the
-  `SET GLOBAL` is server-wide, so every other suite sharing that server must be
-  pinned too — they are, through the builder.
-- `database-lock.spec.ts` pins mutual exclusion, the timeout and per-name
-  independence of `withDataSourceLock`.
-
-Both were negative-controlled: building `server-db-kit` without the pin / with
-the lock bypassed fails them on mysql and postgres.
-
-## Migration Tests
-
-The `test` CI job runs the integration suite against MySQL, Postgres, and SQLite, but the schema is built via `dataSource.synchronize()` (see `apps/<service>/test/app/database.ts`) — migration files in `apps/<service>/src/adapters/database/migrations/{mysql,postgres}/` are **not** exercised by that suite.
-
-A separate `tests-migrations` CI job runs the migration CLI end-to-end for `server-core`, `server-storage`, `server-telemetry`, and `server-messenger` against a fresh MySQL and Postgres container:
-
-1. `migration run` — applies all migrations forward
-2. `migration revert` × N — undoes every migration in reverse order (verifies every `down()` works)
-3. `migration run` — re-applies the full chain (verifies idempotency)
-4. `npm run test:schema-drift` — asserts the migrated schema matches the entity metadata
-
-This catches SQL syntax errors, cross-DB type mismatches, and `down()` regressions across every migration. It does **not** catch data-correctness bugs in `UPDATE`/`INSERT` migrations against pre-existing rows — those still require manual smoke-testing against a populated database.
-
-The drift step (4) exists because the migration chain and the entity classes are two
-**independent** descriptions of the same schema, and nothing else compares them: the
-round-trip exercises only the chain, while the integration suites `synchronize()` from
-the entities — so a migration that writes something the entities do not describe (or an
-entity change with no migration) passed every gate and surfaced only as
-`migration generate` noise (issue #1823: the `analyses` table carried
-`analysis_entity`-derived constraint names through two table renames).
-`scripts/assert-schema-drift.mjs` (all four server apps) wraps typeorm-extension's
-`assertSchemaMatchesMetadata` with `skipWithoutMigrations: true` — sqlite carries no
-migrations, so there are never two descriptions to compare — and rethrows anything that
-is not a `SchemaDriftError`, so an unreachable database is not reported as drift.
-
-authup's populated round-trip (`verify-latest-migration.mjs`) was deliberately **not**
-ported. The blocker is that the script boots the real application to do the seeding,
-and hub's `tests-migrations` job carries none of the infrastructure a hub service boots
-against (Authup at minimum — the job provides databases only). A port would also have
-to seed around telemetry's documented-lossy IPv6 `down()` (the newest telemetry
-migration narrows `request_ip_address` back to varchar(15) on revert). Open follow-up.
-
-The job pre-flights with a sanity check that the compiled migrations exist under `apps/<service>/dist/adapters/database/migrations/{mysql,postgres}/` — without this guard, running the CLI from the wrong working directory results in typeorm silently reporting "No migrations are pending" with exit code 0, masking the failure.
-
-Locally, run the same `run → revert × N → run → drift` flow against a running compose stack:
-
-```bash
-# MySQL
-docker compose up -d mysql
-cd apps/server-core               # or: server-storage / server-telemetry / server-messenger
-
-export DB_TYPE=mysql DB_HOST=127.0.0.1 DB_PORT=3306 \
-       DB_USERNAME=root DB_PASSWORD=start123 DB_DATABASE=app
-
-node dist/cli/index.mjs migration run
-node dist/cli/index.mjs migration revert    # repeat once per migration
-node dist/cli/index.mjs migration run       # idempotency replay
-npm run test:schema-drift                   # migrated schema ↔ entity metadata
-```
-
-```bash
-# Postgres
-docker compose up -d postgres
-cd apps/server-core
-
-export DB_TYPE=postgres DB_HOST=127.0.0.1 DB_PORT=5432 \
-       DB_USERNAME=postgres DB_PASSWORD=start123 DB_DATABASE=app
-
-node dist/cli/index.mjs migration run
-node dist/cli/index.mjs migration revert
-node dist/cli/index.mjs migration run
-npm run test:schema-drift
-```
-
-The CLI auto-creates the target database if it does not exist.
