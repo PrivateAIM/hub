@@ -269,7 +269,10 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
             throw new PermissionDeniedError('You are either no authority of the node or you don\'t have the required permissions.');
         }
 
-        if (isPropertySet(data, 'executionStatus') && !canUpdateNode) {
+        if (
+            (isPropertySet(data, 'executionStatus') || isPropertySet(data, 'executionProgress')) &&
+            !canUpdateNode
+        ) {
             throw new PermissionDeniedError('You are either no authority of the node or you don\'t have the required permissions.');
         }
     }

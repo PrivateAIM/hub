@@ -11,6 +11,7 @@ import type { MasterImage } from '@privateaim/core-kit';
 import { MasterImageCommand } from '@privateaim/core-kit';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
+import { MasterImageBuilderEvent } from '@privateaim/server-core-worker-kit';
 import {
     beforeEach,
     describe,
@@ -18,6 +19,7 @@ import {
     it,
 } from 'vitest';
 import { MasterImageService } from '../../../../../src/core/entities/master-image/service.ts';
+import { MasterImageBuilderService } from '../../../../../src/core/services/master-image/index.ts';
 import { createAllowAllActor, createDenyAllActor } from '@privateaim/server-test-kit';
 import { FakeMasterImageRepository } from './fake-repository.ts';
 import { FakeMasterImageBuilderDispatcher } from './fake-builder-dispatcher.ts';
@@ -170,9 +172,6 @@ describe('MasterImageService', () => {
             it('should reject a second build while the first is starting', async () => {
                 repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
                 await service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor());
-                // the fake does not stamp updatedAt; a fresh claim is "now"
-                await repository.save({ ...repository.getAll()[0], updatedAt: new Date().toISOString() });
-
                 await expect(
                     service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor()),
                 ).rejects.toThrow(BadRequestError);
@@ -189,31 +188,134 @@ describe('MasterImageService', () => {
                 }));
 
                 await service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor());
+                await expect(
+                    service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor()),
+                ).rejects.toThrow(BadRequestError);
 
                 expect(builderDispatcher.getCallCount()).toBe(1);
             });
 
-            it('should restore buildStatus when the dispatch fails', async () => {
-                repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
-                builderDispatcher.failWith = new Error('broker unavailable');
+            it('should reject another build while the first is started', async () => {
+                repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.STARTED }));
 
                 await expect(
-                    service.executeCommand(
+                    service.executeCommand(MasterImageCommand.BUILD, { id: 'mi-1' }, createAllowAllActor()),
+                ).rejects.toThrow(BadRequestError);
+
+                expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.STARTED);
+                expect(builderDispatcher.getCallCount()).toBe(0);
+            });
+
+            it('should allow takeover of a stale started build', async () => {
+                repository.seed(createTestMasterImage({
+                    id: 'mi-1',
+                    buildStatus: ProcessStatus.STARTED,
+                    updatedAt: new Date(Date.now() - 16 * 60 * 1000).toISOString(),
+                }));
+
+                const result = await service.executeCommand(
+                    MasterImageCommand.BUILD,
+                    { id: 'mi-1' },
+                    createAllowAllActor(),
+                );
+
+                expect(result?.buildStatus).toBe(ProcessStatus.STARTING);
+                expect(builderDispatcher.getCallCount()).toBe(1);
+            });
+
+            it.each([
+                [null, MasterImageBuilderEvent.EXECUTION_FINISHED, ProcessStatus.EXECUTED],
+                [null, MasterImageBuilderEvent.EXECUTION_FAILED, ProcessStatus.FAILED],
+                [ProcessStatus.EXECUTED, MasterImageBuilderEvent.EXECUTION_FINISHED, ProcessStatus.EXECUTED],
+                [ProcessStatus.EXECUTED, MasterImageBuilderEvent.EXECUTION_FAILED, ProcessStatus.FAILED],
+            ] as const)('should retain the claim from %s and accept %s after the dispatch rejects', async (buildStatus, event, expectedStatus) => {
+                repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus }));
+
+                const failure = new Error('confirmation lost');
+                const builderService = new MasterImageBuilderService({ imageRepository: repository });
+
+                builderDispatcher.failWith = failure;
+
+                await expect(service.executeCommand(
+                    MasterImageCommand.BUILD,
+                    { id: 'mi-1' },
+                    createAllowAllActor(),
+                )).rejects.toBe(failure);
+
+                expect(builderDispatcher.getCalls()).toEqual([{ id: 'mi-1' }]);
+                expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.STARTING);
+                await expect(service.executeCommand(
+                    MasterImageCommand.BUILD,
+                    { id: 'mi-1' },
+                    createAllowAllActor(),
+                )).rejects.toThrow(BadRequestError);
+                expect(builderDispatcher.getCallCount()).toBe(1);
+
+                await builderService.applyEvent(MasterImageBuilderEvent.EXECUTION_STARTED, { id: 'mi-1' });
+                expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.STARTED);
+
+                const progressPayload = {
+                    id: 'mi-1',
+                    progress: {
+                        current: 1,
+                        total: 2,
+                        percent: 50,
+                    },
+                };
+
+                await builderService.applyEvent(MasterImageBuilderEvent.EXECUTION_PROGRESS, progressPayload);
+                expect(repository.getAll()[0].buildProgress).toBe(50);
+                await builderService.applyEvent(event, { id: 'mi-1' });
+                expect(repository.getAll()[0].buildStatus).toBe(expectedStatus);
+            });
+
+            it.each([ProcessStatus.STARTING, ProcessStatus.STARTED])(
+                'should keep a renewed stale %s claim after failed dispatch and block an immediate retry',
+                async (buildStatus) => {
+                    const updatedAt = new Date(Date.now() - 16 * 60 * 1000).toISOString();
+
+                    repository.seed(createTestMasterImage({
+                        id: 'mi-1',
+                        buildStatus,
+                        updatedAt,
+                    }));
+
+                    const failure = new Error('broker unavailable');
+                    const claimedAfter = Date.now();
+
+                    builderDispatcher.failWith = failure;
+
+                    await expect(service.executeCommand(
                         MasterImageCommand.BUILD,
                         { id: 'mi-1' },
                         createAllowAllActor(),
-                    ),
-                ).rejects.toThrow('broker unavailable');
+                    )).rejects.toBe(failure);
 
-                expect(repository.getAll()[0].buildStatus).toBe(ProcessStatus.EXECUTED);
-            });
+                    const stored = await repository.findOneById('mi-1');
+
+                    expect(stored.buildStatus).toBe(ProcessStatus.STARTING);
+                    expect(new Date(stored.updatedAt).getTime()).toBeGreaterThanOrEqual(claimedAfter);
+
+                    builderDispatcher.failWith = undefined;
+
+                    await expect(service.executeCommand(
+                        MasterImageCommand.BUILD,
+                        { id: 'mi-1' },
+                        createAllowAllActor(),
+                    )).rejects.toThrow(BadRequestError);
+                    expect(builderDispatcher.getCallCount()).toBe(1);
+                },
+            );
 
             it('should not revert a status a worker event already advanced', async () => {
                 repository.seed(createTestMasterImage({ id: 'mi-1', buildStatus: ProcessStatus.EXECUTED }));
                 builderDispatcher.failWith = new Error('publish confirm timed out');
-                // the broker took the message after all, and the worker already reported
+
+                const builderService = new MasterImageBuilderService({ imageRepository: repository });
+
+                // The broker took the message and the worker reported before dispatch rejected.
                 builderDispatcher.onExecute = async () => {
-                    await repository.save({ ...repository.getAll()[0], buildStatus: ProcessStatus.STARTED });
+                    await builderService.applyEvent(MasterImageBuilderEvent.EXECUTION_STARTED, { id: 'mi-1' });
                 };
 
                 await expect(

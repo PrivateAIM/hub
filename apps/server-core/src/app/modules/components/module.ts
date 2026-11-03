@@ -14,6 +14,7 @@ import {
     LoggerInjectionKey,
     MESSAGE_BUS_MODULE_NAME,
     MessageBusInjectionKey,
+    RemoteMessageBusInjectionKey,
     createRemoteWorkerLogHooks,
 } from '@privateaim/server-kit';
 import { RemoteWorker } from 'hubwire';
@@ -68,15 +69,18 @@ export class ComponentsModule implements IModule {
             ),
         ];
 
-        this.components.push(createAnalysisReconcilerComponent({
-            reconciler: new AnalysisReconciler({
-                repository: container.resolve(DatabaseInjectionKey.AnalysisRepository),
-                builder: container.resolve(AnalysisInjectionKey.Builder),
-                distributor: container.resolve(AnalysisInjectionKey.Distributor),
+        // A memory-only bus has no worker to consume the reconciler's checks.
+        if (container.tryResolve(RemoteMessageBusInjectionKey).success) {
+            this.components.push(createAnalysisReconcilerComponent({
+                reconciler: new AnalysisReconciler({
+                    repository: container.resolve(DatabaseInjectionKey.AnalysisRepository),
+                    builder: container.resolve(AnalysisInjectionKey.Builder),
+                    distributor: container.resolve(AnalysisInjectionKey.Distributor),
+                    logger,
+                }),
                 logger,
-            }),
-            logger,
-        }));
+            }));
+        }
 
         // Without an Authup client there are no node clients to sync.
         if (authupResult.success) {

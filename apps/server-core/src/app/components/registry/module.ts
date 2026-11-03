@@ -18,6 +18,8 @@ import {
     RegistrySetupHandler,
 } from './handlers/index.ts';
 import type { RegistryEventMap } from './types.ts';
+import { RegistryProjectRelinkStore } from './handlers/project/relink/store.ts';
+import { RegistryProjectMigration } from './handlers/project/relink/migration.ts';
 
 export class RegistryComponent extends Component<RegistryEventMap> {
     constructor(ctx: {
@@ -38,7 +40,10 @@ export class RegistryComponent extends Component<RegistryEventMap> {
             logger: ctx.logger,
         }));
         this.mount(RegistryCommand.PROJECT_UNLINK, new RegistryProjectUnlinkHandler());
-        this.mount(RegistryCommand.PROJECT_RELINK, new RegistryProjectRelinkHandler());
+        this.mount(RegistryCommand.PROJECT_RELINK, new RegistryProjectRelinkHandler({
+            store: new RegistryProjectRelinkStore(),
+            migration: new RegistryProjectMigration({ publicURL: ctx.publicURL, authupClient: ctx.authupClient }),
+        }));
     }
 
     async start() {

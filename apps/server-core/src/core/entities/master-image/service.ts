@@ -13,6 +13,7 @@ import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@privateaim/server-kit';
 import { decodeQuery } from '../../query/index.ts';
+import { isProcessStatusInProgress } from '../../services/helpers.ts';
 import { masterImageSchema } from './schema.ts';
 import type {
     IMasterImageBuilderDispatcher,
@@ -118,23 +119,19 @@ export class MasterImageService extends AbstractEntityService implements IMaster
 
                 // persist STARTING before dispatching, or a fast worker event
                 // could be overwritten by this save.
-                let previous: MasterImage['buildStatus'] = null;
                 const entity = await this.repository.updateLocked(id, (locked) => {
-                    // one STARTING owner at a time, so the rollback below can
-                    // only revert its own claim. A claim older than the
-                    // threshold is presumed dead (no worker event moved it on)
-                    // and may be taken over — master images have no check
-                    // command to recover it otherwise.
-                    // ponytail: age-based, until the reconciler (plan 018 F14) exists.
+                    // Only one active build may claim the row. An old build
+                    // may be taken over because master images have no check command.
                     if (
-                        locked.buildStatus === ProcessStatus.STARTING &&
+                        isProcessStatusInProgress(locked.buildStatus) &&
                         Date.now() - new Date(locked.updatedAt).getTime() < MASTER_IMAGE_BUILD_CLAIM_STALE_MS
                     ) {
-                        throw new BadRequestError('The master image build is already starting.');
+                        throw new BadRequestError('The master image build is already in progress.');
                     }
 
-                    previous = locked.buildStatus;
                     locked.buildStatus = ProcessStatus.STARTING;
+                    // A stale STARTING takeover otherwise saves no change and retains its old claim time.
+                    locked.updatedAt = new Date().toISOString();
 
                     return true;
                 });
@@ -143,24 +140,9 @@ export class MasterImageService extends AbstractEntityService implements IMaster
                     throw new EntityNotFoundError({ entity: 'master-image' });
                 }
 
-                try {
-                    await this.builderDispatcher.dispatchExecute({ id: entity.id });
-                } catch (e) {
-                    // presumably nothing was dispatched, so no worker event will
-                    // move STARTING on — but a publish can fail after the broker
-                    // took the message, so revert only a row still STARTING.
-                    await this.repository.updateLocked(id, (locked) => {
-                        if (locked.buildStatus !== ProcessStatus.STARTING) {
-                            return false;
-                        }
-
-                        locked.buildStatus = previous;
-
-                        return true;
-                    });
-
-                    throw e;
-                }
+                // A rejected publish may already have reached a worker. Keep the
+                // claim active so its events apply and an immediate retry cannot duplicate it.
+                await this.builderDispatcher.dispatchExecute({ id: entity.id });
 
                 return entity;
             }

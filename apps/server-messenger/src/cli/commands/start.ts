@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { startApplication } from '@privateaim/server-kit';
 import { defineCommand } from 'citty';
 import { createApplication } from '../../app/index.ts';
 
@@ -14,7 +15,7 @@ export function defineCLIStartCommand() {
         async setup() {
             const app = createApplication();
 
-            await app.setup();
+            await startApplication(app);
         },
     });
 }

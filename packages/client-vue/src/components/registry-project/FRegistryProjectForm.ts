@@ -96,7 +96,7 @@ export default defineComponent({
                 return true;
             }
 
-            return manager.data.value.externalName !== form.externalName;
+            return manager.data.value.externalName === form.externalName;
         });
 
         const toggleForm = (key: keyof typeof form, id: any) => {
@@ -195,8 +195,8 @@ export default defineComponent({
             }, () => [
                 h('div', { class: 'mb-1' }, [
                     (!isExternalNameUnchanged.value ?
-                        'If you change the externalName, a new representation will be created in the Registry.' :
-                        'If you don\'t want to chose a externalName by your own, you can generate one.'
+                        'Renaming queues an artifact copy and verification. The active namespace changes only after success; the source is retained. Pause registry writers before renaming.' :
+                        'Choose an externalName or generate one.'
                     ),
                 ]),
                 h(VCButton, {

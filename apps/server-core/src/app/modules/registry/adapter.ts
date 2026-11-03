@@ -6,6 +6,7 @@
  */
 
 import type { RegistryProject } from '@privateaim/core-kit';
+import { withDataSourceLock } from '@privateaim/server-db-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { RegistryEntity, RegistryProjectEntity } from '../../../adapters/database/entities/index.ts';
 import { RegistryCommand } from '../../../core/domains/index.ts';
@@ -13,6 +14,8 @@ import type { IRegistryDispatcher } from '../../../core/harbor/types.ts';
 import type { IRegistryManager } from '../../../core/index.ts';
 
 export class RegistryManagerAdapter implements IRegistryManager {
+    protected dataSource: DataSource;
+
     protected registryRepository: Repository<RegistryEntity>;
 
     protected registryProjectRepository: Repository<RegistryProjectEntity>;
@@ -32,6 +35,7 @@ export class RegistryManagerAdapter implements IRegistryManager {
         dataSource: DataSource;
         registryComponentDispatcher?: IRegistryDispatcher | (() => IRegistryDispatcher | undefined);
     }) {
+        this.dataSource = ctx.dataSource;
         this.registryRepository = ctx.dataSource.getRepository(RegistryEntity);
         this.registryProjectRepository = ctx.dataSource.getRepository(RegistryProjectEntity);
         this.registryComponentDispatcher = ctx.registryComponentDispatcher;
@@ -41,6 +45,10 @@ export class RegistryManagerAdapter implements IRegistryManager {
         return typeof this.registryComponentDispatcher === 'function' ?
             this.registryComponentDispatcher() :
             this.registryComponentDispatcher;
+    }
+
+    async withRegistryLock<T>(registryId: string, fn: () => Promise<T>): Promise<T> {
+        return withDataSourceLock(this.dataSource, `server-core:registry-migration:${registryId}`, fn);
     }
 
     async findDefaultRegistryId(): Promise<string | null> {
@@ -70,7 +78,7 @@ export class RegistryManagerAdapter implements IRegistryManager {
     async createProject(data: Partial<RegistryProject>): Promise<RegistryProject> {
         const entity = this.registryProjectRepository.create(data);
 
-        return this.registryProjectRepository.save(entity);
+        return this.withRegistryLock(entity.registryId, () => this.registryProjectRepository.save(entity));
     }
 
     async findProject(id: string): Promise<RegistryProject | null> {
@@ -95,7 +103,7 @@ export class RegistryManagerAdapter implements IRegistryManager {
         await dispatcher.dispatch(RegistryCommand.PROJECT_LINK, { id }, {});
     }
 
-    async relinkProject(project: RegistryProject): Promise<void> {
+    async relinkProject(project: RegistryProject, targetExternalName: string): Promise<void> {
         const dispatcher = this.resolveRegistryComponentDispatcher();
 
         if (!dispatcher) {
@@ -108,6 +116,7 @@ export class RegistryManagerAdapter implements IRegistryManager {
                 id: project.id,
                 registryId: project.registryId,
                 externalName: project.externalName,
+                targetExternalName,
                 accountId: project.accountId,
             },
             {},

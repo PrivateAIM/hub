@@ -11,7 +11,7 @@ import {
     ValidatorGroup,
     isPropertySet,
 } from '@privateaim/kit';
-import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import {
     AbstractEntityService,
@@ -31,7 +31,7 @@ import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
 import type { IRegistryManager } from '../node/types.ts';
 import type { IRegistryProjectRepository, IRegistryProjectService } from './types.ts';
 import { registryProjectSchema } from './schema.ts';
-import { RegistryProjectValidator } from '@privateaim/core-kit';
+import { RegistryProjectType, RegistryProjectValidator } from '@privateaim/core-kit';
 
 type RegistryProjectServiceContext = {
     repository: IRegistryProjectRepository;
@@ -222,7 +222,10 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             data: { attributes: entity },
         });
 
-        const saved = await this.repository.save(entity, { data: actor.metadata });
+        const persist = () => this.repository.save(entity, { data: actor.metadata });
+        const saved = this.registryManager ?
+            await this.registryManager.withRegistryLock(entity.registryId, persist) :
+            await persist();
 
         if (this.registryManager) {
             await this.registryManager.linkProject(saved.id);
@@ -242,28 +245,44 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             throw new EntityNotFoundError({ entity: 'registry-project' });
         }
 
-        const previousExternalName = entity.externalName;
+        const persist = async () => {
+            // Re-read under the migration lock: the initial lookup only locates the registry.
+            const project = await this.repository.findOneBy({ id });
 
-        // Snapshot the stored row: typeorm's merge() writes into `entity`.
-        const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
-        const merged = this.repository.merge(entity, validated);
+            if (!project) {
+                throw new EntityNotFoundError({ entity: 'registry-project' });
+            }
 
-        await evaluateRecordUpdate(actor.permissionEvaluator, {
-            name: PermissionName.REGISTRY_PROJECT_MANAGE,
-            current,
-            next: { realm: merged.realmId, data: { attributes: merged } },
-        });
+            const previousExternalName = project.externalName;
+            const current = { realm: project.realmId, data: { attributes: { ...project } } };
+            const merged = this.repository.merge(project, validated);
+            const targetExternalName = merged.externalName;
 
-        const saved = await this.repository.save(merged, { data: actor.metadata });
+            await evaluateRecordUpdate(actor.permissionEvaluator, {
+                name: PermissionName.REGISTRY_PROJECT_MANAGE,
+                current,
+                next: { realm: merged.realmId, data: { attributes: { ...merged } } },
+            });
 
+            if (previousExternalName !== targetExternalName && merged.type === RegistryProjectType.MASTER_IMAGES) {
+                throw new BadRequestError({ message: 'The master images registry project cannot be renamed.' });
+            }
+
+            // The active source stays usable until the asynchronous migration completes.
+            merged.externalName = previousExternalName;
+
+            const saved = await this.repository.save(merged, { data: actor.metadata });
+
+            return { saved, targetExternalName };
+        };
+        const { saved, targetExternalName } = this.registryManager ?
+            await this.registryManager.withRegistryLock(entity.registryId, persist) :
+            await persist();
+
+        // A local dispatcher may itself acquire the migration lock.
         if (this.registryManager) {
-            if (
-                previousExternalName &&
-                validated.externalName &&
-                previousExternalName !== validated.externalName
-            ) {
-                // one command: separate unlink + link messages could run out of order.
-                await this.registryManager.relinkProject({ ...saved, externalName: previousExternalName });
+            if (saved.externalName !== targetExternalName) {
+                await this.registryManager.relinkProject(saved, targetExternalName);
             } else {
                 await this.registryManager.linkProject(saved.id);
             }

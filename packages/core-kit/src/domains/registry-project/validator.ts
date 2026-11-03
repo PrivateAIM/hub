@@ -38,7 +38,7 @@ export class RegistryProjectValidator extends TypedContainer<RegistryProject> {
         // max(64) matches the varchar(64) column — anything longer used to
         // pass validation and blow up in the database instead; min(3)
         // mirrors the pre-migration form rule.
-        const externalNameValidator = createValidator(z.string().min(3).max(64).regex(/^[a-z0-9-_]*$/));
+        const externalNameValidator = createValidator(z.string().min(3).max(64).regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/));
 
         this.mount(
             'externalName',

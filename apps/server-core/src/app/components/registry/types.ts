@@ -23,7 +23,8 @@ export type RegistryProjectUnlinkPayload = {
 };
 
 export type RegistryProjectRelinkPayload = RegistryProjectUnlinkPayload & {
-    id: RegistryProject['id']
+    id: RegistryProject['id'],
+    targetExternalName: RegistryProject['externalName']
 };
 
 export type RegistryEventMap = ObjectLiteralKeys<{

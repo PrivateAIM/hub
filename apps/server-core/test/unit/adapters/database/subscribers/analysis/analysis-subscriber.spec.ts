@@ -155,6 +155,51 @@ describe('AnalysisSubscriber', () => {
     });
 
     describe('afterUpdate', () => {
+        it('skips client lookup for loaded-row status and heartbeat saves with an unchanged client', async () => {
+            const analysisClientService = new FakeAnalysisClientService();
+            const subscriber = new AnalysisSubscriber({ analysisClientService: analysisClientService as unknown as AnalysisClientService });
+
+            for (const entity of [
+                { clientId: 'existing-client', buildProgress: 25 },
+                { clientId: 'existing-client', updatedAt: new Date() },
+            ]) {
+                await subscriber.afterUpdate(createMockUpdateEvent({
+                    entity,
+                    databaseEntity: { id: randomUUID(), clientId: 'existing-client' },
+                }) as any);
+            }
+
+            expect(analysisClientService.getAssignCalls()).toHaveLength(0);
+        });
+
+        it('checks an explicitly changed client', async () => {
+            const analysisClientService = new FakeAnalysisClientService();
+            const subscriber = new AnalysisSubscriber({ analysisClientService: analysisClientService as unknown as AnalysisClientService });
+
+            await subscriber.afterUpdate(createMockUpdateEvent({
+                entity: { clientId: 'new-client' },
+                databaseEntity: { id: randomUUID(), clientId: 'old-client' },
+            }) as any);
+
+            expect(analysisClientService.getAssignCalls()).toHaveLength(1);
+            expect(analysisClientService.getAssignDefaultPermissionsCalls()).toHaveLength(0);
+        });
+
+        it('provisions a client when the binding is explicitly cleared', async () => {
+            const analysisClientService = new FakeAnalysisClientService();
+            const subscriber = new AnalysisSubscriber({ analysisClientService: analysisClientService as unknown as AnalysisClientService });
+            const event = createMockUpdateEvent({
+                entity: { clientId: null },
+                databaseEntity: { id: randomUUID(), clientId: 'old-client' },
+            });
+
+            await subscriber.afterUpdate(event as any);
+
+            expect(analysisClientService.getAssignCalls()).toHaveLength(1);
+            expect(analysisClientService.getAssignCalls()[0].entity.id).toBe(event.databaseEntity.id);
+            expect(analysisClientService.getAssignDefaultPermissionsCalls()).toHaveLength(0);
+        });
+
         it('should call analysisClientService.assign with merged entity', async () => {
             const analysisClientService = new FakeAnalysisClientService();
             const subscriber = new AnalysisSubscriber({ analysisClientService: analysisClientService as unknown as AnalysisClientService });

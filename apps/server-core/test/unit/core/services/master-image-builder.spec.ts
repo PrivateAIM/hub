@@ -47,6 +47,48 @@ describe('MasterImageBuilderService', () => {
         };
     }
 
+    it.each([null, ...Object.values(ProcessStatus)])('applies events only to active status %s', async (status) => {
+        const active = status === ProcessStatus.STARTING || status === ProcessStatus.STARTED;
+        const cases = [
+            {
+                event: MasterImageBuilderEvent.EXECUTION_STARTED,
+                status: ProcessStatus.STARTED,
+                progress: 0,
+            },
+            {
+                event: MasterImageBuilderEvent.EXECUTION_PROGRESS,
+                status,
+                progress: 40,
+            },
+            {
+                event: MasterImageBuilderEvent.EXECUTION_FAILED,
+                status: ProcessStatus.FAILED,
+                progress: 20,
+            },
+            {
+                event: MasterImageBuilderEvent.EXECUTION_FINISHED,
+                status: ProcessStatus.EXECUTED,
+                progress: 100,
+            },
+        ];
+
+        for (const testCase of cases) {
+            const image = seedImage({ buildStatus: status, buildProgress: 20 });
+            const saved = await service.applyEvent(testCase.event, createProgressPayload(image.id, 40));
+            const stored = await imageRepository.findOneById(image.id);
+
+            if (active) {
+                expect(saved).not.toBeNull();
+                expect(stored?.buildStatus).toBe(testCase.status);
+                expect(stored?.buildProgress).toBe(testCase.progress);
+            } else {
+                expect(saved).toBeNull();
+                expect(stored?.buildStatus).toBe(status);
+                expect(stored?.buildProgress).toBe(20);
+            }
+        }
+    });
+
     it('should apply progress to a running build', async () => {
         const image = seedImage({ buildStatus: ProcessStatus.STARTED, buildProgress: 20 });
 
