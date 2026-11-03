@@ -19,17 +19,17 @@ docs/src/
 ├── index.md                 # Landing page
 ├── getting-started/         # Overview, architecture
 ├── guide/
-│   ├── user/                # Projects, analyses, realms, nodes, approval
-│   ├── deployment/          # Config, Docker, K8s, reverse proxy
-│   └── development/         # Setup, repo structure, API, contributing
-├── reference/               # Services + packages (grouped by service area)
+│   ├── user/                # Projects, analyses, approval, nodes, realms
+│   ├── deployment/          # Configuration, Docker, Docker Compose, Kubernetes, reverse proxy
+│   └── development/         # Contributing, setup, repository structure, API, camelCase migration
+├── reference/               # index.md + per service area (service index.md + its packages)
 │   ├── shared/              # kit, server-kit, server-db-kit, server-http-kit
-│   ├── core/                # server-core service + core-kit, core-http-kit, core-realtime-kit
+│   ├── core/                # server-core + core-kit, core-http-kit, core-realtime-kit
 │   ├── worker/              # server-core-worker + server-core-worker-kit
 │   ├── storage/             # server-storage + storage-kit, server-storage-kit
 │   ├── telemetry/           # server-telemetry + telemetry-kit, server-telemetry-kit
-│   ├── messenger/           # server-messenger + messenger-kit, server-realtime-kit
-│   └── frontend/            # client-ui + client-vue
+│   ├── messenger/           # server-messenger + messenger-kit, messenger-http-kit, server-realtime-kit
+│   └── frontend/            # client-ui + client-vue, client-vue-theme
 ├── about/team.{md,vue}      # Team page
 └── public/images/           # UI screenshots and architecture diagram
 ```

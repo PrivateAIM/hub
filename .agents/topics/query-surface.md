@@ -4,19 +4,70 @@ Read before changing a rapiq schema (allow-lists, indexes), the depth bound of q
 
 ## rapiq v2 + authup beta.54 Follow-ups
 
-~~rapiq v2 + authup beta.54 Follow-ups~~ — Complete (post-migration cleanup for the #1758/#1760/#1761 two-PR stack). `build:types` runs in CI as part of every package's `build`; client-ui's is `nuxi typecheck`. The filter-helper rule is in [conventions.md](../conventions.md#query-filters), enforced by ESLint. Left open, deliberately: the `Schema<any>[]` registries (`core/query/module.ts` in server-core/storage/telemetry, `describe.ts` in server-kit) — rapiq's `Schema<T>` is invariant, so a heterogeneous array has no non-`any` type until rapiq ships an existential `AnySchema`; and the repo-wide `strict: true` migration. **The depth-3 rapiq bound is permanent.** rapiq#821 was closed as completed on 2026-07-24 (before the beta.13 hub already shipped), but the bound is not a workaround for it: `@authup/client-web-kit` still declares `EntityListQueryInput<T> = QueryInput<T> | IQuery` with `QueryInput<T> = QueryBuildInput<T, 3>` (re-verified at authup `1.0.0-beta.62`; hub is on rapiq 2.2.0 as of 2026-08-18), and states the reason as a standing design decision — the library default (depth 5) explodes TypeScript's inferred-type serialization for **self-recursive** entities, and UI queries never address more than three relation segments. Hub must keep `<T, 3>` to stay assignable across that boundary; widening hub alone would reintroduce the TS7056 emit failure *and* create a variance mismatch against authup's components.
+- **The depth-3 bound on query inputs is permanent** (`QueryBuildInput<T, 3>` in
+  client-vue). `@authup/client-web-kit` declares
+  `EntityListQueryInput<T> = QueryInput<T> | IQuery` with
+  `QueryInput<T> = QueryBuildInput<T, 3>` as a design decision: rapiq's default
+  depth 5 explodes TypeScript's inferred-type serialization for self-recursive
+  entities, and UI queries never use more than three relation segments. Widening
+  hub alone brings back the TS7056 emit failure and a variance mismatch against
+  authup's components. It is not a workaround for rapiq#821.
+- The `Schema<any>[]` registries (`entitySchemas` in each service's
+  `core/query/module.ts`, the cache in server-kit's `core/query/describe.ts`) stay
+  `any`: rapiq's `Schema<T>` is invariant, so a heterogeneous array has no other
+  type until rapiq ships an existential `AnySchema`.
+- Filters with operators use the typed helpers; see
+  [conventions.md](../conventions.md#query-filters) (ESLint-enforced).
 
 ## Indexed query surface + schema drift gate (#1842, #1823)
 
-Indexed query surface + schema drift gate (#1842, #1823) — Implemented. All 15 rapiq entity schemas (12 server-core, 2 server-storage, 1 server-telemetry) declare `indexes` and opt into the indexed policies, backed by real DDL, and a typeorm-extension drift gate joins the migration CI for all four server apps. What is not obvious from the diff:
-
-- **`indexes` declares the QUERY SURFACE, not the table.** Every sequence is property-name-spelled and a leftmost prefix of a real PK/unique/`@Index`; entity indexes whose leading column is not queryable (nodes' `(externalName, registryId)` unique, events' `(expiring, expiresAt)` sweep index) are deliberately not declared. The invariant — every `filters.allowed`/`sorts.allowed` key LEADS a declared sequence — is enforced per service in `schema-entity-parity.spec.ts` via `collectNonLeadingQueryKeys` (new `@privateaim/server-test-kit` export), with authup-style anti-vacuity guards (the allow-lists are read off `describe()` output, pinned per schema, and asserted non-empty — a renamed description key must surface as offenders, not skip the loops) and, in server-storage, a negative control pinning rapiq's `SchemaEntityIndexMismatchError` so the not-to-throw assertions are proven to run against a rapiq that actually checks indexes. Wire-visible: `meta.schema` now carries the real sequences plus `filters.indexed: 'anchor'` / `sorts.indexed: true`, and new HTTP probe specs (`test/unit/http/*query-surface.spec.ts`) pin every advertised filter/sort key → 200 and a disallowed key → 400 per service. **Standing rule: a key added to any allow-list needs its backing entity index + migration in the same change** — the parity spec fails otherwise. See [database.md](database.md#column-naming).
-- **Backing DDL**: 58 single-column indexes in server-core (`1788410000000-QueryIndexes`, both dialects), 13 in server-storage (`1788420000000-QueryIndexes`), and one `events(created_at)` index in server-telemetry, folded into the still-unreleased `1788220800000-EventWidenIpAddressAndRebuildIndexes` as the window's consolidation step (it briefly existed as its own `1788430000000-EventCreatedAtIndex`; anyone who executed a pre-fold file must drop their dev DB or fix its `migrations` table by hand). Eight server-core indexes land on FK columns whose implicit InnoDB index the new explicit index displaces (InnoDB silently drops the implicit one on creation, so a plain `DROP INDEX` in `down()` would fail with "needed in a foreign key constraint", non-transactionally). The mysql `down()` therefore RENAMES those eight back to the constraint's own name (`ALTER TABLE … RENAME INDEX` — metadata-only, legal while the constraint is live) instead of dropping them: the foreign key is never dropped, so there is no orphan window and nothing is re-added unvalidated. An earlier drop/re-add design under `SET FOREIGN_KEY_CHECKS=0` was replaced for exactly that reason — a checks-off `ADD FOREIGN KEY` does not validate existing rows, so any row orphaned by writes while the constraints were absent would sit permanently behind a constraint the database reports as satisfied.
-- **Postgres migrations commit per migration** (`migrationsTransactionMode: 'each'` in server-db-kit's `DataSourceOptionsBuilder`): under the previous `'all'`, every pending migration fused into ONE postgres transaction, so AlignAnalysesConstraintNames' ACCESS EXCLUSIVE lock on `analyses` (taken by its first `RENAME CONSTRAINT`) would have been held across QueryIndexes' entire 58-index build — blocking reads on the busiest table for the whole window at pod boot, for a duration scaling with the operator's data. `'each'` keeps every postgres migration atomic on its own and releases each migration's locks at its own commit; MySQL auto-commits DDL statement by statement regardless, so `'all'` never bought it anything.
-- **Write-cost trade-off, accepted and recorded**: the invariant forces an index onto every allow-listed key, so some indexes land on low-cardinality or write-hot columns no known query uses (`analyses.configuration_locked`, `analysis_bucket_files.root`, the storage tables' two `actor_type` columns). Accepted over another round of breaking allow-list narrowing; narrowing those allow-lists — and dropping the indexes with them — remains open as a follow-up.
-- **Telemetry event filters NARROWED** — `createdAt`/`updatedAt` removed — and that is a fix, not collateral: both are datetime columns behind `dateToISOStringTransformer`, and transformers apply on read, never to WHERE binds, so such filters compared an ISO string against the driver's native storage format and matched wrong rows *silently*. An expression-dialect filter on them now 400s; the bracket form drops silently. This deliberately diverges from authup, whose event schema keeps `createdAt` filterable despite the same TIMESTAMP+transformer shape — checked: there is **no** storage difference excusing it, so the divergence reads as an authup-side exposure to the same trap, not a hub-side quirk. Event sorts narrowed to `createdAt` only: events are append-only since #1866, so `updatedAt` always equals `createdAt` — a redundant ordering. `expiresAt` is excluded for a different reason: it is not `createdAt` plus a fixed window in general (an explicit publisher `expiresAt`, or `expiring: false`, wins over the auto-stamped default, and `EVENT_RETENTION_DAYS=0` disables the window entirely — see item 21 above), and no declared `indexes` sequence leads it, so allow-listing it would fail the parity spec's leading-key invariant. `sorts.default: { createdAt: 'DESC' }` is the soft-failure floor: sorts fail SOFT, so a dropped or no-longer-allowed sort parameter now degrades to newest-first (the admin events page's order) instead of to no ordering at all.
-- **The masterImage sorts allow-list was WIDENED, and that fixes a real bug**: the schema declared only `sorts: { default: { path: 'ASC' } }`, so the derived allow-list was `['path']` and the `virtualPath` sort client-vue's FMasterImages has been requesting was silently dropped all along — now explicit (`['name', 'path', 'virtualPath', 'createdAt', 'updatedAt']`). masterImageGroup, which declared no sorts at all (under `strict`, every requested key rejected), got the same explicit list. In the other direction, `analysis` filters lost `description`: a `text` column, unindexable under MySQL utf8mb4's 3072-byte key bound, and nothing in client-vue/client-ui ever filtered on it.
-- **#1823 root cause: a `RENAME TABLE` carries every constraint name over, but typeorm hashes them from table + column names.** Two renames (`analysis_entity` → `analysis` → `analyses`) left seven stale hashes, so every `migration generate` opened with spurious drop/recreates. `1788400000000-AlignAnalysesConstraintNames` (both dialects) renames them: 4 indexes via `RENAME INDEX` (MySQL) / `ALTER INDEX … RENAME` (postgres); the 3 FKs via drop+re-add on MySQL (no `RENAME CONSTRAINT` there), wrapped in `SET FOREIGN_KEY_CHECKS=0` with a `finally` restore — the setting is per-session and the connection returns to the pool on failure. Postgres renames the FKs directly. The rule is now in conventions.md: a table rename must re-derive every constraint name, or let `migration generate` write the DDL.
-- **The drift gate is what keeps #1823 fixed**: `scripts/assert-schema-drift.mjs` in all four server apps (`npm run test:schema-drift`; adapted from authup) wraps typeorm-extension's `assertSchemaMatchesMetadata` with `skipWithoutMigrations: true` and catches only `SchemaDriftError`, and `tests-migrations` runs it as a new step after the idempotency replay. The migration chain and the entity metadata are two independent descriptions of one schema, and nothing compared them before — the suites `synchronize()` from the entities. authup's populated round-trip (`verify-latest-migration.mjs`) was deliberately NOT ported: it boots the real app for seeding, which needs per-service infrastructure the migration job lacks (Authup at minimum — the job provides databases only). It round-trips only the NEWEST migration, so the telemetry IPv6-lossy `down()` deeper in the chain is no obstacle — recorded as an open follow-up in [database.md](database.md#migration-tests).
-
-Verified: full round-trip (`run` → `revert` × N → `run`) plus drift gate green on all four services × mysql/postgres; all three service suites green; build green.
+- **`indexes` declares the query surface, not the table.** Each sequence is
+  property-name-spelled and a leftmost prefix of a real PK/unique/`@Index`.
+  Entity indexes whose leading column is not queryable (nodes'
+  `(externalName, registryId)`, events' `(expiring, expiresAt)`) are not declared.
+  Schemas opt into `filters.indexed` (anchor mode) and `sorts.indexed`.
+- **Every `filters.allowed` / `sorts.allowed` key must lead a declared
+  sequence**, so a key added to an allow-list needs its backing entity index and
+  migration in the same change. Each service's `schema-entity-parity.spec.ts`
+  checks this with `collectNonLeadingQueryKeys` (`@privateaim/server-test-kit`).
+  A key that leads nothing makes rapiq reject the filter (400) or drop the sort
+  silently. See [database.md](database.md#column-naming).
+- Accepted write cost: the invariant puts indexes on low-cardinality columns no
+  known query uses (`analyses.configuration_locked`,
+  `analysis_bucket_files.root`, the storage `actor_type` columns). Narrowing
+  those allow-lists, and dropping the indexes, is an open follow-up.
+- **Never allow-list a filter on a `dateToISOStringTransformer` column.**
+  Transformers do not apply to WHERE binds, so the filter compares an ISO string
+  against the native format and silently matches wrong rows. The event schema
+  therefore filters no timestamps; authup's event schema keeps `createdAt`
+  filterable and has the same exposure. Sorting on them is fine.
+- Event sorts allow `createdAt` only (events are append-only, so `updatedAt`
+  equals it; `expiresAt` leads no index). `sorts.default: { createdAt: 'DESC' }`
+  is the floor sorts fall back to, since a rejected sort fails soft.
+- Every schema states its sort allow-list explicitly: under `strict`, a schema
+  with only `sorts.default` allows just the default key and drops the rest.
+- A `text` column (`analyses.description`) is not filterable: MySQL utf8mb4
+  cannot index it within the 3072-byte key bound.
+- **MySQL `down()` must not drop an explicit index on an FK column.** Creating it
+  makes InnoDB drop the implicit FK index, so `DROP INDEX` then fails
+  non-transactionally. Rename it back to the constraint's name instead
+  (`ALTER TABLE … RENAME INDEX`). Do not drop and re-add the FK under
+  `SET FOREIGN_KEY_CHECKS=0`: a checks-off `ADD FOREIGN KEY` does not validate
+  existing rows. When a FK must be dropped and re-added (MySQL has no
+  `RENAME CONSTRAINT`), restore `FOREIGN_KEY_CHECKS` in a `finally`, since the
+  pooled connection keeps the session setting.
+- **Postgres migrations run with `migrationsTransactionMode: 'each'`**
+  (server-db-kit `DataSourceOptionsBuilder`). With `'all'`, every pending
+  migration shares one transaction and holds each lock (e.g. ACCESS EXCLUSIVE on
+  `analyses`) until the whole chain commits at boot.
+- **A table rename must re-derive every constraint name** (#1823): typeorm hashes
+  them from table and column names, a rename keeps the old strings, and every
+  later `migration generate` then emits spurious drops. See
+  [database.md](database.md#database-migrations).
+- **The drift gate** (`scripts/assert-schema-drift.mjs` in all four server apps,
+  `npm run test:schema-drift`, run by the `tests-migrations` CI job) compares the
+  migrated schema with the entity metadata, which nothing else does: the suites
+  `synchronize()` from the entities. authup's populated round-trip
+  (`verify-latest-migration.mjs`) is not ported, because it boots the real app,
+  which needs Authup and other infrastructure the migration job lacks. See
+  [database.md](database.md#migration-tests).

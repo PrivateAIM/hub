@@ -55,9 +55,9 @@ Source: [`.agents/conventions.md` § Database Migrations](https://github.com/aut
 
 **Hub mapping:** same layout — `apps/<service>/src/adapters/database/migrations/{mysql,postgres}/`,
 same sqlite carve-out (`migrations: []`, boot falls back to `synchronize()`), and the
-same round-trip check is already documented in [testing.md](../testing.md#migration-tests)
+same round-trip check is already documented in [testing.md](../topics/database.md#migration-tests)
 and run by the `tests-migrations` CI job. See
-[conventions.md § Database Migrations](../conventions.md#database-migrations).
+[conventions.md § Database Migrations](../topics/database.md#database-migrations).
 
 **Hub divergence:** hub allows several changes to share one migration file, where
 authup keeps them strictly one-per-feature until release-time squashing. Hub's
@@ -152,4 +152,4 @@ Both repos keep the fake a **real subclass**, which matters for the
 **Do NOT port:** authup's rule that `interface` is reserved for class-implemented
 contracts (hub's core-kit domain entities are bare `interface`s), nor its
 dependency-classification rule forbidding internal packages in
-`peerDependencies` (see [conventions.md](../conventions.md#dependency-classification)).
+`peerDependencies` (see [conventions.md](../topics/dependencies.md#dependency-classification)).

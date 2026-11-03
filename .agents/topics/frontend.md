@@ -36,14 +36,9 @@ also narrowing `EntityID<RECORD> | null | undefined` for the `getOne` call. Only
 `nuxi typecheck` (Nuxt 4 strict, via client-ui's `build:types`) catches losing
 that; the repo itself builds at `strict: false`.
 
-Why this matters: the failure is silent and looks like a working page. A detail
-page whose route param stopped resolving rendered — and permitted edit and delete
-of — the first row in scope, which is how a registry project's Harbor robot
-`accountSecret` ended up in a form belonging to a different record.
-
-`packages/client-vue/test/unit/core/entity-manager.spec.ts` pins every branch, and
-`test/unit/components/f-master-image-picker.spec.ts` pins the create-mode path on a
-real form component.
+The failure is silent and looks like a working page: a detail page whose route
+param stops resolving renders, and permits edit and delete of, the first row in
+scope.
 
 ## Icons
 
@@ -71,10 +66,9 @@ The same applies to `packages/client-vue` and `packages/client-vue-theme`: they
 are scanned as source, and they are published, so a consuming app's scanner sees
 exactly the same literals.
 
-Both halves fail **silently** — an unmatched glob or a composed name yields an
-empty icon slot, not a build error. `apps/client-ui/test/unit/icon-bundle.spec.ts`
-guards the glob list by pinning one uniquely-attributable icon per scanned
-source; it drives the real plugin, so it needs no build output.
+Both halves fail **silently**: an unmatched glob or a composed name yields an
+empty icon slot, not a build error. A new scanned source needs an icon assertion
+in `apps/client-ui/test/unit/icon-bundle.spec.ts`.
 
 ## Component Tests (client-vue)
 
@@ -115,9 +109,8 @@ Things the harness handles, and why they matter:
   `VCIcon` that `@vuecs/button` imports directly (a global `components`
   registration does not).
 - **`realtime` is omitted** by default, so `installSocketManager` is skipped.
-  Pass `{ realtime: true }` as the harness's fourth argument to opt in —
-  `test/unit/core/realtime-gate.spec.ts` pins both sides of that gate,
-  because a consumer that forgets the option loses realtime SILENTLY.
+  Pass `{ realtime: true }` as the harness's fourth argument to opt in; a
+  consumer that forgets the option loses realtime SILENTLY.
 
 Cross-package test imports resolve through `dist`, so the kits must be built
 first. `nx.json`'s `test: { dependsOn: ["^build"] }` handles that for
@@ -126,19 +119,15 @@ cold tree does not.
 
 ## Build-Config Tests (client-ui)
 
-`apps/client-ui/test/` is a plain node vitest config with no plugins — it
-renders nothing. Its one suite, `unit/icon-bundle.spec.ts`, guards the icon
-subset the app ships (see [conventions.md](#icons)) by pinning one
-uniquely-attributable icon per scanned source, so removing any glob fails
-exactly one assertion.
+`apps/client-ui/test/` is a plain node vitest config with no plugins. Its suite
+`unit/icon-bundle.spec.ts` guards the shipped icon subset (see [Icons](#icons))
+with one uniquely-attributable icon per scanned source.
 
-It drives the real `@nuxt/icon` plugin object — `load('\0virtual:nuxt-icon-bundle')`
-runs the whole scan → resolve → generate path by itself — rather than reading a
-built bundle. That is deliberate: CI's build cache carries only `**/dist/**` and
-`.nx`, so `apps/client-ui/.output` does **not** survive into the test job, and a
-spec asserting against it would either fail or need extra cache plumbing.
-Asserting a rendered page cannot work at all — `@iconify/vue` resolves icons
-client-side, so SSR output carries empty `<svg>` shells either way.
+It drives the real `@nuxt/icon` plugin (`load('\0virtual:nuxt-icon-bundle')`)
+rather than a built bundle: CI's build cache carries only `**/dist/**` and `.nx`,
+so `apps/client-ui/.output` is absent in the test job. A rendered page cannot be
+asserted either: `@iconify/vue` resolves icons client-side, so SSR output holds
+empty `<svg>` shells.
 
 Note `nuxi typecheck` (client-ui's `build:types`) **does** cover `test/**` under
 Nuxt 4 strict, unlike every other workspace, whose `tsconfig.build.json` includes
@@ -146,16 +135,14 @@ Nuxt 4 strict, unlike every other workspace, whose `tsconfig.build.json` include
 
 ## SSR hydration handoff (#1805)
 
-SSR hydration handoff (#1805) — Implemented (what the server render fetched now reaches the browser instead of being discarded). client-ui runs `ssr: true`, but every detail page fetched its record **twice**, and a list's initial load ran in a detached microtask that resolved *after* the HTML was flushed — the server paid for the request and shipped an empty list anyway. The seam is `@authup/client-web-kit`'s hydration store, provided by `@authup/client-web-nuxt`'s kit plugin over `nuxtApp.payload.data` (both already dependencies at beta.63 — **no authup bump**). Hub adds **no install option and no plugin**: `createListRaw` calls `injectHydrationStore()` and no-ops when it returns `undefined`, so a host without one skips the server-side load entirely rather than rendering rows the hydrating client cannot reproduce. Four things in it are not obvious:
+client-ui runs `ssr: true`. Lists and detail records fetched during the server render reach the browser through `@authup/client-web-kit`'s hydration store (provided by `@authup/client-web-nuxt` over `nuxtApp.payload.data`). Hub adds no plugin or install option: `createListRaw` (`packages/client-vue/src/core/list/module.ts`) calls `injectHydrationStore()` and skips the server-side load when it returns `undefined`, so it never renders rows the client cannot reproduce.
 
-- **The list key is `flame:list:<type>:${useId()}`, never the query.** A query-derived key has to be re-derived *identically* on the client, which makes filter insertion order, a `query` prop assembled from store state that is not populated yet on one side, and two same-query lists on one page all load-bearing — and each of those fails **silently**, as a list that simply fetches twice again. Vue 3.5's `useId` is stable per component-tree position across the boundary, so agreement is structural rather than something a caller can get wrong. The entity type is in the key only to bound the blast radius of an entry that is recorded but never adopted.
-- **`onServerPrefetch` is registered on BOTH sides, and that is load-bearing.** A non-empty `instance.sp` is what makes Vue call `markAsyncBoundary()` after setup, giving the component's subtree a fresh `useId` counter; `instance.sp` is read in exactly two places (`runtime-core`'s boundary check and `@vue/server-renderer`, the only invoker). Registering the hook only under `isServerRuntime()` marks the boundary only on the server, so every `useId()` inside or after a list shifts between renders — a second same-type list then derives the key the server used for the FIRST one and adopts the wrong rows, with its own load suppressed so it never corrects. `list-hydration.spec.ts`'s two-list round trip is the negative control; it fails the moment the registration is moved back inside the server branch.
-- **The composed `query` travels in the snapshot.** `query` is assigned nowhere but inside `load()`, which the adopting client skips, and the socket handler reads its sorts to decide whether a realtime-created entity belongs at the top of a full first page. Without it, realtime inserts stop silently on every hydrated list (a ≥10-row list on `/projects`, `/projects/in`, `/admin/nodes`, …) until the user pages or searches.
-- **A collection query must not request a permission-gated column any more.** The list's rows now reach the payload, i.e. the served HTML document. `fields: ['+accountSecret']` was dropped from the registry-projects list: nothing there rendered it (the details modal re-resolves by id with its own `+accountSecret`), so it was pure over-fetch that would have put every Harbor robot secret into the document.
-- **Only a load that ran to completion may be recorded.** An adopted snapshot *suppresses* the client's own load, so recording what a failed — or coalesced-away — load left behind strands the list on it with no retry. The `loaded` flag set at the end of `load()`'s try block is the enforcement point: `onServerPrefetch` awaits `load()` in a try/catch and records nothing unless it is set. `onServerPrefetch` is also what makes the renderer **wait**, which puts a list's upstream latency on the SSR critical path — the nine `[id].vue` detail pages already blocked SSR by awaiting in `setup()`, so this is not a new class of dependency.
-- **`useAsyncData` needs `deep: true`.** Nuxt 4 returns a `shallowRef`, and every one of the nine pages mutates its entity **per property** (`updateObjectProperties` does `src.value[key] = …`, or `extendObject`), so without it the page silently stops updating after a save. `useEntityRecord` centralises it. A second Nuxt trap sits next to it: 4.5.2's `asyncData.js` **defers** `initialFetch` to `onBeforeMount` during hydration when the payload holds no entry for the key, so `await useAsyncData(...)` can resolve with `data.value === undefined` **and** `error.value === null` — a guard of the form `if (error.value || !data.value) redirect` therefore bounces a page that is merely late.
-- **No authenticated route may get an `swr` or `isr` route rule** — the payload is per-request, and a cached one would be served to the wrong session. `apps/client-ui/nuxt.config.ts` declares exactly one route rule, `'/login/callback': { ssr: false }`.
+- **The list key is `flame:list:<type>:${useId()}`, never the query.** A query-derived key must be re-derived identically on the client (filter order, store state not yet populated, two same-query lists), and every mismatch fails silently as a double fetch. `useId` agrees by tree position.
+- **`onServerPrefetch` is registered on both sides.** A non-empty `instance.sp` makes Vue call `markAsyncBoundary()`, which resets the subtree's `useId` counter. Registering it only under `isServerRuntime()` shifts every later `useId()` between renders, so a second same-type list adopts the first one's rows and never corrects.
+- **The composed `query` travels in the snapshot.** The adopting client skips `load()`, the only place `query` is assigned, and the socket handler reads its sorts to place realtime inserts; without it realtime inserts silently stop.
+- **Only a completed load is recorded** (the `loaded` flag). An adopted snapshot suppresses the client's load, so recording a failed or coalesced-away load strands the list with no retry.
+- **A collection query must not request a permission-gated column** (e.g. `+accountSecret`): its rows land in the served HTML payload. Resolve secrets per record.
+- **Detail pages use `useEntityRecord`** (`apps/client-ui/composables/entity-record.ts`), never a bare `useAsyncData`. It sets `deep: true` (Nuxt 4 returns a `shallowRef`, and pages mutate the entity per property, so a shallow ref silently stops updating after a save) and `immediate: false` (otherwise Nuxt can defer the fetch to `onBeforeMount` during hydration, resolving with both `data` and `error` empty, so a `!data.value` redirect guard bounces a page that is merely late).
+- **No authenticated route may get an `swr` or `isr` route rule**: the payload is per-request, and a cached one reaches the wrong session. `apps/client-ui/nuxt.config.ts` declares only `'/login/callback': { ssr: false }`.
 
-One consequence is accepted rather than fixed: list rows now render on the server, which puts `<VCTimeago>` on both sides of the boundary for the first time. It computes a relative string during `setup()`, so a bucket crossing between render and hydration — or clock skew — is a text mismatch, and Vue `console.error`s those in production builds too. Vue repairs the text; the cost is console noise on list pages and one more thing to rule out when debugging a real mismatch. The fix belongs upstream in `@vuecs/timeago` (SSR-stable first render, relative string in `onMounted`).
-
-Deliberately **not** done: records resolved by `createEntityManager` (a separate producer, tracked as a follow-up issue) and the pages that `await getMany` rather than a record (`pages/projects/[id].vue`, `pages/projects/index/in.vue`, `pages/admin/services/registry/index/client.vue`). Documented in [reference/frontend](../../docs/src/reference/frontend/index.md#server-rendering-and-hydration).
+Accepted: `<VCTimeago>` computes its relative string in `setup()`, so a bucket boundary or clock skew between render and hydration logs a text mismatch; the fix belongs upstream in `@vuecs/timeago`. Not hydrated: records resolved by `createEntityManager` and pages that `await getMany` directly. See [reference/frontend](../../docs/src/reference/frontend/index.md#server-rendering-and-hydration).
