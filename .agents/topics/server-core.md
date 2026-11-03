@@ -69,8 +69,8 @@ apps/server-core/src/
 | ComponentsModule | `components` | `database`, `analysis`, `messageBus` | `RegistryComponentDispatcher` (bus dispatch, in-process only without a bus); starts the registry consumer and the node-client and analysis-reconciler scheduled components, stops them on teardown |
 | AnalysisModule | `analysis` | `database` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
-| AggregatorsModule | `aggregators` | `database`, `components`, `analysis` | nothing (starts AMQP event consumers, stops them on teardown) |
-| HTTPModule | `http` | `config`, `database`, `analysis`, `telemetryClient`? | `App`, `Server`, `Router` |
+| AggregatorsModule | `aggregators` | `database`, `components`, `analysis`, `messageBus` | nothing (starts AMQP event consumers, stops them on teardown) |
+| HTTPModule | `http` | `config`, `database`, `analysis`, `messageBus`, `telemetryClient`?, `authupClient`?, `components`? | `App`, `Server`, `Router` |
 | TelemetryClientModule | `telemetryClient` | `config`, `authupHook`? | `TelemetryClient` |
 
 `?` marks an **optional** dependency (`{ name, optional: true }`) — the module still

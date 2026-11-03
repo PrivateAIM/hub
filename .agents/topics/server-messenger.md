@@ -70,7 +70,7 @@ apps/server-messenger/src/
 | DatabaseModule | `database` | none | `DataSource`, `MessageRepository` |
 | WakeupModule | `wakeup` | `config`, `redis`? | `WakeupInjectionKey` |
 | SweeperModule | `sweeper` | `database` | nothing (scheduled component expiring stored messages; started in `setup`, stopped in `teardown`) |
-| HTTPModule | `http` | `config`, `database`, `wakeup` | `Server`, `SocketServer` |
+| HTTPModule | `http` | `config`, `database`, `wakeup`, `authupClient`? | `Server`, `SocketServer` |
 
 server-messenger is **not** a database-less relay:
 the durable mailbox (#1715) gives it a `DataSource` + `MessageRepository`,

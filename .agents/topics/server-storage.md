@@ -59,7 +59,7 @@ apps/server-storage/src/
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | `entityEvent`? | `DataSource` |
 | StorageModule | `storage` | `config` | `IStorageAdapter` (`MinioStorageAdapter` or `FsStorageAdapter`) |
-| ComponentsModule | `components` | `storage`, `database` | nothing (starts bucket + bucket-file consumers, stops them on teardown) |
+| ComponentsModule | `components` | `storage`, `database`, `messageBus` | nothing (starts bucket + bucket-file consumers, stops them on teardown) |
 | HTTPModule | `http` | `config`, `database`, `storage` | `Server`, `Router` |
 
 The storage backend is a **port**, not a hard-wired MinIO client: `StorageModule`

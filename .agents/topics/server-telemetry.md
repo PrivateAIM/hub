@@ -86,7 +86,7 @@ apps/server-telemetry/src/
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | `entityEvent`? | `DataSource` |
 | VictoriaLogsModule | `victoriaLogs` | `config` | `VictoriaLogsClient`, `LogStore` |
-| ComponentsModule | `components` | `database`, `victoriaLogs` | nothing (starts event + log consumers and the event-cleaner scheduled component, stops them on teardown) |
+| ComponentsModule | `components` | `config`, `database`, `victoriaLogs`, `messageBus` | nothing (starts event + log consumers and the event-cleaner scheduled component, stops them on teardown) |
 | HTTPModule | `http` | `config`, `database`, `victoriaLogs` | `Server`, `Router` |
 
 ## Telemetry event hardening (#1745, back-port of authup's event-log improvements)

@@ -64,7 +64,7 @@ All `@authup/*` packages now require beta.68; related Vue/Vuecs floors and rapiq
 2.4 are aligned. HTTP and socket authorization read one `GET /authorization`
 catalog per request/connection with the service credential and preserve complete
 introspection grants through `createAuthorizationEvaluator`. See
-[architecture.md](#authorization-catalog) and
+[Authorization catalog](#authorization-catalog) and
 [deployment configuration](../../docs/src/guide/deployment/configuration.md#authup-upgrade-to-beta-68)
 for credential requirements and the boundary between pre-checks and row policies.
 Policy-free introspection does not make `compile()` a no-op in this wiring;

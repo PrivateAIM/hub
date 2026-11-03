@@ -160,8 +160,8 @@ index backs, and `collectNonLeadingQueryKeys` rejects an allow-listed
 filter/sort key that leads no declared sequence — a key that leads nothing makes
 enforcement reject (filters, a hard 400) or drop (sorts, silently unsorted) a
 query the allow-lists themselves advertise. **Adding a key to any
-`filters.allowed` / `sorts.allowed` therefore requires the backing entity index
-and its migration in the same change** — the parity spec fails otherwise.
+`filters.allowed` / `sorts.allowed` therefore requires a backing entity index
+in the same change, plus its migration when the index is new** — the parity spec fails otherwise.
 
 Never allow-list a filter on a column behind `dateToISOStringTransformer` — the
 timestamp-filter trap. Transformers apply on read, never to WHERE binds, so such
@@ -265,8 +265,8 @@ export DB_TYPE=postgres DB_HOST=127.0.0.1 DB_PORT=5432 \
        DB_USERNAME=postgres DB_PASSWORD=start123 DB_DATABASE=app
 
 node dist/cli/index.mjs migration run
-node dist/cli/index.mjs migration revert
-node dist/cli/index.mjs migration run
+node dist/cli/index.mjs migration revert    # repeat once per migration
+node dist/cli/index.mjs migration run       # idempotency replay
 npm run test:schema-drift
 ```
 

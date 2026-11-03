@@ -38,7 +38,7 @@ the worker aggregators) goes through `updateLockedEntity` (`adapters/database/lo
 — `core/` reaches it as `IAnalysisRepository` / `IMasterImageRepository` `.updateLocked(id, fn)`.
 It holds the row with `SELECT … FOR UPDATE` and saves through the transaction manager, so
 subscribers still publish; never replace it with `repository.update()`. `fn` is synchronous
-and returns `true` to save; dispatch to the worker only after it resolves. A CHECK_FINISHED
+and returns `true` to save; dispatch to the worker only after it resolves. better-sqlite3 runs it without a row lock and is not race safe. A CHECK_FINISHED
 verdict whose `checkedAt` predates the locked row's `updatedAt` is dropped — any write
 counts. Every other writer of these rows must not `save()` a copy read earlier either: the
 recalculators apply their derived fields via `saveAnalysisPatch`; `AnalysisService.update` and

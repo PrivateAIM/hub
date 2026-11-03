@@ -30,7 +30,7 @@ Runnable services and the frontend, located in `apps/`.
 |-----------|--------------------------------------|-------------------------------------|
 | `docs`    | VitePress documentation site         | vitepress, vue                      |
 
-See [Conventions — Documentation Site](conventions.md#documentation-site) for docs structure and update guidelines.
+See [Conventions — Documentation Site](conventions.md#documentation-site) for update guidelines and [topics/docs-site.md](topics/docs-site.md) for the docs structure.
 
 ## Packages & Libraries (19)
 

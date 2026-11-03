@@ -66,5 +66,5 @@ apps/server-core-worker/src/
 | CoreClientModule | `coreClient` | `config`, `authupHook`? | nothing (calls `setCoreClient()`) |
 | StorageClientModule | `storageClient` | `config`, `authupHook`? | nothing (calls `setStorageClient()`) |
 | DockerModule | `docker` | none | `DockerInjectionKey` (dockerode client) |
-| ComponentsModule | `components` | `coreClient`, `storageClient`, `docker` | nothing (starts 4 worker components, stops them on teardown) |
+| ComponentsModule | `components` | `coreClient`, `storageClient`, `docker`, `messageBus` | nothing (starts 4 worker components, stops them on teardown) |
 | HTTPModule | `http` | `config` | `Server` (health-check only) |

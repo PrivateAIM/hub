@@ -86,4 +86,4 @@ that short-circuit, keeping enforcement and client-provisioning decoupled.
 
 ## Testcontainers + Always-On Authup
 
-[Testcontainers + Always-On Authup](../plans/015-test-authup-testcontainers.md) — Implemented (server-core/storage/telemetry test suites run against a real Authup + real DB via testcontainers when not externally provided, with **real authorization enforcement** — `dryRun` removed). Shared helpers in `@privateaim/server-test-kit`; Authup provisioning generated from `PermissionName`; CI runs Authup via testcontainers (DB stays a workflow service).
+Testcontainers + Always-On Authup — Implemented (server-core/storage/telemetry test suites run against a real Authup + real DB via testcontainers when not externally provided, with **real authorization enforcement** — `dryRun` removed). Shared helpers in `@privateaim/server-test-kit`; Authup provisioning generated from `PermissionName`; CI runs Authup via testcontainers (DB stays a workflow service).
