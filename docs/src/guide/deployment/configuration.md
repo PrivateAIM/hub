@@ -141,8 +141,11 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
 
 ## Registry project renames
 
-Changing a node's `externalName`, or renaming a registry project directly, queues
-an asynchronous **same-registry** migration. Hub keeps the active registry-project
+Changing a node's `externalName`, or renaming a registry project directly, while
+its registry stays the same, starts a **same-registry** migration. With
+`AMQP_URL` set it is queued and runs asynchronously; without it, server-core runs
+it in-process. Changing a node's `registryId` is not a migration: Hub unlinks the
+old project and provisions a new one on the new registry. Hub keeps the active registry-project
 name, Harbor ID and credentials at the source until it has copied and verified
 the destination and provisioned destination access. Poll the registry-project
 record to observe cutover; the update response still contains the active source
@@ -160,7 +163,11 @@ Before renaming:
    read-only switch. Inventory verification detects changes during copying, but
    it is not a write fence: a push after verification can remain source-only.
    Do not resume writers until the active binding has switched and clients have
-   refreshed their namespace and credentials.
+   refreshed their namespace and credentials. The migration holds the
+   registry-level lock while it copies artifacts, and that lock times out after
+   60 seconds: a node registration, a registry-project create or update, or a node
+   update that synchronizes its registry project on the same registry can wait for
+   that long and then fail with `DatabaseLockError`.
 3. Do not issue link/unlink/delete, registry reassignment, or overlapping rename
    requests during migration. A competing rename is refused once its expected
    source no longer matches; it is not a last-request-wins operation. Retry from
