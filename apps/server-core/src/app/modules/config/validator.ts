@@ -28,6 +28,7 @@ export class ConfigValidator extends TypedContainer<Config> {
 
         this.mount('authupURL', { optional: true }, createValidator(zod.url()));
         this.mount('telemetryURL', { optional: true }, createValidator(zod.url()));
+        this.mount('storageURL', { optional: true }, createValidator(zod.url()));
         this.mount('harborURL', { optional: true }, createValidator(zod.url()));
 
         this.mount('cookiePrefix', { optional: true }, createValidator(zod.string()));
