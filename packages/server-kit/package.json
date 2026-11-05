@@ -48,7 +48,7 @@
         "winston-transport": "^4.9.0"
     },
     "devDependencies": {
-        "@authup/access": "^1.0.0-beta.72",
+        "@authup/access": "^1.0.0-beta.73",
         "@authup/server-test-kit": "^1.0.0-beta.72",
         "@hubwire/test": "^0.1.2",
         "redis-extension": "^2.0.4",
@@ -56,7 +56,7 @@
         "vitest": "^5.0.5"
     },
     "peerDependencies": {
-        "@authup/access": "^1.0.0-beta.72",
+        "@authup/access": "^1.0.0-beta.73",
         "redis-extension": "^2.0.4",
         "typeorm-extension": "^4.3.0"
     },
