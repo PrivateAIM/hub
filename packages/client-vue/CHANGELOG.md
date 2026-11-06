@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-11-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* All workspaces and service deployments now require Node.js >=26.0.0.
+* Node.js >=24.0.0 is required. Import forwarded error helpers from @ebec/core, theme helpers from @authup/client-web-kit-theme, and permission evaluator test helpers from @authup/server-test-kit instead of the PrivateAIM barrels.
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group across 1 directory with 20 updates ([#1997](https://github.com/PrivateAIM/hub/issues/1997)) ([1dc48f8](https://github.com/PrivateAIM/hub/commit/1dc48f8055bb4449e502882a5832d7f26a66b324))
+* **deps:** bump the minorandpatch group with 9 updates ([#2000](https://github.com/PrivateAIM/hub/issues/2000)) ([f393377](https://github.com/PrivateAIM/hub/commit/f393377ef14004e4d015f480faaabfb465a45d8b))
+* harden node authority, build claims and service shutdown ([#1996](https://github.com/PrivateAIM/hub/issues/1996)) ([027d1a0](https://github.com/PrivateAIM/hub/commit/027d1a0b9c761a119d67a0641b5911d837672ade))
+
+
+### Build System
+
+* require Node 26 across workspaces and CI ([3b1989e](https://github.com/PrivateAIM/hub/commit/3b1989eb5bdb44ca91c95092d0de38f8d3700153))
+* upgrade eslint config to v3 and require Node 24 ([652d794](https://github.com/PrivateAIM/hub/commit/652d794c872bf59177512a2a8ad10f26bb5545f1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/core-http-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/core-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/core-realtime-kit bumped from ^0.18.3 to ^0.19.0
+    * @privateaim/kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/storage-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/telemetry-kit bumped from ^0.19.2 to ^0.20.0
+  * peerDependencies
+    * @privateaim/core-http-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/core-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/storage-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/telemetry-kit bumped from ^0.19.2 to ^0.20.0
+
 ## [0.19.2](https://github.com/PrivateAIM/hub/compare/v0.19.1...v0.19.2) (2026-10-27)
 
 

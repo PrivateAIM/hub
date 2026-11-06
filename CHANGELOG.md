@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-11-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* All workspaces and service deployments now require Node.js >=26.0.0.
+* Node.js >=24.0.0 is required. Import forwarded error helpers from @ebec/core, theme helpers from @authup/client-web-kit-theme, and permission evaluator test helpers from @authup/server-test-kit instead of the PrivateAIM barrels.
+
+### Bug Fixes
+
+* **deps-dev:** bump fast-uri from 3.1.6 to 3.1.9 ([#1987](https://github.com/PrivateAIM/hub/issues/1987)) ([08099c6](https://github.com/PrivateAIM/hub/commit/08099c6689b4866e033f9bc0685c2c6c3c1d43b2))
+* **deps-dev:** bump serialize-javascript from 7.1.2 to 7.1.4 ([#1985](https://github.com/PrivateAIM/hub/issues/1985)) ([e5fd935](https://github.com/PrivateAIM/hub/commit/e5fd935103fd0d94cd819940ff2a2b72f2076adb))
+* **deps:** bump github/codeql-action from 4.39.1 to 4.39.2 ([#2015](https://github.com/PrivateAIM/hub/issues/2015)) ([f01a0ce](https://github.com/PrivateAIM/hub/commit/f01a0ced38c09a9cf156b549e01de874df2285db))
+* **deps:** bump tada5hi/monoship from 2.2.0 to 2.2.1 ([#1998](https://github.com/PrivateAIM/hub/issues/1998)) ([128718e](https://github.com/PrivateAIM/hub/commit/128718ecd4cfae427fbee0eef69937ae38a55078))
+* **deps:** bump the minorandpatch group across 1 directory with 20 updates ([#1997](https://github.com/PrivateAIM/hub/issues/1997)) ([1dc48f8](https://github.com/PrivateAIM/hub/commit/1dc48f8055bb4449e502882a5832d7f26a66b324))
+* **deps:** bump the minorandpatch group with 9 updates ([#2000](https://github.com/PrivateAIM/hub/issues/2000)) ([f393377](https://github.com/PrivateAIM/hub/commit/f393377ef14004e4d015f480faaabfb465a45d8b))
+* harden node authority, build claims and service shutdown ([#1996](https://github.com/PrivateAIM/hub/issues/1996)) ([027d1a0](https://github.com/PrivateAIM/hub/commit/027d1a0b9c761a119d67a0641b5911d837672ade))
+* **server-core-worker:** finalize symmetric crypto synchronously ([179beb9](https://github.com/PrivateAIM/hub/commit/179beb9307091596a1e58e6e54719ee46274861c))
+
+
+### Build System
+
+* require Node 26 across workspaces and CI ([3b1989e](https://github.com/PrivateAIM/hub/commit/3b1989eb5bdb44ca91c95092d0de38f8d3700153))
+* upgrade eslint config to v3 and require Node 24 ([652d794](https://github.com/PrivateAIM/hub/commit/652d794c872bf59177512a2a8ad10f26bb5545f1))
+
 ## [0.19.2](https://github.com/PrivateAIM/hub/compare/v0.19.1...v0.19.2) (2026-10-27)
 
 
