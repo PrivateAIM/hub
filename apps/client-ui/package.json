@@ -29,7 +29,7 @@
         "@authup/core-http-kit": "^1.0.0-beta.72",
         "@authup/core-kit": "^1.0.0-beta.72",
         "@authup/i18n": "^1.0.0-beta.72",
-        "@authup/kit": "^1.0.0-beta.72",
+        "@authup/kit": "^1.0.0-beta.73",
         "@iconify-json/fa6-brands": "^1.2.6",
         "@iconify-json/fa6-solid": "^1.2.4",
         "@iconify/vue": "^5.0.4",
