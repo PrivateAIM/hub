@@ -23,6 +23,7 @@ import {
 import { createAuthupTokenVerifier, mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import {
+    AnalysisCommunicationSummaryController,
     AnalysisLogController,
     AnalysisNodeLogController,
     RootController,
@@ -32,6 +33,7 @@ import { AnalysisLogAccessService } from '../../../core/services/analysis-log-ac
 import { AnalysisReachService } from '../../../core/services/analysis-reach/index.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
+import { StorageClientInjectionKey } from '../storage-client/constants.ts';
 import { TelemetryClientInjectionKey } from '../telemetry-client/constants.ts';
 import { createControllers } from './controller.ts';
 import type { HTTPModuleOptions, HTTPServer  } from './types.ts';
@@ -63,6 +65,7 @@ export class HTTPModule implements IModule {
         'analysis',
         MESSAGE_BUS_MODULE_NAME,
         { name: 'telemetryClient', optional: true },
+        { name: 'storageClient', optional: true },
         { name: AUTHUP_CLIENT_MODULE_NAME, optional: true },
         { name: 'components', optional: true },
     ];
@@ -98,6 +101,9 @@ export class HTTPModule implements IModule {
 
         const telemetryClientResult = container.tryResolve(TelemetryClientInjectionKey);
         const telemetryClient = telemetryClientResult.success ? telemetryClientResult.data : undefined;
+
+        const storageClientResult = container.tryResolve(StorageClientInjectionKey);
+        const storageClient = storageClientResult.success ? storageClientResult.data : undefined;
 
         const analysisRepository = container.resolve(DatabaseInjectionKey.AnalysisRepository);
         const analysisNodeRepository = container.resolve(DatabaseInjectionKey.AnalysisNodeRepository);
@@ -151,6 +157,13 @@ export class HTTPModule implements IModule {
                     // Telemetry-coupled (DI-wired instances)
                     new AnalysisLogController({ accessService: analysisLogAccessService, telemetryClient }),
                     new AnalysisNodeLogController({ accessService: analysisLogAccessService, telemetryClient }),
+                    new AnalysisCommunicationSummaryController({
+                        accessService: analysisLogAccessService,
+                        analysisNodeRepository,
+                        analysisBucketRepository: container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
+                        telemetryClient,
+                        storageClient,
+                    }),
 
                     // Workflows
                     RootController,

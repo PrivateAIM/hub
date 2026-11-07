@@ -14,6 +14,7 @@ export type Config = BaseServerConfig & {
     harborURL?: string;
 
     telemetryURL?: string;
+    storageURL?: string;
 
     masterImagesRepository: string;
     masterImagesOwner: string;

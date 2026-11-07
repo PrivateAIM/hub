@@ -27,6 +27,7 @@ import { AggregatorsModule } from './modules/aggregators/index.ts';
 import { AnalysisModule } from './modules/analysis/index.ts';
 import { ComponentsModule } from './modules/components/index.ts';
 import { HarborModule } from './modules/harbor/index.ts';
+import { StorageClientModule } from './modules/storage-client/index.ts';
 import { TelemetryClientModule } from './modules/telemetry-client/index.ts';
 
 export function createApplication() {
@@ -99,6 +100,7 @@ export function createApplication() {
     app = builder.build();
 
     app.addModule(new TelemetryClientModule());
+    app.addModule(new StorageClientModule());
     app.addModule(new HarborModule());
     app.addModule(new ComponentsModule());
     app.addModule(new AnalysisModule());
