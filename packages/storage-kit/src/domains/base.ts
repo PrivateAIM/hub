@@ -36,7 +36,7 @@ export class BaseAPI {
      * segment (`https://host/storage` -> `https://host/<path>`).
      */
     protected resolveURL(path: string) : string {
-        const baseURL = this.client.getBaseURL();
+        const baseURL = this.client.getBaseURL() ?? '';
         const base = baseURL.endsWith('/') ? baseURL : `${baseURL}/`;
 
         return new URL(path, base).href;
