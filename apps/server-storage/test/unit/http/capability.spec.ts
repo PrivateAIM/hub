@@ -207,6 +207,46 @@ describe('capability tokens on bucket and bucket-file routes', () => {
             }
         });
 
+        it('should read a sparse-field file for a bucket capability', async () => {
+            const token = await mint([`bucket:${bucketId}:read`]);
+            const response = await request(`/bucket-files/${fileId}?fields=name`, bearer(token));
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+
+            expect(body.data.name).toBe('capability.json');
+        });
+
+        it('should read a sparse-field file for a file-only capability', async () => {
+            const token = await mint([`bucket-file:${fileId}:read`]);
+            const response = await request(`/bucket-files/${fileId}?fields=name`, bearer(token));
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+
+            expect(body.data.name).toBe('capability.json');
+        });
+
+        it('should refuse a sparse-field file of another bucket', async () => {
+            const token = await mint([`bucket:${bucketId}:read`]);
+            const response = await request(`/bucket-files/${otherFileId}?fields=name`, bearer(token));
+
+            expect(response.status).toBe(403);
+        });
+
+        it('should read a sparse-field bucket for a bucket capability', async () => {
+            const token = await mint([`bucket:${bucketId}:read`]);
+            const response = await request(`/buckets/${bucketId}?fields=name`, bearer(token));
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+
+            expect(body.data.name).toBeDefined();
+        });
+
         it('should refuse a file the capability does not cover', async () => {
             const token = await mint([`bucket:${bucketId}:read`]);
             const response = await request(`/bucket-files/${otherFileId}`, bearer(token));

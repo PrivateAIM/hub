@@ -68,17 +68,32 @@ export class BucketService extends AbstractEntityService implements IBucketServi
     }
 
     async getOne(id: string, query?: Record<string, any>, capability?: StorageCapability): Promise<Bucket> {
+        let lookupId = id;
+
+        if (capability) {
+            // Judged on the stored row by its stored id: `id` may be the
+            // bucket's name, and a projection may lack `id`.
+            const stored = await this.repository.findOneByIdOrName(id);
+
+            if (!stored) {
+                throw new EntityNotFoundError({ entity: 'bucket' });
+            }
+
+            assertCapabilityCoversBucket(capability, stored.id, StorageCapabilityAction.READ);
+
+            if (!query) {
+                return stored;
+            }
+
+            lookupId = stored.id;
+        }
+
         const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: bucketSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
+            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: bucketSchema, parameters: ['fields', 'relations'] }), eq('id', lookupId))).then((r) => r.data[0]) :
             await this.repository.findOneByIdOrName(id);
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'bucket' });
-        }
-
-        // Judged by the stored id: `id` may be the bucket's name.
-        if (capability) {
-            assertCapabilityCoversBucket(capability, entity.id, StorageCapabilityAction.READ);
         }
 
         return entity;

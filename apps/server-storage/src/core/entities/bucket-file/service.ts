@@ -75,22 +75,34 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
             decodeQuery(query, { schema: bucketFileSchema, parameters: ['fields', 'relations'] }) :
             undefined;
 
+        if (capability) {
+            // Coverage is judged on the stored row: the projected one may
+            // lack `id` or `bucketId`.
+            const stored = await this.repository.findOneById(id);
+
+            if (!stored) {
+                throw new EntityNotFoundError({ entity: 'bucket-file' });
+            }
+
+            assertCapabilityCoversBucketFile(capability, stored, StorageCapabilityAction.READ);
+
+            // A file entry covers only that file: the joined bucket row needs
+            // read on the bucket itself, as `GET /buckets/:id` would.
+            if (decoded && this.requestsBucketRelation(decoded)) {
+                assertCapabilityCoversBucket(capability, stored.bucketId, StorageCapabilityAction.READ);
+            }
+
+            if (!decoded) {
+                return stored;
+            }
+        }
+
         const entity = decoded ?
             await this.repository.findMany(appendQueryConditions(decoded, eq('id', id))).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'bucket-file' });
-        }
-
-        if (capability) {
-            assertCapabilityCoversBucketFile(capability, entity, StorageCapabilityAction.READ);
-
-            // A file entry covers only that file: the joined bucket row needs
-            // read on the bucket itself, as `GET /buckets/:id` would.
-            if (decoded && this.requestsBucketRelation(decoded)) {
-                assertCapabilityCoversBucket(capability, entity.bucketId, StorageCapabilityAction.READ);
-            }
         }
 
         return entity;
