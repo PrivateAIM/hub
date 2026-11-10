@@ -43,12 +43,6 @@ export interface IAnalysisAPI extends IEntityAPI<Analysis, AnalysisCreatePayload
     ) : Promise<EntityRecordResponse<Analysis>>;
 
     /**
-     * `responseType: 'stream'` hands back the raw response body. Declared as
-     * `ReadableStream` to match the same operation in `@privateaim/storage-kit`
-     * (`IBucketAPI.stream` / `IBucketFileAPI.stream`) — the established
-     * convention for a stream verb in this monorepo.
-     */
-    /**
      * Mint a storage capability token for buckets of this analysis. Credential
      * endpoint: the body is flat, without the `{ data, meta }` envelope.
      */
@@ -57,6 +51,12 @@ export interface IAnalysisAPI extends IEntityAPI<Analysis, AnalysisCreatePayload
         data: AnalysisStorageTokenCreatePayload,
     ) : Promise<AnalysisStorageToken>;
 
+    /**
+     * `responseType: 'stream'` hands back the raw response body. Declared as
+     * `ReadableStream` to match the same operation in `@privateaim/storage-kit`
+     * (`IBucketAPI.stream` / `IBucketFileAPI.stream`) — the established
+     * convention for a stream verb in this monorepo.
+     */
     streamFiles(id: Analysis['id']) : Promise<ReadableStream<any>>;
     downloadResult(id: Analysis['id']) : Promise<ReadableStream<any>>;
 }
