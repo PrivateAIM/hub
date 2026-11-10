@@ -162,6 +162,51 @@ describe('capability tokens on bucket and bucket-file routes', () => {
             expect(response.status).toBe(200);
         });
 
+        it('should refuse the bucket relation of a file to a file-only capability', async () => {
+            const token = await mint([`bucket-file:${fileId}:read`]);
+            const response = await request(`/bucket-files/${fileId}?include=bucket`, bearer(token));
+
+            expect(response.status).toBe(403);
+        });
+
+        it('should include the bucket of a file for a bucket capability', async () => {
+            const token = await mint([`bucket:${bucketId}:read`]);
+            const response = await request(`/bucket-files/${fileId}?include=bucket`, bearer(token));
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+
+            expect(body.data.bucket.id).toBe(bucketId);
+        });
+
+        it('should list no file with its bucket for a file-only capability', async () => {
+            const token = await mint([`bucket-file:${fileId}:read`]);
+            const response = await request('/bucket-files?include=bucket', bearer(token));
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+
+            expect(body.data).toEqual([]);
+        });
+
+        it('should list the files of a covered bucket with their bucket', async () => {
+            const token = await mint([`bucket:${bucketId}:read`, `bucket-file:${otherFileId}:read`]);
+            const response = await request('/bucket-files?include=bucket', bearer(token));
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+
+            expect(body.data.length).toBeGreaterThan(0);
+
+            for (const item of body.data) {
+                expect(item.bucketId).toBe(bucketId);
+                expect(item.bucket.id).toBe(bucketId);
+            }
+        });
+
         it('should refuse a file the capability does not cover', async () => {
             const token = await mint([`bucket:${bucketId}:read`]);
             const response = await request(`/bucket-files/${otherFileId}`, bearer(token));
@@ -283,6 +328,25 @@ describe('capability tokens on bucket and bucket-file routes', () => {
             const files = await request(`/bucket-files?dt=${token}`);
 
             expect(files.status).toBe(401);
+        });
+
+        it('should refuse a query token on the upload and delete routes', async () => {
+            const token = await mint([`bucket:${bucketId}:read,write,delete`], 60);
+
+            const formData = new FormData();
+
+            formData.append('file[0]', new Blob([content]), 'query.json');
+
+            const upload = await request(`/buckets/${bucketId}/upload?dt=${token}`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            expect(upload.status).toBe(401);
+
+            const drop = await request(`/bucket-files/${fileId}?dt=${token}`, { method: 'DELETE' });
+
+            expect(drop.status).toBe(401);
         });
 
         it('should stream a covered bucket as a tar', async () => {

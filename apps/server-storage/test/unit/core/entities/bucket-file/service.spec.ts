@@ -314,6 +314,37 @@ describe('BucketFileService', () => {
             expect(repository.getAll()).toHaveLength(0);
         });
 
+        it('should deny the bucket relation of a file to a file-only capability', async () => {
+            repository.seed(createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }));
+
+            const capability = createCapability('bucket-file:f-1:read');
+
+            await expect(service.getOne('f-1', { include: 'bucket' }, capability)).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getOne('f-1', {}, capability)).resolves.toMatchObject({ id: 'f-1' });
+        });
+
+        it('should grant the bucket relation of a file to a bucket capability', async () => {
+            repository.seed(createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }));
+
+            await expect(
+                service.getOne('f-1', { include: 'bucket' }, createCapability('bucket:b-1:read')),
+            ).resolves.toMatchObject({ id: 'f-1' });
+        });
+
+        it('should list with the bucket relation only files of covered buckets', async () => {
+            repository.seed([
+                createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }),
+                createTestBucketFile({ id: 'f-2', bucketId: 'b-2' }),
+            ]);
+
+            const result = await service.getMany(
+                { include: 'bucket' },
+                createCapability('bucket:b-1:read', 'bucket-file:f-2:read'),
+            );
+
+            expect(result.data.map((item) => item.id)).toEqual(['f-1']);
+        });
+
         it('should deny deleting a file covered only for read', async () => {
             repository.seed(createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }));
 

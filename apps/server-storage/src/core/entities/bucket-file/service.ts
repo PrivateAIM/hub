@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ICondition } from '@rapiq/core';
+import type { ICondition, IQuery } from '@rapiq/core';
 import { eq, inArray, or } from '@rapiq/core';
 import type { BucketFile } from '@privateaim/storage-kit';
 import { StorageCapabilityAction, capabilityBucketFileIds, capabilityBucketIds } from '@privateaim/storage-kit';
@@ -17,7 +17,7 @@ import { evaluateRecord } from '@authup/access';
 import { decodeQuery } from '../../query/index.ts';
 import type { IBucketFileDispatcher, IBucketFileRepository, IBucketFileService } from './types.ts';
 import { bucketFileSchema } from './schema.ts';
-import { assertCapabilityCoversBucketFile } from '../../capability/module.ts';
+import { assertCapabilityCoversBucket, assertCapabilityCoversBucketFile } from '../../capability/module.ts';
 import type { StorageCapability, StorageRequester } from '../../capability/types.ts';
 
 type BucketFileServiceContext = {
@@ -47,7 +47,13 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
         }
 
         const bucketIds = capabilityBucketIds(capability.entries, StorageCapabilityAction.READ);
-        const fileIds = capabilityBucketFileIds(capability.entries, StorageCapabilityAction.READ);
+
+        // A file entry covers only that file, not its bucket: with the
+        // `bucket` relation requested, only files of read-covered buckets
+        // are listed, so no joined bucket row escapes.
+        const fileIds = this.requestsBucketRelation(decoded) ?
+            [] :
+            capabilityBucketFileIds(capability.entries, StorageCapabilityAction.READ);
 
         // ANDed onto the caller's filters, so no filter widens the result
         // beyond the covered buckets and files.
@@ -65,8 +71,12 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
     }
 
     async getOne(id: string, query?: Record<string, any>, capability?: StorageCapability): Promise<BucketFile> {
-        const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: bucketFileSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
+        const decoded = query ?
+            decodeQuery(query, { schema: bucketFileSchema, parameters: ['fields', 'relations'] }) :
+            undefined;
+
+        const entity = decoded ?
+            await this.repository.findMany(appendQueryConditions(decoded, eq('id', id))).then((r) => r.data[0]) :
             await this.repository.findOneById(id);
 
         if (!entity) {
@@ -75,9 +85,19 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
 
         if (capability) {
             assertCapabilityCoversBucketFile(capability, entity, StorageCapabilityAction.READ);
+
+            // A file entry covers only that file: the joined bucket row needs
+            // read on the bucket itself, as `GET /buckets/:id` would.
+            if (decoded && this.requestsBucketRelation(decoded)) {
+                assertCapabilityCoversBucket(capability, entity.bucketId, StorageCapabilityAction.READ);
+            }
         }
 
         return entity;
+    }
+
+    private requestsBucketRelation(query: IQuery): boolean {
+        return query.relations.value.some((relation) => relation.name === 'bucket' satisfies keyof BucketFile);
     }
 
     async delete(id: string, requester: StorageRequester): Promise<BucketFile> {
