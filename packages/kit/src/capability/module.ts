@@ -20,13 +20,11 @@ import type { CapabilityEntry } from './types';
  * @throws TypeError on any malformed entry.
  */
 export function parseCapabilityEntry(value: string): CapabilityEntry {
-    const parts = value.split(':');
+    const [type, id, rawActions, ...rest] = value.split(':');
 
-    if (parts.length !== 3) {
+    if (type === undefined || id === undefined || rawActions === undefined || rest.length > 0) {
         throw new TypeError(`Capability entry "${value}" must have the format type:id:actions.`);
     }
-
-    const [type, id, rawActions] = parts;
 
     if (!CAPABILITY_TYPE_PATTERN.test(type)) {
         throw new TypeError(`Capability entry "${value}" has an invalid type.`);
