@@ -35,10 +35,21 @@ export interface IStorageClient extends IBaseClient {
      * `Authorization: Bearer <await resolve({ method })>`. The parent's hooks
      * and default headers are not carried over.
      */
-    withAuthorization(resolve: StorageAuthorizationResolver) : IStorageClient;
+    withAuthorization(
+        resolve: StorageAuthorizationResolver,
+        options?: StorageAuthorizationOptions,
+    ) : IStorageClient;
 }
 
 export type StorageAuthorizationResolver = (request: { method: string }) => Promise<string>;
+
+export type StorageAuthorizationOptions = {
+    /**
+     * Called when storage answers 401 or 403 to a request, so the caller can
+     * drop the token it resolved for it. The error still propagates.
+     */
+    onRefused?: (request: { method: string }) => void
+};
 
 export type ClientEntityAPIKey = keyof IStorageClient & keyof DomainTypeMap;
 

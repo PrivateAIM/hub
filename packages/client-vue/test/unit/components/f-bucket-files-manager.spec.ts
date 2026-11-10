@@ -9,6 +9,7 @@ import { flushPromises } from '@vue/test-utils';
 import { fakeResponse } from '@privateaim/core-http-kit/testing';
 import { describe, expect, it } from 'vitest';
 import { FBucketFileDownload } from '../../../src/components/bucket-file/FBucketFileDownload';
+import FBucketFiles from '../../../src/components/bucket-file/FBucketFiles.vue';
 import FBucketFilesManager from '../../../src/components/bucket-file/FBucketFilesManager.vue';
 import FBucketFilesUpload from '../../../src/components/bucket-file/FBucketFilesUpload.vue';
 import { mountClientVueComponent } from '../../utils';
@@ -124,5 +125,52 @@ describe('FBucketFilesManager', () => {
         await flushPromises();
 
         expect(wrapper.emitted('failed')?.[0]?.[0]).toBeInstanceOf(Error);
+    });
+
+    it('mints again after a request is refused with 401', async () => {
+        let deletes = 0;
+        const { wrapper, coreClient } = mountClientVueComponent(
+            FBucketFilesManager,
+            { entityId: BUCKET_ID, analysisId: ANALYSIS_ID },
+            {
+                core: {
+                    'POST /analyses/:id/storage-tokens': (req) => {
+                        const cap = isMintBody(req.body) ? req.body.cap[0] : '';
+
+                        return {
+                            token: `tok(${cap})`,
+                            expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
+                        };
+                    },
+                },
+                storage: {
+                    'GET /bucket-files': () => ({ data: [], meta: { total: 0 } }),
+                    'DELETE /bucket-files/:id': () => {
+                        deletes += 1;
+
+                        return deletes === 1 ?
+                            fakeResponse(401, { message: 'expired' }) :
+                            { data: { id: 'F1' }, meta: {} };
+                    },
+                },
+            },
+        );
+
+        await flushPromises();
+
+        const files = wrapper.findComponent<{ delete(id: string): Promise<void> }>(FBucketFiles);
+        const deleteMints = () => coreClient.requests
+            .filter((r) => r.method === 'POST' && isMintBody(r.body) && r.body.cap[0] === `bucket:${BUCKET_ID}:delete`);
+
+        await files.vm.delete('F1');
+        await flushPromises();
+
+        expect(deleteMints()).toHaveLength(1);
+
+        await files.vm.delete('F1');
+        await flushPromises();
+
+        expect(deletes).toBe(2);
+        expect(deleteMints()).toHaveLength(2);
     });
 });

@@ -115,4 +115,27 @@ describe('FakeClient.withAuthorization', () => {
 
         expect(client.requests[0].headers.authorization).toBeUndefined();
     });
+
+    it('should report a 401 or 403 answer to onRefused and rethrow it', async () => {
+        const client = createFakeClient({
+            handlers: {
+                'GET /buckets/:id': () => fakeResponse(401, { message: 'expired' }),
+                'DELETE /buckets/:id': () => fakeResponse(403, { message: 'denied' }),
+                'GET /buckets': () => fakeResponse(404, { message: 'missing' }),
+            },
+        });
+        const refused : string[] = [];
+
+        const scoped = client.withAuthorization(async () => 'cap-token', {
+            onRefused: ({ method }) => {
+                refused.push(method);
+            },
+        });
+
+        await expect(scoped.bucket.getOne('a')).rejects.toSatisfy(isClientError);
+        await expect(scoped.bucket.delete('a')).rejects.toSatisfy(isClientError);
+        await expect(scoped.bucket.getMany()).rejects.toSatisfy(isClientError);
+
+        expect(refused).toEqual(['GET', 'DELETE']);
+    });
 });

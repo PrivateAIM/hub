@@ -65,7 +65,7 @@ export default defineComponent({
 
         // One cached capability per action on this manager's bucket; the
         // action follows the HTTP method of each storage request.
-        const scopedClient = injectStorageHTTPClient().withAuthorization(async ({ method }) => {
+        const buildCap = (method: string) : string[] => {
             let action : 'read' | 'write' | 'delete';
 
             switch (method) {
@@ -90,8 +90,14 @@ export default defineComponent({
                 }
             }
 
-            return tokenProvider.getToken([`bucket:${props.entityId}:${action}`]);
-        });
+            return [`bucket:${props.entityId}:${action}`];
+        };
+
+        const scopedClient = injectStorageHTTPClient().withAuthorization(
+            async ({ method }) => tokenProvider.getToken(buildCap(method)),
+            // a refused token is not served from the cache again
+            { onRefused: ({ method }) => tokenProvider.invalidate(buildCap(method)) },
+        );
 
         provideScopedStorageHTTPClient(scopedClient);
         provideAnalysisStorageScope({ analysisId: props.analysisId });
