@@ -39,6 +39,7 @@ import { AnalysisNodeController } from '../../../adapters/http/controllers/entit
 import { AnalysisNodeEventController } from '../../../adapters/http/controllers/entities/analysis-node-event/module.ts';
 import { AnalysisClientPermissionController } from '../../../adapters/http/controllers/entities/analysis-client-permission/module.ts';
 import { AuthupClientPermissionStore } from '../database/analysis-client-permission.ts';
+import { AnalysisBucketAccess } from '../../../core/services/analysis-bucket-access/index.ts';
 import { AnalysisClientPermissionService } from '../../../core/services/analysis-client-permission/index.ts';
 import { AnalysisReachService } from '../../../core/services/analysis-reach/index.ts';
 import { AnalysisClientCredentialController } from '../../../adapters/http/controllers/entities/analysis-client-credential/module.ts';
@@ -127,9 +128,13 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         repository: analysisBucketFileRepository,
         recalculator: container.resolve(AnalysisInjectionKey.FileRecalculator),
         reach: analysisReachService,
+        access: new AnalysisBucketAccess({
+            reach: analysisReachService,
+            analysisRepository,
+            analysisNodeRepository,
+        }),
         analysisRepository,
         analysisBucketRepository,
-        analysisNodeRepository,
     });
     const projectNodeService = new ProjectNodeService({
         repository: projectNodeRepository,
