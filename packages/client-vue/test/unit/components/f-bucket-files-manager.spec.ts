@@ -6,7 +6,9 @@
  */
 
 import { flushPromises } from '@vue/test-utils';
+import { fakeResponse } from '@privateaim/core-http-kit/testing';
 import { describe, expect, it } from 'vitest';
+import { FBucketFileDownload } from '../../../src/components/bucket-file/FBucketFileDownload';
 import FBucketFilesManager from '../../../src/components/bucket-file/FBucketFilesManager.vue';
 import FBucketFilesUpload from '../../../src/components/bucket-file/FBucketFilesUpload.vue';
 import { mountClientVueComponent } from '../../utils';
@@ -81,5 +83,46 @@ describe('FBucketFilesManager', () => {
 
         expect(request).toBeDefined();
         expect(request?.headers.authorization).toBe(`Bearer tok(bucket:${BUCKET_ID}:write)`);
+    });
+
+    it('emits failed when a file download mint is rejected', async () => {
+        const { wrapper } = mountClientVueComponent(
+            FBucketFilesManager,
+            { entityId: BUCKET_ID, analysisId: ANALYSIS_ID },
+            {
+                core: {
+                    'POST /analyses/:id/storage-tokens': (req) => {
+                        const cap = isMintBody(req.body) ? req.body.cap[0] : '';
+
+                        if (cap?.startsWith('bucket-file:')) {
+                            return fakeResponse(403, { message: 'denied' });
+                        }
+
+                        return {
+                            token: `tok(${cap})`,
+                            expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
+                        };
+                    },
+                },
+                storage: {
+                    'GET /bucket-files': () => ({
+                        data: [{
+                            id: 'F1',
+                            path: 'a.txt',
+                            size: 1,
+                            bucketId: BUCKET_ID,
+                        }],
+                        meta: { total: 1 },
+                    }),
+                },
+            },
+        );
+
+        await flushPromises();
+
+        await wrapper.findComponent(FBucketFileDownload).trigger('click');
+        await flushPromises();
+
+        expect(wrapper.emitted('failed')?.[0]?.[0]).toBeInstanceOf(Error);
     });
 });

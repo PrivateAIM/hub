@@ -19,7 +19,7 @@ import {
     watch,
 } from 'vue';
 import type { QueryBuildInput } from '@rapiq/core';
-import type { BucketFile, StorageCapabilityTokenMintInput  } from '@privateaim/storage-kit';
+import type { BucketFile, StorageCapabilityTokenMintInput } from '@privateaim/storage-kit';
 import { StorageCapabilityTokenProvider } from '@privateaim/storage-kit';
 import {
     injectCoreHTTPClient,
@@ -282,6 +282,7 @@ export default defineComponent({
                                     :files-selected="selected"
                                     @toggle="toggleFile"
                                     @deleted="deleted"
+                                    @failed="handleFailed"
                                 >
                                     <template #actions="actionProps">
                                         <slot
