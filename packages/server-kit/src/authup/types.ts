@@ -34,3 +34,41 @@ export type AuthupUserTokenCreatorCreateContext = {
     password: string,
     realm: string,
 };
+
+export type AuthupTokenExchangeContext = {
+    /**
+     * Authup base URL; a sub-path is kept.
+     */
+    baseURL: string,
+    clientId: string,
+    clientSecret: string,
+    /**
+     * Realm id the acting client lives in.
+     */
+    realm: string,
+};
+
+export type AuthupTokenExchangeInput = {
+    subjectToken: string,
+    audience: string,
+    /**
+     * Capability entries, sent space-separated.
+     */
+    cap: string[],
+    /**
+     * Requested lifetime in seconds; Authup caps it at the capability's max age.
+     */
+    expiresIn?: number,
+};
+
+export type AuthupTokenExchangeResult = {
+    token: string,
+    expiresIn: number,
+};
+
+export type AuthupTokenExchangeBody = {
+    access_token?: string,
+    expires_in?: number,
+    error?: string,
+    error_description?: string,
+};

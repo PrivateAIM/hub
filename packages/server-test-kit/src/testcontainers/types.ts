@@ -15,14 +15,54 @@ export type AuthupProvisioningPermission = {
 };
 
 /**
+ * What the built-in `system` client may delegate through token exchange
+ * (one Authup capability per audience).
+ */
+export type AuthupTokenExchangeProvisioning = {
+    audience: string,
+    /**
+     * Space-separated capability types the client may delegate.
+     */
+    value: string,
+    /**
+     * Maximum lifetime of an issued token, in seconds.
+     */
+    maxAge: number,
+    realmScope: 'own' | 'any',
+};
+
+export type AuthupProvisioningOptions = {
+    tokenExchange?: AuthupTokenExchangeProvisioning,
+};
+
+export type AuthupProvisioningRealm = {
+    attributes: { name: string },
+    strategy: { type: 'merge' },
+    relations: {
+        clients: {
+            attributes: { name: string, grantTypes: string },
+            strategy: { type: 'merge' },
+            relations: {
+                tokenExchangeCapabilities: {
+                    attributes: AuthupTokenExchangeProvisioning,
+                    strategy: { type: 'replace' },
+                }[],
+            },
+        }[],
+    },
+};
+
+/**
  * The subset of Authup's root provisioning shape we emit for tests.
  *
- * All top-level entries are global (`realmId = null`, `clientId = null`);
+ * Top-level permissions are global (`realmId = null`, `clientId = null`);
  * the built-in `admin` role's `globalPermissions: ['*']` picks them up
- * automatically at provisioning time.
+ * automatically at provisioning time. Token exchange is provisioned onto the
+ * built-in `system` client of the `master` realm.
  */
 export type AuthupProvisioning = {
-    permissions?: AuthupProvisioningPermission[]
+    permissions?: AuthupProvisioningPermission[],
+    realms?: AuthupProvisioningRealm[],
 };
 
 /**

@@ -54,6 +54,16 @@ export type FakeAuthupClientOptions = {
     fallback?: FakeAuthupHandler
 };
 
+export type CapabilityTokenInput = {
+    subjectToken: string,
+    cap: string[],
+    expiresIn?: number,
+    /**
+     * Defaults to `storage`.
+     */
+    audience?: string,
+};
+
 export type QueryIndexInvariantDescription = {
     indexes?: string[][] | null,
     filters?: { allowed?: readonly string[] | null },
