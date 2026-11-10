@@ -698,8 +698,13 @@ release. Hub needs no data changes:
 
 Browsers reach server-storage with a capability token that server-core mints per analysis
 (`POST /analyses/:id/storage-tokens`) by exchanging the caller's access token at Authup
-(RFC 8693). This needs a one-time Authup setup and is checked at runtime; without it the mint route
-answers 502.
+(RFC 8693).
+
+::: warning Required from this release
+The UI's analysis file pages and downloads **require** the token exchange. There is no fallback to
+the login token: without the setup below the file lists, uploads and downloads fail. Complete the
+steps below before rolling out the UI.
+:::
 
 - **Authup 1.0.0-beta.74 or newer.** Older servers have no token exchange or capability tokens.
 - **Hub's core client may exchange tokens.** The client server-core authenticates as (`CLIENT_ID`,
@@ -735,9 +740,25 @@ answers 502.
   with one, so a realm that only has an OCT key cannot issue them, and server-storage could not
   verify them.
 - **server-storage verifies tokens locally** against `AUTHUP_URL`'s `/jwks`; it needs no extra
-  credential. Roll out server-storage before server-core. Until then a minted token is refused (401).
+  credential.
 
-Login requests to server-storage are unchanged.
+### Rollout order
+
+1. **Authup**: upgrade to 1.0.0-beta.74 or newer, provision the core client (grant and `storage`
+   capability) and make sure every realm has an RSA or EC signing key.
+2. **server-storage**: until it runs the new version, a minted token is refused (401).
+3. **server-core**: it serves the mint route.
+4. **client-ui**: it asks for the tokens.
+
+### Symptoms of a missing step
+
+| Symptom | Missing step |
+|---------|--------------|
+| Mint answers 501 | `AUTHUP_URL` is not set on server-core |
+| Mint answers 502 | Authup is too old or unreachable, the core client lacks the grant or the `storage` capability, a `realmScope` does not cover the caller's realm, or the realm has no RSA/EC signing key |
+| Mint answers 404 | Unknown analysis |
+| Mint succeeds, storage answers 401 | server-storage is not upgraded, or cannot reach Authup's `/jwks` (a `/jwks` outage answers 502) |
+| File pages and downloads fail in the UI | Any of the above; check the mint response first |
 
 ## Database Variables
 
