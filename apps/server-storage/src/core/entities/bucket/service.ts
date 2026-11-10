@@ -6,7 +6,13 @@
  */
 
 import type { Bucket } from '@privateaim/storage-kit';
-import { eq } from '@rapiq/core';
+import {
+    BucketValidator,
+    StorageCapabilityAction,
+    assertBucketRefPairing,
+    capabilityBucketIds,
+} from '@privateaim/storage-kit';
+import { eq, inArray } from '@rapiq/core';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
@@ -15,9 +21,10 @@ import { AbstractEntityService, appendQueryConditions } from '@privateaim/server
 import { evaluateRecord, evaluateRecordUpdate } from '@authup/access';
 import { decodeQuery } from '../../query/index.ts';
 import type { IBucketDispatcher, IBucketRepository, IBucketService } from './types.ts';
-import { BucketValidator, assertBucketRefPairing } from '@privateaim/storage-kit';
 import { bucketSchema } from './schema.ts';
 import type { IStorageAdapter } from '../../storage/types.ts';
+import { assertCapabilityCoversBucket } from '../../capability/module.ts';
+import type { StorageCapability, StorageRequester } from '../../capability/types.ts';
 
 type BucketServiceContext = {
     repository: IBucketRepository;
@@ -42,17 +49,36 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         this.validator = new BucketValidator();
     }
 
-    async getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Bucket>> {
-        return this.repository.findMany(decodeQuery(query, { schema: bucketSchema }));
+    async getMany(
+        query: Record<string, any>,
+        capability?: StorageCapability,
+    ): Promise<EntityRepositoryFindManyResult<Bucket>> {
+        const decoded = decodeQuery(query, { schema: bucketSchema });
+
+        if (!capability) {
+            return this.repository.findMany(decoded);
+        }
+
+        // ANDed onto the caller's filters, so no filter widens the result
+        // beyond the covered buckets.
+        return this.repository.findMany(appendQueryConditions(
+            decoded,
+            inArray('id', capabilityBucketIds(capability.entries, StorageCapabilityAction.READ)),
+        ));
     }
 
-    async getOne(id: string, query?: Record<string, any>): Promise<Bucket> {
+    async getOne(id: string, query?: Record<string, any>, capability?: StorageCapability): Promise<Bucket> {
         const entity = query ?
             await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: bucketSchema, parameters: ['fields', 'relations'] }), eq('id', id))).then((r) => r.data[0]) :
             await this.repository.findOneByIdOrName(id);
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'bucket' });
+        }
+
+        // Judged by the stored id: `id` may be the bucket's name.
+        if (capability) {
+            assertCapabilityCoversBucket(capability, entity.id, StorageCapabilityAction.READ);
         }
 
         return entity;
@@ -177,7 +203,15 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         return this.dispatcher.clear(entity.id);
     }
 
-    async checkUploadAccess(entity: Bucket, actor: ActorContext): Promise<void> {
+    async checkUploadAccess(entity: Bucket, requester: StorageRequester): Promise<void> {
+        if (requester.type === 'capability') {
+            assertCapabilityCoversBucket(requester.capability, entity.id, StorageCapabilityAction.WRITE);
+
+            return;
+        }
+
+        const { actor } = requester;
+
         // ponytail: a bucket with a refId belongs to another service's resource (e.g. an
         // analysis), whose uploaders span realms and whose permissions storage cannot
         // evaluate; server-core checks those uploads after the fact. A synchronous gate

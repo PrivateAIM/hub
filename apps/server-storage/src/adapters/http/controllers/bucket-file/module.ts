@@ -7,7 +7,6 @@
 
 import { Readable } from 'node:stream';
 import { createGzip } from 'node:zlib';
-import { EntityNotFoundError } from '@privateaim/errors';
 import type {
     BucketFile,
     EntityCollectionResponse,
@@ -26,7 +25,10 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
+import {
+    ForceIdentityOrCapabilityMiddleware,
+    ForceIdentityOrStreamCapabilityMiddleware,
+} from '@privateaim/server-http-kit';
 import type { IAppEvent } from 'routup';
 import {
     getRequestAcceptableEncoding,
@@ -35,13 +37,13 @@ import {
     setResponseHeaderContentType,
 } from 'routup';
 import type { IStorageAdapter } from '../../../../core/storage/types.ts';
-import type { IBucketFileRepository, IBucketFileService } from '../../../../core/entities/index.ts';
+import type { IBucketFileService } from '../../../../core/entities/index.ts';
 import { bucketFileSchema } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
+import { useStorageCapability, useStorageRequester } from '../../requester.ts';
 
 type BucketFileControllerContext = {
     service: IBucketFileService;
-    bucketFileRepository: IBucketFileRepository;
     storage: IStorageAdapter;
     logger?: Logger;
 };
@@ -51,39 +53,36 @@ type BucketFileControllerContext = {
 export class BucketFileController {
     protected service: IBucketFileService;
 
-    protected bucketFileRepository: IBucketFileRepository;
-
     protected storage: IStorageAdapter;
 
     protected logger: Logger | undefined;
 
     constructor(ctx: BucketFileControllerContext) {
         this.service = ctx.service;
-        this.bucketFileRepository = ctx.bucketFileRepository;
         this.storage = ctx.storage;
         this.logger = ctx.logger;
     }
 
-    @DGet('', [ForceLoggedInMiddleware])
+    @DGet('', [ForceIdentityOrCapabilityMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<BucketFile>> {
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query);
+        const { data, meta } = await this.service.getMany(query, useStorageCapability(event));
 
         return { data, meta: { ...meta, schema: describeQuerySchema(bucketFileSchema) } };
     }
 
-    @DGet('/:id/stream', [ForceLoggedInMiddleware])
+    @DGet('/:id/stream', [ForceIdentityOrStreamCapabilityMiddleware])
     async stream(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ) {
-        const entity = await this.bucketFileRepository.findOneById(id);
+        // The URL may carry a capability token (`?dt=`): never pass it on.
+        event.response.headers.set('referrer-policy', 'no-referrer');
 
-        if (!entity) {
-            throw new EntityNotFoundError({ entity: 'bucket-file' });
-        }
+        // Judged before the object is fetched.
+        const entity = await this.service.getOne(id, undefined, useStorageCapability(event));
 
         const bucketName = toBucketName(entity.bucketId);
 
@@ -122,13 +121,17 @@ export class BucketFileController {
         return sendStream(event, Readable.toWeb(nodeStream) as ReadableStream);
     }
 
-    @DGet('/:id', [ForceLoggedInMiddleware])
+    @DGet('/:id', [ForceIdentityOrCapabilityMiddleware])
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<BucketFile>> {
         const query = useRequestQuery(event);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(
+            id,
+            Object.keys(query).length > 0 ? query : undefined,
+            useStorageCapability(event),
+        );
 
         return {
             data: entity,
@@ -136,13 +139,12 @@ export class BucketFileController {
         };
     }
 
-    @DDelete('/:id', [ForceLoggedInMiddleware])
+    @DDelete('/:id', [ForceIdentityOrCapabilityMiddleware])
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<BucketFile>> {
-        const actor = buildActorContext(event);
-        const entity = await this.service.delete(id, actor);
+        const entity = await this.service.delete(id, useStorageRequester(event));
 
         event.response.status = 202;
 

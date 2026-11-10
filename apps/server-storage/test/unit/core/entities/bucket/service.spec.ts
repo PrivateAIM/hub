@@ -25,6 +25,7 @@ import {
 import { FakeBucketDispatcher } from './fake-dispatcher.ts';
 import { FakeBucketRepository } from './fake-repository.ts';
 import { FakeStorageAdapter } from './fake-storage.ts';
+import type { StorageCapability } from '../../../../../src/core/capability/types.ts';
 
 function createTestBucket(overrides?: Partial<Bucket>): Bucket {
     return {
@@ -456,19 +457,19 @@ describe('BucketService', () => {
                 realmId: 'other-realm',
             });
 
-            await expect(service.checkUploadAccess(bucket, actor)).resolves.toBeUndefined();
+            await expect(service.checkUploadAccess(bucket, { type: 'actor', actor })).resolves.toBeUndefined();
         });
 
         it('should deny a non-owner without BUCKET_UPDATE', async () => {
             await expect(
-                service.checkUploadAccess(createTestBucket(), createDenyAllActor()),
+                service.checkUploadAccess(createTestBucket(), { type: 'actor', actor: createDenyAllActor() }),
             ).rejects.toThrow(PermissionError);
         });
 
         it('should let a BUCKET_UPDATE holder of the bucket realm upload', async () => {
             const actor = createScopedActor({ realmId: 'realm-1', realmScope: 'own' });
 
-            await expect(service.checkUploadAccess(createTestBucket({ realmId: 'realm-1' }), actor)).resolves.toBeUndefined();
+            await expect(service.checkUploadAccess(createTestBucket({ realmId: 'realm-1' }), { type: 'actor', actor })).resolves.toBeUndefined();
             expect(actor.permissionEvaluator.evaluateCalls[0].name).toBe(PermissionName.BUCKET_UPDATE);
         });
 
@@ -476,7 +477,7 @@ describe('BucketService', () => {
             await expect(
                 service.checkUploadAccess(
                     createTestBucket({ realmId: 'other-realm' }),
-                    createScopedActor({ realmId: 'realm-1', realmScope: 'own' }),
+                    { type: 'actor', actor: createScopedActor({ realmId: 'realm-1', realmScope: 'own' }) },
                 ),
             ).rejects.toThrow(PermissionError);
         });
@@ -484,13 +485,107 @@ describe('BucketService', () => {
         it('should leave a bucket with a ref to the owning service', async () => {
             const bucket = createTestBucket({ refType: 'analysis', refId: randomUUID() });
 
-            await expect(service.checkUploadAccess(bucket, createDenyAllActor())).resolves.toBeUndefined();
+            await expect(service.checkUploadAccess(bucket, { type: 'actor', actor: createDenyAllActor() })).resolves.toBeUndefined();
         });
 
         it('should gate a bucket with only a refType like a ref-less one', async () => {
             await expect(
-                service.checkUploadAccess(createTestBucket({ refType: 'analysis' }), createDenyAllActor()),
+                service.checkUploadAccess(createTestBucket({ refType: 'analysis' }), { type: 'actor', actor: createDenyAllActor() }),
             ).rejects.toThrow(PermissionError);
+        });
+    });
+
+    describe('capability', () => {
+        function createCapability(...entries: string[]): StorageCapability {
+            return {
+                subject: {
+                    id: randomUUID(),
+                    type: 'user',
+                    realmId: 'realm-1',
+                },
+                entries: entries.map((entry) => {
+                    const [type, id, actions] = entry.split(':');
+
+                    return {
+                        type,
+                        id,
+                        actions: actions.split(','),
+                    };
+                }),
+            };
+        }
+
+        it('should list only the buckets covered for read', async () => {
+            repository.seed([
+                createTestBucket({ id: 'b-1' }),
+                createTestBucket({ id: 'b-2' }),
+                createTestBucket({ id: 'b-3' }),
+            ]);
+
+            const result = await service.getMany({}, createCapability('bucket:b-1:read', 'bucket:b-2:write'));
+
+            expect(result.data.map((item) => item.id)).toEqual(['b-1']);
+        });
+
+        it('should not widen the list through a filter', async () => {
+            repository.seed([
+                createTestBucket({ id: 'b-1' }),
+                createTestBucket({ id: 'b-2' }),
+            ]);
+
+            const result = await service.getMany(
+                { filter: { id: 'b-2' } },
+                createCapability('bucket:b-1:read'),
+            );
+
+            expect(result.data).toEqual([]);
+        });
+
+        it('should list nothing for a capability naming no bucket', async () => {
+            repository.seed(createTestBucket({ id: 'b-1' }));
+
+            const result = await service.getMany({}, createCapability('bucket-file:f-1:read'));
+
+            expect(result.data).toEqual([]);
+        });
+
+        it('should read a covered bucket, also by name', async () => {
+            repository.seed(createTestBucket({ id: 'b-1', name: 'named' }));
+
+            const capability = createCapability('bucket:b-1:read');
+
+            await expect(service.getOne('b-1', undefined, capability)).resolves.toMatchObject({ id: 'b-1' });
+            await expect(service.getOne('named', undefined, capability)).resolves.toMatchObject({ id: 'b-1' });
+        });
+
+        it('should deny a bucket the capability does not cover for read', async () => {
+            repository.seed(createTestBucket({ id: 'b-1' }));
+
+            await expect(
+                service.getOne('b-1', undefined, createCapability('bucket:b-2:read', 'bucket:b-1:write')),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
+        it('should let a capability with write upload', async () => {
+            const bucket = createTestBucket({ id: 'b-1' });
+
+            await expect(service.checkUploadAccess(bucket, {
+                type: 'capability',
+                capability: createCapability('bucket:b-1:write'),
+            })).resolves.toBeUndefined();
+        });
+
+        it('should deny an upload without write, even into a bucket with a ref', async () => {
+            const bucket = createTestBucket({
+                id: 'b-1',
+                refType: 'analysis',
+                refId: randomUUID(),
+            });
+
+            await expect(service.checkUploadAccess(bucket, {
+                type: 'capability',
+                capability: createCapability('bucket:b-1:read,delete'),
+            })).rejects.toThrow(PermissionDeniedError);
         });
     });
 });
