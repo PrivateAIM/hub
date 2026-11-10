@@ -294,3 +294,26 @@ No `REALM_MASTER_NAME` check exists outside tests. Operator notes:
   throttled only if every `PermissionName` has unbounded reach, checked one name per
   `compile()` call (one call with all names is any-of, so a single `any`-scoped
   `node_read` would exempt it). Users are always throttled.
+
+## Capability tokens (storage)
+
+Resource-scoped tokens (`kind: capability_token`, `cap: type:id:actions`) let a browser reach one
+analysis's buckets and files. server-core mints them; server-storage verifies them locally. Operator
+steps: [deployment configuration](../../docs/src/guide/deployment/configuration.md#storage-capability-tokens).
+
+- **A capability request carries no identity, permission evaluator or access token** (only
+  `useRequestCapability`), so every `ForceLoggedInMiddleware` route answers it 401. Routes admit one
+  through `ForceIdentityOrCapabilityMiddleware`; a capability reaches storage only through the
+  kind-routed authorization middleware, never as an identity (it also refuses a non-access kind as one).
+- **A query token (`?dt=`) is valid only on the two `/stream` routes and only with `exp - iat <= 60`.**
+  A URL lands in logs, histories and referrers. Never verify an access token from the query; stream
+  responses send `Referrer-Policy: no-referrer`; never log a raw query string.
+- **Core decides access before the exchange, and every entry belongs to the one analysis in the path.**
+  An entry outside it fails the whole mint (400), never dropped silently. Core reuses the file
+  read/create/delete rules of `AnalysisBucketAccess`, so a minted token never exceeds the login rules.
+  Authup's `invalid_grant` is 401, any other exchange failure 502.
+- **Storage judges coverage before fetching or streaming** (a bucket entry covers its files; a file
+  entry only itself) and narrows listings with `appendQueryConditions`; a check must not touch the
+  stream body (backpressure).
+- Verification is Authup's `TokenVerifier` with `capability: { audience: 'storage' }` (signature vs
+  `/jwks`, `aud`, `kind`, `exp`); `peekTokenKind` of the unverified payload only picks the verifier.

@@ -73,6 +73,9 @@ import { Bucket, BucketFile } from '@privateaim/storage-kit';
 | `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
 | `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute` |
 | `domains` | `Bucket`, `BucketFile` types and validators |
+| `StorageCapabilityType` / `StorageCapabilityAction` / `assertStorageCapabilityEntry` | Capability vocabulary: types `bucket`, `bucket-file`; actions `read`, `write`, `delete`; `capabilityCoversBucket` / `capabilityCoversBucketFile` decide coverage (a bucket entry covers its files) |
+| `StorageCapabilityTokenProvider` / `IStorageCapabilityTokenProvider` | Caches a minted token per cap set (re-mints within 60 s of expiry, shares concurrent mints, never caches a failure) |
+| `IStorageClient.withAuthorization(resolve)` | A scoped client that sends `Authorization: Bearer <await resolve({ method })>` on each request |
 
 ## Contract
 

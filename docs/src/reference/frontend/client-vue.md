@@ -155,6 +155,13 @@ and the permission-check composables call `injectStore()`. Installing only
 client-vue throws.
 :::
 
+### Analysis file access
+
+`FBucketFilesManager` requires an `analysisId`. It provides a scoped storage client to its subtree
+that authorizes each request with a cached [storage capability token](/reference/core/#storage-capability-tokens)
+(`GET` reads, `POST` writes, `DELETE` deletes). Downloads mint a fresh 60 second token per click
+and pass it as `?dt=` to the stream route.
+
 ### Testing with a fake client
 
 Pass a `FakeClient` through the `*HTTPClient` options rather than pre-providing

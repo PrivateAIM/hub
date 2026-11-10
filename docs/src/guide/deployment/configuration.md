@@ -694,6 +694,51 @@ release. Hub needs no data changes:
   ignored such grants (see
   [Authup upgrade to beta.68](#authup-upgrade-to-beta-68)), so nothing changes.
 
+## Storage capability tokens
+
+Browsers reach server-storage with a capability token that server-core mints per analysis
+(`POST /analyses/:id/storage-tokens`) by exchanging the caller's access token at Authup
+(RFC 8693). This needs a one-time Authup setup and is checked at runtime; without it the mint route
+answers 502.
+
+- **Authup 1.0.0-beta.74 or newer.** Older servers have no token exchange or capability tokens.
+- **Hub's core client may exchange tokens.** The client server-core authenticates as (`CLIENT_ID`,
+  default `system`) lists `urn:ietf:params:oauth:grant-type:token-exchange` in `grantTypes` (the grant
+  is opt-in) and holds a token exchange capability for the audience `storage`. Declared in an Authup
+  [provisioning file](https://authup.org/guide/deployment/provisioning.html):
+
+  ```yaml
+  realms:
+    - attributes:
+        name: master
+      relations:
+        clients:
+          - attributes:
+              name: system
+              grantTypes: client_credentials urn:ietf:params:oauth:grant-type:token-exchange
+            relations:
+              tokenExchangeCapabilities:
+                - strategy:
+                    type: merge
+                  attributes:
+                    audience: storage
+                    value: bucket bucket-file
+                    maxAge: 3600
+                    realmScope: any
+  ```
+
+  `value` lists the capability types the client may delegate, `maxAge` caps a token's lifetime in
+  seconds, and `realmScope: any` lets it act for users and node clients of every realm. Keep the
+  client's other `grantTypes` (a hub client normally also needs `client_credentials`).
+- **Every realm whose users or node clients mint tokens needs an asymmetric signing key (RSA or
+  EC).** Authup's `/jwks` publishes no symmetric (OCT) keys and refuses to sign a capability token
+  with one, so a realm that only has an OCT key cannot issue them, and server-storage could not
+  verify them.
+- **server-storage verifies tokens locally** against `AUTHUP_URL`'s `/jwks`; it needs no extra
+  credential. Roll out server-storage before server-core. Until then a minted token is refused (401).
+
+Login requests to server-storage are unchanged.
+
 ## Database Variables
 
 Used by `server-core`, `server-storage`, `server-telemetry`, and `server-messenger`:
