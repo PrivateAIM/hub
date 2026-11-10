@@ -40,6 +40,8 @@ import { AnalysisNodeEventController } from '../../../adapters/http/controllers/
 import { AnalysisClientPermissionController } from '../../../adapters/http/controllers/entities/analysis-client-permission/module.ts';
 import { AuthupClientPermissionStore } from '../database/analysis-client-permission.ts';
 import { AnalysisBucketAccess } from '../../../core/services/analysis-bucket-access/index.ts';
+import { AuthupCapabilityTokenIssuer } from '../../../adapters/authup/capability-token-issuer.ts';
+import { StorageCapabilityService } from '../../../core/services/storage-capability/index.ts';
 import { AnalysisClientPermissionService } from '../../../core/services/analysis-client-permission/index.ts';
 import { AnalysisReachService } from '../../../core/services/analysis-reach/index.ts';
 import { AnalysisClientCredentialController } from '../../../adapters/http/controllers/entities/analysis-client-credential/module.ts';
@@ -124,15 +126,16 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         analysisRepository,
         reach: analysisReachService,
     });
+    const analysisBucketAccess = new AnalysisBucketAccess({
+        reach: analysisReachService,
+        analysisRepository,
+        analysisNodeRepository,
+    });
     const analysisBucketFileService = new AnalysisBucketFileService({
         repository: analysisBucketFileRepository,
         recalculator: container.resolve(AnalysisInjectionKey.FileRecalculator),
         reach: analysisReachService,
-        access: new AnalysisBucketAccess({
-            reach: analysisReachService,
-            analysisRepository,
-            analysisNodeRepository,
-        }),
+        access: analysisBucketAccess,
         analysisRepository,
         analysisBucketRepository,
     });
@@ -156,6 +159,22 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         registryProjectRepository,
     });
 
+    // Capability tokens are exchanged at Authup, so the mint route needs its URL.
+    const storageCapabilityService = config.authupURL ?
+        new StorageCapabilityService({
+            issuer: new AuthupCapabilityTokenIssuer({
+                baseURL: config.authupURL,
+                clientId: config.clientId,
+                clientSecret: config.clientSecret,
+                realm: config.realm,
+            }),
+            access: analysisBucketAccess,
+            analysisRepository,
+            analysisBucketRepository,
+            analysisBucketFileRepository,
+        }) :
+        undefined;
+
     // Create controller instances
     const controllers: Record<string, any>[] = [
         new NodeController({ service: nodeService }),
@@ -165,7 +184,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         new MasterImageGroupController({ service: masterImageGroupService }),
         new ProjectController({ service: projectService }),
         new RegistryProjectController({ service: registryProjectService }),
-        new AnalysisController({ service: analysisService }),
+        new AnalysisController({ service: analysisService, storageCapabilityService }),
         new AnalysisBucketController({ service: analysisBucketService }),
         new AnalysisBucketFileController({ service: analysisBucketFileService }),
         new ProjectNodeController({ service: projectNodeService }),

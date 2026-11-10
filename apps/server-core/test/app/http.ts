@@ -19,6 +19,12 @@ import { TestApplication } from './module.ts';
 export class TestHTTPApplication extends TestApplication {
     protected _client: ICoreClient | undefined;
 
+    get url(): string {
+        const { url } = this.container.resolve<HTTPServer>(HTTPInjectionKey.Server);
+
+        return url.endsWith('/') ? url : `${url}/`;
+    }
+
     get client(): ICoreClient {
         if (typeof this._client === 'undefined') {
             this._client = this.createClient();
