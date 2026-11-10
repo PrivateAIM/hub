@@ -82,6 +82,7 @@ export default defineComponent({
                         <FBucketFilesManager
                             ref="bucketFiles"
                             :entity-id="props.data.bucketId"
+                            :analysis-id="entity.id"
                             :readonly="entity.configurationLocked"
                         />
                     </template>

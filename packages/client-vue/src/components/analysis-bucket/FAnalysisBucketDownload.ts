@@ -8,7 +8,14 @@
 import type { AnalysisBucket } from '@privateaim/core-kit';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
-import { ActionCommandElementType, renderActionCommand } from '../../core';
+import { STORAGE_CAPABILITY_QUERY_PARAMETER, STORAGE_CAPABILITY_URL_TOKEN_MAX_LIFETIME } from '@privateaim/storage-kit';
+import {
+    ActionCommandElementType,
+    downloadViaAnchor,
+    injectCoreHTTPClient,
+    injectStorageHTTPClient,
+    renderActionCommand,
+} from '../../core';
 
 const FAnalysisBucketDownload = defineComponent({
     props: {
@@ -29,20 +36,34 @@ const FAnalysisBucketDownload = defineComponent({
             default: true,
         },
     },
-    setup(props, { slots }) {
+    emits: ['failed'],
+    setup(props, { slots, emit }) {
+        const coreClient = injectCoreHTTPClient();
+        const storageClient = injectStorageHTTPClient();
+
         const execute = async () => {
-            if (!props.entity.bucketId) {
+            const { bucketId } = props.entity;
+
+            if (!bucketId) {
                 return;
             }
 
-            // Same-origin, so the host-only session cookie is sent along. A direct
-            // cross-subdomain storage URL cannot carry it, and a navigation
-            // cannot carry an Authorization header either. The Nuxt server
-            // proxies through to storage in-cluster.
-            window.open(
-                `/api/download/bucket/${props.entity.bucketId}`,
-                '_blank',
-            );
+            try {
+                // A navigation cannot carry an Authorization header, so the
+                // download carries a short-lived capability in the query.
+                const { token } = await coreClient.analysis.createStorageToken(props.entity.analysisId, {
+                    cap: [`bucket:${bucketId}:read`],
+                    lifetime: STORAGE_CAPABILITY_URL_TOKEN_MAX_LIFETIME,
+                });
+
+                const url = new URL(storageClient.bucket.getStreamURL(bucketId));
+
+                url.searchParams.set(STORAGE_CAPABILITY_QUERY_PARAMETER, token);
+
+                downloadViaAnchor(url.href);
+            } catch (e) {
+                emit('failed', e);
+            }
         };
 
         return () => renderActionCommand({

@@ -40,6 +40,7 @@ export default defineNuxtComponent({
                         <FBucketFilesManager
                             ref="bucketFiles"
                             :entity-id="props.data.bucketId"
+                            :analysis-id="entity.id"
                             :readonly="true"
                         />
                     </template>

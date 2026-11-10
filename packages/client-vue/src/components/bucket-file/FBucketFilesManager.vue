@@ -19,8 +19,15 @@ import {
     watch,
 } from 'vue';
 import type { QueryBuildInput } from '@rapiq/core';
-import type { BucketFile } from '@privateaim/storage-kit';
-import { wrapFnWithBusyState } from '../../core';
+import type { BucketFile, StorageCapabilityTokenMintInput  } from '@privateaim/storage-kit';
+import { StorageCapabilityTokenProvider } from '@privateaim/storage-kit';
+import {
+    injectCoreHTTPClient,
+    injectStorageHTTPClient,
+    provideAnalysisStorageScope,
+    provideScopedStorageHTTPClient,
+    wrapFnWithBusyState,
+} from '../../core';
 import FBucketFile from './FBucketFile.vue';
 import FBucketFilesUpload from './FBucketFilesUpload.vue';
 import FBucketFiles from './FBucketFiles.vue';
@@ -40,6 +47,10 @@ export default defineComponent({
             type: String,
             required: true,
         },
+        analysisId: {
+            type: String,
+            required: true,
+        },
         readonly: {
             type: Boolean,
             default: false,
@@ -47,6 +58,44 @@ export default defineComponent({
     },
     emits: ['created', 'updated', 'deleted', 'uploaded', 'failed'],
     setup(props, { emit, expose }) {
+        const coreClient = injectCoreHTTPClient();
+        const mint = (input: StorageCapabilityTokenMintInput) => coreClient.analysis
+            .createStorageToken(props.analysisId, input);
+        const tokenProvider = new StorageCapabilityTokenProvider({ mint });
+
+        // One cached capability per action on this manager's bucket; the
+        // action follows the HTTP method of each storage request.
+        const scopedClient = injectStorageHTTPClient().withAuthorization(async ({ method }) => {
+            let action : 'read' | 'write' | 'delete';
+
+            switch (method) {
+                case 'GET':
+                case 'HEAD': {
+                    action = 'read';
+
+                    break;
+                }
+                case 'POST': {
+                    action = 'write';
+
+                    break;
+                }
+                case 'DELETE': {
+                    action = 'delete';
+
+                    break;
+                }
+                default: {
+                    throw new Error(`No storage capability for HTTP method ${method}.`);
+                }
+            }
+
+            return tokenProvider.getToken([`bucket:${props.entityId}:${action}`]);
+        });
+
+        provideScopedStorageHTTPClient(scopedClient);
+        provideAnalysisStorageScope({ analysisId: props.analysisId });
+
         const modal = ref(false);
         const toggleModal = () => {
             modal.value = !modal.value;

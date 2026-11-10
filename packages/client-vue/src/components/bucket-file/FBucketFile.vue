@@ -177,6 +177,7 @@ export default defineComponent({
                             :with-text="false"
                             :with-icon="true"
                             :entity="data"
+                            @failed="$emit('failed', $event)"
                         />
                     </div>
                     <template v-if="!readonly">
