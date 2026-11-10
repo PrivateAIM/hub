@@ -31,7 +31,42 @@ export type AuthTokenVerifierCreateContext = {
     redisClient?: RedisClient,
 };
 
+export type AuthCapabilityTokenVerifierCreateContext = {
+    /**
+     * The Authup URL (its `/jwks` verifies the signature). Without it the
+     * verifier refuses every token.
+     */
+    baseURL?: string,
+    /**
+     * The `aud` a capability token must name to be accepted here.
+     */
+    audience: string,
+    cache?: ITokenCache,
+};
+
+export type AuthorizationMiddlewareCapabilityOptions = {
+    /**
+     * Build it with `createAuthupCapabilityTokenVerifier`. It verifies a
+     * bearer whose payload names `kind: capability_token`, and the query
+     * token.
+     */
+    verifier: ITokenVerifier,
+    /**
+     * The query parameter carrying a short-lived (`exp - iat <= 60`)
+     * capability token. Default: `dt`.
+     */
+    queryParameter?: string,
+};
+
 export type AuthorizationMiddlewareRegistrationOptions = {
+    /**
+     * Set, capability tokens are accepted beside access tokens: from the
+     * `Authorization` header, then from the query parameter. A capability
+     * request gets `capability`, never an identity or a permission evaluator.
+     * Unset, a capability token is verified like an access token, which
+     * refuses it, and the query parameter is ignored.
+     */
+    capability?: AuthorizationMiddlewareCapabilityOptions,
     /**
      * Required to authenticate anything: without it the middleware attaches
      * no identity, so every `ForceLoggedInMiddleware` route answers 401.
