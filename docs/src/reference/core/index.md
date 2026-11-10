@@ -113,11 +113,11 @@ the path, and the caller must be allowed every requested action:
 |--------|-------|
 | 200 | Token minted |
 | 400 | Malformed entry, unsupported type or action, or an entry outside the analysis (the whole request fails) |
-| 401 | No access token, or Authup refused the access token |
+| 401 | No access token, or core refused it |
 | 403 | An action is not allowed |
 | 404 | Unknown analysis |
 | 501 | `AUTHUP_URL` is not configured |
-| 502 | Authup refused the delegation or is unreachable (check the [deployment setup](/guide/deployment/configuration#storage-capability-tokens)) |
+| 502 | Authup refused the exchange (any refusal, including `invalid_grant`) or is unreachable (check the [deployment setup](/guide/deployment/configuration#storage-capability-tokens)) |
 
 ## Architecture
 

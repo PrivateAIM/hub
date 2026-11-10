@@ -311,7 +311,8 @@ steps: [deployment configuration](../../docs/src/guide/deployment/configuration.
 - **Core decides access before the exchange, and every entry belongs to the one analysis in the path.**
   An entry outside it fails the whole mint (400), never dropped silently. Core reuses the file
   read/create/delete rules of `AnalysisBucketAccess`, so a minted token never exceeds the login rules.
-  Authup's `invalid_grant` is 401, any other exchange failure 502.
+  Every exchange failure is 502, `invalid_grant` included: core already authenticated the caller, so a
+  refusal is a delegation problem, and a 401 would sign the user out.
 - **Storage judges coverage before fetching or streaming** (a bucket entry covers its files; a file
   entry only itself) and narrows listings with `appendQueryConditions`; a check must not touch the
   stream body (backpressure).

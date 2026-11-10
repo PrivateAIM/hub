@@ -6,7 +6,7 @@
  */
 
 import { OAuth2TokenGrant, OAuth2TokenTypeIdentifier } from '@authup/specs';
-import { HubError, UnauthorizedError } from '@privateaim/errors';
+import { HubError } from '@privateaim/errors';
 import type {
     AuthupTokenExchangeBody,
     AuthupTokenExchangeContext,
@@ -16,9 +16,10 @@ import type {
 
 /**
  * Exchange an access token for a capability token (RFC 8693) as the acting
- * client. A refused subject token (`invalid_grant`) is an `UnauthorizedError`;
- * every other failure (misconfigured delegation, 5xx, network) is a 502
- * `upstream_error`.
+ * client. Every failure is a 502 `upstream_error`, a
+ * refused subject token (`invalid_grant`) included: the caller's token was
+ * authenticated before the exchange, so a refusal is a delegation problem,
+ * and a 401 would sign the user out.
  */
 export async function exchangeAuthupToken(
     ctx: AuthupTokenExchangeContext,
@@ -61,20 +62,22 @@ export async function exchangeAuthupToken(
     let body: AuthupTokenExchangeBody = {};
 
     try {
-        body = await response.json();
+        const parsed = await response.json();
+
+        if (typeof parsed === 'object' && parsed !== null) {
+            body = parsed;
+        }
     } catch {
         // a non-JSON body is handled through the status below
     }
 
     if (!response.ok) {
-        if (body.error === 'invalid_grant') {
-            throw new UnauthorizedError(body.error_description || 'The subject token was refused.');
-        }
+        const detail = [body.error, body.error_description].filter(Boolean).join(': ');
 
         throw new HubError({
             code: 'upstream_error',
             status: 502,
-            message: body.error_description || `The token exchange failed (${response.status}).`,
+            message: detail || `The token exchange failed (${response.status}).`,
         });
     }
 
