@@ -7,7 +7,7 @@
 
 import { Client, HookName, isClientError } from 'hapic';
 import { BucketAPI, BucketFileAPI } from '../../domains';
-import type { ClientOptions, IStorageClient } from './types';
+import type { ClientOptions, IStorageClient, StorageAuthorizationResolver } from './types';
 
 export class APIClient extends Client implements IStorageClient {
     public readonly bucket : BucketAPI;
@@ -32,5 +32,31 @@ export class APIClient extends Client implements IStorageClient {
 
             throw error;
         }));
+    }
+
+    withAuthorization(resolve: StorageAuthorizationResolver) : IStorageClient {
+        const client = this.createScopedClient();
+
+        client.on(HookName.REQUEST, async (options) => {
+            // a stream request dispatches without a method, which means GET
+            const method = (options.method ?? 'GET').toUpperCase();
+            const token = await resolve({ method });
+
+            const headers = new Headers(options.headers);
+
+            headers.set('Authorization', `Bearer ${token}`);
+            options.headers = headers;
+
+            return options;
+        });
+
+        return client;
+    }
+
+    /**
+     * Seam for the testing FakeClient, which has to keep its transport.
+     */
+    protected createScopedClient() : APIClient {
+        return new APIClient({ baseURL: this.getBaseURL() });
     }
 }

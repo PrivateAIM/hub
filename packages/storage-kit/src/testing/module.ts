@@ -80,10 +80,11 @@ export class FakeClient extends APIClient {
         const {
             handlers,
             fallback,
+            requests: sharedRequests,
             ...clientOptions
         } = options;
 
-        const requests : FakeRequest[] = [];
+        const requests : FakeRequest[] = sharedRequests ?? [];
         const map : FakeHandlerMap = handlers ?? {};
         const fb : FakeHandler = fallback ?? defaultFallback;
 
@@ -136,6 +137,25 @@ export class FakeClient extends APIClient {
         });
 
         this.requests = requests;
+        this.handlers = map;
+        this.fallback = fb;
+    }
+
+    protected readonly handlers : FakeHandlerMap;
+
+    protected readonly fallback : FakeHandler;
+
+    /**
+     * The scoped client answers from the same handlers and records into the
+     * same `requests` list, so specs assert on the parent.
+     */
+    protected createScopedClient() : FakeClient {
+        return new FakeClient({
+            baseURL: this.getBaseURL(),
+            handlers: this.handlers,
+            fallback: this.fallback,
+            requests: this.requests,
+        });
     }
 }
 

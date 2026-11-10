@@ -6,7 +6,12 @@
  */
 
 import type { RequestBaseOptions } from 'hapic';
-import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
+import type {
+    Analysis,
+    AnalysisCommand,
+    AnalysisStorageToken,
+    AnalysisStorageTokenCreatePayload,
+} from '@privateaim/core-kit';
 import type { EntityQueryInput } from '../../utils';
 import type { EntityRecordResponse, IEntityAPI } from '../types';
 
@@ -43,6 +48,15 @@ export interface IAnalysisAPI extends IEntityAPI<Analysis, AnalysisCreatePayload
      * (`IBucketAPI.stream` / `IBucketFileAPI.stream`) — the established
      * convention for a stream verb in this monorepo.
      */
+    /**
+     * Mint a storage capability token for buckets of this analysis. Credential
+     * endpoint: the body is flat, without the `{ data, meta }` envelope.
+     */
+    createStorageToken(
+        id: Analysis['id'],
+        data: AnalysisStorageTokenCreatePayload,
+    ) : Promise<AnalysisStorageToken>;
+
     streamFiles(id: Analysis['id']) : Promise<ReadableStream<any>>;
     downloadResult(id: Analysis['id']) : Promise<ReadableStream<any>>;
 }

@@ -29,7 +29,16 @@ export type ClientOptions = ClientOptionsInput;
 export interface IStorageClient extends IBaseClient {
     readonly bucket : IBucketAPI;
     readonly bucketFile : IBucketFileAPI;
+
+    /**
+     * A new client for the same base URL that authorizes every request with
+     * `Authorization: Bearer <await resolve({ method })>`. The parent's hooks
+     * and default headers are not carried over.
+     */
+    withAuthorization(resolve: StorageAuthorizationResolver) : IStorageClient;
 }
+
+export type StorageAuthorizationResolver = (request: { method: string }) => Promise<string>;
 
 export type ClientEntityAPIKey = keyof IStorageClient & keyof DomainTypeMap;
 

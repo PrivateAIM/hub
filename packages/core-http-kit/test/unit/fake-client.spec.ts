@@ -146,6 +146,20 @@ describe('FakeClient', () => {
         expect(client.requests[0].headers.authorization).toBe('Bearer abc');
     });
 
+    it('should post a storage token mint to the analysis and return the flat body', async () => {
+        const client = createFakeClient({ handlers: { 'POST /analyses/:id/storage-tokens': () => ({ token: 't', expiresAt: '2026-01-01T00:00:00.000Z' }) } });
+
+        const result = await client.analysis.createStorageToken('a1', { cap: ['bucket:b1:read'], lifetime: 60 });
+
+        expect(result).toEqual({ token: 't', expiresAt: '2026-01-01T00:00:00.000Z' });
+        expect(client.requests[0]).toMatchObject({
+            method: 'POST',
+            url: expect.stringContaining('analyses/a1/storage-tokens'),
+            params: { id: 'a1' },
+            body: { cap: ['bucket:b1:read'], lifetime: 60 },
+        });
+    });
+
     it('should include a baseURL path prefix in the matched pathname', async () => {
         // Documented footgun: a path-bearing baseURL shifts every pathname, so
         // 'GET /projects' silently falls through to the fallback.
