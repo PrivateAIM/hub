@@ -136,6 +136,39 @@ describe('BucketService', () => {
         const listIds = async (requester: StorageRequester) => (await service.getMany({}, requester)).data
             .map((item) => item.id);
 
+        it('should resolve a name within the read reach', async () => {
+            repository.seed([
+                createTestBucket({
+                    id: 'a-2',
+                    name: 'shared',
+                    realmId: realmA,
+                }),
+                createTestBucket({
+                    id: 'b-2',
+                    name: 'shared',
+                    realmId: realmB,
+                }),
+            ]);
+
+            const reader = actorRequester(createScopedActor({ realmScope: 'own', realmId: realmB }));
+
+            await expect(service.getOne('shared', undefined, reader)).resolves.toMatchObject({ id: 'b-2' });
+        });
+
+        it('should answer 404 for a name outside the read reach', async () => {
+            repository.seed([
+                createTestBucket({
+                    id: 'a-2',
+                    name: 'shared',
+                    realmId: realmA,
+                }),
+            ]);
+
+            const reader = actorRequester(createScopedActor({ realmScope: 'own', realmId: realmB }));
+
+            await expect(service.getOne('shared', undefined, reader)).rejects.toThrow(EntityNotFoundError);
+        });
+
         it('should pre-gate the read permissions as a one-of', async () => {
             const actor = createScopedActor({ realmScope: 'any' });
 

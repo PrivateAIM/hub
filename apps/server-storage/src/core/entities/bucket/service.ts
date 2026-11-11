@@ -76,12 +76,19 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         }
 
         let reach: ICondition | undefined;
+        let target: ICondition = eq('id', stored.id);
 
         if (requester.type === 'capability') {
             assertCapabilityCoversBucket(requester.capability, stored.id, StorageCapabilityAction.READ);
         } else {
             // The list's condition: an unreached bucket is a 404, like a missing one.
             reach = await resolveBucketReadReach(requester.actor);
+
+            // A name is unique per realm only: the unscoped lookup may have
+            // picked another realm's bucket, so resolve it within the reach.
+            if (stored.id !== id) {
+                target = eq('name', id);
+            }
         }
 
         if (!query && !reach) {
@@ -92,7 +99,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
             decodeQuery(query, { schema: bucketSchema, parameters: ['fields', 'relations'] }) :
             new Query({});
 
-        const conditions: ICondition[] = [eq('id', stored.id)];
+        const conditions: ICondition[] = [target];
 
         if (reach) {
             conditions.push(reach);
