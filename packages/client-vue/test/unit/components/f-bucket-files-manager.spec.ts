@@ -29,7 +29,7 @@ function mountManager() {
         { entityId: BUCKET_ID, analysisId: ANALYSIS_ID },
         {
             core: {
-                'POST /analyses/:id/storage-tokens': (req) => {
+                'POST /analyses/:id/storage/tokens': (req) => {
                     const cap = isMintBody(req.body) ? req.body.cap[0] : '';
 
                     return {
@@ -92,7 +92,7 @@ describe('FBucketFilesManager', () => {
             { entityId: BUCKET_ID, analysisId: ANALYSIS_ID },
             {
                 core: {
-                    'POST /analyses/:id/storage-tokens': (req) => {
+                    'POST /analyses/:id/storage/tokens': (req) => {
                         const cap = isMintBody(req.body) ? req.body.cap[0] : '';
 
                         if (cap?.startsWith('bucket-file:')) {
@@ -134,7 +134,7 @@ describe('FBucketFilesManager', () => {
             { entityId: BUCKET_ID, analysisId: ANALYSIS_ID },
             {
                 core: {
-                    'POST /analyses/:id/storage-tokens': (req) => {
+                    'POST /analyses/:id/storage/tokens': (req) => {
                         const cap = isMintBody(req.body) ? req.body.cap[0] : '';
 
                         return {

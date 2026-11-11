@@ -97,7 +97,7 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
         id: Analysis['id'],
         data: AnalysisStorageTokenCreatePayload,
     ): Promise<AnalysisStorageToken> {
-        const { data: response } = await this.client.post(`analyses/${id}/storage-tokens`, data);
+        const { data: response } = await this.client.post(`analyses/${id}/storage/tokens`, data);
 
         return response;
     }

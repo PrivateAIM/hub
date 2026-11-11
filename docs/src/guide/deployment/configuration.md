@@ -697,7 +697,7 @@ release. Hub needs no data changes:
 ## Storage capability tokens
 
 Browsers reach server-storage with a capability token that server-core mints per analysis
-(`POST /analyses/:id/storage-tokens`) by exchanging the caller's access token at Authup
+(`POST /analyses/:id/storage/tokens`) by exchanging the caller's access token at Authup
 (RFC 8693).
 
 ::: warning Required from this release
