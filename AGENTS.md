@@ -83,9 +83,9 @@ Open work is tracked in GitHub issues and in the local roadmap `.agents/plans/00
 
 - **Analysis check hardening**: race-safe verdicts shipped (#1954); narrow ports, precise registry classification and check observability remain.
 - **Per-analysis Authup client**: `analysis.clientId` provisioning (#1693), capability management and credential rotation exist; typed HTTP-client methods, capability UI and verified node consumption remain.
-- **Analysis capability tokens**: storage tokens shipped (mint route, storage verification, client-vue use). Enforcement for login requests, telemetry and messenger remain.
+- **Analysis capability tokens**: storage tokens shipped (mint route, storage verification, client-vue use). Storage reads and uploads are enforced (`bucket_read`, owner reach); telemetry and messenger remain.
 - **Message broker rewrite**: durable mailbox and REST API (#1711, #1715) and the payload-free `messagePending` wakeup (#1717) shipped. The legacy relay/presence stays until decommission; the external TS node broker and the rollout remain.
-- **Open findings**: run ids for process status, trusted-proxy hop counting for audit IPs, direct storage authorization.
+- **Open findings**: run ids for process status, trusted-proxy hop counting for audit IPs.
 
 Delivered work is recorded as invariants in the [topic files](.agents/architecture.md#topic-files), not here.
 
