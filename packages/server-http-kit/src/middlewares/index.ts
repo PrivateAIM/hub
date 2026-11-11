@@ -10,6 +10,8 @@ export * from './basic';
 export * from './cors';
 export * from './decorators';
 export * from './error';
+export * from './force-identity-or-capability';
+export * from './force-identity-or-stream-capability';
 export * from './force-logged-in';
 export * from './module';
 export * from './prometheus';

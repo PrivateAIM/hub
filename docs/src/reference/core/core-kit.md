@@ -44,6 +44,7 @@ import { CoreError } from '@privateaim/core-kit';
 | Module | Description |
 |--------|-------------|
 | `domains` | Entity types: Analysis, Node, Project, Registry, MasterImage, etc. |
+| `AnalysisStorageToken` / `AnalysisStorageTokenCreatePayload` / `AnalysisStorageTokenValidator` | Request and response of the storage-token mint route |
 | `error` | Core-specific error types |
 | `constants` | Domain constants and enums (statuses, permission names) |
 

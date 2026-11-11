@@ -25,6 +25,7 @@ import {
     it,
 } from 'vitest';
 import { AnalysisBucketFileService } from '../../../../../src/core/entities/analysis-bucket-file/service.ts';
+import { AnalysisBucketAccess } from '../../../../../src/core/services/analysis-bucket-access/index.ts';
 import { AnalysisReachService } from '../../../../../src/core/services/analysis-reach/index.ts';
 import { FakePermissionEvaluator } from '@authup/server-test-kit';
 import {
@@ -78,16 +79,22 @@ describe('AnalysisBucketFileService', () => {
             analysisBucketRepository.seed(buckets[type]);
         }
 
+        const reach = new AnalysisReachService({
+            analysisNodeRepository,
+            analysisRepository,
+            nodeRepository: new FakeEntityRepository<Node>(),
+        });
+
         service = new AnalysisBucketFileService({
             repository,
             recalculator,
             analysisRepository,
             analysisBucketRepository,
-            analysisNodeRepository,
-            reach: new AnalysisReachService({
-                analysisNodeRepository,
-                analysisRepository,
-                nodeRepository: new FakeEntityRepository<Node>(),
+            reach,
+            analysisBucketAccess: new AnalysisBucketAccess({
+                reach, 
+                analysisRepository, 
+                analysisNodeRepository, 
             }),
         });
     });

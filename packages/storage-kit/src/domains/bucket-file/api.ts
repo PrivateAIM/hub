@@ -48,7 +48,7 @@ export class BucketFileAPI extends BaseAPI implements IBucketFileAPI {
     }
 
     getStreamURL(id: BucketFile['id']) : string {
-        return new URL(this.getStreamPath(id), this.client.getBaseURL()).href;
+        return this.resolveURL(this.getStreamPath(id));
     }
 
     async stream(id: BucketFile['id']) : Promise<ReadableStream<any>> {

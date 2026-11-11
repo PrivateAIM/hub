@@ -33,6 +33,10 @@ Helpers in `@privateaim/server-test-kit` (`src/testcontainers/`, `src/authup-tok
   `PROVISIONING_DIRECTORY_PATH` to that directory rather than inheriting the
   image default. Silent trap: a provisioning file at a path Authup does not read
   is ignored, the container stays healthy, and every permission check fails later.
+- `provideAuthup(..., { tokenExchange })` provisions the built-in `system` client with the
+  token exchange grant and one capability for `audience` (`value`, `maxAge`, `realmScope`);
+  `createCapabilityToken({ subjectToken, cap })` then exchanges a real token as `system`.
+  Without the option the exchange is refused.
 - `assertAuthupProvisioning(baseURL, permissionNames)` — runs in global setup for
   both the container and the external-`AUTHUP_URL` path; it introspects the admin
   token and fails immediately, naming any missing permission.

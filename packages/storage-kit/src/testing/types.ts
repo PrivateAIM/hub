@@ -35,7 +35,9 @@ export type FakeHandlerMap = Record<string, FakeHandler>;
 
 export type FakeClientOptions = ClientOptions & {
     handlers?: FakeHandlerMap,
-    fallback?: FakeHandler
+    fallback?: FakeHandler,
+    /** Record into this list instead of a fresh one (used by scoped clients). */
+    requests?: FakeRequest[]
 };
 
 export type RouteMatch = {

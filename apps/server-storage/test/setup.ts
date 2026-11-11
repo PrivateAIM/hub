@@ -38,7 +38,14 @@ async function setup(project: TestProject) {
     // Provide a database + Authup instance: an externally configured service
     // (CI) is used as-is, otherwise a testcontainer is started.
     await provideDatabase(project, 'storage');
-    await provideAuthup(project, PERMISSIONS);
+    await provideAuthup(project, PERMISSIONS, {
+        tokenExchange: {
+            audience: 'storage',
+            value: 'bucket bucket-file',
+            maxAge: 3600,
+            realmScope: 'any',
+        },
+    });
 
     const database = new TestDatabase();
 

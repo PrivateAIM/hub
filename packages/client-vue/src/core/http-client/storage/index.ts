@@ -6,4 +6,6 @@
  */
 
 export * from './install';
+export * from './scope';
 export * from './singleton';
+export * from './types';

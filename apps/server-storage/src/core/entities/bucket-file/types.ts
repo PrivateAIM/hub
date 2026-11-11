@@ -6,7 +6,8 @@
  */
 
 import type { BucketFile } from '@privateaim/storage-kit';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type { EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type { StorageCapability, StorageRequester } from '../../capability/types.ts';
 
 export interface IBucketFileRepository extends IEntityRepository<BucketFile> {
 
@@ -17,7 +18,7 @@ export interface IBucketFileDispatcher {
 }
 
 export interface IBucketFileService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<BucketFile>>;
-    getOne(id: string, query?: Record<string, any>): Promise<BucketFile>;
-    delete(id: string, actor: ActorContext): Promise<BucketFile>;
+    getMany(query: Record<string, any>, capability?: StorageCapability): Promise<EntityRepositoryFindManyResult<BucketFile>>;
+    getOne(id: string, query?: Record<string, any>, capability?: StorageCapability): Promise<BucketFile>;
+    delete(id: string, requester: StorageRequester): Promise<BucketFile>;
 }

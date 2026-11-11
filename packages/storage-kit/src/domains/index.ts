@@ -7,6 +7,7 @@
 
 export * from './bucket';
 export * from './bucket-file';
+export * from './capability';
 
 export * from './constants';
 export * from './types';

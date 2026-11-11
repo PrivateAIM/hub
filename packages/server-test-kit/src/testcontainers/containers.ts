@@ -9,7 +9,7 @@ import { createRequire } from 'node:module';
 import type { StartedNetwork, StartedTestContainer } from 'testcontainers';
 import { GenericContainer, Network, Wait } from 'testcontainers';
 import { buildAuthupProvisioningModule } from './provisioning.ts';
-import type { DatabaseConnection } from './types.ts';
+import type { AuthupProvisioningOptions, DatabaseConnection } from './types.ts';
 
 /**
  * Tag the Authup container with the **installed** `@authup/core-kit` version,
@@ -177,6 +177,7 @@ async function startAuthupDatabaseContainer(
 export async function startAuthupContainer(
     permissionNames: string[],
     databaseEnv: Record<string, string>,
+    options: AuthupProvisioningOptions = {},
 ): Promise<string> {
     let builder = new GenericContainer(AUTHUP_IMAGE).withExposedPorts(AUTHUP_PORT);
     let resolvedDatabaseEnv = databaseEnv;
@@ -218,7 +219,7 @@ export async function startAuthupContainer(
             })
             .withCopyContentToContainer([
                 {
-                    content: buildAuthupProvisioningModule(permissionNames),
+                    content: buildAuthupProvisioningModule(permissionNames, options),
                     target: AUTHUP_PROVISIONING_TARGET,
                 },
             ])

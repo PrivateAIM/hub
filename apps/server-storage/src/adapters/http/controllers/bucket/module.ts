@@ -27,7 +27,13 @@ import {
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
+import {
+    ForceIdentityOrCapabilityMiddleware,
+    ForceIdentityOrStreamCapabilityMiddleware,
+    ForceLoggedInMiddleware,
+    buildActorContext,
+    useRequestIdentityOrFail,
+} from '@privateaim/server-http-kit';
 import type { IAppEvent } from 'routup';
 import {
     sendStream,
@@ -39,7 +45,9 @@ import type { IBucketFileRepository, IBucketService } from '../../../../core/ent
 import { bucketSchema } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
+import { useStorageCapability, useStorageRequester } from '../../requester.ts';
 import { uploadRequestFilesToBucket } from './upload.ts';
+import type { BucketFileUploader } from './types.ts';
 import { packBucketFiles } from './stream.ts';
 
 type BucketControllerContext = {
@@ -78,22 +86,26 @@ export class BucketController {
         this.logger = ctx.logger;
     }
 
-    @DGet('', [ForceLoggedInMiddleware])
+    @DGet('', [ForceIdentityOrCapabilityMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<Bucket>> {
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query);
+        const { data, meta } = await this.service.getMany(query, useStorageCapability(event));
 
         return { data, meta: { ...meta, schema: describeQuerySchema(bucketSchema) } };
     }
 
-    @DGet('/:id/stream', [ForceLoggedInMiddleware])
+    @DGet('/:id/stream', [ForceIdentityOrStreamCapabilityMiddleware])
     async stream(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ) {
-        const entity = await this.service.getOne(id);
+        // The URL may carry a capability token (`?dt=`): never pass it on.
+        event.response.headers.set('referrer-policy', 'no-referrer');
+
+        // Judged before a single byte is packed.
+        const entity = await this.service.getOne(id, undefined, useStorageCapability(event));
 
         const files = await this.bucketFileRepository.findManyBy({ bucketId: entity.id });
 
@@ -112,17 +124,44 @@ export class BucketController {
         return sendStream(event, stream);
     }
 
-    @DPost('/:id/upload', [ForceLoggedInMiddleware])
+    @DPost('/:id/upload', [ForceIdentityOrCapabilityMiddleware])
     async upload(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ) {
-        const actor = buildActorContext(event);
+        const requester = useStorageRequester(event);
         const entity = await this.service.getOne(id);
 
-        await this.service.checkUploadAccess(entity, actor);
+        await this.service.checkUploadAccess(entity, requester);
 
-        const files = await uploadRequestFilesToBucket(event, entity, this.bucketFileComponent, this.bucketFileEventDispatcher);
+        let uploader: BucketFileUploader;
+
+        if (requester.type === 'capability') {
+            // server-core judges the subject's upload when it registers the file.
+            const { subject } = requester.capability;
+
+            uploader = {
+                type: subject.type,
+                id: subject.id,
+                realmId: subject.realmId,
+            };
+        } else {
+            const identity = useRequestIdentityOrFail(event);
+
+            uploader = {
+                type: identity.type,
+                id: identity.id,
+                realmId: identity.realmId,
+            };
+        }
+
+        const files = await uploadRequestFilesToBucket(
+            event,
+            entity,
+            uploader,
+            this.bucketFileComponent,
+            this.bucketFileEventDispatcher,
+        );
 
         event.response.status = 201;
 
@@ -145,13 +184,17 @@ export class BucketController {
         return { data: entity, meta: {} };
     }
 
-    @DGet('/:id', [ForceLoggedInMiddleware])
+    @DGet('/:id', [ForceIdentityOrCapabilityMiddleware])
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Bucket>> {
         const query = useRequestQuery(event);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(
+            id,
+            Object.keys(query).length > 0 ? query : undefined,
+            useStorageCapability(event),
+        );
 
         return {
             data: entity,

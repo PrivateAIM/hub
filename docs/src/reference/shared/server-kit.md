@@ -118,7 +118,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 | `logger` | Winston logger setup and `LoggerModule` |
 | `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `hubwire` message bus; `createMessageBusLogHooks`, `createAmqpDriverLogHooks`, `createRemoteWorkerLogHooks`, `createScheduledComponentLogHooks` — hubwire `hooks` that log through a hub logger |
 | `redis` | Redis module and connection helpers |
-| `authup` | Authup authentication middleware module |
+| `authup` | Authup authentication middleware module; `exchangeAuthupToken` (RFC 8693 token exchange as the Hub client) |
 | `config` | Configuration reading via `envix` |
 | `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema`; `collectRootFilterValues()` — flattens an `and`-of-`eq` filter tree into label equalities for the log endpoints and rejects any other operator with a 400 |
 | `entity-event` | Entity event pub/sub system |

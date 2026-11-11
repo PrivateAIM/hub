@@ -6,7 +6,12 @@
  */
 
 import type { RequestBaseOptions } from 'hapic';
-import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
+import type {
+    Analysis,
+    AnalysisCommand,
+    AnalysisStorageToken,
+    AnalysisStorageTokenCreatePayload,
+} from '@privateaim/core-kit';
 import type { EntityQueryInput } from '../../utils';
 import type { EntityRecordResponse, IEntityAPI } from '../types';
 
@@ -36,6 +41,15 @@ export interface IAnalysisAPI extends IEntityAPI<Analysis, AnalysisCreatePayload
         command: `${AnalysisCommand}`,
         data?: Record<string, any>,
     ) : Promise<EntityRecordResponse<Analysis>>;
+
+    /**
+     * Mint a storage capability token for buckets of this analysis. Credential
+     * endpoint: the body is flat, without the `{ data, meta }` envelope.
+     */
+    createStorageToken(
+        id: Analysis['id'],
+        data: AnalysisStorageTokenCreatePayload,
+    ) : Promise<AnalysisStorageToken>;
 
     /**
      * `responseType: 'stream'` hands back the raw response body. Declared as

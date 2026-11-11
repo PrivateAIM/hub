@@ -8,17 +8,12 @@
 import type { ICondition, IQuery } from '@rapiq/core';
 import { and, eq } from '@rapiq/core';
 import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
-import { AnalysisBucketFileValidator, AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
+import { AnalysisBucketFileValidator, AnalysisBucketType } from '@privateaim/core-kit';
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
-import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
-import {
-    evaluateRecord,
-    evaluateRecordUpdate,
-    hasUnboundedReach,
-    isPermissionError,
-} from '@authup/access';
+import { evaluateRecordUpdate, isPermissionError } from '@authup/access';
 import type { BucketFile } from '@privateaim/storage-kit';
 import type {
     AnalysisBucketUploadRemoval,
@@ -31,7 +26,7 @@ import { decodeQuery } from '../../query/index.ts';
 import { analysisBucketFileSchema } from './schema.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
 import type { IAnalysisBucketRepository } from '../analysis-bucket/types.ts';
-import type { IAnalysisNodeRepository } from '../analysis-node/types.ts';
+import type { IAnalysisBucketAccess } from '../../services/analysis-bucket-access/index.ts';
 import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
 import { buildAnalysisBucketTypeReach } from '../../services/analysis-reach/index.ts';
 
@@ -40,8 +35,8 @@ type AnalysisBucketFileServiceContext = {
     recalculator: IAnalysisFileMetadataRecalculator;
     analysisRepository: IAnalysisRepository;
     analysisBucketRepository: IAnalysisBucketRepository;
-    analysisNodeRepository: IAnalysisNodeRepository;
     reach: IAnalysisReachService;
+    analysisBucketAccess: IAnalysisBucketAccess;
 };
 
 const REACH_TARGET: AnalysisReachTarget = {
@@ -58,9 +53,9 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
     protected analysisBucketRepository: IAnalysisBucketRepository;
 
-    protected analysisNodeRepository: IAnalysisNodeRepository;
-
     protected reach: IAnalysisReachService;
+
+    protected analysisBucketAccess: IAnalysisBucketAccess;
 
     protected validator: AnalysisBucketFileValidator;
 
@@ -70,8 +65,8 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         this.recalculator = ctx.recalculator;
         this.analysisRepository = ctx.analysisRepository;
         this.analysisBucketRepository = ctx.analysisBucketRepository;
-        this.analysisNodeRepository = ctx.analysisNodeRepository;
         this.reach = ctx.reach;
+        this.analysisBucketAccess = ctx.analysisBucketAccess;
         this.validator = new AnalysisBucketFileValidator();
     }
 
@@ -149,18 +144,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         validated.realmId = bucket.realmId;
         validated.analysisId = bucket.analysisId;
 
-        if (bucket.type === AnalysisBucketType.CODE) {
-            await this.assertOwner(actor, analysis, validated);
-            this.assertUnlocked(analysis);
-        } else if (
-            !await this.isSystem(actor) &&
-            !await this.isParticipantUploader(analysis, {
-                realmId: this.getActorRealmId(actor),
-                clientId: actor.identity.type === 'client' ? actor.identity.id : undefined,
-            })
-        ) {
-            throw new PermissionDeniedError();
-        }
+        await this.analysisBucketAccess.assertWrite(actor, bucket, analysis, validated);
 
         if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
             throw new BadRequestError('Only a code file can be the root file.');
@@ -222,7 +206,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
             next: { realm: analysis.realmId, data: { attributes: merged } },
         });
 
-        await this.assertBucketWritable(actor, bucket, analysis);
+        await this.analysisBucketAccess.assertBucketWritable(actor, bucket, analysis);
 
         if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
             throw new BadRequestError('Only a code file can be the root file.');
@@ -245,8 +229,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         // ponytail: a node deleting its OWN result upload needs the plan-021 client binding.
         const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
 
-        await this.assertOwner(actor, analysis, entity);
-        await this.assertBucketWritable(actor, bucket, analysis);
+        await this.analysisBucketAccess.assertDelete(actor, bucket, analysis, entity);
 
         const entityId = entity.id;
 
@@ -335,39 +318,12 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         const analysis = await this.analysisRepository.findOneById(bucket.analysisId);
-        const participant = analysis && await this.isParticipantUploader(analysis, {
+        const participant = analysis && await this.analysisBucketAccess.isParticipantUploader(analysis, {
             realmId: file.realmId,
             clientId: file.actorType === 'client' ? file.actorId : undefined,
         });
 
         return participant ? undefined : 'the uploader is neither an approved analysis node nor the analysis client';
-    }
-
-    /**
-     * Interim RESULT/TEMP participation rule until plan 021: the analysis' own
-     * client (it sits in the owner realm, so it participates by binding — D8),
-     * or the realm of an approved analysis node.
-     */
-    protected async isParticipantUploader(
-        analysis: Analysis,
-        uploader: { realmId?: string | null, clientId?: string },
-    ): Promise<boolean> {
-        if (uploader.clientId && analysis.clientId === uploader.clientId) {
-            return true;
-        }
-
-        // typeorm drops an undefined key, which would match any approved node.
-        if (!uploader.realmId) {
-            return false;
-        }
-
-        const participant = await this.analysisNodeRepository.findOneBy({
-            analysisId: analysis.id,
-            nodeRealmId: uploader.realmId,
-            approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
-        });
-
-        return !!participant;
     }
 
     protected async resolveScope(analysisBucketId: string): Promise<{ bucket: AnalysisBucket, analysis: Analysis }> {
@@ -379,40 +335,5 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         return { bucket, analysis };
-    }
-
-    /** The system: a grant reaching every realm unconditionally (plan 021, Q4). */
-    protected async isSystem(actor: ActorContext): Promise<boolean> {
-        return hasUnboundedReach(actor.permissionEvaluator, PermissionName.ANALYSIS_UPDATE);
-    }
-
-    /** The analysis' realm writes the file, whichever realm uploaded it (D3). */
-    protected async assertOwner(actor: ActorContext, analysis: Analysis, file: Partial<AnalysisBucketFile>): Promise<void> {
-        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
-        await evaluateRecord(actor.permissionEvaluator, {
-            name: PermissionName.ANALYSIS_UPDATE,
-            realm: analysis.realmId,
-            data: { attributes: file },
-        });
-    }
-
-    protected assertUnlocked(analysis: Analysis): void {
-        if (analysis.configurationLocked) {
-            throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
-        }
-    }
-
-    /**
-     * Code files are frozen with the configuration; temp files belong to the
-     * system alone.
-     */
-    protected async assertBucketWritable(actor: ActorContext, bucket: AnalysisBucket, analysis: Analysis): Promise<void> {
-        if (bucket.type === AnalysisBucketType.CODE) {
-            this.assertUnlocked(analysis);
-        }
-
-        if (bucket.type === AnalysisBucketType.TEMP && !await this.isSystem(actor)) {
-            throw new PermissionDeniedError();
-        }
     }
 }

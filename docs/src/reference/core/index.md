@@ -54,6 +54,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `GET/POST` | `/nodes/:id/client/credentials` | Read / update the node's OAuth2 client credentials (secret, name, display name) — usable by the node's own client or a `NODE_UPDATE` manager |
 | `GET` | `/nodes/:id/registry/credentials` | Read the node's own registry project (Harbor robot) credentials — accessible to the node's own client without any management permission |
 | `GET/POST` | `/analyses/:id/client/credentials` | Read / rotate the analysis's OAuth2 client credentials |
+| `POST` | `/analyses/:id/storage/token` | Mint a storage capability token for buckets and files of the analysis (see below) |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
 
 ## Response Shapes
@@ -69,7 +70,7 @@ bulk-delete shapes rather than entity records:
 |----------|-------|
 | `GET /` | `{ version, timestamp }` — service metadata |
 | `POST /services/:id/hook`, `POST /services/:id/command` | `null` (202) — Harbor webhook / command protocol |
-| `GET`/`POST` `/nodes/:id/client/credentials`, `GET`/`POST` `/analyses/:id/client/credentials`, `GET /nodes/:id/registry/credentials` | credential payloads |
+| `GET`/`POST` `/nodes/:id/client/credentials`, `GET`/`POST` `/analyses/:id/client/credentials`, `GET /nodes/:id/registry/credentials`, `POST /analyses/:id/storage/token` | credential payloads |
 | `DELETE /analysis-logs`, `DELETE /analysis-node-logs` | `null` (202) |
 
 `GET /analyses/:id/client/permissions` is a collection but carries **no** `meta.schema` — it proxies
@@ -77,6 +78,46 @@ Authup `ClientPermission` records, for which no Hub-side query schema exists.
 
 See [API Reference](/guide/development/api#response-shapes) for the full contract and the
 `meta.schema` reading rules.
+
+## Storage Capability Tokens
+
+`POST /analyses/:id/storage/token` mints a short-lived, resource-scoped token that
+[server-storage](/reference/storage/#capability-tokens) accepts instead of the caller's login. A
+browser then reaches only the buckets and files of one analysis, for only the requested actions.
+
+```http
+POST /analyses/:id/storage/token
+Authorization: Bearer <access token>
+
+{ "cap": ["bucket:<bucketId>:read,write", "bucket-file:<fileId>:read"], "lifetime": 60 }
+```
+
+| Field | Description |
+|-------|-------------|
+| `cap` | 1 to 32 entries `type:id:actions` (actions comma-separated). Types `bucket` (`read`, `write`, `delete`) and `bucket-file` (`read`, `delete`). `id` is the **storage** bucket or file id. |
+| `lifetime` | Optional, seconds, 1 to 3600 (default 3600). |
+
+The answer is flat (no `{ data, meta }` envelope): `{ "token": "...", "expiresAt": "<ISO date>" }`.
+
+Core decides access first, then exchanges the caller's access token for a capability token at
+Authup (RFC 8693), acting as the Hub client (`CLIENT_ID`). Every entry must belong to the analysis in
+the path, and the caller must be allowed every requested action:
+
+| Action | Rule |
+|--------|------|
+| `read` | The file read rule of the bucket's type: `CODE` needs any participation, `TEMP` an approved node, `RESULT` an approved node plus `analysis_result_read` |
+| `write` | The file create rule: `CODE` owner and unlocked, `RESULT`/`TEMP` system or participant uploader |
+| `delete` | The file delete rule: owner plus a writable bucket |
+
+| Status | Cause |
+|--------|-------|
+| 200 | Token minted |
+| 400 | Malformed entry, unsupported type or action, or an entry outside the analysis (the whole request fails) |
+| 401 | No access token, or core refused it |
+| 403 | An action is not allowed |
+| 404 | Unknown analysis |
+| 501 | `AUTHUP_URL` is not configured |
+| 502 | Authup refused the exchange (any refusal, including `invalid_grant`) or is unreachable (check the [deployment setup](/guide/deployment/configuration#storage-capability-tokens)) |
 
 ## Architecture
 

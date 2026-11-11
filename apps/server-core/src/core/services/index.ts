@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './analysis-bucket-access/index.ts';
 export * from './analysis-builder/index.ts';
 export * from './analysis-configurator/index.ts';
 export * from './analysis-log-access/index.ts';

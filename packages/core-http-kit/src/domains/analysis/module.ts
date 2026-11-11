@@ -8,7 +8,12 @@
 import type { RequestBaseOptions } from 'hapic';
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
-import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
+import type {
+    Analysis,
+    AnalysisCommand,
+    AnalysisStorageToken,
+    AnalysisStorageTokenCreatePayload,
+} from '@privateaim/core-kit';
 import { BaseAPI } from '../base';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 import type { AnalysisCreatePayload, AnalysisUpdatePayload, IAnalysisAPI } from './types';
@@ -84,6 +89,15 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
                 command,
                 ...data,
             });
+
+        return response;
+    }
+
+    async createStorageToken(
+        id: Analysis['id'],
+        data: AnalysisStorageTokenCreatePayload,
+    ): Promise<AnalysisStorageToken> {
+        const { data: response } = await this.client.post(`analyses/${id}/storage/token`, data);
 
         return response;
     }

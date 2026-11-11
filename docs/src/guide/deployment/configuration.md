@@ -694,6 +694,72 @@ release. Hub needs no data changes:
   ignored such grants (see
   [Authup upgrade to beta.68](#authup-upgrade-to-beta-68)), so nothing changes.
 
+## Storage capability tokens
+
+Browsers reach server-storage with a capability token that server-core mints per analysis
+(`POST /analyses/:id/storage/token`) by exchanging the caller's access token at Authup
+(RFC 8693).
+
+::: warning Required from this release
+The UI's analysis file pages and downloads **require** the token exchange. There is no fallback to
+the login token: without the setup below the file lists, uploads and downloads fail. Complete the
+steps below before rolling out the UI.
+:::
+
+- **Authup 1.0.0-beta.74 or newer.** Older servers have no token exchange or capability tokens.
+- **Hub's core client may exchange tokens.** The client server-core authenticates as (`CLIENT_ID`,
+  default `system`) lists `urn:ietf:params:oauth:grant-type:token-exchange` in `grantTypes` (the grant
+  is opt-in) and holds a token exchange capability for the audience `storage`. Declared in an Authup
+  [provisioning file](https://authup.org/guide/deployment/provisioning.html):
+
+  ```yaml
+  realms:
+    - attributes:
+        name: master
+      relations:
+        clients:
+          - attributes:
+              name: system
+              grantTypes: client_credentials urn:ietf:params:oauth:grant-type:token-exchange
+            relations:
+              tokenExchangeCapabilities:
+                - strategy:
+                    type: merge
+                  attributes:
+                    audience: storage
+                    value: bucket bucket-file
+                    maxAge: 3600
+                    realmScope: any
+  ```
+
+  `value` lists the capability types the client may delegate, `maxAge` caps a token's lifetime in
+  seconds, and `realmScope: any` lets it act for users and node clients of every realm. Keep the
+  client's other `grantTypes` (a hub client normally also needs `client_credentials`).
+- **Every realm whose users or node clients mint tokens needs an asymmetric signing key (RSA or
+  EC).** Authup's `/jwks` publishes no symmetric (OCT) keys and refuses to sign a capability token
+  with one, so a realm that only has an OCT key cannot issue them, and server-storage could not
+  verify them.
+- **server-storage verifies tokens locally** against `AUTHUP_URL`'s `/jwks`; it needs no extra
+  credential.
+
+### Rollout order
+
+1. **Authup**: upgrade to 1.0.0-beta.74 or newer, provision the core client (grant and `storage`
+   capability) and make sure every realm has an RSA or EC signing key.
+2. **server-storage**: until it runs the new version, a minted token is refused (401).
+3. **server-core**: it serves the mint route.
+4. **client-ui**: it asks for the tokens.
+
+### Symptoms of a missing step
+
+| Symptom | Missing step |
+|---------|--------------|
+| Mint answers 501 | `AUTHUP_URL` is not set on server-core |
+| Mint answers 502 | Authup is too old or unreachable, the core client lacks the grant or the `storage` capability, a `realmScope` does not cover the caller's realm, or the realm has no RSA/EC signing key |
+| Mint answers 404 | Unknown analysis |
+| Mint succeeds, storage answers 401 | server-storage is not upgraded, or cannot reach Authup's `/jwks` (a `/jwks` outage answers 502) |
+| File pages and downloads fail in the UI | Any of the above; check the mint response first |
+
 ## Database Variables
 
 Used by `server-core`, `server-storage`, `server-telemetry`, and `server-messenger`:

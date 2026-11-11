@@ -8,7 +8,15 @@
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import type { BucketFile } from '@privateaim/storage-kit';
-import { ActionCommandElementType, renderActionCommand } from '../../core';
+import { STORAGE_CAPABILITY_QUERY_PARAMETER, STORAGE_CAPABILITY_URL_TOKEN_MAX_LIFETIME } from '@privateaim/storage-kit';
+import {
+    ActionCommandElementType,
+    downloadViaAnchor,
+    injectAnalysisStorageScope,
+    injectCoreHTTPClient,
+    injectStorageHTTPClient,
+    renderActionCommand,
+} from '../../core';
 
 const FBucketFileDownload = defineComponent({
     props: {
@@ -29,16 +37,33 @@ const FBucketFileDownload = defineComponent({
             default: true,
         },
     },
-    setup(props, { slots }) {
+    emits: ['failed'],
+    setup(props, { slots, emit }) {
+        const scope = injectAnalysisStorageScope();
+        const coreClient = injectCoreHTTPClient();
+        const storageClient = injectStorageHTTPClient();
+
         const execute = async () => {
-            // Same-origin, so the host-only session cookie is sent along. A direct
-            // cross-subdomain storage URL cannot carry it, and a navigation
-            // cannot carry an Authorization header either. The Nuxt server
-            // proxies through to storage in-cluster.
-            window.open(
-                `/api/download/bucket-file/${props.entity.id}`,
-                '_blank',
-            );
+            try {
+                if (!scope) {
+                    throw new Error('A bucket file download requires an analysis storage scope.');
+                }
+
+                // A navigation cannot carry an Authorization header, so the
+                // download carries a short-lived capability in the query.
+                const { token } = await coreClient.analysis.createStorageToken(scope.analysisId, {
+                    cap: [`bucket-file:${props.entity.id}:read`],
+                    lifetime: STORAGE_CAPABILITY_URL_TOKEN_MAX_LIFETIME,
+                });
+
+                const url = new URL(storageClient.bucketFile.getStreamURL(props.entity.id));
+
+                url.searchParams.set(STORAGE_CAPABILITY_QUERY_PARAMETER, token);
+
+                downloadViaAnchor(url.href);
+            } catch (e) {
+                emit('failed', e);
+            }
         };
 
         return () => renderActionCommand({

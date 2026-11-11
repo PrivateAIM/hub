@@ -8,6 +8,8 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { App, serve } from 'routup';
+import { MemoryTokenCache, RedisTokenCache } from '@authup/server-adapter-kit';
+import { STORAGE_CAPABILITY_AUDIENCE } from '@privateaim/storage-kit';
 import {
     AUTHUP_CLIENT_MODULE_NAME,
     AuthupClientInjectionKey,
@@ -18,6 +20,7 @@ import {
     createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
 import {
+    createAuthupCapabilityTokenVerifier,
     createAuthupTokenVerifier,
     mountErrorMiddleware,
     mountMiddlewares,
@@ -83,6 +86,18 @@ export class HTTPModule implements IModule {
                     redisResult.data :
                     undefined,
                 cookiePrefix: config.cookiePrefix,
+                // Capability tokens are verified locally (signature against
+                // Authup's `/jwks`, `aud`, `kind`, `exp`); the cache keeps
+                // Authup's default namespace `authup:capability:storage:<baseURL>`.
+                capability: {
+                    verifier: createAuthupCapabilityTokenVerifier({
+                        baseURL: config.authupURL,
+                        audience: STORAGE_CAPABILITY_AUDIENCE,
+                        cache: redisResult.success ?
+                            new RedisTokenCache(redisResult.data) :
+                            new MemoryTokenCache(),
+                    }),
+                },
                 tokenVerifier: createAuthupTokenVerifier({
                     baseURL: config.authupURL,
                     creator: createAuthupClientTokenCreator({

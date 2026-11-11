@@ -157,6 +157,8 @@ const client = new Client({
 
 ### Client Methods
 
+`client.analysis.createStorageToken(id, { cap, lifetime? })` mints a [storage capability token](/reference/core/#storage-capability-tokens) and returns the flat `{ token, expiresAt }`.
+
 The client exposes a property per domain entity, each with `getMany`, `getOne`, `create`, `update`, `delete` methods:
 
 - `client.analysis`

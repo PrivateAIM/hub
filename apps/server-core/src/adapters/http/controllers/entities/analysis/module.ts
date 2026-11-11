@@ -5,7 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
+import type { 
+    Analysis, 
+    AnalysisCommand, 
+    AnalysisStorageToken, 
+    AnalysisStorageTokenCreatePayload, 
+} from '@privateaim/core-kit';
+import { HubError, UnauthorizedError } from '@privateaim/errors';
 import type {
     AnalysisCreatePayload,
     AnalysisUpdatePayload,
@@ -24,13 +30,15 @@ import {
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
 import type { IAppEvent } from 'routup';
-import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
+import { ForceLoggedInMiddleware, buildActorContext, useRequestToken } from '@privateaim/server-http-kit';
 import { RECORD_QUERY_PARAMETERS, describeQuerySchema } from '@privateaim/server-kit';
 import type { IAnalysisService } from '../../../../../core/index.ts';
 import { analysisSchema } from '../../../../../core/index.ts';
+import type { IStorageCapabilityService } from '../../../../../core/services/storage-capability/index.ts';
 
 type AnalysisControllerContext = {
     service: IAnalysisService;
+    storageCapabilityService?: IStorageCapabilityService;
 };
 
 @DTags('analysis')
@@ -38,8 +46,11 @@ type AnalysisControllerContext = {
 export class AnalysisController {
     protected service: IAnalysisService;
 
+    protected storageCapabilityService: IStorageCapabilityService | undefined;
+
     constructor(ctx: AnalysisControllerContext) {
         this.service = ctx.service;
+        this.storageCapabilityService = ctx.storageCapabilityService;
     }
 
     @DGet('', [ForceLoggedInMiddleware])
@@ -104,6 +115,32 @@ export class AnalysisController {
         event.response.status = 202;
 
         return { data: entity, meta: {} };
+    }
+
+    // A credential endpoint: the response is flat, not a { data, meta } envelope.
+    @DPost('/:id/storage/token', [ForceLoggedInMiddleware])
+    async mintStorageToken(
+        @DPath('id') id: string,
+        @DBody() data: AnalysisStorageTokenCreatePayload,
+        @DContext() event: IAppEvent,
+    ): Promise<AnalysisStorageToken> {
+        if (!this.storageCapabilityService) {
+            throw new HubError({
+                code: 'not_configured',
+                status: 501,
+                message: 'Storage capability tokens require a configured Authup URL.',
+            });
+        }
+
+        const subjectToken = useRequestToken(event);
+
+        if (!subjectToken) {
+            throw new UnauthorizedError();
+        }
+
+        const actor = buildActorContext(event);
+
+        return this.storageCapabilityService.mint(id, data, actor, subjectToken);
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])

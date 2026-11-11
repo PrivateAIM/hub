@@ -27,4 +27,18 @@ export class BaseAPI {
             input :
             createClient(input);
     }
+
+    // -----------------------------------------------------------------------------------
+
+    /**
+     * Resolve a relative path against the base URL, appending rather than
+     * replacing: a base without a trailing slash would lose its last path
+     * segment (`https://host/storage` -> `https://host/<path>`).
+     */
+    protected resolveURL(path: string) : string {
+        const baseURL = this.client.getBaseURL() ?? '';
+        const base = baseURL.endsWith('/') ? baseURL : `${baseURL}/`;
+
+        return new URL(path, base).href;
+    }
 }

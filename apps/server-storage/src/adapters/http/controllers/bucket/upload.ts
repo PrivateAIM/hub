@@ -18,13 +18,14 @@ import Busboy from 'busboy';
 import path from 'node:path';
 import type { IAppEvent } from 'routup';
 import { BadRequestError } from '@privateaim/errors';
-import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import type { BucketEntity } from '../../../database/index.ts';
+import type { BucketFileUploader } from './types.ts';
 
 export async function uploadRequestFilesToBucket(
     event: IAppEvent,
     bucket: BucketEntity,
+    uploader: BucketFileUploader,
     bucketFileComponent: BucketFileComponent,
     bucketFileEventDispatcher?: BucketFileEventDispatcher,
 ) {
@@ -42,10 +43,6 @@ export async function uploadRequestFilesToBucket(
         headers: { 'content-type': contentType },
         preservePath: true,
     });
-
-    const actor = useRequestIdentityOrFail(event);
-
-    const identity = useRequestIdentityOrFail(event);
 
     return new Promise<BucketFileCreationFinishedEventPayload[]>((resolve, reject) => {
         const entries : Promise<BucketFileCreationFinishedEventPayload>[] = [];
@@ -67,12 +64,12 @@ export async function uploadRequestFilesToBucket(
                         {
                             meta: {
                                 id: randomUUID(),
-                                actorType: actor.type,
-                                actorId: actor.id,
+                                actorType: uploader.type,
+                                actorId: uploader.id,
                                 name: path.basename(info.filename),
                                 path: info.filename,
                                 directory: path.dirname(info.filename),
-                                realmId: identity.realmId,
+                                realmId: uploader.realmId,
                                 bucketId: bucket.id,
                                 bucket,
                             },
