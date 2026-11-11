@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './bucket/constants.ts';
 export * from './bucket/types.ts';
 export * from './bucket/service.ts';
 export * from './bucket/schema.ts';
