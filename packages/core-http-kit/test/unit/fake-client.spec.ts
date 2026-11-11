@@ -147,14 +147,14 @@ describe('FakeClient', () => {
     });
 
     it('should post a storage token mint to the analysis and return the flat body', async () => {
-        const client = createFakeClient({ handlers: { 'POST /analyses/:id/storage/tokens': () => ({ token: 't', expiresAt: '2026-01-01T00:00:00.000Z' }) } });
+        const client = createFakeClient({ handlers: { 'POST /analyses/:id/storage/token': () => ({ token: 't', expiresAt: '2026-01-01T00:00:00.000Z' }) } });
 
         const result = await client.analysis.createStorageToken('a1', { cap: ['bucket:b1:read'], lifetime: 60 });
 
         expect(result).toEqual({ token: 't', expiresAt: '2026-01-01T00:00:00.000Z' });
         expect(client.requests[0]).toMatchObject({
             method: 'POST',
-            url: expect.stringContaining('analyses/a1/storage/tokens'),
+            url: expect.stringContaining('analyses/a1/storage/token'),
             params: { id: 'a1' },
             body: { cap: ['bucket:b1:read'], lifetime: 60 },
         });

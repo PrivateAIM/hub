@@ -43,7 +43,7 @@ describe('components/FAnalysisNodeInCard', () => {
                         }],
                         meta: { total: 1 },
                     }),
-                    'POST /analyses/:id/storage/tokens': () => fakeResponse(403, { message: 'denied' }),
+                    'POST /analyses/:id/storage/token': () => fakeResponse(403, { message: 'denied' }),
                 },
             },
         );

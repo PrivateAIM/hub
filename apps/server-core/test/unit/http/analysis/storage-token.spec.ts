@@ -53,7 +53,7 @@ describe('analysis/storage-token', () => {
     });
 
     async function mint(token: string, body: Record<string, any>) {
-        const response = await fetch(`${suite.url}analyses/${analysis.id}/storage/tokens`, {
+        const response = await fetch(`${suite.url}analyses/${analysis.id}/storage/token`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',

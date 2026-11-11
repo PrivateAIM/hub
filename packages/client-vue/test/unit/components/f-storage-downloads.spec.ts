@@ -46,7 +46,7 @@ const listener = (event: Event) => {
 };
 
 const coreHandlers = {
-    'POST /analyses/:id/storage/tokens': () => ({
+    'POST /analyses/:id/storage/token': () => ({
         token: 'a.b+c/d',
         expiresAt: new Date(Date.now() + 60 * 1000).toISOString(),
     }),

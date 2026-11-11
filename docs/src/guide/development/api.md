@@ -17,7 +17,7 @@ Authorization: Bearer <token>
 ```
 
 Storage additionally accepts a short-lived **capability token** minted by
-`POST /analyses/:id/storage/tokens`; see [Storage capability tokens](#storage-capability-tokens).
+`POST /analyses/:id/storage/token`; see [Storage capability tokens](#storage-capability-tokens).
 
 ## Response Shapes
 
@@ -79,7 +79,7 @@ bespoke shapes stay flat.** These endpoints answer with their own shape and neve
 | `GET`/`POST` `/nodes/:id/client/credentials` | `ClientCredentials` | OAuth2 credential payload |
 | `GET`/`POST` `/analyses/:id/client/credentials` | `ClientCredentials` | OAuth2 credential payload |
 | `GET /nodes/:id/registry/credentials` | `RegistryCredentials` | Projection over registry + registry project, not a persisted record |
-| `POST /analyses/:id/storage/tokens` | `{ token, expiresAt }` | Credential payload |
+| `POST /analyses/:id/storage/token` | `{ token, expiresAt }` | Credential payload |
 | `DELETE /analysis-logs` | `null` (202) | Bulk delete, nothing to return |
 | `DELETE /analysis-node-logs` | `null` (202) | Bulk delete, nothing to return |
 | `DELETE /logs` (telemetry) | `null` (202) | Bulk delete, nothing to return |
@@ -264,7 +264,7 @@ The **Shape** column tells you which envelope from [Response Shapes](#response-s
 | `POST` | `/analyses` | Create analysis | record, `meta: {}` |
 | `POST` | `/analyses/:id` | Update analysis | record, `meta: {}` |
 | `POST` | `/analyses/:id/command` | Run an analysis command | record, `meta: {}` |
-| `POST` | `/analyses/:id/storage/tokens` | Mint a storage capability token (body `{ cap: string[], lifetime?: number }`) | flat `{ token, expiresAt }` |
+| `POST` | `/analyses/:id/storage/token` | Mint a storage capability token (body `{ cap: string[], lifetime?: number }`) | flat `{ token, expiresAt }` |
 | `DELETE` | `/analyses/:id` | Delete analysis | record, `meta: {}` |
 
 ### Projects

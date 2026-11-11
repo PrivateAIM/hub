@@ -76,7 +76,7 @@ the owning service checks each upload when it registers it (see
 
 Besides a login, server-storage accepts an Authup **capability token** (`kind: capability_token`,
 audience `storage`) minted by server-core through
-[`POST /analyses/:id/storage/tokens`](/reference/core/#storage-capability-tokens). It is verified
+[`POST /analyses/:id/storage/token`](/reference/core/#storage-capability-tokens). It is verified
 locally (signature against Authup's `/jwks`, `aud`, `kind`, `exp`) and grants only the actions on the
 resources in its `cap` claim. A capability request carries no identity: every route not listed below
 answers it 401.

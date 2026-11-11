@@ -118,7 +118,7 @@ export class AnalysisController {
     }
 
     // A credential endpoint: the response is flat, not a { data, meta } envelope.
-    @DPost('/:id/storage/tokens', [ForceLoggedInMiddleware])
+    @DPost('/:id/storage/token', [ForceLoggedInMiddleware])
     async mintStorageToken(
         @DPath('id') id: string,
         @DBody() data: AnalysisStorageTokenCreatePayload,
