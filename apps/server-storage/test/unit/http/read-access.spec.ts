@@ -225,6 +225,38 @@ describe('identity read access to buckets and bucket files', () => {
             expect(stream.status).toBe(200);
             await stream.arrayBuffer();
         });
+
+        it.each([
+            'createdAt',
+            '-createdAt',
+            'updatedAt',
+            'directory',
+        ])('should page a sparse fieldset sorted by an omitted column (%s)', async (sort) => {
+            const response = await request(token, `/bucket-files?fields=name&sort=${sort}&page[limit]=10&page[offset]=0`);
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+
+            expect(body.data).toHaveLength(1);
+            expect(body.data[0].name).toBe('owned.json');
+            expect(Object.keys(body.data[0])).not.toContain(sort.replace(/^-/, ''));
+        });
+
+        it.each([
+            'createdAt',
+            '-updatedAt',
+        ])('should page a sparse bucket fieldset sorted by an omitted column (%s)', async (sort) => {
+            const response = await request(token, `/buckets?fields=name&sort=${sort}&page[limit]=10&page[offset]=0`);
+
+            expect(response.status).toBe(200);
+
+            const body = await response.json();
+
+            expect(body.data).toHaveLength(1);
+            expect(Object.keys(body.data[0])).not.toContain('createdAt');
+            expect(Object.keys(body.data[0])).not.toContain('updatedAt');
+        });
     });
 
     describe('as the admin', () => {
