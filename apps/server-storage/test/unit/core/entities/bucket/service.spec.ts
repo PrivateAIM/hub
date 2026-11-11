@@ -121,14 +121,14 @@ describe('BucketService', () => {
         beforeEach(() => {
             repository.seed([
                 createTestBucket({
-                    id: 'a-1', 
-                    name: 'a-1', 
-                    realmId: realmA, 
+                    id: 'a-1',
+                    name: 'a-1',
+                    realmId: realmA,
                 }),
                 createTestBucket({
-                    id: 'b-1', 
-                    name: 'b-1', 
-                    realmId: realmB, 
+                    id: 'b-1',
+                    name: 'b-1',
+                    realmId: realmB,
                 }),
             ]);
         });
@@ -594,10 +594,24 @@ describe('BucketService', () => {
             ).rejects.toThrow(PermissionError);
         });
 
-        it('should leave a bucket with a ref to the owning service', async () => {
+        it('should gate a bucket with a ref like a ref-less one', async () => {
             const bucket = createTestBucket({ refType: 'analysis', refId: randomUUID() });
 
-            await expect(service.checkUploadAccess(bucket, { type: 'actor', actor: createDenyAllActor() })).resolves.toBeUndefined();
+            await expect(
+                service.checkUploadAccess(bucket, { type: 'actor', actor: createDenyAllActor() }),
+            ).rejects.toThrow(PermissionError);
+        });
+
+        it('should let the owner of a bucket with a ref upload', async () => {
+            const actor = createDenyAllActor();
+            const bucket = createTestBucket({
+                refType: 'analysis',
+                refId: randomUUID(),
+                actorId: actor.identity!.id,
+                actorType: 'user',
+            });
+
+            await expect(service.checkUploadAccess(bucket, { type: 'actor', actor })).resolves.toBeUndefined();
         });
 
         it('should gate a bucket with only a refType like a ref-less one', async () => {

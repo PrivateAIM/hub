@@ -249,12 +249,7 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
         const { actor } = requester;
 
-        // ponytail: a bucket with a refId belongs to another service's resource (e.g. an
-        // analysis), whose uploaders span realms and whose permissions storage cannot
-        // evaluate; server-core checks those uploads after the fact. A synchronous gate
-        // for them is plan 012 (analysis capability tokens) — until then a rejected
-        // RESULT/TEMP upload stays in storage.
-        if (entity.refId || this.isOwnedByActor(entity, actor)) {
+        if (this.isOwnedByActor(entity, actor)) {
             return;
         }
 

@@ -37,7 +37,7 @@ export function applyQuery(
     // With a join and a page, typeorm selects `DISTINCT <alias>.id` from the
     // inner query, so a sparse fieldset without `id` would reference a missing
     // column (500). Identity reads of bucket files join `bucket` for the reach.
-    // ponytail: belongs in rapiq's fields adapter (always project the primary key).
+    // Belongs in rapiq's fields adapter (always project the primary key).
     const { selects, mainAlias } = queryBuilder.expressionMap;
 
     const needsId = mainAlias && selects.length > 0 &&

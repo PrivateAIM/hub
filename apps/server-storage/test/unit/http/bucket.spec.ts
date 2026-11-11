@@ -18,6 +18,7 @@ import type { Readable } from 'node:stream';
 import type { ComponentHandlerContext } from 'hubwire';
 import type { BucketComponentEventMap } from '@privateaim/server-storage-kit';
 import { BucketCommand, BucketEvent } from '@privateaim/server-storage-kit';
+import type { Bucket } from '@privateaim/storage-kit';
 import { PermissionName } from '@privateaim/kit';
 import { createAdminAuthorizationHeader, createRestrictedAccessToken } from '@privateaim/server-test-kit';
 import {
@@ -645,24 +646,54 @@ describe('bucket HTTP endpoints', () => {
                 expect((await upload(updater, refLessBucketId)).status).toBe(201);
             });
 
-            it('should leave uploads to a bucket with a ref to the owning service', async () => {
-                let bucketId: string | undefined;
-                const handler = new BucketCreateHandler({ storage: suite.storage() });
+            describe('into a bucket with a ref to the owning service', () => {
+                const seedRefBucket = async (extra: Partial<Bucket> = {}): Promise<string> => {
+                    let bucketId: string | undefined;
+                    const handler = new BucketCreateHandler({ storage: suite.storage() });
 
-                await handler.handle(createTestBucket({ refType: 'analysis', refId: crypto.randomUUID() }), {
-                    key: BucketCommand.CREATE,
-                    metadata: {},
-                    handle: async (...event) => {
-                        if (event[0] === BucketEvent.CREATION_FINISHED) {
-                            bucketId = event[1].id;
-                        }
-                    },
+                    await handler.handle({
+                        ...createTestBucket({ refType: 'analysis', refId: crypto.randomUUID() }),
+                        ...extra,
+                    }, {
+                        key: BucketCommand.CREATE,
+                        metadata: {},
+                        handle: async (...event) => {
+                            if (event[0] === BucketEvent.CREATION_FINISHED) {
+                                bucketId = event[1].id;
+                            }
+                        },
+                    });
+                    expect(bucketId).toBeDefined();
+
+                    return bucketId!;
+                };
+
+                it('should deny a stranger without BUCKET_UPDATE before storing anything', async () => {
+                    const refBucketId = await seedRefBucket();
+                    const stranger = await createRestrictedAccessToken();
+
+                    expect((await upload(stranger, refBucketId)).status).toBe(403);
+                    expect(await countFiles(refBucketId)).toBe(0);
                 });
-                expect(bucketId).toBeDefined();
 
-                const stranger = await createRestrictedAccessToken();
+                it('should let a BUCKET_UPDATE holder upload', async () => {
+                    const updater = await createRestrictedAccessToken([PermissionName.BUCKET_UPDATE]);
+                    const [, payload] = updater.split('.');
+                    const { realm_id: realmId } = JSON.parse(Buffer.from(payload, 'base64url').toString('utf-8'));
+                    // The grant reaches the bucket's realm: seed the bucket there, as an analysis bucket is.
+                    const refBucketId = await seedRefBucket({ realmId });
 
-                expect((await upload(stranger, bucketId!)).status).toBe(201);
+                    expect((await upload(updater, refBucketId)).status).toBe(201);
+                });
+
+                it('should let the owner upload without a bucket permission', async () => {
+                    const owner = await createRestrictedAccessToken();
+                    const [, payload] = owner.split('.');
+                    const { sub } = JSON.parse(Buffer.from(payload, 'base64url').toString('utf-8'));
+                    const refBucketId = await seedRefBucket({ actorId: sub, actorType: 'user' });
+
+                    expect((await upload(owner, refBucketId)).status).toBe(201);
+                });
             });
         });
     });
