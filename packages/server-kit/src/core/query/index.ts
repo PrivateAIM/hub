@@ -8,5 +8,6 @@
 export * from './conditions.ts';
 export * from './describe.ts';
 export * from './filters.ts';
+export * from './prefix.ts';
 export * from './scope.ts';
 export * from './types.ts';

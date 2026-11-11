@@ -6,6 +6,5 @@
  */
 
 export * from './module.ts';
-export * from './prefix.ts';
 export * from './relations.ts';
 export * from './types.ts';

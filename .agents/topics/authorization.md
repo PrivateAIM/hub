@@ -210,7 +210,7 @@ steps: [deployment configuration](../../docs/src/guide/deployment/configuration.
 
 - **The grant is compiled against the analysis (no `realmAttributeName`) and re-rooted
   onto the row's `analysis` relation** with `prefixConditionFields`
-  (`core/query/prefix.ts`). Never filter on a family table's own realm column: a bucket
+  (`@privateaim/server-kit`). Never filter on a family table's own realm column: a bucket
   file's `realmId` is the uploader's, not the owner's.
 - Per bucket type (`buildAnalysisBucketTypeReach`): CODE for every participant; TEMP/RESULT
   only through an APPROVED node. RESULT **files** additionally need
