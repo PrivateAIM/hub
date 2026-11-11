@@ -108,7 +108,8 @@ itself, and never to a value that covers Authup's host. The Helm chart refuses t
 combination at render time (`flameHub.validateCookieDomain`).
 
 It buys the Hub nothing by default: the backend services read only the bearer token from
-the `Authorization` header (or `?dt=` on the two storage stream routes), never a cookie.
+the `Authorization` header, never a cookie (a short-lived stream capability token may use `?dt=`
+on the two storage stream routes).
 Downloads use short-lived capability tokens minted by server-core.
 
 When `NUXT_PUBLIC_COOKIE_DOMAIN` genuinely must be widened, also set

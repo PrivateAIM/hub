@@ -905,8 +905,8 @@ The cookie settings are deployment decisions rather than service addresses, and 
 | `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` | No | Namespace prefixed onto every session cookie name. Set this **whenever `NUXT_PUBLIC_COOKIE_DOMAIN` is widened**, so Authup's own hosted pages can't collide with the UI's cookies on that domain. |
 
 The backend services (`server-core`, `server-storage`, `server-telemetry`, `server-messenger`)
-never read a session cookie: a request must send `Authorization: Bearer`, or `?dt=` on the two
-storage stream routes. The cookie settings above therefore concern the UI and Authup only.
+never read a session cookie: a login sends `Authorization: Bearer`, and only a short-lived stream
+capability token may use `?dt=` on the two storage stream routes. The cookie settings above therefore concern the UI and Authup only.
 
 ### Where Authup is served matters
 

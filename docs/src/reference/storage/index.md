@@ -66,8 +66,8 @@ everyone else needs the permission and realm access. Buckets created before this
 actor and are not backfilled, so only permission holders can manage them.
 
 Uploading (`POST /buckets/:id/upload`) into any bucket, one with a `refId` (an analysis bucket) included,
-requires being its creator, or `bucket_update` with realm access; anyone else gets 403 before a file is
-stored. Server-core additionally checks each upload when it registers it (see
+requires being its creator, `bucket_update` with realm access, or a capability token with `write` on the
+bucket; anyone else gets 403 before a file is stored. Server-core additionally checks each upload when it registers it (see
 [Writing analysis buckets and files](/guide/deployment/configuration#writing-analysis-buckets-and-files-requires-analysis-update)).
 
 ## Read access
@@ -79,8 +79,8 @@ realm and creator, never by the uploader's realm. A record out of reach answers 
 login without any of the three permissions sees only the buckets it created. Sparse fieldsets always
 include `id`.
 
-The service reads the access token only from the `Authorization: Bearer` header, or `?dt=` on the two
-stream routes; it never reads a cookie.
+A login sends its access token in the `Authorization: Bearer` header; the service never reads a cookie.
+Only a short-lived stream capability token may travel in `?dt=`, and only on the two stream routes.
 
 ## Capability Tokens
 
