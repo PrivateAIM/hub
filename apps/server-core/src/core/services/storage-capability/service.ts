@@ -43,7 +43,7 @@ type ResolvedEntry = {
 export class StorageCapabilityService implements IStorageCapabilityService {
     protected issuer: ICapabilityTokenIssuer;
 
-    protected access: IAnalysisBucketAccess;
+    protected analysisBucketAccess: IAnalysisBucketAccess;
 
     protected analysisRepository: IAnalysisRepository;
 
@@ -55,7 +55,7 @@ export class StorageCapabilityService implements IStorageCapabilityService {
 
     constructor(ctx: StorageCapabilityServiceContext) {
         this.issuer = ctx.issuer;
-        this.access = ctx.access;
+        this.analysisBucketAccess = ctx.analysisBucketAccess;
         this.analysisRepository = ctx.analysisRepository;
         this.analysisBucketRepository = ctx.analysisBucketRepository;
         this.analysisBucketFileRepository = ctx.analysisBucketFileRepository;
@@ -162,17 +162,17 @@ export class StorageCapabilityService implements IStorageCapabilityService {
     ): Promise<void> {
         switch (action) {
             case StorageCapabilityAction.READ:
-                if (!await this.access.canRead(actor, bucket)) {
+                if (!await this.analysisBucketAccess.canRead(actor, bucket)) {
                     throw new PermissionDeniedError();
                 }
 
                 return;
             case StorageCapabilityAction.WRITE:
-                await this.access.assertWrite(actor, bucket, analysis, file);
+                await this.analysisBucketAccess.assertWrite(actor, bucket, analysis, file);
 
                 return;
             case StorageCapabilityAction.DELETE:
-                await this.access.assertDelete(actor, bucket, analysis, file);
+                await this.analysisBucketAccess.assertDelete(actor, bucket, analysis, file);
 
                 return;
             default:

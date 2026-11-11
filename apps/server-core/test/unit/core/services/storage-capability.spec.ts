@@ -94,7 +94,7 @@ describe('StorageCapabilityService', () => {
 
         service = new StorageCapabilityService({
             issuer,
-            access: new AnalysisBucketAccess({
+            analysisBucketAccess: new AnalysisBucketAccess({
                 reach, 
                 analysisRepository, 
                 analysisNodeRepository, 

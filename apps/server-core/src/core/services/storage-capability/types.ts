@@ -24,7 +24,7 @@ export interface ICapabilityTokenIssuer {
 
 export type StorageCapabilityServiceContext = {
     issuer: ICapabilityTokenIssuer;
-    access: IAnalysisBucketAccess;
+    analysisBucketAccess: IAnalysisBucketAccess;
     analysisRepository: IAnalysisRepository;
     analysisBucketRepository: IAnalysisBucketRepository;
     analysisBucketFileRepository: IAnalysisBucketFileRepository;

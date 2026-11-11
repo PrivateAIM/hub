@@ -168,7 +168,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
                 clientSecret: config.clientSecret,
                 realm: config.realm,
             }),
-            access: analysisBucketAccess,
+            analysisBucketAccess,
             analysisRepository,
             analysisBucketRepository,
             analysisBucketFileRepository,
