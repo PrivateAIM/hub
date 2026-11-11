@@ -15,6 +15,7 @@ import {
 import type { ICondition } from '@rapiq/core';
 import { Query, eq, inArray } from '@rapiq/core';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import type { CapabilityEntry } from '@privateaim/kit';
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
@@ -79,7 +80,19 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         let target: ICondition = eq('id', stored.id);
 
         if (requester.type === 'capability') {
-            assertCapabilityCoversBucket(requester.capability, stored.id, StorageCapabilityAction.READ);
+            // A name is unique per realm only: prefer the covered bucket of
+            // that name over whichever one the unscoped lookup picked.
+            const covered = stored.id === id ?
+                stored :
+                await this.findCoveredByName(id, requester.capability.entries) ?? stored;
+
+            assertCapabilityCoversBucket(requester.capability, covered.id, StorageCapabilityAction.READ);
+
+            if (!query) {
+                return covered;
+            }
+
+            target = eq('id', covered.id);
         } else {
             // The list's condition: an unreached bucket is a 404, like a missing one.
             reach = await resolveBucketReadReach(requester.actor);
@@ -110,6 +123,20 @@ export class BucketService extends AbstractEntityService implements IBucketServi
         if (data.length === 0) {
             throw new EntityNotFoundError({ entity: 'bucket' });
         }
+
+        return data[0];
+    }
+
+    protected async findCoveredByName(name: string, entries: CapabilityEntry[]): Promise<Bucket | undefined> {
+        const ids = capabilityBucketIds(entries, StorageCapabilityAction.READ);
+
+        if (ids.length === 0) {
+            return undefined;
+        }
+
+        const { data } = await this.repository.findMany(
+            appendQueryConditions(new Query({}), eq('name', name), inArray('id', ids)),
+        );
 
         return data[0];
     }

@@ -721,6 +721,29 @@ describe('BucketService', () => {
             await expect(service.getOne('named', undefined, { type: 'capability', capability })).resolves.toMatchObject({ id: 'b-1' });
         });
 
+        it('should resolve a shared name to the covered bucket', async () => {
+            repository.seed([
+                createTestBucket({
+                    id: 'b-1', 
+                    name: 'shared', 
+                    realmId: 'realm-a', 
+                }),
+                createTestBucket({
+                    id: 'b-2', 
+                    name: 'shared', 
+                    realmId: 'realm-b', 
+                }),
+            ]);
+
+            await expect(
+                service.getOne('shared', undefined, capabilityRequester('bucket:b-2:read')),
+            ).resolves.toMatchObject({ id: 'b-2' });
+
+            await expect(
+                service.getOne('shared', undefined, capabilityRequester('bucket:b-3:read')),
+            ).rejects.toThrow(PermissionDeniedError);
+        });
+
         it('should deny a bucket the capability does not cover for read', async () => {
             repository.seed(createTestBucket({ id: 'b-1' }));
 
