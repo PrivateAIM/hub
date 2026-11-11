@@ -91,7 +91,7 @@ describe('AnalysisBucketFileService', () => {
             analysisRepository,
             analysisBucketRepository,
             reach,
-            access: new AnalysisBucketAccess({
+            analysisBucketAccess: new AnalysisBucketAccess({
                 reach, 
                 analysisRepository, 
                 analysisNodeRepository, 

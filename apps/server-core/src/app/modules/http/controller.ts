@@ -135,7 +135,7 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         repository: analysisBucketFileRepository,
         recalculator: container.resolve(AnalysisInjectionKey.FileRecalculator),
         reach: analysisReachService,
-        access: analysisBucketAccess,
+        analysisBucketAccess,
         analysisRepository,
         analysisBucketRepository,
     });

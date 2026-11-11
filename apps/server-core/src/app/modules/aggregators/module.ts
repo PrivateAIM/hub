@@ -124,7 +124,7 @@ export class AggregatorsModule implements IModule {
                         analysisRepository,
                         analysisBucketRepository,
                         reach: bucketFileReach,
-                        access: new AnalysisBucketAccess({
+                        analysisBucketAccess: new AnalysisBucketAccess({
                             reach: bucketFileReach,
                             analysisRepository,
                             analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),

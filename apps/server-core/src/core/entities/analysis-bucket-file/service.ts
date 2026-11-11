@@ -36,7 +36,7 @@ type AnalysisBucketFileServiceContext = {
     analysisRepository: IAnalysisRepository;
     analysisBucketRepository: IAnalysisBucketRepository;
     reach: IAnalysisReachService;
-    access: IAnalysisBucketAccess;
+    analysisBucketAccess: IAnalysisBucketAccess;
 };
 
 const REACH_TARGET: AnalysisReachTarget = {
@@ -55,7 +55,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
     protected reach: IAnalysisReachService;
 
-    protected access: IAnalysisBucketAccess;
+    protected analysisBucketAccess: IAnalysisBucketAccess;
 
     protected validator: AnalysisBucketFileValidator;
 
@@ -66,7 +66,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         this.analysisRepository = ctx.analysisRepository;
         this.analysisBucketRepository = ctx.analysisBucketRepository;
         this.reach = ctx.reach;
-        this.access = ctx.access;
+        this.analysisBucketAccess = ctx.analysisBucketAccess;
         this.validator = new AnalysisBucketFileValidator();
     }
 
@@ -144,7 +144,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         validated.realmId = bucket.realmId;
         validated.analysisId = bucket.analysisId;
 
-        await this.access.assertWrite(actor, bucket, analysis, validated);
+        await this.analysisBucketAccess.assertWrite(actor, bucket, analysis, validated);
 
         if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
             throw new BadRequestError('Only a code file can be the root file.');
@@ -206,7 +206,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
             next: { realm: analysis.realmId, data: { attributes: merged } },
         });
 
-        await this.access.assertBucketWritable(actor, bucket, analysis);
+        await this.analysisBucketAccess.assertBucketWritable(actor, bucket, analysis);
 
         if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
             throw new BadRequestError('Only a code file can be the root file.');
@@ -229,7 +229,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         // ponytail: a node deleting its OWN result upload needs the plan-021 client binding.
         const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
 
-        await this.access.assertDelete(actor, bucket, analysis, entity);
+        await this.analysisBucketAccess.assertDelete(actor, bucket, analysis, entity);
 
         const entityId = entity.id;
 
@@ -318,7 +318,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         const analysis = await this.analysisRepository.findOneById(bucket.analysisId);
-        const participant = analysis && await this.access.isParticipantUploader(analysis, {
+        const participant = analysis && await this.analysisBucketAccess.isParticipantUploader(analysis, {
             realmId: file.realmId,
             clientId: file.actorType === 'client' ? file.actorId : undefined,
         });

@@ -74,7 +74,7 @@ describe('storage bucket-file aggregator', () => {
                 analysisRepository,
                 analysisBucketRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
                 reach,
-                access: new AnalysisBucketAccess({
+                analysisBucketAccess: new AnalysisBucketAccess({
                     reach,
                     analysisRepository,
                     analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
