@@ -28,8 +28,8 @@ import { UnconfiguredTokenVerifier } from './unconfigured-token-verifier.ts';
  * this closes (authup#3724: an Authup server <= 1.0.0-beta.69 reported a
  * malformed token as the calling service's own client, and the beta.70
  * verifier still forwards such a token to introspection). Lives on the
- * verifier every service builds, so every credential source — header, cookie
- * fallback, socket handshake — is covered from one place.
+ * verifier every service builds, so every credential source — header, query
+ * capability, socket handshake — is covered from one place.
  *
  * Every hub service passes a `creator`, so the verifier runs in REMOTE mode
  * (introspection), and always passes a result cache: Redis when the service

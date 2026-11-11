@@ -27,17 +27,6 @@ type TokenVerificationDataMinimal = Pick<
 >;
 
 /**
- * Namespaces the cookie-fallback token lookup the same way
- * `@authup/client-web-nuxt`'s `cookiePrefix` module option namespaces the
- * cookie it writes. `prefix` is empty by default, so the bare `access_token`
- * name is unchanged for every deployment that hasn't widened its cookie
- * domain.
- */
-export function resolveAccessTokenCookieName(prefix?: string): string {
-    return `${prefix ?? ''}access_token`;
-}
-
-/**
  * The `kind` claim of a compact JWS, read WITHOUT verification. It only
  * picks the verifier: each verifier checks `kind` on the claims it verified
  * itself, so a lying payload ends in a refused token, never in a capability

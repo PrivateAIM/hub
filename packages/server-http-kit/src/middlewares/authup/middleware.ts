@@ -10,7 +10,6 @@ import type { ITokenVerifier } from '@authup/server-adapter-kit';
 import { extractBearerToken } from '@authup/server-adapter-kit';
 import { OAuth2TokenKind } from '@authup/specs';
 import { UnauthorizedError } from '@privateaim/errors';
-import { useRequestCookie } from '@routup/basic/cookie';
 import type { App, IAppEvent } from 'routup';
 import { defineCoreHandler } from 'routup';
 import { setRequestEnv } from '../../request/index.ts';
@@ -21,7 +20,6 @@ import {
     buildRequestCapability,
     isCapabilityTokenKind,
     peekTokenKind,
-    resolveAccessTokenCookieName,
 } from './utils.ts';
 
 /**
@@ -74,8 +72,8 @@ async function applyCapabilityToken(
 
 /**
  * Credential precedence: the `Authorization` header, then (only with
- * `options.capability`) the query capability token, then the access-token
- * cookie. Exactly one credential is verified per request.
+ * `options.capability`) the query capability token. Exactly one
+ * credential is verified per request; a cookie is never read.
  *
  * A capability request gets `capability` and no identity, no permission
  * evaluator and no `token`, so every `ForceLoggedInMiddleware` route answers
@@ -132,17 +130,6 @@ export function mountAuthorizationMiddleware(
                     await applyCapabilityToken(event, queryToken, capability.verifier, 'query');
 
                     return event.next();
-                }
-            }
-
-            const cookieToken = useRequestCookie(event, resolveAccessTokenCookieName(options.cookiePrefix));
-
-            if (cookieToken) {
-                // The cookie may hold the bare token or `Bearer <token>`, as `verifyRequest` accepted.
-                const token = extractBearerToken(cookieToken.startsWith('Bearer ') ? cookieToken : `Bearer ${cookieToken}`);
-
-                if (token) {
-                    await applyIdentityToken(event, token, tokenVerifier, authupClient);
                 }
             }
         } catch (err) {

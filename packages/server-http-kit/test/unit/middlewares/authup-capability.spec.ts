@@ -286,12 +286,16 @@ describe('authorization middleware: capability tokens', () => {
         expect(res.body?.token).toBe(ACCESS_NO_KIND);
     });
 
-    it('stores the raw cookie token of an identity request', async () => {
-        const res = await request(createApp(), { cookie: ACCESS });
+    it('leaves a request carrying only the access-token cookie anonymous', async () => {
+        const tokenVerifier = createTokenVerifier();
+        const capabilityVerifier = createCapabilityVerifier();
+        const res = await request(createApp({ tokenVerifier, capabilityVerifier }), { cookie: ACCESS });
 
         expect(res.status).toBe(200);
-        expect(res.body?.identity).toEqual({ id: SUBJECT_ID, type: 'user' });
-        expect(res.body?.token).toBe(ACCESS);
+        expect(res.body?.identity).toBeNull();
+        expect(res.body?.token).toBeNull();
+        expect(res.body?.capability).toBeNull();
+        expect(tokenVerifier.calls).toEqual([]);
     });
 
     it('accepts a query capability living 60 seconds', async () => {
@@ -341,7 +345,7 @@ describe('authorization middleware: capability tokens', () => {
         expect(res.body?.capability).toBeNull();
     });
 
-    it('lets the query token win over the cookie, and skips the cookie', async () => {
+    it('ignores the cookie next to a query token', async () => {
         const tokenVerifier = createTokenVerifier();
         const res = await request(createApp({ tokenVerifier }), { path: `/?dt=${QUERY_CAP_60}`, cookie: ACCESS });
 
