@@ -7,7 +7,7 @@
 
 import type { BucketFile } from '@privateaim/storage-kit';
 import type { EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import type { StorageCapability, StorageRequester } from '../../capability/types.ts';
+import type { StorageRequester } from '../../capability/types.ts';
 
 export interface IBucketFileRepository extends IEntityRepository<BucketFile> {
 
@@ -18,7 +18,15 @@ export interface IBucketFileDispatcher {
 }
 
 export interface IBucketFileService {
-    getMany(query: Record<string, any>, capability?: StorageCapability): Promise<EntityRepositoryFindManyResult<BucketFile>>;
-    getOne(id: string, query?: Record<string, any>, capability?: StorageCapability): Promise<BucketFile>;
+    /**
+     * The files a capability covers for read, or of the buckets an identity
+     * reaches (judged by the bucket, never by the file's own realm).
+     */
+    getMany(query: Record<string, any>, requester: StorageRequester): Promise<EntityRepositoryFindManyResult<BucketFile>>;
+    /**
+     * One file through the list's condition: an identity that does not reach
+     * its bucket gets a 404, an uncovering capability a 403.
+     */
+    getOne(id: string, query: Record<string, any> | undefined, requester: StorageRequester): Promise<BucketFile>;
     delete(id: string, requester: StorageRequester): Promise<BucketFile>;
 }

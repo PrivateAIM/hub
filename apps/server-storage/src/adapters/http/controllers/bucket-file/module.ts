@@ -40,7 +40,7 @@ import type { IStorageAdapter } from '../../../../core/storage/types.ts';
 import type { IBucketFileService } from '../../../../core/entities/index.ts';
 import { bucketFileSchema } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
-import { useStorageCapability, useStorageRequester } from '../../requester.ts';
+import { useStorageRequester } from '../../requester.ts';
 
 type BucketFileControllerContext = {
     service: IBucketFileService;
@@ -68,7 +68,7 @@ export class BucketFileController {
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<BucketFile>> {
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query, useStorageCapability(event));
+        const { data, meta } = await this.service.getMany(query, useStorageRequester(event));
 
         return { data, meta: { ...meta, schema: describeQuerySchema(bucketFileSchema) } };
     }
@@ -82,7 +82,7 @@ export class BucketFileController {
         event.response.headers.set('referrer-policy', 'no-referrer');
 
         // Judged before the object is fetched.
-        const entity = await this.service.getOne(id, undefined, useStorageCapability(event));
+        const entity = await this.service.getOne(id, undefined, useStorageRequester(event));
 
         const bucketName = toBucketName(entity.bucketId);
 
@@ -130,7 +130,7 @@ export class BucketFileController {
         const entity = await this.service.getOne(
             id,
             Object.keys(query).length > 0 ? query : undefined,
-            useStorageCapability(event),
+            useStorageRequester(event),
         );
 
         return {

@@ -17,6 +17,7 @@ import {
     it,
 } from 'vitest';
 import { BucketFileService } from '../../../../../src/core/entities/bucket-file/service.ts';
+import type { ActorContext } from '@privateaim/server-kit';
 import {
     FakeEntityRepository,
     createAllowAllActor,
@@ -24,7 +25,7 @@ import {
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeBucketFileDispatcher } from './fake-dispatcher.ts';
-import type { StorageCapability } from '../../../../../src/core/capability/types.ts';
+import type { StorageCapability, StorageRequester } from '../../../../../src/core/capability/types.ts';
 
 function createTestBucketFile(overrides?: Partial<BucketFile>): BucketFile {
     return {
@@ -45,6 +46,34 @@ function createTestBucketFile(overrides?: Partial<BucketFile>): BucketFile {
     } as BucketFile;
 }
 
+function createTestBucket(overrides: Partial<Bucket>): Bucket {
+    return {
+        id: randomUUID(),
+        name: randomUUID(),
+        region: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        actorId: null,
+        actorType: null,
+        realmId: null,
+        refType: null,
+        refId: null,
+        ...overrides,
+    };
+}
+
+function actorRequester(actor: ActorContext): StorageRequester {
+    return { type: 'actor', actor };
+}
+
+function ownedBy(actor: ActorContext): Pick<BucketFile, 'actorType' | 'actorId'> {
+    if (!actor.identity) {
+        throw new Error('The actor has no identity.');
+    }
+
+    return { actorType: actor.identity.type, actorId: actor.identity.id };
+}
+
 describe('BucketFileService', () => {
     let repository: FakeEntityRepository<BucketFile>;
     let dispatcher: FakeBucketFileDispatcher;
@@ -63,7 +92,7 @@ describe('BucketFileService', () => {
                 createTestBucketFile({ id: 'bf-2' }),
             ]);
 
-            const result = await service.getMany({});
+            const result = await service.getMany({}, actorRequester(createScopedActor({ realmScope: 'any' })));
 
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
@@ -71,18 +100,108 @@ describe('BucketFileService', () => {
     });
 
     describe('getOne', () => {
+        const requester = () => actorRequester(createScopedActor({ realmScope: 'any' }));
+
         it('should return entity by ID', async () => {
             const file = createTestBucketFile({ id: 'bf-1' });
 
             repository.seed(file);
 
-            const result = await service.getOne('bf-1');
+            const result = await service.getOne('bf-1', undefined, requester());
 
             expect(result.id).toBe('bf-1');
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('nonexistent', undefined, requester())).rejects.toThrow(EntityNotFoundError);
+        });
+    });
+
+    describe('identity read reach', () => {
+        const realmA = randomUUID();
+        const realmB = randomUUID();
+
+        const bucketA = createTestBucket({ id: 'bucket-a', realmId: realmA });
+        const bucketB = createTestBucket({ id: 'bucket-b', realmId: realmB });
+
+        beforeEach(() => {
+            repository.seed([
+                // Uploaded by realm B into realm A's bucket: the bucket decides.
+                createTestBucketFile({
+                    id: 'f-a',
+                    bucketId: bucketA.id,
+                    bucket: bucketA,
+                    realmId: realmB,
+                }),
+                createTestBucketFile({
+                    id: 'f-b',
+                    bucketId: bucketB.id,
+                    bucket: bucketB,
+                    realmId: realmA,
+                }),
+            ]);
+        });
+
+        const listIds = async (requester: StorageRequester, query: Record<string, any> = {}) => (
+            await service.getMany(query, requester)
+        ).data.map((item) => item.id);
+
+        it('should reach a file through its bucket realm, not its own', async () => {
+            const realmAGrant = actorRequester(createScopedActor({ realmScope: 'own', realmId: realmA }));
+
+            expect(await listIds(realmAGrant)).toEqual(['f-a']);
+            await expect(service.getOne('f-a', undefined, realmAGrant)).resolves.toMatchObject({ id: 'f-a' });
+            await expect(service.getOne('f-b', undefined, realmAGrant)).rejects.toThrow(EntityNotFoundError);
+
+            const realmBGrant = actorRequester(createScopedActor({ realmScope: 'own', realmId: realmB }));
+
+            expect(await listIds(realmBGrant)).toEqual(['f-b']);
+            await expect(service.getOne('f-a', undefined, realmBGrant)).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should not widen the reach through a bucket filter', async () => {
+            const requester = actorRequester(createScopedActor({ realmScope: 'own', realmId: realmA }));
+
+            expect(await listIds(requester, { filter: { bucketId: bucketB.id } })).toEqual([]);
+        });
+
+        it('should list nothing without a permission, not refuse', async () => {
+            const requester = actorRequester(createDenyAllActor(realmA));
+
+            expect(await listIds(requester)).toEqual([]);
+            await expect(service.getOne('f-a', undefined, requester)).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should let the bucket owner read its files without a permission', async () => {
+            const actor = createDenyAllActor(realmB);
+            const owned = createTestBucket({
+                id: 'bucket-owned',
+                realmId: realmA,
+                ...ownedBy(actor),
+            });
+
+            repository.seed(createTestBucketFile({
+                id: 'f-owned',
+                bucketId: owned.id,
+                bucket: owned,
+                actorId: randomUUID(),
+            }));
+
+            expect(await listIds(actorRequester(actor))).toEqual(['f-owned']);
+            await expect(service.getOne('f-owned', undefined, actorRequester(actor))).resolves.toMatchObject({ id: 'f-owned' });
+        });
+
+        it('should not let the uploader read a file of a bucket it does not reach', async () => {
+            const actor = createDenyAllActor(realmB);
+
+            repository.seed(createTestBucketFile({
+                id: 'f-uploaded',
+                bucketId: bucketA.id,
+                bucket: bucketA,
+                ...ownedBy(actor),
+            }));
+
+            expect(await listIds(actorRequester(actor))).toEqual([]);
         });
     });
 
@@ -236,6 +355,10 @@ describe('BucketFileService', () => {
             };
         }
 
+        function capabilityRequester(...entries: string[]): StorageRequester {
+            return { type: 'capability', capability: createCapability(...entries) };
+        }
+
         it('should list the files of covered buckets and covered files', async () => {
             repository.seed([
                 createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }),
@@ -244,7 +367,7 @@ describe('BucketFileService', () => {
                 createTestBucketFile({ id: 'f-4', bucketId: 'b-3' }),
             ]);
 
-            const result = await service.getMany({}, createCapability(
+            const result = await service.getMany({}, capabilityRequester(
                 'bucket:b-1:read',
                 'bucket-file:f-3:read',
                 'bucket:b-3:write,delete',
@@ -261,7 +384,7 @@ describe('BucketFileService', () => {
 
             const result = await service.getMany(
                 { filter: { bucketId: 'b-2' } },
-                createCapability('bucket:b-1:read'),
+                capabilityRequester('bucket:b-1:read'),
             );
 
             expect(result.data).toEqual([]);
@@ -270,7 +393,7 @@ describe('BucketFileService', () => {
         it('should list nothing for a capability covering no read', async () => {
             repository.seed(createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }));
 
-            const result = await service.getMany({}, createCapability('bucket:b-1:write'));
+            const result = await service.getMany({}, capabilityRequester('bucket:b-1:write'));
 
             expect(result.data).toEqual([]);
         });
@@ -283,15 +406,15 @@ describe('BucketFileService', () => {
 
             const capability = createCapability('bucket:b-1:read', 'bucket-file:f-2:read');
 
-            await expect(service.getOne('f-1', undefined, capability)).resolves.toMatchObject({ id: 'f-1' });
-            await expect(service.getOne('f-2', undefined, capability)).resolves.toMatchObject({ id: 'f-2' });
+            await expect(service.getOne('f-1', undefined, { type: 'capability', capability })).resolves.toMatchObject({ id: 'f-1' });
+            await expect(service.getOne('f-2', undefined, { type: 'capability', capability })).resolves.toMatchObject({ id: 'f-2' });
         });
 
         it('should deny a file the capability does not cover for read', async () => {
             repository.seed(createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }));
 
             await expect(
-                service.getOne('f-1', undefined, createCapability('bucket:b-2:read', 'bucket-file:f-1:delete')),
+                service.getOne('f-1', undefined, capabilityRequester('bucket:b-2:read', 'bucket-file:f-1:delete')),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -319,15 +442,15 @@ describe('BucketFileService', () => {
 
             const capability = createCapability('bucket-file:f-1:read');
 
-            await expect(service.getOne('f-1', { include: 'bucket' }, capability)).rejects.toThrow(PermissionDeniedError);
-            await expect(service.getOne('f-1', {}, capability)).resolves.toMatchObject({ id: 'f-1' });
+            await expect(service.getOne('f-1', { include: 'bucket' }, { type: 'capability', capability })).rejects.toThrow(PermissionDeniedError);
+            await expect(service.getOne('f-1', {}, { type: 'capability', capability })).resolves.toMatchObject({ id: 'f-1' });
         });
 
         it('should grant the bucket relation of a file to a bucket capability', async () => {
             repository.seed(createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }));
 
             await expect(
-                service.getOne('f-1', { include: 'bucket' }, createCapability('bucket:b-1:read')),
+                service.getOne('f-1', { include: 'bucket' }, capabilityRequester('bucket:b-1:read')),
             ).resolves.toMatchObject({ id: 'f-1' });
         });
 
@@ -339,7 +462,7 @@ describe('BucketFileService', () => {
 
             const result = await service.getMany(
                 { include: 'bucket' },
-                createCapability('bucket:b-1:read', 'bucket-file:f-2:read'),
+                capabilityRequester('bucket:b-1:read', 'bucket-file:f-2:read'),
             );
 
             expect(result.data.map((item) => item.id)).toEqual(['f-1']);

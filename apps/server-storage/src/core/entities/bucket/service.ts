@@ -12,7 +12,8 @@ import {
     assertBucketRefPairing,
     capabilityBucketIds,
 } from '@privateaim/storage-kit';
-import { eq, inArray } from '@rapiq/core';
+import type { ICondition } from '@rapiq/core';
+import { Query, eq, inArray } from '@rapiq/core';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
@@ -24,7 +25,8 @@ import type { IBucketDispatcher, IBucketRepository, IBucketService } from './typ
 import { bucketSchema } from './schema.ts';
 import type { IStorageAdapter } from '../../storage/types.ts';
 import { assertCapabilityCoversBucket } from '../../capability/module.ts';
-import type { StorageCapability, StorageRequester } from '../../capability/types.ts';
+import type { StorageRequester } from '../../capability/types.ts';
+import { resolveBucketReadReach } from './reach.ts';
 
 type BucketServiceContext = {
     repository: IBucketRepository;
@@ -51,50 +53,70 @@ export class BucketService extends AbstractEntityService implements IBucketServi
 
     async getMany(
         query: Record<string, any>,
-        capability?: StorageCapability,
+        requester: StorageRequester,
     ): Promise<EntityRepositoryFindManyResult<Bucket>> {
         const decoded = decodeQuery(query, { schema: bucketSchema });
 
-        if (!capability) {
-            return this.repository.findMany(decoded);
-        }
-
         // ANDed onto the caller's filters, so no filter widens the result
-        // beyond the covered buckets.
-        return this.repository.findMany(appendQueryConditions(
-            decoded,
-            inArray('id', capabilityBucketIds(capability.entries, StorageCapabilityAction.READ)),
-        ));
+        // beyond the covered or reached buckets.
+        const condition = requester.type === 'capability' ?
+            inArray('id', capabilityBucketIds(requester.capability.entries, StorageCapabilityAction.READ)) :
+            await resolveBucketReadReach(requester.actor);
+
+        return this.repository.findMany(condition ? appendQueryConditions(decoded, condition) : decoded);
     }
 
-    async getOne(id: string, query?: Record<string, any>, capability?: StorageCapability): Promise<Bucket> {
-        let lookupId = id;
+    async getOne(id: string, query: Record<string, any> | undefined, requester: StorageRequester): Promise<Bucket> {
+        // Resolved by its stored id: `id` may be the bucket's name, and a
+        // projection may lack `id`.
+        const stored = await this.repository.findOneByIdOrName(id);
 
-        if (capability) {
-            // Judged on the stored row by its stored id: `id` may be the
-            // bucket's name, and a projection may lack `id`.
-            const stored = await this.repository.findOneByIdOrName(id);
-
-            if (!stored) {
-                throw new EntityNotFoundError({ entity: 'bucket' });
-            }
-
-            assertCapabilityCoversBucket(capability, stored.id, StorageCapabilityAction.READ);
-
-            if (!query) {
-                return stored;
-            }
-
-            lookupId = stored.id;
+        if (!stored) {
+            throw new EntityNotFoundError({ entity: 'bucket' });
         }
 
-        const entity = query ?
-            await this.repository.findMany(appendQueryConditions(decodeQuery(query, { schema: bucketSchema, parameters: ['fields', 'relations'] }), eq('id', lookupId))).then((r) => r.data[0]) :
-            await this.repository.findOneByIdOrName(id);
+        let reach: ICondition | undefined;
+
+        if (requester.type === 'capability') {
+            assertCapabilityCoversBucket(requester.capability, stored.id, StorageCapabilityAction.READ);
+        } else {
+            // The list's condition: an unreached bucket is a 404, like a missing one.
+            reach = await resolveBucketReadReach(requester.actor);
+        }
+
+        if (!query && !reach) {
+            return stored;
+        }
+
+        const decoded = query ?
+            decodeQuery(query, { schema: bucketSchema, parameters: ['fields', 'relations'] }) :
+            new Query({});
+
+        const conditions: ICondition[] = [eq('id', stored.id)];
+
+        if (reach) {
+            conditions.push(reach);
+        }
+
+        const { data } = await this.repository.findMany(appendQueryConditions(decoded, ...conditions));
+
+        if (data.length === 0) {
+            throw new EntityNotFoundError({ entity: 'bucket' });
+        }
+
+        return data[0];
+    }
+
+    async getUploadTarget(id: string, requester: StorageRequester): Promise<Bucket> {
+        // Not read-scoped: uploading is judged by checkUploadAccess, which a
+        // write-only capability or an uploader without read reach can pass.
+        const entity = await this.repository.findOneByIdOrName(id);
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'bucket' });
         }
+
+        await this.checkUploadAccess(entity, requester);
 
         return entity;
     }
