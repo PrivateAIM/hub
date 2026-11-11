@@ -12,6 +12,7 @@ import { rateLimit } from '@routup/rate-limit';
 import type { App, IAppEvent } from 'routup';
 import { useRequestEnv, useRequestIdentity } from '../request';
 
+// The exemption needs unbounded reach on every PermissionName: grant each new name to service clients (e.g. `system`) or they lose it.
 const PERMISSION_NAMES = Object.values(PermissionName);
 
 export function mountRateLimiterMiddleware(app: App) {

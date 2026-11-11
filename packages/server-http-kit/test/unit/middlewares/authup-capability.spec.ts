@@ -163,7 +163,7 @@ function createApp(setup: Setup = {}) {
         tokenVerifier: setup.tokenVerifier ?? createTokenVerifier(),
     };
 
-    // The cookie parser, as every service mounts it before authorization.
+    // Mounted only so the negative case proves a cookie is ignored.
     mountBasicMiddleware(app);
 
     if (setup.capability ?? true) {

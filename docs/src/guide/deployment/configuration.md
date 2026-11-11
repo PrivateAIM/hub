@@ -896,11 +896,12 @@ another, so the connection pool needs at least two connections.
 ## Frontend Variables (client-ui)
 
 The full list lives in the [frontend reference](../../reference/frontend/index.md#environment-variables).
-Two of them are deployment decisions rather than service addresses, and go together:
+The cookie settings are deployment decisions rather than service addresses, and go together:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `NUXT_PUBLIC_COOKIE_DOMAIN` | No | `Domain` attribute for the UI's session cookies. **Leave empty.** |
+| `COOKIE_PREFIX` | No | Build-time default for the cookie prefix below (client-ui only). |
 | `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` | No | Namespace prefixed onto every session cookie name. Set this **whenever `NUXT_PUBLIC_COOKIE_DOMAIN` is widened**, so Authup's own hosted pages can't collide with the UI's cookies on that domain. |
 
 The backend services (`server-core`, `server-storage`, `server-telemetry`, `server-messenger`)

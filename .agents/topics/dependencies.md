@@ -117,8 +117,9 @@ Error-model invariants from this bump:
   such user one shared avatar. Do not re-introspect from the UI to get claims.
 - The account console default is `<authupUrl>/console/account`
   (`apps/client-ui/core/account.ts`, overridden by `NUXT_PUBLIC_ACCOUNT_URL`).
-- client-ui's `cookiePrefix` is wired from
-  `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` and **empty by default** (nested under
+- client-ui's `cookiePrefix` (client-ui only; backends never read a cookie) takes its
+  build-time default from `COOKIE_PREFIX`, overridden at runtime by
+  `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX`, and is **empty by default** (nested under
   `public.authup`; no runtime key exists). A default prefix would rename every
   deployment's cookies, and changing it forces everyone to sign out, since
   un-prefixed cookies are then neither read nor swept.
