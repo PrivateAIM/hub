@@ -7,6 +7,7 @@
 
 import { OAuth2TokenGrant, OAuth2TokenTypeIdentifier } from '@authup/specs';
 import { HubError } from '@privateaim/errors';
+import { isObject } from '@privateaim/kit';
 import type {
     AuthupTokenExchangeBody,
     AuthupTokenExchangeContext,
@@ -64,7 +65,7 @@ export async function exchangeAuthupToken(
     try {
         const parsed = await response.json();
 
-        if (typeof parsed === 'object' && parsed !== null) {
+        if (isObject(parsed)) {
             body = parsed;
         }
     } catch {
