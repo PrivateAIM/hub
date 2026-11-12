@@ -96,7 +96,7 @@ other route, and a query token that lives longer than 60 s is refused (401). Onl
 | `bucket:<id>:read` | The bucket, its tar stream and every file in it |
 | `bucket:<id>:write` | Uploads into the bucket |
 | `bucket:<id>:delete` | Deleting files of the bucket |
-| `bucket-file:<id>:read` / `:delete` | That one file only |
+| `bucketFile:<id>:read` / `:delete` | That one file only |
 
 Listings are narrowed to the covered buckets and files: a filter on another bucket returns nothing.
 Stream responses send `Referrer-Policy: no-referrer` so a token in the URL does not leak, and the

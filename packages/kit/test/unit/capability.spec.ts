@@ -21,6 +21,10 @@ describe('parseCapabilityEntry', () => {
         });
     });
 
+    it('accepts a camelCase type', () => {
+        expect(parseCapabilityEntry('bucketFile:7d2a:read').type).toBe('bucketFile');
+    });
+
     it.each([
         'bucket:7d2a',
         'bucket:7d2a:read:x',

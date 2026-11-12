@@ -246,7 +246,7 @@ describe('BucketFileService', () => {
 
             const result = await service.getMany({}, createCapability(
                 'bucket:b-1:read',
-                'bucket-file:f-3:read',
+                'bucketFile:f-3:read',
                 'bucket:b-3:write,delete',
             ));
 
@@ -281,7 +281,7 @@ describe('BucketFileService', () => {
                 createTestBucketFile({ id: 'f-2', bucketId: 'b-2' }),
             ]);
 
-            const capability = createCapability('bucket:b-1:read', 'bucket-file:f-2:read');
+            const capability = createCapability('bucket:b-1:read', 'bucketFile:f-2:read');
 
             await expect(service.getOne('f-1', undefined, capability)).resolves.toMatchObject({ id: 'f-1' });
             await expect(service.getOne('f-2', undefined, capability)).resolves.toMatchObject({ id: 'f-2' });
@@ -291,7 +291,7 @@ describe('BucketFileService', () => {
             repository.seed(createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }));
 
             await expect(
-                service.getOne('f-1', undefined, createCapability('bucket:b-2:read', 'bucket-file:f-1:delete')),
+                service.getOne('f-1', undefined, createCapability('bucket:b-2:read', 'bucketFile:f-1:delete')),
             ).rejects.toThrow(PermissionDeniedError);
         });
 
@@ -317,7 +317,7 @@ describe('BucketFileService', () => {
         it('should deny the bucket relation of a file to a file-only capability', async () => {
             repository.seed(createTestBucketFile({ id: 'f-1', bucketId: 'b-1' }));
 
-            const capability = createCapability('bucket-file:f-1:read');
+            const capability = createCapability('bucketFile:f-1:read');
 
             await expect(service.getOne('f-1', { include: 'bucket' }, capability)).rejects.toThrow(PermissionDeniedError);
             await expect(service.getOne('f-1', {}, capability)).resolves.toMatchObject({ id: 'f-1' });
@@ -339,7 +339,7 @@ describe('BucketFileService', () => {
 
             const result = await service.getMany(
                 { include: 'bucket' },
-                createCapability('bucket:b-1:read', 'bucket-file:f-2:read'),
+                createCapability('bucket:b-1:read', 'bucketFile:f-2:read'),
             );
 
             expect(result.data.map((item) => item.id)).toEqual(['f-1']);
@@ -350,7 +350,7 @@ describe('BucketFileService', () => {
 
             await expect(service.delete('f-1', {
                 type: 'capability',
-                capability: createCapability('bucket:b-1:read', 'bucket-file:f-1:read'),
+                capability: createCapability('bucket:b-1:read', 'bucketFile:f-1:read'),
             })).rejects.toThrow(PermissionDeniedError);
 
             expect(dispatcher.getDeleteCalls()).toHaveLength(0);

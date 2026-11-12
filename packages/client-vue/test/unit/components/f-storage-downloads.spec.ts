@@ -104,7 +104,7 @@ describe('storage downloads', () => {
         expect(coreClient.requests).toHaveLength(1);
         expect(coreClient.requests[0]).toMatchObject({
             params: { id: 'A1' },
-            body: { cap: ['bucket-file:F1:read'], lifetime: 60 },
+            body: { cap: ['bucketFile:F1:read'], lifetime: 60 },
         });
         expect(captured).toHaveLength(1);
         expect(captured[0]?.href).toMatch(/\/bucket-files\/F1\/stream\?dt=a\.b%2Bc%2Fd$/);

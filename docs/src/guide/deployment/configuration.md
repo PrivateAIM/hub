@@ -706,7 +706,8 @@ the login token: without the setup below the file lists, uploads and downloads f
 steps below before rolling out the UI.
 :::
 
-- **Authup 1.0.0-beta.74 or newer.** Older servers have no token exchange or capability tokens.
+- **Authup 1.0.0-beta.75 or newer.** Older servers have no token exchange or capability tokens, and
+  1.0.0-beta.74 refuses the camelCase capability type `bucketFile`.
 - **Hub's core client may exchange tokens.** The client server-core authenticates as (`CLIENT_ID`,
   default `system`) lists `urn:ietf:params:oauth:grant-type:token-exchange` in `grantTypes` (the grant
   is opt-in) and holds a token exchange capability for the audience `storage`. Declared in an Authup
@@ -727,14 +728,15 @@ steps below before rolling out the UI.
                     type: merge
                   attributes:
                     audience: storage
-                    value: bucket bucket-file
+                    value: bucket bucketFile
                     maxAge: 3600
                     realmScope: any
   ```
 
-  `value` lists the capability types the client may delegate, `maxAge` caps a token's lifetime in
-  seconds, and `realmScope: any` lets it act for users and node clients of every realm. Keep the
-  client's other `grantTypes` (a hub client normally also needs `client_credentials`).
+  `value` lists the capability types the client may delegate (storage's domain types `bucket` and
+  `bucketFile`), `maxAge` caps a token's lifetime in seconds, and `realmScope: any` lets it act for
+  users and node clients of every realm. Keep the client's other `grantTypes` (a hub client normally
+  also needs `client_credentials`).
 - **Every realm whose users or node clients mint tokens needs an asymmetric signing key (RSA or
   EC).** Authup's `/jwks` publishes no symmetric (OCT) keys and refuses to sign a capability token
   with one, so a realm that only has an OCT key cannot issue them, and server-storage could not
@@ -744,11 +746,29 @@ steps below before rolling out the UI.
 
 ### Rollout order
 
-1. **Authup**: upgrade to 1.0.0-beta.74 or newer, provision the core client (grant and `storage`
+1. **Authup**: upgrade to 1.0.0-beta.75 or newer, provision the core client (grant and `storage`
    capability) and make sure every realm has an RSA or EC signing key.
 2. **server-storage**: until it runs the new version, a minted token is refused (401).
 3. **server-core**: it serves the mint route.
 4. **client-ui**: it asks for the tokens.
+
+### Upgrading from the `bucket-file` capability type
+
+The single-file capability type is `bucketFile`, the storage domain type of a file. Releases before
+it spelled the type `bucket-file`; `bucket` entries are unchanged. Neither spelling is accepted in
+place of the other: server-core mints only `bucketFile`, server-storage honours only `bucketFile`
+entries, and a server-storage of an earlier release refuses a token carrying one (401).
+
+1. **Authup**: upgrade to 1.0.0-beta.75 and provision both spellings for the rollout, so the
+   server-core of either release can mint: `value: bucket bucket-file bucketFile`. The `merge`
+   strategy overwrites the stored `value` on Authup's next start.
+2. **server-storage** and **server-core**: roll them out together. Between the two, single-file
+   downloads and deletes fail (a `bucket-file` entry covers nothing on the new server-storage, and a
+   `bucketFile` token is refused by the old one); bucket uploads, listings and downloads keep
+   working. A `bucket-file` token minted before the switch lives at most an hour (the UI's download
+   tokens 60 seconds) and is not honoured afterwards; a new mint replaces it.
+3. **client-ui**: the earlier server-core refuses its `bucketFile` mints (400).
+4. **Authup**: drop `bucket-file` from the value (`value: bucket bucketFile`).
 
 ### Symptoms of a missing step
 

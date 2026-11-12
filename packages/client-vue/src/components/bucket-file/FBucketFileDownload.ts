@@ -8,7 +8,11 @@
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import type { BucketFile } from '@privateaim/storage-kit';
-import { STORAGE_CAPABILITY_QUERY_PARAMETER, STORAGE_CAPABILITY_URL_TOKEN_MAX_LIFETIME } from '@privateaim/storage-kit';
+import {
+    STORAGE_CAPABILITY_QUERY_PARAMETER,
+    STORAGE_CAPABILITY_URL_TOKEN_MAX_LIFETIME,
+    StorageCapabilityType,
+} from '@privateaim/storage-kit';
 import {
     ActionCommandElementType,
     downloadViaAnchor,
@@ -52,7 +56,7 @@ const FBucketFileDownload = defineComponent({
                 // A navigation cannot carry an Authorization header, so the
                 // download carries a short-lived capability in the query.
                 const { token } = await coreClient.analysis.createStorageToken(scope.analysisId, {
-                    cap: [`bucket-file:${props.entity.id}:read`],
+                    cap: [`${StorageCapabilityType.BUCKET_FILE}:${props.entity.id}:read`],
                     lifetime: STORAGE_CAPABILITY_URL_TOKEN_MAX_LIFETIME,
                 });
 

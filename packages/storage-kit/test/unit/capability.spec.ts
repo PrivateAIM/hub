@@ -7,6 +7,8 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+    DomainType,
+    StorageCapabilityType,
     assertStorageCapabilityEntry,
     capabilityBucketFileIds,
     capabilityBucketIds,
@@ -15,6 +17,12 @@ import {
 } from '../../src';
 
 describe('storage capability', () => {
+    it('spells each type as the domain type of its entity', () => {
+        expect(StorageCapabilityType.BUCKET).toBe(DomainType.BUCKET);
+        expect(StorageCapabilityType.BUCKET_FILE).toBe(DomainType.BUCKET_FILE);
+        expect(Object.values(StorageCapabilityType)).toHaveLength(2);
+    });
+
     const bucketRead = {
         type: 'bucket', 
         id: 'B', 
@@ -29,7 +37,7 @@ describe('storage capability', () => {
 
     it('covers a file through its own entry only', () => {
         const entries = [{
-            type: 'bucket-file', 
+            type: 'bucketFile', 
             id: 'F', 
             actions: ['read'], 
         }];
@@ -53,7 +61,7 @@ describe('storage capability', () => {
                 actions: ['write'], 
             },
             {
-                type: 'bucket-file', 
+                type: 'bucketFile', 
                 id: 'F', 
                 actions: ['read', 'delete'], 
             },
@@ -71,19 +79,24 @@ describe('storage capability', () => {
             actions: ['read', 'write', 'delete'], 
         })).not.toThrow();
         expect(() => assertStorageCapabilityEntry({
-            type: 'bucket-file', 
+            type: 'bucketFile', 
             id: 'F', 
             actions: ['read', 'delete'], 
         })).not.toThrow();
         expect(() => assertStorageCapabilityEntry({
-            type: 'bucket-file', 
+            type: 'bucketFile', 
             id: 'F', 
             actions: ['write'], 
         })).toThrow(TypeError);
         expect(() => assertStorageCapabilityEntry({
-            type: 'analysis', 
-            id: '1', 
-            actions: ['read'], 
+            type: 'bucket-file',
+            id: 'F',
+            actions: ['read'],
+        })).toThrow(TypeError);
+        expect(() => assertStorageCapabilityEntry({
+            type: 'analysis',
+            id: '1',
+            actions: ['read'],
         })).toThrow(TypeError);
         expect(() => assertStorageCapabilityEntry({
             type: 'bucket', 

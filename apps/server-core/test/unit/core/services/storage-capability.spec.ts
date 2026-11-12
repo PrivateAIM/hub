@@ -151,7 +151,7 @@ describe('StorageCapabilityService', () => {
 
         await service.mint(
             analysis.id,
-            { cap: [`bucket-file:${file.bucketFileId}:read,delete`] },
+            { cap: [`bucketFile:${file.bucketFileId}:read,delete`] },
             createAllowAllActor(OWNER_REALM),
             'subject',
         );
@@ -175,7 +175,7 @@ describe('StorageCapabilityService', () => {
 
         await expect(service.mint(
             analysis.id,
-            { cap: [`bucket-file:${file.bucketFileId}:read`] },
+            { cap: [`bucketFile:${file.bucketFileId}:read`] },
             createAllowAllActor(OWNER_REALM),
             'subject',
         )).rejects.toBeInstanceOf(BadRequestError);
@@ -210,7 +210,7 @@ describe('StorageCapabilityService', () => {
 
         await expect(service.mint(
             analysis.id,
-            { cap: [`bucket-file:${file.bucketFileId}:write`] },
+            { cap: [`bucketFile:${file.bucketFileId}:write`] },
             createAllowAllActor(OWNER_REALM),
             'subject',
         )).rejects.toBeInstanceOf(BadRequestError);

@@ -123,7 +123,7 @@ describe('capability tokens on bucket and bucket-file routes', () => {
         });
 
         it('should list no bucket for a capability naming only a file', async () => {
-            const token = await mint([`bucket-file:${fileId}:read`]);
+            const token = await mint([`bucketFile:${fileId}:read`]);
             const response = await request('/buckets', bearer(token));
 
             expect(response.status).toBe(200);
@@ -145,7 +145,7 @@ describe('capability tokens on bucket and bucket-file routes', () => {
         });
 
         it('should list only a covered file', async () => {
-            const token = await mint([`bucket-file:${otherFileId}:read`]);
+            const token = await mint([`bucketFile:${otherFileId}:read`]);
             const response = await request('/bucket-files', bearer(token));
 
             expect(response.status).toBe(200);
@@ -163,7 +163,7 @@ describe('capability tokens on bucket and bucket-file routes', () => {
         });
 
         it('should refuse the bucket relation of a file to a file-only capability', async () => {
-            const token = await mint([`bucket-file:${fileId}:read`]);
+            const token = await mint([`bucketFile:${fileId}:read`]);
             const response = await request(`/bucket-files/${fileId}?include=bucket`, bearer(token));
 
             expect(response.status).toBe(403);
@@ -181,7 +181,7 @@ describe('capability tokens on bucket and bucket-file routes', () => {
         });
 
         it('should list no file with its bucket for a file-only capability', async () => {
-            const token = await mint([`bucket-file:${fileId}:read`]);
+            const token = await mint([`bucketFile:${fileId}:read`]);
             const response = await request('/bucket-files?include=bucket', bearer(token));
 
             expect(response.status).toBe(200);
@@ -192,7 +192,7 @@ describe('capability tokens on bucket and bucket-file routes', () => {
         });
 
         it('should list the files of a covered bucket with their bucket', async () => {
-            const token = await mint([`bucket:${bucketId}:read`, `bucket-file:${otherFileId}:read`]);
+            const token = await mint([`bucket:${bucketId}:read`, `bucketFile:${otherFileId}:read`]);
             const response = await request('/bucket-files?include=bucket', bearer(token));
 
             expect(response.status).toBe(200);
@@ -219,7 +219,7 @@ describe('capability tokens on bucket and bucket-file routes', () => {
         });
 
         it('should read a sparse-field file for a file-only capability', async () => {
-            const token = await mint([`bucket-file:${fileId}:read`]);
+            const token = await mint([`bucketFile:${fileId}:read`]);
             const response = await request(`/bucket-files/${fileId}?fields=name`, bearer(token));
 
             expect(response.status).toBe(200);
@@ -330,7 +330,7 @@ describe('capability tokens on bucket and bucket-file routes', () => {
 
     describe('query token', () => {
         it('should stream a covered file without any header', async () => {
-            const token = await mint([`bucket-file:${fileId}:read`], 60);
+            const token = await mint([`bucketFile:${fileId}:read`], 60);
             const response = await request(`/bucket-files/${fileId}/stream?dt=${token}`);
 
             expect(response.status).toBe(200);
@@ -345,14 +345,14 @@ describe('capability tokens on bucket and bucket-file routes', () => {
         });
 
         it('should refuse to stream a file the capability does not cover', async () => {
-            const token = await mint([`bucket-file:${fileId}:read`], 60);
+            const token = await mint([`bucketFile:${fileId}:read`], 60);
             const response = await request(`/bucket-files/${otherFileId}/stream?dt=${token}`);
 
             expect(response.status).toBe(403);
         });
 
         it('should refuse a long-lived token in the query', async () => {
-            const token = await mint([`bucket-file:${fileId}:read`], 3600);
+            const token = await mint([`bucketFile:${fileId}:read`], 3600);
             const response = await request(`/bucket-files/${fileId}/stream?dt=${token}`);
 
             expect(response.status).toBe(401);
