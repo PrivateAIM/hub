@@ -465,7 +465,7 @@ describe('AnalysisReachService', () => {
             await expect(read('a-3')).resolves.toEqual(['a-3']);
         });
 
-        it('should take only the rows the page dropped off the total', async () => {
+        it('should keep the candidate total when the page drops rows', async () => {
             // Reports more rows than the page holds, like a paged list.
             const repository = {
                 findMany: async (query: IQuery): Promise<EntityRepositoryFindManyResult<Analysis>> => {
@@ -482,9 +482,10 @@ describe('AnalysisReachService', () => {
             });
             const result = await service.findMany(repository, new Query({}), await service.resolve(actor, ANALYSIS));
 
-            // 4 rows on the page of a reported 14; own-closed is dropped.
+            // 4 rows on the page of a reported 14; own-closed is dropped, the
+            // total still counts it so later pages stay reachable by paging.
             expect(result.data).toHaveLength(3);
-            expect(result.meta.total).toEqual(13);
+            expect(result.meta.total).toEqual(14);
         });
 
         it('should propagate anything but a permission denial', async () => {
@@ -559,7 +560,8 @@ describe('AnalysisReachService', () => {
                 // own-open is in reach although its rows carry a foreign realm,
                 // a-3 by participation; a row without its analysis is not reached.
                 expect(data.map((row) => row.id).sort()).toEqual(['of-a-3', 'of-own-open', 'of-own-open-2']);
-                expect(meta.total).toEqual(3);
+                // The candidate count: denied rows stay in the total.
+                expect(meta.total).toEqual(6);
 
                 expect(analysisRepository.findManyCalls).toHaveLength(1);
 

@@ -129,7 +129,8 @@ describe('EventService', () => {
                 // Not own-closed, although it is in the actor's realm; the
                 // foreign and the global event the grant reaches are kept.
                 expect(sortedIds(result)).toEqual(['foreign-open', 'global-open', 'own-open']);
-                expect(result.meta.total).toEqual(3);
+                // The candidate count: denied rows stay in the total.
+                expect(result.meta.total).toEqual(4);
             });
 
             it('should apply the realm scope of the grant per event', async () => {

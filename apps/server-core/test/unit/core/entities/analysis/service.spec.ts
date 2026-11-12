@@ -239,7 +239,8 @@ describe('AnalysisService', () => {
                 // Not own-closed, although it is in the actor's realm; the
                 // foreign analysis the grant reaches is kept.
                 expect(result.data.map((e) => e.id).sort()).toEqual(['foreign-open', 'joined', 'own-open']);
-                expect(result.meta.total).toBe(3);
+                // The candidate count: denied rows stay in the total.
+                expect(result.meta.total).toBe(4);
             });
 
             it('should apply the realm scope of the grant per analysis', async () => {

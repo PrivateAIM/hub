@@ -86,8 +86,8 @@ export interface IAnalysisReachService {
     /**
      * Read the rows of `query` the reach covers, from the repository of the
      * entity the reach was resolved for. A `post` reach is decided per
-     * analysis of the page, so the page may come back short and `meta.total`
-     * loses only the rows this page dropped. A record read passes the query
+     * analysis of the page, so the page may come back short or empty while
+     * `meta.total` stays the candidate count. A record read passes the query
      * with its `id` condition, so list and record share the decision.
      */
     findMany<T extends object>(

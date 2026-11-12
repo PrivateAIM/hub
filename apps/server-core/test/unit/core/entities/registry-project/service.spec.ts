@@ -276,7 +276,8 @@ describe('RegistryProjectService', () => {
                     // Not own-closed, although it is in the actor's realm; the
                     // foreign and the global row the grant reaches are kept.
                     expect(result.data.map((e) => e.id).sort()).toEqual(['foreign-open', 'global-open', 'own-open']);
-                    expect(result.meta.total).toEqual(3);
+                    // The candidate count: denied rows stay in the total.
+                    expect(result.meta.total).toEqual(4);
                 });
 
                 it('should apply the realm scope of the grant per row', async () => {

@@ -172,7 +172,8 @@ describe('a post verdict against a real Authup', () => {
         const result = await service.getMany({}, actor);
 
         expect(result.data.map((row) => row.id)).toEqual(['own']);
-        expect(result.meta.total).toEqual(1);
+        // The candidate count: denied rows stay in the total.
+        expect(result.meta.total).toEqual(3);
         await expect(service.getOne('foreign', actor)).rejects.toThrow();
     }, 60_000);
 

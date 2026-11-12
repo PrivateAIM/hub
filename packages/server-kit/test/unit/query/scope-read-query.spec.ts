@@ -210,9 +210,9 @@ describe('findManyScoped', () => {
         }, actor);
 
         expect(result.data.map((row) => row.id)).toEqual(['own-open', 'foreign-open', 'global-open']);
-        // Only the denied row of this page leaves the total.
+        // The total stays the candidate count, so paging by it reaches every page.
         expect(result.meta).toEqual({
-            total: 11,
+            total: 12,
             limit: 50,
             offset: 0,
         });

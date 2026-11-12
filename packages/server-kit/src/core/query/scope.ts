@@ -71,8 +71,9 @@ export async function scopeReadQuery(
  * `post` scope keeps only the rows a grant of one of the names reaches,
  * evaluated against the stored row (re-read by id in one query, so a sparse
  * fieldset cannot hide the realm or an attribute a policy reads) and its own
- * realm. The page may come back short, and `meta.total` loses only the rows
- * this page dropped.
+ * realm. The page may come back short or empty; `meta.total` stays the
+ * candidate count, so a client paging by total still requests every page and
+ * no reachable row on a later page is cut off.
  *
  * A record read appends `eq('id', id)` to the scope's query and runs it
  * through here too, so list and record share the decision.
@@ -109,13 +110,7 @@ export async function findManyScoped<T extends object>(
 
     const data = result.data.filter((row) => reached.has(Reflect.get(row, 'id')));
 
-    return {
-        data,
-        meta: {
-            ...result.meta,
-            total: result.meta.total - (result.data.length - data.length),
-        },
-    };
+    return { data, meta: result.meta };
 }
 
 /**

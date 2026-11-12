@@ -162,13 +162,7 @@ export class AnalysisReachService implements IAnalysisReachService {
         const reached = new Set(reachedRows.map((row) => Reflect.get(row, 'id')));
         const data = result.data.filter((row) => reached.has(Reflect.get(row, 'id')));
 
-        return {
-            data,
-            meta: {
-                ...result.meta,
-                total: result.meta.total - (result.data.length - data.length),
-            },
-        };
+        return { data, meta: result.meta };
     }
 
     /**

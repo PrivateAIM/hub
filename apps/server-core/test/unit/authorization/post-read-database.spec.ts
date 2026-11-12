@@ -321,7 +321,8 @@ describe('a post verdict through the database repositories', () => {
 
             // Not ownClosed, although it is in the actor's realm.
             expect(result.data.map((row) => row.id).sort()).toEqual(idsOf(['ownOpen', 'foreignOpen', 'globalOpen']));
-            expect(result.meta.total).toEqual(3);
+            // The candidate count: denied rows stay in the total.
+            expect(result.meta.total).toEqual(4);
         });
 
         it('applies the realm scope of the grant per row', async () => {
@@ -363,7 +364,8 @@ describe('a post verdict through the database repositories', () => {
 
             expect(result.data.map((row) => row.id).sort())
                 .toEqual(idsOf([ownOpen, foreignOpen, joinedPending, joinedApproved]));
-            expect(result.meta.total).toEqual(4);
+            // The candidate count: denied rows stay in the total.
+            expect(result.meta.total).toEqual(5);
         });
 
         it('applies the realm scope of the grant per analysis', async () => {
@@ -411,7 +413,8 @@ describe('a post verdict through the database repositories', () => {
 
             expect(result.data.map((row) => row.id).sort()).toEqual(expected());
             // 15 files seeded, 5 dropped.
-            expect(result.meta.total).toEqual(10);
+            // The candidate count: denied rows stay in the total.
+            expect(result.meta.total).toEqual(15);
         });
 
         it('lists the same files for a sparse fieldset and with the relations included', async () => {
@@ -503,7 +506,8 @@ describe('a post verdict through the database repositories', () => {
             // foreignOpen 1, joinedPending 2 (the peer's row included), joinedApproved 1; not ownClosed's.
             expect(result.data).toHaveLength(4);
             expect(result.data.every((row) => reached.has(row.analysisId))).toBe(true);
-            expect(result.meta.total).toEqual(4);
+            // The candidate count: denied rows stay in the total.
+            expect(result.meta.total).toEqual(5);
         });
 
         it('lists the events of the reached analyses', async () => {

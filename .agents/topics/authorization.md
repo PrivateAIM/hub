@@ -65,8 +65,8 @@ The evaluator enforces only the data a call supplies: a service using only
   (re-read by id in one query, so a sparse fieldset hides neither the realm nor a policy
   attribute). Never answer `post` with the actor's realm, not even as a pre-filter: it
   returns own-realm rows the policy denies and drops reachable global and foreign rows.
-  Accepted: a `post` page may be short, and `meta.total` loses only the rows that page
-  dropped.
+  A `post` page may be short or empty and `meta.total` stays the candidate count: a
+  reduced total would end a total-driven pager before later pages with reachable rows.
 - `compile: false` leaves a capability gate only (the global catalogs: node,
   master-image(-group), registry).
 - Forward `realmAttributeName` only when a caller sets it: naming a realm column makes

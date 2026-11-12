@@ -618,7 +618,8 @@ describe('AnalysisBucketFileService', () => {
                 }));
 
                 expect(result.data.map((file) => file.id).sort()).toEqual(open.map((file) => file.id).sort());
-                expect(result.meta.total).toEqual(3);
+                // The candidate count: denied rows stay in the total.
+                expect(result.meta.total).toEqual(6);
             });
 
             it('should return the files of a foreign analysis the grant reaches', async () => {
