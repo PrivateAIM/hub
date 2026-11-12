@@ -17,6 +17,8 @@ import {
     it,
 } from 'vitest';
 import { BucketService } from '../../../../../src/core/entities/bucket/service.ts';
+import { BUCKET_READ_PERMISSIONS } from '../../../../../src/core/entities/bucket/constants.ts';
+import type { ActorContext } from '@privateaim/server-kit';
 import {
     createAllowAllActor,
     createDenyAllActor,
@@ -25,7 +27,7 @@ import {
 import { FakeBucketDispatcher } from './fake-dispatcher.ts';
 import { FakeBucketRepository } from './fake-repository.ts';
 import { FakeStorageAdapter } from './fake-storage.ts';
-import type { StorageCapability } from '../../../../../src/core/capability/types.ts';
+import type { StorageCapability, StorageRequester } from '../../../../../src/core/capability/types.ts';
 
 function createTestBucket(overrides?: Partial<Bucket>): Bucket {
     return {
@@ -39,6 +41,18 @@ function createTestBucket(overrides?: Partial<Bucket>): Bucket {
         updatedAt: new Date(),
         ...overrides,
     } as Bucket;
+}
+
+function actorRequester(actor: ActorContext): StorageRequester {
+    return { type: 'actor', actor };
+}
+
+function ownedBy(actor: ActorContext): Pick<Bucket, 'actorType' | 'actorId'> {
+    if (!actor.identity) {
+        throw new Error('The actor has no identity.');
+    }
+
+    return { actorType: actor.identity.type, actorId: actor.identity.id };
 }
 
 describe('BucketService', () => {
@@ -65,7 +79,7 @@ describe('BucketService', () => {
                 createTestBucket({ id: 'b-2' }),
             ]);
 
-            const result = await service.getMany({});
+            const result = await service.getMany({}, actorRequester(createScopedActor({ realmScope: 'any' })));
 
             expect(result.data).toHaveLength(2);
             expect(result.meta.total).toBe(2);
@@ -73,12 +87,14 @@ describe('BucketService', () => {
     });
 
     describe('getOne', () => {
+        const requester = () => actorRequester(createScopedActor({ realmScope: 'any' }));
+
         it('should return entity by ID', async () => {
             const bucket = createTestBucket({ id: 'b-1' });
 
             repository.seed(bucket);
 
-            const result = await service.getOne('b-1');
+            const result = await service.getOne('b-1', undefined, requester());
 
             expect(result.id).toBe('b-1');
         });
@@ -88,13 +104,142 @@ describe('BucketService', () => {
 
             repository.seed(bucket);
 
-            const result = await service.getOne('my-bucket');
+            const result = await service.getOne('my-bucket', undefined, requester());
 
             expect(result.name).toBe('my-bucket');
         });
 
         it('should throw EntityNotFoundError for missing entity', async () => {
-            await expect(service.getOne('nonexistent')).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('nonexistent', undefined, requester())).rejects.toThrow(EntityNotFoundError);
+        });
+    });
+
+    describe('identity read reach', () => {
+        const realmA = randomUUID();
+        const realmB = randomUUID();
+
+        beforeEach(() => {
+            repository.seed([
+                createTestBucket({
+                    id: 'a-1',
+                    name: 'a-1',
+                    realmId: realmA,
+                }),
+                createTestBucket({
+                    id: 'b-1',
+                    name: 'b-1',
+                    realmId: realmB,
+                }),
+            ]);
+        });
+
+        const listIds = async (requester: StorageRequester) => (await service.getMany({}, requester)).data
+            .map((item) => item.id);
+
+        it('should resolve a name within the read reach', async () => {
+            repository.seed([
+                createTestBucket({
+                    id: 'a-2',
+                    name: 'shared',
+                    realmId: realmA,
+                }),
+                createTestBucket({
+                    id: 'b-2',
+                    name: 'shared',
+                    realmId: realmB,
+                }),
+            ]);
+
+            const reader = actorRequester(createScopedActor({ realmScope: 'own', realmId: realmB }));
+
+            await expect(service.getOne('shared', undefined, reader)).resolves.toMatchObject({ id: 'b-2' });
+        });
+
+        it('should answer 404 for a name outside the read reach', async () => {
+            repository.seed([
+                createTestBucket({
+                    id: 'a-2',
+                    name: 'shared',
+                    realmId: realmA,
+                }),
+            ]);
+
+            const reader = actorRequester(createScopedActor({ realmScope: 'own', realmId: realmB }));
+
+            await expect(service.getOne('shared', undefined, reader)).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should pre-gate the read permissions as a one-of', async () => {
+            const actor = createScopedActor({ realmScope: 'any' });
+
+            await service.getMany({}, actorRequester(actor));
+
+            expect(actor.permissionEvaluator.preEvaluateOneOfCalls[0].name).toEqual(BUCKET_READ_PERMISSIONS);
+            expect(actor.permissionEvaluator.compileCalls[0]).toEqual({ name: BUCKET_READ_PERMISSIONS });
+        });
+
+        it('should narrow a realm-scoped grant to that realm', async () => {
+            const requester = actorRequester(createScopedActor({ realmScope: 'own', realmId: realmA }));
+
+            expect(await listIds(requester)).toEqual(['a-1']);
+            await expect(service.getOne('a-1', undefined, requester)).resolves.toMatchObject({ id: 'a-1' });
+            await expect(service.getOne('b-1', undefined, requester)).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('b-1', { fields: 'name' }, requester)).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should reach every bucket with an unbounded grant', async () => {
+            expect(await listIds(actorRequester(createScopedActor({ realmScope: 'any' })))).toEqual(['a-1', 'b-1']);
+        });
+
+        it('should list nothing without a permission, not refuse', async () => {
+            const requester = actorRequester(createDenyAllActor(realmA));
+
+            expect(await listIds(requester)).toEqual([]);
+            await expect(service.getOne('a-1', undefined, requester)).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('a-1', { fields: 'name' }, requester)).rejects.toThrow(EntityNotFoundError);
+        });
+
+        it('should not widen the reach through a filter', async () => {
+            const requester = actorRequester(createScopedActor({ realmScope: 'own', realmId: realmA }));
+
+            const result = await service.getMany({ filter: { realmId: realmB } }, requester);
+
+            expect(result.data).toEqual([]);
+        });
+
+        it('should let the owner read its bucket without a permission', async () => {
+            const actor = createDenyAllActor(realmA);
+
+            repository.seed(createTestBucket({
+                id: 'owned',
+                name: 'owned',
+                realmId: realmB,
+                ...ownedBy(actor),
+            }));
+
+            expect(await listIds(actorRequester(actor))).toEqual(['owned']);
+            await expect(service.getOne('owned', undefined, actorRequester(actor))).resolves.toMatchObject({ id: 'owned' });
+        });
+
+        it('should combine the realm grant and ownership', async () => {
+            const actor = createScopedActor({ realmScope: 'own', realmId: realmA });
+
+            repository.seed(createTestBucket({
+                id: 'owned',
+                name: 'owned',
+                realmId: realmB,
+                ...ownedBy(actor),
+            }));
+
+            expect(await listIds(actorRequester(actor))).toEqual(['a-1', 'owned']);
+        });
+
+        it('should propagate an evaluator failure that is no denial', async () => {
+            const actor = createAllowAllActor(realmA);
+
+            actor.permissionEvaluator.denyAll(new Error('authup unavailable'));
+
+            await expect(service.getMany({}, actorRequester(actor))).rejects.toThrow('authup unavailable');
         });
     });
 
@@ -482,10 +627,24 @@ describe('BucketService', () => {
             ).rejects.toThrow(PermissionError);
         });
 
-        it('should leave a bucket with a ref to the owning service', async () => {
+        it('should gate a bucket with a ref like a ref-less one', async () => {
             const bucket = createTestBucket({ refType: 'analysis', refId: randomUUID() });
 
-            await expect(service.checkUploadAccess(bucket, { type: 'actor', actor: createDenyAllActor() })).resolves.toBeUndefined();
+            await expect(
+                service.checkUploadAccess(bucket, { type: 'actor', actor: createDenyAllActor() }),
+            ).rejects.toThrow(PermissionError);
+        });
+
+        it('should let the owner of a bucket with a ref upload', async () => {
+            const actor = createDenyAllActor();
+            const bucket = createTestBucket({
+                refType: 'analysis',
+                refId: randomUUID(),
+                actorId: actor.identity!.id,
+                actorType: 'user',
+            });
+
+            await expect(service.checkUploadAccess(bucket, { type: 'actor', actor })).resolves.toBeUndefined();
         });
 
         it('should gate a bucket with only a refType like a ref-less one', async () => {
@@ -515,6 +674,10 @@ describe('BucketService', () => {
             };
         }
 
+        function capabilityRequester(...entries: string[]): StorageRequester {
+            return { type: 'capability', capability: createCapability(...entries) };
+        }
+
         it('should list only the buckets covered for read', async () => {
             repository.seed([
                 createTestBucket({ id: 'b-1' }),
@@ -522,7 +685,7 @@ describe('BucketService', () => {
                 createTestBucket({ id: 'b-3' }),
             ]);
 
-            const result = await service.getMany({}, createCapability('bucket:b-1:read', 'bucket:b-2:write'));
+            const result = await service.getMany({}, capabilityRequester('bucket:b-1:read', 'bucket:b-2:write'));
 
             expect(result.data.map((item) => item.id)).toEqual(['b-1']);
         });
@@ -535,7 +698,7 @@ describe('BucketService', () => {
 
             const result = await service.getMany(
                 { filter: { id: 'b-2' } },
-                createCapability('bucket:b-1:read'),
+                capabilityRequester('bucket:b-1:read'),
             );
 
             expect(result.data).toEqual([]);
@@ -544,7 +707,7 @@ describe('BucketService', () => {
         it('should list nothing for a capability naming no bucket', async () => {
             repository.seed(createTestBucket({ id: 'b-1' }));
 
-            const result = await service.getMany({}, createCapability('bucket-file:f-1:read'));
+            const result = await service.getMany({}, capabilityRequester('bucket-file:f-1:read'));
 
             expect(result.data).toEqual([]);
         });
@@ -554,15 +717,38 @@ describe('BucketService', () => {
 
             const capability = createCapability('bucket:b-1:read');
 
-            await expect(service.getOne('b-1', undefined, capability)).resolves.toMatchObject({ id: 'b-1' });
-            await expect(service.getOne('named', undefined, capability)).resolves.toMatchObject({ id: 'b-1' });
+            await expect(service.getOne('b-1', undefined, { type: 'capability', capability })).resolves.toMatchObject({ id: 'b-1' });
+            await expect(service.getOne('named', undefined, { type: 'capability', capability })).resolves.toMatchObject({ id: 'b-1' });
+        });
+
+        it('should resolve a shared name to the covered bucket', async () => {
+            repository.seed([
+                createTestBucket({
+                    id: 'b-1', 
+                    name: 'shared', 
+                    realmId: 'realm-a', 
+                }),
+                createTestBucket({
+                    id: 'b-2', 
+                    name: 'shared', 
+                    realmId: 'realm-b', 
+                }),
+            ]);
+
+            await expect(
+                service.getOne('shared', undefined, capabilityRequester('bucket:b-2:read')),
+            ).resolves.toMatchObject({ id: 'b-2' });
+
+            await expect(
+                service.getOne('shared', undefined, capabilityRequester('bucket:b-3:read')),
+            ).rejects.toThrow(PermissionDeniedError);
         });
 
         it('should deny a bucket the capability does not cover for read', async () => {
             repository.seed(createTestBucket({ id: 'b-1' }));
 
             await expect(
-                service.getOne('b-1', undefined, createCapability('bucket:b-2:read', 'bucket:b-1:write')),
+                service.getOne('b-1', undefined, capabilityRequester('bucket:b-2:read', 'bucket:b-1:write')),
             ).rejects.toThrow(PermissionDeniedError);
         });
 

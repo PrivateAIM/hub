@@ -45,7 +45,7 @@ import type { IBucketFileRepository, IBucketService } from '../../../../core/ent
 import { bucketSchema } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
-import { useStorageCapability, useStorageRequester } from '../../requester.ts';
+import { useStorageRequester } from '../../requester.ts';
 import { uploadRequestFilesToBucket } from './upload.ts';
 import type { BucketFileUploader } from './types.ts';
 import { packBucketFiles } from './stream.ts';
@@ -91,7 +91,7 @@ export class BucketController {
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<Bucket>> {
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query, useStorageCapability(event));
+        const { data, meta } = await this.service.getMany(query, useStorageRequester(event));
 
         return { data, meta: { ...meta, schema: describeQuerySchema(bucketSchema) } };
     }
@@ -105,7 +105,7 @@ export class BucketController {
         event.response.headers.set('referrer-policy', 'no-referrer');
 
         // Judged before a single byte is packed.
-        const entity = await this.service.getOne(id, undefined, useStorageCapability(event));
+        const entity = await this.service.getOne(id, undefined, useStorageRequester(event));
 
         const files = await this.bucketFileRepository.findManyBy({ bucketId: entity.id });
 
@@ -130,9 +130,7 @@ export class BucketController {
         @DContext() event: IAppEvent,
     ) {
         const requester = useStorageRequester(event);
-        const entity = await this.service.getOne(id);
-
-        await this.service.checkUploadAccess(entity, requester);
+        const entity = await this.service.getUploadTarget(id, requester);
 
         let uploader: BucketFileUploader;
 
@@ -193,7 +191,7 @@ export class BucketController {
         const entity = await this.service.getOne(
             id,
             Object.keys(query).length > 0 ? query : undefined,
-            useStorageCapability(event),
+            useStorageRequester(event),
         );
 
         return {

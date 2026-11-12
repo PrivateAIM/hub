@@ -127,8 +127,8 @@ export default defineNuxtConfig({
     // Namespaces every session cookie name (`access_token` ->
     // `<prefix>access_token`), so Authup's own hosted pages can't collide
     // with the UI's cookies once `NUXT_PUBLIC_COOKIE_DOMAIN` is widened to
-    // let a sibling host (e.g. a storage/stream download) read them. Empty
-    // by default — only needed alongside a widened cookie domain, see
+    // share the UI's session across its own hosts. No backend reads the
+    // cookie. Empty by default — only needed alongside a widened cookie domain, see
     // docs/src/reference/frontend/index.md#session-cookies. No
     // `cookiePrefixRuntimeKey` exists on this option (authup >=
     // 1.0.0-beta.64), so unlike `apiURL`/`cookieDomain` this is read from

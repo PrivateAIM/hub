@@ -21,3 +21,5 @@ export type ScopeReadQueryOptions = {
      */
     realmAttributeName?: string,
 };
+
+export type CompileReadReachOptions = Pick<ScopeReadQueryOptions, 'names' | 'realmAttributeName'>;

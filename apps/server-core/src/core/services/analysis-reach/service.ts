@@ -9,7 +9,7 @@ import type { ICondition } from '@rapiq/core';
 import { eq, inArray, or } from '@rapiq/core';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import type { ActorContext } from '@privateaim/server-kit';
-import { prefixConditionFields } from '../../query/index.ts';
+import { prefixConditionFields } from '@privateaim/server-kit';
 import type { AnalysisParticipationWhere } from '../../entities/analysis-node/types.ts';
 import { ANALYSIS_READ_PERMISSIONS } from './constants.ts';
 import type {

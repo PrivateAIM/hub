@@ -16,6 +16,7 @@ import { TestDatabase } from './utils/index.ts';
 // The permissions server-storage's authorization middleware checks.
 const PERMISSIONS: PermissionName[] = [
     PermissionName.BUCKET_CREATE,
+    PermissionName.BUCKET_READ,
     PermissionName.BUCKET_UPDATE,
     PermissionName.BUCKET_DELETE,
 ];

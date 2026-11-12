@@ -12,7 +12,6 @@ These variables are shared across all services:
 | `AUTHUP_URL` | Yes | Authup identity provider URL |
 | `REDIS_URL` | No | Redis connection URL (for pub/sub and caching) |
 | `AMQP_URL` | No | RabbitMQ connection URL |
-| `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
 
 ## Graceful shutdown
 
@@ -333,13 +332,12 @@ against the analysis's realm, not the caller's:
 
 ## Uploading into a bucket requires ownership or `bucket_update`
 
-**Breaking for API clients.** `POST /buckets/:id/upload` into a bucket created
-over HTTP (one without a `refId`) answers 403 unless the caller created the
-bucket or holds `bucket_update` with access to the bucket's realm. Previously
-any authenticated caller could upload into any bucket. Buckets created before
-the creator was recorded have no owner, so only `bucket_update` holders can
-upload into them. Analysis buckets (which carry a `refId`) are unchanged: their
-uploads are still checked by server-core when it registers them.
+**Breaking for API clients.** `POST /buckets/:id/upload` into any bucket,
+analysis buckets (with a `refId`) included, answers 403 unless the caller created
+the bucket or holds `bucket_update` with access to the bucket's realm. A
+capability token needs `write` on the bucket. Buckets created before the creator
+was recorded have no owner, so only `bucket_update` holders can upload into them.
+Server-core still checks each upload when it registers it.
 
 Analysis buckets created before `refType`/`refId` existed carry no ref.
 Migration `1788900000000-BackfillAnalysisBucketRefs` recovers it from the bucket
@@ -760,6 +758,31 @@ steps below before rolling out the UI.
 | Mint succeeds, storage answers 401 | server-storage is not upgraded, or cannot reach Authup's `/jwks` (a `/jwks` outage answers 502) |
 | File pages and downloads fail in the UI | Any of the above; check the mint response first |
 
+### Reading storage requires `bucket_read`, a capability or ownership
+
+**Breaking for API clients and users that browse storage directly.** A login
+reading buckets or bucket files (list, get and both `/stream` routes) is let
+through only with a capability token covering the record, one of `bucket_read`,
+`bucket_update` or `bucket_delete` with access to the **bucket's** realm (a
+file is judged by its bucket's realm, not the uploader's), or by owning the
+bucket. A record out of reach answers 404 and lists omit it. The
+services no longer read the access token from a cookie, so downloads from the UI
+use short-lived capability tokens (the UI's `/api/download` proxy is gone;
+`STORAGE_URL` stays for server rendering). Sparse fieldsets on storage always
+include `id`.
+
+**Before upgrading:**
+
+1. **Add `bucket_read` to your Authup provisioning first.** The built-in `admin`
+   role (`*`) only picks up permissions that exist when provisioning runs.
+2. Grant `bucket_read` to roles that browse storage directly (analysis files
+   in the UI go through capability tokens and need nothing).
+3. Make sure hub's service clients (`system`, the worker's `CLIENT_ID`) hold
+   `bucket_read`: the rate limiter exempts only a client with unbounded reach on
+   **every** hub permission, so without it they are throttled.
+4. Roll out in this order, synced with the node storage service release:
+   Authup provisioning, server-storage, server-core, client-ui.
+
 ## Database Variables
 
 Used by `server-core`, `server-storage`, `server-telemetry`, and `server-messenger`:
@@ -873,22 +896,17 @@ another, so the connection pool needs at least two connections.
 ## Frontend Variables (client-ui)
 
 The full list lives in the [frontend reference](../../reference/frontend/index.md#environment-variables).
-Two of them are deployment decisions rather than service addresses, and go together:
+The cookie settings are deployment decisions rather than service addresses, and go together:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `NUXT_PUBLIC_COOKIE_DOMAIN` | No | `Domain` attribute for the UI's session cookies. **Leave empty.** |
+| `COOKIE_PREFIX` | No | Build-time default for the cookie prefix below (client-ui only). |
 | `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` | No | Namespace prefixed onto every session cookie name. Set this **whenever `NUXT_PUBLIC_COOKIE_DOMAIN` is widened**, so Authup's own hosted pages can't collide with the UI's cookies on that domain. |
 
-Setting a prefix is only safe once the backend agrees on it: `server-core`,
-`server-storage`, `server-telemetry` and `server-messenger` each fall back to
-reading the `access_token` cookie (for requests that can't carry an
-`Authorization` header — a stream download is a top-level navigation) when the
-identity middleware finds nothing else. That fallback needs the **same**
-prefix, via each service's own `COOKIE_PREFIX` env var (see
-[Common Variables](#common-variables)) — set it to the exact same value as
-`NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` / `COOKIE_PREFIX`, verbatim (no separator
-is inserted automatically on either side).
+The backend services (`server-core`, `server-storage`, `server-telemetry`, `server-messenger`)
+never read a session cookie: a login sends `Authorization: Bearer`, and only a short-lived stream
+capability token may use `?dt=` on the two storage stream routes. The cookie settings above therefore concern the UI and Authup only.
 
 ### Where Authup is served matters
 

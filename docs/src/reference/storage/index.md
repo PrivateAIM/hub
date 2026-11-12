@@ -65,12 +65,22 @@ update, clear and delete the bucket, and delete its files, without `bucket_updat
 everyone else needs the permission and realm access. Buckets created before this was fixed carry no
 actor and are not backfilled, so only permission holders can manage them.
 
-Uploading (`POST /buckets/:id/upload`) into a bucket **without** a `refId` requires being its creator,
-or `bucket_update` with realm access; anyone else gets 403 before a file is stored. A bucket **with**
-a `refId` (e.g. an analysis bucket) accepts uploads from any authenticated caller, because its
-legitimate uploaders span realms and storage cannot evaluate the referencing service's permissions:
-the owning service checks each upload when it registers it (see
+Uploading (`POST /buckets/:id/upload`) into any bucket, one with a `refId` (an analysis bucket) included,
+requires being its creator, `bucket_update` with realm access, or a capability token with `write` on the
+bucket; anyone else gets 403 before a file is stored. Server-core additionally checks each upload when it registers it (see
 [Writing analysis buckets and files](/guide/deployment/configuration#writing-analysis-buckets-and-files-requires-analysis-update)).
+
+## Read access
+
+A login reading buckets or bucket files (list, get, both `/stream` routes) needs a capability token
+covering the record (below), **or** one of `bucket_read`, `bucket_update` or `bucket_delete` with realm
+access to the **bucket's** realm, **or** to be the bucket's creator. A file is judged by its bucket's
+realm and creator, never by the uploader's realm. A record out of reach answers 404 and lists omit it. A
+login without any of the three permissions sees only the buckets it created. Sparse fieldsets always
+include `id`.
+
+A login sends its access token in the `Authorization: Bearer` header; the service never reads a cookie.
+Only a short-lived stream capability token may travel in `?dt=`, and only on the two stream routes.
 
 ## Capability Tokens
 

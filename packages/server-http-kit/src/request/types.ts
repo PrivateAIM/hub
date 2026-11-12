@@ -58,7 +58,7 @@ export type RequestEnv = {
     capability?: RequestCapability,
 
     /**
-     * The raw access token of an identity request (header or cookie), for a
+     * The raw access token of an identity request (the `Authorization` header), for a
      * service exchanging it on the caller's behalf. Never a capability token.
      */
     token?: string,

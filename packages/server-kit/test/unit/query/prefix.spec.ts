@@ -15,7 +15,7 @@ import {
     or,
 } from '@rapiq/core';
 import { describe, expect, it } from 'vitest';
-import { prefixConditionFields } from '../../../../src/core/query/index.ts';
+import { prefixConditionFields } from '../../../src';
 
 describe('prefixConditionFields', () => {
     it('should re-root every field of a nested tree', () => {

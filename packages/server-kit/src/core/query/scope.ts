@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IQuery } from '@rapiq/core';
+import type { ICondition, IQuery } from '@rapiq/core';
 import { eq, inArray } from '@rapiq/core';
 import type { ActorContext } from '../actor/index.ts';
 import { appendQueryConditions } from './conditions.ts';
-import type { ScopeReadQueryOptions } from './types.ts';
+import type { CompileReadReachOptions, ScopeReadQueryOptions } from './types.ts';
 
 /**
  * The gate every read runs: pre-gate the read permissions (a missing grant
@@ -39,6 +39,21 @@ export async function scopeReadQuery(
         return query;
     }
 
+    const condition = await compileReadReach(actor, options);
+
+    return condition ? appendQueryConditions(query, condition) : query;
+}
+
+/**
+ * The compile step of {@link scopeReadQuery}, without its pre-gate: the
+ * caller's reach for `names` as a condition, `undefined` when it reaches
+ * every row. For callers that combine the reach with another condition (an
+ * owner, a relation path) before appending it.
+ */
+export async function compileReadReach(
+    actor: ActorContext,
+    options: CompileReadReachOptions,
+): Promise<ICondition | undefined> {
     // Forward the realm column only when set, like authup: naming one tells
     // authup the row may not carry a grant policy's fields, which turns every
     // lowerable grant policy into `post`. Without it the reach lowers onto
@@ -50,24 +65,22 @@ export async function scopeReadQuery(
 
     switch (compiled.verdict) {
         case 'allow':
-            return query;
+            return undefined;
         case 'conditional':
-            return appendQueryConditions(query, compiled.condition);
+            return compiled.condition;
         case 'deny':
-            return appendQueryConditions(query, matchNothing());
+            return matchNothing();
         default: {
             // `post`: fall back to the actor's own realm.
             if (!actor.realm) {
-                return appendQueryConditions(query, matchNothing());
+                return matchNothing();
             }
 
-            const realmAttributeName = options.realmAttributeName ?? 'realmId';
-
-            return appendQueryConditions(query, eq(realmAttributeName, actor.realm.id));
+            return eq(options.realmAttributeName ?? 'realmId', actor.realm.id);
         }
     }
 }
 
-function matchNothing() {
+function matchNothing(): ICondition {
     return inArray('id', []);
 }

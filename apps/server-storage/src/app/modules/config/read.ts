@@ -28,6 +28,5 @@ export function readConfigFromEnv(): Partial<Config> {
 
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),
 
-        cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
     };
 }

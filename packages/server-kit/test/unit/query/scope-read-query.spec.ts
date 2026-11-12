@@ -15,7 +15,7 @@ import {
 } from '@rapiq/core';
 import type { ICondition, IQuery } from '@rapiq/core';
 import { describe, expect, it } from 'vitest';
-import { scopeReadQuery } from '../../../src';
+import { compileReadReach, scopeReadQuery } from '../../../src';
 
 function createActor(realm?: { id: string, name: string }) {
     return { permissionEvaluator: new FakePermissionEvaluator(), realm };
@@ -97,5 +97,27 @@ describe('scopeReadQuery', () => {
         const scoped = await scopeReadQuery(new Query({}), createActor(), { names });
 
         expect(appendedCondition(scoped)).toEqual(inArray('id', []));
+    });
+});
+
+describe('compileReadReach', () => {
+    const names = ['bucket_read', 'bucket_update'];
+
+    it('lowers the reach without pre-gating', async () => {
+        const actor = createActor({ id: 'r1', name: 'r1' });
+        const condition = eq('realmId', 'r2');
+
+        actor.permissionEvaluator.setCompileResult({ verdict: 'conditional', condition });
+
+        await expect(compileReadReach(actor, { names })).resolves.toEqual(condition);
+        expect(actor.permissionEvaluator.preEvaluateOneOfCalls).toHaveLength(0);
+    });
+
+    it('answers undefined for an allow verdict', async () => {
+        const actor = createActor({ id: 'r1', name: 'r1' });
+
+        actor.permissionEvaluator.setCompileResult({ verdict: 'allow' });
+
+        await expect(compileReadReach(actor, { names })).resolves.toBeUndefined();
     });
 });

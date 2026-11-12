@@ -9,7 +9,65 @@ import type { IQuery } from '@rapiq/core';
 import { Query } from '@rapiq/core';
 import { TypeormAdapter } from '@rapiq/adapter-typeorm';
 import type { SelectQueryBuilder } from 'typeorm';
+import { DriverUtils } from 'typeorm/driver/DriverUtils.js';
 import type { EntityRepositoryPaginationMeta } from '@privateaim/server-kit';
+
+/**
+ * With a join and a page, typeorm first selects `DISTINCT <alias>.id` and
+ * every ORDER BY column from the original query, wrapped as `distinctAlias`,
+ * so a sparse fieldset without them references missing columns (500).
+ * Identity reads of bucket files join `bucket` for the reach.
+ *
+ * The primary key is added as a hydrated selection. An unselected sort column
+ * is projected raw, under the alias typeorm expects, so it is never hydrated
+ * into the response. Belongs in rapiq's fields adapter.
+ */
+function selectPaginationColumns(queryBuilder: SelectQueryBuilder<any>): void {
+    const {
+        selects,
+        mainAlias,
+        aliases,
+    } = queryBuilder.expressionMap;
+
+    if (!mainAlias) {
+        return;
+    }
+
+    const isSelected = (aliasName: string, propertyPath: string) => selects.some(
+        ({ selection }) => selection === aliasName || selection === `${aliasName}.${propertyPath}`,
+    );
+
+    if (!isSelected(mainAlias.name, 'id')) {
+        queryBuilder.addSelect(`${mainAlias.name}.id`);
+    }
+
+    const keys = Object.keys(queryBuilder.expressionMap.allOrderBys);
+
+    for (const key of keys) {
+        const index = key.indexOf('.');
+
+        if (index === -1) {
+            continue;
+        }
+
+        const aliasName = key.slice(0, index);
+        const propertyPath = key.slice(index + 1);
+
+        const alias = aliases.find((item) => item.name === aliasName);
+        const column = alias && alias.hasMetadata ?
+            alias.metadata.findColumnWithPropertyPath(propertyPath) :
+            undefined;
+
+        if (!column || isSelected(aliasName, propertyPath)) {
+            continue;
+        }
+
+        queryBuilder.addSelect(
+            `${queryBuilder.escape(aliasName)}.${queryBuilder.escape(column.databaseName)}`,
+            DriverUtils.buildAlias(queryBuilder.dataSource.driver, undefined, aliasName, column.databaseName),
+        );
+    }
+}
 
 /**
  * Apply a decoded rapiq query (IR) to the given TypeORM query builder.
@@ -33,6 +91,8 @@ export function applyQuery(
     });
 
     const { pagination } = adapter.execute(query ?? new Query({}));
+
+    selectPaginationColumns(queryBuilder);
 
     return { pagination };
 }

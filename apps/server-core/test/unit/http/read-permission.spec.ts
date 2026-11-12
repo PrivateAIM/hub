@@ -58,6 +58,9 @@ describe('read permission on global catalogs', () => {
         // A sparse fieldset without `id` must survive the reach join (paged DISTINCT-ids query).
         ['/analysis-bucket-files?fields=path', PermissionName.ANALYSIS_READ],
         ['/analysis-nodes?fields=approvalStatus', PermissionName.ANALYSIS_READ],
+        // ... and so must one sorted by a column it omits (the DISTINCT query orders by it).
+        ['/analysis-bucket-files?fields=path&sort=-createdAt&page[limit]=10', PermissionName.ANALYSIS_READ],
+        ['/analysis-nodes?fields=approvalStatus&sort=createdAt&page[limit]=10', PermissionName.ANALYSIS_READ],
     ])('GET %s requires %s', async (path, permissionName) => {
         expect(await status(path, await createRestrictedAccessToken([]))).toBe(403);
         expect(await status(path, await createRestrictedAccessToken([permissionName]))).toBe(200);

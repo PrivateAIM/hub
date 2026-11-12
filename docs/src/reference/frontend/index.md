@@ -107,12 +107,10 @@ three layouts. Set it only when a *sibling* host genuinely has to read the cooki
 itself, and never to a value that covers Authup's host. The Helm chart refuses that
 combination at render time (`flameHub.validateCookieDomain`).
 
-It buys the Hub nothing by default: the services read the bearer token from the
-`Authorization` header, and their cookie fallback only ever sees same-origin requests
-under a shared hostname. The one case it does matter is a **stream/download**
-endpoint reached by a top-level browser navigation (`GET /buckets/:id/stream`,
-`GET /bucket-files/:id/stream`) — that request cannot carry an `Authorization`
-header, so the widened domain is what lets the storage host read the cookie at all.
+It buys the Hub nothing by default: the backend services read only the bearer token from
+the `Authorization` header, never a cookie (a short-lived stream capability token may use `?dt=`
+on the two storage stream routes).
+Downloads use short-lived capability tokens minted by server-core.
 
 When `NUXT_PUBLIC_COOKIE_DOMAIN` genuinely must be widened, also set
 `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` (Authup `client-web-nuxt` >= `1.0.0-beta.64`,
@@ -124,12 +122,7 @@ going live with a widened domain: switching it later requires everyone to sign o
 clear cookies) first, since the un-prefixed names are neither read nor swept once the
 prefix is in place.
 
-Setting a prefix on the UI alone breaks the very stream/download fallback it was set
-for: `server-core`, `server-storage`, `server-telemetry` and `server-messenger` each
-look for the bare `access_token` cookie name unless told otherwise. Set the matching
-`COOKIE_PREFIX` env var on **every** backend service too — see
-[Deployment Configuration](../../guide/deployment/configuration.md#common-variables) —
-to the exact same string, verbatim (neither side inserts a separator automatically).
+The backend services never read the cookie, so they need no matching setting.
 
 ::: warning Changing `NUXT_PUBLIC_COOKIE_DOMAIN` from a value to empty
 The switch does not clear what browsers already hold. The previously written

@@ -92,7 +92,7 @@ SUBNET=172.40.1.0/24
 | `CORE_PUBLIC_URL` | `http://localhost:3000/core/` | Public core API URL |
 | `STORAGE_PUBLIC_URL` | `http://localhost:3000/storage/` | Public storage URL |
 | `TELEMETRY_PUBLIC_URL` | `http://localhost:3000/telemetry/` | Public telemetry URL |
-| `COOKIE_DOMAIN` | `localhost` | Cookie domain for auth |
+| `COOKIE_DOMAIN` | `localhost` | Cookie domain for the UI's session cookies |
 | `MQ_CONNECTION_URL` | `amqp://root:start123@172.40.1.1` | RabbitMQ connection |
 
 See [Configuration](/guide/deployment/configuration) for service-specific environment variables.

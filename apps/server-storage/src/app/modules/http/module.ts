@@ -85,7 +85,6 @@ export class HTTPModule implements IModule {
                 redisClient: redisResult.success ?
                     redisResult.data :
                     undefined,
-                cookiePrefix: config.cookiePrefix,
                 // Capability tokens are verified locally (signature against
                 // Authup's `/jwks`, `aud`, `kind`, `exp`); the cache keeps
                 // Authup's default namespace `authup:capability:storage:<baseURL>`.

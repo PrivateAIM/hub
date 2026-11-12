@@ -6,7 +6,12 @@
  */
 
 import type { ICondition, IQuery } from '@rapiq/core';
-import { eq, inArray, or } from '@rapiq/core';
+import {
+    Query,
+    eq,
+    inArray,
+    or,
+} from '@rapiq/core';
 import type { BucketFile } from '@privateaim/storage-kit';
 import { StorageCapabilityAction, capabilityBucketFileIds, capabilityBucketIds } from '@privateaim/storage-kit';
 import { EntityNotFoundError } from '@privateaim/errors';
@@ -18,7 +23,10 @@ import { decodeQuery } from '../../query/index.ts';
 import type { IBucketFileDispatcher, IBucketFileRepository, IBucketFileService } from './types.ts';
 import { bucketFileSchema } from './schema.ts';
 import { assertCapabilityCoversBucket, assertCapabilityCoversBucketFile } from '../../capability/module.ts';
-import type { StorageCapability, StorageRequester } from '../../capability/types.ts';
+import type { StorageRequester } from '../../capability/types.ts';
+import { resolveBucketReadReach } from '../bucket/reach.ts';
+
+const BUCKET_RELATION = 'bucket' satisfies keyof BucketFile;
 
 type BucketFileServiceContext = {
     repository: IBucketFileRepository;
@@ -38,13 +46,18 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
 
     async getMany(
         query: Record<string, any>,
-        capability?: StorageCapability,
+        requester: StorageRequester,
     ): Promise<EntityRepositoryFindManyResult<BucketFile>> {
         const decoded = decodeQuery(query, { schema: bucketFileSchema });
 
-        if (!capability) {
-            return this.repository.findMany(decoded);
+        if (requester.type === 'actor') {
+            // A file is judged by its bucket: its own realm is the uploader's.
+            const reach = await resolveBucketReadReach(requester.actor, BUCKET_RELATION);
+
+            return this.repository.findMany(reach ? appendQueryConditions(decoded, reach) : decoded);
         }
+
+        const { capability } = requester;
 
         const bucketIds = capabilityBucketIds(capability.entries, StorageCapabilityAction.READ);
 
@@ -70,19 +83,22 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
         return this.repository.findMany(appendQueryConditions(decoded, condition));
     }
 
-    async getOne(id: string, query?: Record<string, any>, capability?: StorageCapability): Promise<BucketFile> {
+    async getOne(id: string, query: Record<string, any> | undefined, requester: StorageRequester): Promise<BucketFile> {
         const decoded = query ?
             decodeQuery(query, { schema: bucketFileSchema, parameters: ['fields', 'relations'] }) :
             undefined;
 
-        if (capability) {
-            // Coverage is judged on the stored row: the projected one may
-            // lack `id` or `bucketId`.
-            const stored = await this.repository.findOneById(id);
+        // Judged on the stored row: the projected one may lack `id` or `bucketId`.
+        const stored = await this.repository.findOneById(id);
 
-            if (!stored) {
-                throw new EntityNotFoundError({ entity: 'bucket-file' });
-            }
+        if (!stored) {
+            throw new EntityNotFoundError({ entity: 'bucket-file' });
+        }
+
+        let reach: ICondition | undefined;
+
+        if (requester.type === 'capability') {
+            const { capability } = requester;
 
             assertCapabilityCoversBucketFile(capability, stored, StorageCapabilityAction.READ);
 
@@ -91,25 +107,32 @@ export class BucketFileService extends AbstractEntityService implements IBucketF
             if (decoded && this.requestsBucketRelation(decoded)) {
                 assertCapabilityCoversBucket(capability, stored.bucketId, StorageCapabilityAction.READ);
             }
-
-            if (!decoded) {
-                return stored;
-            }
+        } else {
+            // The list's condition: an unreached file is a 404, like a missing one.
+            reach = await resolveBucketReadReach(requester.actor, BUCKET_RELATION);
         }
 
-        const entity = decoded ?
-            await this.repository.findMany(appendQueryConditions(decoded, eq('id', id))).then((r) => r.data[0]) :
-            await this.repository.findOneById(id);
+        if (!decoded && !reach) {
+            return stored;
+        }
 
-        if (!entity) {
+        const conditions: ICondition[] = [eq('id', stored.id)];
+
+        if (reach) {
+            conditions.push(reach);
+        }
+
+        const { data } = await this.repository.findMany(appendQueryConditions(decoded ?? new Query({}), ...conditions));
+
+        if (data.length === 0) {
             throw new EntityNotFoundError({ entity: 'bucket-file' });
         }
 
-        return entity;
+        return data[0];
     }
 
     private requestsBucketRelation(query: IQuery): boolean {
-        return query.relations.value.some((relation) => relation.name === 'bucket' satisfies keyof BucketFile);
+        return query.relations.value.some((relation) => relation.name === BUCKET_RELATION);
     }
 
     async delete(id: string, requester: StorageRequester): Promise<BucketFile> {

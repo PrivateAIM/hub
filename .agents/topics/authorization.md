@@ -37,7 +37,7 @@ every verifier call site must pass `config.clientId` / `config.realm`.
   non-empty string to introspection, and an Authup server below beta.70 (authup#3724)
   introspects a malformed token as hub's own credential, i.e. the `system` client. Hub
   requires a beta.70+ server, so the guard is defence in depth (hub upgraded before
-  Authup) and saves a round-trip. It covers header, cookie and socket alike.
+  Authup) and saves a round-trip. It covers header and socket alike; no service reads the token from a cookie.
 - **No `AUTHUP_URL` → `UnconfiguredTokenVerifier`** (refuses every token, 401).
   beta.70's `TokenVerifier` constructor throws without a base URL, so constructing it
   directly crashes boot.
@@ -210,7 +210,7 @@ steps: [deployment configuration](../../docs/src/guide/deployment/configuration.
 
 - **The grant is compiled against the analysis (no `realmAttributeName`) and re-rooted
   onto the row's `analysis` relation** with `prefixConditionFields`
-  (`core/query/prefix.ts`). Never filter on a family table's own realm column: a bucket
+  (`@privateaim/server-kit`). Never filter on a family table's own realm column: a bucket
   file's `realmId` is the uploader's, not the owner's.
 - Per bucket type (`buildAnalysisBucketTypeReach`): CODE for every participant; TEMP/RESULT
   only through an APPROVED node. RESULT **files** additionally need
@@ -316,5 +316,6 @@ steps: [deployment configuration](../../docs/src/guide/deployment/configuration.
 - **Storage judges coverage before fetching or streaming** (a bucket entry covers its files; a file
   entry only itself) and narrows listings with `appendQueryConditions`; a check must not touch the
   stream body (backpressure).
+- **An identity storage read scopes on the bucket's realm** through the bucket relation (`BUCKET_READ_PERMISSIONS`, one-of, plus the owner's `actorType`/`actorId`), never on a file's own realm (the uploader's). Unreached is 404, as the list omits it.
 - Verification is Authup's `TokenVerifier` with `capability: { audience: 'storage' }` (signature vs
   `/jwks`, `aud`, `kind`, `exp`); `peekTokenKind` of the unverified payload only picks the verifier.
