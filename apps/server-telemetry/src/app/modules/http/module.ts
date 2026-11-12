@@ -14,7 +14,6 @@ import {
     EnvironmentName,
     LoggerInjectionKey,
     RedisClientInjectionKey,
-    createAuthupClientTokenCreator,
 } from '@privateaim/server-kit';
 import {
     createAuthupTokenVerifier,
@@ -83,14 +82,11 @@ export class HTTPModule implements IModule {
                 cookiePrefix: config.cookiePrefix,
                 tokenVerifier: createAuthupTokenVerifier({
                     baseURL: config.authupURL,
-                    creator: createAuthupClientTokenCreator({
-                        baseURL: config.authupURL,
-                        clientId: config.clientId,
-                        clientSecret: config.clientSecret,
+                    client: {
+                        id: config.clientId,
+                        secret: config.clientSecret,
                         realm: config.realm,
-                    }),
-                    clientId: config.clientId,
-                    realm: config.realm,
+                    },
                     redisClient: redisResult.success ? redisResult.data : undefined,
                 }),
             },

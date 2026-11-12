@@ -25,13 +25,15 @@ grants and identity.
 ## Token verification and read scoping
 
 `createAuthupTokenVerifier` (`server-http-kit/src/middlewares/authup/token-verifier.ts`)
-passes a `creator`, so vouchly's `TokenVerifier` runs in remote mode (introspection),
-with a result cache (Redis, else memory) kept until the token's `exp`. The cache
-namespace (`buildAuthupTokenCacheNamespace`:
-`authup:remote:<baseURL>:client:<realm>:<clientId>`) includes the introspecting client,
-because authup answers `active: false` to a client without `token_introspect` reach into
-the token's realm. Services share entries only when they introspect as the same client;
-every verifier call site must pass `config.clientId` / `config.realm`.
+takes one `client` (`{ id, secret, realm }`) and builds from it both the client-credentials
+token creator, so vouchly's `TokenVerifier` runs in remote mode (introspection), and the
+namespace of its result cache (Redis, else memory, kept until the token's `exp`):
+`authup:remote:<baseURL>:client:<realm>:<id>`. The namespace names the introspecting
+client because authup answers `active: false` to a client without `token_introspect`
+reach into the token's realm; services share entries only when they introspect as the
+same client. Do not reintroduce a separate `creator` option: it lets the namespace and
+the minting client disagree. The string is a Redis key prefix; changing it drops every
+cached entry on rollout.
 
 - **Keep `IntrospectableTokenVerifier`'s non-compact-JWS guard.** vouchly forwards any
   non-empty string to introspection, and an Authup server below beta.70 (authup#3724)
