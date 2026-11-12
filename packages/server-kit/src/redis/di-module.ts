@@ -48,7 +48,7 @@ export class RedisModule implements IModule {
             return;
         }
 
-        const client = createRedisClient({ connectionString });
+        const client = createRedisClient({ url: connectionString });
 
         container.register(RedisClientInjectionKey, { useValue: client });
         container.register(RedisPublishClientInjectionKey, { useFactory: () => client.duplicate() });
