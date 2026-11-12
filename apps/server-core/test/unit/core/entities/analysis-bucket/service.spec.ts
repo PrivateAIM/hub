@@ -136,7 +136,7 @@ describe('AnalysisBucketService', () => {
                 approvalStatus: null,
             }));
 
-            const pending = await service.getMany({}, createAllowAllActor('realm-a'));
+            const pending = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(pending.data.map((e) => e.id)).toEqual(['code']);
 
@@ -145,7 +145,7 @@ describe('AnalysisBucketService', () => {
                 approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
             });
 
-            const approved = await service.getMany({}, createAllowAllActor('realm-a'));
+            const approved = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(approved.data.map((e) => e.id).sort()).toEqual(['code', 'result', 'temp']);
         });
@@ -172,7 +172,7 @@ describe('AnalysisBucketService', () => {
                 }),
             ]);
 
-            const result = await service.getMany({}, createAllowAllActor('realm-a'));
+            const result = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(result.data.map((e) => e.id).sort()).toEqual(['code', 'result']);
         });
@@ -184,7 +184,7 @@ describe('AnalysisBucketService', () => {
 
             repository.seed(bucket);
 
-            const result = await service.getOne('ab-1', createAllowAllActor('realm-1'));
+            const result = await service.getOne('ab-1', createScopedActor({ realmId: 'realm-1', realmScope: 'own' }));
 
             expect(result.id).toBe('ab-1');
         });
@@ -206,7 +206,7 @@ describe('AnalysisBucketService', () => {
                 approvalStatus: null,
             }));
 
-            await expect(service.getOne('result', createAllowAllActor('realm-a'))).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('result', createScopedActor({ realmId: 'realm-a', realmScope: 'own' }))).rejects.toThrow(EntityNotFoundError);
         });
     });
 

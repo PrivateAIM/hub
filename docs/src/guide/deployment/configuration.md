@@ -381,8 +381,10 @@ same table also gates:
   across realms.
 - **Registry projects and events** are narrowed by the grant's `realm_scope`:
   `own` returns the caller's realm, `ownOrNull` adds realm-less rows, `any`
-  returns all. A grant carrying a policy Hub cannot turn into a query falls back
-  to the caller's own realm.
+  returns all. A grant carrying a policy Hub cannot turn into a query is checked
+  row by row instead: the read returns exactly the rows the grant allows, in
+  whichever realm they are. Such a page can hold fewer rows than its `limit`,
+  and `meta.total` only leaves out the rows that were dropped from that page.
 - **A node client** reads its own registry project without any grant, on both
   `GET /registry-projects` (narrowed to that one project) and
   `GET /registry-projects/:id`. A read grant it is given applies as for any
@@ -466,7 +468,11 @@ lists analyses; pair it with `analysis_read`.
   realm or from its grants' realm scope. New analysis clients are given
   `analysis_read`; clients of analyses created before the upgrade are not.
 - **A grant carrying a policy** narrows every one of these reads by that
-  policy, evaluated against the analysis the row belongs to.
+  policy, evaluated against the analysis the row belongs to. A policy Hub
+  cannot turn into a query is checked analysis by analysis: the read returns
+  the rows of exactly the analyses the grant allows (plus those reached through
+  a node), in whichever realm they are. Such a page can hold fewer rows than
+  its `limit`, and `meta.total` only leaves out the rows dropped from that page.
 - `GET /analysis-nodes` and `GET /analysis-node-events` return every row of a
   reachable analysis, so nodes see each other's approval and execution status.
 - **Buckets and their files depend on the bucket type:**

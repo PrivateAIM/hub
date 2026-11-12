@@ -21,6 +21,7 @@ import {
     FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
+    createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
 
@@ -94,7 +95,7 @@ describe('AnalysisNodeEventService', () => {
                 createTestAnalysisNodeEvent({ id: 'foreign', analysisRealmId: 'realm-c' }),
             ]);
 
-            const result = await service.getMany({}, createAllowAllActor('realm-a'));
+            const result = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(result.data.map((e) => e.id)).toEqual(['own']);
         });
@@ -123,7 +124,7 @@ describe('AnalysisNodeEventService', () => {
         it('should answer an event out of reach like a missing one', async () => {
             repository.seed(createTestAnalysisNodeEvent({ id: 'foreign', analysisRealmId: 'realm-c' }));
 
-            await expect(service.getOne('foreign', createAllowAllActor('realm-a'))).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('foreign', createScopedActor({ realmId: 'realm-a', realmScope: 'own' }))).rejects.toThrow(EntityNotFoundError);
         });
     });
 });

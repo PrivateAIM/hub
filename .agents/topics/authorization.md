@@ -57,16 +57,22 @@ The evaluator enforces only the data a call supplies: a service using only
 
 - Pre-evaluates a one-of of the entity's read and write/manage names; holding none is
   403. Holding a write implies read; there is no self-service fallback, by decision.
-- Lowers `compile()`: `allow` → unchanged, `conditional` → AND-appended, `deny` →
-  `inArray('id', [])`, `post` → `eq('realmId', actor.realm.id)` (nothing without a
-  realm). `post` narrowing by realm only ignores the unlowerable policy, a deliberate
-  simplification of authup's per-row evaluation.
+- Returns a `ReadScope { query, post, names }`, lowering `compile()`: `allow` →
+  unchanged, `conditional` → AND-appended, `deny` → `inArray('id', [])`, `post` → the
+  query unnarrowed with `post: true`.
+- **Run every scope through `findManyScoped(repository, scope, actor)`** (#2021). On
+  `post` it keeps the rows `reachesRecordOneOf` allows, evaluated against the stored row
+  (re-read by id in one query, so a sparse fieldset hides neither the realm nor a policy
+  attribute). Never answer `post` with the actor's realm, not even as a pre-filter: it
+  returns own-realm rows the policy denies and drops reachable global and foreign rows.
+  Accepted: a `post` page may be short, and `meta.total` loses only the rows that page
+  dropped.
 - `compile: false` leaves a capability gate only (the global catalogs: node,
   master-image(-group), registry).
 - Forward `realmAttributeName` only when a caller sets it: naming a realm column makes
   authup refuse to lower grant policies, degrading every lowerable policy to `post`.
-- Record reads reuse the scoped query (`appendQueryConditions(scoped, eq('id', id))`),
-  so list and record cannot disagree and an out-of-reach row is a 404, like a missing one.
+- Record reads reuse the scope with `eq('id', id)` appended to its query, so list and
+  record cannot disagree and an out-of-reach row is a 404, like a missing one.
 
 Client side: the Vue store batches verdict fetching and expiry; custom async navigation
 resolvers must watch `store.permissionRevision`.
@@ -189,8 +195,8 @@ registry-project and event compile, the global catalogs do not (#1940). Operator
 ## Analysis read reach
 
 `GET /analyses` and `/analysis-nodes` pre-gate a one-of over `ANALYSIS_READ` and every
-analysis write/lifecycle name, then narrow by `AnalysisReachService`
-(`core/services/analysis-reach/`), one condition for lists and records (#1955). Operator
+analysis write/lifecycle name, then read through `AnalysisReachService`
+(`core/services/analysis-reach/`), one reach for lists and records (#1955). Operator
 steps: [deployment configuration](../../docs/src/guide/deployment/configuration.md#reading-analyses-requires-analysis-read-and-reach).
 
 - Reach = the grant's `compile()` verdict OR'd, for users only, with
@@ -198,6 +204,14 @@ steps: [deployment configuration](../../docs/src/guide/deployment/configuration.
   (`IAnalysisNodeRepository.findAnalysisIds`). Ids are collected first rather than joined
   as a subquery, so lists, records and the in-memory fakes share one path; ceiling: a
   realm in many thousands of analyses.
+- **`resolve()` returns an `AnalysisReach`, executed only by the service's `findMany`**
+  (never append a condition by hand; combine reaches with `intersectAnalysisReach` /
+  `buildAnalysisBucketTypeReach`). A grant that does not lower (`post`) is decided per
+  analysis (#2021): the page's distinct analyses are loaded in one query, each is reached
+  iff `reachesRecordOneOf` allows the **analysis row and its realm** or its id is among
+  the participation ids, and the refined reach is applied to the page's rows as a
+  condition again. No own-realm narrowing; short pages and `meta.total` as for
+  `findManyScoped`.
 - **No master-realm bypass**: a master user with `own` grants sees only master's analyses;
   the built-in `admin` role and `system` client hold `any`.
 - Node and analysis clients reach by binding only, and the binding counts only when the

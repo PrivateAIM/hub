@@ -14,7 +14,7 @@ import type {
 } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import { FakeEntityRepository, createAllowAllActor } from '@privateaim/server-test-kit';
+import { FakeEntityRepository, createAllowAllActor, createScopedActor } from '@privateaim/server-test-kit';
 import {
     beforeEach,
     describe,
@@ -198,7 +198,7 @@ describe('StorageCapabilityService', () => {
         await expect(service.mint(
             analysis.id,
             { cap: [`bucket:${resultBucket.bucketId}:read`] },
-            createAllowAllActor('realm-stranger'),
+            createScopedActor({ realmId: 'realm-stranger', realmScope: 'own' }),
             'subject',
         )).rejects.toBeInstanceOf(PermissionDeniedError);
 

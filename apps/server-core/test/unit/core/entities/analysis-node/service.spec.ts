@@ -155,7 +155,7 @@ describe('AnalysisNodeService', () => {
                 }),
             ]);
 
-            const result = await service.getMany({}, createAllowAllActor('realm-a'));
+            const result = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(result.data.map((e) => e.id).sort()).toEqual(['mine', 'peer']);
         });

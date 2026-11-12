@@ -88,7 +88,7 @@ Entities carry `realmId`. There is no master-realm bypass: reach comes from each
   - An array of names is ALL-of in the plain variants; use `*OneOf` for any-of.
   - `evaluateRecordUpdate({ current, next })`: snapshot `{ ...entity }` before `repository.merge()`, which mutates the entity.
   - The predicates read only authup's `PermissionError` as `false`; anything else propagates. Test fakes throw `PermissionError` too; hub's `PermissionDeniedError` is what hub throws after a predicate said no. Both are 403.
-- **Reads** lower `compile()` into the query (`scopeReadQuery`, `AnalysisReachService`).
+- **Reads** lower `compile()` into the query (`scopeReadQuery`, `AnalysisReachService`) and run through `findManyScoped` / `AnalysisReachService.findMany`, which decide a `post` verdict per row by evaluation, never by the actor's realm (#2021).
 - **"Reaches every realm"** is `hasUnboundedReach(evaluator, name)` (compiled verdict `allow`).
 - Node and analysis clients reach by **binding** (`node.clientId` / `analysis.clientId`, in the client's own realm); their grants are scoped `none`.
 

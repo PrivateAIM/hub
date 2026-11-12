@@ -33,6 +33,12 @@ export type ScopedActorOptions = {
     realmScope: `${RealmScope}`;
     /** Defaults to a user of `realmId`. */
     identity?: ActorContext['identity'];
+    /**
+     * A grant policy that does not lower onto a column: `compile()` answers
+     * `post`, and an evaluation of a record passes only when the realm scope
+     * matches and the policy holds for the row (no row denies).
+     */
+    policy?: (attributes: Record<string, any>) => boolean;
 };
 
 export type ColumnNamingViolation = {

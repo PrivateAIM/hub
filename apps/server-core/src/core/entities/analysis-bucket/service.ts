@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
 import type { AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisBucketValidator } from '@privateaim/core-kit';
@@ -18,7 +17,7 @@ import { decodeQuery } from '../../query/index.ts';
 import { analysisBucketSchema } from './schema.ts';
 import type { IAnalysisBucketRepository, IAnalysisBucketService } from './types.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
-import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
+import type { AnalysisReach, AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
 import { buildAnalysisBucketTypeReach } from '../../services/analysis-reach/index.ts';
 
 type AnalysisBucketServiceContext = {
@@ -50,17 +49,22 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisBucket>> {
-        return this.repository.findMany(await this.scopeRead(decodeQuery(query, { schema: analysisBucketSchema }), actor));
+        return this.reach.findMany(
+            this.repository,
+            decodeQuery(query, { schema: analysisBucketSchema }),
+            await this.resolveReadReach(actor),
+        );
     }
 
     /** Reads through the same reach as {@link getMany}; out of reach answers 404. */
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisBucket> {
-        const scoped = await this.scopeRead(
-            decodeQuery(query, { schema: analysisBucketSchema, parameters: ['fields', 'relations'] }),
-            actor,
-        );
+        const decoded = decodeQuery(query, { schema: analysisBucketSchema, parameters: ['fields', 'relations'] });
 
-        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+        const { data: [entity] } = await this.reach.findMany(
+            this.repository,
+            appendQueryConditions(decoded, eq('id', id)),
+            await this.resolveReadReach(actor),
+        );
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
@@ -70,8 +74,8 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
     }
 
     /** D2: CODE for every participant, RESULT and TEMP only through an approved node. */
-    protected async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
-        const condition = buildAnalysisBucketTypeReach('type', [
+    protected async resolveReadReach(actor: ActorContext): Promise<AnalysisReach> {
+        return buildAnalysisBucketTypeReach('type', [
             {
                 types: [AnalysisBucketType.CODE],
                 reach: await this.reach.resolve(actor, REACH_TARGET),
@@ -81,8 +85,6 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
                 reach: await this.reach.resolve(actor, REACH_TARGET, { approvedOnly: true }),
             },
         ]);
-
-        return condition ? appendQueryConditions(query, condition) : query;
     }
 
     async create(data: Partial<AnalysisBucket>, actor: ActorContext): Promise<AnalysisBucket> {
@@ -115,19 +117,12 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             throw new EntityNotFoundError({ entity: 'analysis-bucket' });
         }
 
-        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
-
         const validated = await this.validator.run(data, { group: ValidatorGroup.UPDATE });
 
-        // Snapshot the stored row: typeorm's merge() writes into `entity`.
-        const current = { realm: entity.realmId, data: { attributes: { ...entity } } };
+        const current = { ...entity };
         const merged = this.repository.merge(entity, validated);
 
-        await evaluateRecordUpdate(actor.permissionEvaluator, {
-            name: PermissionName.ANALYSIS_UPDATE,
-            current,
-            next: { realm: merged.realmId, data: { attributes: merged } },
-        });
+        await this.assertOwnerUpdate(actor, current, merged);
 
         return this.repository.save(merged, { data: actor.metadata });
     }
@@ -165,6 +160,24 @@ export class AnalysisBucketService extends AbstractEntityService implements IAna
             name: PermissionName.ANALYSIS_UPDATE,
             realm: bucket.realmId,
             data: { attributes: bucket },
+        });
+    }
+
+    /**
+     * {@link assertOwner} for an update: the owner realm writes the bucket,
+     * before and after. `current` must be a copy of the stored row taken
+     * before `merge()`, which writes into the entity it merges into.
+     */
+    protected async assertOwnerUpdate(
+        actor: ActorContext,
+        current: Partial<AnalysisBucket>,
+        next: Partial<AnalysisBucket>,
+    ): Promise<void> {
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
+        await evaluateRecordUpdate(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            current: { realm: current.realmId, data: { attributes: current } },
+            next: { realm: next.realmId, data: { attributes: next } },
         });
     }
 }

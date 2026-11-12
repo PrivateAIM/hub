@@ -10,7 +10,12 @@ import type { MasterImageGroup } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@privateaim/server-kit';
+import {
+    AbstractEntityService,
+    appendQueryConditions,
+    findManyScoped,
+    scopeReadQuery,
+} from '@privateaim/server-kit';
 import { decodeQuery } from '../../query/index.ts';
 import { masterImageGroupSchema } from './schema.ts';
 import type { IMasterImageGroupRepository, IMasterImageGroupService } from './types.ts';
@@ -43,7 +48,7 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
             { names: MASTER_IMAGE_GROUP_READ_PERMISSIONS, compile: false },
         );
 
-        return this.repository.findMany(scoped);
+        return findManyScoped(this.repository, scoped, actor);
     }
 
     /**

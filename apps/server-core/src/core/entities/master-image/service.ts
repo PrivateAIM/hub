@@ -11,7 +11,12 @@ import { MasterImageCommand } from '@privateaim/core-kit';
 import { PermissionName, ProcessStatus } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@privateaim/server-kit';
+import {
+    AbstractEntityService,
+    appendQueryConditions,
+    findManyScoped,
+    scopeReadQuery,
+} from '@privateaim/server-kit';
 import { decodeQuery } from '../../query/index.ts';
 import { isProcessStatusInProgress } from '../../services/helpers.ts';
 import { masterImageSchema } from './schema.ts';
@@ -72,7 +77,7 @@ export class MasterImageService extends AbstractEntityService implements IMaster
             { names: MASTER_IMAGE_READ_PERMISSIONS, compile: false },
         );
 
-        return this.repository.findMany(scoped);
+        return findManyScoped(this.repository, scoped, actor);
     }
 
     /**

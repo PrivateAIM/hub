@@ -66,18 +66,21 @@ export class AnalysisNodeService extends AbstractEntityService implements IAnaly
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisNode>> {
         const decoded = decodeQuery(query, { schema: analysisNodeSchema });
-        const condition = await this.reach.resolve(actor, REACH_TARGET);
+        const reach = await this.reach.resolve(actor, REACH_TARGET);
 
-        return this.repository.findMany(condition ? appendQueryConditions(decoded, condition) : decoded);
+        return this.reach.findMany(this.repository, decoded, reach);
     }
 
     /** Reads through the same reach as {@link getMany}; out of reach answers 404. */
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisNode> {
         const decoded = decodeQuery(query, { schema: analysisNodeSchema, parameters: ['fields', 'relations'] });
-        const condition = await this.reach.resolve(actor, REACH_TARGET);
+        const reach = await this.reach.resolve(actor, REACH_TARGET);
 
-        const scoped = condition ? appendQueryConditions(decoded, condition) : decoded;
-        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+        const { data: [entity] } = await this.reach.findMany(
+            this.repository,
+            appendQueryConditions(decoded, eq('id', id)),
+            reach,
+        );
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-node' });
