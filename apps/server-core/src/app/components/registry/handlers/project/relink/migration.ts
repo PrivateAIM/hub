@@ -9,6 +9,7 @@ import type { Client as AuthupClient } from '@authup/core-http-kit';
 import type { 
     HarborClient, 
     ProjectWebhookPolicy, 
+    ProjectWebhookPolicyCreatePayload,
     Robot, 
     RobotPermission, 
 } from '@hapic/harbor';
@@ -169,7 +170,7 @@ export class RegistryProjectMigration implements IRegistryProjectMigration {
         }
 
         const client = this.client(source);
-        const data: Partial<ProjectWebhookPolicy> = {
+        const data: ProjectWebhookPolicyCreatePayload = {
             name: 'api',
             enabled: true,
             event_types: ['PUSH_ARTIFACT'],
@@ -243,8 +244,7 @@ export class RegistryProjectMigration implements IRegistryProjectMigration {
 
                 await client.projectRepositoryArtifact.getMany({
                     projectName: target.externalName,
-                    // Harbor decodes once while routing and once in the handler.
-                    repositoryName: encodeURIComponent(encodeURIComponent(repository.name.slice(prefix.length))),
+                    repositoryName: repository.name.slice(prefix.length),
                     query: { page: 1, page_size: 1 },
                 });
             }

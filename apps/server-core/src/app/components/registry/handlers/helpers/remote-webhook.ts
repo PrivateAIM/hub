@@ -35,6 +35,7 @@ export async function saveRemoteRegistryProjectWebhook(
         data: {
             enabled: true,
             name: 'api',
+            event_types: ['PUSH_ARTIFACT'],
             targets: [
                 {
                     auth_header: stringifyAuthorizationHeader({
