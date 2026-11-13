@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-11-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* requires Authup 1.0.0-beta.75. The provisioned token exchange capability value has to list bucketFile; see the deployment configuration guide for the rollout order.
+* All workspaces and service deployments now require Node.js >=26.0.0.
+* Node.js >=24.0.0 is required. Import forwarded error helpers from @ebec/core, theme helpers from @authup/client-web-kit-theme, and permission evaluator test helpers from @authup/server-test-kit instead of the PrivateAIM barrels.
+
+### Features
+
+* add a tag-invalidated read cache for client binding lookups ([#2024](https://github.com/PrivateAIM/hub/issues/2024)) ([cffdfcb](https://github.com/PrivateAIM/hub/commit/cffdfcb717e315aaf89c0159cf7d3ea0c00e552b))
+* add storage capability tokens for analysis buckets ([#2017](https://github.com/PrivateAIM/hub/issues/2017)) ([55142a8](https://github.com/PrivateAIM/hub/commit/55142a8fe2f4ceb1f732d6364e505d08e52c4632))
+* authup beta.75, camelCase capability types, per-row post reads ([#2023](https://github.com/PrivateAIM/hub/issues/2023)) ([9dabc2b](https://github.com/PrivateAIM/hub/commit/9dabc2b951b0617194b1b1cecfc9a57826947cb8))
+
+
+### Bug Fixes
+
+* **deps-dev:** bump fast-uri from 3.1.6 to 3.1.9 ([#1987](https://github.com/PrivateAIM/hub/issues/1987)) ([08099c6](https://github.com/PrivateAIM/hub/commit/08099c6689b4866e033f9bc0685c2c6c3c1d43b2))
+* **deps-dev:** bump serialize-javascript from 7.1.2 to 7.1.4 ([#1985](https://github.com/PrivateAIM/hub/issues/1985)) ([e5fd935](https://github.com/PrivateAIM/hub/commit/e5fd935103fd0d94cd819940ff2a2b72f2076adb))
+* **deps:** bump @authup/* to 1.0.0-beta.74 ([e3e3b6f](https://github.com/PrivateAIM/hub/commit/e3e3b6fccb61f34960197835465f8a12f608163c))
+* **deps:** bump fast-xml-parser from 5.10.1 to 5.12.0 ([#2018](https://github.com/PrivateAIM/hub/issues/2018)) ([26a1fe5](https://github.com/PrivateAIM/hub/commit/26a1fe5c4360e17a3a9dac256fcd079182aead5a))
+* **deps:** bump github/codeql-action from 4.39.1 to 4.39.2 ([#2015](https://github.com/PrivateAIM/hub/issues/2015)) ([f01a0ce](https://github.com/PrivateAIM/hub/commit/f01a0ced38c09a9cf156b549e01de874df2285db))
+* **deps:** bump github/codeql-action from 4.39.2 to 4.39.3 ([#2016](https://github.com/PrivateAIM/hub/issues/2016)) ([d796e49](https://github.com/PrivateAIM/hub/commit/d796e49e5ef4a8730b25b016098985003c04648c))
+* **deps:** bump tada5hi/monoship from 2.2.0 to 2.2.1 ([#1998](https://github.com/PrivateAIM/hub/issues/1998)) ([128718e](https://github.com/PrivateAIM/hub/commit/128718ecd4cfae427fbee0eef69937ae38a55078))
+* **deps:** bump the minorandpatch group across 1 directory with 20 updates ([#1997](https://github.com/PrivateAIM/hub/issues/1997)) ([1dc48f8](https://github.com/PrivateAIM/hub/commit/1dc48f8055bb4449e502882a5832d7f26a66b324))
+* **deps:** bump the minorandpatch group with 7 updates ([#2020](https://github.com/PrivateAIM/hub/issues/2020)) ([30a13e4](https://github.com/PrivateAIM/hub/commit/30a13e4ae41d408cab2333bc020a654d6eb9fd1a))
+* **deps:** bump the minorandpatch group with 9 updates ([#2000](https://github.com/PrivateAIM/hub/issues/2000)) ([f393377](https://github.com/PrivateAIM/hub/commit/f393377ef14004e4d015f480faaabfb465a45d8b))
+* harden node authority, build claims and service shutdown ([#1996](https://github.com/PrivateAIM/hub/issues/1996)) ([027d1a0](https://github.com/PrivateAIM/hub/commit/027d1a0b9c761a119d67a0641b5911d837672ade))
+* **server-core-worker:** finalize symmetric crypto synchronously ([179beb9](https://github.com/PrivateAIM/hub/commit/179beb9307091596a1e58e6e54719ee46274861c))
+
+
+### Build System
+
+* require Node 26 across workspaces and CI ([3b1989e](https://github.com/PrivateAIM/hub/commit/3b1989eb5bdb44ca91c95092d0de38f8d3700153))
+* upgrade eslint config to v3 and require Node 24 ([652d794](https://github.com/PrivateAIM/hub/commit/652d794c872bf59177512a2a8ad10f26bb5545f1))
+
 ## [0.19.2](https://github.com/PrivateAIM/hub/compare/v0.19.1...v0.19.2) (2026-10-27)
 
 
