@@ -291,6 +291,26 @@ describe('src/query-cache suspension after a lost invalidation', () => {
         expect(await cache.remember('s', () => ['item'], read)).toEqual('new');
     });
 
+    it('should not serve a fill that was in flight when the bump was lost', async () => {
+        const pending = Promise.withResolvers<string>();
+
+        const inFlight = cache.remember('f', () => ['item'], () => pending.promise);
+
+        tagged.fail();
+        await expect(invalidator.invalidate(['item'])).rejects.toThrow();
+
+        // the read finishes after the failure and is stored with a full ttl.
+        advance(10);
+        pending.resolve('old');
+        expect(await inFlight).toEqual('old');
+
+        advance(TTL - 10);
+
+        const { read } = createRead('new');
+
+        expect(await cache.remember('f', () => ['item'], read)).toEqual('new');
+    });
+
     it('should extend the suspension on a second failure', async () => {
         const { state, read } = createRead('value');
 
