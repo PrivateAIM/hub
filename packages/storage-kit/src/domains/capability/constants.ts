@@ -7,7 +7,7 @@
 
 export enum StorageCapabilityType {
     BUCKET = 'bucket',
-    BUCKET_FILE = 'bucket-file',
+    BUCKET_FILE = 'bucketFile',
 }
 
 export enum StorageCapabilityAction {

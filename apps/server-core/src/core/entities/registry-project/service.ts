@@ -12,10 +12,16 @@ import {
     isPropertySet,
 } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityRepositoryFindManyResult,
+    IEntityRepository,
+    ReadScope,
+} from '@privateaim/server-kit';
 import {
     AbstractEntityService,
     appendQueryConditions,
+    findManyScoped,
     scopeReadQuery,
 } from '@privateaim/server-kit';
 import {
@@ -78,8 +84,8 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
-        const scoped = await this.scopeRead(decodeQuery(query, { schema: registryProjectSchema }), actor);
-        const result = await this.repository.findMany(scoped);
+        const scope = await this.scopeRead(decodeQuery(query, { schema: registryProjectSchema }), actor);
+        const result = await findManyScoped(this.repository, scope, actor);
 
         const hasSecrets = result.data.some((e) => this.hasSecretField(e));
 
@@ -91,12 +97,16 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<RegistryProject> {
-        const scoped = await this.scopeRead(
+        const scope = await this.scopeRead(
             decodeQuery(query, { schema: registryProjectSchema, parameters: ['fields', 'relations'] }),
             actor,
         );
 
-        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+        const { data: [entity] } = await findManyScoped(
+            this.repository,
+            { ...scope, query: appendQueryConditions(scope.query, eq('id', id)) },
+            actor,
+        );
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry-project' });
@@ -114,7 +124,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
      * query to its reach. A node's own client without that grant may still
      * read exactly its own project; if it does hold the grant, the grant wins.
      */
-    private async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+    private async scopeRead(query: IQuery, actor: ActorContext): Promise<ReadScope> {
         await preEvaluateRelationReads(query, actor, RELATION_READ_PERMISSIONS);
 
         try {
@@ -130,7 +140,11 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
                 throw e;
             }
 
-            return appendQueryConditions(query, eq('id', ownProjectId));
+            return {
+                query: appendQueryConditions(query, eq('id', ownProjectId)),
+                post: false,
+                names: REGISTRY_PROJECT_READ_PERMISSIONS,
+            };
         }
     }
 

@@ -87,7 +87,7 @@ describe('AnalysisBucketAccess', () => {
     }
 
     function createNodeActor(holdsResultRead = true) {
-        const actor = createAllowAllActor(NODE_REALM);
+        const actor = createScopedActor({ realmId: NODE_REALM, realmScope: 'own' });
 
         if (!holdsResultRead) {
             actor.permissionEvaluator.setBehavior(({ method, ctx }) => {

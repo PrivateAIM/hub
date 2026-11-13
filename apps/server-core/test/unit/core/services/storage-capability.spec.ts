@@ -14,7 +14,7 @@ import type {
 } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import { FakeEntityRepository, createAllowAllActor } from '@privateaim/server-test-kit';
+import { FakeEntityRepository, createAllowAllActor, createScopedActor } from '@privateaim/server-test-kit';
 import {
     beforeEach,
     describe,
@@ -151,7 +151,7 @@ describe('StorageCapabilityService', () => {
 
         await service.mint(
             analysis.id,
-            { cap: [`bucket-file:${file.bucketFileId}:read,delete`] },
+            { cap: [`bucketFile:${file.bucketFileId}:read,delete`] },
             createAllowAllActor(OWNER_REALM),
             'subject',
         );
@@ -175,7 +175,7 @@ describe('StorageCapabilityService', () => {
 
         await expect(service.mint(
             analysis.id,
-            { cap: [`bucket-file:${file.bucketFileId}:read`] },
+            { cap: [`bucketFile:${file.bucketFileId}:read`] },
             createAllowAllActor(OWNER_REALM),
             'subject',
         )).rejects.toBeInstanceOf(BadRequestError);
@@ -198,7 +198,7 @@ describe('StorageCapabilityService', () => {
         await expect(service.mint(
             analysis.id,
             { cap: [`bucket:${resultBucket.bucketId}:read`] },
-            createAllowAllActor('realm-stranger'),
+            createScopedActor({ realmId: 'realm-stranger', realmScope: 'own' }),
             'subject',
         )).rejects.toBeInstanceOf(PermissionDeniedError);
 
@@ -210,7 +210,7 @@ describe('StorageCapabilityService', () => {
 
         await expect(service.mint(
             analysis.id,
-            { cap: [`bucket-file:${file.bucketFileId}:write`] },
+            { cap: [`bucketFile:${file.bucketFileId}:write`] },
             createAllowAllActor(OWNER_REALM),
             'subject',
         )).rejects.toBeInstanceOf(BadRequestError);

@@ -52,7 +52,7 @@ async function setup(project: TestProject) {
     await provideAuthup(project, PERMISSIONS, {
         tokenExchange: {
             audience: 'storage',
-            value: 'bucket bucket-file',
+            value: 'bucket bucketFile',
             maxAge: 3600,
             realmScope: 'any',
         },

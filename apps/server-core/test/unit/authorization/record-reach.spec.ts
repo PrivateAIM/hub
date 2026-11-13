@@ -104,12 +104,12 @@ describe('record reach against a real Authup', () => {
         catalogClient.setAuthorizationHeader({ type: 'Bearer', token: adminToken });
         verifier = createAuthupTokenVerifier({
             baseURL,
-            creator: createAuthupUserTokenCreator({
-                baseURL,
-                name: 'admin',
-                password: 'start123',
+            // The built-in `system` client, as the services introspect.
+            client: {
+                id: 'system',
+                secret: 'start123',
                 realm: 'master',
-            }),
+            },
         });
 
         const { data: realm } = await request<{ data: { id: string } }>('POST', 'realms', { name: `other-${randomUUID().slice(0, 6)}` });

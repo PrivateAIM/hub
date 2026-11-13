@@ -183,7 +183,7 @@ describe('AnalysisService', () => {
                 nodeRealmId: 'realm-a',
             } as AnalysisNode);
 
-            const result = await service.getMany({}, createAllowAllActor('realm-a'));
+            const result = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(result.data.map((e) => e.id).sort()).toEqual(['joined', 'own']);
             expect(result.meta.total).toBe(2);
@@ -191,6 +191,79 @@ describe('AnalysisService', () => {
 
         it('should refuse an actor without any analysis read permission', async () => {
             await expect(service.getMany({}, createDenyAllActor())).rejects.toThrow(PermissionError);
+        });
+
+        describe('with a grant that does not lower (post)', () => {
+            // A grant policy no column condition expresses.
+            const policy = (row: Record<string, any>) => row.name === 'open';
+
+            beforeEach(() => {
+                analysisRepository.seed([
+                    createFullAnalysis({
+                        id: 'own-open',
+                        realmId: 'realm-a',
+                        name: 'open',
+                    }),
+                    createFullAnalysis({
+                        id: 'own-closed',
+                        realmId: 'realm-a',
+                        name: 'closed',
+                    }),
+                    createFullAnalysis({
+                        id: 'foreign-open',
+                        realmId: 'realm-c',
+                        name: 'open',
+                    }),
+                    createFullAnalysis({
+                        id: 'joined',
+                        realmId: 'realm-b',
+                        name: 'closed',
+                    }),
+                ]);
+                analysisNodeRepository.seed({
+                    id: 'an-1',
+                    analysisId: 'joined',
+                    analysisRealmId: 'realm-b',
+                    nodeId: 'node-a',
+                    nodeRealmId: 'realm-a',
+                } as AnalysisNode);
+            });
+
+            it('should return exactly the analyses the evaluation allows, plus participation', async () => {
+                const result = await service.getMany({}, createScopedActor({
+                    realmId: 'realm-a',
+                    realmScope: 'any',
+                    policy,
+                }));
+
+                // Not own-closed, although it is in the actor's realm; the
+                // foreign analysis the grant reaches is kept.
+                expect(result.data.map((e) => e.id).sort()).toEqual(['foreign-open', 'joined', 'own-open']);
+                // The candidate count: denied rows stay in the total.
+                expect(result.meta.total).toBe(4);
+            });
+
+            it('should apply the realm scope of the grant per analysis', async () => {
+                const result = await service.getMany({}, createScopedActor({
+                    realmId: 'realm-a',
+                    realmScope: 'own',
+                    policy,
+                }));
+
+                expect(result.data.map((e) => e.id).sort()).toEqual(['joined', 'own-open']);
+            });
+
+            it('should decide a record read like the list', async () => {
+                const actor = createScopedActor({
+                    realmId: 'realm-a',
+                    realmScope: 'any',
+                    policy,
+                });
+
+                await expect(service.getOne('foreign-open', actor)).resolves.toMatchObject({ id: 'foreign-open' });
+                await expect(service.getOne('joined', actor)).resolves.toMatchObject({ id: 'joined' });
+                await expect(service.getOne('own-closed', actor)).rejects.toThrow(EntityNotFoundError);
+            });
         });
     });
 
@@ -210,14 +283,14 @@ describe('AnalysisService', () => {
         it('should answer an analysis out of reach like a missing one', async () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'realm-c' }));
 
-            await expect(service.getOne('analysis-1', createAllowAllActor('realm-a')))
+            await expect(service.getOne('analysis-1', createScopedActor({ realmId: 'realm-a', realmScope: 'own' })))
                 .rejects.toThrow(EntityNotFoundError);
         });
 
         it('should not let the master realm read beyond its grant', async () => {
             analysisRepository.seed(createFullAnalysis({ realmId: 'realm-c' }));
 
-            await expect(service.getOne('analysis-1', createAllowAllActor('realm-master')))
+            await expect(service.getOne('analysis-1', createScopedActor({ realmId: 'realm-master', realmScope: 'own' })))
                 .rejects.toThrow(EntityNotFoundError);
         });
     });

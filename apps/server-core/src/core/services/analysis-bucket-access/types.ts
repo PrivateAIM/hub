@@ -42,6 +42,18 @@ export interface IAnalysisBucketAccess {
         file?: Partial<AnalysisBucketFile>,
     ): Promise<void>;
 
+    /**
+     * The owner rule for an update: the analysis' realm writes the file,
+     * before and after. `current` must be a copy of the stored row taken
+     * before `merge()`, which writes into the entity it merges into. Throws.
+     */
+    assertOwnerUpdate(
+        actor: ActorContext,
+        analysis: Analysis,
+        current: Partial<AnalysisBucketFile>,
+        next: Partial<AnalysisBucketFile>,
+    ): Promise<void>;
+
     /** The delete rule: the owner realm plus {@link assertBucketWritable}. Throws. */
     assertDelete(
         actor: ActorContext,

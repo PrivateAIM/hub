@@ -39,7 +39,7 @@ Core services are tested with fakes and need no database or Authup. Tests are gr
 
 - `FakeEntityRepository<T>`: in-memory `IEntityRepository<T>` with `seed()`, `getAll()`, `clear()`.
 - `FakePermissionEvaluator` (re-exported from `@authup/server-test-kit`): call arrays, `setBehavior` / `deny` / `denyAll`, `compile()` defaulting to `post`. A denial throws authup's `PermissionError`, as production does; a hand-written behavior must throw it too, never `PermissionDeniedError` (`reachesRecord` & co. read only `PermissionError` as "not reached").
-- `createAllowAllActor()` / `createDenyAllActor()` / `createScopedActor({ realmScope })`: `FakeActorContext` factories; only the scoped one enforces realm reach. Assert `toThrow(PermissionError)` for an evaluator denial, `toThrow(PermissionDeniedError)` only for a denial hub code throws.
+- `createAllowAllActor()` / `createDenyAllActor()` / `createScopedActor({ realmScope })`: `FakeActorContext` factories; only the scoped one enforces realm reach, and its `policy` option models a grant that does not lower (`compile()` → `post`, rows decided by the policy). The allow-all actor also compiles to `post` and then reaches every row of every realm, so a read spec about realm reach needs the scoped one. Assert `toThrow(PermissionError)` for an evaluator denial, `toThrow(PermissionDeniedError)` only for a denial hub code throws.
 - `createFakeAuthupClient({ handlers, fallback })`: a real `AuthupClient` on a `MemoryTransport`. Not `@authup/core-http-kit/testing`'s fake, which hard-codes a 200 and cannot reach the 404 branches of `AnalysisClientService` / `NodeClientService`.
 
 ## CI Pipeline

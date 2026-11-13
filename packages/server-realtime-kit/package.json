@@ -22,14 +22,14 @@
     "license": "Apache-2.0",
     "description": "This package contains the realtime application which connects the API with socket based clients.",
     "dependencies": {
-        "@authup/access": "^1.0.0-beta.74",
-        "@authup/core-http-kit": "^1.0.0-beta.74",
-        "@authup/core-kit": "^1.0.0-beta.74",
-        "@authup/core-realtime-kit": "^1.0.0-beta.74",
-        "@authup/kit": "^1.0.0-beta.74",
-        "@authup/server-adapter-kit": "^1.0.0-beta.74",
-        "@authup/server-adapter-socket-io": "^1.0.0-beta.74",
-        "@authup/specs": "^1.0.0-beta.74",
+        "@authup/access": "^1.0.0-beta.75",
+        "@authup/core-http-kit": "^1.0.0-beta.75",
+        "@authup/core-kit": "^1.0.0-beta.75",
+        "@authup/core-realtime-kit": "^1.0.0-beta.75",
+        "@authup/kit": "^1.0.0-beta.75",
+        "@authup/server-adapter-kit": "^1.0.0-beta.75",
+        "@authup/server-adapter-socket-io": "^1.0.0-beta.75",
+        "@authup/specs": "^1.0.0-beta.75",
         "@privateaim/errors": "^0.19.1",
         "@privateaim/kit": "^0.19.2",
         "@privateaim/server-kit": "^0.19.2",
@@ -37,11 +37,11 @@
         "@socket.io/redis-adapter": "^8.3.0"
     },
     "devDependencies": {
-        "redis-extension": "^2.0.4",
+        "redis-extension": "^3.0.0",
         "socket.io": "^4.8.4"
     },
     "peerDependencies": {
-        "redis-extension": "^2.0.4",
+        "redis-extension": "^3.0.0",
         "socket.io": "^4.8.4"
     },
     "scripts": {

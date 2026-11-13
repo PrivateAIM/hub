@@ -37,7 +37,7 @@ import { generateSwaggerDocumentation } from '@privateaim/server-http-kit';
 
 | Module | Description |
 |--------|-------------|
-| `middlewares` | Auth middleware (`ForceLoggedInMiddleware`, `ForceIdentityOrCapabilityMiddleware`, `ForceIdentityOrStreamCapabilityMiddleware`); `createAuthupCapabilityTokenVerifier` for the `capability` option of the authorization middleware |
+| `middlewares` | Auth middleware (`ForceLoggedInMiddleware`, `ForceIdentityOrCapabilityMiddleware`, `ForceIdentityOrStreamCapabilityMiddleware`); `createAuthupTokenVerifier({ baseURL, client: { id, secret, realm }, redisClient?, cache? })` for the `tokenVerifier` option, which introspects as `client` and caches results per that client; `createAuthupCapabilityTokenVerifier` for the `capability` option of the authorization middleware |
 | `request` | Request identity, permission, and query helpers; `useRequestCapability` (a capability request has a capability and no identity, permission evaluator or token) |
 | `swagger` | OpenAPI/Swagger documentation generator |
 | `constants` | HTTP-specific constants |

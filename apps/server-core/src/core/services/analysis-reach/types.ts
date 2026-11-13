@@ -5,15 +5,45 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ICondition } from '@rapiq/core';
+import type { ICondition, IQuery } from '@rapiq/core';
 import type { Analysis, AnalysisBucketType, Node } from '@privateaim/core-kit';
-import type { ActorContext, IEntityRepository } from '@privateaim/server-kit';
+import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
+
+/** A reach that is a query condition; `undefined` reaches every analysis. */
+export type AnalysisReachLowered = {
+    kind: 'lowered';
+    condition: ICondition | undefined;
+};
+
+/**
+ * A reach whose grant did not lower (`post`): which analyses it covers is
+ * known only by evaluating each one.
+ */
+export type AnalysisReachPost = {
+    kind: 'post';
+    /**
+     * What may narrow the candidates before the decision: the parts that
+     * did lower. Never the reach itself.
+     */
+    candidates: ICondition | undefined;
+    /** Column of the queried entity holding the analysis id. */
+    analysisIdAttributeName: string;
+    /** The reach as a condition, exact among the given analyses. */
+    refine: (analyses: Analysis[]) => Promise<ICondition | undefined>;
+};
+
+/**
+ * Which analyses an actor reaches. The two shapes share no condition
+ * property on purpose: a reach is executed by
+ * `IAnalysisReachService.findMany`, not appended by hand.
+ */
+export type AnalysisReach = AnalysisReachLowered | AnalysisReachPost;
 
 export type AnalysisBucketTypeReach = {
     types: `${AnalysisBucketType}`[];
-    /** `undefined`: every analysis; `null`: none — the types are excluded. */
-    reach: ICondition | undefined | null;
+    /** `null`: none — the types are excluded. */
+    reach: AnalysisReach | null;
 };
 
 export type AnalysisReachServiceContext = {
@@ -45,12 +75,24 @@ export type AnalysisReachOptions = {
 export interface IAnalysisReachService {
     /**
      * Pre-gate the capability one-of (a missing grant throws, i.e. 403) and
-     * return the condition that narrows a query to the analyses the actor
-     * reaches — `undefined` when it reaches every analysis.
+     * return the analyses the actor reaches.
      */
     resolve(
         actor: ActorContext,
         target: AnalysisReachTarget,
         options?: AnalysisReachOptions,
-    ): Promise<ICondition | undefined>;
+    ): Promise<AnalysisReach>;
+
+    /**
+     * Read the rows of `query` the reach covers, from the repository of the
+     * entity the reach was resolved for. A `post` reach is decided per
+     * analysis of the page, so the page may come back short or empty while
+     * `meta.total` stays the candidate count. A record read passes the query
+     * with its `id` condition, so list and record share the decision.
+     */
+    findMany<T extends object>(
+        repository: Pick<IEntityRepository<T>, 'findMany'>,
+        query: IQuery,
+        reach: AnalysisReach,
+    ): Promise<EntityRepositoryFindManyResult<T>>;
 }

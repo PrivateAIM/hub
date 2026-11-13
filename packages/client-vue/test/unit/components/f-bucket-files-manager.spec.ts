@@ -95,7 +95,7 @@ describe('FBucketFilesManager', () => {
                     'POST /analyses/:id/storage/token': (req) => {
                         const cap = isMintBody(req.body) ? req.body.cap[0] : '';
 
-                        if (cap?.startsWith('bucket-file:')) {
+                        if (cap?.startsWith('bucketFile:')) {
                             return fakeResponse(403, { message: 'denied' });
                         }
 

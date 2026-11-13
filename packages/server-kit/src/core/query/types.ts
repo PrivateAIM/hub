@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { IQuery } from '@rapiq/core';
+
 export type ScopeReadQueryOptions = {
     /**
      * The permissions that grant the read, pre-gated as a disjunction
@@ -18,6 +20,27 @@ export type ScopeReadQueryOptions = {
     compile?: boolean,
     /**
      * The row's realm column (property name), default `realmId`.
+     */
+    realmAttributeName?: string,
+};
+
+/**
+ * A read query with the actor's reach applied, executed with
+ * `findManyScoped`.
+ */
+export type ReadScope = {
+    query: IQuery,
+    /**
+     * The reach did not lower (`post`): `query` carries no reach at all and
+     * every row it returns has to be decided by evaluation.
+     */
+    post: boolean,
+    /**
+     * The permissions a `post` row is evaluated against, any-of.
+     */
+    names: string[],
+    /**
+     * The row's realm column (property name) when it is not `realmId`.
      */
     realmAttributeName?: string,
 };

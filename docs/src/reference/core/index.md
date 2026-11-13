@@ -89,12 +89,12 @@ browser then reaches only the buckets and files of one analysis, for only the re
 POST /analyses/:id/storage/token
 Authorization: Bearer <access token>
 
-{ "cap": ["bucket:<bucketId>:read,write", "bucket-file:<fileId>:read"], "lifetime": 60 }
+{ "cap": ["bucket:<bucketId>:read,write", "bucketFile:<fileId>:read"], "lifetime": 60 }
 ```
 
 | Field | Description |
 |-------|-------------|
-| `cap` | 1 to 32 entries `type:id:actions` (actions comma-separated). Types `bucket` (`read`, `write`, `delete`) and `bucket-file` (`read`, `delete`). `id` is the **storage** bucket or file id. |
+| `cap` | 1 to 32 entries `type:id:actions` (actions comma-separated). Types `bucket` (`read`, `write`, `delete`) and `bucketFile` (`read`, `delete`). `id` is the **storage** bucket or file id. |
 | `lifetime` | Optional, seconds, 1 to 3600 (default 3600). |
 
 The answer is flat (no `{ data, meta }` envelope): `{ "token": "...", "expiresAt": "<ISO date>" }`.

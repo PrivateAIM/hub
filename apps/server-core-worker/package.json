@@ -30,7 +30,7 @@
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "dependencies": {
-        "@authup/core-http-kit": "^1.0.0-beta.74",
+        "@authup/core-http-kit": "^1.0.0-beta.75",
         "@hapic/harbor": "^3.0.2",
         "@privateaim/core-http-kit": "^0.19.2",
         "@privateaim/core-kit": "^0.19.2",
@@ -49,7 +49,7 @@
         "hapic": "^3.0.2",
         "hubwire": "^0.2.2",
         "orkos": "^1.1.1",
-        "redis-extension": "^2.0.4",
+        "redis-extension": "^3.0.0",
         "routup": "^6.1.1",
         "tar": "^7.5.22",
         "tar-fs": "^3.1.3",

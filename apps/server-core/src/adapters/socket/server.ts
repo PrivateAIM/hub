@@ -13,9 +13,6 @@ import type {
 } from '@privateaim/core-realtime-kit';
 import { createAuthupTokenVerifier } from '@privateaim/server-http-kit';
 import type { BaseServerConfig, Logger } from '@privateaim/server-kit';
-import {
-    createAuthupClientTokenCreator,
-} from '@privateaim/server-kit';
 import type { Socket, SocketData } from '@privateaim/server-realtime-kit';
 import {
     createServer,
@@ -64,14 +61,11 @@ export function createSocketServer(
         baseURL: ctx.config.authupURL,
         tokenVerifier: createAuthupTokenVerifier({
             baseURL: ctx.config.authupURL,
-            creator: createAuthupClientTokenCreator({
-                baseURL: ctx.config.authupURL,
-                clientId: ctx.config.clientId,
-                clientSecret: ctx.config.clientSecret,
+            client: {
+                id: ctx.config.clientId,
+                secret: ctx.config.clientSecret,
                 realm: ctx.config.realm,
-            }),
-            clientId: ctx.config.clientId,
-            realm: ctx.config.realm,
+            },
             redisClient: ctx.redisPublishClient,
         }),
         logger: ctx.logger,

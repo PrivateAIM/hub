@@ -9,10 +9,11 @@ import type { Event } from '@privateaim/telemetry-kit';
 import { EventValidator } from '@privateaim/telemetry-kit';
 import { PermissionName } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
-import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import type { ActorContext, EntityRepositoryFindManyResult, ReadScope } from '@privateaim/server-kit';
 import {
     AbstractEntityService,
     appendQueryConditions,
+    findManyScoped,
     scopeReadQuery,
 } from '@privateaim/server-kit';
 import { evaluateRecord } from '@authup/access';
@@ -46,14 +47,18 @@ export class EventService extends AbstractEntityService implements IEventService
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<Event>> {
         const decoded = decodeQuery(query, { schema: eventSchema });
 
-        return this.repository.findMany(await this.scopeRead(decoded, actor));
+        return findManyScoped(this.repository, await this.scopeRead(decoded, actor), actor);
     }
 
     async getOne(id: string, actor: ActorContext): Promise<Event> {
         // Read through the collection's scope, so an event outside the
         // actor's reach answers 404 exactly like a missing one.
-        const scoped = await this.scopeRead(new Query({}), actor);
-        const { data } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+        const scope = await this.scopeRead(new Query({}), actor);
+        const { data } = await findManyScoped(
+            this.repository,
+            { ...scope, query: appendQueryConditions(scope.query, eq('id', id)) },
+            actor,
+        );
 
         if (data.length === 0) {
             throw new EntityNotFoundError({ entity: 'event' });
@@ -66,7 +71,7 @@ export class EventService extends AbstractEntityService implements IEventService
      * The read scope for list and record alike: pre-gated on a read
      * permission and narrowed to what the caller's grant reaches.
      */
-    protected scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+    protected scopeRead(query: IQuery, actor: ActorContext): Promise<ReadScope> {
         return scopeReadQuery(query, actor, { names: READ_PERMISSIONS });
     }
 

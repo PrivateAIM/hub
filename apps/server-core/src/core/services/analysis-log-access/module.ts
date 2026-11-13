@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ICondition } from '@rapiq/core';
 import { Query, eq } from '@rapiq/core';
 import type { Node } from '@privateaim/core-kit';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
@@ -20,7 +19,7 @@ import { z } from 'zod';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
-import type { AnalysisReachTarget, IAnalysisReachService } from '../analysis-reach/index.ts';
+import type { AnalysisReach, AnalysisReachTarget, IAnalysisReachService } from '../analysis-reach/index.ts';
 import { LogAccessIntent } from './constants.ts';
 import type { AnalysisLogAccessServiceContext, IAnalysisLogAccessService } from './types.ts';
 
@@ -68,11 +67,11 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
     ): Promise<void> {
         assertUUID(analysisId, 'analysisId');
 
-        const condition = intent === LogAccessIntent.DELETE ?
+        const reach = intent === LogAccessIntent.DELETE ?
             await this.reach.resolve(actor, REACH_TARGET, { names: [PermissionName.ANALYSIS_UPDATE], grantOnly: true }) :
             await this.reach.resolve(actor, REACH_TARGET, { approvedOnly: true });
 
-        if (!await this.reaches(analysisId, condition)) {
+        if (!await this.reaches(analysisId, reach)) {
             throw new EntityNotFoundError({ entity: 'analysis' });
         }
     }
@@ -185,9 +184,12 @@ export class AnalysisLogAccessService implements IAnalysisLogAccessService {
         return node;
     }
 
-    protected async reaches(analysisId: string, condition: ICondition | undefined): Promise<boolean> {
-        const conditions = condition ? [condition, eq('id', analysisId)] : [eq('id', analysisId)];
-        const { data } = await this.analysisRepository.findMany(appendQueryConditions(new Query({}), ...conditions));
+    protected async reaches(analysisId: string, reach: AnalysisReach): Promise<boolean> {
+        const { data } = await this.reach.findMany(
+            this.analysisRepository,
+            appendQueryConditions(new Query({}), eq('id', analysisId)),
+            reach,
+        );
 
         return data.length > 0;
     }

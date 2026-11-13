@@ -544,7 +544,7 @@ describe('BucketService', () => {
         it('should list nothing for a capability naming no bucket', async () => {
             repository.seed(createTestBucket({ id: 'b-1' }));
 
-            const result = await service.getMany({}, createCapability('bucket-file:f-1:read'));
+            const result = await service.getMany({}, createCapability('bucketFile:f-1:read'));
 
             expect(result.data).toEqual([]);
         });

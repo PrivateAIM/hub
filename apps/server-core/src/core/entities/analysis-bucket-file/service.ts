@@ -5,15 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ICondition, IQuery } from '@rapiq/core';
-import { and, eq } from '@rapiq/core';
+import { eq } from '@rapiq/core';
 import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketFileValidator, AnalysisBucketType } from '@privateaim/core-kit';
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
-import { evaluateRecordUpdate, isPermissionError } from '@authup/access';
+import { isPermissionError } from '@authup/access';
 import type { BucketFile } from '@privateaim/storage-kit';
 import type {
     AnalysisBucketUploadRemoval,
@@ -27,8 +26,8 @@ import { analysisBucketFileSchema } from './schema.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
 import type { IAnalysisBucketRepository } from '../analysis-bucket/types.ts';
 import type { IAnalysisBucketAccess } from '../../services/analysis-bucket-access/index.ts';
-import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
-import { buildAnalysisBucketTypeReach } from '../../services/analysis-reach/index.ts';
+import type { AnalysisReach, AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
+import { buildAnalysisBucketTypeReach, intersectAnalysisReach } from '../../services/analysis-reach/index.ts';
 
 type AnalysisBucketFileServiceContext = {
     repository: IAnalysisBucketFileRepository;
@@ -71,17 +70,22 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>> {
-        return this.repository.findMany(await this.scopeRead(decodeQuery(query, { schema: analysisBucketFileSchema }), actor));
+        return this.reach.findMany(
+            this.repository,
+            decodeQuery(query, { schema: analysisBucketFileSchema }),
+            await this.resolveReadReach(actor),
+        );
     }
 
     /** Reads through the same reach as {@link getMany}; out of reach answers 404. */
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisBucketFile> {
-        const scoped = await this.scopeRead(
-            decodeQuery(query, { schema: analysisBucketFileSchema, parameters: ['fields', 'relations'] }),
-            actor,
-        );
+        const decoded = decodeQuery(query, { schema: analysisBucketFileSchema, parameters: ['fields', 'relations'] });
 
-        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+        const { data: [entity] } = await this.reach.findMany(
+            this.repository,
+            appendQueryConditions(decoded, eq('id', id)),
+            await this.resolveReadReach(actor),
+        );
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
@@ -96,11 +100,11 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
      * — narrowed further by that grant's own reach. Without it, RESULT files are
      * left out rather than refused, so listings of the other types still work.
      */
-    protected async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+    protected async resolveReadReach(actor: ActorContext): Promise<AnalysisReach> {
         const code = await this.reach.resolve(actor, REACH_TARGET);
         const temp = await this.reach.resolve(actor, REACH_TARGET, { approvedOnly: true });
 
-        let result: ICondition | undefined | null;
+        let result: AnalysisReach | null;
 
         try {
             result = await this.reach.resolve(actor, REACH_TARGET, {
@@ -117,17 +121,15 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         // The result read narrows the approved-participant reach, never widens
         // it: a file's analysis must stay readable whenever the file is (D7).
-        if (result !== null && temp !== undefined) {
-            result = result === undefined ? temp : and(temp, result);
+        if (result !== null) {
+            result = intersectAnalysisReach(temp, result);
         }
 
-        const condition = buildAnalysisBucketTypeReach('analysisBucket.type', [
+        return buildAnalysisBucketTypeReach('analysisBucket.type', [
             { types: [AnalysisBucketType.CODE], reach: code },
             { types: [AnalysisBucketType.TEMP], reach: temp },
             { types: [AnalysisBucketType.RESULT], reach: result },
         ]);
-
-        return condition ? appendQueryConditions(query, condition) : query;
     }
 
     async create(data: Partial<AnalysisBucketFile>, actor: ActorContext): Promise<AnalysisBucketFile> {
@@ -193,18 +195,10 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
 
-        // The analysis' realm writes the file, before and after (D3). The stored
-        // row is snapshotted, since typeorm's merge() writes into `entity`.
-        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
-
-        const current = { realm: analysis.realmId, data: { attributes: { ...entity } } };
+        const current = { ...entity };
         const merged = this.repository.merge(entity, validated);
 
-        await evaluateRecordUpdate(actor.permissionEvaluator, {
-            name: PermissionName.ANALYSIS_UPDATE,
-            current,
-            next: { realm: analysis.realmId, data: { attributes: merged } },
-        });
+        await this.analysisBucketAccess.assertOwnerUpdate(actor, analysis, current, merged);
 
         await this.analysisBucketAccess.assertBucketWritable(actor, bucket, analysis);
 

@@ -90,10 +90,67 @@ describe('EventService', () => {
             expect(sortedIds(await service.getMany({}, actor))).toEqual(['e-2']);
         });
 
-        it('should return only the actor realm\'s events on a post verdict', async () => {
-            seedEventsAcrossRealms();
+        describe('on a post verdict', () => {
+            // A grant policy no column condition expresses.
+            const policy = (row: Record<string, any>) => row.name === 'open';
 
-            expect(sortedIds(await service.getMany({}, createAllowAllActor('realm-1')))).toEqual(['e-1']);
+            beforeEach(() => {
+                repository.seed([
+                    createTestEvent({
+                        id: 'own-open',
+                        realmId: 'realm-1',
+                        name: 'open',
+                    }),
+                    createTestEvent({
+                        id: 'own-closed',
+                        realmId: 'realm-1',
+                        name: 'closed',
+                    }),
+                    createTestEvent({
+                        id: 'foreign-open',
+                        realmId: 'realm-2',
+                        name: 'open',
+                    }),
+                    createTestEvent({
+                        id: 'global-open',
+                        realmId: null,
+                        name: 'open',
+                    }),
+                ]);
+            });
+
+            it('should return exactly the events the evaluation allows, whatever the actor realm', async () => {
+                const result = await service.getMany({}, createScopedActor({
+                    realmId: 'realm-1',
+                    realmScope: 'any',
+                    policy,
+                }));
+
+                // Not own-closed, although it is in the actor's realm; the
+                // foreign and the global event the grant reaches are kept.
+                expect(sortedIds(result)).toEqual(['foreign-open', 'global-open', 'own-open']);
+                // The candidate count: denied rows stay in the total.
+                expect(result.meta.total).toEqual(4);
+            });
+
+            it('should apply the realm scope of the grant per event', async () => {
+                expect(sortedIds(await service.getMany({}, createScopedActor({
+                    realmId: 'realm-1',
+                    realmScope: 'own',
+                    policy,
+                })))).toEqual(['own-open']);
+            });
+
+            it('should decide a record read like the list', async () => {
+                const actor = createScopedActor({
+                    realmId: 'realm-1',
+                    realmScope: 'any',
+                    policy,
+                });
+
+                await expect(service.getOne('foreign-open', actor)).resolves.toMatchObject({ id: 'foreign-open' });
+                await expect(service.getOne('own-closed', actor)).rejects.toThrow(EntityNotFoundError);
+            });
         });
 
         it('should return nothing on a deny verdict', async () => {
@@ -140,7 +197,7 @@ describe('EventService', () => {
             repository.seed(createTestEvent({ id: 'e-1', realmId: 'realm-2' }));
 
             await expect(
-                service.getOne('e-1', createAllowAllActor('realm-1')),
+                service.getOne('e-1', createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(EntityNotFoundError);
         });
 

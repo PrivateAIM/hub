@@ -15,7 +15,12 @@ import {
 } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions, scopeReadQuery  } from '@privateaim/server-kit';
+import {
+    AbstractEntityService,
+    appendQueryConditions,
+    findManyScoped,
+    scopeReadQuery,
+} from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
 import type { IRegistryDispatcher } from '../../harbor/types.ts';
 import { decodeQuery } from '../../query/index.ts';
@@ -71,7 +76,7 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
 
         await this.checkSecretFieldAccess(query, actor);
 
-        return this.repository.findMany(scoped);
+        return findManyScoped(this.repository, scoped, actor);
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Registry> {

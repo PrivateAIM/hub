@@ -17,9 +17,9 @@ import {
     TokenVerifier,
 } from '@authup/server-adapter-kit';
 import { HubError } from '@privateaim/errors';
-import { assertIntrospectableToken } from '@privateaim/server-kit';
+import { assertIntrospectableToken, createAuthupClientTokenCreator } from '@privateaim/server-kit';
 import { VouchlyErrorCode, isVouchlyError } from 'vouchly';
-import type { AuthTokenVerifierCreateContext } from './types.ts';
+import type { AuthTokenVerifierClientContext, AuthTokenVerifierCreateContext } from './types.ts';
 import { UnconfiguredTokenVerifier } from './unconfigured-token-verifier.ts';
 
 /**
@@ -31,10 +31,10 @@ import { UnconfiguredTokenVerifier } from './unconfigured-token-verifier.ts';
  * verifier every service builds, so every credential source — header, cookie
  * fallback, socket handshake — is covered from one place.
  *
- * Every hub service passes a `creator`, so the verifier runs in REMOTE mode
- * (introspection), and always passes a result cache: Redis when the service
- * has one, else process memory. Entries live until the token's `exp` and are
- * namespaced per introspecting client (`buildAuthupTokenCacheNamespace`):
+ * The verifier introspects as the given client (REMOTE mode, client
+ * credentials) and always has a result cache: Redis when the service has
+ * one, else process memory. Entries live until the token's `exp` and are
+ * namespaced per introspecting client (`buildCacheNamespace`):
  * authup answers `active: false` to a caller that may not introspect a token,
  * so a result is only valid for the client that asked. Services sharing one
  * Redis, one Authup URL and one client still share entries.
@@ -78,19 +78,14 @@ function toUpstreamError(input: unknown): unknown {
 }
 
 /**
- * The result-cache namespace of a verifier introspecting as `ctx.clientId`
- * (in `ctx.realm`): authup's default (`authup:remote:<baseURL>`) plus the
- * client, so verifiers of different clients never share entries. Without a
- * client id, `undefined` keeps authup's default.
+ * The result-cache namespace of a verifier introspecting as `client`:
+ * authup's default (`authup:remote:<baseURL>`) plus the client and its realm,
+ * so verifiers of different clients never share entries. Services sharing a
+ * Redis share entries only through an identical string, so it must stay
+ * byte-stable.
  */
-export function buildAuthupTokenCacheNamespace(
-    ctx: Pick<AuthTokenVerifierCreateContext, 'baseURL' | 'clientId' | 'realm'>,
-): string | undefined {
-    if (!ctx.clientId) {
-        return undefined;
-    }
-
-    return `authup:remote:${ctx.baseURL}:client:${ctx.realm ?? ''}:${ctx.clientId}`;
+function buildCacheNamespace(baseURL: string, client: AuthTokenVerifierClientContext): string {
+    return `authup:remote:${baseURL}:client:${client.realm}:${client.id}`;
 }
 
 export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext): ITokenVerifier {
@@ -110,8 +105,15 @@ export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext): 
 
     return new IntrospectableTokenVerifier({
         baseURL: ctx.baseURL,
-        creator: ctx.creator,
+        // The creator and the namespace come from the one `client`, so the
+        // namespace always names the client that introspects.
+        creator: createAuthupClientTokenCreator({
+            baseURL: ctx.baseURL,
+            clientId: ctx.client.id,
+            clientSecret: ctx.client.secret,
+            realm: ctx.client.realm,
+        }),
         cache,
-        cacheNamespace: buildAuthupTokenCacheNamespace(ctx),
+        cacheNamespace: buildCacheNamespace(ctx.baseURL, ctx.client),
     });
 }

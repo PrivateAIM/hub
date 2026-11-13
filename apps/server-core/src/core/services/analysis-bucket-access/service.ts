@@ -5,18 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Query, and, eq } from '@rapiq/core';
-import type { ICondition } from '@rapiq/core';
+import { Query, eq } from '@rapiq/core';
 import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
-import { evaluateRecord, hasUnboundedReach, isPermissionError } from '@authup/access';
+import {
+    evaluateRecord,
+    evaluateRecordUpdate,
+    hasUnboundedReach,
+    isPermissionError,
+} from '@authup/access';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
-import type { AnalysisReachTarget, IAnalysisReachService } from '../analysis-reach/types.ts';
+import { intersectAnalysisReach } from '../analysis-reach/helpers.ts';
+import type { AnalysisReach, AnalysisReachTarget, IAnalysisReachService } from '../analysis-reach/types.ts';
 import type {
     AnalysisBucketAccessContext,
     AnalysisBucketUploader,
@@ -49,10 +54,10 @@ export class AnalysisBucketAccess extends AbstractEntityService implements IAnal
      * grant's own reach (the same conditions the file listing applies).
      */
     async canRead(actor: ActorContext, bucket: AnalysisBucket): Promise<boolean> {
-        let condition: ICondition | undefined;
+        let reach: AnalysisReach;
 
         try {
-            condition = await this.resolveReadReach(actor, bucket.type);
+            reach = await this.resolveReadReach(actor, bucket.type);
         } catch (e) {
             if (isPermissionError(e)) {
                 return false;
@@ -61,8 +66,10 @@ export class AnalysisBucketAccess extends AbstractEntityService implements IAnal
             throw e;
         }
 
-        const { data } = await this.analysisRepository.findMany(
-            appendQueryConditions(new Query({}), eq('id', bucket.analysisId), ...(condition ? [condition] : [])),
+        const { data } = await this.reach.findMany(
+            this.analysisRepository,
+            appendQueryConditions(new Query({}), eq('id', bucket.analysisId)),
+            reach,
         );
 
         return data.length > 0;
@@ -136,7 +143,7 @@ export class AnalysisBucketAccess extends AbstractEntityService implements IAnal
         return !!participant;
     }
 
-    protected async resolveReadReach(actor: ActorContext, type: `${AnalysisBucketType}`): Promise<ICondition | undefined> {
+    protected async resolveReadReach(actor: ActorContext, type: `${AnalysisBucketType}`): Promise<AnalysisReach> {
         switch (type) {
             case AnalysisBucketType.CODE:
                 return this.reach.resolve(actor, ANALYSIS_TARGET);
@@ -150,11 +157,7 @@ export class AnalysisBucketAccess extends AbstractEntityService implements IAnal
                 });
 
                 // The result read narrows the approved-participant reach, never widens it.
-                if (temp === undefined) {
-                    return result;
-                }
-
-                return result === undefined ? temp : and(temp, result);
+                return intersectAnalysisReach(temp, result);
             }
             default:
                 throw new PermissionDeniedError();
@@ -173,6 +176,20 @@ export class AnalysisBucketAccess extends AbstractEntityService implements IAnal
             name: PermissionName.ANALYSIS_UPDATE,
             realm: analysis.realmId,
             data: { attributes: file },
+        });
+    }
+
+    async assertOwnerUpdate(
+        actor: ActorContext,
+        analysis: Analysis,
+        current: Partial<AnalysisBucketFile>,
+        next: Partial<AnalysisBucketFile>,
+    ): Promise<void> {
+        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
+        await evaluateRecordUpdate(actor.permissionEvaluator, {
+            name: PermissionName.ANALYSIS_UPDATE,
+            current: { realm: analysis.realmId, data: { attributes: current } },
+            next: { realm: analysis.realmId, data: { attributes: next } },
         });
     }
 
