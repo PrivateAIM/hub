@@ -53,6 +53,7 @@ import { FakeAnalysisBuilderDispatcher } from '../../services/helpers/fake-build
 import { FakeAnalysisDistributorDispatcher } from '../../services/helpers/fake-distributor-dispatcher.ts';
 import { FakeBucketDispatcher } from '../../services/helpers/fake-bucket-dispatcher.ts';
 import { createFullAnalysis } from '../../../../utils/domains/index.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
 
 function createTestProject(overrides?: Partial<Project>): Project {
     return {
@@ -148,7 +149,7 @@ describe('AnalysisService', () => {
             reach: new AnalysisReachService({
                 analysisNodeRepository,
                 analysisRepository,
-                nodeRepository: new FakeEntityRepository<Node>(),
+                nodeRepository: new FakeNodeRepository(),
             }),
         });
     });

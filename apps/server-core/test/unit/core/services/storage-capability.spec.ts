@@ -10,7 +10,6 @@ import type {
     Analysis,
     AnalysisBucket,
     AnalysisBucketFile,
-    Node,
 } from '@privateaim/core-kit';
 import { AnalysisBucketType } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -28,6 +27,7 @@ import type { ICapabilityTokenIssuer } from '../../../../src/core/services/stora
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { FakeAnalysisBucketFileRepository } from '../entities/analysis-bucket-file/fake-repository.ts';
+import { FakeNodeRepository } from '../entities/node/fake-repository.ts';
 
 const OWNER_REALM = 'realm-owner';
 
@@ -89,7 +89,7 @@ describe('StorageCapabilityService', () => {
         const reach = new AnalysisReachService({
             analysisNodeRepository,
             analysisRepository,
-            nodeRepository: new FakeEntityRepository<Node>(),
+            nodeRepository: new FakeNodeRepository(),
         });
 
         service = new StorageCapabilityService({

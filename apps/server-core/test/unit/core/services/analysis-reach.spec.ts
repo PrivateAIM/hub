@@ -27,13 +27,14 @@ import {
 import { AnalysisReachService } from '../../../../src/core/services/analysis-reach/index.ts';
 import type { AnalysisReach, AnalysisReachTarget } from '../../../../src/core/services/analysis-reach/index.ts';
 import {
-    FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../utils/domains/index.ts';
+import { FakeNodeRepository } from '../entities/node/fake-repository.ts';
+import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 
 const ANALYSIS: AnalysisReachTarget = { analysisPath: '', analysisIdAttributeName: 'id' };
 const ANALYSIS_NODE: AnalysisReachTarget = { analysisPath: 'analysis', analysisIdAttributeName: 'analysisId' };
@@ -60,14 +61,14 @@ class SparseAnalysisNodeRepository extends FakeAnalysisNodeRepository {
 
 describe('AnalysisReachService', () => {
     let analysisNodeRepository: FakeAnalysisNodeRepository;
-    let analysisRepository: FakeEntityRepository<Analysis>;
-    let nodeRepository: FakeEntityRepository<Node>;
+    let analysisRepository: FakeAnalysisRepository;
+    let nodeRepository: FakeNodeRepository;
     let service: AnalysisReachService;
 
     beforeEach(() => {
         analysisNodeRepository = new FakeAnalysisNodeRepository();
-        analysisRepository = new FakeEntityRepository<Analysis>();
-        nodeRepository = new FakeEntityRepository<Node>();
+        analysisRepository = new FakeAnalysisRepository();
+        nodeRepository = new FakeNodeRepository();
         service = new AnalysisReachService({
             analysisNodeRepository,
             analysisRepository,

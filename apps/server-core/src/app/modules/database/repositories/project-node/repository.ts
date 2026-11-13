@@ -61,7 +61,6 @@ export class ProjectNodeRepositoryAdapter implements IProjectNodeRepository {
         return this.repository.find({
             where: { projectId },
             relations: { node: true },
-            cache: false,
         });
     }
 

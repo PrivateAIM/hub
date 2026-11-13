@@ -61,7 +61,6 @@ export class AnalysisNodeRepositoryAdapter implements IAnalysisNodeRepository {
         return this.repository.find({
             where: { analysisId },
             relations: { node: true },
-            cache: false,
         });
     }
 
@@ -74,7 +73,6 @@ export class AnalysisNodeRepositoryAdapter implements IAnalysisNodeRepository {
         const rows = await this.repository.find({
             where,
             select: { analysisId: true },
-            cache: false,
         });
 
         return [...new Set(rows.map((row) => row.analysisId))];

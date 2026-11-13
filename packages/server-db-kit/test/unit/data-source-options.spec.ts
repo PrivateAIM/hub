@@ -22,6 +22,16 @@ describe('DataSourceOptionsBuilder (timezone pin)', () => {
         expect(options).toMatchObject({ timezone: 'Z', dateStrings: ['DATE'] });
     });
 
+    it('turns the typeorm result cache off, whatever the input says', () => {
+        const options = new DataSourceOptionsBuilder().buildWith({
+            type: 'better-sqlite3',
+            database: ':memory:',
+            cache: { type: 'database', alwaysEnabled: true },
+        });
+
+        expect(options.cache).toBe(false);
+    });
+
     it('leaves better-sqlite3 as configured', () => {
         const options = new DataSourceOptionsBuilder().buildWith({ type: 'better-sqlite3', database: ':memory:' });
 

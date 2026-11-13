@@ -16,36 +16,14 @@ import {
     expect, 
     it,
 } from 'vitest';
+import { DomainType } from '@privateaim/core-kit';
+import { AnalysisNodeEventEntity, NodeEntity } from '../../../../src/adapters/database/index.ts';
+import { entitySchemas } from '../../../../src/core/index.ts';
 import {
-    AnalysisBucketEntity,
-    AnalysisBucketFileEntity,
-    AnalysisEntity,
-    AnalysisNodeEntity,
-    AnalysisNodeEventEntity,
-    MasterImageEntity,
-    MasterImageGroupEntity,
-    NodeEntity,
-    ProjectEntity,
-    ProjectNodeEntity,
-    RegistryEntity,
-    RegistryProjectEntity,
-} from '../../../../src/adapters/database/index.ts';
-import {
-    analysisBucketFileSchema,
-    analysisBucketSchema,
-    analysisNodeEventSchema,
-    analysisNodeSchema,
-    analysisSchema,
-    entitySchemas,
-    masterImageGroupSchema,
-    masterImageSchema,
-    nodeSchema,
-    projectNodeSchema,
-    projectSchema,
-    registryProjectSchema,
-    registrySchema,
-} from '../../../../src/core/index.ts';
-import { DataSourceOptionsBuilder } from '../../../../src/app/modules/database/index.ts';
+    DataSourceOptionsBuilder,
+    SCHEMA_ENTITY_TARGETS as SCHEMA_ENTITY_TARGETS_BY_NAME,
+    resolveCacheSchemaName,
+} from '../../../../src/app/modules/database/index.ts';
 
 /**
  * Plan 017 guard for the OTHER half of the rename: a rapiq schema is a set of
@@ -58,20 +36,8 @@ import { DataSourceOptionsBuilder } from '../../../../src/app/modules/database/i
  * `analysisLogSchema` / `analysisNodeLogSchema` are deliberately absent: they are
  * backed by VictoriaLogs, not by a TypeORM entity.
  */
-const SCHEMA_ENTITY_TARGETS: [string, any, EntityTarget<any>][] = [
-    ['analysis', analysisSchema, AnalysisEntity],
-    ['analysisBucket', analysisBucketSchema, AnalysisBucketEntity],
-    ['analysisBucketFile', analysisBucketFileSchema, AnalysisBucketFileEntity],
-    ['analysisNode', analysisNodeSchema, AnalysisNodeEntity],
-    ['analysisNodeEvent', analysisNodeEventSchema, AnalysisNodeEventEntity],
-    ['masterImage', masterImageSchema, MasterImageEntity],
-    ['masterImageGroup', masterImageGroupSchema, MasterImageGroupEntity],
-    ['node', nodeSchema, NodeEntity],
-    ['project', projectSchema, ProjectEntity],
-    ['projectNode', projectNodeSchema, ProjectNodeEntity],
-    ['registry', registrySchema, RegistryEntity],
-    ['registryProject', registryProjectSchema, RegistryProjectEntity],
-];
+const SCHEMA_ENTITY_TARGETS: [string, any, EntityTarget<any>][] = entitySchemas
+    .map((schema) => [schema.name, schema, SCHEMA_ENTITY_TARGETS_BY_NAME[schema.name]]);
 
 describe('core/query (schema ↔ entity parity)', () => {
     let dataSource: DataSource;
@@ -93,11 +59,25 @@ describe('core/query (schema ↔ entity parity)', () => {
         }
     });
 
-    // SCHEMA_ENTITY_TARGETS is hand-maintained, so without this a schema added
-    // later would silently go unguarded rather than fail.
+    // The map is hand-maintained, so without this a schema added later would
+    // silently go unguarded, and its writes would invalidate no cached read.
     it('should cover every schema in the registry', () => {
-        expect(SCHEMA_ENTITY_TARGETS.map(([, schema]) => schema.name).sort())
+        expect(Object.keys(SCHEMA_ENTITY_TARGETS_BY_NAME).sort())
             .toEqual(entitySchemas.map((schema) => schema.name).sort());
+
+        for (const [name, , target] of SCHEMA_ENTITY_TARGETS) {
+            expect(target, name).toBeDefined();
+        }
+    });
+
+    it('should name the cache schema of every entity but the untracked event log', () => {
+        expect(resolveCacheSchemaName(dataSource.getMetadata(NodeEntity))).toEqual(DomainType.NODE);
+        expect(resolveCacheSchemaName(dataSource.getMetadata(AnalysisNodeEventEntity))).toBeUndefined();
+
+        const tracked = SCHEMA_ENTITY_TARGETS
+            .filter(([, , target]) => typeof resolveCacheSchemaName(dataSource.getMetadata(target)) === 'string');
+
+        expect(tracked).toHaveLength(SCHEMA_ENTITY_TARGETS.length - 1);
     });
 
     // The other direction, which `assertSchemaMatchesEntity` does not check: a

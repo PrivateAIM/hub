@@ -8,7 +8,7 @@
 import type { Analysis } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
 import type { EntityPersistContext } from '@privateaim/server-kit';
-import type { IAnalysisRepository } from '../../../../../src/core/entities/analysis/types.ts';
+import type { AnalysisClientBinding, IAnalysisRepository } from '../../../../../src/core/entities/analysis/types.ts';
 import { FakeEntityRepository } from '@privateaim/server-test-kit';
 
 export class FakeAnalysisRepository extends FakeEntityRepository<Analysis> implements IAnalysisRepository {
@@ -36,6 +36,20 @@ export class FakeAnalysisRepository extends FakeEntityRepository<Analysis> imple
         await this.afterUnlockedRead?.(row.id);
 
         return copy;
+    }
+
+    async findOneByClientBinding(clientId: string, realmId: string): Promise<AnalysisClientBinding | null> {
+        const row = this.getAll().find((entity) => entity.clientId === clientId && entity.realmId === realmId);
+
+        if (!row) {
+            return null;
+        }
+
+        return {
+            id: row.id, 
+            clientId: row.clientId, 
+            realmId: row.realmId, 
+        };
     }
 
     async findOneWithProject(id: string): Promise<Analysis | null> {

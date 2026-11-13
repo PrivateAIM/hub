@@ -12,7 +12,6 @@ import type {
     AnalysisBucket,
     AnalysisBucketFile,
     AnalysisNode,
-    Node,
 } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -38,6 +37,7 @@ import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
 import { FakeAnalysisBucketFileRepository } from './fake-repository.ts';
 import { FakeAnalysisFileMetadataRecalculator } from './fake-metadata-recalculator.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
 
 const OWNER_REALM = 'realm-owner';
 const NODE_REALM = 'realm-node';
@@ -82,7 +82,7 @@ describe('AnalysisBucketFileService', () => {
         const reach = new AnalysisReachService({
             analysisNodeRepository,
             analysisRepository,
-            nodeRepository: new FakeEntityRepository<Node>(),
+            nodeRepository: new FakeNodeRepository(),
         });
 
         service = new AnalysisBucketFileService({

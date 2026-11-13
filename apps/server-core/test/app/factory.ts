@@ -10,6 +10,7 @@ import {
     AuthupHookModule,
     LoggerModule,
     MessageBusModule,
+    TaggedCacheModule,
 } from '@privateaim/server-kit';
 import type { IModule } from 'orkos';
 import { MemoryMessageBusDriver } from 'hubwire';
@@ -17,6 +18,7 @@ import { createFakeClient } from '@privateaim/telemetry-kit/testing';
 import type { FakeHandlerMap } from '@privateaim/telemetry-kit/testing';
 import { ConfigModule } from '../../src/app/modules/config/index.ts';
 import { AnalysisModule } from '../../src/app/modules/analysis/index.ts';
+import { QUERY_CACHE_PREFIX } from '../../src/app/modules/database/index.ts';
 import { HTTPModule } from '../../src/app/modules/http/index.ts';
 import { TelemetryClientInjectionKey } from '../../src/app/modules/telemetry-client/index.ts';
 
@@ -66,6 +68,8 @@ export function createTestApplication(options: TestApplicationOptions = {}): Tes
         new MessageBusModule({ driverFactory: () => new MemoryMessageBusDriver() }),
         new AuthupHookModule(),
         new AuthupClientModule(),
+        // no RedisModule: the memory driver
+        new TaggedCacheModule({ prefix: QUERY_CACHE_PREFIX }),
         createTestDatabaseModule(),
         new AnalysisModule(),
     ];
@@ -85,6 +89,7 @@ export function createTestDatabaseApplication(): TestApplication {
         new LoggerModule(),
         // in-process: commands are dispatched, nothing in the suite consumes them
         new MessageBusModule({ driverFactory: () => new MemoryMessageBusDriver() }),
+        new TaggedCacheModule({ prefix: QUERY_CACHE_PREFIX }),
         createTestDatabaseModule(),
         new AnalysisModule(),
     ];

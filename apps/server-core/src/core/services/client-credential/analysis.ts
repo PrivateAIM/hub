@@ -120,10 +120,7 @@ export class AnalysisClientCredentialService extends AbstractEntityService imple
      */
     protected async isAuthorized(analysis: Analysis, actor: ActorContext): Promise<boolean> {
         if (actor.identity && actor.identity.type === 'client' && actor.identity.realmId) {
-            const node = await this.nodeRepository.findOneBy({
-                clientId: actor.identity.id,
-                realmId: actor.identity.realmId,
-            });
+            const node = await this.nodeRepository.findOneByClientBinding(actor.identity.id, actor.identity.realmId);
 
             if (node) {
                 const analysisNode = await this.analysisNodeRepository.findOneBy({

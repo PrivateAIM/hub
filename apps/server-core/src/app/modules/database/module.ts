@@ -12,6 +12,8 @@ import {
     AuthupClientInjectionKey,
     ENTITY_EVENT_MODULE_NAME,
     EntityEventPublisherInjectionKey,
+    LOGGER_MODULE_NAME,
+    TAGGED_CACHE_MODULE_NAME,
 } from '@privateaim/server-kit';
 import {
     checkDatabase,
@@ -38,6 +40,7 @@ import { NodeClientService } from './node-client.ts';
 import { AnalysisClientService } from './analysis-client.ts';
 import { DataSourceOptionsBuilder } from './options.ts';
 import { DatabaseInjectionKey, MIGRATION_DATABASE_LOCK } from './constants.ts';
+import { registerQueryCache } from './query-cache.ts';
 import { registerRepositories } from './register.ts';
 import { DataSource } from 'typeorm';
 
@@ -47,6 +50,8 @@ export class DatabaseModule implements IModule {
     readonly dependencies: (string | ModuleDependency)[] = [
         { name: ENTITY_EVENT_MODULE_NAME, optional: true },
         { name: AUTHUP_CLIENT_MODULE_NAME, optional: true },
+        { name: TAGGED_CACHE_MODULE_NAME, optional: true },
+        { name: LOGGER_MODULE_NAME, optional: true },
     ];
 
     async setup(container: IContainer): Promise<void> {
@@ -75,6 +80,8 @@ export class DatabaseModule implements IModule {
             // initialize() overwrites dataSource.subscribers from options.
             this.registerSubscribers(dataSource, container);
 
+            const queryCache = registerQueryCache(container, dataSource);
+
             setDataSource(dataSource);
 
             if (!check.schema) {
@@ -87,7 +94,7 @@ export class DatabaseModule implements IModule {
 
             container.register(DatabaseInjectionKey.DataSource, { useValue: dataSource });
 
-            registerRepositories(container, dataSource);
+            registerRepositories(container, dataSource, queryCache);
         } catch (e) {
             if (dataSource.isInitialized) {
                 await dataSource.destroy();

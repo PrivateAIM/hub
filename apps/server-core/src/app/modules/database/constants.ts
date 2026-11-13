@@ -6,6 +6,7 @@
  */
 
 import { TypedToken } from 'eldin';
+import type { IQueryCache } from '@privateaim/server-db-kit';
 import type { DataSource } from 'typeorm';
 import type {
     IAnalysisBucketFileRepository,
@@ -25,6 +26,7 @@ import type {
 
 export const DatabaseInjectionKey = {
     DataSource: new TypedToken<DataSource>('DataSource'),
+    QueryCache: new TypedToken<IQueryCache>('QueryCache'),
 
     NodeRepository: new TypedToken<INodeRepository>('NodeRepository'),
     RegistryRepository: new TypedToken<IRegistryRepository>('RegistryRepository'),
@@ -50,3 +52,9 @@ export const DatabaseInjectionKey = {
  * would not wait for each other during a rolling upgrade.
  */
 export const MIGRATION_DATABASE_LOCK = 'server-core:migration';
+
+/**
+ * The key prefix of server-core's read cache in a shared Redis; every
+ * service sharing one Redis needs its own.
+ */
+export const QUERY_CACHE_PREFIX = 'hub-core';

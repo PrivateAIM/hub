@@ -29,7 +29,7 @@ describe('registerRepositories — RegistryComponentDispatcher resolution orderi
         await suite.setup();
 
         try {
-            registerRepositories(suite.container, suite.dataSource);
+            registerRepositories(suite.container, suite.dataSource, suite.container.resolve(DatabaseInjectionKey.QueryCache));
 
             const dispatcher = new FakeRegistryComponentDispatcher();
 

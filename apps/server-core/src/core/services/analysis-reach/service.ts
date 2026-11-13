@@ -198,12 +198,11 @@ export class AnalysisReachService implements IAnalysisReachService {
             return undefined;
         }
 
-        // `node.clientId` is writable by node managers and not unique, so the
-        // binding only counts in the client's own realm: another realm cannot
-        // claim a client by pointing its node at it.
+        // The binding only counts in the client's own realm: another realm
+        // cannot claim a client by pointing its node at it.
         const { id: clientId, realmId } = actor.identity;
 
-        const node = await this.nodeRepository.findOneBy({ clientId, realmId });
+        const node = await this.nodeRepository.findOneByClientBinding(clientId, realmId);
 
         if (node) {
             const ids = await this.analysisNodeRepository.findAnalysisIds({ nodeId: node.id, ...approval });
@@ -211,7 +210,7 @@ export class AnalysisReachService implements IAnalysisReachService {
             return inArray(target.analysisIdAttributeName, ids);
         }
 
-        const analysis = await this.analysisRepository.findOneBy({ clientId, realmId });
+        const analysis = await this.analysisRepository.findOneByClientBinding(clientId, realmId);
 
         if (analysis) {
             return eq(target.analysisIdAttributeName, analysis.id);

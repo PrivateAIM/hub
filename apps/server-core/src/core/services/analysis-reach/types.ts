@@ -6,9 +6,11 @@
  */
 
 import type { ICondition, IQuery } from '@rapiq/core';
-import type { Analysis, AnalysisBucketType, Node } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucketType } from '@privateaim/core-kit';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
+import type { INodeRepository } from '../../entities/node/types.ts';
 
 /** A reach that is a query condition; `undefined` reaches every analysis. */
 export type AnalysisReachLowered = {
@@ -48,8 +50,8 @@ export type AnalysisBucketTypeReach = {
 
 export type AnalysisReachServiceContext = {
     analysisNodeRepository: IAnalysisNodeRepository;
-    analysisRepository: IEntityRepository<Analysis>;
-    nodeRepository: IEntityRepository<Node>;
+    analysisRepository: Pick<IAnalysisRepository, 'findMany' | 'findOneByClientBinding'>;
+    nodeRepository: Pick<INodeRepository, 'findOneByClientBinding'>;
 };
 
 /** Where the queried entity keeps its analysis. */

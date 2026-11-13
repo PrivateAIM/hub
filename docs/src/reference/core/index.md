@@ -128,6 +128,17 @@ The Core API follows the [hexagonal architecture](/getting-started/architecture)
 - **AMQP task consumers** for registry and analysis metadata processing
 - **TypeORM subscribers** publishing domain events on entity changes
 
+### Read Cache
+
+The lookup of the node or analysis bound to a calling client, made whenever a node or analysis
+client reads analyses, their nodes, buckets and files, registry projects or credentials, is cached
+for up to 60 seconds (`QueryCache` from
+[`@privateaim/server-db-kit`](/reference/shared/server-db-kit#read-cache)). A write to a node or
+analysis drops the affected entries when its transaction commits. The entries live in Redis when
+`REDIS_CONNECTION_STRING` is set (key prefix `hub-core`), else in process memory; see
+[Read cache (Redis)](/guide/deployment/configuration#read-cache-redis) for the Redis requirements
+and for running several replicas.
+
 ## Stuck Builds and Distributions
 
 A build or distribution that stays `starting`/`started` while its analysis has not been

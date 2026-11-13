@@ -8,6 +8,7 @@
 export * from './core';
 export * from './app';
 export * from './authup';
+export * from './cache';
 export * from './config';
 export * from './constants';
 export * from './entity-event';
