@@ -26,7 +26,6 @@ import { AnalysisNodeService } from '../../../../../src/core/entities/analysis-n
 import { AnalysisReachService } from '../../../../../src/core/services/analysis-reach/index.ts';
 import { createPermissionActor } from '../../helpers/index.ts';
 import {
-    FakeEntityRepository,
     createAllowAllActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
@@ -34,6 +33,8 @@ import { FakeAnalysisNodeMetadataRecalculator } from './fake-metadata-recalculat
 import { FakeAnalysisNodeRepository } from './fake-repository.ts';
 import { FakeProjectNodeRepository } from '../project-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../../utils/domains/index.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
+import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 
 class FakeAnalysisNodeServiceRepository extends FakeAnalysisNodeRepository {
     constructor(private readonly fixture: {
@@ -82,8 +83,8 @@ class FakeAnalysisNodeServiceRepository extends FakeAnalysisNodeRepository {
 
 describe('AnalysisNodeService', () => {
     let repository: FakeAnalysisNodeRepository;
-    let analysisRepository: FakeEntityRepository<Analysis>;
-    let nodeRepository: FakeEntityRepository<Node>;
+    let analysisRepository: FakeAnalysisRepository;
+    let nodeRepository: FakeNodeRepository;
     let projectNodeRepository: FakeProjectNodeRepository;
     let recalculator: FakeAnalysisNodeMetadataRecalculator;
     let service: AnalysisNodeService;
@@ -100,8 +101,8 @@ describe('AnalysisNodeService', () => {
 
         projectNodeRepository = new FakeProjectNodeRepository();
 
-        analysisRepository = new FakeEntityRepository<Analysis>();
-        nodeRepository = new FakeEntityRepository<Node>();
+        analysisRepository = new FakeAnalysisRepository();
+        nodeRepository = new FakeNodeRepository();
         recalculator = new FakeAnalysisNodeMetadataRecalculator(analysisRepository);
 
         projectNodeRepository.seed({

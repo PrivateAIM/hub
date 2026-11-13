@@ -10,7 +10,7 @@ These variables are shared across all services:
 |----------|----------|-------------|
 | `PORT` | No | HTTP server port (default varies by service) |
 | `AUTHUP_URL` | Yes | Authup identity provider URL |
-| `REDIS_URL` | No | Redis connection URL (for pub/sub and caching) |
+| `REDIS_CONNECTION_STRING` | No | Redis connection URL (for pub/sub and caching) |
 | `AMQP_URL` | No | RabbitMQ connection URL |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
 
@@ -28,6 +28,22 @@ Core closes its Socket.IO clients before the HTTP listener. The installed Orkos
 lifecycle catches individual module teardown errors, so exit code 0 is not proof
 that every module cleaned up successfully; detecting those failures requires an
 upstream lifecycle change.
+
+## Read cache (Redis)
+
+Services that cache database reads keep the entries in Redis when `REDIS_CONNECTION_STRING` is set, each service
+under its own key prefix, and drop them by tag when a record changes.
+
+- Requires **Redis 5** or later.
+- Set `maxmemory-policy` to `noeviction` or a `volatile-*` policy; the cache's clock key never expires
+  and must not be evicted on its own.
+- Entries live **60 seconds**, which also bounds how long a lost invalidation (e.g. a write committed
+  during a Redis outage) can serve a stale read.
+- A Redis outage does not fail requests or the service start: reads fall through to the database,
+  and the failure is logged at most once every 10 seconds.
+- Without Redis each process keeps an in-memory cache. Run more than one replica of a service only
+  with Redis: otherwise a change written through one replica is answered stale by the others for up
+  to 60 seconds.
 
 ## Message delivery (RabbitMQ)
 

@@ -36,6 +36,8 @@
         "@hubwire/amqp": "^0.2.2",
         "@privateaim/errors": "^0.19.1",
         "@privateaim/kit": "^0.19.2",
+        "@rapiq/cache": "^0.1.1",
+        "@rapiq/cache-redis": "^0.1.1",
         "@rapiq/core": "^2.4.0",
         "@socket.io/redis-emitter": "^5.1.0",
         "eldin": "^1.3.0",

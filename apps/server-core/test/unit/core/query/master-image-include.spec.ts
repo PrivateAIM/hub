@@ -12,10 +12,12 @@ import {
     expect,
     it,
 } from 'vitest';
+import { QueryCache } from '@privateaim/server-db-kit';
+import { TAGGED_CACHE_TTL } from '@privateaim/server-kit';
 import { DataSource } from 'typeorm';
 import { DataSourceOptionsBuilder } from '../../../../src/app/modules/database/index.ts';
 import { AnalysisRepositoryAdapter } from '../../../../src/app/modules/database/repositories/analysis/repository.ts';
-import { decodeQuery } from '../../../../src/core/query/index.ts';
+import { decodeQuery, schemaRegistry } from '../../../../src/core/query/index.ts';
 import { analysisSchema } from '../../../../src/core/entities/analysis/schema.ts';
 import {
     AnalysisEntity,
@@ -62,7 +64,11 @@ describe('core/query analysis include=masterImage', () => {
 
     it('hydrates the masterImage relation (incl. its json commandArguments) when included', async () => {
         const query = decodeQuery({ include: 'masterImage' }, { schema: analysisSchema });
-        const repository = new AnalysisRepositoryAdapter(dataSource);
+        const repository = new AnalysisRepositoryAdapter(dataSource, new QueryCache({
+            dataSource, 
+            registry: schemaRegistry, 
+            ttl: TAGGED_CACHE_TTL, 
+        }));
 
         const { data } = await repository.findMany(query);
 
@@ -77,7 +83,11 @@ describe('core/query analysis include=masterImage', () => {
 
     it('projects the analysis json column imageCommandArguments', async () => {
         const query = decodeQuery({}, { schema: analysisSchema });
-        const repository = new AnalysisRepositoryAdapter(dataSource);
+        const repository = new AnalysisRepositoryAdapter(dataSource, new QueryCache({
+            dataSource, 
+            registry: schemaRegistry, 
+            ttl: TAGGED_CACHE_TTL, 
+        }));
 
         const { data } = await repository.findMany(query);
 

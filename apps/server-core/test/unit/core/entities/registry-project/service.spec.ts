@@ -21,13 +21,13 @@ import {
 } from 'vitest';
 import { RegistryProjectService } from '../../../../../src/core/entities/registry-project/service.ts';
 import {
-    FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeRegistryManager } from '../node/fake-registry-manager.ts';
 import { FakeRegistryProjectRepository } from './fake-repository.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
 
 const READ_PERMISSIONS = [
     PermissionName.REGISTRY_PROJECT_READ,
@@ -78,13 +78,13 @@ function createTestRegistryProject(overrides?: Partial<RegistryProject>): Regist
 describe('RegistryProjectService', () => {
     let repository: FakeRegistryProjectRepository;
     let registryManager: FakeRegistryManager;
-    let nodeRepository: FakeEntityRepository<Node>;
+    let nodeRepository: FakeNodeRepository;
     let service: RegistryProjectService;
 
     beforeEach(() => {
         repository = createFakeRegistryProjectRepository();
         registryManager = new FakeRegistryManager();
-        nodeRepository = new FakeEntityRepository<Node>();
+        nodeRepository = new FakeNodeRepository();
         service = new RegistryProjectService({
             repository,
             registryManager,

@@ -6,10 +6,25 @@
  */
 
 import type { Node } from '@privateaim/core-kit';
-import type { INodeRepository } from '../../../../../src/core/entities/node/types.ts';
+import type { INodeRepository, NodeClientBinding } from '../../../../../src/core/entities/node/types.ts';
 import { FakeEntityRepository } from '@privateaim/server-test-kit';
 
 export class FakeNodeRepository extends FakeEntityRepository<Node> implements INodeRepository {
+    async findOneByClientBinding(clientId: string, realmId: string): Promise<NodeClientBinding | null> {
+        const row = this.getAll().find((entity) => entity.clientId === clientId && entity.realmId === realmId);
+
+        if (!row) {
+            return null;
+        }
+
+        return {
+            id: row.id,
+            clientId: row.clientId,
+            realmId: row.realmId,
+            registryProjectId: row.registryProjectId,
+        };
+    }
+
     async findOneWithExternalName(id: string): Promise<Node | null> {
         return this.findOneById(id);
     }

@@ -6,11 +6,15 @@
  */
 
 import type { Node } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
+import type { IQueryCache } from '@privateaim/server-db-kit';
+import { buildCollectionTag } from '@rapiq/cache';
 import type { DataSource, Repository } from 'typeorm';
 import {
     validateEntityJoinColumns,
 } from 'typeorm-extension';
 import type { IQuery } from '@rapiq/core';
+import { defineQuery } from '@rapiq/core';
 import { NodeEntity } from '../../../../../adapters/database/entities/node.ts';
 import type {
     EntityPersistContext,
@@ -18,6 +22,7 @@ import type {
 } from '@privateaim/server-kit';
 import type {
     INodeRepository,
+    NodeClientBinding,
 } from '../../../../../core/index.ts';
 import { applyQuery } from '../query.ts';
 
@@ -26,9 +31,12 @@ export class NodeRepositoryAdapter implements INodeRepository {
 
     protected repository: Repository<NodeEntity>;
 
-    constructor(dataSource: DataSource) {
+    protected cache: IQueryCache;
+
+    constructor(dataSource: DataSource, cache: IQueryCache) {
         this.dataSource = dataSource;
         this.repository = dataSource.getRepository(NodeEntity);
+        this.cache = cache;
     }
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Node>> {
@@ -51,6 +59,44 @@ export class NodeRepositoryAdapter implements INodeRepository {
 
     async findOneById(id: string): Promise<Node | null> {
         return this.repository.findOneBy({ id });
+    }
+
+    async findOneByClientBinding(clientId: string, realmId: string): Promise<NodeClientBinding | null> {
+        const where = { clientId, realmId };
+
+        return this.cache.rememberQuery<NodeClientBinding | null>(
+            {
+                key: `${DomainType.NODE}/clientBinding?${JSON.stringify([clientId, realmId])}`,
+                query: defineQuery<Node>({ filters: where }),
+                schema: DomainType.NODE,
+                // `clientId` narrows to one row (unique); a realm scope would add nothing.
+                caseSensitive: ['clientId'],
+                // A registry project or registry delete nulls `registryProjectId`
+                // in the database, which bumps the node collection alone.
+                // Nodes are written rarely, so every node write drops the entry.
+                tags: () => [buildCollectionTag(DomainType.NODE)],
+            },
+            async () => {
+                const row = await this.repository.findOne({
+                    select: {
+                        id: true,
+                        clientId: true,
+                        realmId: true,
+                        registryProjectId: true,
+                    },
+                    where,
+                });
+
+                // the same plain shape a hit has
+                return row ? {
+                    id: row.id,
+                    clientId: row.clientId,
+                    realmId: row.realmId,
+                    registryProjectId: row.registryProjectId,
+                } : null;
+            },
+            { manager: this.repository.manager },
+        );
     }
 
     async findOneWithExternalName(id: string): Promise<Node | null> {

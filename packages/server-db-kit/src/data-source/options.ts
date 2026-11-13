@@ -78,6 +78,9 @@ export class DataSourceOptionsBuilder {
         options = {
             ...options,
             logging: false,
+            // TypeORM's own result cache (env `DB_CACHE`) is never invalidated
+            // by the tagged read cache (`QueryCache`), so it stays off.
+            cache: false,
             entities: [
                 ...(options.entities ? options.entities : []) as string[],
                 ...(this.entities) as string[],

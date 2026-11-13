@@ -7,7 +7,7 @@
 
 import { PermissionError } from '@authup/access';
 import { randomUUID } from 'node:crypto';
-import type { Analysis, AnalysisNodeEvent, Node } from '@privateaim/core-kit';
+import type { Analysis, AnalysisNodeEvent } from '@privateaim/core-kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import {
     beforeEach,
@@ -24,6 +24,8 @@ import {
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
+import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 
 function createTestAnalysisNodeEvent(overrides?: Partial<AnalysisNodeEvent>): AnalysisNodeEvent {
     const analysisId = overrides?.analysisId ?? randomUUID();
@@ -62,8 +64,8 @@ describe('AnalysisNodeEventService', () => {
             repository,
             reach: new AnalysisReachService({
                 analysisNodeRepository: new FakeAnalysisNodeRepository(),
-                analysisRepository: new FakeEntityRepository<Analysis>(),
-                nodeRepository: new FakeEntityRepository<Node>(),
+                analysisRepository: new FakeAnalysisRepository(),
+                nodeRepository: new FakeNodeRepository(),
             }),
         });
     });

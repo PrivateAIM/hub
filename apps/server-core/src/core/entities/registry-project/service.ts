@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Node, RegistryProject } from '@privateaim/core-kit';
+import type { RegistryProject } from '@privateaim/core-kit';
 import {
     PermissionName,
     ValidatorGroup,
@@ -15,7 +15,6 @@ import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@pr
 import type {
     ActorContext,
     EntityRepositoryFindManyResult,
-    IEntityRepository,
     ReadScope,
 } from '@privateaim/server-kit';
 import {
@@ -34,7 +33,7 @@ import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
 import { decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
 import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
-import type { IRegistryManager } from '../node/types.ts';
+import type { INodeRepository, IRegistryManager } from '../node/types.ts';
 import type { IRegistryProjectRepository, IRegistryProjectService } from './types.ts';
 import { registryProjectSchema } from './schema.ts';
 import { RegistryProjectType, RegistryProjectValidator } from '@privateaim/core-kit';
@@ -42,7 +41,7 @@ import { RegistryProjectType, RegistryProjectValidator } from '@privateaim/core-
 type RegistryProjectServiceContext = {
     repository: IRegistryProjectRepository;
     registryManager?: IRegistryManager;
-    nodeRepository?: IEntityRepository<Node>;
+    nodeRepository?: Pick<INodeRepository, 'findOneByClientBinding'>;
 };
 
 /**
@@ -71,7 +70,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
     protected registryManager?: IRegistryManager;
 
-    protected nodeRepository?: IEntityRepository<Node>;
+    protected nodeRepository?: Pick<INodeRepository, 'findOneByClientBinding'>;
 
     protected validator: RegistryProjectValidator;
 
@@ -158,7 +157,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             return undefined;
         }
 
-        const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id, realmId: actor.identity.realmId });
+        const node = await this.nodeRepository.findOneByClientBinding(actor.identity.id, actor.identity.realmId);
 
         return node?.registryProjectId ?? undefined;
     }

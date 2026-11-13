@@ -147,6 +147,30 @@ These stay snake_case and must not be swept into a rename:
   query syntax.
 - Environment variables.
 
+## Read Cache
+
+`QueryCache` (server-db-kit, over `@rapiq/cache`, authup/authup#3688) serves only the client-binding
+lookups (`INodeRepository` / `IAnalysisRepository.findOneByClientBinding`). `registerQueryCache`
+pushes its one `CacheInvalidationSubscriber` after `initialize()`, in `DatabaseModule` and the test
+database module alike.
+
+- **A hit is a plain object**: the binding port types are `Pick`s; never hand one to `save`, `merge`
+  or `remove`. A new cached read passes the manager it reads through (transaction bypass) and keys
+  every input selecting its result.
+- **Raw SQL bumps nothing and a criteria `update` / `delete` bumps the collection tag alone.** The
+  analysis entry is scoped on `clientId` plus its record tag, so a criteria write or a project
+  `CASCADE` (refused while `analyses > 0`) on `analyses` serves it stale up to the 60 s TTL. Write
+  nodes and analyses through entity `save` / `remove` / `updateLocked`.
+- The node entry carries the node collection tag: the `SET NULL` of `registryProjectId` (registry
+  project or registry delete) bumps nothing narrower. Dropping it fails
+  `test/unit/app/modules/database/query-cache.spec.ts`.
+- A scoped tag needs its column in `caseSensitive` and leading an `indexes` sequence of the schema,
+  spelled through `QUERY_CACHE_SCOPED_VALUE_NORMALIZER` on both sides. A new entity needs its
+  `SCHEMA_ENTITY_TARGETS` entry (parity spec), or its writes invalidate nothing.
+  `analysisNodeEvent` is untracked (append-only, read by no cached query).
+- TypeORM's own result cache is forced off in `DataSourceOptionsBuilder` (`DB_CACHE` ignored): it
+  would answer reads the tags never invalidate.
+
 ## Migration Tests
 
 The `test` CI job builds its schema with `dataSource.synchronize()`, so it never runs a

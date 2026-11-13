@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { BuiltInPolicyType, PermissionError } from '@authup/access';
-import type { Analysis, AnalysisBucket, Node } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityConflictError, EntityNotFoundError } from '@privateaim/errors';
 import {
@@ -27,6 +27,7 @@ import {
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../../utils/domains/index.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
 
 function createFakeAnalysisBucketRepository() {
     const repo = new FakeEntityRepository<AnalysisBucket>();
@@ -81,7 +82,7 @@ describe('AnalysisBucketService', () => {
             reach: new AnalysisReachService({
                 analysisNodeRepository,
                 analysisRepository,
-                nodeRepository: new FakeEntityRepository<Node>(),
+                nodeRepository: new FakeNodeRepository(),
             }),
         });
     });

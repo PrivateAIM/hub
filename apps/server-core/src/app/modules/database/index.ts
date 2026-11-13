@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './cache.ts';
 export * from './constants.ts';
 export * from './module.ts';
 export * from './options.ts';
+export * from './query-cache.ts';
 export * from './register.ts';
+export * from './schema-targets.ts';

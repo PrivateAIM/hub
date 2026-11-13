@@ -7,6 +7,7 @@
 
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
+import { TAGGED_CACHE_MODULE_NAME } from '@privateaim/server-kit';
 import {
     createDatabase,
     setDataSource,
@@ -16,6 +17,7 @@ import { DataSource } from 'typeorm';
 import {
     DataSourceOptionsBuilder,
     DatabaseInjectionKey,
+    registerQueryCache,
     registerRepositories,
 } from '../../src/app/modules/database/index.ts';
 import {
@@ -36,7 +38,9 @@ import {
 export function createTestDatabaseModule(): IModule {
     return {
         name: 'database',
-        dependencies: [],
+        dependencies: [
+            { name: TAGGED_CACHE_MODULE_NAME, optional: true },
+        ],
 
         async setup(container: IContainer): Promise<void> {
             const optionsBuilder = new DataSourceOptionsBuilder();
@@ -95,7 +99,7 @@ export function createTestDatabaseModule(): IModule {
                 new RegistryProjectSubscriber(),
             );
 
-            registerRepositories(container, dataSource);
+            registerRepositories(container, dataSource, registerQueryCache(container, dataSource));
         },
 
         async teardown(container: IContainer): Promise<void> {

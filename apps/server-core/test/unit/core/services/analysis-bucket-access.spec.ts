@@ -11,13 +11,11 @@ import type {
     Analysis,
     AnalysisBucket,
     AnalysisNode,
-    Node,
 } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import {
-    FakeEntityRepository,
     createAllowAllActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
@@ -31,6 +29,7 @@ import { AnalysisBucketAccess } from '../../../../src/core/services/analysis-buc
 import { AnalysisReachService } from '../../../../src/core/services/analysis-reach/index.ts';
 import { FakeAnalysisRepository } from '../entities/analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../entities/analysis-node/fake-repository.ts';
+import { FakeNodeRepository } from '../entities/node/fake-repository.ts';
 
 const OWNER_REALM = 'realm-owner';
 const NODE_REALM = 'realm-node';
@@ -69,7 +68,7 @@ describe('AnalysisBucketAccess', () => {
             reach: new AnalysisReachService({
                 analysisNodeRepository,
                 analysisRepository,
-                nodeRepository: new FakeEntityRepository<Node>(),
+                nodeRepository: new FakeNodeRepository(),
             }),
             analysisRepository,
             analysisNodeRepository,
