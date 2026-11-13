@@ -22,7 +22,7 @@
     "license": "Apache-2.0",
     "description": "This package contains server side db helpers & utilities.",
     "dependencies": {
-        "@authup/kit": "^1.0.0-beta.75",
+        "@authup/kit": "^1.0.0-beta.76",
         "@privateaim/kit": "^0.19.2",
         "@privateaim/server-kit": "^0.19.2",
         "@rapiq/cache": "^0.1.1",
@@ -33,7 +33,7 @@
         "typeorm": "^1.1.2",
         "typeorm-extension": "^4.3.0",
         "unplugin-swc": "^2.0.0",
-        "vitest": "^5.0.5"
+        "vitest": "^5.1.0"
     },
     "peerDependencies": {
         "typeorm": "^1.1.2",
