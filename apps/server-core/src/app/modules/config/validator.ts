@@ -34,7 +34,6 @@ export class ConfigValidator extends TypedContainer<Config> {
 
         this.mount('redisConnectionString', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('rabbitMqConnectionString', { optional: true }, createValidator(zod.string().min(1)));
-        this.mount('vaultConnectionString', { optional: true }, createValidator(zod.string().min(1)));
 
         this.mount('masterImagesOwner', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('masterImagesRepository', { optional: true }, createValidator(zod.string().min(1)));

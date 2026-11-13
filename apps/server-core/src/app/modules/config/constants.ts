@@ -22,7 +22,6 @@ export enum EnvironmentInputKey {
 
     RABBITMQ_CONNECTION_STRING = 'RABBITMQ_CONNECTION_STRING',
     REDIS_CONNECTION_STRING = 'REDIS_CONNECTION_STRING',
-    VAULT_CONNECTION_STRING = 'VAULT_CONNECTION_STRING',
     HARBOR_URL = 'HARBOR_URL',
 
     AUTHUP_URL = 'AUTHUP_URL',
@@ -51,8 +50,6 @@ export const ConfigDefaults = {
     REDIS: 'redis://127.0.0.1',
 
     RABBITMQ: 'amqp://root:start123@127.0.0.1',
-
-    VAULT: 'start123@http://127.0.0.1:8090/v1/',
 
     MASTER_IMAGES_OWNER: 'PrivateAim',
     MASTER_IMAGES_REPOSITORY: 'master-images',

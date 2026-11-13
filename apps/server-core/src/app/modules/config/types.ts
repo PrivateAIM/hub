@@ -10,7 +10,6 @@ import type { BaseServerConfig } from '@privateaim/server-kit';
 export type Config = BaseServerConfig & {
     publicURL: string;
 
-    vaultConnectionString?: string;
     harborURL?: string;
 
     telemetryURL?: string;

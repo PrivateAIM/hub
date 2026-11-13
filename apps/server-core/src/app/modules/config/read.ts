@@ -68,17 +68,5 @@ export function readConfigFromEnv(): Partial<Config> {
         config.redisConnectionString = ConfigDefaults.REDIS;
     }
 
-    // Vault
-    const vaultConnectionString = oneOf([
-        readBool(EnvironmentInputKey.VAULT_CONNECTION_STRING),
-        read(EnvironmentInputKey.VAULT_CONNECTION_STRING),
-    ]);
-
-    if (typeof vaultConnectionString === 'string') {
-        config.vaultConnectionString = vaultConnectionString;
-    } else if (isBoolTrue(vaultConnectionString)) {
-        config.vaultConnectionString = ConfigDefaults.VAULT;
-    }
-
     return config;
 }

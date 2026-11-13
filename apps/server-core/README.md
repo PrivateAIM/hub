@@ -50,7 +50,6 @@ docker run privateaim/hub core cli start
 | `RABBITMQ_CONNECTION_STRING` | — | RabbitMQ connection |
 | `HARBOR_URL` | — | Harbor registry URL |
 | `TELEMETRY_URL` | — | Telemetry service URL |
-| `VAULT_CONNECTION_STRING` | `start123@http://127.0.0.1:8090/v1/` | Vault connection |
 | `SKIP_PROJECT_APPROVAL` | `false` | Skip project approval workflow |
 | `SKIP_ANALYSIS_APPROVAL` | `false` | Skip analysis approval workflow |
 
