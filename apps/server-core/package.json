@@ -22,6 +22,7 @@
         "@ebec/http": "^4.3.2",
         "@hapic/harbor": "^3.0.2",
         "@hapic/oauth2": "^4.0.2",
+        "@privateaim/communication-kit": "^0.19.1",
         "@privateaim/core-kit": "^0.19.2",
         "@privateaim/core-realtime-kit": "^0.18.3",
         "@privateaim/errors": "^0.19.1",
