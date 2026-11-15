@@ -7,7 +7,7 @@
 
 import type { Registry, RegistryAPICommand, RegistryProject } from '@privateaim/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
-import { BaseAPI } from '../base';
+import { BaseAPI } from 'hapic';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import type { IServiceAPI } from './types';
 

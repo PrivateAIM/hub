@@ -9,6 +9,7 @@ import type { IContainer } from 'eldin';
 import type { ConfigInput } from '@hapic/victorialogs';
 import { VictoriaLogsClient } from '@hapic/victorialogs';
 import type { IModule } from 'orkos';
+import { HTTPClientTimeout } from '@privateaim/server-kit';
 import { VictoriaLogsLogStore } from '../../../adapters/telemetry/victoria-logs.ts';
 import { MemoryLogStore } from '../../../adapters/telemetry/memory.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
@@ -32,10 +33,10 @@ export class VictoriaLogsModule implements IModule {
             return;
         }
 
-        const config: ConfigInput = {};
+        const config: ConfigInput = { request: { timeout: HTTPClientTimeout.VICTORIA_LOGS } };
 
         if (baseURL) {
-            config.request = { baseURL };
+            config.request.baseURL = baseURL;
         }
 
         if (ingestorURL || querierURL) {

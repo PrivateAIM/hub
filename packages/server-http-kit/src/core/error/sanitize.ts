@@ -12,6 +12,7 @@ import {
     BadRequestError,
     EntityConflictError,
     EntityRelationInvalidError,
+    ErrorCode,
     HubError,
     InternalError,
     StorageInsufficientError,
@@ -19,6 +20,7 @@ import {
     isHubError,
 } from '@privateaim/errors';
 import { isHTTPError } from '@ebec/http';
+import { isClientErrorDueTimeout } from 'hapic';
 import {
     AdapterError,
     CodecError,
@@ -37,6 +39,7 @@ import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'v
  * 4. any other authup error            → HubError with authup's code and status
  *    (permission_* → 403, *_token → 401, throttled → 429, upstream_error → 502,
  *    upstream_timeout → 504)
+ * 4b. outbound hapic request timeout  → HubError `upstream_timeout` (504)
  * 5. rapiq decode error                → BadRequestError carrying its parse trace
  *    (ParseError covers the per-parameter subclasses, CodecError an unresolvable
  *    codec stamp — both are triggered by wire input; Adapter/Build/Merge/Schema
@@ -89,6 +92,16 @@ export function sanitizeError(input: unknown): HubError {
             message: input.message,
             stack: input.stack,
             issues: input.issues,
+        });
+    }
+
+    // An outbound hapic request (core, storage, telemetry, Harbor, …) that ran
+    // out of its `timeout`. The client error's message names the upstream URL,
+    // so it is not passed on.
+    if (isClientErrorDueTimeout(input)) {
+        return new HubError({
+            code: ErrorCode.UPSTREAM_TIMEOUT,
+            message: 'An upstream service did not answer in time.',
         });
     }
 

@@ -6,7 +6,6 @@
  */
 
 import type { ObjectLiteral, SchemaDescription } from '@rapiq/core';
-import type { IClient as IBaseClient, RequestBaseOptions } from 'hapic';
 import type { EntityQueryInput } from '../utils';
 
 /**
@@ -79,12 +78,3 @@ export interface IEntityAPI<T extends ObjectLiteral, TCreate = Partial<T>, TUpda
     update(id: DomainEntityID<T>, data: TUpdate) : Promise<EntityRecordResponse<T>>;
 }
 
-export type BaseAPIContext = {
-    /**
-     * hapic's client INTERFACE, not its concrete class: `BaseAPI` only ever
-     * calls the interface surface, and keeping this structural means a
-     * subclass — or a second declaration copy of the package — satisfies it
-     * without tripping over `BaseAPI`'s own `protected client`.
-     */
-    client?: IBaseClient | RequestBaseOptions
-};

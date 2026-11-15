@@ -107,6 +107,14 @@ await cache.invalidate([`node:${id}`]);
 import { AuthupModule } from '@privateaim/server-kit';
 ```
 
+### Outbound HTTP Timeouts
+
+`HTTPClientTimeout` holds the request deadline in milliseconds for each kind of peer:
+`AUTHUP` (10 000, the Authup client and the OAuth2 token creators), `SERVICE` (30 000, the core,
+storage and telemetry clients and GitHub), `HARBOR` (60 000) and `VICTORIA_LOGS` (30 000). A call
+that streams a request or response body passes `timeout: 0`. A timed-out request inside an HTTP
+request is answered `504` with the code `upstream_timeout`; the worker retries it.
+
 ### Query Schema Description
 
 `describeQuerySchema()` serializes a rapiq entity schema into the `SchemaDescription` that
@@ -156,7 +164,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 | `config` | Configuration reading via `envix` |
 | `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema`; `collectRootFilterValues()` — flattens an `and`-of-`eq` filter tree into label equalities for the log endpoints and rejects any other operator with a 400 |
 | `entity-event` | Entity event pub/sub system |
-| `constants` | Module names, injection keys |
+| `constants` | Module names, injection keys, `HTTPClientTimeout` |
 
 ### Shared DI Modules
 

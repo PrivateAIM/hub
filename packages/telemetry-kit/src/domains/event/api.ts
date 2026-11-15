@@ -9,7 +9,7 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { Event, IEventAPI } from './types';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
-import { BaseAPI } from '../base';
+import { BaseAPI } from 'hapic';
 
 export class EventAPI extends BaseAPI implements IEventAPI {
     async getMany(options?: EntityQueryInput<Event>): Promise<EntityCollectionResponse<Event>> {

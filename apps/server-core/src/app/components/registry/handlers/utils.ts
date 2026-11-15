@@ -7,8 +7,9 @@
 
 import type { HarborClient } from '@hapic/harbor';
 import { createClient } from '@hapic/harbor';
+import { HTTPClientTimeout } from '@privateaim/server-kit';
 
 export function createBasicHarborAPIClient(connectionString: string) : HarborClient {
     // todo: use proxy config in the future...
-    return createClient({ connectionString });
+    return createClient({ connectionString, request: { timeout: HTTPClientTimeout.HARBOR } });
 }

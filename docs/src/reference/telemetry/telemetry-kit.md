@@ -33,6 +33,9 @@ const { data: event } = await client.event.create({
 const { data: entity } = await client.event.getOne(eventId);
 ```
 
+`timeout` (milliseconds) bounds each request; none is set by default. A timed-out request
+rejects with a hapic client error whose `code` is `ETIMEDOUT`.
+
 ### Response Shapes
 
 Every single-record method (`getOne`, `create`, `delete`) resolves to the

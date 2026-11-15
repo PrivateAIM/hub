@@ -80,7 +80,8 @@ const STARTUP_TIMEOUT = 180_000;
 
 /**
  * How many trailing Authup log lines a failed start reports. A startup timeout
- * from the wait strategy says only that `/` never answered; the container's own
+ * from the wait strategy says only that `/readyz` never answered 200 (it does
+ * once Authup's database answers); the container's own
  * output (a crashed migration, an unreachable database) is the cause, and it is
  * gone once testcontainers removes the container.
  */
@@ -223,7 +224,7 @@ export async function startAuthupContainer(
                     target: AUTHUP_PROVISIONING_TARGET,
                 },
             ])
-            .withWaitStrategy(Wait.forHttp('/', AUTHUP_PORT).forStatusCode(200))
+            .withWaitStrategy(Wait.forHttp('/readyz', AUTHUP_PORT).forStatusCode(200))
             .withStartupTimeout(STARTUP_TIMEOUT)
             .start();
     } catch (e) {

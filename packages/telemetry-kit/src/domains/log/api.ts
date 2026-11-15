@@ -9,7 +9,7 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { ILogAPI, Log, LogInput } from './types';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
-import { BaseAPI } from '../base';
+import { BaseAPI } from 'hapic';
 
 export class LogAPI extends BaseAPI implements ILogAPI {
     async getMany(options?: EntityQueryInput<Log>): Promise<EntityCollectionResponse<Log>> {

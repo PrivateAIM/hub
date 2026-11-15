@@ -6,8 +6,9 @@
  */
 
 import { OAuth2TokenGrant, OAuth2TokenTypeIdentifier } from '@authup/specs';
-import { HubError } from '@privateaim/errors';
+import { ErrorCode, HubError } from '@privateaim/errors';
 import { isObject } from '@privateaim/kit';
+import { HTTPClientTimeout } from '../constants';
 import type {
     AuthupTokenExchangeBody,
     AuthupTokenExchangeContext,
@@ -50,8 +51,18 @@ export async function exchangeAuthupToken(
             method: 'POST',
             headers: { 'content-type': 'application/x-www-form-urlencoded' },
             body: form,
+            signal: AbortSignal.timeout(HTTPClientTimeout.AUTHUP),
         });
     } catch (e) {
+        if (Error.isError(e) && e.name === 'TimeoutError') {
+            throw new HubError({
+                code: ErrorCode.UPSTREAM_TIMEOUT,
+                status: 504,
+                message: 'The token exchange request to Authup timed out.',
+                cause: e,
+            });
+        }
+
         throw new HubError({
             code: 'upstream_error',
             status: 502,

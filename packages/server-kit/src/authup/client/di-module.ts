@@ -10,6 +10,7 @@ import type { AuthupClientModuleOptions } from './types';
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../../config/constants';
+import { HTTPClientTimeout } from '../../constants';
 import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '../client-hook/constants';
 import { AUTHUP_CLIENT_MODULE_NAME, AuthupClientInjectionKey } from './constants';
 import { AuthupClient } from './module';
@@ -54,7 +55,7 @@ export class AuthupClientModule implements IModule {
             return;
         }
 
-        const client = new AuthupClient({ baseURL });
+        const client = new AuthupClient({ baseURL, timeout: HTTPClientTimeout.AUTHUP });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
 

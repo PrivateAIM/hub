@@ -32,6 +32,12 @@ const { data: created } = await client.bucket.create({ name: 'analysis-bucket' }
 const stream = await client.bucketFile.stream(fileId);
 ```
 
+### Timeouts
+
+`timeout` (milliseconds) bounds each request, including reading its response body; none is set
+by default. `bucket.stream`, `bucketFile.stream` and `bucket.upload` pass `timeout: 0`, so a long
+transfer is never cut off. A client from `withAuthorization()` keeps the parent's timeout.
+
 ### Response Shapes
 
 Every single-record method (`getOne`, `create`, `update`, `delete`, `clear`) resolves to the
@@ -75,7 +81,7 @@ import { Bucket, BucketFile } from '@privateaim/storage-kit';
 | `domains` | `Bucket`, `BucketFile` types and validators |
 | `StorageCapabilityType` / `StorageCapabilityAction` / `assertStorageCapabilityEntry` | Capability vocabulary: types `bucket`, `bucketFile` (the storage `DomainType` values); actions `read`, `write`, `delete`; `capabilityCoversBucket` / `capabilityCoversBucketFile` decide coverage (a bucket entry covers its files) |
 | `StorageCapabilityTokenProvider` / `IStorageCapabilityTokenProvider` | Caches a minted token per cap set (re-mints within 60 s of expiry, shares concurrent mints, never caches a failure) |
-| `IStorageClient.withAuthorization(resolve)` | A scoped client that sends `Authorization: Bearer <await resolve({ method })>` on each request |
+| `IStorageClient.withAuthorization(resolve)` | A scoped client that sends `Authorization: Bearer <await resolve({ method })>` on each request. It copies the parent's base URL, timeout, headers and transport, but none of its hooks |
 
 ## Contract
 

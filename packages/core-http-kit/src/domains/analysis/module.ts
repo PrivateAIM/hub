@@ -14,7 +14,7 @@ import type {
     AnalysisStorageToken,
     AnalysisStorageTokenCreatePayload,
 } from '@privateaim/core-kit';
-import { BaseAPI } from '../base';
+import { BaseAPI } from 'hapic';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 import type { AnalysisCreatePayload, AnalysisUpdatePayload, IAnalysisAPI } from './types';
 
@@ -103,7 +103,11 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
     }
 
     async streamFiles(id: Analysis['id']) : Promise<ReadableStream<any>> {
-        const response = await this.client.get(this.getFilesDownloadPath(id), { responseType: 'stream' });
+        const response = await this.client.get(this.getFilesDownloadPath(id), {
+            responseType: 'stream',
+            // the timer would keep running while the body is read
+            timeout: 0,
+        });
 
         if (typeof response.data === 'undefined') {
             throw new Error('The stream response did not return a body.');
@@ -113,7 +117,11 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
     }
 
     async downloadResult(id: Analysis['id']) : Promise<ReadableStream<any>> {
-        const response = await this.client.get(this.getResultDownloadPath(id), { responseType: 'stream' });
+        const response = await this.client.get(this.getResultDownloadPath(id), {
+            responseType: 'stream',
+            // the timer would keep running while the body is read
+            timeout: 0,
+        });
 
         if (typeof response.data === 'undefined') {
             throw new Error('The stream response did not return a body.');
