@@ -71,7 +71,11 @@ export class RegistryService extends AbstractEntityService implements IRegistryS
         const scoped = await scopeReadQuery(
             decodeQuery(query, { schema: registrySchema }),
             actor,
-            { names: REGISTRY_READ_PERMISSIONS, compile: false },
+            {
+                names: REGISTRY_READ_PERMISSIONS, 
+                schema: registrySchema, 
+                compile: false, 
+            },
         );
 
         await this.checkSecretFieldAccess(query, actor);

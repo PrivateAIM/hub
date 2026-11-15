@@ -14,14 +14,28 @@ import {
     or,
 } from '@rapiq/core';
 import { AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
-import { appendQueryConditions } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityRepositoryFindManyResult,
+    IEntityRepository,
+    ReadProjection,
+} from '@privateaim/server-kit';
+import {
+    appendQueryConditions,
+    buildCheckFields,
+    readCheckAttributes,
+    readPath,
+    trimReadProjection,
+    widenReadProjection,
+} from '@privateaim/server-kit';
 import { prefixConditionFields } from '../../query/index.ts';
 import type { AnalysisParticipationWhere } from '../../entities/analysis-node/types.ts';
+import { analysisSchema } from '../../entities/analysis/schema.ts';
 import { ANALYSIS_READ_PERMISSIONS } from './constants.ts';
 import type {
     AnalysisReach,
     AnalysisReachOptions,
+    AnalysisReachPost,
     AnalysisReachServiceContext,
     AnalysisReachTarget,
     IAnalysisReachService,
@@ -104,24 +118,31 @@ export class AnalysisReachService implements IAnalysisReachService {
         return {
             kind: 'post',
             candidates: undefined,
+            analysisPath: target.analysisPath,
             analysisIdAttributeName: target.analysisIdAttributeName,
+            // Rows that are analyses are evaluated themselves, on their whole
+            // default row; any other row only names its analysis.
+            checkFields: target.analysisPath === '' ?
+                buildCheckFields(analysisSchema) :
+                [target.analysisIdAttributeName],
             refine: async (analyses) => {
-                const reached: string[] = [];
+                const reached = new Set<unknown>();
 
                 for (const analysis of analyses) {
-                    const isReached = participating.includes(analysis.id) ||
+                    const id = Reflect.get(analysis, 'id');
+                    const isReached = (typeof id === 'string' && participating.includes(id)) ||
                         await reachesRecordOneOf(actor.permissionEvaluator, {
                             name: names,
-                            realm: analysis.realmId,
+                            realm: readRealm(analysis),
                             data: { [BuiltInPolicyType.ATTRIBUTES]: analysis },
                         });
 
                     if (isReached) {
-                        reached.push(analysis.id);
+                        reached.add(id);
                     }
                 }
 
-                return inArray(target.analysisIdAttributeName, reached);
+                return (row) => reached.has(readPath(row, target.analysisIdAttributeName));
             },
         };
     }
@@ -135,57 +156,56 @@ export class AnalysisReachService implements IAnalysisReachService {
             return repository.findMany(reach.condition ? appendQueryConditions(query, reach.condition) : query);
         }
 
-        const result = await repository.findMany(reach.candidates ? appendQueryConditions(query, reach.candidates) : query);
+        // One read of the page: what the decision reads of each row is loaded
+        // with it, so the rows returned are the rows decided.
+        const projection = widenReadProjection(query, reach.checkFields);
+        const result = await repository.findMany(
+            reach.candidates ? appendQueryConditions(projection.query, reach.candidates) : projection.query,
+        );
 
         if (result.data.length === 0) {
             return result;
         }
 
-        // The page's distinct analyses, loaded once and decided once each.
-        const ids = result.data.map((row) => Reflect.get(row, 'id'));
-        const analysisIds = await this.collectAnalysisIds(repository, result.data, ids, reach.analysisIdAttributeName);
-        const { data: analyses } = await this.analysisRepository.findMany(
-            appendQueryConditions(new Query({}), inArray('id', analysisIds)),
-        );
+        const matches = await reach.refine(await this.loadAnalyses(result.data, reach, projection));
+        const data = result.data.filter((row) => matches(row));
 
-        const condition = await reach.refine(analyses);
-
-        if (!condition) {
-            return result;
-        }
-
-        // The refined reach is a condition again: which of the page's rows it
-        // covers is the repository's answer, as for a reach that lowered.
-        const { data: reachedRows } = await repository.findMany(
-            appendQueryConditions(new Query({}), inArray('id', ids), condition),
-        );
-        const reached = new Set(reachedRows.map((row) => Reflect.get(row, 'id')));
-        const data = result.data.filter((row) => reached.has(Reflect.get(row, 'id')));
-
-        return { data, meta: result.meta };
+        return { data: trimReadProjection(data, projection), meta: result.meta };
     }
 
     /**
-     * The analysis ids of a page's rows, re-read by id when a sparse
-     * fieldset left the column out.
+     * The page's distinct analyses, each decided once: the rows themselves
+     * when they are the analyses, else loaded in one query of the analysis
+     * table (whole rows).
      */
-    protected async collectAnalysisIds<T extends object>(
-        repository: Pick<IEntityRepository<T>, 'findMany'>,
-        rows: T[],
-        ids: unknown[],
-        attributeName: string,
-    ): Promise<string[]> {
-        let values = rows.map((row) => Reflect.get(row, attributeName));
-
-        const isSparse = values.some((value) => typeof value !== 'string');
-
-        if (isSparse) {
-            const { data } = await repository.findMany(appendQueryConditions(new Query({}), inArray('id', ids)));
-
-            values = data.map((row) => Reflect.get(row, attributeName));
+    protected async loadAnalyses(
+        rows: object[],
+        reach: AnalysisReachPost,
+        projection: ReadProjection,
+    ): Promise<object[]> {
+        if (reach.analysisPath === '') {
+            return rows.map((row) => readCheckAttributes(row, projection));
         }
 
-        return [...new Set(values.filter((value) => typeof value === 'string'))];
+        const ids = new Set<string>();
+
+        for (const row of rows) {
+            const id = readPath(row, reach.analysisIdAttributeName);
+
+            if (typeof id === 'string') {
+                ids.add(id);
+            }
+        }
+
+        if (ids.size === 0) {
+            return [];
+        }
+
+        const { data } = await this.analysisRepository.findMany(
+            appendQueryConditions(new Query({}), inArray('id', [...ids])),
+        );
+
+        return data;
     }
 
     /** The reach of a node's or analysis' own client; `undefined` for any other identity. */
@@ -226,4 +246,18 @@ function lowered(condition: ICondition | undefined): AnalysisReach {
 
 function matchNothing(): ICondition {
     return inArray('id', []);
+}
+
+/**
+ * The analysis' realm, raw. Anything but a realm id or `null` reads as
+ * `undefined`, which the record helpers refuse instead of matching.
+ */
+function readRealm(analysis: object): string | null | undefined {
+    const value: unknown = Reflect.get(analysis, 'realmId');
+
+    if (typeof value === 'string') {
+        return value;
+    }
+
+    return value === null ? null : undefined;
 }

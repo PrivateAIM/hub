@@ -74,7 +74,11 @@ export class MasterImageService extends AbstractEntityService implements IMaster
         const scoped = await scopeReadQuery(
             decodeQuery(query, { schema: masterImageSchema }),
             actor,
-            { names: MASTER_IMAGE_READ_PERMISSIONS, compile: false },
+            {
+                names: MASTER_IMAGE_READ_PERMISSIONS, 
+                schema: masterImageSchema, 
+                compile: false, 
+            },
         );
 
         return findManyScoped(this.repository, scoped, actor);

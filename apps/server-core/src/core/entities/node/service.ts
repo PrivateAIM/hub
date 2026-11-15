@@ -73,7 +73,11 @@ export class NodeService extends AbstractEntityService implements INodeService {
         const scoped = await scopeReadQuery(
             decoded,
             actor,
-            { names: NODE_READ_PERMISSIONS, compile: false },
+            {
+                names: NODE_READ_PERMISSIONS, 
+                schema: nodeSchema, 
+                compile: false, 
+            },
         );
 
         return findManyScoped(this.repository, scoped, actor);

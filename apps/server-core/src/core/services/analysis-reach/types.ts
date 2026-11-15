@@ -6,7 +6,7 @@
  */
 
 import type { ICondition, IQuery } from '@rapiq/core';
-import type { Analysis, AnalysisBucketType } from '@privateaim/core-kit';
+import type { AnalysisBucketType } from '@privateaim/core-kit';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
 import type { IAnalysisRepository } from '../../entities/analysis/types.ts';
 import type { IAnalysisNodeRepository } from '../../entities/analysis-node/types.ts';
@@ -19,20 +19,37 @@ export type AnalysisReachLowered = {
 };
 
 /**
+ * Whether a row of the page, read with the reach's `checkFields`, is
+ * reached. Only defined for rows that satisfy the reach's `candidates`.
+ */
+export type AnalysisRowMatcher = (row: object) => boolean;
+
+/**
  * A reach whose grant did not lower (`post`): which analyses it covers is
  * known only by evaluating each one.
  */
 export type AnalysisReachPost = {
     kind: 'post';
     /**
-     * What may narrow the candidates before the decision: the parts that
-     * did lower. Never the reach itself.
+     * What narrows the candidates in the page read: every part that did
+     * lower. Never the reach itself.
      */
     candidates: ICondition | undefined;
+    /** Relation path to the analysis; `''` when the rows are the analyses. */
+    analysisPath: string;
     /** Column of the queried entity holding the analysis id. */
     analysisIdAttributeName: string;
-    /** The reach as a condition, exact among the given analyses. */
-    refine: (analyses: Analysis[]) => Promise<ICondition | undefined>;
+    /**
+     * The fields of the queried row the decision reads (relation paths
+     * dotted), loaded with the page by widening its projection.
+     */
+    checkFields: string[];
+    /**
+     * Decide the page's rows, given its distinct analyses (the rows
+     * themselves when they are the analyses). A part that lowered holds for
+     * every row already, through `candidates`.
+     */
+    refine: (analyses: object[]) => Promise<AnalysisRowMatcher>;
 };
 
 /**
@@ -88,9 +105,11 @@ export interface IAnalysisReachService {
     /**
      * Read the rows of `query` the reach covers, from the repository of the
      * entity the reach was resolved for. A `post` reach is decided per
-     * analysis of the page, so the page may come back short or empty while
-     * `meta.total` stays the candidate count. A record read passes the query
-     * with its `id` condition, so list and record share the decision.
+     * analysis of the page on the page read itself (its projection widened
+     * to the reach's `checkFields` and trimmed again), so the page may come
+     * back short or empty while `meta.total` stays the candidate count. A
+     * record read passes the query with its `id` condition, so list and
+     * record share the decision.
      */
     findMany<T extends object>(
         repository: Pick<IEntityRepository<T>, 'findMany'>,

@@ -7,10 +7,16 @@
 
 import { BuiltInPolicyType, reachesRecordOneOf } from '@authup/access';
 import type { IQuery } from '@rapiq/core';
-import { Query, inArray } from '@rapiq/core';
+import { inArray } from '@rapiq/core';
 import type { ActorContext } from '../actor/index.ts';
 import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
 import { appendQueryConditions } from './conditions.ts';
+import { 
+    buildCheckFields, 
+    readCheckAttributes, 
+    trimReadProjection, 
+    widenReadProjection, 
+} from './projection.ts';
 import type { ReadScope, ScopeReadQueryOptions } from './types.ts';
 
 /**
@@ -23,26 +29,26 @@ import type { ReadScope, ScopeReadQueryOptions } from './types.ts';
  * - `deny`        → matches nothing.
  * - `post`        → the reach cannot be expressed as a condition (a grant
  *                   policy that does not lower): the query is returned
- *                   unnarrowed and flagged, and each row is decided by
- *                   evaluation. Run the scope through {@link findManyScoped},
- *                   which does that; the actor's realm is never the answer.
+ *                   unnarrowed and flagged with the fields the decision
+ *                   reads, and each row is decided by evaluation. Run the
+ *                   scope through {@link findManyScoped}, which does that;
+ *                   the actor's realm is never the answer.
  */
 export async function scopeReadQuery(
     query: IQuery,
     actor: ActorContext,
     options: ScopeReadQueryOptions,
 ): Promise<ReadScope> {
-    const scope = (scoped: IQuery, post: boolean): ReadScope => ({
-        query: scoped,
-        post,
+    const base = {
+        query,
         names: options.names,
         ...(options.realmAttributeName ? { realmAttributeName: options.realmAttributeName } : {}),
-    });
+    };
 
     await actor.permissionEvaluator.preEvaluateOneOf({ name: options.names });
 
     if (options.compile === false) {
-        return scope(query, false);
+        return { ...base, post: false };
     }
 
     // Forward the realm column only when set, like authup: naming one tells
@@ -56,24 +62,41 @@ export async function scopeReadQuery(
 
     switch (compiled.verdict) {
         case 'allow':
-            return scope(query, false);
+            return { ...base, post: false };
         case 'conditional':
-            return scope(appendQueryConditions(query, compiled.condition), false);
+            return {
+                ...base, 
+                query: appendQueryConditions(query, compiled.condition), 
+                post: false, 
+            };
         case 'deny':
-            return scope(appendQueryConditions(query, inArray('id', [])), false);
+            return {
+                ...base, 
+                query: appendQueryConditions(query, inArray('id', [])), 
+                post: false, 
+            };
         default:
-            return scope(query, true);
+            return {
+                ...base,
+                post: true,
+                checkFields: buildCheckFields(options.schema, options.realmAttributeName),
+            };
     }
 }
 
 /**
- * Run a scoped read. A lowered scope is the repository's answer as it is. A
- * `post` scope keeps only the rows a grant of one of the names reaches,
- * evaluated against the stored row (re-read by id in one query, so a sparse
- * fieldset cannot hide the realm or an attribute a policy reads) and its own
- * realm. The page may come back short or empty; `meta.total` stays the
- * candidate count, so a client paging by total still requests every page and
- * no reachable row on a later page is cut off.
+ * Run a scoped read. A lowered scope is the repository's answer as it is.
+ *
+ * A `post` scope is decided per row on ONE read: its projection is widened
+ * to the scope's `checkFields` (the schema's defaults, the realm column and
+ * the key), so each row is evaluated on its stored realm and every attribute
+ * a policy can read, and the rows returned are the rows evaluated. What the
+ * widening loaded beyond the asked projection is trimmed from the response;
+ * a gated field (`select: false`, outside `fields.default`) is never loaded
+ * for the check and, when the read asks for it, never shown to the policy.
+ * The page may come back short or empty; `meta.total` stays the candidate
+ * count, so a client paging by total still requests every page and no
+ * reachable row on a later page is cut off.
  *
  * A record read appends `eq('id', id)` to the scope's query and runs it
  * through here too, so list and record share the decision.
@@ -83,34 +106,29 @@ export async function findManyScoped<T extends object>(
     scope: ReadScope,
     actor: ActorContext,
 ): Promise<EntityRepositoryFindManyResult<T>> {
-    const result = await repository.findMany(scope.query);
-
-    if (!scope.post || result.data.length === 0) {
-        return result;
+    if (!scope.post) {
+        return repository.findMany(scope.query);
     }
 
-    const { data: stored } = await repository.findMany(appendQueryConditions(
-        new Query({}),
-        inArray('id', result.data.map((row) => Reflect.get(row, 'id'))),
-    ));
+    const projection = widenReadProjection(scope.query, scope.checkFields);
+    const result = await repository.findMany(projection.query);
 
-    const reached = new Set<unknown>();
+    const data: T[] = [];
 
-    for (const row of stored) {
+    for (const row of result.data) {
+        const attributes = readCheckAttributes(row, projection);
         const isReached = await reachesRecordOneOf(actor.permissionEvaluator, {
             name: scope.names,
-            realm: readRealm(row, scope.realmAttributeName ?? 'realmId'),
-            data: { [BuiltInPolicyType.ATTRIBUTES]: row },
+            realm: readRealm(attributes, scope.realmAttributeName ?? 'realmId'),
+            data: { [BuiltInPolicyType.ATTRIBUTES]: attributes },
         });
 
         if (isReached) {
-            reached.add(Reflect.get(row, 'id'));
+            data.push(row);
         }
     }
 
-    const data = result.data.filter((row) => reached.has(Reflect.get(row, 'id')));
-
-    return { data, meta: result.meta };
+    return { data: trimReadProjection(data, projection), meta: result.meta };
 }
 
 /**

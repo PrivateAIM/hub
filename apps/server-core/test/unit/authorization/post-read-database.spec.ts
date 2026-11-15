@@ -10,6 +10,9 @@ import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { FakeActorContext } from '@privateaim/server-test-kit';
 import { createScopedActor } from '@privateaim/server-test-kit';
+import type { EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { findManyScoped, scopeReadQuery } from '@privateaim/server-kit';
+import type { IQuery } from '@rapiq/core';
 import type { DataSource } from 'typeorm';
 import {
     afterAll,
@@ -42,12 +45,66 @@ import {
 import { AnalysisBucketAccess } from '../../../src/core/services/analysis-bucket-access/index.ts';
 import { AnalysisLogAccessService, LogAccessIntent } from '../../../src/core/services/analysis-log-access/index.ts';
 import { AnalysisReachService } from '../../../src/core/services/analysis-reach/index.ts';
+import { decodeQuery } from '../../../src/core/query/index.ts';
+import { registryProjectSchema } from '../../../src/core/entities/registry-project/schema.ts';
+import { analysisSchema } from '../../../src/core/entities/analysis/schema.ts';
 import { createTestDatabaseApplication } from '../../app';
 
-// A grant that does not lower (`post`) is decided per row. The decision runs
-// extra queries built on a bare `Query` (the stored rows by id, the page's
-// analyses, the refined reach with its relation paths); this runs them through
-// the typeorm repositories against the suite's database.
+// A grant that does not lower (`post`) is decided per row, on the one read of
+// the page: its projection is widened to what the decision reads (default
+// columns, the analysis id, a relation path such as `analysisBucket.type`) and
+// trimmed again. This runs those widened reads, and the batched read of the
+// page's analyses, through the typeorm repositories against the suite's
+// database.
+
+/**
+ * The keys a row carries a value for: an entity instance declares every
+ * column as an own property, `undefined` when the read did not load it.
+ */
+function definedKeys(row: object): string[] {
+    return Object.keys(row).filter((key) => Reflect.get(row, key) !== undefined).sort();
+}
+
+type ReadCounter<T extends { findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<any>> }> = {
+    repository: T,
+    calls: IQuery[],
+    /** Runs once, after the first read answered and before the caller sees it. */
+    afterFirstRead?: () => Promise<void>,
+};
+
+/** The real repository, recording each `findMany` query. */
+function countReads<T extends { findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<any>> }>(
+    target: T,
+    afterFirstRead?: () => Promise<void>,
+): ReadCounter<T> {
+    const counter: ReadCounter<T> = {
+        repository: target, 
+        calls: [], 
+        afterFirstRead, 
+    };
+
+    counter.repository = new Proxy(target, {
+        get(object, property, receiver) {
+            if (property !== 'findMany') {
+                return Reflect.get(object, property, receiver);
+            }
+
+            return async (query: IQuery) => {
+                counter.calls.push(query);
+
+                const result = await object.findMany(query);
+
+                if (counter.calls.length === 1 && counter.afterFirstRead) {
+                    await counter.afterFirstRead();
+                }
+
+                return result;
+            };
+        },
+    });
+
+    return counter;
+}
 
 const OWN_REALM = randomUUID();
 const FOREIGN_REALM = randomUUID();
@@ -342,6 +399,79 @@ describe('a post verdict through the database repositories', () => {
             }
         });
 
+        it('returns exactly the asked root field and no field loaded for the check', async () => {
+            const result = await registryProjectService.getMany({ filter: { registryId }, fields: 'id' }, createActor());
+
+            expect(result.data).toHaveLength(3);
+            expect(result.data.every((row) => definedKeys(row).join() === 'id')).toBe(true);
+        });
+
+        it('decides a nested relation fieldset on the root row and returns the projection', async () => {
+            const result = await registryProjectService.getMany(
+                {
+                    filter: { registryId }, 
+                    fields: ['id', 'registry.name'], 
+                    include: 'registry', 
+                },
+                createActor(),
+            );
+
+            expect(result.data.map((row) => row.id).sort()).toEqual(idsOf(['ownOpen', 'foreignOpen', 'globalOpen']));
+
+            for (const row of result.data) {
+                expect(definedKeys(row)).toEqual(['id', 'registry']);
+                expect(row.registry.name).toBeDefined();
+            }
+        });
+
+        it('never loads the gated secret for the check', async () => {
+            const counter = countReads(suite.container.resolve(DatabaseInjectionKey.RegistryProjectRepository));
+            const actor = createActor();
+            const scope = await scopeReadQuery(
+                decodeQuery({ filter: { registryId }, fields: 'id' }, { schema: registryProjectSchema }),
+                actor,
+                { names: ['registry_project_read'], schema: registryProjectSchema },
+            );
+
+            const result = await findManyScoped(counter.repository, scope, actor);
+
+            expect(counter.calls).toHaveLength(1);
+            expect(counter.calls[0].fields.value.map((field) => field.name)).not.toContain('accountSecret');
+            expect(result.data.every((row) => row.accountSecret === undefined)).toBe(true);
+            expect(actor.permissionEvaluator.evaluateOneOfCalls.every((call) => !('accountSecret' in call.data.get<Record<string, unknown>>('attributes'))))
+                .toBe(true);
+        });
+
+        it('returns the row it evaluated, in one read, even when the row changes right after it', async () => {
+            const repository = dataSource.getRepository(RegistryProjectEntity);
+            const target = registryProjects.foreignOpen;
+            // Closes the row between the page read and any later read of it.
+            const counter = countReads(
+                suite.container.resolve(DatabaseInjectionKey.RegistryProjectRepository),
+                async () => {
+                    await repository.update({ id: target.id }, { name: uniqueName('closed') });
+                },
+            );
+
+            try {
+                const actor = createActor();
+                const scope = await scopeReadQuery(
+                    decodeQuery({ filter: { registryId }, fields: 'id,name' }, { schema: registryProjectSchema }),
+                    actor,
+                    { names: ['registry_project_read'], schema: registryProjectSchema },
+                );
+
+                const result = await findManyScoped(counter.repository, scope, actor);
+
+                // No second read of the same rows...
+                expect(counter.calls).toHaveLength(1);
+                // ...so the row is decided and returned in the one state that was read.
+                expect(result.data.find((row) => row.id === target.id)).toEqual({ id: target.id, name: target.name });
+            } finally {
+                await repository.update({ id: target.id }, { name: target.name });
+            }
+        });
+
         it('decides a record read like the list', async () => {
             const actor = createActor();
 
@@ -379,7 +509,26 @@ describe('a post verdict through the database repositories', () => {
 
             expect(result.data.map((row) => row.id).sort())
                 .toEqual(idsOf([ownOpen, foreignOpen, joinedPending, joinedApproved]));
-            expect(result.data.every((row) => row.realmId === undefined)).toBe(true);
+            expect(result.data.every((row) => definedKeys(row).join() === 'id')).toBe(true);
+        });
+
+        it('decides a page of analyses on itself, in one read', async () => {
+            const counter = countReads(suite.container.resolve(DatabaseInjectionKey.AnalysisRepository));
+            const actor = createActor();
+            const reach = new AnalysisReachService({
+                analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                analysisRepository: counter.repository,
+                nodeRepository: suite.container.resolve(DatabaseInjectionKey.NodeRepository),
+            });
+
+            const { data } = await reach.findMany(
+                counter.repository,
+                decodeQuery({ filter: { projectId }, fields: 'id' }, { schema: analysisSchema }),
+                await reach.resolve(actor, { analysisPath: '', analysisIdAttributeName: 'id' }),
+            );
+
+            expect(data.map((row) => row.id).sort()).toEqual(idsOf([ownOpen, foreignOpen, joinedPending, joinedApproved]));
+            expect(counter.calls).toHaveLength(1);
         });
 
         it('decides a record read like the list', async () => {
@@ -424,7 +573,8 @@ describe('a post verdict through the database repositories', () => {
             );
 
             expect(sparse.data.map((row) => row.id).sort()).toEqual(expected());
-            expect(sparse.data.every((row) => row.analysisId === undefined)).toBe(true);
+            // Neither the analysis id nor the bucket type loaded for the decision.
+            expect(sparse.data.every((row) => definedKeys(row).join() === 'id')).toBe(true);
 
             const included = await analysisBucketFileService.getMany(
                 { filter: { analysisId: analysisIds() }, include: 'analysis,analysisBucket' },
@@ -432,6 +582,54 @@ describe('a post verdict through the database repositories', () => {
             );
 
             expect(included.data.map((row) => row.id).sort()).toEqual(expected());
+
+            const nested = await analysisBucketFileService.getMany(
+                {
+                    filter: { analysisId: analysisIds() }, 
+                    fields: ['id', 'analysisBucket.bucketId'], 
+                    include: 'analysisBucket', 
+                },
+                createActor(),
+            );
+
+            expect(nested.data.map((row) => row.id).sort()).toEqual(expected());
+
+            for (const row of nested.data) {
+                expect(definedKeys(row)).toEqual(['analysisBucket', 'id']);
+                expect(row.analysisBucket.bucketId).toBeDefined();
+                // The type decided the row and is trimmed from the included relation.
+                expect(row.analysisBucket.type).toBeUndefined();
+            }
+        });
+
+        it('reads the files once and their analyses once', async () => {
+            const files = countReads(suite.container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository));
+            const analyses = countReads(suite.container.resolve(DatabaseInjectionKey.AnalysisRepository));
+            const analysisNodeRepository = suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository);
+            const reach = new AnalysisReachService({
+                analysisNodeRepository,
+                analysisRepository: analyses.repository,
+                nodeRepository: suite.container.resolve(DatabaseInjectionKey.NodeRepository),
+            });
+            const service = new AnalysisBucketFileService({
+                repository: files.repository,
+                recalculator: suite.container.resolve(AnalysisInjectionKey.FileRecalculator),
+                reach,
+                analysisBucketAccess: new AnalysisBucketAccess({
+                    reach, 
+                    analysisRepository: analyses.repository, 
+                    analysisNodeRepository, 
+                }),
+                analysisRepository: analyses.repository,
+                analysisBucketRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
+            });
+
+            const result = await service.getMany({ filter: { analysisId: analysisIds() }, fields: 'id' }, createActor());
+
+            expect(result.data.map((row) => row.id).sort()).toEqual(expected());
+            // The page read carries the decision; the analyses are another table.
+            expect(files.calls).toHaveLength(1);
+            expect(analyses.calls).toHaveLength(1);
         });
 
         it('decides a record read like the list', async () => {
@@ -447,7 +645,7 @@ describe('a post verdict through the database repositories', () => {
                 .rejects.toThrow(EntityNotFoundError);
         });
 
-        it('decides a full page without truncating the re-read', async () => {
+        it('decides a full page without truncating it', async () => {
             const bulk = await seedAnalysis('open', FOREIGN_REALM);
             const repository = dataSource.getRepository(AnalysisBucketFileEntity);
             const bucket = bulk.buckets[AnalysisBucketType.CODE];
