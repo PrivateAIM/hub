@@ -91,7 +91,7 @@ Delivered work is recorded as invariants in the [topic files](.agents/architectu
 
 ## Operational Invariants
 
-- Production starts use `startApplication` from server-kit: one-shot SIGINT/SIGTERM teardown bounded to 30 s. server-core closes its Socket.IO server before HTTP.
+- Production starts use `startApplication` from server-kit with `createHealthShutdownHook`: the first SIGINT/SIGTERM turns `/readyz` 503, waits `SHUTDOWN_DELAY` (after startup only; a second signal ends it), then a one-shot teardown bounded to 30 s that starts after the delay. Health routes mount before every middleware; both probes fail until every module's `onReady`, and readiness checks only the database (never Redis, RabbitMQ or Authup). server-core closes its Socket.IO server before HTTP.
 - The analysis reconciler is registered only with `RemoteMessageBusInjectionKey` (AMQP).
 - An analysis update with an unchanged non-null client binding skips the Authup lookup; remote client deletion is not repaired on incidental saves.
 - Node-log creation requires an existing analysis-node pair (approval not required). Execution progress and status require node authority on the analysis-node update route; assignment creation ignores execution, approval and comment fields.

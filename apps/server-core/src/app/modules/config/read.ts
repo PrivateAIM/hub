@@ -35,6 +35,7 @@ export function readConfigFromEnv(): Partial<Config> {
         publicURL: read(EnvironmentInputKey.PUBLIC_URL, `http://127.0.0.1:${port}/`),
 
         cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
+        shutdownDelay: readInt(EnvironmentInputKey.SHUTDOWN_DELAY),
 
         masterImagesOwner: read(EnvironmentInputKey.MASTER_IMAGES_OWNER, ConfigDefaults.MASTER_IMAGES_OWNER),
         masterImagesRepository: read(EnvironmentInputKey.MASTER_IMAGES_REPOSITORY, ConfigDefaults.MASTER_IMAGES_REPOSITORY),

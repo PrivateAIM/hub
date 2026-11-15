@@ -41,4 +41,5 @@ export enum EnvironmentInputKey {
     PUBLIC_URL = 'PUBLIC_URL',
 
     COOKIE_PREFIX = 'COOKIE_PREFIX',
+    SHUTDOWN_DELAY = 'SHUTDOWN_DELAY',
 }

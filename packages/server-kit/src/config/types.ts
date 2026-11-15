@@ -28,4 +28,11 @@ export type BaseServerConfig = {
      * `packages/server-http-kit/src/middlewares/authup/types.ts`.
      */
     cookiePrefix?: string;
+
+    /**
+     * Seconds the listener keeps serving after SIGTERM / SIGINT while
+     * `GET /readyz` already answers 503, so a load balancer stops routing
+     * to the process before it closes (`SHUTDOWN_DELAY`, default 0).
+     */
+    shutdownDelay?: number;
 };

@@ -29,8 +29,10 @@ RUN chmod +x ./entrypoint.sh
 
 EXPOSE 3000
 
+# GET /livez (HEALTHCHECK_PATH=/readyz to take readiness instead); see
+# docs/src/guide/deployment/configuration.md#health-endpoints.
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 \
-    CMD wget --proxy off --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1
+    CMD /bin/sh ./entrypoint.sh healthcheck || exit 1
 
 ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
 CMD ["core", "cli", "start"]

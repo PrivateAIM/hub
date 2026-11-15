@@ -42,6 +42,8 @@ Authenticated as the calling identity (e.g. a node's `client_credentials` token)
 | `POST` | `/messages/ack` `{ ids }` | Acknowledge messages by id — the broker deletes them (delete-on-ack). |
 | `GET`  | `/messages/stream` | Server-Sent Events stream of payload-free `messagePending` wakeups for the caller (and one on connect), kept alive by comment lines. The client pulls via `GET /messages` on each event. See [SSE stream format](#sse-stream-format). |
 
+`GET`/`HEAD` `/livez` and `/readyz` are anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)).
+
 Messages carry a uniform TTL (24h). A pull never returns an expired message, and a background sweep reaps expired rows in bounded batches, so a backlog never becomes one long-running delete. Contract types live in `@privateaim/messenger-kit`; the Hapic client is `@privateaim/messenger-http-kit`.
 
 ## Wakeup (`messagePending`)
@@ -90,6 +92,7 @@ data: {"recipient":{"type":"client","id":"<subject id>"}}
 | `REALM` | `master` | Authup realm |
 | `CLIENT_ID` | `system` | Authup client ID |
 | `CLIENT_SECRET` | `start123` | Authup client secret |
+| `SHUTDOWN_DELAY` | `0` | Seconds to keep serving after a stop signal while `/readyz` answers 503 |
 
 ## Architecture
 

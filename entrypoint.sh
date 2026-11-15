@@ -13,6 +13,23 @@ BASE_DIR=/usr/src/project
 
 cd "${BASE_DIR}"
 
+# The image HEALTHCHECK runs `entrypoint.sh healthcheck`. A service answers
+# `HEALTHCHECK_PATH` (default `/livez`: a database outage must not make
+# Swarm or autoheal restart the container); the ui has no probe routes and
+# keeps `/`. The started service is recorded below, since the check runs
+# as its own process.
+SERVICE_FILE=/tmp/.hub-service
+
+if [ "${1}" = "healthcheck" ]; then
+    HEALTH_PATH="${HEALTHCHECK_PATH:-/livez}"
+
+    if [ "$(cat "${SERVICE_FILE}" 2>/dev/null)" = "ui" ]; then
+        HEALTH_PATH=/
+    fi
+
+    exec wget --proxy off --no-verbose --tries=1 --spider "http://127.0.0.1:3000${HEALTH_PATH}"
+fi
+
 case "${1}" in
     core) PACKAGE=core;;
     core-worker) PACKAGE=core-worker;;
@@ -43,6 +60,8 @@ if [[ -z "${COMMAND}" ]]; then
     printf "A ${PACKAGE} command must be specified.\n"
     exit 1
 fi
+
+echo "${PACKAGE}" > "${SERVICE_FILE}"
 
 case "${PACKAGE}" in
     core)

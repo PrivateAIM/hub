@@ -155,7 +155,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 
 | Module | Description |
 |--------|-------------|
-| `app` | `BaseApplicationBuilder`, `Application` base class |
+| `app` | `BaseApplicationBuilder`, `Application` base class; `startApplication(app, { onSignal })` — one-shot SIGINT/SIGTERM shutdown with drain delay; `Health`, `HealthInjectionKey`, `createDatabaseHealthCheck` (1 s bound, 1 s reuse), `createHealthShutdownHook`, `createHealthLogObserver` — the state behind `/livez` and `/readyz` (routes: `mountHealthRoutes` in `@privateaim/server-http-kit`) |
 | `logger` | Winston logger setup and `LoggerModule` |
 | `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `hubwire` message bus; `createMessageBusLogHooks`, `createAmqpDriverLogHooks`, `createRemoteWorkerLogHooks`, `createScheduledComponentLogHooks` — hubwire `hooks` that log through a hub logger |
 | `redis` | Redis module and connection helpers |

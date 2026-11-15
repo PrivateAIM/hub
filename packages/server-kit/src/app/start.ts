@@ -6,25 +6,65 @@
  */
 
 import type { IApplication } from 'orkos';
+import type { StartApplicationOptions } from './types';
 
-/** Own a production process's startup and one-shot SIGINT/SIGTERM shutdown. */
-export async function startApplication(app: Pick<IApplication, 'setup' | 'teardown'>): Promise<void> {
+const SHUTDOWN_TIMEOUT = 30_000;
+
+/**
+ * Own a production process's startup and one-shot SIGINT/SIGTERM shutdown.
+ *
+ * The first signal calls `onSignal` (readiness answers 503 from then on) and,
+ * when setup had completed, waits the drain delay it answers while the
+ * listeners keep serving; a second signal ends that wait early. Then setup
+ * (if still running) and teardown are bounded to 30 s, which start after the
+ * delay: a stop timeout must exceed the delay plus 30 s.
+ */
+export async function startApplication(
+    app: Pick<IApplication, 'setup' | 'teardown'>,
+    options: StartApplicationOptions = {},
+): Promise<void> {
     let stopping: Promise<void> | undefined;
     let setup: Promise<void>;
+    let started = false;
+    let endDelay: (() => void) | undefined;
 
     const shutdown = () => {
         if (stopping) {
+            endDelay?.();
+
             return stopping;
         }
 
-        // Bound startup, teardown and any handles left open after teardown.
-        const deadline = setTimeout(() => {
-            process.stderr.write('Application shutdown timed out\n');
-            process.exit(1);
-        }, 30_000);
+        let delay = 0;
+
+        try {
+            delay = options.onSignal?.() ?? 0;
+        } catch (error) {
+            process.stderr.write(`Application stop signal hook failed: ${String(error)}\n`);
+        }
 
         stopping = (async () => {
             let exitCode = process.exitCode || 0;
+
+            // A process that never finished setup served nothing to drain.
+            if (started && delay > 0) {
+                await new Promise<void>((resolve) => {
+                    const timer = setTimeout(resolve, delay);
+
+                    endDelay = () => {
+                        clearTimeout(timer);
+                        resolve();
+                    };
+                });
+
+                endDelay = undefined;
+            }
+
+            // Bound startup, teardown and any handles left open after teardown.
+            const deadline = setTimeout(() => {
+                process.stderr.write('Application shutdown timed out\n');
+                process.exit(1);
+            }, SHUTDOWN_TIMEOUT);
 
             try {
                 await setup;
@@ -54,6 +94,7 @@ export async function startApplication(app: Pick<IApplication, 'setup' | 'teardo
 
     try {
         await setup;
+        started = true;
     } catch (error) {
         await shutdown();
 
