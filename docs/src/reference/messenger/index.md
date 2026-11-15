@@ -40,7 +40,7 @@ Authenticated as the calling identity (e.g. a node's `client_credentials` token)
 | `POST` | `/messages` | Send `{ recipients: MessageParty[], data?, metadata? }`. Sender = the authenticated identity; recipients are any kind (`user` / `robot` / `client`). One stored row per recipient. Returns the created message ids. |
 | `GET`  | `/messages?limit=<n>&wait=<ms>` | Pull the caller's pending messages, oldest first. `wait` enables long-poll: park up to `wait` ms (capped at 30s) for a pending message before returning empty. |
 | `POST` | `/messages/ack` `{ ids }` | Acknowledge messages by id — the broker deletes them (delete-on-ack). |
-| `GET`  | `/messages/stream` | Server-Sent Events stream of payload-free `messagePending` wakeups for the caller (and one on connect). The client pulls via `GET /messages` on each event. |
+| `GET`  | `/messages/stream` | Server-Sent Events stream of payload-free `messagePending` wakeups for the caller (and one on connect), kept alive by comment lines. The client pulls via `GET /messages` on each event. See [SSE stream format](#sse-stream-format). |
 
 Messages carry a uniform TTL (24h). A pull never returns an expired message, and a background sweep reaps expired rows in bounded batches, so a backlog never becomes one long-running delete. Contract types live in `@privateaim/messenger-kit`; the Hapic client is `@privateaim/messenger-http-kit`.
 
@@ -53,6 +53,20 @@ When a message is sent, the broker publishes a payload-free wakeup. Across insta
 - **Long-poll** (`GET /messages?wait`) — the universal fallback when no stream is held; the parked request resolves on the wakeup.
 
 The payload is never sent over any wakeup channel — it carries only the recipient identity, and the recipient pulls the actual message(s) via REST. A recipient reconnecting a stream should pull once to catch up (the durable mailbox means nothing is lost across gaps).
+
+### SSE stream format
+
+```text
+event: messagePending
+data: {"recipient":{"type":"client","id":"<subject id>"}}
+
+: ping
+```
+
+- Every wakeup is a `messagePending` event whose `data` is the JSON `MessagePendingEvent` (`{ recipient }`). The stream sends no `id` or `retry` field, so there is nothing to replay with `Last-Event-ID`.
+- Every 15 seconds the server writes a `: ping` **comment** line as a keep-alive. SSE clients (including `EventSource`) ignore comments, so the heartbeat never reaches an application as an event. A failed write also tells the server that the client is gone.
+- The server never closes the stream on its own; a client reconnects after a network drop or server restart, then pulls once.
+- `@privateaim/messenger-http-kit` reads the stream with `client.message.subscribe()` ([usage](./messenger-http-kit.md#wakeup-subscription)).
 
 ## Environment Variables
 

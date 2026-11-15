@@ -48,10 +48,10 @@ describe('FakeClient', () => {
     it('should send messages and return the persisted ids', async () => {
         const client = createFakeClient({ handlers: { 'POST /messages': () => ({ data: ['m1', 'm2'] }) } });
 
-        const ids = await client.message.send({ recipients: ['r1'], data: { body: 'hi' } });
+        const ids = await client.message.send({ recipients: [{ type: 'client', id: 'r1' }], data: { body: 'hi' } });
 
         expect(ids).toEqual(['m1', 'm2']);
-        expect(client.requests[0].body).toMatchObject({ recipients: ['r1'] });
+        expect(client.requests[0].body).toMatchObject({ recipients: [{ type: 'client', id: 'r1' }] });
     });
 
     it('should acknowledge messages by id', async () => {
