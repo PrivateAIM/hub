@@ -42,21 +42,21 @@
         "@routup/prometheus": "^4.0.1",
         "@routup/rate-limit": "^4.0.2",
         "@routup/swagger-ui": "^4.0.2",
-        "hapic": "^3.0.2",
+        "hapic": "^3.1.0",
         "locter": "^4.1.2",
         "validup": "^2.0.1",
-        "vouchly": "^0.1.1"
+        "vouchly": "^0.1.2"
     },
     "devDependencies": {
         "@authup/server-test-kit": "^1.0.0-beta.75",
         "redis-extension": "^3.0.0",
-        "routup": "^6.1.1",
+        "routup": "^6.3.0",
         "typeorm-extension": "^4.3.0",
-        "vitest": "^5.0.5"
+        "vitest": "^5.1.0"
     },
     "peerDependencies": {
         "redis-extension": "^3.0.0",
-        "routup": "^6.1.1",
+        "routup": "^6.3.0",
         "typeorm-extension": "^4.3.0"
     },
     "scripts": {
