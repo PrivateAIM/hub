@@ -45,6 +45,30 @@ describe('FakeClient', () => {
         expect(client.requests[0].url).toContain('wait=10');
     });
 
+    it('should extend the client deadline by a long-poll wait', async () => {
+        // the body arrives after 120 ms, past the client's 50 ms deadline
+        const respondLate = () => {
+            let timer: ReturnType<typeof setTimeout> | undefined;
+
+            return new Response(new ReadableStream({
+                start(controller) {
+                    timer = setTimeout(() => {
+                        controller.enqueue(new TextEncoder().encode('{"messages":[]}'));
+                        controller.close();
+                    }, 120);
+                },
+                cancel() {
+                    clearTimeout(timer);
+                },
+            }), { headers: { 'content-type': 'application/json' } });
+        };
+
+        const client = createFakeClient({ timeout: 50, handlers: { 'GET /messages': respondLate } });
+
+        await expect(client.message.pull()).rejects.toThrow();
+        await expect(client.message.pull({ wait: 200 })).resolves.toEqual({ messages: [] });
+    });
+
     it('should send messages and return the persisted ids', async () => {
         const client = createFakeClient({ handlers: { 'POST /messages': () => ({ data: ['m1', 'm2'] }) } });
 

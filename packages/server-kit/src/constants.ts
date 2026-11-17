@@ -31,8 +31,9 @@ export const HTTPClientTimeout = {
      */
     HARBOR: 60_000,
     /**
-     * VictoriaLogs ingest and query.
+     * VictoriaLogs ingest and query. Shorter than `SERVICE`, so telemetry
+     * answers a VictoriaLogs timeout (504) before its caller gives up.
      */
-    VICTORIA_LOGS: 30_000,
+    VICTORIA_LOGS: 20_000,
 } as const;
 

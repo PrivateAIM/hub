@@ -18,7 +18,8 @@ import type {
 
 /**
  * Exchange an access token for a capability token (RFC 8693) as the acting
- * client. Every failure is a 502 `upstream_error`, a
+ * client. A request or body read past the deadline is a 504
+ * `upstream_timeout`; every other failure is a 502 `upstream_error`, a
  * refused subject token (`invalid_grant`) included: the caller's token was
  * authenticated before the exchange, so a refusal is a delegation problem,
  * and a 401 would sign the user out.
@@ -79,7 +80,17 @@ export async function exchangeAuthupToken(
         if (isObject(parsed)) {
             body = parsed;
         }
-    } catch {
+    } catch (e) {
+        // the deadline also covers reading the body
+        if (Error.isError(e) && e.name === 'TimeoutError') {
+            throw new HubError({
+                code: ErrorCode.UPSTREAM_TIMEOUT,
+                status: 504,
+                message: 'The token exchange request to Authup timed out.',
+                cause: e,
+            });
+        }
+
         // a non-JSON body is handled through the status below
     }
 

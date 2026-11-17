@@ -54,7 +54,15 @@ export class MessageAPI extends BaseAPI implements IMessageAPI {
      * Process them and `ack` their ids to delete them (delete-on-ack).
      */
     async pull(query?: MessagePullQuery): Promise<MessagePullResponse> {
-        const { data } = await this.client.get(`messages${buildPullQuery(query)}`);
+        // A long-poll parks up to `wait` ms on the server: extend the
+        // client's deadline by it, so an empty mailbox is not a timeout.
+        const { timeout } = this.client.toOptions();
+        const options = typeof query?.wait === 'number' && query.wait > 0 &&
+            typeof timeout === 'number' && timeout > 0 ?
+            { timeout: timeout + query.wait } :
+            undefined;
+
+        const { data } = await this.client.get(`messages${buildPullQuery(query)}`, options);
 
         return { messages: Array.isArray(data.messages) ? data.messages : [] };
     }
