@@ -22,12 +22,15 @@ SERVICE_FILE=/tmp/.hub-service
 
 if [ "${1}" = "healthcheck" ]; then
     HEALTH_PATH="${HEALTHCHECK_PATH:-/livez}"
+    HEALTH_PATH="/${HEALTH_PATH#/}"
+    HEALTH_PORT="${PORT:-3000}"
 
     if [ "$(cat "${SERVICE_FILE}" 2>/dev/null)" = "ui" ]; then
         HEALTH_PATH=/
+        HEALTH_PORT=3000
     fi
 
-    exec wget --proxy off --no-verbose --tries=1 --spider "http://127.0.0.1:3000${HEALTH_PATH}"
+    exec wget --proxy off --no-verbose --tries=1 --spider "http://127.0.0.1:${HEALTH_PORT}${HEALTH_PATH}"
 fi
 
 case "${1}" in
@@ -61,7 +64,8 @@ if [[ -z "${COMMAND}" ]]; then
     exit 1
 fi
 
-echo "${PACKAGE}" > "${SERVICE_FILE}"
+# Best effort: a read-only root filesystem must not stop the start.
+{ echo "${PACKAGE}" > "${SERVICE_FILE}"; } 2>/dev/null || true
 
 case "${PACKAGE}" in
     core)

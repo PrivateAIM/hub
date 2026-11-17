@@ -31,7 +31,7 @@ EXPOSE 3000
 
 # GET /livez (HEALTHCHECK_PATH=/readyz to take readiness instead); see
 # docs/src/guide/deployment/configuration.md#health-endpoints.
-HEALTHCHECK --interval=10s --timeout=5s --retries=5 \
+HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=120s \
     CMD /bin/sh ./entrypoint.sh healthcheck || exit 1
 
 ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]

@@ -13,7 +13,7 @@ These variables are shared across all services:
 | `REDIS_CONNECTION_STRING` | No | Redis connection URL (for pub/sub and caching) |
 | `AMQP_URL` | No | RabbitMQ connection URL |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
-| `SHUTDOWN_DELAY` | No | Seconds core, storage, telemetry and messenger keep serving after `SIGTERM`/`SIGINT` while `GET /readyz` already answers 503, so a load balancer stops routing to them first (default `0`). The worker ignores it. See [Graceful shutdown](#graceful-shutdown). |
+| `SHUTDOWN_DELAY` | No | Seconds core, storage, telemetry and messenger keep serving after `SIGTERM`/`SIGINT` while `GET /readyz` already answers 503, so a load balancer stops routing to them first (0 to 3600, default `0`). The worker ignores it. See [Graceful shutdown](#graceful-shutdown). |
 
 ## Graceful shutdown
 
