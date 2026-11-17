@@ -33,11 +33,11 @@
         "@privateaim/server-kit": "^0.19.2",
         "@rapiq/adapter-memory": "^2.4.0",
         "@rapiq/core": "^2.4.0",
-        "hapic": "^3.0.2",
+        "hapic": "^3.1.0",
         "testcontainers": "^12.2.1",
-        "typeorm": "^1.1.2",
+        "typeorm": "^1.1.3",
         "typeorm-extension": "^4.3.0",
-        "vitest": "^5.0.5"
+        "vitest": "^5.1.0"
     },
     "peerDependencies": {
         "@authup/access": "^1.0.0-beta.75",
@@ -47,8 +47,8 @@
         "@privateaim/server-kit": "^0.19.2",
         "@rapiq/adapter-memory": "^2.4.0",
         "@rapiq/core": "^2.4.0",
-        "hapic": "^3.0.2",
-        "typeorm": "^1.1.2",
+        "hapic": "^3.1.0",
+        "typeorm": "^1.1.3",
         "typeorm-extension": "^4.3.0"
     },
     "scripts": {
