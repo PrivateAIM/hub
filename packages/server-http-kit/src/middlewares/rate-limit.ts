@@ -13,6 +13,7 @@ import { rateLimit } from '@routup/rate-limit';
 import type { App, IAppEvent } from 'routup';
 import { defineCoreHandler, getRequestIP } from 'routup';
 import { useRequestEnv, useRequestIdentity } from '../request';
+import type { MiddlewareRateLimitOptions } from './types';
 
 const PERMISSION_NAMES = Object.values(PermissionName);
 
@@ -33,6 +34,20 @@ export const RATE_LIMIT_BUDGETS = {
     user: 60 * 100,
     client: 60 * 1000,
 } as const;
+
+/**
+ * Whether the address key names the client rather than a value the client
+ * chose. Unset or `true`, TRUST_PROXY trusts every hop, so the leftmost
+ * `X-Forwarded-For` entry is the key: blocking it would let anyone lock out
+ * any address, and rotating it would evade the block.
+ */
+export function isAddressKeyTrusted(options: boolean | MiddlewareRateLimitOptions | undefined): boolean {
+    if (typeof options !== 'object' || options === null) {
+        return false;
+    }
+
+    return typeof options.trustProxy !== 'undefined' && options.trustProxy !== true;
+}
 
 // A proxy may append the client's source port, which changes per connection.
 function stripPort(ip: string): string {

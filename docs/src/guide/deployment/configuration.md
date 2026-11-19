@@ -66,6 +66,9 @@ Every service rate-limits in two stages, per replica:
   minute that carry a credential and answer 401. An expired or revoked token
   and a request without a credential are not counted, so users behind one NAT
   address (a clinic network) are not locked out by ordinary token renewal.
+  This stage blocks the whole address, so it runs only once `TRUST_PROXY` is
+  set to something other than `true`: with every hop trusted, a client could
+  lock out any address by naming it in `X-Forwarded-For`.
 - **After authentication**, per identity (100 requests a second for a user,
   1000 for a client), and per client address for an anonymous request (20 a
   second). Hub's own service clients are not limited.

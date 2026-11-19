@@ -15,8 +15,11 @@ import { App, defineCoreHandler } from 'routup';
 import { toNodeHandler } from 'routup/node';
 import { describe, expect, it } from 'vitest';
 import { mountErrorMiddleware } from '../../../src/middlewares/error.ts';
+import { mountMiddlewares } from '../../../src/middlewares/module.ts';
+import type { MiddlewareMountOptions } from '../../../src/middlewares/types.ts';
 import {
     RATE_LIMIT_FAILED_AUTHENTICATION_MAX,
+    isAddressKeyTrusted,
     mountAuthenticationRateLimiterMiddleware,
     mountRateLimiterMiddleware,
 } from '../../../src/middlewares/rate-limit.ts';
@@ -233,5 +236,51 @@ describe('authentication rate limiter', () => {
                 server.close(resolve);
             });
         }
+    });
+});
+
+describe('failed-authentication stage gating', () => {
+    function createApp(rateLimit: MiddlewareMountOptions['rateLimit']) {
+        const app = new App();
+
+        mountMiddlewares(app, { rateLimit });
+        app.get('/fail', defineCoreHandler(() => {
+            throw new HubError({
+                code: 'invalid_token',
+                status: 401,
+                message: 'refused',
+            });
+        }));
+        app.get('/ok', defineCoreHandler(() => ({})));
+        mountErrorMiddleware(app);
+
+        return app;
+    }
+
+    async function lockOut(app: App) {
+        const headers = { authorization: 'Bearer forged', 'x-forwarded-for': '203.0.113.7' };
+
+        for (let i = 0; i < RATE_LIMIT_FAILED_AUTHENTICATION_MAX; i++) {
+            await app.fetch(new Request('http://hub.test/fail', { headers }));
+        }
+
+        return app.fetch(new Request('http://hub.test/ok', { headers: { ...headers, authorization: 'Bearer valid' } }));
+    }
+
+    it.each([
+        [true],
+        [{}],
+        [{ trustProxy: true }],
+    ])('does not block addresses a client can forge (%j)', async (rateLimit) => {
+        expect((await lockOut(createApp(rateLimit))).status).toBe(200);
+    });
+
+    it.each([
+        [{ trustProxy: false }],
+        [{ trustProxy: 1 }],
+        [{ trustProxy: ['10.0.0.0/8'] }],
+    ])('blocks once TRUST_PROXY is narrowed (%j)', async (rateLimit) => {
+        expect(isAddressKeyTrusted(rateLimit)).toBe(true);
+        expect((await lockOut(createApp(rateLimit))).status).toBe(429);
     });
 });
