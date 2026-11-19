@@ -6,6 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { Client as AuthupClient } from '@authup/core-http-kit';
 import { createAuthupUserTokenCreator } from '@privateaim/server-kit';
 import type { AuthupPermissionRow } from './types.ts';
 
@@ -88,28 +89,14 @@ export async function createRestrictedAccessToken(
         throw new Error('The AUTHUP_URL is not configured — cannot mint a restricted access token.');
     }
 
-    const adminToken = await createAdminAccessToken(baseURL);
-    const request = async <T>(method: string, path: string, body?: Record<string, any>): Promise<T> => {
-        const response = await fetch(buildAuthupURL(baseURL, path), {
-            method,
-            headers: {
-                'content-type': 'application/json',
-                authorization: `Bearer ${adminToken}`,
-            },
-            body: body ? JSON.stringify(body) : undefined,
-        });
+    const client = new AuthupClient({ baseURL });
 
-        if (!response.ok) {
-            throw new Error(`Authup ${method} ${path} failed (${response.status}): ${await response.text()}`);
-        }
-
-        return response.json();
-    };
+    client.setAuthorizationHeader({ type: 'Bearer', token: await createAdminAccessToken(baseURL) });
 
     const name = `restricted-${randomUUID().slice(0, 8)}`;
     const password = 'start123start';
 
-    const { data: user } = await request<{ data: { id: string } }>('POST', 'users', {
+    const { data: user } = await client.user.create({
         name,
         email: `${name}@example.com`,
         password,
@@ -117,17 +104,14 @@ export async function createRestrictedAccessToken(
     });
 
     for (const permissionName of permissionNames) {
-        const { data: permissions } = await request<{ data: AuthupPermissionRow[] }>(
-            'GET',
-            `permissions?filter[name]=${encodeURIComponent(permissionName)}`,
-        );
+        const { data: permissions } = await client.permission.getMany({ filters: { name: permissionName } });
         const permission = selectGlobalPermission(permissions);
 
         if (!permission) {
             throw new Error(`The global permission ${permissionName} is not provisioned — cannot grant it to ${name}.`);
         }
 
-        await request('POST', 'user-permissions', {
+        await client.userPermission.create({
             userId: user.id,
             permissionId: permission.id,
         });

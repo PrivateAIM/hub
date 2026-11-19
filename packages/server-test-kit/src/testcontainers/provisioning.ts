@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Client as AuthupClient } from '@authup/core-http-kit';
 import { createAdminAccessToken } from '../authup-token.ts';
 import type { AuthupIntrospectionResult, AuthupProvisioning, AuthupProvisioningOptions } from './types.ts';
 
@@ -91,23 +92,21 @@ export async function assertAuthupProvisioning(
     }
 
     const token = await createAdminAccessToken(baseURL);
+    const client = new AuthupClient({ baseURL });
 
-    const response = await fetch(new URL('token/introspect', baseURL), {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json',
-            authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ token }),
-    });
+    let body: AuthupIntrospectionResult;
 
-    if (!response.ok) {
+    try {
+        body = await client.token.introspect<AuthupIntrospectionResult>(
+            { token },
+            { authorizationHeader: { type: 'Bearer', token } },
+        );
+    } catch (e) {
         throw new Error(
-            `Authup token introspection failed (${response.status}) while verifying provisioning at ${baseURL}.`,
+            `Authup token introspection failed while verifying provisioning at ${baseURL}.`,
+            { cause: e },
         );
     }
-
-    const body: AuthupIntrospectionResult = await response.json();
 
     if (!body.active) {
         throw new Error(
