@@ -1,5 +1,55 @@
 # Changelog
 
+## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-11-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* @privateaim/core-http-kit and @privateaim/messenger-http-kit no longer export isClientError or isClientErrorWithStatusCode; import them from hapic.
+* @privateaim/core-http-kit and @privateaim/messenger-http-kit no longer export isClientError or isClientErrorWithStatusCode; import them from hapic.
+* core-http-kit, storage-kit and telemetry-kit no longer export BaseAPIContext; their API classes extend hapic's BaseAPI.
+* requires Authup 1.0.0-beta.75. The provisioned token exchange capability value has to list bucketFile; see the deployment configuration guide for the rollout order.
+* All workspaces and service deployments now require Node.js >=26.0.0.
+* Node.js >=24.0.0 is required. Import forwarded error helpers from @ebec/core, theme helpers from @authup/client-web-kit-theme, and permission evaluator test helpers from @authup/server-test-kit instead of the PrivateAIM barrels.
+
+### Features
+
+* adopt hapic and routup features, keep plugin error statuses, handle aborts ([#2033](https://github.com/PrivateAIM/hub/issues/2033)) ([d702cee](https://github.com/PrivateAIM/hub/commit/d702cee7250ef0aa80f4b9b495e3d38d1e94b8fa))
+* authup beta.75, camelCase capability types, per-row post reads ([#2023](https://github.com/PrivateAIM/hub/issues/2023)) ([9dabc2b](https://github.com/PrivateAIM/hub/commit/9dabc2b951b0617194b1b1cecfc9a57826947cb8))
+* authup beta.76, outbound timeouts, health probes and one-read post decisions ([#2026](https://github.com/PrivateAIM/hub/issues/2026)) ([3d27fe6](https://github.com/PrivateAIM/hub/commit/3d27fe670dd7c25423ded2c131220a5c64f54ac7))
+* trusted proxy hops, two-stage rate limiting, swagger-ui 5 ([#2034](https://github.com/PrivateAIM/hub/issues/2034)) ([cfeace3](https://github.com/PrivateAIM/hub/commit/cfeace3c55898195d1c3026d384c7bb666a7bf93))
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/* to 1.0.0-beta.74 ([e3e3b6f](https://github.com/PrivateAIM/hub/commit/e3e3b6fccb61f34960197835465f8a12f608163c))
+* **deps:** bump the minorandpatch group ([#2032](https://github.com/PrivateAIM/hub/issues/2032)) ([4d18c34](https://github.com/PrivateAIM/hub/commit/4d18c345d40bde4ba22081572fc1c6af6cd877ab))
+* **deps:** bump the minorandpatch group with 7 updates ([#2020](https://github.com/PrivateAIM/hub/issues/2020)) ([30a13e4](https://github.com/PrivateAIM/hub/commit/30a13e4ae41d408cab2333bc020a654d6eb9fd1a))
+* **deps:** bump the minorandpatch group with 9 updates ([#2000](https://github.com/PrivateAIM/hub/issues/2000)) ([f393377](https://github.com/PrivateAIM/hub/commit/f393377ef14004e4d015f480faaabfb465a45d8b))
+* harden node authority, build claims and service shutdown ([#1996](https://github.com/PrivateAIM/hub/issues/1996)) ([027d1a0](https://github.com/PrivateAIM/hub/commit/027d1a0b9c761a119d67a0641b5911d837672ade))
+* trust only the core client's capability tokens and fix three audit findings ([#2035](https://github.com/PrivateAIM/hub/issues/2035)) ([7c96e60](https://github.com/PrivateAIM/hub/commit/7c96e60ca83270311c2747a05f6d9ac50d396249))
+
+
+### Build System
+
+* require Node 26 across workspaces and CI ([3b1989e](https://github.com/PrivateAIM/hub/commit/3b1989eb5bdb44ca91c95092d0de38f8d3700153))
+* upgrade eslint config to v3 and require Node 24 ([652d794](https://github.com/PrivateAIM/hub/commit/652d794c872bf59177512a2a8ad10f26bb5545f1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/errors bumped from ^0.19.1 to ^0.20.0
+    * @privateaim/kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/server-db-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/server-http-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/server-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/server-telemetry-kit bumped from ^0.19.2 to ^0.20.0
+    * @privateaim/telemetry-kit bumped from ^0.19.2 to ^0.20.0
+  * devDependencies
+    * @privateaim/server-test-kit bumped from ^0.19.2 to ^0.20.0
+
 ## [0.19.2](https://github.com/PrivateAIM/hub/compare/v0.19.1...v0.19.2) (2026-10-27)
 
 
