@@ -37,11 +37,15 @@ export type MessageSubscribeOptions = APIRequestOptions;
 /**
  * NOT an entity API: the broker surface is a protocol, not a CRUD resource.
  * Nothing here carries the `{ data, meta }` envelope, and the pull query is
- * hand-rolled `URLSearchParams` rather than rapiq.
+ * plain `limit` / `wait` parameters rather than rapiq.
  */
 export interface IMessageAPI {
     send(data: SendMessageRequest, options?: APIRequestOptions) : Promise<string[]>;
-    pull(query?: MessagePullQuery) : Promise<MessagePullResponse>;
+    /**
+     * A long-poll (`wait` > 0) extends the deadline (`options.timeout`, else
+     * the client's `timeout`) by `wait`, so an empty mailbox is no timeout.
+     */
+    pull(query?: MessagePullQuery, options?: APIRequestOptions) : Promise<MessagePullResponse>;
     ack(data: MessageAckRequest, options?: APIRequestOptions) : Promise<void>;
     /**
      * Open the caller's wakeup stream and yield its typed events. The request

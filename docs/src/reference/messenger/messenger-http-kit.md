@@ -4,8 +4,8 @@ HTTP client for the Hub messenger's durable store-and-forward broker surface.
 
 Unlike the other Hub HTTP kits this is **not** an entity API: the messenger
 exposes a protocol (send / pull / acknowledge), so nothing here carries the
-`{ data, meta }` envelope and the pull query is built with `URLSearchParams`
-rather than rapiq.
+`{ data, meta }` envelope and the pull query is plain `limit` / `wait`
+parameters rather than rapiq (an unset one is not sent).
 
 ## Installation
 
@@ -34,9 +34,11 @@ await client.message.ack({ ids: messages.map((message) => message.id) });
 
 ### Cancellation & Per-Call Timeouts
 
-`send` and `ack` take one optional `APIRequestOptions` object (`{ signal?, timeout? }`) as their
-last parameter: `signal` aborts the call, `timeout` (milliseconds) overrides the client's for this
-call. `subscribe()` takes the same object as its only argument.
+`send`, `pull` and `ack` take one optional `APIRequestOptions` object (`{ signal?, timeout? }`)
+as their last parameter: `signal` aborts the call, `timeout` (milliseconds) overrides the client's
+for this call. A long-poll `pull({ wait })` extends that deadline (else the client's `timeout`) by
+`wait`, so an empty mailbox is not a timeout. `subscribe()` takes the same object as its only
+argument.
 
 ### Wakeup subscription
 

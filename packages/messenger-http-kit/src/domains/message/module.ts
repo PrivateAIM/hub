@@ -18,26 +18,6 @@ import { buildRequestConfig } from '../utils';
 import { toMessageStreamEvent } from './helpers';
 import type { IMessageAPI, MessageStreamEvent, MessageSubscribeOptions } from './types';
 
-function buildPullQuery(query?: MessagePullQuery): string {
-    if (!query) {
-        return '';
-    }
-
-    const params = new URLSearchParams();
-
-    if (typeof query.limit !== 'undefined') {
-        params.set('limit', `${query.limit}`);
-    }
-
-    if (typeof query.wait !== 'undefined') {
-        params.set('wait', `${query.wait}`);
-    }
-
-    const serialized = params.toString();
-
-    return serialized.length > 0 ? `?${serialized}` : '';
-}
-
 export class MessageAPI extends BaseAPI implements IMessageAPI {
     /**
      * Send a message to one or more recipients. The sender is the authenticated
@@ -55,16 +35,30 @@ export class MessageAPI extends BaseAPI implements IMessageAPI {
      * Pull the calling identity's pending (un-acked) messages, oldest first.
      * Process them and `ack` their ids to delete them (delete-on-ack).
      */
-    async pull(query?: MessagePullQuery): Promise<MessagePullResponse> {
-        // A long-poll parks up to `wait` ms on the server: extend the
-        // client's deadline by it, so an empty mailbox is not a timeout.
-        const { timeout } = this.client.toOptions();
-        const options = typeof query?.wait === 'number' && query.wait > 0 &&
-            typeof timeout === 'number' && timeout > 0 ?
-            { timeout: timeout + query.wait } :
-            undefined;
+    async pull(query?: MessagePullQuery, options?: APIRequestOptions): Promise<MessagePullResponse> {
+        const config = buildRequestConfig(options) ?? {};
 
-        const { data } = await this.client.get(`messages${buildPullQuery(query)}`, options);
+        // A long-poll parks up to `wait` ms on the server: extend the
+        // deadline (the call's own, else the client's) by it, so an empty
+        // mailbox is not a timeout.
+        const timeout = config.timeout ?? this.client.defaults.timeout;
+
+        if (
+            query &&
+            typeof query.wait === 'number' && query.wait > 0 &&
+            typeof timeout === 'number' && timeout > 0
+        ) {
+            config.timeout = timeout + query.wait;
+        }
+
+        // hapic serializes `query` and drops an undefined `limit` / `wait`.
+        const { data } = await this.client.get('messages', {
+            ...config,
+            query: {
+                limit: query?.limit,
+                wait: query?.wait,
+            },
+        });
 
         return { messages: Array.isArray(data.messages) ? data.messages : [] };
     }

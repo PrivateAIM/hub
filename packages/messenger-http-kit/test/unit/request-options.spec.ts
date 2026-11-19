@@ -24,6 +24,7 @@ const ID = '00000000-0000-4000-8000-000000000000';
 const CASES : Case[] = [
     ['send', (client, o) => client.message.send({ recipients: [], data: {} }, o)],
     ['ack', (client, o) => client.message.ack({ ids: [ID] }, o)],
+    ['pull', (client, o) => client.message.pull(undefined, o)],
 ];
 
 function createStalledTransport() : MemoryTransport {
@@ -108,5 +109,35 @@ describe('per-call request options', () => {
 
         expect(client.requests[0].options).toEqual({ signal: controller.signal, timeout: 1000 });
         expect(client.requests[1].options).toEqual({});
+    });
+
+    it('should extend the per-call timeout of a pull by its wait', async () => {
+        const client = createFakeClient({ timeout: 50, handlers: { 'GET /messages': () => ({ messages: [] }) } });
+
+        const controller = new AbortController();
+
+        await client.message.pull({ wait: 200 });
+        await client.message.pull({ wait: 200 }, { signal: controller.signal, timeout: 100 });
+        await client.message.pull(undefined, { timeout: 100 });
+
+        expect(client.requests.map((request) => request.options)).toEqual([
+            { timeout: 250 },
+            { signal: controller.signal, timeout: 300 },
+            { timeout: 100 },
+        ]);
+    });
+
+    it('should send only the pull parameters that are set', async () => {
+        const client = createFakeClient({ handlers: { 'GET /messages': () => ({ messages: [] }) } });
+
+        await client.message.pull();
+        await client.message.pull({ limit: 5 });
+        await client.message.pull({ limit: 5, wait: 0 });
+
+        expect(client.requests.map((request) => request.url)).toEqual([
+            'http://fake.test/messages',
+            'http://fake.test/messages?limit=5',
+            'http://fake.test/messages?limit=5&wait=0',
+        ]);
     });
 });
