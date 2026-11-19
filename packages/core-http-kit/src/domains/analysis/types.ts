@@ -5,15 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RequestBaseOptions } from 'hapic';
 import type {
     Analysis,
     AnalysisCommand,
     AnalysisStorageToken,
     AnalysisStorageTokenCreatePayload,
 } from '@privateaim/core-kit';
-import type { EntityQueryInput } from '../../utils';
-import type { EntityRecordResponse, IEntityAPI } from '../types';
+import type { APIRequestOptions, EntityRecordResponse, IEntityAPI } from '../types';
 
 export type AnalysisCreatePayload =    & Pick<Analysis, 'projectId'> &
     Partial<Pick<Analysis, 'name' | 'displayName' | 'description' | 'masterImageId' | 'registryId' | 'imageCommandArguments'>>;
@@ -22,24 +20,13 @@ export type AnalysisUpdatePayload = Partial<AnalysisCreatePayload>;
 
 export interface IAnalysisAPI extends IEntityAPI<Analysis, AnalysisCreatePayload, AnalysisUpdatePayload> {
     getResultDownloadPath(id: Analysis['id']) : string;
-    getResultDownloadURL(id: Analysis['id']) : string;
     getFilesDownloadPath(id: Analysis['id']) : string;
-    getFileDownloadURL(id: Analysis['id']) : string;
-
-    /**
-     * Unique in this package: a third `requestConfig` argument, used to pass a
-     * per-call authorization header from the worker.
-     */
-    getOne(
-        id: Analysis['id'],
-        options?: EntityQueryInput<Analysis>,
-        requestConfig?: RequestBaseOptions,
-    ) : Promise<EntityRecordResponse<Analysis>>;
 
     runCommand(
         id: Analysis['id'],
         command: `${AnalysisCommand}`,
         data?: Record<string, any>,
+        options?: APIRequestOptions,
     ) : Promise<EntityRecordResponse<Analysis>>;
 
     /**
@@ -49,14 +36,17 @@ export interface IAnalysisAPI extends IEntityAPI<Analysis, AnalysisCreatePayload
     createStorageToken(
         id: Analysis['id'],
         data: AnalysisStorageTokenCreatePayload,
+        options?: APIRequestOptions,
     ) : Promise<AnalysisStorageToken>;
 
     /**
      * `responseType: 'stream'` hands back the raw response body. Declared as
      * `ReadableStream` to match the same operation in `@privateaim/storage-kit`
      * (`IBucketAPI.stream` / `IBucketFileAPI.stream`) — the established
-     * convention for a stream verb in this monorepo.
+     * convention for a stream verb in this monorepo. The call sends
+     * `timeout: 0` unless `options.timeout` is set: the deadline would keep
+     * running while the caller reads the body.
      */
-    streamFiles(id: Analysis['id']) : Promise<ReadableStream<any>>;
-    downloadResult(id: Analysis['id']) : Promise<ReadableStream<any>>;
+    streamFiles(id: Analysis['id'], options?: APIRequestOptions) : Promise<ReadableStream<any>>;
+    downloadResult(id: Analysis['id'], options?: APIRequestOptions) : Promise<ReadableStream<any>>;
 }

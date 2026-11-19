@@ -9,18 +9,32 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
+import { buildRequestConfig } from '../utils';
 import type { IAnalysisNodeEventAPI } from './types';
 
 export class AnalysisNodeEventAPI extends BaseAPI implements IAnalysisNodeEventAPI {
-    async getMany(options?: EntityQueryInput<AnalysisNodeEvent>): Promise<EntityCollectionResponse<AnalysisNodeEvent>> {
-        const { data: response } = await this.client.get(`analysis-node-events${buildQueryString(options)}`);
+    async getMany(
+        record?: EntityQueryInput<AnalysisNodeEvent>,
+        options?: APIRequestOptions,
+    ): Promise<EntityCollectionResponse<AnalysisNodeEvent>> {
+        const { data: response } = await this.client.get(
+            `analysis-node-events${buildQueryString(record)}`,
+            buildRequestConfig(options),
+        );
 
         return response;
     }
 
-    async getOne(id: AnalysisNodeEvent['id']): Promise<EntityRecordResponse<AnalysisNodeEvent>> {
-        const { data: response } = await this.client.get(`analysis-node-events/${id}`);
+    async getOne(
+        id: AnalysisNodeEvent['id'],
+        record?: EntityQueryInput<AnalysisNodeEvent>,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<AnalysisNodeEvent>> {
+        const { data: response } = await this.client.get(
+            `analysis-node-events/${id}${buildQueryString(record)}`,
+            buildRequestConfig(options),
+        );
 
         return response;
     }

@@ -8,6 +8,7 @@
 import { OAuth2TokenGrant, OAuth2TokenTypeIdentifier } from '@authup/specs';
 import { ErrorCode, HubError } from '@privateaim/errors';
 import { isObject } from '@privateaim/kit';
+import { Client, isClientErrorDueTimeout, isHttpResponseError } from 'hapic';
 import { HTTPClientTimeout } from '../constants';
 import type {
     AuthupTokenExchangeBody,
@@ -28,8 +29,6 @@ export async function exchangeAuthupToken(
     ctx: AuthupTokenExchangeContext,
     input: AuthupTokenExchangeInput,
 ): Promise<AuthupTokenExchangeResult> {
-    const base = ctx.baseURL.endsWith('/') ? ctx.baseURL : `${ctx.baseURL}/`;
-
     const form = new URLSearchParams({
         grant_type: OAuth2TokenGrant.TOKEN_EXCHANGE,
         subject_token: input.subjectToken,
@@ -45,22 +44,34 @@ export async function exchangeAuthupToken(
         form.set('expires_in', String(input.expiresIn));
     }
 
-    let response: Response;
+    // hapic bounds dispatch and body read alike and keeps a sub-path of the
+    // base URL (`https://host/auth` + `token`).
+    const client = new Client({ baseURL: ctx.baseURL, timeout: HTTPClientTimeout.AUTHUP });
+
+    let data: unknown;
 
     try {
-        response = await fetch(new URL('token', base), {
-            method: 'POST',
-            headers: { 'content-type': 'application/x-www-form-urlencoded' },
-            body: form,
-            signal: AbortSignal.timeout(HTTPClientTimeout.AUTHUP),
-        });
+        const response = await client.post('token', form);
+
+        data = response.data;
     } catch (e) {
-        if (Error.isError(e) && e.name === 'TimeoutError') {
+        if (isClientErrorDueTimeout(e)) {
             throw new HubError({
                 code: ErrorCode.UPSTREAM_TIMEOUT,
                 status: 504,
                 message: 'The token exchange request to Authup timed out.',
                 cause: e,
+            });
+        }
+
+        if (isHttpResponseError(e)) {
+            const body: AuthupTokenExchangeBody = isObject(e.response?.data) ? e.response.data : {};
+            const detail = [body.error, body.error_description].filter(Boolean).join(': ');
+
+            throw new HubError({
+                code: 'upstream_error',
+                status: 502,
+                message: detail || `The token exchange failed (${e.status}).`,
             });
         }
 
@@ -72,37 +83,7 @@ export async function exchangeAuthupToken(
         });
     }
 
-    let body: AuthupTokenExchangeBody = {};
-
-    try {
-        const parsed = await response.json();
-
-        if (isObject(parsed)) {
-            body = parsed;
-        }
-    } catch (e) {
-        // the deadline also covers reading the body
-        if (Error.isError(e) && e.name === 'TimeoutError') {
-            throw new HubError({
-                code: ErrorCode.UPSTREAM_TIMEOUT,
-                status: 504,
-                message: 'The token exchange request to Authup timed out.',
-                cause: e,
-            });
-        }
-
-        // a non-JSON body is handled through the status below
-    }
-
-    if (!response.ok) {
-        const detail = [body.error, body.error_description].filter(Boolean).join(': ');
-
-        throw new HubError({
-            code: 'upstream_error',
-            status: 502,
-            message: detail || `The token exchange failed (${response.status}).`,
-        });
-    }
+    const body: AuthupTokenExchangeBody = isObject(data) ? data : {};
 
     if (!body.access_token) {
         throw new HubError({

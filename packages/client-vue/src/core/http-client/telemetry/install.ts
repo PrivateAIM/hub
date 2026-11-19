@@ -17,7 +17,7 @@ export function installTelemetryHTTPClient(app: App, options: BaseHTTPClientInst
         return;
     }
 
-    const client = options.client ?? new Client({ baseURL: options.baseURL });
+    const client = options.client ?? new Client({ baseURL: options.baseURL, timeout: options.timeout });
 
     setupBaseHTTPClient(app, client);
 

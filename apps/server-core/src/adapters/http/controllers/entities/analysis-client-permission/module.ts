@@ -15,6 +15,7 @@ import {
     DGet,
     DPath,
     DPost,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import type { IAppEvent } from 'routup';
@@ -46,6 +47,7 @@ export class AnalysisClientPermissionController {
     }
 
     @DPost('/:id/client/permissions', [ForceLoggedInMiddleware])
+    @DStatus(201)
     async add(
         @DPath('id') id: string,
         @DBody() data: { permissionId: string },
@@ -54,12 +56,11 @@ export class AnalysisClientPermissionController {
         const actor = buildActorContext(event);
         const entity = await this.service.create(id, data, actor);
 
-        event.response.status = 201;
-
         return { data: entity, meta: {} };
     }
 
     @DDelete('/:id/client/permissions/:permissionId', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async drop(
         @DPath('id') id: string,
         @DPath('permissionId') permissionId: string,
@@ -67,8 +68,6 @@ export class AnalysisClientPermissionController {
     ): Promise<EntityRecordResponse<ClientPermission>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, permissionId, actor);
-
-        event.response.status = 202;
 
         return { data: entity, meta: {} };
     }

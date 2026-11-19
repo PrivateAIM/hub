@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Readable } from 'node:stream';
+import { Readable, pipeline } from 'node:stream';
 import { createGzip } from 'node:zlib';
 import type {
     BucketFile,
@@ -22,6 +22,8 @@ import {
     DDelete,
     DGet,
     DPath,
+    DProduces,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -74,10 +76,11 @@ export class BucketFileController {
     }
 
     @DGet('/:id/stream', [ForceIdentityOrStreamCapabilityMiddleware])
+    @DProduces('application/octet-stream')
     async stream(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<Response> {
         // The URL may carry a capability token (`?dt=`): never pass it on.
         event.response.headers.set('referrer-policy', 'no-referrer');
 
@@ -108,12 +111,17 @@ export class BucketFileController {
         setResponseHeaderAttachment(event, entity.name || entity.hash);
         setResponseHeaderContentType(event, 'application/octet-stream', true);
 
+        // The body depends on Accept-Encoding, so a cache must key on it.
+        event.response.headers.append('vary', 'accept-encoding');
+
         const gzipSupported = getRequestAcceptableEncoding(event, 'gzip');
 
         if (gzipSupported) {
             event.response.headers.set('content-encoding', 'gzip');
 
-            const gzipped = nodeStream.pipe(createGzip());
+            // pipeline, not pipe: a client that aborts the download destroys
+            // the gzip stream, and that has to release the object stream too.
+            const gzipped = pipeline(nodeStream, createGzip(), () => {});
 
             return sendStream(event, Readable.toWeb(gzipped) as ReadableStream);
         }
@@ -140,13 +148,12 @@ export class BucketFileController {
     }
 
     @DDelete('/:id', [ForceIdentityOrCapabilityMiddleware])
+    @DStatus(202)
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<BucketFile>> {
         const entity = await this.service.delete(id, useStorageRequester(event));
-
-        event.response.status = 202;
 
         return { data: entity, meta: {} };
     }

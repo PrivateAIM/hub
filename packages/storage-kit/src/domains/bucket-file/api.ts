@@ -8,37 +8,56 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
+import { buildRequestConfig } from '../utils';
 import type { BucketFile, IBucketFileAPI } from './types';
 import { StorageBaseAPI } from '../base';
 
 export class BucketFileAPI extends StorageBaseAPI implements IBucketFileAPI {
-    async getMany(record?: EntityQueryInput<BucketFile>): Promise<EntityCollectionResponse<BucketFile>> {
-        const response = await this.client.get(`bucket-files${buildQueryString(record)}`);
+    async getMany(
+        record?: EntityQueryInput<BucketFile>,
+        options?: APIRequestOptions,
+    ): Promise<EntityCollectionResponse<BucketFile>> {
+        const response = await this.client.get(`bucket-files${buildQueryString(record)}`, buildRequestConfig(options));
 
         return response.data;
     }
 
-    async getOne(id: BucketFile['id'], requestRecord?: EntityQueryInput<BucketFile>): Promise<EntityRecordResponse<BucketFile>> {
-        const response = await this.client.get(`bucket-files/${id}${buildQueryString(requestRecord)}`);
+    async getOne(
+        id: BucketFile['id'],
+        record?: EntityQueryInput<BucketFile>,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<BucketFile>> {
+        const response = await this.client.get(
+            `bucket-files/${id}${buildQueryString(record)}`,
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }
 
-    async create(data: Record<string, any>): Promise<EntityRecordResponse<BucketFile>> {
-        const response = await this.client.post('bucket-files', nullifyEmptyObjectProperties(data));
+    async create(data: Record<string, any>, options?: APIRequestOptions): Promise<EntityRecordResponse<BucketFile>> {
+        const response = await this.client.post('bucket-files', nullifyEmptyObjectProperties(data), buildRequestConfig(options));
 
         return response.data;
     }
 
-    async delete(id: BucketFile['id']): Promise<EntityRecordResponse<BucketFile>> {
-        const response = await this.client.delete(`bucket-files/${id}`);
+    async delete(id: BucketFile['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<BucketFile>> {
+        const response = await this.client.delete(`bucket-files/${id}`, buildRequestConfig(options));
 
         return response.data;
     }
 
-    async update(id: BucketFile['id'], data: Record<string, any>): Promise<EntityRecordResponse<BucketFile>> {
-        const response = await this.client.post(`bucket-files/${id}`, nullifyEmptyObjectProperties(data));
+    async update(
+        id: BucketFile['id'],
+        data: Record<string, any>,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<BucketFile>> {
+        const response = await this.client.post(
+            `bucket-files/${id}`,
+            nullifyEmptyObjectProperties(data),
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }
@@ -51,12 +70,13 @@ export class BucketFileAPI extends StorageBaseAPI implements IBucketFileAPI {
         return this.resolveURL(this.getStreamPath(id));
     }
 
-    async stream(id: BucketFile['id']) : Promise<ReadableStream<any>> {
+    async stream(id: BucketFile['id'], options?: APIRequestOptions) : Promise<ReadableStream<any>> {
         const response = await this.client.request({
             url: this.getStreamPath(id),
             responseType: 'stream',
             // the timer would keep running while the body is read
             timeout: 0,
+            ...buildRequestConfig(options),
         });
 
         if (typeof response.data === 'undefined') {

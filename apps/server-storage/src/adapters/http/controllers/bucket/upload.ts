@@ -7,6 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import type { ReadableStream } from 'node:stream/web';
 import {
     BucketFileCommand,
@@ -48,6 +49,12 @@ export async function uploadRequestFilesToBucket(
         const entries : Promise<BucketFileCreationFinishedEventPayload>[] = [];
 
         instance.on('file', (_, file, info) => {
+            // An abort destroys the file stream with an error, possibly before
+            // the create handler pipes it (it awaits the data source first).
+            // Without a listener that error is uncaught; the handler still
+            // sees it, as its pipeline rejects on an errored stream.
+            file.on('error', () => {});
+
             if (typeof info.filename === 'undefined') {
                 file.resume();
 
@@ -114,6 +121,16 @@ export async function uploadRequestFilesToBucket(
                 .catch((e) => reject(e));
         });
 
-        Readable.fromWeb(event.request.body as ReadableStream).pipe(instance);
+        // pipeline, not pipe: when the client aborts the upload, the request
+        // stream errors, busboy is destroyed with it and fails the open file
+        // stream, so neither this promise nor a storage write hangs.
+        pipeline(Readable.fromWeb(event.request.body as ReadableStream), instance)
+            .catch(async (e) => {
+                // 'finish' never comes: settle the file writes still open
+                // before failing the request.
+                await Promise.allSettled(entries);
+
+                reject(e);
+            });
     });
 }

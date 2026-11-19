@@ -24,12 +24,6 @@ const id = createNanoID();
 import { DomainEventName } from '@privateaim/kit';
 ```
 
-### Error Handling
-
-```typescript
-import { isClientError } from '@privateaim/kit';
-```
-
 ### Validation
 
 `TypedContainer` is validup's `Container` with the `mount()` key escape hatch

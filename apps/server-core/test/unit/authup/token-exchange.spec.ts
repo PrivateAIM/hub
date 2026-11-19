@@ -91,4 +91,54 @@ describe('exchangeAuthupToken', () => {
             });
         }
     });
+
+    it('posts a form to the token endpoint below a base path and answers its refusal 502', async () => {
+        const seen: {
+            url?: string, 
+            contentType?: string, 
+            body: string 
+        } = { body: '' };
+        const server = createServer((req, res) => {
+            seen.url = req.url;
+            seen.contentType = req.headers['content-type'];
+            req.on('data', (chunk) => {
+                seen.body += chunk;
+            });
+            req.on('end', () => {
+                res.statusCode = 400;
+                res.setHeader('content-type', 'application/json');
+                res.end(JSON.stringify({ error: 'invalid_grant', error_description: 'subject token refused' }));
+            });
+        });
+
+        await new Promise<void>((resolve) => {
+            server.listen(0, '127.0.0.1', resolve);
+        });
+
+        try {
+            const { port } = server.address() as AddressInfo;
+
+            await expect(exchangeAuthupToken({
+                ...context(),
+                baseURL: `http://127.0.0.1:${port}/auth`,
+            }, {
+                subjectToken: 'x',
+                audience: 'storage',
+                cap: ['bucket:b1:read'],
+                expiresIn: 30,
+            })).rejects.toMatchObject({
+                status: 502,
+                code: 'upstream_error',
+                message: 'invalid_grant: subject token refused',
+            });
+
+            expect(seen.url).toEqual('/auth/token');
+            expect(seen.contentType).toContain('application/x-www-form-urlencoded');
+            expect(new URLSearchParams(seen.body).get('expires_in')).toEqual('30');
+        } finally {
+            await new Promise((resolve) => {
+                server.close(resolve);
+            });
+        }
+    });
 });

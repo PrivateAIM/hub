@@ -8,22 +8,23 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { ILogAPI, Log, LogInput } from './types';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
+import { buildRequestConfig } from '../utils';
 import { BaseAPI } from 'hapic';
 
 export class LogAPI extends BaseAPI implements ILogAPI {
-    async getMany(options?: EntityQueryInput<Log>): Promise<EntityCollectionResponse<Log>> {
-        const { data: response } = await this.client.get(`logs${buildQueryString(options)}`);
+    async getMany(record?: EntityQueryInput<Log>, options?: APIRequestOptions): Promise<EntityCollectionResponse<Log>> {
+        const { data: response } = await this.client.get(`logs${buildQueryString(record)}`, buildRequestConfig(options));
 
         return response;
     }
 
-    async deleteMany(options?: EntityQueryInput<Log>): Promise<void> {
-        await this.client.delete(`logs${buildQueryString(options)}`);
+    async deleteMany(record?: EntityQueryInput<Log>, options?: APIRequestOptions): Promise<void> {
+        await this.client.delete(`logs${buildQueryString(record)}`, buildRequestConfig(options));
     }
 
-    async create(data: LogInput): Promise<EntityRecordResponse<Log>> {
-        const { data: response } = await this.client.post('logs', data);
+    async create(data: LogInput, options?: APIRequestOptions): Promise<EntityRecordResponse<Log>> {
+        const { data: response } = await this.client.post('logs', data, buildRequestConfig(options));
 
         return response;
     }

@@ -7,7 +7,7 @@
 
 import type { Client } from '@authup/core-kit';
 import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
-import type { EntityRecordResponse, IEntityAPI } from '../types';
+import type { APIRequestOptions, EntityRecordResponse, IEntityAPI } from '../types';
 
 export type NodeCreatePayload =    & Pick<Node, 'name'> &
     Partial<Pick<Node, 'type' | 'hidden' | 'publicKey' | 'externalName' | 'registryId' | 'clientId' | 'realmId'>>;
@@ -31,9 +31,18 @@ export type NodeRegistryCredentials =    & Pick<Registry, 'host' | 'accountName'
     Pick<RegistryProject, 'externalName'>;
 
 export interface INodeAPI extends IEntityAPI<Node, NodeCreatePayload, NodeUpdatePayload> {
-    runCommand(id: Node['id'], task: string, data: Record<string, any>) : Promise<EntityRecordResponse<Node>>;
+    runCommand(
+        id: Node['id'],
+        task: string,
+        data: Record<string, any>,
+        options?: APIRequestOptions,
+    ) : Promise<EntityRecordResponse<Node>>;
 
-    getClientCredentials(id: Node['id']) : Promise<NodeClientCredentials>;
-    setClientCredentials(id: Node['id'], data?: NodeClientCredentialsUpdate) : Promise<NodeClientCredentials>;
-    getRegistryCredentials(id: Node['id']) : Promise<NodeRegistryCredentials>;
+    getClientCredentials(id: Node['id'], options?: APIRequestOptions) : Promise<NodeClientCredentials>;
+    setClientCredentials(
+        id: Node['id'],
+        data?: NodeClientCredentialsUpdate,
+        options?: APIRequestOptions,
+    ) : Promise<NodeClientCredentials>;
+    getRegistryCredentials(id: Node['id'], options?: APIRequestOptions) : Promise<NodeRegistryCredentials>;
 }

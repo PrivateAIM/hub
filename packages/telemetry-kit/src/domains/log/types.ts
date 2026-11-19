@@ -6,7 +6,7 @@
  */
 
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import type { LogChannel, LogLevel } from './constants';
 
 /**
@@ -15,9 +15,9 @@ import type { LogChannel, LogLevel } from './constants';
  * is a query-keyed `deleteMany` resolving to `void`.
  */
 export interface ILogAPI {
-    getMany(options?: EntityQueryInput<Log>) : Promise<EntityCollectionResponse<Log>>;
-    deleteMany(options?: EntityQueryInput<Log>) : Promise<void>;
-    create(data: LogInput) : Promise<EntityRecordResponse<Log>>;
+    getMany(record?: EntityQueryInput<Log>, options?: APIRequestOptions) : Promise<EntityCollectionResponse<Log>>;
+    deleteMany(record?: EntityQueryInput<Log>, options?: APIRequestOptions) : Promise<void>;
+    create(data: LogInput, options?: APIRequestOptions) : Promise<EntityRecordResponse<Log>>;
 }
 
 // todo: update logger-transport on new top level log flags

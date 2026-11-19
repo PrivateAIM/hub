@@ -121,6 +121,21 @@ describe('core/entities/message/service', () => {
         expect(result.messages[0].data).toBe('delivered');
     });
 
+    it('should end the long-poll at once when the caller aborts', async () => {
+        const service = new MessageService({ repository: new FakeMessageRepository() });
+        const controller = new AbortController();
+
+        const start = Date.now();
+        const pullPromise = service.pull({ wait: 5000 }, actorFor(randomUUID()), { signal: controller.signal });
+
+        setTimeout(() => controller.abort(), 20);
+
+        const result = await pullPromise;
+
+        expect(result.messages).toHaveLength(0);
+        expect(Date.now() - start).toBeLessThan(1000);
+    });
+
     it('should long-poll and return empty after the wait budget with no message', async () => {
         const service = new MessageService({ repository: new FakeMessageRepository() });
 

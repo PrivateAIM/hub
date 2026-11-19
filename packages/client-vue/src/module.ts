@@ -17,11 +17,23 @@ import {
 import type { Options } from './types';
 
 export function install(app: App, options: Options): void {
-    installCoreHTTPClient(app, { baseURL: options.coreURL, client: options.coreHTTPClient });
+    installCoreHTTPClient(app, {
+        baseURL: options.coreURL,
+        client: options.coreHTTPClient,
+        timeout: options.httpTimeout,
+    });
 
-    installStorageHTTPClient(app, { baseURL: options.storageURL, client: options.storageHTTPClient });
+    installStorageHTTPClient(app, {
+        baseURL: options.storageURL,
+        client: options.storageHTTPClient,
+        timeout: options.httpTimeout,
+    });
 
-    installTelemetryHTTPClient(app, { baseURL: options.telemetryURL, client: options.telemetryHTTPClient });
+    installTelemetryHTTPClient(app, {
+        baseURL: options.telemetryURL,
+        client: options.telemetryHTTPClient,
+        timeout: options.httpTimeout,
+    });
 
     // Opt-in: the socket manager needs a live authup store and opens a
     // websocket. `apps/client-ui` passes `realtime: true` to keep it on.

@@ -14,8 +14,7 @@ import {
     FAnalysisNodeInCard,
     FAnalysisNodes,
     FPagination,
-    FTitle, 
-    injectCoreHTTPClient,
+    FTitle,
 } from '@privateaim/client-vue';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
@@ -47,7 +46,6 @@ export default defineComponent({
         });
 
 
-        const api = injectCoreHTTPClient();
         const store = injectStore();
         const { realmId } = storeToRefs(store);
 
@@ -62,12 +60,6 @@ export default defineComponent({
             sorts: { updatedAt: 'DESC' },
         };
 
-        const download = (item: AnalysisNode) => {
-            if (typeof window !== 'undefined') {
-                window.open(api.analysis.getFileDownloadURL(item.analysisId), '_blank');
-            }
-        };
-
         const listNode = useTemplateRef<typeof FAnalysisNodes>('listNode');
 
         const handleUpdated = (item: AnalysisNode) => {
@@ -80,7 +72,6 @@ export default defineComponent({
             realmId,
             canManage,
             query,
-            download,
             handleUpdated,
             listNode,
         };
