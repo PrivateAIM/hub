@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Readable } from 'node:stream';
+import { Readable, pipeline } from 'node:stream';
 import { createGzip } from 'node:zlib';
 import type {
     BucketFile,
@@ -111,12 +111,17 @@ export class BucketFileController {
         setResponseHeaderAttachment(event, entity.name || entity.hash);
         setResponseHeaderContentType(event, 'application/octet-stream', true);
 
+        // The body depends on Accept-Encoding, so a cache must key on it.
+        event.response.headers.append('vary', 'accept-encoding');
+
         const gzipSupported = getRequestAcceptableEncoding(event, 'gzip');
 
         if (gzipSupported) {
             event.response.headers.set('content-encoding', 'gzip');
 
-            const gzipped = nodeStream.pipe(createGzip());
+            // pipeline, not pipe: a client that aborts the download destroys
+            // the gzip stream, and that has to release the object stream too.
+            const gzipped = pipeline(nodeStream, createGzip(), () => {});
 
             return sendStream(event, Readable.toWeb(gzipped) as ReadableStream);
         }
