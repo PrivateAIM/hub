@@ -271,6 +271,8 @@ describe('failed-authentication stage gating', () => {
         [true],
         [{}],
         [{ trustProxy: true }],
+        [{ trustProxy: ['0.0.0.0/0', '::/0'] }],
+        [{ trustProxy: ['10.0.0.0/8', '0.0.0.0/0'] }],
     ])('does not block addresses a client can forge (%j)', async (rateLimit) => {
         expect((await lockOut(createApp(rateLimit))).status).toBe(200);
     });

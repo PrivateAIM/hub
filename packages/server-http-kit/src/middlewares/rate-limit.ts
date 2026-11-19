@@ -37,16 +37,26 @@ export const RATE_LIMIT_BUDGETS = {
 
 /**
  * Whether the address key names the client rather than a value the client
- * chose. Unset or `true`, TRUST_PROXY trusts every hop, so the leftmost
- * `X-Forwarded-For` entry is the key: blocking it would let anyone lock out
- * any address, and rotating it would evade the block.
+ * chose. Unset, `true` or a list with a `/0` range, TRUST_PROXY trusts every
+ * hop, so the leftmost `X-Forwarded-For` entry is the key: blocking it would
+ * let anyone lock out any address, and rotating it would evade the block.
  */
 export function isAddressKeyTrusted(options: boolean | MiddlewareRateLimitOptions | undefined): boolean {
     if (typeof options !== 'object' || options === null) {
         return false;
     }
 
-    return typeof options.trustProxy !== 'undefined' && options.trustProxy !== true;
+    const { trustProxy } = options;
+
+    if (typeof trustProxy === 'undefined' || trustProxy === true) {
+        return false;
+    }
+
+    if (Array.isArray(trustProxy)) {
+        return trustProxy.every((entry) => !entry.trimEnd().endsWith('/0'));
+    }
+
+    return true;
 }
 
 // A proxy may append the client's source port, which changes per connection.
