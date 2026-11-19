@@ -348,3 +348,6 @@ steps: [deployment configuration](../../docs/src/guide/deployment/configuration.
   stream body (backpressure).
 - Verification is Authup's `TokenVerifier` with `capability: { audience: 'storage' }` (signature vs
   `/jwks`, `aud`, `kind`, `exp`); `peekTokenKind` of the unverified payload only picks the verifier.
+- **Storage accepts only the core client's exchanges** (`act.sub` = `CAPABILITY_CLIENT_ID`,
+  `TrustedActorTokenVerifier`): Authup lets any client with a `storage` exchange capability mint
+  tokens, and only server-core judges analysis access before minting. Audience alone is not enough.

@@ -846,8 +846,11 @@ steps below before rolling out the UI.
   EC).** Authup's `/jwks` publishes no symmetric (OCT) keys and refuses to sign a capability token
   with one, so a realm that only has an OCT key cannot issue them, and server-storage could not
   verify them.
-- **server-storage verifies tokens locally** against `AUTHUP_URL`'s `/jwks`; it needs no extra
-  credential.
+- **server-storage verifies tokens locally** against `AUTHUP_URL`'s `/jwks`, and accepts only tokens
+  the core client exchanged. `CAPABILITY_CLIENT_ID` names that client and defaults to storage's own
+  `CLIENT_ID`: when server-core and server-storage authenticate as different clients, set it to the
+  core client's id (or name in `REALM`; a name is looked up once and needs `client_read`). Without it,
+  every capability request answers 401.
 
 ### Rollout order
 

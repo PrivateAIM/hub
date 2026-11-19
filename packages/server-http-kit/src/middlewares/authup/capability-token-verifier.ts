@@ -16,6 +16,7 @@ import { HubError } from '@privateaim/errors';
 import { assertIntrospectableToken } from '@privateaim/server-kit';
 import { isClientError } from 'hapic';
 import type { AuthCapabilityTokenVerifierCreateContext } from './types.ts';
+import { TrustedActorTokenVerifier } from './trusted-actor-token-verifier.ts';
 import { UnconfiguredTokenVerifier } from './unconfigured-token-verifier.ts';
 
 /**
@@ -54,9 +55,11 @@ export function createAuthupCapabilityTokenVerifier(ctx: AuthCapabilityTokenVeri
         return new UnconfiguredTokenVerifier();
     }
 
-    return new CapabilityTokenVerifier({
+    const verifier = new CapabilityTokenVerifier({
         baseURL: ctx.baseURL,
         capability: { audience: ctx.audience },
         cache: ctx.cache,
     });
+
+    return new TrustedActorTokenVerifier(verifier, ctx.trustedClientId);
 }

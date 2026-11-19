@@ -19,6 +19,8 @@ import {
 } from 'vitest';
 import { createAuthupCapabilityTokenVerifier } from '../../../../src/middlewares/authup/capability-token-verifier.ts';
 
+const TRUSTED_CLIENT_ID = '00000000-0000-4000-8000-000000000009';
+
 function base64url(input: string): string {
     return Buffer.from(input, 'utf8').toString('base64url');
 }
@@ -67,7 +69,11 @@ describe('createAuthupCapabilityTokenVerifier', () => {
         await once(server, 'listening');
 
         const baseURL = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-        const verifier = createAuthupCapabilityTokenVerifier({ baseURL, audience: 'storage' });
+        const verifier = createAuthupCapabilityTokenVerifier({
+            baseURL, 
+            audience: 'storage', 
+            trustedClientId: async () => TRUSTED_CLIENT_ID, 
+        });
 
         const error = await verifier.verify(buildToken(baseURL)).then(() => undefined, (e: unknown) => e);
 
@@ -84,7 +90,11 @@ describe('createAuthupCapabilityTokenVerifier', () => {
         await once(server, 'listening');
 
         const baseURL = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-        const verifier = createAuthupCapabilityTokenVerifier({ baseURL, audience: 'storage' });
+        const verifier = createAuthupCapabilityTokenVerifier({
+            baseURL, 
+            audience: 'storage', 
+            trustedClientId: async () => TRUSTED_CLIENT_ID, 
+        });
 
         const error = await verifier.verify(buildToken(baseURL)).then(() => undefined, (e: unknown) => e);
 

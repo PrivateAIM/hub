@@ -35,6 +35,7 @@ const catalog: AuthorizationCatalog = { permissions: [], policies: {} };
 const SUBJECT_ID = '00000000-0000-4000-8000-000000000001';
 const REALM_ID = '00000000-0000-4000-8000-000000000002';
 const BUCKET_ID = '00000000-0000-4000-8000-000000000003';
+const TRUSTED_CLIENT_ID = '00000000-0000-4000-8000-000000000009';
 
 function base64url(input: string): string {
     return Buffer.from(input, 'utf8').toString('base64url');
@@ -413,13 +414,17 @@ describe('capability guards', () => {
 
 describe('createAuthupCapabilityTokenVerifier', () => {
     it('refuses every token without an Authup URL', () => {
-        const verifier = createAuthupCapabilityTokenVerifier({ audience: 'storage' });
+        const verifier = createAuthupCapabilityTokenVerifier({ audience: 'storage', trustedClientId: async () => TRUSTED_CLIENT_ID });
 
         expect(verifier).toBeInstanceOf(UnconfiguredTokenVerifier);
     });
 
     it('refuses a credential that is not a compact JWS before verifying it', async () => {
-        const verifier = createAuthupCapabilityTokenVerifier({ baseURL: 'http://authup.test', audience: 'storage' });
+        const verifier = createAuthupCapabilityTokenVerifier({
+            baseURL: 'http://authup.test', 
+            audience: 'storage', 
+            trustedClientId: async () => TRUSTED_CLIENT_ID, 
+        });
 
         await expect(verifier.verify('not-a-token')).rejects.toThrow(UnauthorizedError);
     });

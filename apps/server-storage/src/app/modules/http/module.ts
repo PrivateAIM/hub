@@ -30,6 +30,7 @@ import {
     mountMiddlewares,
 } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
+import { resolveAuthupClientId } from '../../../adapters/authup/trusted-client.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
 import { createControllers } from './controller.ts';
@@ -95,7 +96,7 @@ export class HTTPModule implements IModule {
             basic: true,
             cors: true,
             prometheus: !isTestEnvironment,
-            rateLimit: !isTestEnvironment,
+            rateLimit: isTestEnvironment ? false : { trustProxy: config.trustProxy },
             authorization: {
                 authupClient: authupResult.success ?
                     authupResult.data :
@@ -111,6 +112,12 @@ export class HTTPModule implements IModule {
                     verifier: createAuthupCapabilityTokenVerifier({
                         baseURL: config.authupURL,
                         audience: STORAGE_CAPABILITY_AUDIENCE,
+                        // Only server-core judges a request before minting.
+                        trustedClientId: () => resolveAuthupClientId(
+                            authupResult.success ? authupResult.data : undefined,
+                            config.capabilityClientId,
+                            config.realm,
+                        ),
                         cache: redisResult.success ?
                             new RedisTokenCache(redisResult.data) :
                             new MemoryTokenCache(),

@@ -23,6 +23,7 @@ export class ConfigValidator extends TypedContainer<Config> {
         this.mount('realm', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('clientId', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('clientSecret', { optional: true }, createValidator(zod.string().min(1)));
+        this.mount('capabilityClientId', { optional: true }, createValidator(zod.string().min(1)));
 
         this.mount('publicURL', { optional: true }, createValidator(zod.url()));
 
