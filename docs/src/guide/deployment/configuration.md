@@ -71,7 +71,9 @@ Every service rate-limits in two stages, per replica:
   lock out any address by naming it in `X-Forwarded-For`.
 - **After authentication**, per identity (100 requests a second for a user,
   1000 for a client), and per client address for an anonymous request (20 a
-  second). Hub's own service clients are not limited.
+  second). A storage capability token counts against its subject, the user or
+  client core minted it for, and shares that subject's budget. Hub's own
+  service clients are not limited.
 
 ## Health endpoints
 

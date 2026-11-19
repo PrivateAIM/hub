@@ -12,8 +12,8 @@ import { PermissionName } from '@privateaim/kit';
 import { rateLimit } from '@routup/rate-limit';
 import type { App, IAppEvent } from 'routup';
 import { defineCoreHandler, getRequestIP } from 'routup';
-import { useRequestEnv, useRequestIdentity } from '../request';
-import type { MiddlewareRateLimitOptions } from './types';
+import { useRequestCapability, useRequestEnv, useRequestIdentity } from '../request';
+import type { MiddlewareRateLimitOptions, RateLimitPrincipal } from './types';
 
 const PERMISSION_NAMES = Object.values(PermissionName);
 
@@ -183,30 +183,52 @@ export function mountAuthenticationRateLimiterMiddleware(app: App) {
 }
 
 /**
- * Second stage, AFTER authorization: an authenticated request counts against
- * its identity, so users sharing an address no longer share a budget; an
- * anonymous one against its address.
+ * Who a request counts against: its identity, else the subject of its
+ * capability token. A capability carries no identity, but core minted it
+ * for an authenticated subject, so it shares that subject's budget instead
+ * of the anonymous one of its address (a node behind one egress address).
+ */
+function resolvePrincipal(event: IAppEvent): RateLimitPrincipal | undefined {
+    const identity = useRequestIdentity(event);
+
+    if (identity) {
+        return { type: identity.type, id: identity.id };
+    }
+
+    const capability = useRequestCapability(event);
+
+    if (capability) {
+        return { type: capability.subject.type, id: capability.subject.id };
+    }
+
+    return undefined;
+}
+
+/**
+ * Second stage, AFTER authorization: an authenticated or capability request
+ * counts against its principal, so principals sharing an address no longer
+ * share a budget; an anonymous one against its address.
  */
 export function mountRateLimiterMiddleware(app: App) {
     app.use(rateLimit({
         keyGenerator: (event) => {
-            const identity = useRequestIdentity(event);
+            const principal = resolvePrincipal(event);
 
-            if (identity) {
-                return `${identity.type}:${identity.id}`;
+            if (principal) {
+                return `${principal.type}:${principal.id}`;
             }
 
             return buildAddressKey(event);
         },
         skip: isServiceClient,
         max(event: IAppEvent) {
-            const identity = useRequestIdentity(event);
+            const principal = resolvePrincipal(event);
 
-            if (!identity) {
+            if (!principal) {
                 return RATE_LIMIT_BUDGETS.anonymous;
             }
 
-            return identity.type === 'client' ? RATE_LIMIT_BUDGETS.client : RATE_LIMIT_BUDGETS.user;
+            return principal.type === 'client' ? RATE_LIMIT_BUDGETS.client : RATE_LIMIT_BUDGETS.user;
         },
         windowMs: WINDOW_MS,
     }));
