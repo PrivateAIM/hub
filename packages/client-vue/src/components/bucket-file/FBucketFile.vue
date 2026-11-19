@@ -87,7 +87,7 @@ export default defineComponent({
         };
 
         expose({
-            data: data.value,
+            data,
             delete: drop,
         });
 
