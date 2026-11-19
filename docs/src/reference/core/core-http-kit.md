@@ -246,6 +246,17 @@ Two changes are needed per upgrade:
 
 `getMany` call sites need **no** change — collections were already enveloped.
 
+### hapic error guards
+
+The kit no longer re-exports hapic's `isClientError` / `isClientErrorWithStatusCode` (nor does
+[`@privateaim/messenger-http-kit`](/reference/messenger/messenger-http-kit)). Import them from
+`hapic`, which every consumer of the client already depends on:
+
+```typescript
+- import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
++ import { isClientErrorWithStatusCode } from 'hapic';
+```
+
 ## Contract
 
 `Client` implements `ICoreClient`, and each sub-API implements its own

@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
+import { isClientErrorWithStatusCode } from 'hapic';
 import type { Analysis, AnalysisNode } from '@privateaim/core-kit';
 import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
