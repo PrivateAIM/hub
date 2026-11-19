@@ -20,9 +20,7 @@ export type AnalysisUpdatePayload = Partial<AnalysisCreatePayload>;
 
 export interface IAnalysisAPI extends IEntityAPI<Analysis, AnalysisCreatePayload, AnalysisUpdatePayload> {
     getResultDownloadPath(id: Analysis['id']) : string;
-    getResultDownloadURL(id: Analysis['id']) : string;
     getFilesDownloadPath(id: Analysis['id']) : string;
-    getFileDownloadURL(id: Analysis['id']) : string;
 
     runCommand(
         id: Analysis['id'],

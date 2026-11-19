@@ -59,7 +59,7 @@ fill `meta.schema`, see below.
 
 Some endpoints deliberately stay flat and are typed accordingly — credential payloads
 (`node.getClientCredentials`, `node.setClientCredentials`, `node.getRegistryCredentials`,
-the analysis client credentials), all stream methods, the URL builders, and the bulk log deletes
+the analysis client credentials), all stream methods, the path builders, and the bulk log deletes
 (`Promise<void>`). See [Response Shapes](/guide/development/api#response-shapes) for the full list.
 
 ### Query Capability Discovery
@@ -256,6 +256,13 @@ The kit no longer re-exports hapic's `isClientError` / `isClientErrorWithStatusC
 - import { isClientErrorWithStatusCode } from '@privateaim/core-http-kit';
 + import { isClientErrorWithStatusCode } from 'hapic';
 ```
+
+### Analysis download URLs
+
+`analysis.getResultDownloadURL` and `analysis.getFileDownloadURL` are removed: they dropped the
+last base-URL path segment when the base URL had no trailing slash, and a bare URL carries no
+credentials. Read the archive through `analysis.downloadResult` / `analysis.streamFiles`, or join
+`getResultDownloadPath` / `getFilesDownloadPath` onto the base URL yourself.
 
 ## Contract
 

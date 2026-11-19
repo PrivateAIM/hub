@@ -68,8 +68,6 @@ const IGNORED : Record<string, Record<string, string>> = {
     analysis: {
         getFilesDownloadPath: 'builds a path, sends nothing',
         getResultDownloadPath: 'builds a path, sends nothing',
-        getFileDownloadURL: 'builds a url, sends nothing',
-        getResultDownloadURL: 'builds a url, sends nothing',
     },
 };
 

@@ -19,27 +19,12 @@ import { buildRequestConfig } from '../utils';
 import type { AnalysisCreatePayload, AnalysisUpdatePayload, IAnalysisAPI } from './types';
 
 export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
-    // todo: we properly don't need this anymore
-    getResultDownloadPath(id: Analysis['id']) {
+    getResultDownloadPath(id: Analysis['id']): string {
         return `analyses/${id}/result/download`;
-    }
-
-    getResultDownloadURL(id: Analysis['id']) {
-        return new URL(
-            this.getResultDownloadPath(id),
-            this.client.getBaseURL(),
-        ).href;
     }
 
     getFilesDownloadPath(id: Analysis['id']): string {
         return `analyses/${id}/files/download`;
-    }
-
-    getFileDownloadURL(id: Analysis['id']) {
-        return new URL(
-            this.getFilesDownloadPath(id),
-            this.client.getBaseURL(),
-        ).href;
     }
 
     async getMany(
