@@ -47,7 +47,9 @@ export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions =
 
         const isServerError = status >= 500 && status < 600;
 
-        if (isServerError && options.logger) {
+        // A request the caller abandoned fails with its abort reason; nobody
+        // reads the answer, and it is not a server fault worth logging.
+        if (isServerError && options.logger && !event.signal.aborted) {
             options.logger.error({
                 message: source,
                 [LogFlag.CHANNEL]: LogChannel.HTTP,

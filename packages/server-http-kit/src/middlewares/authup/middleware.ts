@@ -39,7 +39,8 @@ async function applyIdentityToken(
     tokenVerifier: ITokenVerifier,
     authupClient: IClient,
 ) {
-    const data = await tokenVerifier.verify(token);
+    // A caller that went away stops the introspection round trip too.
+    const data = await tokenVerifier.verify(token, { signal: event.signal });
 
     // Defence in depth: the access-token verifier already refuses any kind
     // but an access token. A capability token must never become an identity.
@@ -58,7 +59,7 @@ async function applyCapabilityToken(
     verifier: ITokenVerifier,
     source: RequestCapabilitySource,
 ) {
-    const capability = buildRequestCapability(await verifier.verify(token), source);
+    const capability = buildRequestCapability(await verifier.verify(token, { signal: event.signal }), source);
 
     if (
         source === 'query' &&
