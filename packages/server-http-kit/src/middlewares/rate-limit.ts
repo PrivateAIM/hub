@@ -33,20 +33,6 @@ export const RATE_LIMIT_BUDGETS = {
     client: 60 * 1000,
 } as const;
 
-// IPv4 127.0.0.0/8, `::1` and the IPv4-mapped form a dual-stack socket
-// reports, anchored and octet-checked: a sloppy match is a way past the limiter.
-const LOOPBACK_IP = /^(?:::1|(?:::ffff:)?127(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3})$/i;
-
-/**
- * Both addresses must be loopback: the socket address cannot be forged by a
- * header, and the trusted address rules out a reverse proxy on the same host,
- * which reaches the service over loopback for every visitor.
- */
-function isLoopbackRequest(event: IAppEvent): boolean {
-    return LOOPBACK_IP.test(getRequestIP(event, { trustProxy: false }) || '') &&
-        LOOPBACK_IP.test(getRequestIP(event) || '');
-}
-
 // A proxy may append the client's source port, which changes per connection.
 function stripPort(ip: string): string {
     return ip.match(/^\[([^\]]+)\]:\d+$/)?.[1] ??
@@ -113,7 +99,6 @@ export function mountAuthenticationRateLimiterMiddleware(app: App) {
         keyGenerator: (event) => `pre:${buildAddressKey(event)}`,
         skipSuccessfulRequest: true,
         requestWasSuccessful: (event, response) => !isFailedAuthentication(event, response),
-        skip: isLoopbackRequest,
         windowMs: WINDOW_MS,
     }));
 }
@@ -134,9 +119,7 @@ export function mountRateLimiterMiddleware(app: App) {
 
             return buildAddressKey(event);
         },
-        async skip(event: IAppEvent) {
-            return isLoopbackRequest(event) || isServiceClient(event);
-        },
+        skip: isServiceClient,
         max(event: IAppEvent) {
             const identity = useRequestIdentity(event);
 

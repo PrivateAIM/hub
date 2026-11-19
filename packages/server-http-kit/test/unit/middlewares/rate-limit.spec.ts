@@ -5,11 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import type { PermissionCompileContext, PermissionCompileResult } from '@authup/access';
 import { PermissionName } from '@privateaim/kit';
 import { FakePermissionEvaluator } from '@authup/server-test-kit';
 import { HubError } from '@privateaim/errors';
 import { App, defineCoreHandler } from 'routup';
+import { toNodeHandler } from 'routup/node';
 import { describe, expect, it } from 'vitest';
 import { mountErrorMiddleware } from '../../../src/middlewares/error.ts';
 import {
@@ -181,5 +184,32 @@ describe('authentication rate limiter', () => {
         const app = createApp();
 
         expect(await remainingAfter(app, '/ok')).toBe(RATE_LIMIT_FAILED_AUTHENTICATION_MAX);
+    });
+
+    it('limits traffic a reverse proxy on the same host forwards over loopback', async () => {
+        // With TRUST_PROXY=false every request of a local proxy has a
+        // loopback socket and trusted address; it must still be counted.
+        const app = new App({ options: { trustProxy: false } });
+
+        mountAuthenticationRateLimiterMiddleware(app);
+        mountRateLimiterMiddleware(app);
+        app.get('/', defineCoreHandler(() => ({})));
+
+        const server = createServer(toNodeHandler(app));
+
+        await new Promise<void>((resolve) => {
+            server.listen(0, '127.0.0.1', resolve);
+        });
+
+        try {
+            const { port } = server.address() as AddressInfo;
+            const response = await fetch(`http://127.0.0.1:${port}/`);
+
+            expect(response.headers.get('ratelimit-limit')).toBe(String(60 * 20));
+        } finally {
+            await new Promise((resolve) => {
+                server.close(resolve);
+            });
+        }
     });
 });
