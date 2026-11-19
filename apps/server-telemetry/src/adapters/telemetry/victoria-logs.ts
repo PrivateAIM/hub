@@ -6,6 +6,7 @@
  */
 
 import type { IngestorData, QuerierQueryOptions, VictoriaLogsClient } from '@hapic/victorialogs';
+import { HTTPClientTimeout } from '@privateaim/server-kit';
 import type { Log, LogInput } from '@privateaim/telemetry-kit';
 import {
     LogChannel,
@@ -49,6 +50,8 @@ export class VictoriaLogsLogStore implements LogStore {
                 { ...input.labels || {} },
                 input.sort,
             ),
+            // VictoriaLogs stops the query once hub's client gives up on it.
+            timeout: `${HTTPClientTimeout.VICTORIA_LOGS / 1000}s`,
         };
 
         if (input.limit) {

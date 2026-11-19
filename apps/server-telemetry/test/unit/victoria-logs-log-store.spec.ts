@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { VictoriaLogsClient } from '@hapic/victorialogs';
+import { MemoryTransport } from 'hapic';
 import { describe, expect, it } from 'vitest';
 import { VictoriaLogsLogStore } from '../../src/adapters/telemetry/victoria-logs.ts';
 
@@ -123,6 +125,33 @@ describe('VictoriaLogsLogStore', () => {
 
         it('should default to DESC sort', () => {
             expect(store.testBuildQuery({})).toContain('sort by (_time DESC)');
+        });
+    });
+
+    describe('query', () => {
+        it('should bound the query on the server by the client timeout', async () => {
+            const urls: URL[] = [];
+            const client = new VictoriaLogsClient({
+                request: {
+                    baseURL: 'http://victoria-logs.test/',
+                    transport: new MemoryTransport({
+                        fetch: (request) => {
+                            urls.push(new URL(request.url));
+
+                            return {
+                                status: 200, 
+                                headers: { 'content-type': 'application/stream+json' }, 
+                                body: '', 
+                            };
+                        },
+                    }),
+                },
+            });
+
+            await new VictoriaLogsLogStore(client).query({ labels: {} });
+
+            expect(urls).toHaveLength(1);
+            expect(urls[0].searchParams.get('timeout')).toEqual('20s');
         });
     });
 });
