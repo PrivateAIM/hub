@@ -51,6 +51,12 @@ export type RequestCapability = {
 export type RequestEnv = {
     permissionEvaluator?: IPermissionEvaluator,
 
+    /**
+     * Code of the error the request failed with, set by the error middleware
+     * so the rate limiter can judge a 401 without reading the body.
+     */
+    errorCode?: string,
+
     identity?: RequestIdentity,
 
     scopes?: string[],

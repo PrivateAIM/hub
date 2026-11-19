@@ -12,7 +12,7 @@ import { mountBasicMiddleware } from './basic';
 import { mountCorsMiddleware } from './cors';
 import { mountDecoratorsMiddleware } from './decorators';
 import { mountPrometheusMiddleware } from './prometheus';
-import { mountRateLimiterMiddleware } from './rate-limit';
+import { mountAuthenticationRateLimiterMiddleware, mountRateLimiterMiddleware } from './rate-limit';
 import { mountSwaggerMiddleware } from './swagger';
 import type { MiddlewareMountOptions } from './types';
 
@@ -32,6 +32,11 @@ export function mountMiddlewares(
 
     if (options.basic) {
         mountBasicMiddleware(app);
+    }
+
+    // Before authorization: bounds failed authentications per address.
+    if (options.rateLimit) {
+        mountAuthenticationRateLimiterMiddleware(app);
     }
 
     if (options.authorization) {

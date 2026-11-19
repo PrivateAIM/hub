@@ -319,7 +319,11 @@ No `REALM_MASTER_NAME` check exists outside tests. Operator notes:
 - **Rate limiter** (`server-http-kit/src/middlewares/rate-limit.ts`): a **client** is not
   throttled only if every `PermissionName` has unbounded reach, checked one name per
   `compile()` call (one call with all names is any-of, so a single `any`-scoped
-  `node_read` would exempt it). Users are always throttled.
+  `node_read` would exempt it). Users are always throttled. A first stage before
+  authorization counts, after the response, only a 401 that carried a credential per
+  address (never a reservation at the start, so pending long-polls and uploads cannot
+  exhaust it); it reads the code the error middleware stores as `errorCode` (an expired
+  or inactive token is not counted), so that middleware must stay on the same app.
 
 ## Capability tokens (storage)
 

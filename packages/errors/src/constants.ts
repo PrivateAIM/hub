@@ -35,6 +35,11 @@ export enum ErrorCode {
     // request that ran out of time.
     UPSTREAM_TIMEOUT = 'upstream_timeout',
 
+    /**
+     * Too many requests (429), e.g. failed authentications from one address.
+     */
+    THROTTLED = 'throttled',
+
     // Storage Codes
     STORAGE_INSUFFICIENT = 'storage_insufficient',
 
