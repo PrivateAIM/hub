@@ -29,13 +29,12 @@ type ErrorMiddlewareOptions = {
 
 export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions = {}) {
     app.use(defineErrorHandler((error, event) => {
-        let next: HubError;
-
-        if (error.cause) {
-            next = sanitizeError(error.cause);
-        } else {
-            next = sanitizeError(error);
-        }
+        // routup wraps a thrown error as the cause of its AppError; an error
+        // routup or a plugin raised itself (invalid JSON 400, body limit 413,
+        // handler timeout 408) carries its options bag as cause instead, and
+        // must keep its own status.
+        const source = Error.isError(error.cause) ? error.cause : error;
+        const next: HubError = sanitizeError(source);
 
         const status = next.status ?? httpStatusFromCode(next.code);
 
@@ -49,17 +48,10 @@ export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions =
         const isServerError = status >= 500 && status < 600;
 
         if (isServerError && options.logger) {
-            if (error.cause && isObject(error.cause)) {
-                options.logger.error({
-                    message: error.cause as Error,
-                    [LogFlag.CHANNEL]: LogChannel.HTTP,
-                });
-            } else {
-                options.logger.error({
-                    message: error,
-                    [LogFlag.CHANNEL]: LogChannel.HTTP,
-                });
-            }
+            options.logger.error({
+                message: source,
+                [LogFlag.CHANNEL]: LogChannel.HTTP,
+            });
         } else if (isObject(next.data)) {
             const keys = Object.keys(next.data);
 

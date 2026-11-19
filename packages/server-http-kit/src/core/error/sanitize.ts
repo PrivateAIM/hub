@@ -159,6 +159,7 @@ export function sanitizeError(input: unknown): HubError {
     if (isHTTPError(input)) {
         return new HubError({
             code: codeFromHttpStatus(input.status),
+            status: input.status,
             message: input.message,
             stack: input.stack,
         });
