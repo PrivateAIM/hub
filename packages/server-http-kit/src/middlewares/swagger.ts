@@ -21,5 +21,9 @@ export function mountSwaggerMiddleware(app: App, options: MiddlewareSwaggerOptio
         document = readSync(path.join(process.cwd(), 'writable', 'swagger.json'));
     }
 
-    app.use('/docs', swaggerUI(document, { baseURL: options.baseURL }));
+    app.use('/docs', swaggerUI(document, {
+        baseURL: options.baseURL,
+        // nosniff, no-referrer and a frame DENY on every docs response.
+        securityHeaders: true,
+    }));
 }
