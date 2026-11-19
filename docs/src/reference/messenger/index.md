@@ -92,6 +92,7 @@ data: {"recipient":{"type":"client","id":"<subject id>"}}
 | `REALM` | `master` | Authup realm |
 | `CLIENT_ID` | `system` | Authup client ID |
 | `CLIENT_SECRET` | `start123` | Authup client secret |
+| `TRUST_PROXY` | `true` | Trusted `X-Forwarded-For` hops: `true`, `false`, a hop count or a comma list of IPs / CIDRs ([details](../../guide/deployment/configuration.md#client-addresses-and-rate-limiting)) |
 | `SHUTDOWN_DELAY` | `0` | Seconds to keep serving after a stop signal while `/readyz` answers 503 |
 
 ## Architecture

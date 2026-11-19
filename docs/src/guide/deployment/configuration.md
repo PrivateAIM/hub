@@ -13,6 +13,7 @@ These variables are shared across all services:
 | `REDIS_CONNECTION_STRING` | No | Redis connection URL (for pub/sub and caching) |
 | `AMQP_URL` | No | RabbitMQ connection URL |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
+| `TRUST_PROXY` | No | Which `X-Forwarded-For` hops core, storage, telemetry and messenger trust when they derive the client address (audit trail, rate-limit key): `true` (every hop, the default), `false` (the socket address), a hop count (`1` for one reverse proxy) or a comma list of IPs, CIDRs or `loopback` / `linklocal` / `uniquelocal`. See [Client addresses and rate limiting](#client-addresses-and-rate-limiting). |
 | `SHUTDOWN_DELAY` | No | Seconds core, storage, telemetry and messenger keep serving after `SIGTERM`/`SIGINT` while `GET /readyz` already answers 503, so a load balancer stops routing to them first (0 to 3600, default `0`). The worker ignores it. See [Graceful shutdown](#graceful-shutdown). |
 
 ## Graceful shutdown
@@ -50,6 +51,24 @@ under its own key prefix, and drop them by tag when a record changes.
 - Without Redis each process keeps an in-memory cache. Run more than one replica of a service only
   with Redis: otherwise a change written through one replica is answered stale by the others for up
   to 60 seconds.
+
+## Client addresses and rate limiting
+
+The audit trail (`requestIpAddress` of an event) and the rate limiter take
+the client address from `X-Forwarded-For`, trusting the hops `TRUST_PROXY`
+names. The default trusts every hop, so a client can name any address it
+likes: behind a reverse proxy set `TRUST_PROXY` to its hop count (`1` for one
+proxy), or to its addresses.
+
+Every service rate-limits in two stages, per replica:
+
+- **Before authentication**, per client address: at most 300 requests a
+  minute that carry a credential and answer 401. An expired or revoked token
+  and a request without a credential are not counted, so users behind one NAT
+  address (a clinic network) are not locked out by ordinary token renewal.
+- **After authentication**, per identity (100 requests a second for a user,
+  1000 for a client), and per client address for an anonymous request (20 a
+  second). Hub's own service clients are not limited.
 
 ## Health endpoints
 

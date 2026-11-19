@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EnvironmentName } from '@privateaim/server-kit';
+import { EnvironmentName, canonicalizeTrustProxy } from '@privateaim/server-kit';
 import { read, readInt } from 'envix';
 import { ConfigDefaults, EnvironmentInputKey } from './constants.ts';
+import type { TrustProxy } from '@privateaim/server-kit';
 import type { Config } from './types.ts';
 
 export function readConfigFromEnv(): Partial<Config> {
@@ -26,6 +27,7 @@ export function readConfigFromEnv(): Partial<Config> {
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),
 
         cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
+        trustProxy: readTrustProxy(EnvironmentInputKey.TRUST_PROXY),
         shutdownDelay: readInt(EnvironmentInputKey.SHUTDOWN_DELAY),
 
         victoriaLogsURL: read(EnvironmentInputKey.VICTORIA_LOGS_URL),
@@ -34,4 +36,14 @@ export function readConfigFromEnv(): Partial<Config> {
 
         eventRetentionDays: readInt(EnvironmentInputKey.EVENT_RETENTION_DAYS, ConfigDefaults.EVENT_RETENTION_DAYS),
     };
+}
+
+function readTrustProxy(key: string): TrustProxy | undefined {
+    const raw = read(key);
+
+    if (typeof raw !== 'string' || raw.trim().length === 0) {
+        return undefined;
+    }
+
+    return canonicalizeTrustProxy(raw);
 }

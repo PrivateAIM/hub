@@ -66,7 +66,9 @@ export class HTTPModule implements IModule {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
-        const app = new App();
+        // Every hop by default; TRUST_PROXY narrows whose X-Forwarded-For
+        // entries name the client (audit IP, rate-limit key).
+        const app = new App({ options: { trustProxy: config.trustProxy ?? true } });
 
         // Ahead of every middleware: probes are neither authenticated, rate
         // limited nor counted. Readiness waits on the database (1 s bound).

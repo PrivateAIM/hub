@@ -24,10 +24,9 @@ export function buildActorContext(event: IAppEvent): ActorContext {
     const metadata: Partial<EntityEventMetadata> = {
         requestPath: event.path,
         requestMethod: event.method || 'GET',
-        requestUserAgent: flattenString(
-            getRequestHeader(event, 'user-agent'),
-        ),
-        requestIpAddress: getRequestIP(event, { trustProxy: true }),
+        requestUserAgent: getRequestHeader(event, 'user-agent') ?? '',
+        // Follows the app's `trustProxy` (TRUST_PROXY).
+        requestIpAddress: getRequestIP(event),
     };
 
     if (identity) {
@@ -49,16 +48,4 @@ export function buildActorContext(event: IAppEvent): ActorContext {
             undefined,
         metadata,
     };
-}
-
-function flattenString(input: string | string[] | null | undefined): string {
-    if (typeof input === 'string') {
-        return input;
-    }
-
-    if (!input) {
-        return '';
-    }
-
-    return input.join(', ');
 }
