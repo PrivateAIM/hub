@@ -37,14 +37,19 @@ describe('mountBasicMiddleware', () => {
         await expect(response.json()).resolves.toEqual({ body: { name: 'node' } });
     });
 
-    it('answers a json body over the limit 413', async () => {
+    it('parses a json body larger than 10mb', async () => {
+        const value = 'x'.repeat(11 * 1024 * 1024);
         const response = await createApp().fetch(new Request('http://hub.test/', {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ value: 'x'.repeat(11 * 1024 * 1024) }),
+            body: JSON.stringify({ value }),
         }));
 
-        expect(response.status).toEqual(413);
+        expect(response.status).toEqual(200);
+
+        const payload = await response.json();
+
+        expect(payload.body.value).toHaveLength(value.length);
     });
 
     it('does not parse a form body', async () => {
