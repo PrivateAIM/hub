@@ -131,7 +131,7 @@ describe('rate limiter', () => {
 });
 
 describe('authentication rate limiter', () => {
-    function createApp(code = 'invalid_token') {
+    function createApp(code = 'invalid_token', gate?: Promise<void>) {
         const app = new App();
 
         mountAuthenticationRateLimiterMiddleware(app);
@@ -143,6 +143,11 @@ describe('authentication rate limiter', () => {
             });
         }));
         app.get('/ok', defineCoreHandler(() => ({})));
+        app.get('/slow', defineCoreHandler(async () => {
+            await gate;
+
+            return {};
+        }));
         mountErrorMiddleware(app);
 
         return app;
@@ -152,38 +157,55 @@ describe('authentication rate limiter', () => {
         return app.fetch(new Request(`http://hub.test${path}`, { headers: { 'x-forwarded-for': '203.0.113.7', ...headers } }));
     }
 
-    async function remainingAfter(app: App, path: string, headers: Record<string, string> = {}) {
-        await send(app, path, headers);
-
-        const probe = await send(app, '/ok');
-
-        return Number(probe.headers.get('ratelimit-remaining'));
+    async function repeat(app: App, path: string, headers: Record<string, string> = {}) {
+        for (let i = 0; i < RATE_LIMIT_FAILED_AUTHENTICATION_MAX; i++) {
+            await send(app, path, headers);
+        }
     }
 
-    it('counts a refused bearer against its address', async () => {
+    it('blocks an address once its refused bearers reach the limit', async () => {
         const app = createApp();
 
-        expect(await remainingAfter(app, '/fail', { authorization: 'Bearer forged' }))
-            .toBe(RATE_LIMIT_FAILED_AUTHENTICATION_MAX - 1);
+        await repeat(app, '/fail', { authorization: 'Bearer forged' });
+
+        const blocked = await send(app, '/ok', { authorization: 'Bearer valid' });
+
+        expect(blocked.status).toBe(429);
+        await expect(blocked.json()).resolves.toMatchObject({ code: 'throttled' });
+        expect(Number(blocked.headers.get('retry-after'))).toBeGreaterThan(0);
     });
 
     it('does not count an expired token', async () => {
         const app = createApp('expired_token');
 
-        expect(await remainingAfter(app, '/fail', { authorization: 'Bearer expired' }))
-            .toBe(RATE_LIMIT_FAILED_AUTHENTICATION_MAX);
+        await repeat(app, '/fail', { authorization: 'Bearer expired' });
+
+        expect((await send(app, '/ok')).status).toBe(200);
     });
 
     it('does not count a 401 without a credential', async () => {
         const app = createApp();
 
-        expect(await remainingAfter(app, '/fail')).toBe(RATE_LIMIT_FAILED_AUTHENTICATION_MAX);
+        await repeat(app, '/fail');
+
+        expect((await send(app, '/ok')).status).toBe(200);
     });
 
-    it('does not count a successful request', async () => {
-        const app = createApp();
+    it('does not let pending valid requests use the budget', async () => {
+        const { promise: gate, resolve: release } = Promise.withResolvers<void>();
+        const app = createApp('invalid_token', gate);
 
-        expect(await remainingAfter(app, '/ok')).toBe(RATE_LIMIT_FAILED_AUTHENTICATION_MAX);
+        const pending = Array.from(
+            { length: RATE_LIMIT_FAILED_AUTHENTICATION_MAX + 10 },
+            () => send(app, '/slow', { authorization: 'Bearer valid' }),
+        );
+
+        const response = await send(app, '/ok', { authorization: 'Bearer valid' });
+
+        expect(response.status).toBe(200);
+
+        release();
+        await Promise.all(pending);
     });
 
     it('limits traffic a reverse proxy on the same host forwards over loopback', async () => {
