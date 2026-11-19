@@ -36,3 +36,8 @@ export type MiddlewareMountOptions = {
     rateLimit?: boolean | MiddlewareRateLimitOptions,
     swagger?: MiddlewareSwaggerOptions | boolean,
 };
+
+export type RateLimitPrincipal = {
+    type: 'user' | 'client',
+    id: string,
+};

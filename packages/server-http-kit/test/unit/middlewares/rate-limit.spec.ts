@@ -23,7 +23,7 @@ import {
     mountAuthenticationRateLimiterMiddleware,
     mountRateLimiterMiddleware,
 } from '../../../src/middlewares/rate-limit.ts';
-import type { RequestIdentity } from '../../../src/request/index.ts';
+import type { RequestCapability, RequestIdentity } from '../../../src/request/index.ts';
 import { setRequestEnv, setRequestIdentity } from '../../../src/request/index.ts';
 
 async function limitFor(
@@ -130,6 +130,90 @@ describe('rate limiter', () => {
         const bob = await send('bob');
 
         expect(bob.headers.get('ratelimit-remaining')).toBe(String(60 * 100 - 1));
+    });
+});
+
+function buildCapability(subject: Pick<RequestCapability['subject'], 'id' | 'type'>): RequestCapability {
+    const issuedAt = Math.floor(Date.now() / 1000);
+
+    return {
+        subject: { realmId: 'b', ...subject },
+        entries: [{
+            type: 'bucket', 
+            id: 'c', 
+            actions: ['read'], 
+        }],
+        issuedAt,
+        expiresAt: issuedAt + 60,
+        source: 'header',
+    };
+}
+
+describe('rate limiter with a capability request', () => {
+    function createApp() {
+        const app = new App();
+
+        app.use(defineCoreHandler((event) => {
+            const capability = event.headers.get('x-capability');
+            const identity = event.headers.get('x-identity');
+
+            if (capability) {
+                setRequestEnv(event, 'capability', buildCapability({
+                    id: capability,
+                    type: (event.headers.get('x-type') || 'client') as 'user' | 'client',
+                }));
+            }
+
+            if (identity) {
+                setRequestIdentity(event, {
+                    id: identity,
+                    type: 'client',
+                    realmId: 'b',
+                    realmName: 'master',
+                });
+            }
+
+            return event.next();
+        }));
+        mountRateLimiterMiddleware(app);
+        app.get('/', defineCoreHandler(() => ({})));
+
+        return app;
+    }
+
+    const send = (app: App, headers: Record<string, string>) => app.fetch(new Request('http://hub.test/', { headers: { 'x-forwarded-for': '203.0.113.7', ...headers } }));
+
+    it('limits a client subject with the client budget', async () => {
+        const response = await send(createApp(), { 'x-capability': 'node' });
+
+        expect(response.headers.get('ratelimit-limit')).toBe(String(60 * 1000));
+    });
+
+    it('limits a user subject with the user budget', async () => {
+        const response = await send(createApp(), { 'x-capability': 'alice', 'x-type': 'user' });
+
+        expect(response.headers.get('ratelimit-limit')).toBe(String(60 * 100));
+    });
+
+    it('counts against the subject, not the address', async () => {
+        const app = createApp();
+
+        await send(app, {});
+        await send(app, {});
+
+        const node = await send(app, { 'x-capability': 'node' });
+
+        expect(node.headers.get('ratelimit-remaining')).toBe(String(60 * 1000 - 1));
+    });
+
+    it('shares the budget of the subject\'s own login requests', async () => {
+        const app = createApp();
+
+        await send(app, { 'x-identity': 'node' });
+
+        const capability = await send(app, { 'x-capability': 'node' });
+
+        expect(capability.headers.get('ratelimit-remaining')).toBe(String(60 * 1000 - 2));
     });
 });
 
