@@ -121,7 +121,13 @@ describe('src/controllers/core/node', () => {
         // freshly registered node used to be left unassigned.
         const { data: node } = await client.node.create(createTestNode());
 
-        expect([first.id, second.id]).toContain(node.registryId);
+        // The suites share one database, so the default registry may be one
+        // another spec file left behind: any existing registry is a connection.
+        expect(node.registryId).toBeTruthy();
+
+        const { data: registry } = await client.registry.getOne(node.registryId!);
+
+        expect(registry.id).toEqual(node.registryId);
         expect(node.registryProjectId).not.toBeNull();
 
         await client.node.delete(node.id);

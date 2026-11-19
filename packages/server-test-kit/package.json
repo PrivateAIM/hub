@@ -35,8 +35,8 @@
         "@rapiq/core": "^2.4.1",
         "hapic": "^3.1.0",
         "testcontainers": "^12.2.1",
-        "typeorm": "^1.1.2",
-        "typeorm-extension": "^4.3.0",
+        "typeorm": "^1.1.3",
+        "typeorm-extension": "^4.4.0",
         "vitest": "^5.1.0"
     },
     "peerDependencies": {
@@ -48,8 +48,8 @@
         "@rapiq/adapter-memory": "^2.4.1",
         "@rapiq/core": "^2.4.1",
         "hapic": "^3.1.0",
-        "typeorm": "^1.1.2",
-        "typeorm-extension": "^4.3.0"
+        "typeorm": "^1.1.3",
+        "typeorm-extension": "^4.4.0"
     },
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",
