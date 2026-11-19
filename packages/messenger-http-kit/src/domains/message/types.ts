@@ -13,6 +13,7 @@ import type {
     SendMessageRequest,
     WakeupEventName,
 } from '@privateaim/messenger-kit';
+import type { APIRequestOptions } from '../types';
 
 /**
  * A typed wakeup read from `GET /messages/stream`. `type` discriminates the
@@ -26,12 +27,12 @@ export type MessageStreamEvent = {
     retry?: number
 };
 
-export type MessageSubscribeOptions = {
-    /**
-     * Abort to close the stream. The iteration then ends without an error.
-     */
-    signal?: AbortSignal
-};
+/**
+ * Aborting `signal` closes the stream and ends the iteration without an
+ * error. The stream is sent with `timeout: 0` unless `timeout` is set: the
+ * deadline would keep running while the stream is read.
+ */
+export type MessageSubscribeOptions = APIRequestOptions;
 
 /**
  * NOT an entity API: the broker surface is a protocol, not a CRUD resource.
@@ -39,9 +40,9 @@ export type MessageSubscribeOptions = {
  * hand-rolled `URLSearchParams` rather than rapiq.
  */
 export interface IMessageAPI {
-    send(data: SendMessageRequest) : Promise<string[]>;
+    send(data: SendMessageRequest, options?: APIRequestOptions) : Promise<string[]>;
     pull(query?: MessagePullQuery) : Promise<MessagePullResponse>;
-    ack(data: MessageAckRequest) : Promise<void>;
+    ack(data: MessageAckRequest, options?: APIRequestOptions) : Promise<void>;
     /**
      * Open the caller's wakeup stream and yield its typed events. The request
      * is sent on the first iteration; one response is read, without

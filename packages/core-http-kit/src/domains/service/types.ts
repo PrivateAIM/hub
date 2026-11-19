@@ -11,6 +11,7 @@ import type {
     RegistryProject,
     ServiceID,
 } from '@privateaim/core-kit';
+import type { APIRequestOptions } from '../types';
 
 /**
  * No entity shape at all: service commands are a protocol surface. The
@@ -18,7 +19,12 @@ import type {
  * unwrap and no record to return.
  */
 export interface IServiceAPI {
-    runCommand(id: `${ServiceID}`, command: string, data?: Record<string, any>) : Promise<void>;
+    runCommand(
+        id: `${ServiceID}`,
+        command: string,
+        data?: Record<string, any>,
+        options?: APIRequestOptions,
+    ) : Promise<void>;
 
     runRegistryCommand(
         command: `${RegistryAPICommand}`,
@@ -26,5 +32,6 @@ export interface IServiceAPI {
             id: Registry['id'] | RegistryProject['id'],
             [key: string]: any
         },
+        options?: APIRequestOptions,
     ) : Promise<void>;
 }

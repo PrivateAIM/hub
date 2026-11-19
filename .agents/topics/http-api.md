@@ -125,6 +125,7 @@ that silently skips the gate.
 
 - Every outbound hapic client sets `timeout` from `HTTPClientTimeout` (`@privateaim/server-kit`), one value per kind of peer; a new client takes its peer's value, never an inline number.
 - hapic's timer keeps running while a body is read, so every call that streams a request or response body (`stream`, `upload`, `streamFiles`, `downloadResult`, the GitHub tarball) passes `timeout: 0`; `timeout.spec.ts` in core-http-kit and storage-kit fails when one does not. A timed-out call answers 504 `upstream_timeout` (`sanitizeError`) and is transient for the worker.
+- Every method of the four kits' `I*API` takes `options?: APIRequestOptions` (`{ signal, timeout }`) last and forwards it through the kit's `buildRequestConfig()`, spread after a stream's `timeout: 0` so a caller's timeout wins; `request-options.spec.ts` in each kit enumerates the sub-API methods and fails on one that drops it.
 
 ## Transport-level FakeClient
 

@@ -8,7 +8,7 @@
 import type { AnalysisLog } from '@privateaim/core-kit';
 import type { Log } from '@privateaim/telemetry-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse } from '../types';
 
 /**
  * STANDALONE — deliberately not `IEntityAPISlim`. Two shapes make analysis
@@ -20,6 +20,6 @@ import type { EntityCollectionResponse } from '../types';
  *   `AnalysisLog` itself declares no `id`.
  */
 export interface IAnalysisLogAPI {
-    getMany(options?: EntityQueryInput<AnalysisLog>) : Promise<EntityCollectionResponse<Log>>;
-    delete(options: EntityQueryInput<AnalysisLog>) : Promise<void>;
+    getMany(record?: EntityQueryInput<AnalysisLog>, options?: APIRequestOptions) : Promise<EntityCollectionResponse<Log>>;
+    delete(record: EntityQueryInput<AnalysisLog>, options?: APIRequestOptions) : Promise<void>;
 }

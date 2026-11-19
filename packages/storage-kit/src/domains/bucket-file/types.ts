@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IEntityAPI } from '../types';
+import type { APIRequestOptions, IEntityAPI } from '../types';
 import type { Realm } from '@authup/core-kit';
 import type { Bucket } from '../bucket';
 
@@ -16,7 +16,11 @@ import type { Bucket } from '../bucket';
 export interface IBucketFileAPI extends IEntityAPI<BucketFile, Record<string, any>, Record<string, any>> {
     getStreamPath(id: BucketFile['id']) : string;
     getStreamURL(id: BucketFile['id']) : string;
-    stream(id: BucketFile['id']) : Promise<ReadableStream<any>>;
+    /**
+     * Sends `timeout: 0` unless `options.timeout` is set: the deadline would
+     * keep running while the caller reads the body.
+     */
+    stream(id: BucketFile['id'], options?: APIRequestOptions) : Promise<ReadableStream<any>>;
 }
 
 export type BucketFile = {

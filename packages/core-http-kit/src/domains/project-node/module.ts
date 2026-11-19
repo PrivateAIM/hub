@@ -9,36 +9,55 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
 import type { ProjectNode } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
+import { buildRequestConfig } from '../utils';
 import type { IProjectNodeAPI, ProjectNodeCreatePayload, ProjectNodeUpdatePayload } from './types';
 
 export class ProjectNodeAPI extends BaseAPI implements IProjectNodeAPI {
-    async getMany(data?: EntityQueryInput<ProjectNode>): Promise<EntityCollectionResponse<ProjectNode>> {
-        const response = await this.client.get(`project-nodes${buildQueryString(data)}`);
+    async getMany(
+        record?: EntityQueryInput<ProjectNode>,
+        options?: APIRequestOptions,
+    ): Promise<EntityCollectionResponse<ProjectNode>> {
+        const response = await this.client.get(`project-nodes${buildQueryString(record)}`, buildRequestConfig(options));
 
         return response.data;
     }
 
-    async getOne(id: ProjectNode['id'], data?: EntityQueryInput<ProjectNode>): Promise<EntityRecordResponse<ProjectNode>> {
-        const response = await this.client.get(`project-nodes/${id}${buildQueryString(data)}`);
+    async getOne(
+        id: ProjectNode['id'],
+        record?: EntityQueryInput<ProjectNode>,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<ProjectNode>> {
+        const response = await this.client.get(
+            `project-nodes/${id}${buildQueryString(record)}`,
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }
 
-    async create(data: ProjectNodeCreatePayload): Promise<EntityRecordResponse<ProjectNode>> {
-        const response = await this.client.post('project-nodes', data);
+    async create(data: ProjectNodeCreatePayload, options?: APIRequestOptions): Promise<EntityRecordResponse<ProjectNode>> {
+        const response = await this.client.post('project-nodes', data, buildRequestConfig(options));
 
         return response.data;
     }
 
-    async update(id: ProjectNode['id'], data: ProjectNodeUpdatePayload): Promise<EntityRecordResponse<ProjectNode>> {
-        const response = await this.client.post(`project-nodes/${id}`, nullifyEmptyObjectProperties(data));
+    async update(
+        id: ProjectNode['id'],
+        data: ProjectNodeUpdatePayload,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<ProjectNode>> {
+        const response = await this.client.post(
+            `project-nodes/${id}`,
+            nullifyEmptyObjectProperties(data),
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }
 
-    async delete(id: ProjectNode['id']): Promise<EntityRecordResponse<ProjectNode>> {
-        const response = await this.client.delete(`project-nodes/${id}`);
+    async delete(id: ProjectNode['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<ProjectNode>> {
+        const response = await this.client.delete(`project-nodes/${id}`, buildRequestConfig(options));
 
         return response.data;
     }

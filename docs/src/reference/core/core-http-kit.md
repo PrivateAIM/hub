@@ -144,6 +144,34 @@ const client = new Client({ baseURL: 'http://localhost:4000', timeout: 30_000 })
 The stream methods (`analysis.streamFiles`, `analysis.downloadResult`) pass `timeout: 0`: the
 deadline would keep running while the caller reads the stream.
 
+### Cancellation & Per-Call Timeouts
+
+Every method of every sub-API takes one optional `APIRequestOptions` object as its **last**
+parameter: `signal` aborts the call, `timeout` (milliseconds) bounds it and overrides the
+client's own `timeout` for this call. Absent, the client defaults apply. On the stream methods a
+per-call `timeout` replaces their `timeout: 0`.
+
+```typescript
+import { isClientErrorDueTimeout } from 'hapic';
+
+const controller = new AbortController();
+
+try {
+    const { data } = await client.project.getMany(
+        { pagination: { limit: 10 } },
+        { signal: controller.signal, timeout: 2_000 },
+    );
+} catch (e) {
+    if (isClientErrorDueTimeout(e)) {
+        // the call ran past 2 seconds
+    }
+}
+```
+
+An aborted call rejects with a hapic client error whose `code` is `ECONNABORTED`, a timed-out
+one with `ETIMEDOUT`. Methods with an optional argument before the options take `undefined` in
+its place (`getOne(id, undefined, { signal })`).
+
 ### With Authentication
 
 ```typescript
@@ -164,6 +192,7 @@ const client = new Client({
 | `EntityRecordResponse` / `EntityRecordMeta` | The `{ data, meta }` record envelope and its meta type |
 | `EntityCollectionResponse` | The `{ data, meta }` collection envelope |
 | `IEntityAPI` / `IEntityAPISlim` | Generic port interfaces the entity sub-APIs build on |
+| `APIRequestOptions` | The per-call `{ signal?, timeout? }` every API method takes last |
 | `ICoreClient` / `ClientOptions` | The client contract and its construction options |
 | `I<X>API` | One contract per sub-API (`IAnalysisAPI`, `INodeAPI`, …) |
 | `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
@@ -270,6 +299,9 @@ const { data: project } = await client.project.getOne('abc');
 // Every dispatched request is recorded, normalized.
 expect(client.requests[0]).toMatchObject({ method: 'GET', params: { id: 'abc' } });
 ```
+
+A recorded request's `options` holds the `signal` and `timeout` it was sent with (client
+defaults included, so a stream method shows `timeout: 0`), each key only when set.
 
 - Handler keys are `'<METHOD> /<path>'`; a `:name` segment captures into `req.params`.
 - The query string is ignored and `'*'` is a catch-all that always loses to a specific pattern.

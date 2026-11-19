@@ -32,6 +32,12 @@ const { messages } = await client.message.pull({ limit: 50, wait: 30 });
 await client.message.ack({ ids: messages.map((message) => message.id) });
 ```
 
+### Cancellation & Per-Call Timeouts
+
+`send` and `ack` take one optional `APIRequestOptions` object (`{ signal?, timeout? }`) as their
+last parameter: `signal` aborts the call, `timeout` (milliseconds) overrides the client's for this
+call. `subscribe()` takes the same object as its only argument.
+
 ### Wakeup subscription
 
 `message.subscribe()` reads the caller's `GET /messages/stream` (Server-Sent
@@ -61,7 +67,8 @@ for await (const event of client.message.subscribe({ signal: controller.signal }
 - **Skipped**: keep-alive comments, event types the kit does not know and a
   `messagePending` whose data is not a wakeup payload.
 - **No deadline**: the call passes `timeout: 0`, so a client-level `timeout`
-  does not cut the open-ended stream. Bound it with the `signal` instead.
+  does not cut the open-ended stream. Bound it with the `signal` instead; a
+  `timeout` passed to `subscribe()` replaces the `0` and cuts the stream.
 - **Abort**: aborting the signal (or `break`ing out of the loop) closes the
   connection; the iteration ends without throwing. A non-2xx answer rejects with
   the usual hapic `ClientError`.
@@ -116,6 +123,8 @@ expect(client.requests[0].url).toContain('limit=5');
 - A handler returns the response **body**; return `fakeResponse(status, body)` for a non-2xx.
 - Keep the default path-free `baseURL` — a `baseURL` carrying a path shifts every
   pathname, and patterns silently stop matching.
+- A recorded request's `options` holds the `signal` and `timeout` it was sent with (client
+  defaults included, so `subscribe()` shows `timeout: 0`), each key only when set.
 
 To test a consumer of `subscribe()`, serve a `FakeEventStream`: an open
 `text/event-stream` response you feed by hand.
@@ -148,6 +157,7 @@ abort or a hapic `timeout` errors the body and cancels the source. Serve one
 | `IMessengerClient` / `ClientOptions` | The client contract and its construction options |
 | `MessageAPI` / `IMessageAPI` | The message sub-API and its contract |
 | `MessageStreamEvent` / `MessageSubscribeOptions` | The typed wakeup yielded by `subscribe()` and its options |
+| `APIRequestOptions` | The per-call `{ signal?, timeout? }` every API method takes last |
 | `toMessageStreamEvent` / `isMessagePendingEvent` | Turn a parsed SSE message into a typed wakeup (or `undefined`); guard a wakeup payload |
 | `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute`, `FakeEventStream` |
 

@@ -8,7 +8,7 @@
 import type { AnalysisNodeLog } from '@privateaim/core-kit';
 import type { Log } from '@privateaim/telemetry-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 
 /**
  * STANDALONE, for the same reasons as {@see IAnalysisLogAPI}: a query-keyed
@@ -16,7 +16,7 @@ import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
  * while `AnalysisNodeLog` is the REQUEST shape.
  */
 export interface IAnalysisNodeLogAPI {
-    getMany(options?: EntityQueryInput<AnalysisNodeLog>) : Promise<EntityCollectionResponse<Log>>;
-    delete(options?: EntityQueryInput<AnalysisNodeLog>) : Promise<void>;
-    create(data: Partial<AnalysisNodeLog>) : Promise<EntityRecordResponse<Log>>;
+    getMany(record?: EntityQueryInput<AnalysisNodeLog>, options?: APIRequestOptions) : Promise<EntityCollectionResponse<Log>>;
+    delete(record?: EntityQueryInput<AnalysisNodeLog>, options?: APIRequestOptions) : Promise<void>;
+    create(data: Partial<AnalysisNodeLog>, options?: APIRequestOptions) : Promise<EntityRecordResponse<Log>>;
 }

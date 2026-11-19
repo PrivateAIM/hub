@@ -38,6 +38,15 @@ const stream = await client.bucketFile.stream(fileId);
 by default. `bucket.stream`, `bucketFile.stream` and `bucket.upload` pass `timeout: 0`, so a long
 transfer is never cut off. A client from `withAuthorization()` keeps the parent's timeout.
 
+Every API method takes one optional `APIRequestOptions` object (`{ signal?, timeout? }`) as its
+last parameter: `signal` aborts the call, `timeout` overrides the client's for this call (and
+replaces the `timeout: 0` of `stream` and `upload`). Semantics as in
+[`@privateaim/core-http-kit`](/reference/core/core-http-kit#cancellation-per-call-timeouts).
+
+```typescript
+const stream = await client.bucketFile.stream(fileId, { signal: controller.signal });
+```
+
 ### Response Shapes
 
 Every single-record method (`getOne`, `create`, `update`, `delete`, `clear`) resolves to the
@@ -124,6 +133,9 @@ const { data: bucket } = await client.bucket.getOne('abc');
 - The query string is ignored and `'*'` is a catch-all that always loses to a specific pattern.
 - A handler returns the response **body**; return `fakeResponse(status, body)` for a non-2xx.
 - Unmatched requests fall back to `{ data: [], meta: { total: 0 } }`.
+- A recorded request's `options` holds the `signal` and `timeout` it was sent with (client
+  defaults included), each key only when set. A client from `withAuthorization()` records
+  empty `options`.
 - Keep the default path-free `baseURL` — a `baseURL` carrying a path shifts every
   pathname, and patterns silently stop matching.
 

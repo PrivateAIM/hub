@@ -7,10 +7,17 @@
 
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 
 /** Read-only: node events are emitted by the platform, never authored over HTTP. */
 export interface IAnalysisNodeEventAPI {
-    getMany(options?: EntityQueryInput<AnalysisNodeEvent>) : Promise<EntityCollectionResponse<AnalysisNodeEvent>>;
-    getOne(id: AnalysisNodeEvent['id']) : Promise<EntityRecordResponse<AnalysisNodeEvent>>;
+    getMany(
+        record?: EntityQueryInput<AnalysisNodeEvent>,
+        options?: APIRequestOptions,
+    ) : Promise<EntityCollectionResponse<AnalysisNodeEvent>>;
+    getOne(
+        id: AnalysisNodeEvent['id'],
+        record?: EntityQueryInput<AnalysisNodeEvent>,
+        options?: APIRequestOptions,
+    ) : Promise<EntityRecordResponse<AnalysisNodeEvent>>;
 }

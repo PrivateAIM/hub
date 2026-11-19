@@ -6,7 +6,12 @@
  */
 
 import type { BucketFile } from '../bucket-file';
-import type { EntityCollectionResponse, EntityRecordResponse, IEntityAPI } from '../types';
+import type {
+    APIRequestOptions,
+    EntityCollectionResponse,
+    EntityRecordResponse,
+    IEntityAPI,
+} from '../types';
 import type { Realm } from '@authup/core-kit';
 
 export type BucketCreatePayload =    & Pick<Bucket, 'name'> &
@@ -15,18 +20,27 @@ export type BucketCreatePayload =    & Pick<Bucket, 'name'> &
 export interface IBucketAPI extends IEntityAPI<Bucket, BucketCreatePayload, Partial<BucketCreatePayload>> {
     /**
      * Multi-file upload: a COLLECTION response, not a record envelope — one
-     * request creates many bucket files.
+     * request creates many bucket files. Sends `timeout: 0` unless
+     * `options.timeout` is set.
      */
-    upload(id: Bucket['id'], formData: FormData) : Promise<EntityCollectionResponse<BucketFile>>;
+    upload(
+        id: Bucket['id'],
+        formData: FormData,
+        options?: APIRequestOptions,
+    ) : Promise<EntityCollectionResponse<BucketFile>>;
 
     /**
      * Empties the bucket (every file and stored object) but keeps it.
      */
-    clear(id: Bucket['id']) : Promise<EntityRecordResponse<Bucket>>;
+    clear(id: Bucket['id'], options?: APIRequestOptions) : Promise<EntityRecordResponse<Bucket>>;
 
     getStreamPath(id: Bucket['id']) : string;
     getStreamURL(id: Bucket['id']) : string;
-    stream(id: Bucket['id']) : Promise<ReadableStream<any>>;
+    /**
+     * Sends `timeout: 0` unless `options.timeout` is set: the deadline would
+     * keep running while the caller reads the body.
+     */
+    stream(id: Bucket['id'], options?: APIRequestOptions) : Promise<ReadableStream<any>>;
 }
 
 export type Bucket = {

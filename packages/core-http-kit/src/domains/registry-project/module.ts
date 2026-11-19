@@ -9,36 +9,62 @@ import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
 import type { RegistryProject } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
+import { buildRequestConfig } from '../utils';
 import type { IRegistryProjectAPI, RegistryProjectCreatePayload, RegistryProjectUpdatePayload } from './types';
 
 export class RegistryProjectAPI extends BaseAPI implements IRegistryProjectAPI {
-    async getMany(options?: EntityQueryInput<RegistryProject>): Promise<EntityCollectionResponse<RegistryProject>> {
-        const response = await this.client.get(`registry-projects${buildQueryString(options)}`);
+    async getMany(
+        record?: EntityQueryInput<RegistryProject>,
+        options?: APIRequestOptions,
+    ): Promise<EntityCollectionResponse<RegistryProject>> {
+        const response = await this.client.get(`registry-projects${buildQueryString(record)}`, buildRequestConfig(options));
 
         return response.data;
     }
 
-    async getOne(id: RegistryProject['id'], options?: EntityQueryInput<RegistryProject>): Promise<EntityRecordResponse<RegistryProject>> {
-        const response = await this.client.get(`registry-projects/${id}${buildQueryString(options)}`);
+    async getOne(
+        id: RegistryProject['id'],
+        record?: EntityQueryInput<RegistryProject>,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<RegistryProject>> {
+        const response = await this.client.get(
+            `registry-projects/${id}${buildQueryString(record)}`,
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }
 
-    async create(data: RegistryProjectCreatePayload): Promise<EntityRecordResponse<RegistryProject>> {
-        const response = await this.client.post('registry-projects', nullifyEmptyObjectProperties(data));
+    async create(
+        data: RegistryProjectCreatePayload,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<RegistryProject>> {
+        const response = await this.client.post(
+            'registry-projects',
+            nullifyEmptyObjectProperties(data),
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }
 
-    async update(id: RegistryProject['id'], data: RegistryProjectUpdatePayload): Promise<EntityRecordResponse<RegistryProject>> {
-        const response = await this.client.post(`registry-projects/${id}`, nullifyEmptyObjectProperties(data));
+    async update(
+        id: RegistryProject['id'],
+        data: RegistryProjectUpdatePayload,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<RegistryProject>> {
+        const response = await this.client.post(
+            `registry-projects/${id}`,
+            nullifyEmptyObjectProperties(data),
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }
 
-    async delete(id: RegistryProject['id']): Promise<EntityRecordResponse<RegistryProject>> {
-        const response = await this.client.delete(`registry-projects/${id}`);
+    async delete(id: RegistryProject['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<RegistryProject>> {
+        const response = await this.client.delete(`registry-projects/${id}`, buildRequestConfig(options));
 
         return response.data;
     }

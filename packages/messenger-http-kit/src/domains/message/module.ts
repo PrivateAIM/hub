@@ -13,6 +13,8 @@ import type {
 } from '@privateaim/messenger-kit';
 import { BaseAPI, parseEventStream } from 'hapic';
 import type { EventStreamMessage } from 'hapic';
+import type { APIRequestOptions } from '../types';
+import { buildRequestConfig } from '../utils';
 import { toMessageStreamEvent } from './helpers';
 import type { IMessageAPI, MessageStreamEvent, MessageSubscribeOptions } from './types';
 
@@ -43,8 +45,8 @@ export class MessageAPI extends BaseAPI implements IMessageAPI {
      * scope (if any) travels in `metadata.analysisId`. Returns the ids of the
      * persisted messages.
      */
-    async send(data: SendMessageRequest): Promise<string[]> {
-        const { data: response } = await this.client.post('messages', data);
+    async send(data: SendMessageRequest, options?: APIRequestOptions): Promise<string[]> {
+        const { data: response } = await this.client.post('messages', data, buildRequestConfig(options));
 
         return response.data ?? [];
     }
@@ -70,8 +72,8 @@ export class MessageAPI extends BaseAPI implements IMessageAPI {
     /**
      * Acknowledge messages by id — the hub deletes them for the caller.
      */
-    async ack(data: MessageAckRequest): Promise<void> {
-        await this.client.post('messages/ack', data);
+    async ack(data: MessageAckRequest, options?: APIRequestOptions): Promise<void> {
+        await this.client.post('messages/ack', data, buildRequestConfig(options));
     }
 
     /**
@@ -97,9 +99,10 @@ export class MessageAPI extends BaseAPI implements IMessageAPI {
                 headers: { accept: 'text/event-stream' },
                 // LOAD-BEARING: hapic's deadline keeps running while a stream
                 // body is read, so a client-level `timeout` would cut this
-                // open-ended stream. 0 disables it for this call only.
+                // open-ended stream. 0 disables it for this call only,
+                // unless the caller sets one.
                 timeout: 0,
-                signal,
+                ...buildRequestConfig(options),
             });
 
             if (!(response.data instanceof ReadableStream)) {

@@ -7,11 +7,18 @@
 
 import type { MasterImageGroup } from '@privateaim/core-kit';
 import type { EntityQueryInput } from '../../utils';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 
 /** Read + delete only — groups appear through master-image catalog sync. */
 export interface IMasterImageGroupAPI {
-    getMany(data?: EntityQueryInput<MasterImageGroup>) : Promise<EntityCollectionResponse<MasterImageGroup>>;
-    getOne(id: MasterImageGroup['id']) : Promise<EntityRecordResponse<MasterImageGroup>>;
-    delete(id: MasterImageGroup['id']) : Promise<EntityRecordResponse<MasterImageGroup>>;
+    getMany(
+        record?: EntityQueryInput<MasterImageGroup>,
+        options?: APIRequestOptions,
+    ) : Promise<EntityCollectionResponse<MasterImageGroup>>;
+    getOne(
+        id: MasterImageGroup['id'],
+        record?: EntityQueryInput<MasterImageGroup>,
+        options?: APIRequestOptions,
+    ) : Promise<EntityRecordResponse<MasterImageGroup>>;
+    delete(id: MasterImageGroup['id'], options?: APIRequestOptions) : Promise<EntityRecordResponse<MasterImageGroup>>;
 }
