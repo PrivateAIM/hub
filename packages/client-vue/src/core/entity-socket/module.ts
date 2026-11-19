@@ -290,7 +290,7 @@ export function createEntitySocket<
 
     watch([targetId, realmId], ([val, realm], [oldValue, oldRealm]) => {
         if ((val !== oldValue || realm !== oldRealm) && isMounted) {
-            Promise.try(() => unsubscribe())
+            Promise.resolve().then(() => unsubscribe())
                 .then(() => subscribe());
         }
     });

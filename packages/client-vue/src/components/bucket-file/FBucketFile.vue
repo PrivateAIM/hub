@@ -68,7 +68,7 @@ export default defineComponent({
             }
         };
 
-        Promise.try(() => resolve());
+        Promise.resolve().then(() => resolve());
 
         const drop = async () => {
             if (busy.value || !data.value) {

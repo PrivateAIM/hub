@@ -44,7 +44,7 @@ export default defineComponent({
 
                 emit('executed');
             } catch (e) {
-                if (Error.isError(e)) {
+                if (e instanceof Error) {
                     emit('failed', e);
                 }
             }

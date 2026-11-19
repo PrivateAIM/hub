@@ -167,7 +167,7 @@ export function createEntityManager<
 
             updated(entity.value as RECORD);
         } catch (e) {
-            if (Error.isError(e)) {
+            if (e instanceof Error) {
                 failed(e);
             }
         } finally {
@@ -193,7 +193,7 @@ export function createEntityManager<
 
             deleted(response.data);
         } catch (e) {
-            if (Error.isError(e)) {
+            if (e instanceof Error) {
                 failed(e);
             }
         } finally {
@@ -218,7 +218,7 @@ export function createEntityManager<
 
             created(response.data);
         } catch (e) {
-            if (Error.isError(e)) {
+            if (e instanceof Error) {
                 failed(e);
             }
         } finally {
@@ -300,7 +300,7 @@ export function createEntityManager<
 
                     return entity.value;
                 } catch (e) {
-                    if (Error.isError(e)) {
+                    if (e instanceof Error) {
                         error.value = e;
                     }
                 }
@@ -335,7 +335,7 @@ export function createEntityManager<
 
                 return entity.value;
             } catch (e) {
-                if (Error.isError(e)) {
+                if (e instanceof Error) {
                     error.value = e;
                 }
             }

@@ -110,7 +110,7 @@ export default defineComponent({
             handleDeleted,
         });
 
-        Promise.try(() => resolve(props.query));
+        Promise.resolve().then(() => resolve(props.query));
 
         return {
             handleDeleted,

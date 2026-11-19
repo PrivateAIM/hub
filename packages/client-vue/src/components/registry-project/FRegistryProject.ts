@@ -129,7 +129,7 @@ export default defineComponent({
 
                 setup.emit('updated', manager.data.value);
             } catch (e) {
-                if (Error.isError(e)) {
+                if (e instanceof Error) {
                     setup.emit('failed', e);
                 }
             }

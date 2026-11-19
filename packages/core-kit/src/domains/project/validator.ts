@@ -28,7 +28,7 @@ export class ProjectValidator extends TypedContainer<Project> {
                     ctx.issues.push({
                         input: ctx.value,
                         code: 'custom',
-                        message: Error.isError(e) ? e.message : 'The project name is not valid.',
+                        message: e instanceof Error ? e.message : 'The project name is not valid.',
                     });
                 }
             }));

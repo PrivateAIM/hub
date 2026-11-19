@@ -133,7 +133,7 @@ export default defineNuxtComponent({
                 if (toast) {
                     toast.show({
                         variant: 'warning',
-                        body: Error.isError(e) ? e.message : 'The login could not be started.',
+                        body: e instanceof Error ? e.message : 'The login could not be started.',
                     });
                 }
             }

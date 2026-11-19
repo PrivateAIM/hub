@@ -124,7 +124,7 @@ export default defineComponent({
                     return;
                 }
 
-                if (Error.isError(e)) {
+                if (e instanceof Error) {
                     emit('failed', e);
                 }
             }

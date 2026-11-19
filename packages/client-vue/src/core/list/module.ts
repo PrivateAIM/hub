@@ -663,7 +663,7 @@ export function createListRaw<
             }
         }
 
-        Promise.try(() => load())
+        Promise.resolve().then(() => load())
             .catch((e) => console.log(e));
     }
 
