@@ -13,14 +13,19 @@ import {
     AUTHUP_CLIENT_MODULE_NAME,
     AuthupClientInjectionKey,
     EnvironmentName,
+    Health,
+    HealthInjectionKey,
     LoggerInjectionKey,
     RedisClientInjectionKey,
     RedisPublishClientInjectionKey,
     RedisSubscribeClientInjectionKey,
+    createDatabaseHealthCheck,
+    createHealthLogObserver,
 } from '@privateaim/server-kit';
 import {
     createAuthupTokenVerifier,
     mountErrorMiddleware,
+    mountHealthRoutes,
     mountMiddlewares,
 } from '@privateaim/server-http-kit';
 import {
@@ -29,6 +34,7 @@ import {
     mountLoggingMiddleware,
 } from '@privateaim/server-realtime-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
+import { DatabaseInjectionKey } from '../database/constants.ts';
 import { registerControllers } from '../../../adapters/socket/register.ts';
 import { createControllers } from './controller.ts';
 import type { HTTPServer } from './types.ts';
@@ -54,11 +60,22 @@ export class HTTPModule implements IModule {
 
     private instance: HTTPServer | undefined;
 
+    private health: Health | undefined;
+
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
         const app = new App();
+
+        // Ahead of every middleware: probes are neither authenticated, rate
+        // limited nor counted. Readiness waits on the database (1 s bound).
+        this.health = new Health({
+            readiness: [createDatabaseHealthCheck(container.resolve(DatabaseInjectionKey.DataSource))],
+            onReadinessChange: createHealthLogObserver(logger),
+        });
+        container.register(HealthInjectionKey, { useValue: this.health });
+        mountHealthRoutes(app, this.health);
 
         const isTestEnvironment = config.env === EnvironmentName.TEST;
 
@@ -157,7 +174,15 @@ export class HTTPModule implements IModule {
         }
     }
 
+    async onReady(): Promise<void> {
+        // Every module finished its setup: both probes may pass from now on.
+        this.health?.markStarted();
+    }
+
     async teardown(container: IContainer): Promise<void> {
+        container.unregister(HealthInjectionKey);
+        this.health = undefined;
+
         const socketResult = container.tryResolve(HTTPInjectionKey.SocketServer);
 
         if (socketResult.success) {

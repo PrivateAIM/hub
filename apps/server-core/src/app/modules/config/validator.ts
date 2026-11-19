@@ -31,10 +31,10 @@ export class ConfigValidator extends TypedContainer<Config> {
         this.mount('harborURL', { optional: true }, createValidator(zod.url()));
 
         this.mount('cookiePrefix', { optional: true }, createValidator(zod.string()));
+        this.mount('shutdownDelay', { optional: true }, createValidator(zod.number().int().nonnegative().max(3600)));
 
         this.mount('redisConnectionString', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('rabbitMqConnectionString', { optional: true }, createValidator(zod.string().min(1)));
-        this.mount('vaultConnectionString', { optional: true }, createValidator(zod.string().min(1)));
 
         this.mount('masterImagesOwner', { optional: true }, createValidator(zod.string().min(1)));
         this.mount('masterImagesRepository', { optional: true }, createValidator(zod.string().min(1)));

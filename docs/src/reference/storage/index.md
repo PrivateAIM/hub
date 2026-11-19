@@ -38,6 +38,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
 | `GET` | `/buckets` | List buckets |
 | `POST` | `/buckets` | Create bucket (no `refId`, see below) |
 | `GET` | `/buckets/:id` | Get bucket |

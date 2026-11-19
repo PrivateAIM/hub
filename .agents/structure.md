@@ -68,7 +68,7 @@ Shared libraries, located in `packages/`.
 | `storage-kit`       | Storage domain types + HTTP client (same `EntityRecordResponse` / `EntityCollectionResponse` envelope types as core-http-kit). Implements `IStorageClient`; ships `./testing`. |
 | `telemetry-kit`     | Telemetry/logging types + HTTP client (same envelope types; `GET /logs` is the one schemaless collection). Implements `ITelemetryClient`; ships `./testing`. |
 | `messenger-kit`     | Messenger domain types                 |
-| `messenger-http-kit` | HTTP client for the messenger broker surface (send/pull/ack). NOT an entity API — no `{ data, meta }` envelope. |
+| `messenger-http-kit` | HTTP client for the messenger broker surface (send/pull/ack, SSE wakeup `subscribe`). NOT an entity API — no `{ data, meta }` envelope. |
 
 ## Dependency Layers
 

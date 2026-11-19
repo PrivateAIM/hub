@@ -107,6 +107,14 @@ await cache.invalidate([`node:${id}`]);
 import { AuthupModule } from '@privateaim/server-kit';
 ```
 
+### Outbound HTTP Timeouts
+
+`HTTPClientTimeout` holds the request deadline in milliseconds for each kind of peer:
+`AUTHUP` (10 000, the Authup client and the OAuth2 token creators), `SERVICE` (30 000, the core,
+storage and telemetry clients and GitHub), `HARBOR` (60 000) and `VICTORIA_LOGS` (30 000). A call
+that streams a request or response body passes `timeout: 0`. A timed-out request inside an HTTP
+request is answered `504` with the code `upstream_timeout`; the worker retries it.
+
 ### Query Schema Description
 
 `describeQuerySchema()` serializes a rapiq entity schema into the `SchemaDescription` that
@@ -147,7 +155,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 
 | Module | Description |
 |--------|-------------|
-| `app` | `BaseApplicationBuilder`, `Application` base class |
+| `app` | `BaseApplicationBuilder`, `Application` base class; `startApplication(app, { onSignal })` — one-shot SIGINT/SIGTERM shutdown with drain delay; `Health`, `HealthInjectionKey`, `createDatabaseHealthCheck` (1 s bound, 1 s reuse), `createHealthShutdownHook`, `createHealthLogObserver` — the state behind `/livez` and `/readyz` (routes: `mountHealthRoutes` in `@privateaim/server-http-kit`) |
 | `logger` | Winston logger setup and `LoggerModule` |
 | `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `hubwire` message bus; `createMessageBusLogHooks`, `createAmqpDriverLogHooks`, `createRemoteWorkerLogHooks`, `createScheduledComponentLogHooks` — hubwire `hooks` that log through a hub logger |
 | `redis` | Redis module and connection helpers |
@@ -156,7 +164,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 | `config` | Configuration reading via `envix` |
 | `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema`; `collectRootFilterValues()` — flattens an `and`-of-`eq` filter tree into label equalities for the log endpoints and rejects any other operator with a 400 |
 | `entity-event` | Entity event pub/sub system |
-| `constants` | Module names, injection keys |
+| `constants` | Module names, injection keys, `HTTPClientTimeout` |
 
 ### Shared DI Modules
 

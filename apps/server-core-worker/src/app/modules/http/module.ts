@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule } from 'orkos';
 import { serve } from 'routup';
-import { LoggerInjectionKey } from '@privateaim/server-kit';
+import { Health, HealthInjectionKey, LoggerInjectionKey } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { createHttpApp } from '../../../adapters/http/index.ts';
 import type { HTTPServer } from './types.ts';
@@ -21,11 +21,19 @@ export class HTTPModule implements IModule {
 
     private instance: HTTPServer | undefined;
 
+    private health: Health | undefined;
+
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
-        const app = createHttpApp();
+        // No readiness dependency: the worker serves no requests, and the
+        // broker it consumes from reconnects on its own. Both probes pass
+        // once every module, the bus consumers included, finished setup.
+        this.health = new Health();
+        container.register(HealthInjectionKey, { useValue: this.health });
+
+        const app = createHttpApp(this.health);
 
         logger.debug('Starting http server...');
 
@@ -53,7 +61,14 @@ export class HTTPModule implements IModule {
         }
     }
 
+    async onReady(): Promise<void> {
+        this.health?.markStarted();
+    }
+
     async teardown(container: IContainer): Promise<void> {
+        container.unregister(HealthInjectionKey);
+        this.health = undefined;
+
         if (!this.instance) {
             return;
         }

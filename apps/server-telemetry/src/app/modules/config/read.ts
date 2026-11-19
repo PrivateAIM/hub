@@ -26,6 +26,7 @@ export function readConfigFromEnv(): Partial<Config> {
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),
 
         cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
+        shutdownDelay: readInt(EnvironmentInputKey.SHUTDOWN_DELAY),
 
         victoriaLogsURL: read(EnvironmentInputKey.VICTORIA_LOGS_URL),
         victoriaLogsIngestorURL: read(EnvironmentInputKey.VICTORIA_LOGS_INGESTOR_URL),

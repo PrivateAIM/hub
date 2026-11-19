@@ -111,6 +111,53 @@ describe('startApplication', () => {
         expect(output).toBe('x'.repeat(1_000_000));
     });
 
+    it('keeps serving for the drain delay before the bounded teardown', async () => {
+        const child = fork(fixture, ['drain'], { stdio: ['ignore', 'ignore', 'pipe', 'ipc'] });
+        const messages: string[] = [];
+        const at: Record<string, number> = {};
+
+        child.on('message', (message: string) => {
+            messages.push(message);
+            at[message] = Date.now();
+
+            if (message === 'ready') {
+                child.kill('SIGTERM');
+            }
+        });
+
+        const code = await new Promise<number | null>((resolve) => {
+            child.on('exit', resolve);
+        });
+
+        // The 300 ms delay outlasts the (patched) 100 ms deadline, so the
+        // deadline must start after the delay, not at the signal.
+        expect(code).toBe(0);
+        expect(messages).toEqual(['ready', 'signal', 'teardown', 'finished']);
+        expect(at.teardown - at.signal).toBeGreaterThanOrEqual(250);
+    });
+
+    it('ends the drain delay on a second signal', async () => {
+        const child = fork(fixture, ['drain-interrupt'], { stdio: ['ignore', 'ignore', 'pipe', 'ipc'] });
+        const messages: string[] = [];
+
+        child.on('message', (message: string) => {
+            messages.push(message);
+
+            if (message === 'ready' || message === 'signal') {
+                child.kill('SIGTERM');
+            }
+        });
+
+        const started = Date.now();
+        const code = await new Promise<number | null>((resolve) => {
+            child.on('exit', resolve);
+        });
+
+        expect(code).toBe(0);
+        expect(messages).toEqual(['ready', 'signal', 'teardown', 'finished']);
+        expect(Date.now() - started).toBeLessThan(10_000);
+    });
+
     it('exits unsuccessfully when teardown fails', async () => {
         const child = fork(fixture, ['fail'], { stdio: ['ignore', 'ignore', 'pipe', 'ipc'] });
 

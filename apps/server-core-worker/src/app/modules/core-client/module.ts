@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { Client } from '@privateaim/core-http-kit';
-import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '@privateaim/server-kit';
+import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey, HTTPClientTimeout } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import type { Config } from '../config/types.ts';
 import { CoreClientInjectionKey } from './constants.ts';
@@ -23,7 +23,7 @@ export class CoreClientModule implements IModule {
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey) as Config;
-        const client = new Client({ baseURL: config.coreURL });
+        const client = new Client({ baseURL: config.coreURL, timeout: HTTPClientTimeout.SERVICE });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
 

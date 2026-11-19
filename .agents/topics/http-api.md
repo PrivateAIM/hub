@@ -120,6 +120,11 @@ read methods take an `ActorContext`:
 Field names are `satisfies keyof T` constants, so a rename cannot leave a stale string
 that silently skips the gate.
 
+## Outbound Timeouts
+
+- Every outbound hapic client sets `timeout` from `HTTPClientTimeout` (`@privateaim/server-kit`), one value per kind of peer; a new client takes its peer's value, never an inline number.
+- hapic's timer keeps running while a body is read, so every call that streams a request or response body (`stream`, `upload`, `streamFiles`, `downloadResult`, the GitHub tarball) passes `timeout: 0`; `timeout.spec.ts` in core-http-kit and storage-kit fails when one does not. A timed-out call answers 504 `upstream_timeout` (`sanitizeError`) and is transient for the worker.
+
 ## Transport-level FakeClient
 
 `@privateaim/<kit>/testing` (all four HTTP kits) ships a `FakeClient` that subclasses the

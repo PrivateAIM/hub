@@ -127,7 +127,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
         await preEvaluateRelationReads(query, actor, RELATION_READ_PERMISSIONS);
 
         try {
-            return await scopeReadQuery(query, actor, { names: REGISTRY_PROJECT_READ_PERMISSIONS });
+            return await scopeReadQuery(query, actor, { names: REGISTRY_PROJECT_READ_PERMISSIONS, schema: registryProjectSchema });
         } catch (e) {
             if (!isPermissionError(e)) {
                 throw e;

@@ -9,6 +9,7 @@ import { BadRequestError } from '@privateaim/errors';
 import type {
     MessageAckRequest,
     MessageParty,
+    MessagePendingEvent,
     MessagePullQuery,
     SendMessageRequest,
 } from '@privateaim/messenger-kit';
@@ -102,7 +103,7 @@ export class MessageController {
 
         const push = () => stream.write({
             event: WakeupEventName.MESSAGE_PENDING,
-            data: JSON.stringify({ recipient }),
+            data: JSON.stringify({ recipient } satisfies MessagePendingEvent),
         });
 
         // nudge the client to pull on connect (catch up on anything pending before the stream opened)
@@ -111,8 +112,10 @@ export class MessageController {
         const unsubscribe = this.wakeup.subscribe(recipient, push);
 
         const heartbeat = setInterval(() => {
-            // `write` returns false once the client disconnects — use it to drive cleanup
-            const alive = stream.write({ event: 'ping', data: `${Date.now()}` });
+            // A comment line keeps the connection alive without dispatching an
+            // event to the client. `writeComment` returns false once the client
+            // disconnects — use it to drive cleanup.
+            const alive = stream.writeComment('ping');
 
             if (alive) {
                 return;

@@ -19,6 +19,7 @@ export async function normalizeConfig(input: Partial<Config>): Promise<Config> {
         ...validated,
         env: validated.env ?? EnvironmentName.DEVELOPMENT,
         port: validated.port ?? ConfigDefaults.PORT,
+        shutdownDelay: validated.shutdownDelay ?? 0,
 
         realm: validated.realm ?? ConfigDefaults.REALM,
         clientId: validated.clientId ?? ConfigDefaults.CLIENT_ID,

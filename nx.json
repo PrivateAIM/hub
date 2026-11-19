@@ -3,24 +3,17 @@
     "build": {
       "dependsOn": [
         "^build"
-      ]
+      ],
+      "cache": true
     },
     "test": {
       "dependsOn": [
         "^build"
-      ]
-    }
-  },
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx/tasks-runners/default",
-      "options": {
-        "cacheableOperations": [
-          "build",
-          "lint",
-          "test"
-        ]
-      }
+      ],
+      "cache": true
+    },
+    "lint": {
+      "cache": true
     }
   },
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
@@ -34,5 +27,8 @@
       "default"
     ]
   },
-  "analytics": false
+  "analytics": false,
+  "affected": {
+    "legacy": true
+  }
 }

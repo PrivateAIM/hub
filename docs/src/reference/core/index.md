@@ -31,7 +31,6 @@ docker run -e ... privateaim/hub core cli start
 |----------|---------|-------------|
 | `HARBOR_URL` | — | Harbor registry URL |
 | `TELEMETRY_URL` | — | Telemetry service URL |
-| `VAULT_CONNECTION_STRING` | `start123@http://127.0.0.1:8090/v1/` | Vault connection for secrets |
 | `MASTER_IMAGES_OWNER` | `PrivateAim` | GitHub owner for master images |
 | `MASTER_IMAGES_REPOSITORY` | `master-images` | GitHub repository name |
 | `MASTER_IMAGES_BRANCH` | `master` | GitHub branch |
@@ -56,6 +55,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `GET/POST` | `/analyses/:id/client/credentials` | Read / rotate the analysis's OAuth2 client credentials |
 | `POST` | `/analyses/:id/storage/token` | Mint a storage capability token for buckets and files of the analysis (see below) |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
+| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
 
 ## Response Shapes
 

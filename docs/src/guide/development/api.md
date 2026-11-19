@@ -230,6 +230,8 @@ Every failure answers with the same flat object — never the `{ data, meta }` e
 - An authorization denial answers **403** with one of `permission_denied`,
   `permission_evaluation_failed` or `permission_not_found` (the last two are Authup's evaluator
   codes, passed through verbatim). Before this was fixed, an evaluator denial answered 400 or 500.
+- A request Hub makes to another service (Authup, telemetry, Harbor, …) that runs out of time
+  answers **504** with `upstream_timeout`.
 
 ### Reading `issues`
 

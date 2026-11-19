@@ -9,7 +9,7 @@ import type { Log } from '@privateaim/telemetry-kit';
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { AnalysisLog } from '@privateaim/core-kit';
-import { BaseAPI } from '../base';
+import { BaseAPI } from 'hapic';
 import type { EntityCollectionResponse } from '../types';
 import type { IAnalysisLogAPI } from './types';
 

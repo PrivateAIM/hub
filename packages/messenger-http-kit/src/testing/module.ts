@@ -55,6 +55,26 @@ function normalizeBody(input: unknown) : unknown {
 }
 
 /**
+ * Tie a response body to the request's signal, as `fetch` does: an abort (a
+ * caller signal or hapic's `timeout`) cancels the source and errors the body
+ * with the signal's reason. Without it an in-memory stream would outlive
+ * every deadline and a test could not tell `timeout: 0` from no option.
+ */
+function bindResponseSignal(response: Response, signal?: AbortSignal | null) : Response {
+    if (!signal || !response.body) {
+        return response;
+    }
+
+    const body = response.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>(), { signal });
+
+    return new Response(body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+    });
+}
+
+/**
  * A REAL `Client` wired to an in-memory transport.
  *
  * Because only the transport is replaced, everything above it still runs: the
@@ -120,7 +140,7 @@ export class FakeClient extends Client {
                     await fb(request);
 
                 if (data instanceof Response) {
-                    return data;
+                    return bindResponseSignal(data, req.signal);
                 }
 
                 // MemoryResponseInit — a bare `{ data, meta }` would carry no

@@ -51,6 +51,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `POST` | `/logs` | Write logs |
 | `DELETE` | `/logs` | Delete logs |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
+| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
 
 ## Response Shapes
 

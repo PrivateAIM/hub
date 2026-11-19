@@ -13,13 +13,22 @@ import {
     AUTHUP_CLIENT_MODULE_NAME,
     AuthupClientInjectionKey,
     EnvironmentName,
+    Health,
+    HealthInjectionKey,
     LoggerInjectionKey,
     MESSAGE_BUS_MODULE_NAME,
     RedisClientInjectionKey,
     RedisPublishClientInjectionKey,
     RedisSubscribeClientInjectionKey,
+    createDatabaseHealthCheck,
+    createHealthLogObserver,
 } from '@privateaim/server-kit';
-import { createAuthupTokenVerifier, mountErrorMiddleware, mountMiddlewares } from '@privateaim/server-http-kit';
+import {
+    createAuthupTokenVerifier,
+    mountErrorMiddleware,
+    mountHealthRoutes,
+    mountMiddlewares,
+} from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import {
     AnalysisLogController,
@@ -72,6 +81,8 @@ export class HTTPModule implements IModule {
 
     private socket: ReturnType<typeof createSocketServer> | undefined;
 
+    private health: Health | undefined;
+
     constructor(options: HTTPModuleOptions = {}) {
         this.options = options;
     }
@@ -81,6 +92,15 @@ export class HTTPModule implements IModule {
         const logger = container.resolve(LoggerInjectionKey);
 
         const app = new App();
+
+        // Ahead of every middleware: probes are neither authenticated, rate
+        // limited nor counted. Readiness waits on the database (1 s bound).
+        this.health = new Health({
+            readiness: [createDatabaseHealthCheck(container.resolve(DatabaseInjectionKey.DataSource))],
+            onReadinessChange: createHealthLogObserver(logger),
+        });
+        container.register(HealthInjectionKey, { useValue: this.health });
+        mountHealthRoutes(app, this.health);
 
         const isTestEnvironment = config.env === EnvironmentName.TEST;
 
@@ -204,8 +224,15 @@ export class HTTPModule implements IModule {
         }
     }
 
+    async onReady(): Promise<void> {
+        // Every module finished its setup: both probes may pass from now on.
+        this.health?.markStarted();
+    }
+
     async teardown(container: IContainer): Promise<void> {
         container.unregister(HTTPInjectionKey.App);
+        container.unregister(HealthInjectionKey);
+        this.health = undefined;
 
         if (!this.instance) {
             return;

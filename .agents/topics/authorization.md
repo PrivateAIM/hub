@@ -57,13 +57,19 @@ The evaluator enforces only the data a call supplies: a service using only
 
 - Pre-evaluates a one-of of the entity's read and write/manage names; holding none is
   403. Holding a write implies read; there is no self-service fallback, by decision.
-- Returns a `ReadScope { query, post, names }`, lowering `compile()`: `allow` →
-  unchanged, `conditional` → AND-appended, `deny` → `inArray('id', [])`, `post` → the
-  query unnarrowed with `post: true`.
+- Takes the entity `schema` and returns a `ReadScope { query, post, names }`, lowering
+  `compile()`: `allow` → unchanged, `conditional` → AND-appended, `deny` →
+  `inArray('id', [])`, `post` → the query unnarrowed with `post: true` and `checkFields`
+  (`fields.default`, the realm column, `id`).
 - **Run every scope through `findManyScoped(repository, scope, actor)`** (#2021). On
-  `post` it keeps the rows `reachesRecordOneOf` allows, evaluated against the stored row
-  (re-read by id in one query, so a sparse fieldset hides neither the realm nor a policy
-  attribute). Never answer `post` with the actor's realm, not even as a pre-filter: it
+  `post` it reads the page ONCE with its projection widened to `checkFields`
+  (`widenReadProjection`), keeps the rows `reachesRecordOneOf` allows on those columns
+  and their realm, and trims the columns loaded only for the check. A second read of the
+  page's rows is rejected: the rows returned and the rows evaluated would be two
+  snapshots (CodeRabbit on #2023; authup#3832). A gated column (`select: false`, outside
+  `fields.default`) is never a check field, and never shown to the policy even when the
+  read asks for it: the verdict would be an oracle on the secret. `id` is not trimmed:
+  `applyQuery` projects it anyway. Never answer `post` with the actor's realm, not even as a pre-filter: it
   returns own-realm rows the policy denies and drops reachable global and foreign rows.
   A `post` page may be short or empty and `meta.total` stays the candidate count: a
   reduced total would end a total-driven pager before later pages with reachable rows.
@@ -207,11 +213,15 @@ steps: [deployment configuration](../../docs/src/guide/deployment/configuration.
 - **`resolve()` returns an `AnalysisReach`, executed only by the service's `findMany`**
   (never append a condition by hand; combine reaches with `intersectAnalysisReach` /
   `buildAnalysisBucketTypeReach`). A grant that does not lower (`post`) is decided per
-  analysis (#2021): the page's distinct analyses are loaded in one query, each is reached
+  analysis (#2021) on one read of the page, widened to the reach's `checkFields` (the
+  analysis id, `analysisBucket.type` for bucket files, the default row when the rows are
+  analyses) and trimmed again. The page's distinct analyses are loaded in one query of
+  the analysis table (the page rows themselves when they are analyses); each is reached
   iff `reachesRecordOneOf` allows the **analysis row and its realm** or its id is among
-  the participation ids, and the refined reach is applied to the page's rows as a
-  condition again. No own-realm narrowing; short pages and `meta.total` as for
-  `findManyScoped`.
+  the participation ids. Each row is then matched in memory: the lowered parts of a
+  combined reach already hold through `candidates` in the page read, and the bucket type
+  picks the row's branch (the branches' types are disjoint). No own-realm narrowing;
+  short pages and `meta.total` as for `findManyScoped`.
 - **No master-realm bypass**: a master user with `own` grants sees only master's analyses;
   the built-in `admin` role and `system` client hold `any`.
 - Node and analysis clients reach by binding only, and the binding counts only when the

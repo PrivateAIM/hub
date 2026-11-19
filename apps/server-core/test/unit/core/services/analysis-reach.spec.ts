@@ -11,6 +11,8 @@ import { PermissionName } from '@privateaim/kit';
 import type { EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { appendQueryConditions } from '@privateaim/server-kit';
 import {
+    Field,
+    Fields,
     Query,
     and,
     eq,
@@ -27,6 +29,7 @@ import {
 import { AnalysisReachService } from '../../../../src/core/services/analysis-reach/index.ts';
 import type { AnalysisReach, AnalysisReachTarget } from '../../../../src/core/services/analysis-reach/index.ts';
 import {
+    FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
     createScopedActor,
@@ -43,20 +46,39 @@ function lowered(condition: ICondition | undefined): AnalysisReach {
     return { kind: 'lowered', condition };
 }
 
-/** Projects the page down to `id`, as a sparse fieldset does; a read by id returns the stored rows. */
-class SparseAnalysisNodeRepository extends FakeAnalysisNodeRepository {
-    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<AnalysisNode>> {
+/**
+ * Loads only the projected columns, like a database repository (every column
+ * when the read names none), and records the rows of each read.
+ */
+class ProjectingRepository<T extends Record<string, any>> extends FakeEntityRepository<T> {
+    returned: T[] = [];
+
+    async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<T>> {
         const result = await super.findMany(query);
+        const names = query.fields.value.map((field) => field.name);
 
-        if (this.findManyCalls.length > 1) {
-            return result;
-        }
+        const data = names.length === 0 ?
+            result.data :
+            result.data.map((row) => {
+                const output: Record<string, any> = {};
 
-        return {
-            data: result.data.map((row) => ({ ...createTestAnalysisNode({ id: row.id }), analysisId: undefined })),
-            meta: result.meta,
-        };
+                for (const name of names) {
+                    if (name in row) {
+                        output[name] = row[name];
+                    }
+                }
+
+                return output as T;
+            });
+
+        this.returned.push(...data);
+
+        return { data, meta: result.meta };
     }
+}
+
+function project(...names: string[]): Query {
+    return new Query({ fields: new Fields(names.map((name) => new Field(name))) });
 }
 
 describe('AnalysisReachService', () => {
@@ -576,8 +598,8 @@ describe('AnalysisReachService', () => {
                     .toEqual(['realm-b', 'realm-b', 'realm-c']);
             });
 
-            it('should find the analysis of a row whose fieldset left the column out', async () => {
-                const repository = new SparseAnalysisNodeRepository();
+            it('should decide a sparse fieldset on one read and return only the asked fields', async () => {
+                const repository = new ProjectingRepository<AnalysisNode>();
 
                 repository.seed(analysisNodeRepository.getAll());
 
@@ -586,12 +608,46 @@ describe('AnalysisReachService', () => {
                     realmScope: 'any',
                     policy,
                 });
-                const { data } = await service.findMany(repository, new Query({}), await service.resolve(actor, ANALYSIS_NODE));
+                const { data } = await service.findMany(repository, project('id'), await service.resolve(actor, ANALYSIS_NODE));
 
                 expect(data.map((row) => row.id).sort())
                     .toEqual(['of-a-3', 'of-foreign-open', 'of-own-open', 'of-own-open-2']);
-                // The projection is returned as it was read.
-                expect(data.every((row) => row.analysisId === undefined)).toBe(true);
+                // One read of the family rows, its projection widened by the analysis id
+                expect(repository.findManyCalls).toHaveLength(1);
+                expect(repository.findManyCalls[0].fields.value.map((field) => field.name)).toEqual(['id', 'analysisId']);
+                // which the response does not carry, and the rows returned are the rows read.
+                expect(data).toEqual(data.map((row) => ({ id: row.id })));
+                expect(data.every((row) => repository.returned.includes(row))).toBe(true);
+            });
+        });
+
+        it('should evaluate a sparse page of analyses on the page rows themselves', async () => {
+            const repository = new ProjectingRepository<Analysis>();
+
+            repository.seed(analysisRepository.getAll());
+
+            const actor = createScopedActor({
+                realmId: 'realm-b',
+                realmScope: 'any',
+                policy,
+            });
+            const reach = await service.resolve(actor, ANALYSIS);
+
+            analysisRepository.findManyCalls = [];
+
+            const { data } = await service.findMany(repository, project('id'), reach);
+
+            expect(data).toEqual([{ id: 'own-open' }, { id: 'foreign-open' }, { id: 'a-3' }]);
+            // No second read of the analyses: the page is decided on itself.
+            expect(repository.findManyCalls).toHaveLength(1);
+            expect(analysisRepository.findManyCalls).toHaveLength(0);
+
+            const evaluated = actor.permissionEvaluator.evaluateOneOfCalls.map((call) => call.data.get<Analysis>('attributes'));
+
+            expect(evaluated).toContainEqual({
+                id: 'own-closed', 
+                realmId: 'realm-b', 
+                name: 'closed', 
             });
         });
     });

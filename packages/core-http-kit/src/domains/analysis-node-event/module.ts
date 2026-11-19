@@ -8,7 +8,7 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString } from '../../utils';
 import type { AnalysisNodeEvent } from '@privateaim/core-kit';
-import { BaseAPI } from '../base';
+import { BaseAPI } from 'hapic';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 import type { IAnalysisNodeEventAPI } from './types';
 

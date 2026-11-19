@@ -45,7 +45,11 @@ export class MasterImageGroupService extends AbstractEntityService implements IM
         const scoped = await scopeReadQuery(
             decodeQuery(query, { schema: masterImageGroupSchema }),
             actor,
-            { names: MASTER_IMAGE_GROUP_READ_PERMISSIONS, compile: false },
+            {
+                names: MASTER_IMAGE_GROUP_READ_PERMISSIONS, 
+                schema: masterImageGroupSchema, 
+                compile: false, 
+            },
         );
 
         return findManyScoped(this.repository, scoped, actor);

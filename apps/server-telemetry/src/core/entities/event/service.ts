@@ -72,7 +72,7 @@ export class EventService extends AbstractEntityService implements IEventService
      * permission and narrowed to what the caller's grant reaches.
      */
     protected scopeRead(query: IQuery, actor: ActorContext): Promise<ReadScope> {
-        return scopeReadQuery(query, actor, { names: READ_PERMISSIONS });
+        return scopeReadQuery(query, actor, { names: READ_PERMISSIONS, schema: eventSchema });
     }
 
     async create(data: Partial<Event>, actor: ActorContext): Promise<Event> {

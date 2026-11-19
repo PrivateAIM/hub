@@ -16,6 +16,7 @@ import {
     RedisTokenCache,
     TokenVerifier,
 } from '@authup/server-adapter-kit';
+import { isUpstreamTimeoutError } from '@authup/errors';
 import { HubError } from '@privateaim/errors';
 import { assertIntrospectableToken, createAuthupClientTokenCreator } from '@privateaim/server-kit';
 import { VouchlyErrorCode, isVouchlyError } from 'vouchly';
@@ -58,9 +59,16 @@ export class IntrospectableTokenVerifier extends TokenVerifier {
  * `invalid_token` — a 401 that makes every authup client hook drop its
  * session, although the caller's token was never judged. Such a failure is
  * answered 502 instead; a token authup did judge (inactive, expired,
- * malformed) keeps its 401.
+ * malformed) keeps its 401. A request that ran out of time is authup's
+ * `UpstreamTimeoutError` (504) and passes through unchanged, also when the
+ * timed-out request was the token mint that vouchly reports as
+ * `introspection_failed`.
  */
 function toUpstreamError(input: unknown): unknown {
+    if (isUpstreamTimeoutError(input)) {
+        return input;
+    }
+
     if (
         Error.isError(input) &&
         isVouchlyError(input.cause) &&

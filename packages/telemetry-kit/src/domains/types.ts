@@ -9,7 +9,6 @@ import type { DomainType } from './constants';
 import type { Event } from './event';
 import type { Log } from './log';
 import type { ObjectLiteral, SchemaDescription } from '@rapiq/core';
-import type { IClient as IBaseClient, RequestBaseOptions } from 'hapic';
 import type { EntityQueryInput } from '../utils';
 
 type DomainTypeMapRaw = {
@@ -83,10 +82,3 @@ export interface IEntityAPI<T extends ObjectLiteral, TCreate = Partial<T>, TUpda
     update(id: DomainEntityID<T>, data: TUpdate) : Promise<EntityRecordResponse<T>>;
 }
 
-export type BaseAPIContext = {
-    /**
-     * hapic client INTERFACE, not its concrete class — see the identical note
-     * in @privateaim/core-http-kit.
-     */
-    client?: IBaseClient | RequestBaseOptions
-};

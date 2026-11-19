@@ -12,6 +12,7 @@ import {
     BadRequestError,
     EntityConflictError,
     EntityRelationInvalidError,
+    ErrorCode,
     HubError,
     InternalError,
     StorageInsufficientError,
@@ -19,6 +20,7 @@ import {
     isHubError,
 } from '@privateaim/errors';
 import { isHTTPError } from '@ebec/http';
+import { isClientErrorDueTimeout } from 'hapic';
 import {
     AdapterError,
     CodecError,
@@ -35,7 +37,9 @@ import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'v
  * 2. EntityRelationLookupError         → EntityRelationInvalidError
  * 3. stale authorization catalog       → InternalError
  * 4. any other authup error            → HubError with authup's code and status
- *    (permission_* → 403, *_token → 401, throttled → 429, upstream → 502)
+ *    (permission_* → 403, *_token → 401, throttled → 429, upstream_error → 502,
+ *    upstream_timeout → 504)
+ * 4b. outbound hapic request timeout  → HubError `upstream_timeout` (504)
  * 5. rapiq decode error                → BadRequestError carrying its parse trace
  *    (ParseError covers the per-parameter subclasses, CodecError an unresolvable
  *    codec stamp — both are triggered by wire input; Adapter/Build/Merge/Schema
@@ -76,8 +80,9 @@ export function sanitizeError(input: unknown): HubError {
 
     // Any other authup error — an evaluator denial (`permission_*`), a dead
     // bearer forwarded by the auth middleware (`JWTError`), a throttle (429),
-    // an upstream failure (502), … — keeps authup's code and answers the
-    // status authup itself assigns it. ABOVE the validup branch for the same
+    // an upstream failure (`upstream_error`, 502), a token verification that
+    // timed out (`UpstreamTimeoutError`, 504), … — keeps authup's code and
+    // answers the status authup itself assigns it. ABOVE the validup branch for the same
     // reason as the rapiq branch below: `evaluationFailed` carries the failed
     // policy's issues, which the validup shape fallback would claim (400).
     if (isAuthupError(input)) {
@@ -87,6 +92,16 @@ export function sanitizeError(input: unknown): HubError {
             message: input.message,
             stack: input.stack,
             issues: input.issues,
+        });
+    }
+
+    // An outbound hapic request (core, storage, telemetry, Harbor, …) that ran
+    // out of its `timeout`. The client error's message names the upstream URL,
+    // so it is not passed on.
+    if (isClientErrorDueTimeout(input)) {
+        return new HubError({
+            code: ErrorCode.UPSTREAM_TIMEOUT,
+            message: 'An upstream service did not answer in time.',
         });
     }
 

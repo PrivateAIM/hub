@@ -10,14 +10,16 @@ import { once } from 'node:events';
 import type { Server } from 'node:http';
 import { createServer } from 'node:http';
 import type { ITokenCache } from '@authup/server-adapter-kit';
+import { isUpstreamTimeoutError } from '@authup/errors';
 import { isHubError, isUnauthorizedError } from '@privateaim/errors';
+import { ErrorCode, createClientError } from 'hapic';
 import {
     afterEach,
     describe,
     expect,
     it,
 } from 'vitest';
-import { createAuthupTokenVerifier } from '../../../../src/middlewares/authup/token-verifier.ts';
+import { IntrospectableTokenVerifier, createAuthupTokenVerifier } from '../../../../src/middlewares/authup/token-verifier.ts';
 
 // A structurally valid compact JWS (header.payload.signature); never verified.
 const jws = [
@@ -284,5 +286,24 @@ describe('createAuthupTokenVerifier upstream failures', () => {
 
         expect(isHubError(error)).toBe(false);
         expect(error).toMatchObject({ code: 'inactive_token' });
+    });
+
+    /**
+     * vouchly reports a failed token mint as `introspection_failed`; authup
+     * classifies a mint that timed out as `UpstreamTimeoutError` (504), which
+     * must not be rewritten to the 502 above.
+     */
+    it('keeps the 504 of a token mint that timed out', async () => {
+        const verifier = new IntrospectableTokenVerifier({
+            baseURL: 'http://127.0.0.1:1/',
+            creator: async () => {
+                throw createClientError({ code: ErrorCode.CONNECTION_TIMEOUT, request: { method: 'POST', url: 'http://127.0.0.1:1/token' } });
+            },
+        });
+
+        const error = await verifier.verify(jws).then(() => undefined, (e: unknown) => e);
+
+        expect(isUpstreamTimeoutError(error)).toBe(true);
+        expect(error).toMatchObject({ code: 'upstream_timeout' });
     });
 });

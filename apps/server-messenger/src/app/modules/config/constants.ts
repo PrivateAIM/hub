@@ -38,4 +38,5 @@ export enum EnvironmentInputKey {
     AUTHUP_URL = 'AUTHUP_URL',
 
     COOKIE_PREFIX = 'COOKIE_PREFIX',
+    SHUTDOWN_DELAY = 'SHUTDOWN_DELAY',
 }

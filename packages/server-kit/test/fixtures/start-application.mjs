@@ -48,11 +48,21 @@ if (mode === 'setup-fail' || mode === 'ready-fail') {
         process.exitCode = 1;
     }
 } else {
-    if (mode === 'timeout' || mode === 'linger') {
+    if (mode === 'timeout' || mode === 'linger' || mode === 'drain') {
         const original = setTimeout;
 
         globalThis.setTimeout = (callback, delay, ...args) => original(callback, delay === 30_000 ? 100 : delay, ...args);
     }
+
+    // `drain`: a 300 ms drain delay, longer than the patched 100 ms deadline.
+    // `drain-interrupt`: a 60 s delay that a second signal must end.
+    const onSignal = mode === 'drain' || mode === 'drain-interrupt' ?
+        () => {
+            process.send('signal');
+
+            return mode === 'drain' ? 300 : 60_000;
+        } :
+        undefined;
 
     await startApplication({
         async setup() {
@@ -98,7 +108,7 @@ if (mode === 'setup-fail' || mode === 'ready-fail') {
 
             process.disconnect();
         },
-    });
+    }, { onSignal });
     keepAlive = setInterval(() => {}, 1_000);
     process.send('ready');
 }

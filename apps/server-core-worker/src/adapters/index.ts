@@ -7,5 +7,4 @@
 
 export * from './docker/index.ts';
 export * from './github/index.ts';
-export * from './harbor/index.ts';
 export * from './http/index.ts';

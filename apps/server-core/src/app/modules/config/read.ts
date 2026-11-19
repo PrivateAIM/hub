@@ -35,6 +35,7 @@ export function readConfigFromEnv(): Partial<Config> {
         publicURL: read(EnvironmentInputKey.PUBLIC_URL, `http://127.0.0.1:${port}/`),
 
         cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
+        shutdownDelay: readInt(EnvironmentInputKey.SHUTDOWN_DELAY),
 
         masterImagesOwner: read(EnvironmentInputKey.MASTER_IMAGES_OWNER, ConfigDefaults.MASTER_IMAGES_OWNER),
         masterImagesRepository: read(EnvironmentInputKey.MASTER_IMAGES_REPOSITORY, ConfigDefaults.MASTER_IMAGES_REPOSITORY),
@@ -66,18 +67,6 @@ export function readConfigFromEnv(): Partial<Config> {
         config.redisConnectionString = redisConnectionString;
     } else if (isBoolTrue(redisConnectionString)) {
         config.redisConnectionString = ConfigDefaults.REDIS;
-    }
-
-    // Vault
-    const vaultConnectionString = oneOf([
-        readBool(EnvironmentInputKey.VAULT_CONNECTION_STRING),
-        read(EnvironmentInputKey.VAULT_CONNECTION_STRING),
-    ]);
-
-    if (typeof vaultConnectionString === 'string') {
-        config.vaultConnectionString = vaultConnectionString;
-    } else if (isBoolTrue(vaultConnectionString)) {
-        config.vaultConnectionString = ConfigDefaults.VAULT;
     }
 
     return config;

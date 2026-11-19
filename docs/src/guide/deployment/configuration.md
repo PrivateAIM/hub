@@ -13,16 +13,22 @@ These variables are shared across all services:
 | `REDIS_CONNECTION_STRING` | No | Redis connection URL (for pub/sub and caching) |
 | `AMQP_URL` | No | RabbitMQ connection URL |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
+| `SHUTDOWN_DELAY` | No | Seconds core, storage, telemetry and messenger keep serving after `SIGTERM`/`SIGINT` while `GET /readyz` already answers 503, so a load balancer stops routing to them first (0 to 3600, default `0`). The worker ignores it. See [Graceful shutdown](#graceful-shutdown). |
 
 ## Graceful shutdown
 
 The core, storage, telemetry and messenger CLI starts, and the worker entrypoint,
-handle `SIGINT` and `SIGTERM` by awaiting application teardown once. A signal during
-startup waits for setup before teardown; a failed setup also triggers cleanup.
-Shutdown has a **30-second deadline**, including handles left alive after teardown;
-expiry or a rejected setup/teardown exits with code 1. Successful cleanup lets buffered
-output drain before the process exits. Allow more than 30 seconds of termination grace
-in your process supervisor so Hub's deadline can run before a forced kill.
+handle `SIGINT` and `SIGTERM` by awaiting application teardown once. On the first
+signal `GET /readyz` answers 503. When startup had finished, the listeners then keep
+serving for `SHUTDOWN_DELAY` seconds (default 0) so a load balancer drains them; a
+second signal ends that wait early. A signal during startup skips the delay and waits
+for setup before teardown; a failed setup also triggers cleanup.
+After the delay, shutdown has a **30-second deadline**, including handles left alive
+after teardown; expiry or a rejected setup/teardown exits with code 1. Successful
+cleanup lets buffered output drain before the process exits. Allow more than
+`SHUTDOWN_DELAY` + 30 seconds of termination grace in your process supervisor
+(`terminationGracePeriodSeconds`, `stop_grace_period`) so Hub's deadline can run
+before a forced kill.
 Scheduled components finish an in-flight pass before their dependencies close.
 Core closes its Socket.IO clients before the HTTP listener. The installed Orkos
 lifecycle catches individual module teardown errors, so exit code 0 is not proof
@@ -44,6 +50,63 @@ under its own key prefix, and drop them by tag when a record changes.
 - Without Redis each process keeps an in-memory cache. Run more than one replica of a service only
   with Redis: otherwise a change written through one replica is answered stale by the others for up
   to 60 seconds.
+
+## Health endpoints
+
+Every service answers two anonymous paths, `GET` and `HEAD` alike, ahead of
+authentication, rate limiting and metrics:
+
+| Path | Question | Use it for |
+|------|----------|------------|
+| `/livez` | Does the process answer? | A liveness probe: failing it restarts the process |
+| `/readyz` | Can the process serve? | A readiness probe, a load balancer health check, `depends_on: service_healthy` |
+
+Both answer 200 or 503 with `Cache-Control: no-store` and a report naming each
+check, never error text:
+
+```json
+{ "healthy": false, "checks": [{ "name": "startup", "ok": true }, { "name": "database", "ok": false }, { "name": "shutdown", "ok": true }] }
+```
+
+| Service | `/livez` fails when | `/readyz` fails when |
+|---------|---------------------|----------------------|
+| core, storage, telemetry, messenger | startup has not finished | startup has not finished, the database does not answer `SELECT 1` within one second, or the stop signal arrived |
+| worker | startup (bus consumers included) has not finished | startup has not finished, or the stop signal arrived |
+
+- Both fail until every module finished setup (migrations included), so give a
+  Kubernetes `startupProbe` on `/livez` a window longer than your slowest migration.
+- `/livez` checks no dependency: a restart does not fix a database outage.
+- Redis, RabbitMQ and Authup are no readiness checks. They are shared by every
+  replica, so failing on them would take all replicas out of rotation at once;
+  the AMQP driver reconnects on its own. VictoriaLogs is none either for telemetry.
+- A database result is reused for one second, so frequent probes add no load.
+- `GET /` keeps its status document (version and timestamp, or a timestamp on
+  messenger and worker) and checks nothing; do not probe it.
+
+```yaml
+startupProbe:
+    httpGet:
+        path: /livez
+        port: 3000
+    periodSeconds: 5
+    failureThreshold: 60
+livenessProbe:
+    httpGet:
+        path: /livez
+        port: 3000
+    periodSeconds: 30
+readinessProbe:
+    httpGet:
+        path: /readyz
+        port: 3000
+    periodSeconds: 10
+```
+
+The image `HEALTHCHECK` requests `/livez` (the ui keeps `/`), so under Docker
+Swarm or autoheal a database outage does not turn into a restart loop. To make
+Docker health mean readiness (e.g. for Compose `depends_on: service_healthy`),
+set `HEALTHCHECK_PATH=/readyz` on the container. Kubernetes ignores the image
+`HEALTHCHECK`; use the probes above.
 
 ## Message delivery (RabbitMQ)
 

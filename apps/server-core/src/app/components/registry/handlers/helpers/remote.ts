@@ -30,7 +30,8 @@ export async function ensureRemoteRegistryProject(
         await httpClient.project.create(options);
     } catch (e) {
         if (isClientErrorWithStatusCode(e, 409)) {
-            await httpClient.project.update(context.remoteName, options, true);
+            // Harbor applies only `metadata` and `cve_allowlist` on update.
+            await httpClient.project.update(context.remoteName, { metadata: { public: options.public ? 'true' : 'false' } }, true);
         }
     }
 

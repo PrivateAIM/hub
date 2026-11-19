@@ -80,9 +80,11 @@ export class APIClient extends Client implements IStorageClient {
     }
 
     /**
-     * Seam for the testing FakeClient, which has to keep its transport.
+     * A copy with this client's defaults (base URL, timeout), headers and
+     * transport, but none of its hooks: the scoped client authorizes through
+     * its own resolver, not through an authentication hook attached here.
      */
     protected createScopedClient() : APIClient {
-        return new APIClient({ baseURL: this.getBaseURL() });
+        return new APIClient(this.toOptions());
     }
 }

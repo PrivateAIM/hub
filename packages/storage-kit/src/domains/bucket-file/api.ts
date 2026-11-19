@@ -10,9 +10,9 @@ import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 import type { BucketFile, IBucketFileAPI } from './types';
-import { BaseAPI } from '../base';
+import { StorageBaseAPI } from '../base';
 
-export class BucketFileAPI extends BaseAPI implements IBucketFileAPI {
+export class BucketFileAPI extends StorageBaseAPI implements IBucketFileAPI {
     async getMany(record?: EntityQueryInput<BucketFile>): Promise<EntityCollectionResponse<BucketFile>> {
         const response = await this.client.get(`bucket-files${buildQueryString(record)}`);
 
@@ -55,6 +55,8 @@ export class BucketFileAPI extends BaseAPI implements IBucketFileAPI {
         const response = await this.client.request({
             url: this.getStreamPath(id),
             responseType: 'stream',
+            // the timer would keep running while the body is read
+            timeout: 0,
         });
 
         if (typeof response.data === 'undefined') {

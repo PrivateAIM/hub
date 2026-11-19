@@ -8,7 +8,7 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
 import type { ProjectNode } from '@privateaim/core-kit';
-import { BaseAPI } from '../base';
+import { BaseAPI } from 'hapic';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 import type { IProjectNodeAPI, ProjectNodeCreatePayload, ProjectNodeUpdatePayload } from './types';
 

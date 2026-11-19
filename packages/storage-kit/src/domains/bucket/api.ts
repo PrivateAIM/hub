@@ -10,10 +10,10 @@ import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
 import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
 import type { Bucket, BucketCreatePayload, IBucketAPI } from './types';
-import { BaseAPI } from '../base';
+import { StorageBaseAPI } from '../base';
 import type { BucketFile } from '../bucket-file';
 
-export class BucketAPI extends BaseAPI implements IBucketAPI {
+export class BucketAPI extends StorageBaseAPI implements IBucketAPI {
     async getMany(record?: EntityQueryInput<Bucket>): Promise<EntityCollectionResponse<Bucket>> {
         const response = await this.client.get(`buckets${buildQueryString(record)}`);
 
@@ -51,7 +51,11 @@ export class BucketAPI extends BaseAPI implements IBucketAPI {
     }
 
     async upload(id: Bucket['id'], formData: FormData): Promise<EntityCollectionResponse<BucketFile>> {
-        const response = await this.client.post(`buckets/${id}/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+        const response = await this.client.post(`buckets/${id}/upload`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            // an upload streams its body; the timer would cut it off
+            timeout: 0,
+        });
 
         return response.data;
     }
@@ -68,6 +72,8 @@ export class BucketAPI extends BaseAPI implements IBucketAPI {
         const response = await this.client.request({
             url: this.getStreamPath(id),
             responseType: 'stream',
+            // the timer would keep running while the body is read
+            timeout: 0,
         });
 
         if (typeof response.data === 'undefined') {

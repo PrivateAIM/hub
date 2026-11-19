@@ -129,6 +129,21 @@ const analysisNodes = await getManyAll((page) => client.analysisNode.getMany({
 }));
 ```
 
+### Timeouts
+
+`timeout` (milliseconds) bounds each request, including reading its response body. The client
+sets none by default; Hub's services set one per kind of peer (`HTTPClientTimeout` in
+[`@privateaim/server-kit`](/reference/shared/server-kit#outbound-http-timeouts)). A timed-out
+request rejects with a hapic client error whose `code` is `ETIMEDOUT`
+(`isClientErrorDueTimeout()`).
+
+```typescript
+const client = new Client({ baseURL: 'http://localhost:4000', timeout: 30_000 });
+```
+
+The stream methods (`analysis.streamFiles`, `analysis.downloadResult`) pass `timeout: 0`: the
+deadline would keep running while the caller reads the stream.
+
 ### With Authentication
 
 ```typescript
@@ -266,5 +281,5 @@ expect(client.requests[0]).toMatchObject({ method: 'GET', params: { id: 'abc' } 
 ## Dependencies
 
 - `@privateaim/core-kit` — Domain types
-- `hapic` — HTTP client base
+- `hapic` — HTTP client base; every sub-API extends hapic's `BaseAPI`
 - `rapiq` — Query parameter building
