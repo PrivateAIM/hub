@@ -8,6 +8,12 @@
 export type BaseHTTPClientInstallOptions<C = unknown> = {
     baseURL?: string,
     /**
+     * Request timeout in milliseconds of a client built from `baseURL`.
+     * Unset, a request waits as long as the server takes, which during SSR
+     * stalls the whole render. Streams and uploads opt out per call.
+     */
+    timeout?: number,
+    /**
      * A pre-built client. When given it is used as-is instead of constructing
      * one from `baseURL` — the seam a test uses to inject a `FakeClient`.
      */

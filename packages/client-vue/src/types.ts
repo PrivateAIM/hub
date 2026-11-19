@@ -21,6 +21,12 @@ export type Options = {
     storageURL: string,
     telemetryURL: string,
 
+    /**
+     * Request timeout in milliseconds of the core, storage and telemetry
+     * clients built from the URLs above (not of pre-built clients).
+     */
+    httpTimeout?: number,
+
     components?: boolean | string[],
 
     translatorLocale?: string,
