@@ -19,6 +19,7 @@ export function readConfigFromEnv(): Partial<Config> {
 
         clientId: read(EnvironmentInputKey.CLIENT_ID, ConfigDefaults.CLIENT_ID),
         clientSecret: read(EnvironmentInputKey.CLIENT_SECRET, ConfigDefaults.CLIENT_SECRET),
+        capabilityClientId: read(EnvironmentInputKey.CAPABILITY_CLIENT_ID),
 
         realm: read(EnvironmentInputKey.REALM, ConfigDefaults.REALM),
 

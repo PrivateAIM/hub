@@ -66,6 +66,9 @@ Every service rate-limits in two stages, per replica:
   minute that carry a credential and answer 401. An expired or revoked token
   and a request without a credential are not counted, so users behind one NAT
   address (a clinic network) are not locked out by ordinary token renewal.
+  This stage blocks the whole address, so it runs only once `TRUST_PROXY` is
+  set to something other than `true` or a list with a `/0` range: with every hop trusted, a client could
+  lock out any address by naming it in `X-Forwarded-For`.
 - **After authentication**, per identity (100 requests a second for a user,
   1000 for a client), and per client address for an anonymous request (20 a
   second). Hub's own service clients are not limited.
@@ -846,8 +849,11 @@ steps below before rolling out the UI.
   EC).** Authup's `/jwks` publishes no symmetric (OCT) keys and refuses to sign a capability token
   with one, so a realm that only has an OCT key cannot issue them, and server-storage could not
   verify them.
-- **server-storage verifies tokens locally** against `AUTHUP_URL`'s `/jwks`; it needs no extra
-  credential.
+- **server-storage verifies tokens locally** against `AUTHUP_URL`'s `/jwks`, and accepts only tokens
+  the core client exchanged. `CAPABILITY_CLIENT_ID` names that client and defaults to storage's own
+  `CLIENT_ID`: when server-core and server-storage authenticate as different clients, set it to the
+  core client's id (or name in `REALM`; a name is looked up once and needs `client_read`). Without it,
+  every capability request answers 401.
 
 ### Rollout order
 

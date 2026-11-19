@@ -24,6 +24,7 @@ export async function normalizeConfig(input: Partial<Config>): Promise<Config> {
         realm: validated.realm ?? ConfigDefaults.REALM,
         clientId: validated.clientId ?? ConfigDefaults.CLIENT_ID,
         clientSecret: validated.clientSecret ?? ConfigDefaults.CLIENT_SECRET,
+        capabilityClientId: validated.capabilityClientId ?? validated.clientId ?? ConfigDefaults.CLIENT_ID,
 
         publicURL: validated.publicURL ?? `http://localhost:${validated.port ?? ConfigDefaults.PORT}`,
 

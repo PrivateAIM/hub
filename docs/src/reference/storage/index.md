@@ -29,6 +29,7 @@ docker run -e ... privateaim/hub storage cli start
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `MINIO_CONNECTION_STRING` | `http://admin:start123@127.0.0.1:9000` | MinIO connection (**required**) |
+| `CAPABILITY_CLIENT_ID` | `CLIENT_ID` | The Authup client (id, or name in `REALM`) whose capability-token exchanges are accepted: the client server-core authenticates as. A token another client exchanged is refused (401). A name is looked up once through Authup, which needs `client_read` for storage's own client; an id needs no lookup. |
 
 ### Inherited
 
@@ -79,7 +80,8 @@ Besides a login, server-storage accepts an Authup **capability token** (`kind: c
 audience `storage`) minted by server-core through
 [`POST /analyses/:id/storage/token`](/reference/core/#storage-capability-tokens). It is verified
 locally (signature against Authup's `/jwks`, `aud`, `kind`, `exp`) and grants only the actions on the
-resources in its `cap` claim. A capability request carries no identity: every route not listed below
+resources in its `cap` claim. Only a token exchanged by `CAPABILITY_CLIENT_ID` (its `act.sub`) is
+accepted, as Authup lets every client with a `storage` exchange capability mint one. A capability request carries no identity: every route not listed below
 answers it 401.
 
 | Where | Routes |

@@ -48,6 +48,12 @@ export type AuthCapabilityTokenVerifierCreateContext = {
      * The `aud` a capability token must name to be accepted here.
      */
     audience: string,
+    /**
+     * Resolves the id of the one client whose exchanges are accepted
+     * (`act.sub`): the service that judges each request before minting.
+     * Any other client able to exchange for `audience` is refused (401).
+     */
+    trustedClientId: () => Promise<string>,
     cache?: ITokenCache,
 };
 

@@ -42,16 +42,15 @@ export class AuthupClientModule implements IModule {
             }
         }
 
-        // Fake-wins guard. This module is MANDATORY in every app harness (it
-        // feeds the authorization middleware across four apps), so a test
-        // cannot simply omit it the way it can omit the core/storage/telemetry
-        // client modules. Without this, an already-registered fake would be
-        // clobbered by the real client.
+        // Without a URL the token stays UNBOUND: consumers rely on
+        // `tryResolve` yielding undefined (node/analysis client provisioning
+        // is skipped, the authorization middleware refuses every token).
         //
-        // Deliberately AFTER the `baseURL` early return: that path legitimately
-        // leaves the token UNBOUND and consumers rely on `tryResolve` yielding
-        // undefined there.
-        if (container.has(AuthupClientInjectionKey)) {
+        // Fake-wins guard: this module is MANDATORY in every app harness (it
+        // feeds the authorization middleware across four apps), so a test
+        // cannot omit it the way it can omit the core/storage/telemetry client
+        // modules. An already-registered fake must not be clobbered.
+        if (!baseURL || container.has(AuthupClientInjectionKey)) {
             return;
         }
 

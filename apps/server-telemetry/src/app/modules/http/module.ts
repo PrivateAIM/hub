@@ -90,7 +90,7 @@ export class HTTPModule implements IModule {
             basic: true,
             cors: true,
             prometheus: !isTestEnvironment,
-            rateLimit: !isTestEnvironment,
+            rateLimit: isTestEnvironment ? false : { trustProxy: config.trustProxy },
             authorization: {
                 authupClient: authupResult.success ?
                     authupResult.data :

@@ -21,4 +21,12 @@ describe('AuthupClientModule', () => {
 
         expect(container.resolve(AuthupClientInjectionKey).toOptions().timeout).toBe(HTTPClientTimeout.AUTHUP);
     });
+
+    it('should leave the client unbound without an Authup URL', async () => {
+        const container = new Container();
+
+        await new AuthupClientModule().setup(container);
+
+        expect(container.tryResolve(AuthupClientInjectionKey).success).toBe(false);
+    });
 });

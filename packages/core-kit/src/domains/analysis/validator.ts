@@ -38,7 +38,7 @@ export class AnalysisValidator extends TypedContainer<Analysis> {
                         ctx.issues.push({
                             input: ctx.value,
                             code: 'custom',
-                            message: Error.isError(e) ? e.message : 'The analysis name is not valid.',
+                            message: e instanceof Error ? e.message : 'The analysis name is not valid.',
                         });
                     }
                 })),
