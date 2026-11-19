@@ -14,6 +14,7 @@ import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import type { App } from 'routup';
 import { defineErrorHandler } from 'routup';
 import { sanitizeError } from '../core';
+import { setRequestEnv } from '../request';
 
 type ErrorResponsePayload = {
     statusCode: number,
@@ -37,6 +38,8 @@ export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions =
         const next: HubError = sanitizeError(source);
 
         const status = next.status ?? httpStatusFromCode(next.code);
+
+        setRequestEnv(event, 'errorCode', `${next.code}`);
 
         const payload: ErrorResponsePayload = {
             statusCode: status,

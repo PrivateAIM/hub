@@ -1,53 +1,151 @@
 /*
- * Copyright (c) 2023-2024.
+ * Copyright (c) 2023-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 import { hasUnboundedReach } from '@authup/access';
+import { ErrorCode as AuthupErrorCode } from '@authup/errors';
 import { PermissionName } from '@privateaim/kit';
-import type { OptionsInput } from '@routup/rate-limit';
 import { rateLimit } from '@routup/rate-limit';
 import type { App, IAppEvent } from 'routup';
+import { getRequestIP } from 'routup';
 import { useRequestEnv, useRequestIdentity } from '../request';
 
 const PERMISSION_NAMES = Object.values(PermissionName);
 
-export function mountRateLimiterMiddleware(app: App) {
-    const options : OptionsInput = {
-        async skip(event: IAppEvent) {
-            const identity = useRequestIdentity(event);
-            const permissionEvaluator = useRequestEnv(event, 'permissionEvaluator');
+const WINDOW_MS = 60 * 1000;
 
-            if (!identity || identity.type !== 'client' || !permissionEvaluator) {
-                return false;
+/**
+ * Failed authentications one source address may cause per window before
+ * authentication is known (authup/authup#3692).
+ */
+export const RATE_LIMIT_FAILED_AUTHENTICATION_MAX = 300;
+
+/**
+ * Requests per window once the caller is known; an anonymous request is
+ * counted against its address.
+ */
+export const RATE_LIMIT_BUDGETS = {
+    anonymous: 60 * 20,
+    user: 60 * 100,
+    client: 60 * 1000,
+} as const;
+
+// IPv4 127.0.0.0/8, `::1` and the IPv4-mapped form a dual-stack socket
+// reports, anchored and octet-checked: a sloppy match is a way past the limiter.
+const LOOPBACK_IP = /^(?:::1|(?:::ffff:)?127(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3})$/i;
+
+/**
+ * Both addresses must be loopback: the socket address cannot be forged by a
+ * header, and the trusted address rules out a reverse proxy on the same host,
+ * which reaches the service over loopback for every visitor.
+ */
+function isLoopbackRequest(event: IAppEvent): boolean {
+    return LOOPBACK_IP.test(getRequestIP(event, { trustProxy: false }) || '') &&
+        LOOPBACK_IP.test(getRequestIP(event) || '');
+}
+
+// A proxy may append the client's source port, which changes per connection.
+function stripPort(ip: string): string {
+    return ip.match(/^\[([^\]]+)\]:\d+$/)?.[1] ??
+        ip.match(/^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/)?.[1] ??
+        ip;
+}
+
+/**
+ * The plugin's default key hardcodes `trustProxy: true`; this one follows the
+ * app's TRUST_PROXY. Prefixed, as the key indexes a plain object.
+ */
+function buildAddressKey(event: IAppEvent): string {
+    return `ip:${stripPort(getRequestIP(event) || '127.0.0.1')}`;
+}
+
+/**
+ * A 401 for a credential that could have been guessed. An expired or revoked
+ * token carries a valid signature, and a request without a credential guessed
+ * nothing; both are what users behind one NAT address cause in ordinary use.
+ */
+function isFailedAuthentication(event: IAppEvent, response: Response): boolean {
+    if (response.status !== 401) {
+        return false;
+    }
+
+    const code = useRequestEnv(event, 'errorCode');
+
+    if (code === AuthupErrorCode.JWT_EXPIRED || code === AuthupErrorCode.JWT_INACTIVE) {
+        return false;
+    }
+
+    return !!event.headers.get('authorization');
+}
+
+/**
+ * Hub's own service clients (e.g. the worker's `system` client) are never
+ * throttled: a client whose grants reach every realm for EVERY hub
+ * permission. One name per call, as several names compile as any-of.
+ */
+async function isServiceClient(event: IAppEvent): Promise<boolean> {
+    const identity = useRequestIdentity(event);
+    const permissionEvaluator = useRequestEnv(event, 'permissionEvaluator');
+
+    if (!identity || identity.type !== 'client' || !permissionEvaluator) {
+        return false;
+    }
+
+    const verdicts = await Promise.all(PERMISSION_NAMES.map(
+        (name) => hasUnboundedReach(permissionEvaluator, name),
+    ));
+
+    return verdicts.every(Boolean);
+}
+
+/**
+ * First stage, BEFORE authorization: counts failed authentications per
+ * source address, so a flood of forged bearers is cut before it reaches
+ * Authup introspection, while valid requests pass uncounted
+ * (`skipSuccessfulRequest` returns their slot once the response is known).
+ */
+export function mountAuthenticationRateLimiterMiddleware(app: App) {
+    app.use(rateLimit({
+        max: RATE_LIMIT_FAILED_AUTHENTICATION_MAX,
+        keyGenerator: (event) => `pre:${buildAddressKey(event)}`,
+        skipSuccessfulRequest: true,
+        requestWasSuccessful: (event, response) => !isFailedAuthentication(event, response),
+        skip: isLoopbackRequest,
+        windowMs: WINDOW_MS,
+    }));
+}
+
+/**
+ * Second stage, AFTER authorization: an authenticated request counts against
+ * its identity, so users sharing an address no longer share a budget; an
+ * anonymous one against its address.
+ */
+export function mountRateLimiterMiddleware(app: App) {
+    app.use(rateLimit({
+        keyGenerator: (event) => {
+            const identity = useRequestIdentity(event);
+
+            if (identity) {
+                return `${identity.type}:${identity.id}`;
             }
 
-            // Never throttle hub's own service clients, e.g. the worker's `system` client:
-            // a client whose grants reach every realm (`realm_scope: any`, no policy) for
-            // EVERY hub permission. One name per call: several names compile as any-of.
-            const verdicts = await Promise.all(PERMISSION_NAMES.map(
-                (name) => hasUnboundedReach(permissionEvaluator, name),
-            ));
-
-            return verdicts.every(Boolean);
+            return buildAddressKey(event);
+        },
+        async skip(event: IAppEvent) {
+            return isLoopbackRequest(event) || isServiceClient(event);
         },
         max(event: IAppEvent) {
             const identity = useRequestIdentity(event);
 
-            if (identity && identity.type === 'user') {
-                return 60 * 100; // 100 req p. sec
+            if (!identity) {
+                return RATE_LIMIT_BUDGETS.anonymous;
             }
 
-            if (identity && identity.type === 'client') {
-                return 60 * 1000; // 1000 req p. sec
-            }
-
-            return 60 * 20; // 20 req p. sec
+            return identity.type === 'client' ? RATE_LIMIT_BUDGETS.client : RATE_LIMIT_BUDGETS.user;
         },
-        windowMs: 60 * 1000, // 60 sec
-    };
-
-    app.use(rateLimit(options));
+        windowMs: WINDOW_MS,
+    }));
 }

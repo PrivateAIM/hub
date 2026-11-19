@@ -8,9 +8,15 @@
 import type { PermissionCompileContext, PermissionCompileResult } from '@authup/access';
 import { PermissionName } from '@privateaim/kit';
 import { FakePermissionEvaluator } from '@authup/server-test-kit';
+import { HubError } from '@privateaim/errors';
 import { App, defineCoreHandler } from 'routup';
 import { describe, expect, it } from 'vitest';
-import { mountRateLimiterMiddleware } from '../../../src/middlewares/rate-limit.ts';
+import { mountErrorMiddleware } from '../../../src/middlewares/error.ts';
+import {
+    RATE_LIMIT_FAILED_AUTHENTICATION_MAX,
+    mountAuthenticationRateLimiterMiddleware,
+    mountRateLimiterMiddleware,
+} from '../../../src/middlewares/rate-limit.ts';
 import type { RequestIdentity } from '../../../src/request/index.ts';
 import { setRequestEnv, setRequestIdentity } from '../../../src/request/index.ts';
 
@@ -92,5 +98,88 @@ describe('rate limiter', () => {
 
     it('limits an anonymous request', async () => {
         expect(await limitFor()).toBe(String(60 * 20));
+    });
+
+    it('counts users behind one address against their own budgets', async () => {
+        const app = new App();
+
+        app.use(defineCoreHandler((event) => {
+            setRequestIdentity(event, {
+                id: event.headers.get('x-user') || 'a',
+                type: 'user',
+                realmId: 'b',
+                realmName: 'master',
+            });
+
+            return event.next();
+        }));
+        mountRateLimiterMiddleware(app);
+        app.get('/', defineCoreHandler(() => ({})));
+
+        const send = (user: string) => app.fetch(new Request('http://hub.test/', { headers: { 'x-user': user, 'x-forwarded-for': '203.0.113.7' } }));
+
+        await send('alice');
+        await send('alice');
+
+        const bob = await send('bob');
+
+        expect(bob.headers.get('ratelimit-remaining')).toBe(String(60 * 100 - 1));
+    });
+});
+
+describe('authentication rate limiter', () => {
+    function createApp(code = 'invalid_token') {
+        const app = new App();
+
+        mountAuthenticationRateLimiterMiddleware(app);
+        app.get('/fail', defineCoreHandler(() => {
+            throw new HubError({
+                code, 
+                status: 401, 
+                message: 'refused', 
+            });
+        }));
+        app.get('/ok', defineCoreHandler(() => ({})));
+        mountErrorMiddleware(app);
+
+        return app;
+    }
+
+    function send(app: App, path: string, headers: Record<string, string> = {}) {
+        return app.fetch(new Request(`http://hub.test${path}`, { headers: { 'x-forwarded-for': '203.0.113.7', ...headers } }));
+    }
+
+    async function remainingAfter(app: App, path: string, headers: Record<string, string> = {}) {
+        await send(app, path, headers);
+
+        const probe = await send(app, '/ok');
+
+        return Number(probe.headers.get('ratelimit-remaining'));
+    }
+
+    it('counts a refused bearer against its address', async () => {
+        const app = createApp();
+
+        expect(await remainingAfter(app, '/fail', { authorization: 'Bearer forged' }))
+            .toBe(RATE_LIMIT_FAILED_AUTHENTICATION_MAX - 1);
+    });
+
+    it('does not count an expired token', async () => {
+        const app = createApp('expired_token');
+
+        expect(await remainingAfter(app, '/fail', { authorization: 'Bearer expired' }))
+            .toBe(RATE_LIMIT_FAILED_AUTHENTICATION_MAX);
+    });
+
+    it('does not count a 401 without a credential', async () => {
+        const app = createApp();
+
+        expect(await remainingAfter(app, '/fail')).toBe(RATE_LIMIT_FAILED_AUTHENTICATION_MAX);
+    });
+
+    it('does not count a successful request', async () => {
+        const app = createApp();
+
+        expect(await remainingAfter(app, '/ok')).toBe(RATE_LIMIT_FAILED_AUTHENTICATION_MAX);
     });
 });
