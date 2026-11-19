@@ -24,6 +24,7 @@ import {
     DGet,
     DPath,
     DPost,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -125,6 +126,7 @@ export class BucketController {
     }
 
     @DPost('/:id/upload', [ForceIdentityOrCapabilityMiddleware])
+    @DStatus(201)
     async upload(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
@@ -163,8 +165,6 @@ export class BucketController {
             this.bucketFileEventDispatcher,
         );
 
-        event.response.status = 201;
-
         return {
             data: files,
             meta: { total: files.length },
@@ -172,14 +172,13 @@ export class BucketController {
     }
 
     @DPost('/:id/clear', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async clear(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.clear(id, actor);
-
-        event.response.status = 202;
 
         return { data: entity, meta: {} };
     }
@@ -203,6 +202,7 @@ export class BucketController {
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async update(
         @DPath('id') id: string,
         @DBody() data: Partial<BucketCreatePayload>,
@@ -211,12 +211,11 @@ export class BucketController {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
 
-        event.response.status = 202;
-
         return { data: entity, meta: {} };
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DStatus(201)
     async add(
         @DBody() data: BucketCreatePayload,
         @DContext() event: IAppEvent,
@@ -224,20 +223,17 @@ export class BucketController {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
 
-        event.response.status = 201;
-
         return { data: entity, meta: {} };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
-
-        event.response.status = 202;
 
         return { data: entity, meta: {} };
     }

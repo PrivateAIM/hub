@@ -25,9 +25,9 @@ async getOne(@DPath('id') id: string, @DContext() event: IAppEvent): Promise<Ent
 }
 
 @DPost('', [ForceLoggedInMiddleware])
+@DStatus(201)
 async add(@DBody() data: NodeCreatePayload, @DContext() event: IAppEvent): Promise<EntityRecordResponse<Node>> {
     const entity = await this.service.create(data, buildActorContext(event));
-    event.response.status = 201;
     return { data: entity, meta: {} };
 }
 ```
@@ -76,7 +76,8 @@ records); `POST /buckets/:id/upload`.
 - **Never mutate a description**: it is memoized, deep-frozen and shared. Spread
   (`meta: { ...meta, schema: … }`); `meta.schema = …` throws a `TypeError`.
 - No `send()`/`sendCreated()` helpers (only `sendStream` in storage): return the value
-  and set `event.response.status`.
+  and declare a non-200 success status with `@DStatus(n)`, never `event.response.status`
+  (trapi documents only the decorator, so an assignment leaves the operation listed as 200).
 
 ## Field Selection Conventions
 

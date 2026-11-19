@@ -22,6 +22,7 @@ import {
     DDelete,
     DGet,
     DPath,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -140,13 +141,12 @@ export class BucketFileController {
     }
 
     @DDelete('/:id', [ForceIdentityOrCapabilityMiddleware])
+    @DStatus(202)
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<BucketFile>> {
         const entity = await this.service.delete(id, useStorageRequester(event));
-
-        event.response.status = 202;
 
         return { data: entity, meta: {} };
     }

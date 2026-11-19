@@ -18,6 +18,7 @@ import {
     DDelete,
     DGet,
     DPost,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -35,13 +36,12 @@ export class LogController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DStatus(201)
     async create(
         @DBody() body: LogInput,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Log>> {
         const entity = await this.service.create(body, buildActorContext(event));
-
-        event.response.status = 201;
 
         return { data: entity, meta: {} };
     }
@@ -58,12 +58,11 @@ export class LogController {
     }
 
     @DDelete('', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async deleteMany(
         @DContext() event: IAppEvent,
     ) {
         await this.service.deleteMany(useRequestQuery(event), buildActorContext(event));
-
-        event.response.status = 202;
 
         return null;
     }

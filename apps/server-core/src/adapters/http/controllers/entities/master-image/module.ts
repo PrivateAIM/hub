@@ -15,6 +15,7 @@ import {
     DGet,
     DPath,
     DPost,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -59,6 +60,7 @@ export class MasterImageController {
     }
 
     @DPost('/command', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async runCommand(
         @DBody() data: {
             command: MasterImageCommand;
@@ -69,22 +71,19 @@ export class MasterImageController {
         const actor = buildActorContext(event);
         const entity = await this.service.executeCommand(data.command, data, actor);
 
-        event.response.status = 202;
-
         // The SYNC branch resolves without an entity — coalesce so the
         // envelope always carries an explicit `data` key on the wire.
         return { data: entity ?? null, meta: {} };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<MasterImage>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
-
-        event.response.status = 202;
 
         return { data: entity, meta: {} };
     }

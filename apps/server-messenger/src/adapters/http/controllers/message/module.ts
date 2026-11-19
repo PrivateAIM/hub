@@ -21,6 +21,7 @@ import {
     DController,
     DGet,
     DPost,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -50,14 +51,13 @@ export class MessageController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async send(
         @DBody() data: SendMessageRequest,
         @DContext() event: IAppEvent,
     ) {
         const actor = buildActorContext(event);
         const messages = await this.service.send(data, actor);
-
-        event.response.status = 202;
 
         return { data: messages.map((message) => message.id) };
     }
@@ -73,6 +73,7 @@ export class MessageController {
     }
 
     @DPost('/ack', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async ack(
         @DBody() data: MessageAckRequest,
         @DContext() event: IAppEvent,
@@ -80,7 +81,6 @@ export class MessageController {
         const actor = buildActorContext(event);
 
         await this.service.ack(data, actor);
-        event.response.status = 202;
 
         return { data: data.ids };
     }

@@ -19,6 +19,7 @@ import {
     DDelete,
     DGet,
     DPost,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -104,6 +105,7 @@ export class AnalysisNodeLogController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async add(
         @DBody() body: Partial<AnalysisNodeLog>,
         @DContext() event: IAppEvent,
@@ -146,12 +148,11 @@ export class AnalysisNodeLogController {
             await this.telemetryClient.log.create(entity);
         }
 
-        event.response.status = 202;
-
         return { data: entity, meta: {} };
     }
 
     @DDelete('', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async drop(
         @DContext() event: IAppEvent,
     ) {
@@ -185,8 +186,6 @@ export class AnalysisNodeLogController {
         if (this.telemetryClient) {
             await this.telemetryClient.log.deleteMany({ filters });
         }
-
-        event.response.status = 202;
 
         return null;
     }

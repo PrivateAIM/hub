@@ -12,6 +12,7 @@ import {
     DContext,
     DController,
     DPost,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 
@@ -39,6 +40,7 @@ export class ServiceController {
     }
 
     @DPost('/:id/hook', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async handleHarborHook(
         @DContext() event: IAppEvent,
         @DBody() data: Record<string, any>,
@@ -51,12 +53,11 @@ export class ServiceController {
 
         await this.registryDispatcher.dispatch('HOOK_PROCESS', data, {});
 
-        event.response.status = 202;
-
         return null;
     }
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async execHarborTask(
         @DContext() event: IAppEvent,
         @DBody() data: {
@@ -74,8 +75,6 @@ export class ServiceController {
         const actor = buildActorContext(event);
 
         await this.registryService.executeCommand(data.command, data, actor);
-
-        event.response.status = 202;
 
         return null;
     }
