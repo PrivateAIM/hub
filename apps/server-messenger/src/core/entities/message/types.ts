@@ -45,8 +45,16 @@ export interface IMessageRepository {
     deleteExpired(now: Date, options?: { batchSize?: number }): Promise<number>;
 }
 
+export type MessagePullOptions = {
+    /**
+     * The caller's request signal: an abort ends the long-poll wait at once
+     * and skips the re-query nobody would read.
+     */
+    signal?: AbortSignal,
+};
+
 export interface IMessageService {
     send(data: SendMessageRequest, actor: ActorContext): Promise<Message[]>;
-    pull(query: MessagePullQuery, actor: ActorContext): Promise<MessagePullResponse>;
+    pull(query: MessagePullQuery, actor: ActorContext, options?: MessagePullOptions): Promise<MessagePullResponse>;
     ack(data: MessageAckRequest, actor: ActorContext): Promise<void>;
 }

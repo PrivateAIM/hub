@@ -69,7 +69,7 @@ export class MessageController {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
 
-        return this.service.pull(this.parsePullQuery(query), actor);
+        return this.service.pull(this.parsePullQuery(query), actor, { signal: event.signal });
     }
 
     @DPost('/ack', [ForceLoggedInMiddleware])
@@ -111,24 +111,34 @@ export class MessageController {
 
         const unsubscribe = this.wakeup.subscribe(recipient, push);
 
-        const heartbeat = setInterval(() => {
-            // A comment line keeps the connection alive without dispatching an
-            // event to the client. `writeComment` returns false once the client
-            // disconnects — use it to drive cleanup.
-            const alive = stream.writeComment('ping');
-
-            if (alive) {
+        let heartbeat: ReturnType<typeof setInterval> | undefined;
+        let closed = false;
+        const close = () => {
+            if (closed) {
                 return;
             }
 
+            closed = true;
             clearInterval(heartbeat);
             unsubscribe();
             stream.end();
+        };
+
+        heartbeat = setInterval(() => {
+            // A comment line keeps the connection alive without dispatching an
+            // event to the client; it fails once the client is gone.
+            if (!stream.writeComment('ping')) {
+                close();
+            }
         }, SSE_HEARTBEAT_MS);
 
         if (typeof heartbeat.unref === 'function') {
             heartbeat.unref();
         }
+
+        // A disconnect aborts the request signal: release the wakeup
+        // subscription now rather than at the next heartbeat.
+        event.signal.addEventListener('abort', close, { once: true });
 
         return stream.response;
     }
