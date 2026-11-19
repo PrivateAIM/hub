@@ -24,6 +24,7 @@ import {
     DGet,
     DPath,
     DPost,
+    DProduces,
     DStatus,
     DTags,
 } from '@routup/decorators';
@@ -98,10 +99,11 @@ export class BucketController {
     }
 
     @DGet('/:id/stream', [ForceIdentityOrStreamCapabilityMiddleware])
+    @DProduces('application/x-tar')
     async stream(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<Response> {
         // The URL may carry a capability token (`?dt=`): never pass it on.
         event.response.headers.set('referrer-policy', 'no-referrer');
 

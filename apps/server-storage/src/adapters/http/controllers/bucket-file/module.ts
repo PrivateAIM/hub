@@ -22,6 +22,7 @@ import {
     DDelete,
     DGet,
     DPath,
+    DProduces,
     DStatus,
     DTags,
 } from '@routup/decorators';
@@ -75,10 +76,11 @@ export class BucketFileController {
     }
 
     @DGet('/:id/stream', [ForceIdentityOrStreamCapabilityMiddleware])
+    @DProduces('application/octet-stream')
     async stream(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ) {
+    ): Promise<Response> {
         // The URL may carry a capability token (`?dt=`): never pass it on.
         event.response.headers.set('referrer-policy', 'no-referrer');
 
