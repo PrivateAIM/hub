@@ -20,6 +20,12 @@ export function mountMiddlewares(
     app: App,
     options: MiddlewareMountOptions = {},
 ) {
+    // First, so requests the middlewares below reject (401, 429, a
+    // preflight) are measured too.
+    if (options.prometheus) {
+        mountPrometheusMiddleware(app);
+    }
+
     if (options.cors) {
         mountCorsMiddleware(app);
     }
@@ -30,10 +36,6 @@ export function mountMiddlewares(
 
     if (options.authorization) {
         mountAuthorizationMiddleware(app, options.authorization);
-    }
-
-    if (options.prometheus) {
-        mountPrometheusMiddleware(app);
     }
 
     if (options.rateLimit) {
