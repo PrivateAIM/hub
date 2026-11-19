@@ -51,6 +51,9 @@ export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions =
             options.logger.error({
                 message: source,
                 [LogFlag.CHANNEL]: LogChannel.HTTP,
+                method: event.method,
+                // The route pattern (`/analyses/:id`), never the concrete path.
+                ...(event.route ? { route: event.route.path } : {}),
             });
         } else if (isObject(next.data)) {
             const keys = Object.keys(next.data);

@@ -61,7 +61,7 @@ describe('mountErrorMiddleware', () => {
             app.get('/gone', defineCoreHandler(() => {
                 throw createError({ status: 410, message: 'gone' });
             }));
-            app.get('/crash', defineCoreHandler(() => {
+            app.get('/crash/:id', defineCoreHandler(() => {
                 throw new Error('boom');
             }));
 
@@ -113,11 +113,12 @@ describe('mountErrorMiddleware', () => {
 
         it('answers a thrown error 500 and logs the thrown error', async () => {
             const transport = new LoggerMemoryTransport();
-            const response = await createBodyApp(transport).fetch(new Request('http://hub.test/crash'));
+            const response = await createBodyApp(transport).fetch(new Request('http://hub.test/crash/42'));
 
             expect(response.status).toEqual(500);
             expect(transport.items).toHaveLength(1);
             expect(transport.items[0].message).toContain('boom');
+            expect(transport.items[0]).toMatchObject({ method: 'GET', route: '/crash/:id' });
         });
     });
 });
