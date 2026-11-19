@@ -37,7 +37,7 @@
         "build": "npm run build:js && npm run build:types"
     },
     "dependencies": {
-        "hubwire": "^0.2.2"
+        "hubwire": "^0.2.3"
     },
     "engines": {
         "node": ">=26.0.0"
