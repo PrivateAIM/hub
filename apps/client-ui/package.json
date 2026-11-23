@@ -66,7 +66,7 @@
         "@vuecs/pagination": "^2.2.3",
         "@vuecs/placeholder": "^1.1.2",
         "@vuecs/table": "^1.6.3",
-        "@vuecs/theme-tailwind": "^6.5.2",
+        "@vuecs/theme-tailwind": "^6.6.0",
         "@vuecs/timeago": "^2.2.2",
         "@vuecs/tree": "^1.0.1",
         "@vueuse/core": "^15.0.0",

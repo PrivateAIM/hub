@@ -49,12 +49,12 @@
     "dependencies": {
         "@authup/client-web-kit-theme": "^1.0.0-beta.76",
         "@vuecs/design": "^1.2.2",
-        "@vuecs/theme-tailwind": "^6.5.2"
+        "@vuecs/theme-tailwind": "^6.6.0"
     },
     "peerDependencies": {
         "@vuecs/core": "^3.6.1",
         "@vuecs/design": "^1.2.2",
-        "@vuecs/theme-tailwind": "^6.5.2",
+        "@vuecs/theme-tailwind": "^6.6.0",
         "tailwindcss": "^4.3.5"
     },
     "publishConfig": {
