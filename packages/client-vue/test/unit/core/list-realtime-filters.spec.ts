@@ -10,14 +10,22 @@ import { ClientManager } from '@authup/core-realtime-kit';
 import { injectStore } from '@authup/client-web-kit';
 import type { Analysis } from '@privateaim/core-kit';
 import { DomainType, buildDomainChannelName, buildDomainNamespaceName } from '@privateaim/core-kit';
+import type { FakeHandlerMap } from '@privateaim/core-http-kit/testing';
 import type { CTSEvents, STCEvents } from '@privateaim/core-realtime-kit';
 import { buildDomainEventFullName } from '@privateaim/kit';
 import { contains, isCondition, or } from '@rapiq/core';
 import { flushPromises } from '@vue/test-utils';
-import { defineComponent, getCurrentInstance, h } from 'vue';
+import type { SetupContext } from 'vue';
+import {
+    defineComponent,
+    getCurrentInstance,
+    h,
+    ref,
+} from 'vue';
 import { describe, expect, it } from 'vitest';
 import FAnalyses from '../../../src/components/analysis/FAnalyses';
-import type { ListLoadFn } from '../../../src/core';
+import type { ListEventsType, ListLoadFn } from '../../../src/core';
+import { createList, defineListProps } from '../../../src/core';
 import { combineFilters, matchesQueryFilters } from '../../../src/core/query';
 import { provideSocketManager } from '../../../src/core/socket';
 import { createTestAnalysis } from '../../utils/factories';
@@ -77,35 +85,33 @@ describe('combineFilters', () => {
     });
 });
 
-describe('list realtime inserts', () => {
-    it('should insert a created record only when it matches the list filters', async () => {
-        const manager = new OfflineClientManager({ url: 'http://fake.test', options: { autoConnect: false } });
-        let load: ListLoadFn | undefined;
-        const host = defineComponent({
-            setup() {
-                provideSocketManager(manager, getCurrentInstance()?.appContext.app);
-                injectStore().setRealmManagement({ id: 'r1', name: 'one' });
+function mountAnalyses(core: FakeHandlerMap) {
+    const manager = new OfflineClientManager({ url: 'http://fake.test', options: { autoConnect: false } });
+    const state : { load?: ListLoadFn } = {};
+    const host = defineComponent({
+        setup() {
+            provideSocketManager(manager, getCurrentInstance()?.appContext.app);
+            injectStore().setRealmManagement({ id: 'r1', name: 'one' });
 
-                return () => h(FAnalyses, { query: { filters: { projectId: 'p1' } } }, {
-                    header: (props: { load: ListLoadFn }) => {
-                        load = props.load;
+            return () => h(FAnalyses, { query: { filters: { projectId: 'p1' } } }, {
+                header: (props: { load: ListLoadFn }) => {
+                    state.load = props.load;
 
-                        return null;
-                    },
-                    item: (props: { data: Analysis }) => h('div', { class: 'row' }, props.data.id),
-                });
-            },
-        });
+                    return null;
+                },
+                item: (props: { data: Analysis }) => h('div', { class: 'row' }, props.data.id),
+            });
+        },
+    });
 
-        const { wrapper, coreClient } = mountClientVueComponent(host, {}, { core: { 'GET /analyses': () => ({ data: [], meta: { total: 0 } }) } });
+    const { wrapper, coreClient } = mountClientVueComponent(host, {}, { core });
 
-        await flushPromises();
-
+    const emit = (data: Analysis) => {
         const [listener] = manager
             .inject(buildDomainNamespaceName('r1'))
             .listeners(buildDomainEventFullName(DomainType.ANALYSIS, EntityDefaultEventName.CREATED));
 
-        const emit = (data: Analysis) => listener({
+        listener({
             data,
             meta: {
                 event: EntityDefaultEventName.CREATED,
@@ -114,6 +120,28 @@ describe('list realtime inserts', () => {
                 roomName: buildDomainChannelName(DomainType.ANALYSIS),
             },
         });
+    };
+
+    const rows = () => wrapper.findAll('.row').map((el) => el.text());
+
+    return {
+        coreClient,
+        emit,
+        rows,
+        state,
+    };
+}
+
+describe('list realtime inserts', () => {
+    it('should insert a created record only when it matches the list filters', async () => {
+        const {
+            coreClient,
+            emit,
+            rows,
+            state,
+        } = mountAnalyses({ 'GET /analyses': () => ({ data: [], meta: { total: 0 } }) });
+
+        await flushPromises();
 
         const foreign = createTestAnalysis({ projectId: 'p2' });
         const own = createTestAnalysis({ projectId: 'p1' });
@@ -122,10 +150,10 @@ describe('list realtime inserts', () => {
         emit(own);
         await flushPromises();
 
-        expect(wrapper.findAll('.row').map((el) => el.text())).toEqual([own.id]);
+        expect(rows()).toEqual([own.id]);
 
         // A search must keep the project scope, on the request and for inserts.
-        await load!({ filters: contains('name', 'foo'), pagination: { offset: 0 } });
+        await state.load!({ filters: contains('name', 'foo'), pagination: { offset: 0 } });
         await flushPromises();
 
         expect(decodeURIComponent(coreClient.requests.at(-1)!.url)).toContain("filter=and(and(eq(projectId,'p1')),contains(name,'foo'))");
@@ -137,6 +165,75 @@ describe('list realtime inserts', () => {
         emit(ownMatch);
         await flushPromises();
 
-        expect(wrapper.findAll('.row').map((el) => el.text())).toEqual([ownMatch.id]);
+        expect(rows()).toEqual([ownMatch.id]);
+    });
+
+    it('should insert nothing while no load completed, since no filters are known yet', async () => {
+        // A failed first load leaves the rows as they are: nothing would
+        // replace a record inserted against the missing filters.
+        const { emit, rows } = mountAnalyses({ 'GET /analyses': () => Promise.reject(new Error('unavailable')) });
+
+        await flushPromises();
+
+        emit(createTestAnalysis({ projectId: 'p2' }));
+        await flushPromises();
+
+        expect(rows()).toEqual([]);
+    });
+});
+
+describe('list loadAll continuation', () => {
+    it('should keep the first page scope for every page of one run', async () => {
+        const scope = ref('p1');
+        const { promise: pending, resolve: release } = Promise.withResolvers<void>();
+
+        const component = defineComponent({
+            props: defineListProps<Analysis>(),
+            setup(props, setup) {
+                const { render } = createList({
+                    type: `${DomainType.ANALYSIS}`,
+                    props,
+                    setup: setup as unknown as SetupContext<ListEventsType<Analysis>>,
+                    loadAll: true,
+                    socket: false,
+                    query: () => ({ filters: { projectId: scope.value } }),
+                });
+
+                return () => render();
+            },
+        });
+
+        const { coreClient } = mountClientVueComponent(component, {}, {
+            core: {
+                'GET /analyses': async (request) => {
+                    if (coreClient.requests.length === 1) {
+                        await pending;
+                    }
+
+                    const offset = request.url.includes('offset=1') ? 1 : 0;
+
+                    return {
+                        data: [createTestAnalysis({ projectId: 'p1' })],
+                        meta: {
+                            total: 2, 
+                            limit: 1, 
+                            offset, 
+                        },
+                    };
+                },
+            },
+        });
+
+        await flushPromises();
+
+        // the scope changes while the first page is in flight
+        scope.value = 'p2';
+        release();
+        await flushPromises();
+
+        const urls = coreClient.requests.map((el) => decodeURIComponent(el.url));
+
+        expect(urls).toHaveLength(2);
+        expect(urls[1]).toContain("filter=eq(projectId,'p1')");
     });
 });

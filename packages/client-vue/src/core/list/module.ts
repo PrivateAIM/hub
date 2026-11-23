@@ -113,14 +113,25 @@ export function createListRaw<
     // Whether a load ran to completion. The initial server-side load records its
     // result for the client, and an adopted snapshot suppresses the client's own
     // load — so recording anything a *failed* load left behind would strand the
-    // list on it with no retry.
+    // list on it with no retry. Realtime inserts also wait for it: before a
+    // completed load, `meta` carries no filters to check a record against.
     let loaded = false;
 
     let query : QueryBuildInput<Entity<RECORD>> | undefined;
 
     let queued : ListMeta<RECORD> | null = null;
 
+    // Set by the loadAll continuation right before it calls load(): every
+    // page of one loadAll run keeps the first page's combined filters, so a
+    // scope change mid-run cannot append another scope's rows, and the
+    // filters are not combined into themselves (one `and()` deeper per page).
+    let continuation : { filters: ListMeta<RECORD>['filters'] } | undefined;
+
     async function load(input: ListMeta<RECORD> = {}) {
+        const pinned = continuation;
+
+        continuation = undefined;
+
         if (typeof domainAPI?.getMany !== 'function') {
             return;
         }
@@ -145,11 +156,6 @@ export function createListRaw<
         // on rejection (the switched segment never loaded) and replayed the
         // stale input on the NEXT unrelated load, overwriting its result.
         let drained = false;
-
-        // The filters this call was given, for the loadAll continuation:
-        // passing `meta.filters` back would re-combine the page filters into
-        // it and nest one `and()` deeper per page.
-        let inputFilters : ListMeta<RECORD>['filters'];
 
         try {
             if (context.queryFilters) {
@@ -191,9 +197,9 @@ export function createListRaw<
 
             // Not part of the merge above: an object merge of a search
             // expression with the page's field bag drops the bag.
-            inputFilters = input.filters;
-
-            const filters = combineFilters(query?.filters, input.filters);
+            const filters = pinned ?
+                pinned.filters :
+                combineFilters(query?.filters, input.filters);
 
             if (filters) {
                 // `ListMeta.filters` cannot name rapiq's `ICondition` (as
@@ -248,9 +254,14 @@ export function createListRaw<
             if (
                 total.value > data.value.length
             ) {
+                continuation = { filters: meta.value.filters };
+
+                // Query keys only: `meta` also carries list state (`total`,
+                // `busy`), which rapiq rejects ("The key total is unknown").
                 await load({
-                    ...meta.value,
-                    filters: inputFilters,
+                    fields: meta.value.fields,
+                    relations: meta.value.relations,
+                    sorts: meta.value.sorts,
                     pagination: {
                         ...meta.value.pagination,
                         offset: (meta.value.pagination?.offset ?? 0) + (meta.value.pagination?.limit ?? 0),
@@ -674,6 +685,10 @@ export function createListRaw<
                 // every hydrated list until the user pages or searches.
                 query = snapshot.query;
 
+                // The snapshot is a completed load: it unlocks realtime
+                // inserts, which wait for one (see the socket handler).
+                loaded = true;
+
                 // Fires exactly once on both paths, so a hydrated list and a
                 // loaded one agree on this published hook.
                 if (context.onLoaded) {
@@ -705,8 +720,10 @@ export function createListRaw<
             // The namespace carries every record of its type in the realm, so
             // a record outside this list's filters (e.g. another project's
             // analysis) must not be inserted. `meta` holds the filters the
-            // last load sent, search input included.
-            if (!matchesQueryFilters(entity, meta.value?.filters)) {
+            // last load sent, search input included, but only once a load
+            // completed: before that (no load yet, the first one in flight
+            // or failed) the list cannot tell, and the load fetches it anyway.
+            if (!loaded || !matchesQueryFilters(entity, meta.value?.filters)) {
                 return;
             }
 
