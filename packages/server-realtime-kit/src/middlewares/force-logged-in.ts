@@ -11,7 +11,7 @@ import type { Namespace, Server } from '../types';
 
 export function mountForceLoggedInMiddleware(input: Namespace | Server) {
     input.use((socket, next) => {
-        if (!isSocketAuthenticated(socket)) {
+        if (isSocketAuthenticated(socket)) {
             next();
 
             return;
