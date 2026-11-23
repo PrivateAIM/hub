@@ -7,7 +7,9 @@
 
 import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
+import type { Analysis } from '@privateaim/core-kit';
 import { defineComponent, h, ref } from 'vue';
+import type { List } from '../../../src/core';
 import FAnalyses from '../../../src/components/analysis/FAnalyses';
 import { createTestAnalysis } from '../../utils/factories';
 import { mountClientVueComponent } from '../../utils';
@@ -19,7 +21,8 @@ describe('core/list load coalescing', () => {
         const entity = createTestAnalysis();
 
         let calls = 0;
-        const listRef = ref<InstanceType<typeof FAnalyses> | null>(null);
+        // The list API is exposed via setup.expose, which the component type does not carry.
+        const listRef = ref<Pick<List<Analysis>, 'load'> | null>(null);
 
         const host = defineComponent({
             setup() {
@@ -64,7 +67,8 @@ describe('core/list load coalescing', () => {
         const entity = createTestAnalysis();
 
         let calls = 0;
-        const listRef = ref<InstanceType<typeof FAnalyses> | null>(null);
+        // The list API is exposed via setup.expose, which the component type does not carry.
+        const listRef = ref<Pick<List<Analysis>, 'load'> | null>(null);
 
         const host = defineComponent({
             setup() {

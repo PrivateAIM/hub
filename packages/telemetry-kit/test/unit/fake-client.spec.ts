@@ -51,7 +51,7 @@ describe('FakeClient', () => {
             message: 'hello', 
             level: 'info', 
             service: 'test', 
-            channel: 'audit',
+            channel: 'system',
         });
 
         expect(client.requests[0].body).toMatchObject({ message: 'hello' });
