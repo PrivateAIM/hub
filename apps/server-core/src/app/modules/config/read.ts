@@ -18,30 +18,30 @@ import type { TrustProxy } from '@privateaim/server-kit';
 import type { Config } from './types.ts';
 
 export function readConfigFromEnv(): Partial<Config> {
-    const port = readInt(EnvironmentInputKey.PORT, ConfigDefaults.PORT);
+    const port = readInt(EnvironmentInputKey.PORT, { default: ConfigDefaults.PORT });
 
     const config: Partial<Config> = {
-        env: read(EnvironmentInputKey.ENV, EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
+        env: read(EnvironmentInputKey.ENV, { default: EnvironmentName.DEVELOPMENT }) as `${EnvironmentName}`,
         port,
 
-        realm: read(EnvironmentInputKey.REALM, ConfigDefaults.REALM),
+        realm: read(EnvironmentInputKey.REALM, { default: ConfigDefaults.REALM }),
 
-        clientId: read(EnvironmentInputKey.CLIENT_ID, ConfigDefaults.CLIENT_ID),
-        clientSecret: read(EnvironmentInputKey.CLIENT_SECRET, ConfigDefaults.CLIENT_SECRET),
+        clientId: read(EnvironmentInputKey.CLIENT_ID, { default: ConfigDefaults.CLIENT_ID }),
+        clientSecret: read(EnvironmentInputKey.CLIENT_SECRET, { default: ConfigDefaults.CLIENT_SECRET }),
 
         harborURL: read(EnvironmentInputKey.HARBOR_URL),
 
         authupURL: read(EnvironmentInputKey.AUTHUP_URL),
         telemetryURL: read(EnvironmentInputKey.TELEMETRY_URL),
-        publicURL: read(EnvironmentInputKey.PUBLIC_URL, `http://127.0.0.1:${port}/`),
+        publicURL: read(EnvironmentInputKey.PUBLIC_URL, { default: `http://127.0.0.1:${port}/` }),
 
         cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
         trustProxy: readTrustProxy(EnvironmentInputKey.TRUST_PROXY),
         shutdownDelay: readInt(EnvironmentInputKey.SHUTDOWN_DELAY),
 
-        masterImagesOwner: read(EnvironmentInputKey.MASTER_IMAGES_OWNER, ConfigDefaults.MASTER_IMAGES_OWNER),
-        masterImagesRepository: read(EnvironmentInputKey.MASTER_IMAGES_REPOSITORY, ConfigDefaults.MASTER_IMAGES_REPOSITORY),
-        masterImagesBranch: read(EnvironmentInputKey.MASTER_IMAGES_BRANCH, ConfigDefaults.MASTER_IMAGES_BRANCH),
+        masterImagesOwner: read(EnvironmentInputKey.MASTER_IMAGES_OWNER, { default: ConfigDefaults.MASTER_IMAGES_OWNER }),
+        masterImagesRepository: read(EnvironmentInputKey.MASTER_IMAGES_REPOSITORY, { default: ConfigDefaults.MASTER_IMAGES_REPOSITORY }),
+        masterImagesBranch: read(EnvironmentInputKey.MASTER_IMAGES_BRANCH, { default: ConfigDefaults.MASTER_IMAGES_BRANCH }),
 
         skipProjectApproval: readBool(EnvironmentInputKey.SKIP_PROJECT_APPROVAL),
         skipAnalysisApproval: readBool(EnvironmentInputKey.SKIP_ANALYSIS_APPROVAL),
