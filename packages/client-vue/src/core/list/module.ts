@@ -33,7 +33,7 @@ import { boolableToObject } from '../../utils';
 import { injectCoreHTTPClient } from '../http-client';
 import { createEntitySocket } from '../entity-socket';
 import type { EntitySocketContext } from '../entity-socket';
-import { isQuerySortedDescByDate } from '../query';
+import { combineFilters, isQuerySortedDescByDate, matchesQueryFilters } from '../query';
 import { EntityListSlotName } from './constants';
 import type {
     List,
@@ -146,6 +146,11 @@ export function createListRaw<
         // stale input on the NEXT unrelated load, overwriting its result.
         let drained = false;
 
+        // The filters this call was given, for the loadAll continuation:
+        // passing `meta.filters` back would re-combine the page filters into
+        // it and nest one `and()` deeper per page.
+        let inputFilters : ListMeta<RECORD>['filters'];
+
         try {
             if (context.queryFilters) {
                 const filters = (input.filters || {}) as FiltersBuildInput<Entity<RECORD>>;
@@ -183,6 +188,21 @@ export function createListRaw<
                 },
                 query || {},
             );
+
+            // Not part of the merge above: an object merge of a search
+            // expression with the page's field bag drops the bag.
+            inputFilters = input.filters;
+
+            const filters = combineFilters(query?.filters, input.filters);
+
+            if (filters) {
+                // `ListMeta.filters` cannot name rapiq's `ICondition` (as
+                // `QueryBuildInput.filters` does): it breaks vue-tsc's
+                // declaration emit for the list components (TS4023).
+                nextQuery.filters = filters as ListMeta<RECORD>['filters'];
+            } else {
+                delete nextQuery.filters;
+            }
 
             const response = await domainAPI.getMany(
                 nextQuery as QueryBuildInput<Entity<RECORD>>,
@@ -230,6 +250,7 @@ export function createListRaw<
             ) {
                 await load({
                     ...meta.value,
+                    filters: inputFilters,
                     pagination: {
                         ...meta.value.pagination,
                         offset: (meta.value.pagination?.offset ?? 0) + (meta.value.pagination?.limit ?? 0),
@@ -681,6 +702,14 @@ export function createListRaw<
         };
 
         socketContext.onCreated = (entity) => {
+            // The namespace carries every record of its type in the realm, so
+            // a record outside this list's filters (e.g. another project's
+            // analysis) must not be inserted. `meta` holds the filters the
+            // last load sent, search input included.
+            if (!matchesQueryFilters(entity, meta.value?.filters)) {
+                return;
+            }
+
             const limit = meta.value?.pagination?.limit;
 
             if (typeof limit !== 'number') {

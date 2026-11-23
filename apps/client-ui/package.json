@@ -45,6 +45,7 @@
         "@privateaim/kit": "^0.20.0",
         "@privateaim/storage-kit": "^0.20.0",
         "@privateaim/telemetry-kit": "^0.20.0",
+        "@rapiq/adapter-memory": "^2.4.1",
         "@rapiq/core": "^2.4.1",
         "@tailwindcss/vite": "^4.3.5",
         "@validup/vue": "^2.0.1",

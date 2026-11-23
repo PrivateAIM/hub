@@ -9,14 +9,13 @@ import type {
     Event,
 } from '@privateaim/telemetry-kit';
 import type { QueryBuildInput } from '@rapiq/core';
-import { and, defineFilters, isCondition } from '@rapiq/core';
 import type { PropType } from 'vue';
 import {
     defineComponent,
     ref,
 } from 'vue';
 import type { ListMeta } from '../../core';
-import { injectTelemetryHTTPClient } from '../../core';
+import { combineFilters, injectTelemetryHTTPClient } from '../../core';
 import FEvent from './FEvent';
 
 export default defineComponent({
@@ -33,24 +32,6 @@ export default defineComponent({
         });
         const busy = ref(false);
         const data = ref<Event[]>([]);
-
-        /**
-         * `FSearch` emits a rapiq EXPRESSION (`contains('name', text)`), while the
-         * page passes a record bag (`{ realmId: [...] }`). Spreading the two
-         * together produced `{ realmId, operator, value, field }`, which encodes as
-         * `eq(operator,'contains')...` and is rejected by the strict `eventSchema`
-         * with a 400. Combine them with `and()` instead.
-         */
-        const mergeFilters = (page?: any, incoming?: any) => {
-            if (!isCondition(incoming)) {
-                return { ...(page || {}), ...(incoming || {}) };
-            }
-
-            // `and(defineFilters({}), …)` throws `filters:compound:empty`
-            return page && Object.keys(page).length > 0 ?
-                and(defineFilters(page), incoming) :
-                incoming;
-        };
 
         const resolve = async (query?: QueryBuildInput<Event, 3>) => {
             busy.value = true;
@@ -78,7 +59,7 @@ export default defineComponent({
                 ...(props.query?.pagination || {}),
                 ...(input.pagination || {}),
             },
-            filters: mergeFilters(props.query?.filters, input.filters),
+            filters: combineFilters(props.query?.filters, input.filters),
         });
 
         const handleDeleted = (input: Event) => {
