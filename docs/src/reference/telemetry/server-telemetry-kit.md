@@ -34,8 +34,23 @@ port `IEventPublisher` requires `dispatchCreate()` instead of `callCreate()`.
 
 ### Winston Transport
 
+`LoggerTransport` turns each Winston entry into a telemetry-kit `LogInput` and hands it to a `save` callback. Every string, number or boolean metadata key becomes a label; `labels` sets fixed ones.
+
 ```typescript
-import { TelemetryTransport } from '@privateaim/server-telemetry-kit';
+import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
+import { LogComponentDispatcher, LoggerTransport } from '@privateaim/server-telemetry-kit';
+
+const dispatcher = new LogComponentDispatcher({ messageBus });
+
+const transport = new LoggerTransport({
+    labels: {
+        [LogFlag.SERVICE]: 'hub-server-worker',
+        [LogFlag.CHANNEL]: LogChannel.SYSTEM,
+    },
+    save: async (data) => {
+        await dispatcher.dispatchWrite(data);
+    },
+});
 ```
 
 ## API
@@ -44,13 +59,15 @@ import { TelemetryTransport } from '@privateaim/server-telemetry-kit';
 
 | Module | Description |
 |--------|-------------|
-| `components` | AMQP consumer components for events and logs |
-| `core` | Core telemetry utilities |
-| `services` | Log component dispatcher, Winston transport |
+| `components` | `LogComponentDispatcher` / `EventComponentDispatcher`, their commands, routings and payload types |
+| `core` | `EntityEventHandler`, which turns entity domain events into telemetry events |
+| `services` | `LoggerTransport` (Winston transport) and its options |
 
 ## Dependencies
 
-- `@privateaim/server-kit` — Server foundation
-- `hubwire` — Component and dispatcher base classes
-- `@privateaim/telemetry-kit` — Telemetry types
+- `@privateaim/server-kit` — Server foundation (peer)
+- `@privateaim/telemetry-kit` — Telemetry types (peer)
+- `@privateaim/kit` — Core utilities (peer)
+- `hubwire` — Dispatcher base classes
 - `winston-transport` — Custom Winston transport base
+- `smob` — Object comparison

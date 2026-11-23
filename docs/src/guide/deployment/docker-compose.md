@@ -51,7 +51,7 @@ The compose stack includes:
 | `core` | `core cli start` | Main REST API |
 | `core-worker` | — | Background worker (Docker execution) |
 | `storage` | — | File/object storage |
-| `messenger` | — | Real-time messaging |
+| `messenger` | — | Message broker (store-and-forward) |
 | `telemetry` | — | Log collection |
 | `ui` | — | Frontend application |
 | `nginx` | — | Reverse proxy (port 3000) |

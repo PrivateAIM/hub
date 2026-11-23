@@ -48,9 +48,9 @@ Shared libraries, located in `packages/`.
 | Package                  | Purpose                                    |
 |--------------------------|--------------------------------------------|
 | `server-kit`             | Logging (Winston), auth helpers, `MessageBusModule` (DI wiring for [`hubwire`](https://github.com/tada5hi/hubwire)'s message bus — AMQP driver from `@hubwire/amqp` or memory driver; components, dispatchers, workers and the bus itself come from hubwire) + the bus/worker/scheduled-component log-hook factories (`message-bus/hooks.ts`), Redis, shared core types (IEntityRepository, ActorContext, AbstractEntityService, ValidatorGroup), `describeQuerySchema()` + `RECORD_QUERY_PARAMETERS` for the response `meta.schema`, `collectRootFilterValues()` for the log endpoints, `scopeReadQuery()` + `appendQueryConditions()` for authorized reads |
-| `server-test-kit`        | Shared test fakes (FakeEntityRepository, FakePermissionEvaluator via `@authup/server-test-kit`, actor factories) |
+| `server-test-kit`        | Shared test fakes (FakeEntityRepository, actor factories, Authup testcontainers); `FakePermissionEvaluator` is imported from `@authup/server-test-kit` directly |
 | `server-db-kit`          | TypeORM utilities, database setup, migrations; options builder pinned to UTC (`pinTimezone`), `withDataSourceLock` for boot passes |
-| `server-http-kit`        | HTTP route/controller decorators for Routup, request helpers incl. the shared `buildActorContext`, rate limiter, `sanitizeError` |
+| `server-http-kit`        | HTTP route/controller decorators for Routup, request helpers incl. the shared `buildActorContext`, rate limiter, error middleware (internal `sanitizeError`, not exported) |
 | `server-realtime-kit`    | Socket.io server helpers                   |
 | `server-telemetry-kit`   | Telemetry/logging utilities                |
 | `server-core-worker-kit` | Worker task type definitions               |

@@ -10,9 +10,9 @@ Hub provides the backend services and frontend application that coordinate feder
 |---------|---------|
 | **Core API** (`server-core`) | Main REST API — manages analyses, projects, nodes, and registries |
 | **Worker** (`server-core-worker`) | Background worker — executes Docker containers for analysis tasks |
-| **Storage** (`server-storage`) | File/object storage backed by MinIO/S3 |
+| **Storage** (`server-storage`) | File/object storage backed by MinIO/S3 or the local filesystem |
 | **Telemetry** (`server-telemetry`) | Log aggregation via VictoriaLogs |
-| **Messenger** (`server-messenger`) | Real-time messaging via Socket.io |
+| **Messenger** (`server-messenger`) | Durable store-and-forward message broker (REST send, pull and ack, with a push wakeup) |
 | **Frontend** (`client-ui`) | Nuxt 4 SSR web application |
 
 ## Technology Stack

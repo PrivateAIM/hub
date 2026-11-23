@@ -5,8 +5,10 @@ The Core API (`server-core`) exposes REST endpoints for managing all domain enti
 ## Base URL
 
 ```
-http://localhost:4000
+http://localhost:3000
 ```
+
+Every service listens on `PORT`, default `3000`; give each service its own port when they run on one host.
 
 ## Authentication
 
@@ -229,7 +231,7 @@ Every failure answers with the same flat object — never the `{ data, meta }` e
 - `issues` is **always present**, as an array — empty when the failure carries no structured detail.
 - An authorization denial answers **403** with one of `permission_denied`,
   `permission_evaluation_failed` or `permission_not_found` (the last two are Authup's evaluator
-  codes, passed through verbatim). Before this was fixed, an evaluator denial answered 400 or 500.
+  codes, passed through verbatim).
 - A request Hub makes to another service (Authup, telemetry, Harbor, …) that runs out of time
   answers **504** with `upstream_timeout`.
 
@@ -301,7 +303,7 @@ The **Shape** column tells you which envelope from [Response Shapes](#response-s
 
 ## Storage Service
 
-Base URL: `http://localhost:4001`
+Base URL: `http://localhost:<PORT>`
 
 ### Buckets
 
@@ -337,7 +339,7 @@ create, update, delete and clear need a login. Entry format, access rules and er
 
 ## Telemetry Service
 
-Base URL: `http://localhost:4002`
+Base URL: `http://localhost:<PORT>`
 
 | Method | Endpoint | Description | Shape |
 |--------|----------|-------------|-------|
@@ -351,8 +353,11 @@ Base URL: `http://localhost:4002`
 
 ## Swagger Documentation
 
-Each service generates OpenAPI documentation at runtime. When a service is running in development mode, visit:
+The OpenAPI document of server-core, server-storage and server-telemetry is generated at build time by each
+service's `build:swagger` script (`trapi generate`, written to `writable/swagger.json`). At runtime the service
+serves it as Swagger UI under `/docs` (`mountSwaggerMiddleware` from `@privateaim/server-http-kit`), in every
+environment except `test`:
 
-- Core API: `http://localhost:4000/docs`
-- Storage: `http://localhost:4001/docs`
-- Telemetry: `http://localhost:4002/docs`
+- Core API: `http://localhost:<PORT>/docs`
+- Storage: `http://localhost:<PORT>/docs`
+- Telemetry: `http://localhost:<PORT>/docs`

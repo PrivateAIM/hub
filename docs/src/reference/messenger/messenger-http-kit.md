@@ -19,14 +19,15 @@ npm install @privateaim/messenger-http-kit
 import { Client } from '@privateaim/messenger-http-kit';
 
 const client = new Client({
-    baseURL: 'http://localhost:4003',
+    baseURL: 'http://localhost:3000',
 });
 
 // Send one message; the hub persists a durable row per recipient.
 const ids = await client.message.send({ /* … */ });
 
-// Pull pending (un-acked) messages, oldest first.
-const { messages } = await client.message.pull({ limit: 50, wait: 30 });
+// Pull pending (un-acked) messages, oldest first. `wait` is a long-poll budget
+// in milliseconds; the hub caps it at 30 000.
+const { messages } = await client.message.pull({ limit: 50, wait: 30_000 });
 
 // Acknowledge by id — the hub deletes them for the caller (delete-on-ack).
 await client.message.ack({ ids: messages.map((message) => message.id) });
@@ -73,7 +74,7 @@ for await (const event of client.message.subscribe({ signal: controller.signal }
   `timeout` passed to `subscribe()` replaces the `0` and cuts the stream.
 - **Abort**: aborting the signal (or `break`ing out of the loop) closes the
   connection; the iteration ends without throwing. A non-2xx answer rejects with
-  the usual hapic `ClientError`.
+  hapic's `HttpResponseError` (a subclass of `ClientError`).
 - **No reconnect**: one response is read. When the loop ends without an abort,
   the server closed the stream: reconnect (with your own backoff), then pull
   once. The durable mailbox loses nothing across the gap, so no `Last-Event-ID`

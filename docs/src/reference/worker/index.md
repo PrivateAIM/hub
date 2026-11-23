@@ -5,11 +5,12 @@ The Worker service executes background tasks — primarily building and distribu
 ## Running
 
 ```bash
-# Development (from repo root)
-npm run server-train-manager
+# From the repo root: build every workspace, then start the worker
+npm run build
+npm run start --workspace=apps/server-core-worker
 
 # Docker
-docker run -e ... privateaim/hub core-worker
+docker run -e ... ghcr.io/privateaim/hub core-worker start
 ```
 
 ::: info
@@ -19,7 +20,7 @@ Unlike other services, the worker has no CLI interface. It starts directly via `
 ## Dependencies
 
 - **Authup** — OAuth2 identity provider
-- **RabbitMQ** — AMQP message bus (receives tasks from Core API)
+- **RabbitMQ** — AMQP message bus (receives tasks from Core API); roll out the worker before server-core, since server-core may send commands only the new worker understands
 - **Core API** — REST client for status updates
 - **Storage API** — REST client for file access
 - **Docker** — local Docker daemon for container execution
@@ -30,20 +31,22 @@ Unlike other services, the worker has no CLI interface. It starts directly via `
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `AUTHUP_URL` | — | Authup identity provider URL (**required**) |
 | `CORE_URL` | — | Core API base URL (**required**) |
 | `STORAGE_URL` | — | Storage service base URL (**required**) |
 | `RABBITMQ_CONNECTION_STRING` | `amqp://root:start123@127.0.0.1` | RabbitMQ connection |
+
+A missing `AUTHUP_URL`, `CORE_URL` or `STORAGE_URL` stops the start; each must be a valid URL. The worker does not read `SHUTDOWN_DELAY` or `TRUST_PROXY`.
 
 ### Inherited
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `NODE_ENV` | `development` | Environment |
-| `PORT` | `3000` | HTTP port of `/`, `/livez` and `/readyz` (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
+| `PORT` | `3000` | HTTP port of `/`, `/livez` and `/readyz` (see [Health endpoints](/guide/deployment/configuration#health-endpoints)) |
 | `REALM` | `master` | Authup realm |
 | `CLIENT_ID` | `system` | Authup client ID |
 | `CLIENT_SECRET` | `start123` | Authup client secret |
-| `AUTHUP_URL` | — | Authup URL |
 
 ## Components
 

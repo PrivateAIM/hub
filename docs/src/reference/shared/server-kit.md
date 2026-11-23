@@ -13,11 +13,15 @@ npm install @privateaim/server-kit
 ### Logger (Winston)
 
 ```typescript
-import { useLogger, LoggerModule } from '@privateaim/server-kit';
+import { createLogger } from '@privateaim/server-kit';
 
-const logger = useLogger();
+const logger = createLogger();
 logger.info('Service started');
 ```
+
+`createLogger({ options?, transports? })` builds a winston logger at level `debug`; without `transports` it uses the
+console transport. In a service, `LoggerModule` builds the logger the same way and registers it under
+`LoggerInjectionKey`.
 
 ### Message Bus
 
@@ -104,14 +108,23 @@ await cache.invalidate([`node:${id}`]);
 ### Authup Integration
 
 ```typescript
-import { AuthupModule } from '@privateaim/server-kit';
+import {
+    AuthupClientInjectionKey,
+    AuthupClientModule,
+    AuthupHookModule,
+} from '@privateaim/server-kit';
 ```
+
+`AuthupHookModule` registers a hook that mints client-credential tokens for outbound Authup calls, and
+`AuthupClientModule` registers the Authup HTTP client under `AuthupClientInjectionKey`, with that hook attached when
+one is registered. Without explicit options both read `authupURL`, `clientId`, `clientSecret` and `realm` from the
+config under `ConfigInjectionKey`, and register nothing when no Authup URL is configured.
 
 ### Outbound HTTP Timeouts
 
 `HTTPClientTimeout` holds the request deadline in milliseconds for each kind of peer:
 `AUTHUP` (10 000, the Authup client and the OAuth2 token creators), `SERVICE` (30 000, the core,
-storage and telemetry clients and GitHub), `HARBOR` (60 000) and `VICTORIA_LOGS` (30 000). A call
+storage and telemetry clients and GitHub), `HARBOR` (60 000) and `VICTORIA_LOGS` (20 000, shorter than `SERVICE` so telemetry answers a VictoriaLogs timeout before its caller gives up). A call
 that streams a request or response body passes `timeout: 0`. A timed-out request inside an HTTP
 request is answered `504` with the code `upstream_timeout`; the worker retries it.
 
@@ -145,9 +158,22 @@ reading rules.
 import { BaseApplicationBuilder } from '@privateaim/server-kit';
 
 class MyAppBuilder extends BaseApplicationBuilder {
-    // Add withConfig(), withDatabase(), withHTTP() etc.
+    // A service adds its own config, database and HTTP modules by pushing them onto this.modules.
 }
+
+const app = new MyAppBuilder()
+    .withLogger()
+    .withRedis()
+    .withMessageBus()
+    .withAuthupHook()
+    .withAuthupClient()
+    .withEntityEvent()
+    .build();
 ```
+
+The builder provides `withLogger`, `withRedis`, `withMessageBus`, `withAuthupHook`, `withAuthupClient` and
+`withEntityEvent`. Each takes the module options, or `false` to leave the module out. It has no config, database or
+HTTP module of its own.
 
 ## API
 
@@ -155,13 +181,13 @@ class MyAppBuilder extends BaseApplicationBuilder {
 
 | Module | Description |
 |--------|-------------|
-| `app` | `BaseApplicationBuilder`, `Application` base class; `startApplication(app, { onSignal })` — one-shot SIGINT/SIGTERM shutdown with drain delay; `Health`, `HealthInjectionKey`, `createDatabaseHealthCheck` (1 s bound, 1 s reuse), `createHealthShutdownHook`, `createHealthLogObserver` — the state behind `/livez` and `/readyz` (routes: `mountHealthRoutes` in `@privateaim/server-http-kit`) |
-| `logger` | Winston logger setup and `LoggerModule` |
+| `app` | `BaseApplicationBuilder` (its `build()` returns an orkos `Application`); `startApplication(app, { onSignal })` — one-shot SIGINT/SIGTERM shutdown with drain delay; `Health`, `HealthInjectionKey`, `createDatabaseHealthCheck` (1 s bound, 1 s reuse), `createHealthShutdownHook`, `createHealthLogObserver` — the state behind `/livez` and `/readyz` (routes: `mountHealthRoutes` in `@privateaim/server-http-kit`) |
+| `logger` | `createLogger()`, `LoggerModule`, `LoggerInjectionKey`, `LoggerConsoleTransport`, `LoggerMemoryTransport` |
 | `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `hubwire` message bus; `createMessageBusLogHooks`, `createAmqpDriverLogHooks`, `createRemoteWorkerLogHooks`, `createScheduledComponentLogHooks` — hubwire `hooks` that log through a hub logger |
 | `redis` | Redis module and connection helpers |
 | `cache` | `TaggedCacheModule`, `TaggedCacheInjectionKey`, `TAGGED_CACHE_MODULE_NAME`, `TAGGED_CACHE_TTL`, `TAGGED_CACHE_ERROR_LOG_INTERVAL`, `createTaggedCache()`, `throttle()` — the tag-invalidated read cache |
-| `authup` | Authup authentication middleware module; `exchangeAuthupToken` (RFC 8693 token exchange as the Hub client) |
-| `config` | Configuration reading via `envix` |
+| `authup` | `AuthupClient`, `AuthupClientModule`, `AuthupHookModule`, the client and user token creators, `createAuthupPermissionEvaluator`; `exchangeAuthupToken` (RFC 8693 token exchange as the Hub client) |
+| `config` | `BaseServerConfig` type, `ConfigInjectionKey`, `CONFIG_MODULE_NAME`, `canonicalizeTrustProxy()`; each service reads its own configuration |
 | `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema`; `collectRootFilterValues()` — flattens an `and`-of-`eq` filter tree into label equalities for the log endpoints and rejects any other operator with a 400 |
 | `entity-event` | Entity event pub/sub system |
 | `constants` | Module names, injection keys, `HTTPClientTimeout` |
@@ -170,22 +196,23 @@ class MyAppBuilder extends BaseApplicationBuilder {
 
 | Module Class | Purpose |
 |-------------|---------|
-| `LoggerModule` | Winston logger with optional telemetry transport |
+| `LoggerModule` | Winston logger under `LoggerInjectionKey`; options `{ options?, transports? }`, console transport when no `transports` are given |
 | `RedisModule` | Redis client registration |
 | `TaggedCacheModule` | Tag-invalidated read cache (`@rapiq/cache`) on a duplicate of the Redis client, or in memory without Redis; options `{ prefix }` |
 | `MessageBusModule` | Registers the `hubwire` message bus (AMQP or memory driver) with log hooks, and as `RemoteMessageBusInjectionKey` unless it is the memory driver; closes it on teardown. `silentRoutings`: routings whose publishes are not logged |
-| `AuthupModule` | Authup middleware and token validation |
+| `AuthupHookModule` | Client-credential token hook for outbound Authup calls |
+| `AuthupClientModule` | Authup HTTP client under `AuthupClientInjectionKey`, with the hook attached when registered |
 | `EntityEventModule` | Domain event dispatching |
 
 ## Dependencies
 
 - `winston` — Logging
-- `@ebec/http` — HTTP error types
+- `@privateaim/errors` — Shared error types
 - `@hapic/oauth2` — OAuth2 client
 - `@rapiq/core` — Query schema definition and description (`describeQuerySchema`)
 - `@rapiq/cache`, `@rapiq/cache-redis` — Tagged read cache and its Redis driver (`TaggedCacheModule`)
 - `orkos` — Module system (`IModule`)
 - `eldin` — DI container (`TypedToken`)
-- `envix` — Environment variable reading
+- `envix` — Reads `env` for the console transport's log level
 - `hubwire` — Message bus, components, dispatchers and workers
 - `@hubwire/amqp` — AMQP driver (brings `amqp-extension`), which `MessageBusModule` imports

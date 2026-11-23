@@ -10,8 +10,8 @@ hub/
 │   ├── client-ui/         # Nuxt 4 SSR web application
 │   ├── server-core/       # Main REST API
 │   ├── server-core-worker/# Background worker (Docker execution)
-│   ├── server-messenger/  # Real-time messaging (Socket.io)
-│   ├── server-storage/    # File/object storage (MinIO/S3)
+│   ├── server-messenger/  # Durable message broker (REST + wakeup)
+│   ├── server-storage/    # File/object storage (MinIO/S3 or filesystem)
 │   └── server-telemetry/  # Log aggregation (VictoriaLogs)
 ├── packages/              # Shared libraries
 │   ├── kit/               # Core utilities: crypto, events, permissions

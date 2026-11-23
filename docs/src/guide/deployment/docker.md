@@ -5,7 +5,7 @@ FLAME Hub uses a multi-service `Dockerfile` that builds the entire monorepo. The
 ## Building the Image
 
 ```bash
-docker build -t privateaim/hub .
+docker build -t ghcr.io/privateaim/hub .
 ```
 
 This produces a single image containing all services. The service to run is selected at container startup.
@@ -40,6 +40,12 @@ docker run \
 
 # Storage service
 docker run \
+    -e DB_TYPE=postgres \
+    -e DB_HOST=db \
+    -e DB_USERNAME=privateaim \
+    -e DB_PASSWORD=secret \
+    -e DB_DATABASE=storage \
+    -e AUTHUP_URL=http://authup:3000 \
     -e MINIO_CONNECTION_STRING=http://minioadmin:minioadmin@minio:9000 \
     -p 3001:3000 \
     ghcr.io/privateaim/hub storage cli start

@@ -1,6 +1,6 @@
 # @privateaim/kit
 
-Core utilities package providing cryptography, domain events, error handling, and shared TypeScript types for the entire PrivateAIM ecosystem.
+Core utilities package providing message sealing (crypto), capabilities, permission names, domain events, validators, utilities and shared TypeScript types for the entire PrivateAIM ecosystem.
 
 ## Installation
 
@@ -12,10 +12,33 @@ npm install @privateaim/kit
 
 ### Crypto
 
+`sealMessage()` encrypts a payload for one recipient (ECDH key agreement, a per-message AES-256-GCM key through
+HKDF); `openMessage()` reverses it. The result is a base64 string that Hub stores as opaque message data.
+
+```typescript
+import {
+    AsymmetricCryptoAlgorithmName,
+    importAsymmetricPrivateKey,
+    importAsymmetricPublicKey,
+    sealMessage,
+} from '@privateaim/kit';
+
+const params = { name: AsymmetricCryptoAlgorithmName.ECDH, namedCurve: 'P-256' };
+
+const payload = await sealMessage({
+    privateKey: await importAsymmetricPrivateKey(senderPrivatePem, params),
+    publicKey: await importAsymmetricPublicKey(recipientPublicPem, params),
+    data: JSON.stringify({ round: 1 }),
+    info: 'message-id:analysis-id',
+});
+```
+
+### Utilities
+
 ```typescript
 import { createNanoID } from '@privateaim/kit';
 
-const id = createNanoID();
+const id = createNanoID(); // default alphabet 0-9a-z, length 21
 ```
 
 ### Domain Events
@@ -60,11 +83,10 @@ body, say — keeps its keys.
 
 | Module | Description |
 |--------|-------------|
-| `crypto` | Cryptographic utilities (ID generation) |
-| `domains` | Shared domain type definitions |
-| `error` | Error types and helpers |
-| `domain-event` | Domain event names and types |
-| `utils` | General utility functions |
+| `crypto` | Asymmetric key helpers (`CryptoAsymmetricAlgorithm`, PEM import/export) and message sealing (`sealMessage`, `openMessage`) |
+| `domains` | `PermissionName`, `DomainEventName`, `DomainEventNamespace` and domain channel/namespace name helpers |
+| `domain-event` | `buildDomainEventFullName` and domain event record types |
+| `utils` | General utility functions (`createNanoID`, `generateName`, `slugify`, `getMinProcessStatus`, error guards such as `isError`) |
 | `constants` | Shared constants |
 | `types` | Core TypeScript types |
 | `capability` | Capability entry helpers: `parseCapabilityEntry(ies)`, `formatCapabilityEntry` for the `type:id:actions` wire format, with Authup's limits (`CAPABILITY_MAX_ENTRIES` 32, `CAPABILITY_MAX_BYTES` 4096) |
@@ -72,9 +94,8 @@ body, say — keeps its keys.
 
 ## Dependencies
 
-- `@authup/kit` — Authup base types
-- `@authup/core-kit` — Authup core types
-- `@ebec/http` — HTTP error types
+- `@authup/kit` — Authup base types (peer dependency)
+- `@authup/core-kit` — Authup core types (peer dependency)
 - `nanoid` — ID generation
 - `pathtrace` — `Path<T>` key type behind `TypedContainer`
 - `validup` — Validation utilities

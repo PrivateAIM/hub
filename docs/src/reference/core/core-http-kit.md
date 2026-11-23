@@ -59,8 +59,8 @@ fill `meta.schema`, see below.
 
 Some endpoints deliberately stay flat and are typed accordingly — credential payloads
 (`node.getClientCredentials`, `node.setClientCredentials`, `node.getRegistryCredentials`,
-the analysis client credentials), all stream methods, the path builders, and the bulk log deletes
-(`Promise<void>`). See [Response Shapes](/guide/development/api#response-shapes) for the full list.
+`analysis.createStorageToken`), all stream methods, the path builders, the bulk log deletes
+and `service.runCommand` / `service.runRegistryCommand` (both `Promise<void>`). See [Response Shapes](/guide/development/api#response-shapes) for the full list.
 
 ### Query Capability Discovery
 
@@ -123,9 +123,9 @@ Use `getManyAll` to follow the pagination until every record is retrieved:
 ```typescript
 import { getManyAll } from '@privateaim/core-http-kit';
 
-const analysisNodes = await getManyAll((page) => client.analysisNode.getMany({
-    filter: { analysisId: analysisId },
-    page,
+const analysisNodes = await getManyAll((pagination) => client.analysisNode.getMany({
+    filters: { analysisId },
+    pagination,
 }));
 ```
 
@@ -174,12 +174,15 @@ its place (`getOne(id, undefined, { signal })`).
 
 ### With Authentication
 
+The client is a hapic client, so the token is set as an authorization header after construction:
+
 ```typescript
-const client = new Client({
-    baseURL: 'http://localhost:4000',
-    token: 'Bearer <your-token>',
-});
+const client = new Client({ baseURL: 'http://localhost:4000' });
+
+client.setAuthorizationHeader({ type: 'Bearer', token: accessToken });
 ```
+
+`client.unsetAuthorizationHeader()` removes it again.
 
 ## API
 
@@ -195,7 +198,7 @@ const client = new Client({
 | `APIRequestOptions` | The per-call `{ signal?, timeout? }` every API method takes last |
 | `ICoreClient` / `ClientOptions` | The client contract and its construction options |
 | `I<X>API` | One contract per sub-API (`IAnalysisAPI`, `INodeAPI`, …) |
-| `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
+| `pickEntityAPI` | Runtime lookup of a sub-API by `DomainType` string; returns `undefined` for a type without an entity API. The record type parameter is asserted by the caller, not checked, and every returned verb is optional |
 | `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute` |
 | `getManyAll` | Helper that fetches a resource collection exhaustively across all pages |
 
@@ -203,18 +206,20 @@ const client = new Client({
 
 `client.analysis.createStorageToken(id, { cap, lifetime? })` mints a [storage capability token](/reference/core/#storage-capability-tokens) and returns the flat `{ token, expiresAt }`.
 
-The client exposes a property per domain entity, each with `getMany`, `getOne`, `create`, `update`, `delete` methods:
+The client exposes a property per domain entity. These carry `getMany`, `getOne`, `create`, `update` and `delete`:
 
 - `client.analysis`
-- `client.analysisBucket`
 - `client.analysisBucketFile`
+- `client.analysisNode`
 - `client.project`
 - `client.projectNode`
 - `client.node`
 - `client.registry`
 - `client.registryProject`
-- `client.masterImage`
-- `client.masterImageGroup`
+
+`client.analysisBucket` has no `update`. `client.masterImage` and `client.masterImageGroup` have neither `create` nor `update` (master images arrive through `masterImage.runCommand('sync' | 'build')`), and `client.analysisNodeEvent` is read-only.
+
+`client.service.runCommand(id, command, data?)` and `client.service.runRegistryCommand(command, data)` resolve to `void`.
 
 ## Migration
 
@@ -280,14 +285,14 @@ function doWork(client: ICoreClient) { /* … */ }
 | Sub-API | Contract |
 |---|---|
 | `analysis` | `IAnalysisAPI` |
-| `analysisBucket` | `IAnalysisBucketAPI` |
+| `analysisBucket` | `IAnalysisBucketAPI` (no `update`) |
 | `analysisBucketFile` | `IAnalysisBucketFileAPI` |
 | `analysisLog` | `IAnalysisLogAPI` (standalone — query-keyed `delete`, returns telemetry `Log`) |
 | `analysisNode` | `IAnalysisNodeAPI` |
 | `analysisNodeEvent` | `IAnalysisNodeEventAPI` (read-only) |
 | `analysisNodeLog` | `IAnalysisNodeLogAPI` (standalone) |
-| `masterImage` | `IMasterImageAPI` (no `create`) |
-| `masterImageGroup` | `IMasterImageGroupAPI` (no `create`) |
+| `masterImage` | `IMasterImageAPI` (no `create`, no `update`) |
+| `masterImageGroup` | `IMasterImageGroupAPI` (no `create`, no `update`) |
 | `node` | `INodeAPI` |
 | `project` | `IProjectAPI` |
 | `projectNode` | `IProjectNodeAPI` |
@@ -330,6 +335,9 @@ defaults included, so a stream method shows `timeout: 0`), each key only when se
 
 ## Dependencies
 
-- `@privateaim/core-kit` — Domain types
+All dependencies are peer dependencies:
+
+- `@privateaim/core-kit`, `@privateaim/kit`, `@privateaim/telemetry-kit` — Domain types
+- `@authup/core-kit`, `@authup/kit` — Authup types
 - `hapic` — HTTP client base; every sub-API extends hapic's `BaseAPI`
-- `rapiq` — Query parameter building
+- `@rapiq/core`, `@rapiq/codec-url` — Query parameter building

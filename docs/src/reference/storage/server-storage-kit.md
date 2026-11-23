@@ -11,11 +11,23 @@ npm install @privateaim/server-storage-kit
 ## Usage
 
 ```typescript
+import { AnalysisBucketType, DomainType, buildAnalysisBucketName } from '@privateaim/core-kit';
 import { BucketComponentDispatcher } from '@privateaim/server-storage-kit';
 
 const dispatcher = new BucketComponentDispatcher({ messageBus });
-await dispatcher.dispatchCreate({ name: 'analysis-bucket' });
+
+// What server-core sends for each bucket of an analysis.
+await dispatcher.dispatchCreate({
+    name: buildAnalysisBucketName(AnalysisBucketType.CODE, analysis.id),
+    realmId: analysis.realmId,
+    refType: DomainType.ANALYSIS,
+    refId: analysis.id,
+});
 ```
+
+The payload is a `Partial<Bucket>`. The finished event carries the stored bucket (with its `refType` / `refId`), and the
+failure event echoes `refType`, `refId` and `name`, so the requester can attribute either. `dispatchDelete` and
+`dispatchClear` take `{ id }` of the bucket.
 
 ## API
 
@@ -27,6 +39,7 @@ await dispatcher.dispatchCreate({ name: 'analysis-bucket' });
 
 ## Dependencies
 
-- `@privateaim/kit` — Core utilities
-- `@privateaim/server-kit` — Server foundation
-- `@privateaim/storage-kit` — Storage types
+- `@privateaim/kit` — Core utilities (peer)
+- `@privateaim/server-kit` — Server foundation (peer)
+- `@privateaim/storage-kit` — Storage types (peer)
+- `hubwire` — Dispatcher base classes

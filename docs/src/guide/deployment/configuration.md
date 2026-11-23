@@ -4,14 +4,19 @@ All Hub services are configured via environment variables, managed by `envix` th
 
 ## Common Variables
 
-These variables are shared across all services:
+These variables are shared across the services. The worker reads only `NODE_ENV`, `PORT`, `REALM`, `CLIENT_ID`, `CLIENT_SECRET`, `AUTHUP_URL` and `RABBITMQ_CONNECTION_STRING`, plus its own [worker variables](#worker-variables-server-core-worker).
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `PORT` | No | HTTP server port (default varies by service) |
-| `AUTHUP_URL` | Yes | Authup identity provider URL |
-| `REDIS_CONNECTION_STRING` | No | Redis connection URL (for pub/sub and caching) |
-| `AMQP_URL` | No | RabbitMQ connection URL |
+| `NODE_ENV` | No | `development` (default), `production` or `test` |
+| `PORT` | No | HTTP server port (default `3000`) |
+| `PUBLIC_URL` | No | Public URL of core, storage and telemetry (default `http://127.0.0.1:<PORT>/` for core, `http://localhost:<PORT>` for storage and telemetry) |
+| `AUTHUP_URL` | Yes | Authup identity provider URL. The worker refuses to start without it; server-messenger defaults to `http://127.0.0.1:3010/` |
+| `REALM` | No | Authup realm of the service client (default `master`) |
+| `CLIENT_ID` | No | Authup client the service authenticates as (default `system`) |
+| `CLIENT_SECRET` | No | Secret of that client (default `start123`) |
+| `REDIS_CONNECTION_STRING` | server-messenger only | Redis connection URL (realtime events, server-core's read cache, the messenger's wakeups). server-core also accepts `true` for `redis://127.0.0.1` |
+| `RABBITMQ_CONNECTION_STRING` | No | RabbitMQ (AMQP) connection URL, e.g. `amqp://root:start123@rabbitmq`. server-core also accepts `true` for `amqp://root:start123@127.0.0.1`; the worker defaults to that value. Without it server-core builds and distributes nothing, and storage creates no analysis buckets |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
 | `TRUST_PROXY` | No | Which `X-Forwarded-For` hops core, storage, telemetry and messenger trust when they derive the client address (audit trail, rate-limit key): `true` (every hop, the default), `false` (the socket address), a hop count (`1` for one reverse proxy) or a comma list of IPs, CIDRs or `loopback` / `linklocal` / `uniquelocal`. See [Client addresses and rate limiting](#client-addresses-and-rate-limiting). |
 | `SHUTDOWN_DELAY` | No | Seconds core, storage, telemetry and messenger keep serving after `SIGTERM`/`SIGINT` while `GET /readyz` already answers 503, so a load balancer stops routing to them first (0 to 3600, default `0`). The worker ignores it. See [Graceful shutdown](#graceful-shutdown). |
@@ -134,7 +139,7 @@ set `HEALTHCHECK_PATH=/readyz` on the container. Kubernetes ignores the image
 
 ## Message delivery (RabbitMQ)
 
-When `AMQP_URL` is set, commands to the worker, storage and telemetry services
+When `RABBITMQ_CONNECTION_STRING` is set, commands to the worker, storage and telemetry services
 (build, distribute, bucket create, …) travel over durable RabbitMQ queues.
 
 - **A failed or interrupted command is retried, up to 5 attempts.** A handler
@@ -235,7 +240,7 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
   processing are published to the `registryCommands` queue and run on whichever
   server-core replica takes them, not inside the HTTP request that triggered
   them. Before, server-core ran the command itself first and fell back to the
-  queue, so a failing command could run twice. Without `AMQP_URL` the command
+  queue, so a failing command could run twice. Without `RABBITMQ_CONNECTION_STRING` the command
   still runs inside the same server-core process. Renaming a registry project
   sends one relink command. Two commands for the same project sent by separate
   requests (an unlink, then a link) can run on two replicas at once, so wait
@@ -246,7 +251,7 @@ When `AMQP_URL` is set, commands to the worker, storage and telemetry services
 
 Changing a node's `externalName`, or renaming a registry project directly, while
 its registry stays the same, starts a **same-registry** migration. With
-`AMQP_URL` set it is queued and runs asynchronously; without it, server-core runs
+`RABBITMQ_CONNECTION_STRING` set it is queued and runs asynchronously; without it, server-core runs
 it in-process. Changing a node's `registryId` is not a migration: Hub unlinks the
 old project and provisions a new one on the new registry. Hub keeps the active registry-project
 name, Harbor ID and credentials at the source until it has copied and verified
@@ -729,7 +734,7 @@ Authup deployment Hub runs against:
   hop count of your proxy.
 - **Some users sign in once more.** Token cookies are now written `SameSite=Lax`,
   and `Secure` on https. Behind a TLS-terminating proxy, forward
-  `X-Forwarded-Proto` (the [reverse proxy](./reverse-proxy.md) example already
+  `X-Forwarded-Proto` (the [reverse proxy](/guide/deployment/reverse-proxy) example already
   does) so server-side cookie writes in client-ui get `Secure` too.
 
 ## Authup upgrade to beta.70
@@ -990,22 +995,49 @@ another, so the connection pool needs at least two connections.
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `MINIO_ENDPOINT` | Yes | MinIO/S3 endpoint URL |
-| `MINIO_ACCESS_KEY` | Yes | S3 access key |
-| `MINIO_SECRET_KEY` | Yes | S3 secret key |
-| `MINIO_USE_SSL` | No | Enable SSL for MinIO connection |
-| `MINIO_PORT` | No | MinIO port |
+| `MINIO_CONNECTION_STRING` | No | MinIO or S3 endpoint as `http(s)://<access-key>:<secret-key>@<host>:<port>`, e.g. `http://admin:start123@minio:9000`; `https` enables TLS |
+| `STORAGE_PATH` | No | Directory for files when `MINIO_CONNECTION_STRING` is unset (default `<cwd>/writable/storage`) |
+| `CAPABILITY_CLIENT_ID` | No | Authup client (id, or name in `REALM`) whose capability-token exchanges storage accepts (default `CLIENT_ID`); see [Storage capability tokens](#storage-capability-tokens) |
+
+Without `MINIO_CONNECTION_STRING` files go to the local filesystem, which several replicas do not
+share and a container loses unless `STORAGE_PATH` is a volume. The connection string is parsed
+strictly: protocol, access key, secret key, host and port are all required, nothing may follow the
+port (no trailing `/`), and key and secret may contain only letters, digits and `_`. A value that does
+not match stops the start with `Invalid MINIO_CONNECTION_STRING format.`
 
 ## Telemetry Variables (server-telemetry)
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `VICTORIA_LOGS_URL` | Yes | VictoriaLogs endpoint URL |
+| `VICTORIA_LOGS_URL` | No | VictoriaLogs base URL |
+| `VICTORIA_LOGS_INGESTOR_URL` | No | VictoriaLogs ingest endpoint, overrides the base URL for writes |
+| `VICTORIA_LOGS_QUERIER_URL` | No | VictoriaLogs query endpoint, overrides the base URL for reads |
 | `EVENT_RETENTION_DAYS` | No | Days an audit/event row is kept before the daily sweep removes it (default `7`; `0` = keep forever) |
+
+Without any `VICTORIA_LOGS_*` variable an in-memory store takes the logs; they are lost on restart
+and not shared between replicas.
+
+## Core Variables (server-core)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `HARBOR_URL` | No | Harbor connection string with credentials in the URL; at startup server-core creates or updates the registry named `default` |
+| `TELEMETRY_URL` | No | server-telemetry URL, for the analysis log endpoints |
+| `MASTER_IMAGES_OWNER` / `MASTER_IMAGES_REPOSITORY` / `MASTER_IMAGES_BRANCH` | No | GitHub source of the master images (defaults `PrivateAim`, `master-images`, `master`) |
+| `SKIP_PROJECT_APPROVAL` / `SKIP_ANALYSIS_APPROVAL` | No | Approve projects or analyses without an administrator (default `false`; for development) |
+
+## Worker Variables (server-core-worker)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `CORE_URL` | Yes | server-core base URL |
+| `STORAGE_URL` | Yes | server-storage base URL |
+
+A missing `AUTHUP_URL`, `CORE_URL` or `STORAGE_URL` stops the worker's start.
 
 ## Frontend Variables (client-ui)
 
-The full list lives in the [frontend reference](../../reference/frontend/index.md#environment-variables).
+The full list lives in the [frontend reference](/reference/frontend/#environment-variables).
 Two of them are deployment decisions rather than service addresses, and go together:
 
 | Variable | Required | Description |
@@ -1037,4 +1069,4 @@ variable as of Authup `1.0.0-beta.64` ([authup#3495](https://github.com/authup/a
 the consoles scope their own cookies to that sub-path automatically.
 
 The layout matrix and the upgrade caveat are documented under
-[Session cookies](../../reference/frontend/index.md#session-cookies).
+[Session cookies](/reference/frontend/#session-cookies).

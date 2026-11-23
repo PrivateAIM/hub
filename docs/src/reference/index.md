@@ -8,9 +8,9 @@ FLAME Hub is composed of five backend services, a frontend, and shared libraries
 |------|---------|----------|
 | [Core](/reference/core/) | Main REST API | core-kit, core-http-kit, core-realtime-kit |
 | [Worker](/reference/worker/) | Background Docker execution | server-core-worker-kit |
-| [Storage](/reference/storage/) | File/object storage (MinIO) | storage-kit, server-storage-kit |
+| [Storage](/reference/storage/) | File/object storage (MinIO/S3 or filesystem) | storage-kit, server-storage-kit |
 | [Telemetry](/reference/telemetry/) | Log aggregation (VictoriaLogs) | telemetry-kit, server-telemetry-kit |
-| [Messenger](/reference/messenger/) | Real-time messaging (Socket.io) | messenger-kit, server-realtime-kit |
+| [Messenger](/reference/messenger/) | Durable store-and-forward message broker (REST + wakeup) | messenger-kit, messenger-http-kit, server-realtime-kit |
 | [Frontend](/reference/frontend/) | Nuxt 4 web application | client-vue |
 
 ## Shared Packages
@@ -26,7 +26,7 @@ Foundation libraries used across all services:
 
 ## Shared Configuration
 
-All backend services inherit a common set of environment variables:
+All backend services read a common set of environment variables. The worker reads only `NODE_ENV`, `PORT`, `REALM`, `CLIENT_ID`, `CLIENT_SECRET`, `AUTHUP_URL` and `RABBITMQ_CONNECTION_STRING`; see each service page for defaults that differ.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -35,20 +35,21 @@ All backend services inherit a common set of environment variables:
 | `REALM` | `master` | Default Authup realm |
 | `CLIENT_ID` | `system` | Authup client ID |
 | `CLIENT_SECRET` | `start123` | Authup client secret |
-| `PUBLIC_URL` | — | Public URL of this service |
+| `PUBLIC_URL` | `http://127.0.0.1:<PORT>/` (core), `http://localhost:<PORT>` (storage, telemetry) | Public URL of this service |
 | `AUTHUP_URL` | — | Authup identity provider URL |
 | `REDIS_CONNECTION_STRING` | — | Redis connection string |
 | `RABBITMQ_CONNECTION_STRING` | — | RabbitMQ (AMQP) connection string |
+| `TRUST_PROXY` | every hop | Trusted `X-Forwarded-For` hops: `true`, `false`, a hop count or a comma list of IPs and CIDRs ([details](/guide/deployment/configuration#client-addresses-and-rate-limiting)); the worker ignores it |
 | `SHUTDOWN_DELAY` | `0` | Seconds core, storage, telemetry and messenger keep serving after a stop signal while `/readyz` answers 503 (the worker ignores it) |
 | `COOKIE_PREFIX` | — | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). Must match the `COOKIE_PREFIX` client-ui was deployed with — see [Frontend Variables](/guide/deployment/configuration#frontend-variables-client-ui). |
 
 ## Database Configuration
 
-Services with a database (`server-core`, `server-storage`, `server-telemetry`) also read:
+Services with a database (`server-core`, `server-storage`, `server-telemetry`, `server-messenger`) also read:
 
 | Variable | Description |
 |----------|-------------|
-| `DB_TYPE` | `mysql`, `postgres`, or `better-sqlite3` |
+| `DB_TYPE` | `mysql`, `postgres`, or `better-sqlite3` (required) |
 | `DB_HOST` | Database hostname |
 | `DB_PORT` | Database port |
 | `DB_USERNAME` | Database username |
@@ -60,12 +61,12 @@ Services with a database (`server-core`, `server-storage`, `server-telemetry`) a
 All services are packaged in a single Docker image. The `entrypoint.sh` script selects the service:
 
 ```bash
-docker run privateaim/hub core cli start
-docker run privateaim/hub storage cli start
-docker run privateaim/hub telemetry cli start
-docker run privateaim/hub messenger cli start
-docker run privateaim/hub core-worker
-docker run privateaim/hub ui
+docker run ghcr.io/privateaim/hub core cli start
+docker run ghcr.io/privateaim/hub storage cli start
+docker run ghcr.io/privateaim/hub telemetry cli start
+docker run ghcr.io/privateaim/hub messenger cli start
+docker run ghcr.io/privateaim/hub core-worker start
+docker run ghcr.io/privateaim/hub ui start
 ```
 
 See [Docker Image](/guide/deployment/docker) for build instructions.

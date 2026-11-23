@@ -1,6 +1,6 @@
 # @privateaim/messenger-kit
 
-Messenger domain types for real-time event-driven communication between Hub components.
+Messenger domain types: the durable broker's message and wakeup types, and the Socket.io connection and messaging events.
 
 ## Installation
 
@@ -12,10 +12,16 @@ npm install @privateaim/messenger-kit
 
 ```typescript
 import {
-    ConnectionEventName,
-    MessagingEventName,
+    CTSMessagingEventName,
+    STCConnectionEventName,
+    WakeupEventName,
 } from '@privateaim/messenger-kit';
+import type { Message, MessagePullQuery } from '@privateaim/messenger-kit';
+
+const query: MessagePullQuery = { limit: 50, wait: 30_000 };
 ```
+
+Event names are split by direction: `CTS*` (client to server) and `STC*` (server to client).
 
 ## API
 
@@ -23,14 +29,16 @@ import {
 
 | Module | Description |
 |--------|-------------|
-| `connection` | Connection lifecycle event types |
-| `messaging` | Message event types and payloads |
-| `types` | Shared TypeScript types |
-| `utils` | Serialization and utility helpers |
+| `broker` | Durable mailbox types (`Message`, `MessageParty`, `MessagePartyKind`, `SendMessageRequest`, `MessagePullQuery`, `MessagePullResponse`, `MessageAckRequest`) and the wakeup (`WakeupEventName`, `MessagePendingEvent`) |
+| `connection` | Connection lifecycle events (`STCConnectionEventName`, `CTSConnectionEventName`) |
+| `messaging` | Socket messaging events (`STCMessagingEventName`, `CTSMessagingEventName`), payload types and validators (`CTSMessagingMessageValidator`, `CTSMessagingPartyValidator`) |
+| `types` | Socket event maps (`STCEvents`, `CTSEvents`) and callback types |
+| `utils` | `isEventCallback`, `isEventTarget` type guards |
 
 ## Dependencies
 
-- `@privateaim/core-kit` — Domain types
-- `@validup/adapter-zod` — Zod validation adapter
+- `@privateaim/kit` — `TypedContainer` for the validators (peer dependency)
+- `@privateaim/core-kit` — Domain types (peer dependency)
+- `@validup/zod` — Zod validation adapter
 - `validup` — Validation utilities
 - `zod` — Schema validation

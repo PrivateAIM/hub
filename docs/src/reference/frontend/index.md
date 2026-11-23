@@ -5,11 +5,15 @@ The frontend is a Nuxt 4 SSR web application that provides the user interface fo
 ## Running
 
 ```bash
-# Development (from repo root)
-npm run client-ui
+# Development server (from repo root)
+npm run dev --workspace=apps/client-ui
 
-# Docker
-docker run -e ... privateaim/hub ui
+# Production build and start
+npm run build --workspace=apps/client-ui
+npm run start --workspace=apps/client-ui
+
+# Docker (listens on port 3000)
+docker run -e ... ghcr.io/privateaim/hub ui start
 ```
 
 ## Dependencies
@@ -19,18 +23,24 @@ docker run -e ... privateaim/hub ui
 
 ## Environment Variables
 
+Nuxt runtime variables, read when the server starts. Each one falls back to the unprefixed variable (`CORE_URL`, `AUTHUP_URL`, `AUTHUP_CLIENT_ID`, `ACCOUNT_URL`, `STORAGE_URL`, `TELEMETRY_URL`, `COOKIE_DOMAIN`, `COOKIE_PREFIX`) that was set when the app was built.
+
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `NUXT_PUBLIC_CORE_URL` | — | Core API base URL |
+| `NUXT_PUBLIC_CORE_URL` | — | Core API base URL, used by the browser; realtime updates use its Socket.IO server |
 | `NUXT_PUBLIC_AUTHUP_URL` | — | Authup URL |
 | `NUXT_AUTHUP_URL` | `AUTHUP_URL` at build time | Address the server render dials Authup on (e.g. an in-cluster service). Only requests are sent there: every URL in the rendered page (identity-provider links, OAuth2 endpoints) keeps `NUXT_PUBLIC_AUTHUP_URL` |
 | `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `admin-console` | OAuth2 client used for the login (authorization-code) flow |
-| `NUXT_PUBLIC_ACCOUNT_URL` | `<NUXT_PUBLIC_AUTHUP_URL>/console/account` | Authup account console, linked from the "Account" sidebar entry |
+| `NUXT_PUBLIC_ACCOUNT_URL` | `<NUXT_PUBLIC_AUTHUP_URL>/console/account` | Authup account console, linked from the header's account icon |
 | `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
 | `NUXT_PUBLIC_TELEMETRY_URL` | — | Telemetry service URL |
 | `NUXT_PUBLIC_COOKIE_DOMAIN` | — (host-only) | `Domain` attribute for the session cookies. Leave empty unless a sibling host must read them — see [Session cookies](#session-cookies) |
 | `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` | — (none) | Namespace prefixed onto every session cookie name. Set alongside a widened `NUXT_PUBLIC_COOKIE_DOMAIN` — see [Session cookies](#session-cookies) |
-| `NUXT_PUBLIC_MESSENGER_URL` | — | Messenger service URL |
+| `NUXT_CORE_URL` | `CORE_URL` at build time | Address the server render calls the core API on (e.g. an in-cluster service) |
+| `NUXT_STORAGE_URL` | `STORAGE_URL` at build time | Address the server render and the download proxy call storage on |
+| `NUXT_TELEMETRY_URL` | `TELEMETRY_URL` at build time | Address the server render calls telemetry on |
+
+The server render uses `NUXT_STORAGE_URL` and `NUXT_TELEMETRY_URL` only when a server-side core URL (`NUXT_CORE_URL`, or `CORE_URL` at build time) is set, and otherwise the public ones. Set the server-side addresses together.
 
 ## Authentication
 
@@ -111,8 +121,11 @@ It buys the Hub nothing by default: the services read the bearer token from the
 `Authorization` header, and their cookie fallback only ever sees same-origin requests
 under a shared hostname. The one case it does matter is a **stream/download**
 endpoint reached by a top-level browser navigation (`GET /buckets/:id/stream`,
-`GET /bucket-files/:id/stream`) — that request cannot carry an `Authorization`
-header, so the widened domain is what lets the storage host read the cookie at all.
+`GET /bucket-files/:id/stream`), which cannot carry an `Authorization` header. The UI
+sends such downloads through its own server route `/api/download/<type>/<id>`, which
+proxies the stream from storage (`NUXT_STORAGE_URL`) with `Cache-Control: no-store`. The
+download stays on the UI's origin, so the host-only `access_token` cookie reaches
+storage without widening the cookie domain.
 
 When `NUXT_PUBLIC_COOKIE_DOMAIN` genuinely must be widened, also set
 `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` (Authup `client-web-nuxt` >= `1.0.0-beta.64`,
@@ -128,7 +141,7 @@ Setting a prefix on the UI alone breaks the very stream/download fallback it was
 for: `server-core`, `server-storage`, `server-telemetry` and `server-messenger` each
 look for the bare `access_token` cookie name unless told otherwise. Set the matching
 `COOKIE_PREFIX` env var on **every** backend service too — see
-[Deployment Configuration](../../guide/deployment/configuration.md#common-variables) —
+[Deployment Configuration](/guide/deployment/configuration#common-variables) —
 to the exact same string, verbatim (neither side inserts a separator automatically).
 
 ::: warning Changing `NUXT_PUBLIC_COOKIE_DOMAIN` from a value to empty
@@ -256,7 +269,7 @@ so a denied consent cannot loop back into the flow.
 - **Analysis workflows** — define, configure, and monitor distributed analyses
 - **Node management** — register and manage compute nodes
 - **Administration** — realm management, user roles, approval workflows
-- **Real-time updates** — live status via WebSocket (Messenger service)
+- **Real-time updates** — live status via the Core API's Socket.IO server
 - **Light / dark mode** — class-based color mode with a header toggle
 
 ## Technology

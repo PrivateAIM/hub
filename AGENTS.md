@@ -14,12 +14,11 @@ npm run test                    # Test all packages (Nx + Vitest)
 npm run lint                    # ESLint across all packages
 npm run lint:fix                # ESLint with auto-fix
 
-# Dev servers
-npm run dev --workspace=apps/client-ui          # Nuxt frontend
-npm run dev --workspace=apps/server-core        # Core API server
-npm run dev --workspace=apps/server-messenger   # Realtime/WebSocket server
-npm run dev --workspace=apps/server-core-worker # Worker service
-npm run dev --workspace=docs                    # Documentation site
+# Dev servers (services have no dev script: build first, then run dist)
+npm run dev --workspace=apps/client-ui                    # Nuxt frontend
+npm run cli --workspace=apps/server-core -- start         # Core API (likewise storage, telemetry, messenger)
+npm run start --workspace=apps/server-core-worker         # Worker service
+npm run dev --workspace=docs                              # Documentation site
 ```
 
 - **Node.js**: ≥26.0.0 (declared in root and workspace `engines`)

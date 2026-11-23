@@ -1,6 +1,6 @@
 # @privateaim/client-vue-theme
 
-Tailwind CSS v4 theme for PrivateAIM client applications. A single stylesheet that composes the full UI cascade — Tailwind, the vuecs design system, the authup kit theme — and layers hub's design tokens, component chrome, and a Bootstrap-shaped compat layer on top.
+Tailwind CSS v4 theme for PrivateAIM client applications. A single stylesheet that composes the full UI cascade — Tailwind, the vuecs design system, the authup kit theme — and layers hub's design tokens, structural component styles and app chrome on top.
 
 ## Installation
 
@@ -32,11 +32,14 @@ app.use(vuecs, {
 
 The stylesheet establishes this order (consumers get all of it from the one import):
 
-1. `tailwindcss` — Tailwind v4 base/utilities
-2. `@vuecs/design` — vuecs design system (semantic `--vc-color-*` tokens, light + dark)
-3. `@vuecs/theme-tailwind` — vuecs component styling bridged onto Tailwind
-4. PrivateAIM tokens — brand palette, chrome, typography
-5. PrivateAIM compat layer — Bootstrap-shaped class shims (`@layer components`), phased out as templates migrate to `<VC*>` components
+1. `tailwindcss` — Tailwind v4 base/utilities (via `@authup/client-web-kit-theme/index.css`)
+2. `@vuecs/design` — vuecs design system (semantic `--vc-color-*` tokens, light + dark; via the kit theme)
+3. `@vuecs/theme-tailwind` — vuecs component styling bridged onto Tailwind (via the kit theme)
+4. PrivateAIM tokens — brand palette, chrome, typography (`@layer base`)
+5. PrivateAIM structural styles — what `@vuecs` does not provide: the progress track/bar, the joined-tab pagination, the inner chrome of `<VCModal>` and the entity icon (`@layer components`)
+6. PrivateAIM app styles — root, colors, cards, header, navbar, sidebar and body (`styles/*.css`, imported last)
+
+The Bootstrap-shaped compat shims (`.btn*`, `.alert*`, `.row`/`.col`, …) are retired; templates use `<VCButton>`, `<VCAlert>`, `<VCBadge>` and Tailwind utilities.
 
 ## Design Tokens
 
@@ -73,7 +76,7 @@ One variable-driven `.card` base; variants only override `--card-*` tokens:
 | `.card-event` | Clickable tile (service catalog) |
 | `.card-file` | Compact single-line file row |
 
-The themable contract: `--card-bg`, `--card-fg`, `--card-border-color`, `--card-border-width`, `--card-radius`, `--card-shadow`, `--card-pad-x/y`, `--card-cursor`, `--card-header-fg`, `--card-footer-border`, `--card-accent`, `--card-accent-icon`. New variants are a handful of variable overrides:
+The themable contract: `--card-bg`, `--card-fg`, `--card-border-color`, `--card-border-width`, `--card-radius`, `--card-shadow`, `--card-pad-x/y`, `--card-cursor`, `--card-header-fg`, `--card-header-border`, `--card-header-shadow`, `--card-body-font-size`, `--card-footer-border`, `--card-accent`, `--card-accent-icon`. New variants are a handful of variable overrides:
 
 ```css
 .card-custom {
@@ -90,5 +93,5 @@ Dark mode is class-based (`.dark` on a root element; toggled in client-ui via `@
 
 ## Notes
 
-- The package currently vendors two kit-component stylesheets (`styles/kit-list.css`, `styles/kit-form-validation.css`) to work around an `@authup/client-web-kit-theme` packaging bug (its published tarball omits CSS files that `src/index.css` imports). Revert once a fixed authup beta ships.
+- The package vendors two kit-component stylesheets (`styles/kit-list.css`, `styles/kit-form-validation.css`): `@authup/client-web-kit-theme` ships no list or form-validation styles, and hub's copies use `vc-*` class names.
 - Icons are SVG via Iconify (`@vuecs/icon`); no icon webfont is shipped. CSS-only glyphs (e.g. the card header chevron) inline the iconify SVG via `mask-image`.

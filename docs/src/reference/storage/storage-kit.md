@@ -85,7 +85,7 @@ import { Bucket, BucketFile } from '@privateaim/storage-kit';
 |--------|-------------|
 | `http` | `APIClient` with bucket and bucket-file API methods |
 | `IStorageClient` / `ClientOptions` | The client contract and its construction options |
-| `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
+| `pickEntityAPI` | Runtime lookup of a sub-API by `DomainType` string; returns `undefined` for a type without an entity API. The record type parameter is asserted by the caller, not checked |
 | `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute` |
 | `domains` | `Bucket`, `BucketFile` types and validators |
 | `StorageCapabilityType` / `StorageCapabilityAction` / `assertStorageCapabilityEntry` | Capability vocabulary: types `bucket`, `bucketFile` (the storage `DomainType` values); actions `read`, `write`, `delete`; `capabilityCoversBucket` / `capabilityCoversBucketFile` decide coverage (a bucket entry covers its files) |
@@ -141,6 +141,9 @@ const { data: bucket } = await client.bucket.getOne('abc');
 
 ## Dependencies
 
-- `@privateaim/kit` — Core utilities
-- `hapic` — HTTP client base
-- `rapiq` — Query parameter building
+- `@privateaim/kit` — Core utilities (peer)
+- `@authup/core-kit` — Authup types (peer)
+- `hapic` — HTTP client base (peer)
+- `@rapiq/core`, `@rapiq/codec-url` — Query parameter building (peer)
+- `@privateaim/errors` — Shared error types
+- `validup`, `@validup/zod`, `zod` — Validation

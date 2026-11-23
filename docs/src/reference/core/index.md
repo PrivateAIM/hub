@@ -5,22 +5,25 @@ The Core API is the main REST service of FLAME Hub. It manages analyses, project
 ## Running
 
 ```bash
-# Development (from repo root)
-npm run server-api
-
-# CLI
+# From the repo root: build every workspace, then start the HTTP and Socket.IO server
+npm run build
 npm run cli --workspace=apps/server-core -- start
 
+# Database migrations: run | revert | status | generate
+npm run cli --workspace=apps/server-core -- migration run
+
 # Docker
-docker run -e ... privateaim/hub core cli start
+docker run -e ... ghcr.io/privateaim/hub core cli start
 ```
+
+`start` creates the database when it does not exist and applies pending migrations before it serves.
 
 ## Dependencies
 
 - **Database** — MySQL, PostgreSQL, or SQLite
 - **Authup** — OAuth2 identity provider
-- **Redis** — pub/sub and caching
-- **RabbitMQ** — AMQP message bus (for worker communication)
+- **Redis** (optional) — realtime events and the read cache
+- **RabbitMQ** (optional) — AMQP message bus; without it nothing is built or distributed, because no worker receives the commands
 - **Harbor** (optional) — Docker registry for analysis images
 
 ## Environment Variables
@@ -29,13 +32,16 @@ docker run -e ... privateaim/hub core cli start
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `HARBOR_URL` | — | Harbor registry URL |
-| `TELEMETRY_URL` | — | Telemetry service URL |
+| `PUBLIC_URL` | `http://127.0.0.1:<PORT>/` | Public URL of this service |
+| `HARBOR_URL` | — | Harbor connection string with credentials in the URL; at startup it creates or updates the registry named `default` |
+| `TELEMETRY_URL` | — | server-telemetry URL, for the analysis log endpoints |
 | `MASTER_IMAGES_OWNER` | `PrivateAim` | GitHub owner for master images |
 | `MASTER_IMAGES_REPOSITORY` | `master-images` | GitHub repository name |
 | `MASTER_IMAGES_BRANCH` | `master` | GitHub branch |
 | `SKIP_PROJECT_APPROVAL` | `false` | Skip project approval workflow |
 | `SKIP_ANALYSIS_APPROVAL` | `false` | Skip analysis approval workflow |
+
+`REDIS_CONNECTION_STRING=true` means `redis://127.0.0.1` and `RABBITMQ_CONNECTION_STRING=true` means `amqp://root:start123@127.0.0.1`.
 
 ### Inherited
 
@@ -55,7 +61,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `GET/POST` | `/analyses/:id/client/credentials` | Read / rotate the analysis's OAuth2 client credentials |
 | `POST` | `/analyses/:id/storage/token` | Mint a storage capability token for buckets and files of the analysis (see below) |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
-| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
+| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](/guide/deployment/configuration#health-endpoints)) |
 
 ## Response Shapes
 
@@ -149,7 +155,7 @@ and once at start — server-core re-runs the build/distribution check for such 
 AMQP is configured**. Without AMQP the reconciler is not scheduled: no external worker can
 consume its checks from the local memory bus. If the
 image is not there, the check result marks the process `failed`, so it can be started again.
-Ordinary status and heartbeat saves no longer query Authup for an unchanged, non-null analysis
+Ordinary status and heartbeat saves do not query Authup for an unchanged, non-null analysis
 client binding. Creating an analysis or saving it with a missing/changed binding still provisions
 or checks its client. Deleting a client remotely is not repaired by an unrelated status save.
 The public analysis update API does not accept `clientId`, so recovery requires administrative

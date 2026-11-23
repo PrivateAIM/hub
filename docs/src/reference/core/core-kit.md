@@ -1,40 +1,61 @@
 # @privateaim/core-kit
 
-Domain models, types, and error definitions for the PrivateAIM core service. Defines all entity types used by `server-core` and consumed by clients.
+Domain models, validators and error definitions for the PrivateAIM core service. Defines all entity types used by `server-core` and consumed by clients.
 
 ## Installation
 
 ```bash
-npm install @privateaim/core-kit
+npm install @privateaim/core-kit @privateaim/kit @authup/core-kit
 ```
+
+`@privateaim/kit`, `@authup/core-kit` and `@privateaim/telemetry-kit` are peer dependencies.
 
 ## Usage
 
 ### Domain Types
 
 ```typescript
-import {
+import type {
     Analysis,
-    AnalysisRunStatus,
+    MasterImage,
     Node,
     Project,
     Registry,
-    MasterImage,
 } from '@privateaim/core-kit';
+import type { ProcessStatus } from '@privateaim/kit';
+
+// buildStatus, distributionStatus and executionStatus are typed as `${ProcessStatus}` | null.
+const status: `${ProcessStatus}` | null = analysis.buildStatus;
 ```
 
 ### Validators
 
-```typescript
-import { analysisSchema } from '@privateaim/core-kit';
+Every writable entity has a validator class (`AnalysisValidator`, `ProjectValidator`, `NodeValidator`, …) built on validup and Zod. Server-core runs the same classes on its create and update routes.
 
-const result = analysisSchema.safeParse(data);
+```typescript
+import { AnalysisValidator } from '@privateaim/core-kit';
+import { ValidatorGroup } from '@privateaim/kit';
+
+const validator = new AnalysisValidator();
+
+// Throws a ValidupError on invalid input; resolves to the normalized data.
+const data = await validator.run(input, { group: ValidatorGroup.CREATE });
 ```
+
+`safeRun()` returns a result object instead of throwing.
 
 ### Error Handling
 
 ```typescript
-import { CoreError } from '@privateaim/core-kit';
+import { AnalysisBuilderCommandChecker, AnalysisError } from '@privateaim/core-kit';
+
+try {
+    AnalysisBuilderCommandChecker.canStart(analysis);
+} catch (e) {
+    if (e instanceof AnalysisError) {
+        console.log(e.message);
+    }
+}
 ```
 
 ## API
@@ -43,10 +64,12 @@ import { CoreError } from '@privateaim/core-kit';
 
 | Module | Description |
 |--------|-------------|
-| `domains` | Entity types: Analysis, Node, Project, Registry, MasterImage, etc. |
+| `domains` | Entity types, validators, enums and command checkers: Analysis, Node, Project, Registry, MasterImage, etc. |
 | `AnalysisStorageToken` / `AnalysisStorageTokenCreatePayload` / `AnalysisStorageTokenValidator` | Request and response of the storage-token mint route |
-| `error` | Core-specific error types |
-| `constants` | Domain constants and enums (statuses, permission names) |
+| `error` | `APIConnectionStringError` and the `ErrorCode` enum (`AnalysisError` lives next to the analysis domain) |
+| `constants` | `EnvironmentName` |
+
+Process statuses (`ProcessStatus`), permission names (`PermissionName`) and `ValidatorGroup` come from `@privateaim/kit`.
 
 ### Key Domain Types
 
@@ -61,8 +84,17 @@ import { CoreError } from '@privateaim/core-kit';
 | `Registry` | Docker registry configuration |
 | `RegistryProject` | Project within a Docker registry |
 
+### Channel Helpers
+
+| Export | Purpose |
+|--------|---------|
+| `buildDomainChannelName(type, id?)` | Socket room of an entity type or one record: `analysis` or `analysis/<id>` |
+| `buildDomainNamespaceName(id?)` | Socket namespace: `/resources` or `/resources/<realmId>` |
+
 ## Dependencies
 
-- `@privateaim/kit` — Core utilities
-- `@authup/core-kit` — Authup types
-- `@privateaim/telemetry-kit` — Telemetry types
+- `@privateaim/kit`: Core utilities (peer)
+- `@authup/core-kit`: Authup types (peer)
+- `@privateaim/telemetry-kit`: Telemetry types (peer)
+- `@privateaim/errors`: Shared `HubError` base class
+- `validup`, `@validup/zod`, `zod`: Validation

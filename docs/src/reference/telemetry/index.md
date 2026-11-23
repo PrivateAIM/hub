@@ -5,22 +5,26 @@ The Telemetry service handles log aggregation via VictoriaLogs and event trackin
 ## Running
 
 ```bash
-# Development
-npm run dev --workspace=apps/server-telemetry
-
-# CLI
+# From the repo root: build every workspace, then start the HTTP server
+npm run build
 npm run cli --workspace=apps/server-telemetry -- start
 
+# Database migrations: run | revert | status | generate
+npm run cli --workspace=apps/server-telemetry -- migration run
+
 # Docker
-docker run -e ... privateaim/hub telemetry cli start
+docker run -e ... ghcr.io/privateaim/hub telemetry cli start
 ```
+
+`start` creates the database when it does not exist and applies pending migrations before it serves.
 
 ## Dependencies
 
 - **Database** — MySQL, PostgreSQL, or SQLite (for event entities)
 - **Authup** — OAuth2 identity provider
 - **VictoriaLogs** (optional) — log storage backend
-- **RabbitMQ** — AMQP message bus
+- **RabbitMQ** (optional) — AMQP message bus, to ingest logs and events from the other services
+- **Redis** (optional) — realtime entity events
 
 ## Environment Variables
 
@@ -28,12 +32,13 @@ docker run -e ... privateaim/hub telemetry cli start
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `PUBLIC_URL` | `http://localhost:<PORT>` | Public URL of this service |
 | `VICTORIA_LOGS_URL` | — | VictoriaLogs base URL |
 | `VICTORIA_LOGS_INGESTOR_URL` | — | VictoriaLogs ingest endpoint (overrides base URL) |
 | `VICTORIA_LOGS_QUERIER_URL` | — | VictoriaLogs query endpoint (overrides base URL) |
 | `EVENT_RETENTION_DAYS` | `7` | Days a bus-ingested event row is kept before the sweep drops it. Stamped at ingest when the publisher supplied no `expiresAt`; `0` keeps rows forever. Events created directly via `POST /events` are never stamped. |
 
-All VictoriaLogs variables are optional. When unset, an in-memory log store is used as a fallback.
+All VictoriaLogs variables are optional. When none is set, an in-memory log store takes the logs; they are lost on restart and not shared between replicas.
 
 ### Inherited
 
@@ -51,7 +56,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `POST` | `/logs` | Write logs |
 | `DELETE` | `/logs` | Delete logs |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
-| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
+| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](/guide/deployment/configuration#health-endpoints)) |
 
 ## Response Shapes
 
@@ -102,7 +107,7 @@ denylist also — deliberately, fail-closed — suppresses the non-secret `bucke
 - **MemoryLogStore** — in-memory fallback for startup and testing
 - **EventComponent** / **LogComponent** — AMQP consumers for async event and log ingestion.
   EventComponent owns retention at both ends. It stamps the window on ingest from
-  `EVENT_RETENTION_DAYS` (publishers no longer stamp; an explicit `expiresAt`, or
+  `EVENT_RETENTION_DAYS` (publishers do not stamp; an explicit `expiresAt`, or
   `expiring: false`, from the publisher still wins), and it runs the sweep: expiring
   events are dropped once at start and daily at 01:00 on a fixed, non-configurable
   schedule, in bounded batches so a matured retention window never becomes one

@@ -14,12 +14,13 @@ npm install @privateaim/client-vue
 
 The library expects the consuming application to provide:
 
-- `vue` ^3.5
-- `@authup/client-web-kit` — Authup UI components
+- `vue` ^3.5, `vue-router`
+- `@authup/client-web-kit`, `@authup/core-kit`, `@authup/core-http-kit`, `@authup/core-realtime-kit`, `@authup/i18n` — Authup UI components and types
 - `@vuecs/*` — component framework (`forms`, `list`, `table`, `pagination`, `overlays`, `icon`, `button`, `elements`, `link`, `timeago`, `countdown`, …)
-- `validup` + `@validup/vue` + `@validup/zod` — form validation
-- `ilingo` + `@ilingo/vue` + `@ilingo/validup` — translations
-- `@privateaim/core-kit`, `@privateaim/core-http-kit`, `@privateaim/storage-kit`, `@privateaim/telemetry-kit` — domain types and HTTP clients
+- `validup` + `@validup/vue` + `@validup/zod` + `zod` — form validation
+- `ilingo` + `@ilingo/vue` + `@ilingo/validup` + `@ilingo/validup-vue` — translations
+- `@privateaim/kit`, `@privateaim/core-kit`, `@privateaim/core-http-kit`, `@privateaim/storage-kit`, `@privateaim/telemetry-kit` — domain types and HTTP clients
+- `hapic`, `@rapiq/core`, `@rapiq/adapter-memory`, `socket.io-client`, `@vueuse/core`, `smob`
 
 ## Usage
 
@@ -50,29 +51,37 @@ type Options = {
     httpTimeout?: number,       // Request timeout (ms) of the clients built from the URLs
     components?: boolean | string[],  // Register globally (true = all, string[] = selective)
     translatorLocale?: string,  // Locale for translations
-    isServer?: boolean,         // SSR mode flag
+    coreHTTPClient?: ICoreClient,           // Pre-built clients used instead of the URLs
+    storageHTTPClient?: IStorageClient,
+    telemetryHTTPClient?: ITelemetryClient,
+    pinia?: Pinia,              // Pinia instance backing authup's store (required outside Nuxt)
+    realtime?: boolean,         // Install the socket manager (default off)
 };
 ```
 
-The plugin installs HTTP clients for the core, storage, and telemetry services, a socket manager for real-time updates, and a translator instance.
+The plugin installs HTTP clients for the core, storage, and telemetry services and an ilingo translator. It installs the socket manager for real-time updates only with `realtime: true`.
 
 ### Components
 
 Components can be imported individually:
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import {
-    FAnalysisList,
-    FProjectForm,
-    FNodeList,
-    FRegistryList,
-    FMasterImagePicker,
+    FAnalyses,
     FEntityDelete,
+    FMasterImagePicker,
+    FNodes,
     FProcessStatus,
+    FProjectForm,
+    RegistryList,
 } from '@privateaim/client-vue';
 </script>
 ```
+
+Collection components use the plural entity name (`FAnalyses`, `FProjects`, `FNodes`, `FMasterImages`). The registry,
+registry-project, master-image-group and login components carry no `F` prefix (`RegistryList`, `RegistryForm`,
+`RegistryProjectList`, `MasterImageGroupList`, `LoginForm`).
 
 ### Available Components
 
@@ -85,7 +94,7 @@ import {
 | Master Image | list, picker, group management |
 | Bucket File | list, upload, stream |
 | Event / Log | list, details |
-| Utility | `FEntityDelete`, `FProcessStatus`, `FContentAction`, login form |
+| Utility | `FEntityDelete`, `FProcessStatus`, `FContentAction`, `FTranslation`, `LoginForm` |
 
 `FContentAction` is the primary action of a collection section, rendered at the
 right of the section's title row. It is route-aware: `+ Add` on `overviewUrl`,
@@ -114,7 +123,6 @@ import {
     injectStorageHTTPClient,
     injectTelemetryHTTPClient,
     injectSocketManager,
-    useTranslator,
 } from '@privateaim/client-vue';
 
 // Inside a setup function. The injected values are typed as the CONTRACTS —
@@ -123,6 +131,8 @@ import {
 const coreClient = injectCoreHTTPClient();       // ICoreClient
 const storageClient = injectStorageHTTPClient(); // IStorageClient
 ```
+
+Translations come from the ilingo instance the plugin installs through `@ilingo/vue`; the `FTranslation` component (props `group`, `name`) renders one entry.
 
 ### Install Options
 
@@ -213,7 +223,7 @@ list handlers keep receiving `{ data, meta }`.
   finds in this package's source, so a composed name (`` `fa6-brands:${os}` ``) is never bundled.
   See [client-ui — Icons](./index.md#icons).
 - `validup` / `@validup/vue` / `@validup/zod` — form validation wired to the core-kit Zod validators
-- `ilingo` / `@ilingo/vue` — translations
+- `ilingo` / `@ilingo/vue` / `@ilingo/validup-vue` — translations
 - `@authup/client-web-kit` — authentication UI
 - `@vueuse/core` — Vue composition utilities
 - `@privateaim/core-kit` — domain types

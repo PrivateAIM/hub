@@ -1,26 +1,30 @@
 # Storage (server-storage)
 
-The Storage service manages file and object storage backed by MinIO (S3-compatible). It provides bucket and file CRUD operations with streaming support.
+The Storage service manages file and object storage, backed by MinIO (S3-compatible) or, without a MinIO connection, the local filesystem. It provides bucket and file CRUD operations with streaming support.
 
 ## Running
 
 ```bash
-# Development
-npm run dev --workspace=apps/server-storage
-
-# CLI
+# From the repo root: build every workspace, then start the HTTP server
+npm run build
 npm run cli --workspace=apps/server-storage -- start
 
+# Database migrations: run | revert | status | generate
+npm run cli --workspace=apps/server-storage -- migration run
+
 # Docker
-docker run -e ... privateaim/hub storage cli start
+docker run -e ... ghcr.io/privateaim/hub storage cli start
 ```
+
+`start` creates the database when it does not exist and applies pending migrations before it serves.
 
 ## Dependencies
 
 - **Database** — MySQL, PostgreSQL, or SQLite
 - **Authup** — OAuth2 identity provider
-- **MinIO** — S3-compatible object storage (**required**)
-- **RabbitMQ** — AMQP message bus
+- **MinIO** (optional) — S3-compatible object storage; without it files go to the local filesystem (`STORAGE_PATH`), which several replicas do not share and a container loses unless the path is a volume
+- **RabbitMQ** (optional) — AMQP message bus; without it no analysis bucket is created, because server-core sends bucket commands over the bus
+- **Redis** (optional) — realtime entity events
 
 ## Environment Variables
 
@@ -28,7 +32,9 @@ docker run -e ... privateaim/hub storage cli start
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MINIO_CONNECTION_STRING` | `http://admin:start123@127.0.0.1:9000` | MinIO connection (**required**) |
+| `PUBLIC_URL` | `http://localhost:<PORT>` | Public URL of this service |
+| `MINIO_CONNECTION_STRING` | — | MinIO or S3 endpoint as `http(s)://<access-key>:<secret-key>@<host>:<port>`; `https` enables TLS. Port is required, nothing may follow it (no trailing `/`), and key and secret may contain only letters, digits and `_`. A malformed value stops the start (`Invalid MINIO_CONNECTION_STRING format.`). |
+| `STORAGE_PATH` | `<cwd>/writable/storage` | Directory for files when `MINIO_CONNECTION_STRING` is unset |
 | `CAPABILITY_CLIENT_ID` | `CLIENT_ID` | The Authup client (id, or name in `REALM`) whose capability-token exchanges are accepted: the client server-core authenticates as. A token another client exchanged is refused (401). A name is looked up once through Authup, which needs `client_read` for storage's own client; an id needs no lookup. |
 
 ### Inherited
@@ -39,7 +45,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
+| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](/guide/deployment/configuration#health-endpoints)) |
 | `GET` | `/buckets` | List buckets |
 | `POST` | `/buckets` | Create bucket (no `refId`, see below) |
 | `GET` | `/buckets/:id` | Get bucket |
@@ -64,8 +70,8 @@ may share a name.
 A bucket records its creator (`actorId`/`actorType`): for `POST /buckets` the authenticated identity
 (an actor in the body is ignored), for a bus create the actor named in the command. The creator may
 update, clear and delete the bucket, and delete its files, without `bucket_update`/`bucket_delete`;
-everyone else needs the permission and realm access. Buckets created before this was fixed carry no
-actor and are not backfilled, so only permission holders can manage them.
+everyone else needs the permission and realm access. Buckets without a recorded creator are not
+backfilled, so only permission holders can manage them.
 
 Uploading (`POST /buckets/:id/upload`) into a bucket **without** a `refId` requires being its creator,
 or `bucket_update` with realm access; anyone else gets 403 before a file is stored. A bucket **with**
@@ -103,7 +109,7 @@ other route, and a query token that lives longer than 60 s is refused (401). Onl
 
 Listings are narrowed to the covered buckets and files: a filter on another bucket returns nothing.
 Stream responses send `Referrer-Policy: no-referrer` so a token in the URL does not leak, and the
-query string is never logged. Login requests behave as before; server-core remains the authority on
+query string is never logged. server-core remains the authority on
 who may upload (it judges each file when it registers it).
 
 ## Response Shapes
@@ -126,7 +132,7 @@ See [API Reference](/guide/development/api#response-shapes) for the full contrac
 ## Architecture
 
 - **BucketEntity** / **BucketFileEntity** — TypeORM entities tracking storage metadata
-- **MinioModule** — creates and registers the S3 client in the DI container
+- **StorageModule** — registers the storage adapter in the DI container: a MinIO client when `MINIO_CONNECTION_STRING` is set, else the filesystem adapter on `STORAGE_PATH`
 - **BucketComponent** — AMQP consumer for asynchronous bucket operations: `create`, `delete` and
   `clear` (removes every object and bucket-file row but keeps the bucket, emitting
   `clearingStarted` / `clearingFinished` / `clearingFailed`)

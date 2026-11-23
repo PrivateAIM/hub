@@ -19,9 +19,9 @@ const client = new APIClient({
     baseURL: 'http://localhost:4002',
 });
 
-// Query logs — filters map onto VictoriaLogs labels
+// Query logs — `filters.labels` maps onto VictoriaLogs labels
 const { data: logs, meta } = await client.log.getMany({
-    filter: { refType: 'analysis', refId: analysisId },
+    filters: { labels: { refType: 'analysis', refId: analysisId } },
 });
 
 // Create an event — { data: Event, meta: {} }
@@ -42,8 +42,15 @@ Semantics as in
 [`@privateaim/core-http-kit`](/reference/core/core-http-kit#cancellation-per-call-timeouts).
 
 ```typescript
-const { data: logs } = await client.log.getMany(undefined, { timeout: 5_000 });
+const { data: logs } = await client.log.getMany(
+    { filters: { labels: { refType: 'analysis', refId: analysisId } } },
+    { timeout: 5_000 },
+);
 ```
+
+`log.getMany` and `log.deleteMany` need at least one label under `filters.labels`; without one the
+service answers 400 (`Filter labels must be specified.`), so a bare request never reaches the whole
+log store.
 
 ### Response Shapes
 
@@ -89,7 +96,7 @@ import { Event, EventScope, Log } from '@privateaim/telemetry-kit';
 |--------|-------------|
 | `http` | `APIClient` with event and log API methods |
 | `ITelemetryClient` / `ClientOptions` | The client contract and its construction options |
-| `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
+| `pickEntityAPI` | Runtime lookup of a sub-API by `DomainType` string; returns `undefined` for a type without an entity API. The record type parameter is asserted by the caller, not checked |
 | `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute` |
 | `domains` | `Event`, `Log` types and Zod validators |
 
@@ -127,7 +134,7 @@ const client = createFakeClient({
     },
 });
 
-const { data: logs } = await client.log.getMany();
+const { data: logs } = await client.log.getMany({ filters: { labels: { refType: 'analysis' } } });
 ```
 
 - Handler keys are `'<METHOD> /<path>'`; a `:name` segment captures into `req.params`.
@@ -141,6 +148,8 @@ const { data: logs } = await client.log.getMany();
 
 ## Dependencies
 
-- `@validup/adapter-zod` — Zod validation adapter
+- `@validup/zod` — Zod validation adapter
 - `validup` — Validation utilities
 - `zod` — Schema validation
+
+Peer dependencies: `@privateaim/kit`, `@authup/core-kit`, `@authup/kit`, `hapic`, `@rapiq/core`, `@rapiq/codec-url`.

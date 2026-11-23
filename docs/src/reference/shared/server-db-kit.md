@@ -13,15 +13,28 @@ npm install @privateaim/server-db-kit
 ### Data Source Setup
 
 ```typescript
-import { createDataSourceOptions } from '@privateaim/server-db-kit';
+import { DataSourceOptionsBuilder } from '@privateaim/server-db-kit';
+import { DataSource } from 'typeorm';
 
-const options = createDataSourceOptions({
+const builder = new DataSourceOptionsBuilder();
+builder.setEntities([NodeEntity, ProjectEntity]);
+builder.setMigrationDirectory('src/adapters/database/migrations');
+
+// DB_TYPE, DB_HOST, DB_PORT, ... (typeorm-extension's env reader)
+const dataSource = new DataSource(builder.buildWithEnv());
+
+// or from explicit options
+const options = builder.buildWith({
     type: 'postgres',
     host: 'localhost',
     port: 5432,
     database: 'hub',
 });
 ```
+
+`buildWithEnv()` throws when no options can be read from the environment. Only `mysql`, `postgres` and
+`better-sqlite3` are accepted. For MySQL and PostgreSQL the builder adds the migrations under
+`<migration directory>/<type>/`.
 
 Every option set the builder produces for MySQL or PostgreSQL is pinned to UTC
 with typeorm-extension's `pinTimezone(options, 'UTC')` (session timezone, reader
@@ -81,8 +94,20 @@ one scoped value spelling (`QUERY_CACHE_SCOPED_VALUE_NORMALIZER`, canonical lowe
 ### Entity Subscribers
 
 ```typescript
-import { EntitySubscriber } from '@privateaim/server-db-kit';
+import { BaseSubscriber } from '@privateaim/server-db-kit';
+
+const subscriber = new BaseSubscriber<NodeEntity>({
+    refType: 'node',
+    destinations: (data) => [{ channel: 'nodes' }, { channel: ['nodes', data.id] }],
+    publisher,
+});
+
+dataSource.subscribers.push(subscriber);
 ```
+
+`BaseSubscriber` publishes a `created` event after insert, `updated` (with `dataPrevious`) after update and `deleted`
+before remove through an `IEntityEventPublisher`. Without a publisher it does nothing; `setPublisher()` attaches one
+later. Columns declared `select: false` are removed from the event payload.
 
 ## API
 
@@ -90,10 +115,10 @@ import { EntitySubscriber } from '@privateaim/server-db-kit';
 
 | Module | Description |
 |--------|-------------|
-| `data-source` | Data source options builder and TypeORM configuration (pinned to UTC) |
+| `data-source` | `DataSourceOptionsBuilder`: normalized TypeORM data source options (pinned to UTC) |
 | `lock` | `withDataSourceLock` — named advisory lock around boot passes |
 | `query-cache` | `QueryCache` (`IQueryCache`) — tag-invalidated read cache and its invalidation subscriber; `QUERY_CACHE_SCOPED_VALUE_NORMALIZER` |
-| `subscriber` | Base subscriber class for entity lifecycle events |
+| `subscriber` | `BaseSubscriber`: entity subscriber publishing domain events |
 | `transformer` | TypeORM value transformers: `dateToISOStringTransformer`, `bigintNumberTransformer`, `serializedTextTransformer` |
 
 ## Dependencies

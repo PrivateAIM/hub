@@ -7,29 +7,30 @@ The Messenger service is the Hub's **durable store-and-forward message broker** 
 ## Running
 
 ```bash
-# Development (from repo root)
-npm run dev --workspace=apps/server-messenger
-
-# CLI
+# From the repo root: build every workspace, then start the HTTP and Socket.io server
+npm run build
 npm run cli --workspace=apps/server-messenger -- start
 
 # Migrations
 npm run cli --workspace=apps/server-messenger -- migration run
 
 # Docker
-docker run -e ... privateaim/hub messenger cli start
+docker run -e ... ghcr.io/privateaim/hub messenger cli start
 ```
+
+`start` creates the database when it does not exist and applies pending migrations before it serves.
 
 ## Dependencies
 
 - **Database** (MySQL / PostgreSQL; SQLite for tests) — durable mailbox
-- **Redis** — cross-instance wakeup pub/sub + Socket.io adapter
+- **Redis** (required) — cross-instance wakeup pub/sub + Socket.io adapter. When Redis is set but unreachable at start, the wakeup falls back to memory and wakes only clients on the same instance.
+- **RabbitMQ** (optional) — ships the service's logs to server-telemetry
 - **Authup** — OAuth2 identity provider (token validation on REST + socket connect).
   **Mandatory**: without it every request and socket connection is rejected as
   unauthenticated (401). The service's own client (`CLIENT_ID`) must hold
   `permission_read` — each authenticated request and socket connection reads
   Authup's authorization catalog (`GET /authorization`). See
-  [Configuration — Authup is mandatory for server-messenger](../../guide/deployment/configuration.md#server-messenger-authenticates-against-authup).
+  [Configuration — Authup is mandatory for server-messenger](/guide/deployment/configuration#server-messenger-authenticates-against-authup).
 
 ## REST API
 
@@ -42,7 +43,7 @@ Authenticated as the calling identity (e.g. a node's `client_credentials` token)
 | `POST` | `/messages/ack` `{ ids }` | Acknowledge messages by id — the broker deletes them (delete-on-ack). |
 | `GET`  | `/messages/stream` | Server-Sent Events stream of payload-free `messagePending` wakeups for the caller (and one on connect), kept alive by comment lines. The client pulls via `GET /messages` on each event. See [SSE stream format](#sse-stream-format). |
 
-`GET`/`HEAD` `/livez` and `/readyz` are anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)).
+`GET`/`HEAD` `/livez` and `/readyz` are anonymous liveness and readiness probes (see [Health endpoints](/guide/deployment/configuration#health-endpoints)).
 
 Messages carry a uniform TTL (24h). A pull never returns an expired message, and a background sweep reaps expired rows in bounded batches, so a backlog never becomes one long-running delete. Contract types live in `@privateaim/messenger-kit`; the Hapic client is `@privateaim/messenger-http-kit`.
 
@@ -68,7 +69,7 @@ data: {"recipient":{"type":"client","id":"<subject id>"}}
 - Every wakeup is a `messagePending` event whose `data` is the JSON `MessagePendingEvent` (`{ recipient }`). The stream sends no `id` or `retry` field, so there is nothing to replay with `Last-Event-ID`.
 - Every 15 seconds the server writes a `: ping` **comment** line as a keep-alive. SSE clients (including `EventSource`) ignore comments, so the heartbeat never reaches an application as an event. A failed write also tells the server that the client is gone.
 - The server never closes the stream on its own; a client reconnects after a network drop or server restart, then pulls once.
-- `@privateaim/messenger-http-kit` reads the stream with `client.message.subscribe()` ([usage](./messenger-http-kit.md#wakeup-subscription)).
+- `@privateaim/messenger-http-kit` reads the stream with `client.message.subscribe()` ([usage](/reference/messenger/messenger-http-kit#wakeup-subscription)).
 
 ## Environment Variables
 
@@ -76,12 +77,13 @@ data: {"recipient":{"type":"client","id":"<subject id>"}}
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DB_TYPE` | `better-sqlite3` | `mysql`, `postgres`, or `better-sqlite3` |
+| `DB_TYPE` | — (**required**) | `mysql`, `postgres`, or `better-sqlite3` |
 | `DB_HOST` / `DB_PORT` | — | Database connection |
 | `DB_USERNAME` / `DB_PASSWORD` | — | Database credentials |
 | `DB_DATABASE` | — | Database name |
-| `REDIS_CONNECTION_STRING` | `redis://127.0.0.1` | Redis connection (**required**) |
+| `REDIS_CONNECTION_STRING` | — (**required**) | Redis connection; the start fails without it |
 | `AUTHUP_URL` | `http://127.0.0.1:3010/` | Authup URL |
+| `RABBITMQ_CONNECTION_STRING` | — | RabbitMQ to ship the service's logs to server-telemetry |
 
 ### Inherited
 
@@ -92,7 +94,8 @@ data: {"recipient":{"type":"client","id":"<subject id>"}}
 | `REALM` | `master` | Authup realm |
 | `CLIENT_ID` | `system` | Authup client ID |
 | `CLIENT_SECRET` | `start123` | Authup client secret |
-| `TRUST_PROXY` | `true` | Trusted `X-Forwarded-For` hops: `true`, `false`, a hop count or a comma list of IPs / CIDRs ([details](../../guide/deployment/configuration.md#client-addresses-and-rate-limiting)) |
+| `COOKIE_PREFIX` | — | Prefix of the `access_token` cookie read when a request has no `Authorization` header; must match client-ui's prefix |
+| `TRUST_PROXY` | every hop | Trusted `X-Forwarded-For` hops: `true`, `false`, a hop count or a comma list of IPs / CIDRs ([details](/guide/deployment/configuration#client-addresses-and-rate-limiting)) |
 | `SHUTDOWN_DELAY` | `0` | Seconds to keep serving after a stop signal while `/readyz` answers 503 |
 
 ## Architecture
