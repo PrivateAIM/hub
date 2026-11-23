@@ -24,12 +24,6 @@ const id = createNanoID();
 import { DomainEventName } from '@privateaim/kit';
 ```
 
-### Error Handling
-
-```typescript
-import { isClientError } from '@privateaim/kit';
-```
-
 ### Validation
 
 `TypedContainer` is validup's `Container` with the `mount()` key escape hatch
@@ -73,6 +67,7 @@ body, say — keeps its keys.
 | `utils` | General utility functions |
 | `constants` | Shared constants |
 | `types` | Core TypeScript types |
+| `capability` | Capability entry helpers: `parseCapabilityEntry(ies)`, `formatCapabilityEntry` for the `type:id:actions` wire format, with Authup's limits (`CAPABILITY_MAX_ENTRIES` 32, `CAPABILITY_MAX_BYTES` 4096) |
 | `validator` | `TypedContainer` / `ITypedContainer` (mount-key-safe validup container), `ValidatorGroup` |
 
 ## Dependencies

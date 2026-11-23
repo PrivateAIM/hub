@@ -1,53 +1,235 @@
 /*
- * Copyright (c) 2023-2024.
+ * Copyright (c) 2023-2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 import { hasUnboundedReach } from '@authup/access';
+import { ErrorCode as AuthupErrorCode } from '@authup/errors';
+import { ErrorCode, HubError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
-import type { OptionsInput } from '@routup/rate-limit';
 import { rateLimit } from '@routup/rate-limit';
 import type { App, IAppEvent } from 'routup';
-import { useRequestEnv, useRequestIdentity } from '../request';
+import { defineCoreHandler, getRequestIP } from 'routup';
+import { useRequestCapability, useRequestEnv, useRequestIdentity } from '../request';
+import type { MiddlewareRateLimitOptions, RateLimitPrincipal } from './types';
 
 const PERMISSION_NAMES = Object.values(PermissionName);
 
-export function mountRateLimiterMiddleware(app: App) {
-    const options : OptionsInput = {
-        async skip(event: IAppEvent) {
-            const identity = useRequestIdentity(event);
-            const permissionEvaluator = useRequestEnv(event, 'permissionEvaluator');
+const WINDOW_MS = 60 * 1000;
 
-            if (!identity || identity.type !== 'client' || !permissionEvaluator) {
-                return false;
+/**
+ * Failed authentications one source address may cause per window before
+ * authentication is known (authup/authup#3692).
+ */
+export const RATE_LIMIT_FAILED_AUTHENTICATION_MAX = 300;
+
+/**
+ * Requests per window once the caller is known; an anonymous request is
+ * counted against its address.
+ */
+export const RATE_LIMIT_BUDGETS = {
+    anonymous: 60 * 20,
+    user: 60 * 100,
+    client: 60 * 1000,
+} as const;
+
+/**
+ * Whether the address key names the client rather than a value the client
+ * chose. Unset, `true` or a list with a `/0` range, TRUST_PROXY trusts every
+ * hop, so the leftmost `X-Forwarded-For` entry is the key: blocking it would
+ * let anyone lock out any address, and rotating it would evade the block.
+ */
+export function isAddressKeyTrusted(options: boolean | MiddlewareRateLimitOptions | undefined): boolean {
+    if (typeof options !== 'object' || options === null) {
+        return false;
+    }
+
+    const { trustProxy } = options;
+
+    if (typeof trustProxy === 'undefined' || trustProxy === true) {
+        return false;
+    }
+
+    if (Array.isArray(trustProxy)) {
+        return trustProxy.every((entry) => !entry.trimEnd().endsWith('/0'));
+    }
+
+    return true;
+}
+
+// A proxy may append the client's source port, which changes per connection.
+function stripPort(ip: string): string {
+    return ip.match(/^\[([^\]]+)\]:\d+$/)?.[1] ??
+        ip.match(/^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/)?.[1] ??
+        ip;
+}
+
+/**
+ * The plugin's default key hardcodes `trustProxy: true`; this one follows the
+ * app's TRUST_PROXY. Prefixed, as the key indexes a plain object.
+ */
+function buildAddressKey(event: IAppEvent): string {
+    return `ip:${stripPort(getRequestIP(event) || '127.0.0.1')}`;
+}
+
+/**
+ * A 401 for a credential that could have been guessed. An expired or revoked
+ * token carries a valid signature, and a request without a credential guessed
+ * nothing; both are what users behind one NAT address cause in ordinary use.
+ */
+function isFailedAuthentication(event: IAppEvent, response: Response): boolean {
+    if (response.status !== 401) {
+        return false;
+    }
+
+    const code = useRequestEnv(event, 'errorCode');
+
+    if (code === AuthupErrorCode.JWT_EXPIRED || code === AuthupErrorCode.JWT_INACTIVE) {
+        return false;
+    }
+
+    return !!event.headers.get('authorization');
+}
+
+/**
+ * Hub's own service clients (e.g. the worker's `system` client) are never
+ * throttled: a client whose grants reach every realm for EVERY hub
+ * permission. One name per call, as several names compile as any-of.
+ */
+async function isServiceClient(event: IAppEvent): Promise<boolean> {
+    const identity = useRequestIdentity(event);
+    const permissionEvaluator = useRequestEnv(event, 'permissionEvaluator');
+
+    if (!identity || identity.type !== 'client' || !permissionEvaluator) {
+        return false;
+    }
+
+    const verdicts = await Promise.all(PERMISSION_NAMES.map(
+        (name) => hasUnboundedReach(permissionEvaluator, name),
+    ));
+
+    return verdicts.every(Boolean);
+}
+
+type FailedAuthenticationWindow = {
+    count: number,
+    resetAt: number,
+};
+
+/**
+ * First stage, BEFORE authorization: counts failed authentications per
+ * source address, so a flood of forged bearers is cut before it reaches
+ * Authup introspection.
+ *
+ * A request is counted only once its response is a failed authentication;
+ * valid, expired-token and still pending requests never use the budget, so
+ * long-polls and uploads from one address cannot exhaust it. The limit is
+ * checked before forwarding, so one parallel burst can overshoot it once
+ * before it closes. Counters live per replica, in fixed windows.
+ */
+export function mountAuthenticationRateLimiterMiddleware(app: App) {
+    const windows = new Map<string, FailedAuthenticationWindow>();
+    let nextSweepAt = Date.now() + WINDOW_MS;
+
+    const sweep = (now: number) => {
+        if (now < nextSweepAt) {
+            return;
+        }
+
+        nextSweepAt = now + WINDOW_MS;
+
+        for (const [key, window] of windows) {
+            if (window.resetAt <= now) {
+                windows.delete(key);
             }
-
-            // Never throttle hub's own service clients, e.g. the worker's `system` client:
-            // a client whose grants reach every realm (`realm_scope: any`, no policy) for
-            // EVERY hub permission. One name per call: several names compile as any-of.
-            const verdicts = await Promise.all(PERMISSION_NAMES.map(
-                (name) => hasUnboundedReach(permissionEvaluator, name),
-            ));
-
-            return verdicts.every(Boolean);
-        },
-        max(event: IAppEvent) {
-            const identity = useRequestIdentity(event);
-
-            if (identity && identity.type === 'user') {
-                return 60 * 100; // 100 req p. sec
-            }
-
-            if (identity && identity.type === 'client') {
-                return 60 * 1000; // 1000 req p. sec
-            }
-
-            return 60 * 20; // 20 req p. sec
-        },
-        windowMs: 60 * 1000, // 60 sec
+        }
     };
 
-    app.use(rateLimit(options));
+    app.use(defineCoreHandler(async (event) => {
+        const key = buildAddressKey(event);
+        const now = Date.now();
+
+        sweep(now);
+
+        const window = windows.get(key);
+
+        if (window && window.resetAt > now && window.count >= RATE_LIMIT_FAILED_AUTHENTICATION_MAX) {
+            event.response.headers.set('retry-after', `${Math.ceil((window.resetAt - now) / 1000)}`);
+
+            throw new HubError({
+                code: ErrorCode.THROTTLED,
+                status: 429,
+                message: 'Too many failed authentications, please try again later.',
+            });
+        }
+
+        const response = await event.next();
+
+        if (response && isFailedAuthentication(event, response)) {
+            const finishedAt = Date.now();
+            const current = windows.get(key);
+
+            if (current && current.resetAt > finishedAt) {
+                current.count += 1;
+            } else {
+                windows.set(key, { count: 1, resetAt: finishedAt + WINDOW_MS });
+            }
+        }
+
+        return response;
+    }));
+}
+
+/**
+ * Who a request counts against: its identity, else the subject of its
+ * capability token. A capability carries no identity, but core minted it
+ * for an authenticated subject, so it shares that subject's budget instead
+ * of the anonymous one of its address (a node behind one egress address).
+ */
+function resolvePrincipal(event: IAppEvent): RateLimitPrincipal | undefined {
+    const identity = useRequestIdentity(event);
+
+    if (identity) {
+        return { type: identity.type, id: identity.id };
+    }
+
+    const capability = useRequestCapability(event);
+
+    if (capability) {
+        return { type: capability.subject.type, id: capability.subject.id };
+    }
+
+    return undefined;
+}
+
+/**
+ * Second stage, AFTER authorization: an authenticated or capability request
+ * counts against its principal, so principals sharing an address no longer
+ * share a budget; an anonymous one against its address.
+ */
+export function mountRateLimiterMiddleware(app: App) {
+    app.use(rateLimit({
+        keyGenerator: (event) => {
+            const principal = resolvePrincipal(event);
+
+            if (principal) {
+                return `${principal.type}:${principal.id}`;
+            }
+
+            return buildAddressKey(event);
+        },
+        skip: isServiceClient,
+        max(event: IAppEvent) {
+            const principal = resolvePrincipal(event);
+
+            if (!principal) {
+                return RATE_LIMIT_BUDGETS.anonymous;
+            }
+
+            return principal.type === 'client' ? RATE_LIMIT_BUDGETS.client : RATE_LIMIT_BUDGETS.user;
+        },
+        windowMs: WINDOW_MS,
+    }));
 }

@@ -5,20 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ICondition, IQuery } from '@rapiq/core';
-import { and, eq } from '@rapiq/core';
+import { eq } from '@rapiq/core';
 import type { Analysis, AnalysisBucket, AnalysisBucketFile } from '@privateaim/core-kit';
-import { AnalysisBucketFileValidator, AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
+import { AnalysisBucketFileValidator, AnalysisBucketType } from '@privateaim/core-kit';
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
-import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
-import {
-    evaluateRecord,
-    evaluateRecordUpdate,
-    hasUnboundedReach,
-    isPermissionError,
-} from '@authup/access';
+import { isPermissionError } from '@authup/access';
 import type { BucketFile } from '@privateaim/storage-kit';
 import type {
     AnalysisBucketUploadRemoval,
@@ -31,17 +25,17 @@ import { decodeQuery } from '../../query/index.ts';
 import { analysisBucketFileSchema } from './schema.ts';
 import type { IAnalysisRepository } from '../analysis/types.ts';
 import type { IAnalysisBucketRepository } from '../analysis-bucket/types.ts';
-import type { IAnalysisNodeRepository } from '../analysis-node/types.ts';
-import type { AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
-import { buildAnalysisBucketTypeReach } from '../../services/analysis-reach/index.ts';
+import type { IAnalysisBucketAccess } from '../../services/analysis-bucket-access/index.ts';
+import type { AnalysisReach, AnalysisReachTarget, IAnalysisReachService } from '../../services/analysis-reach/index.ts';
+import { buildAnalysisBucketTypeReach, intersectAnalysisReach } from '../../services/analysis-reach/index.ts';
 
 type AnalysisBucketFileServiceContext = {
     repository: IAnalysisBucketFileRepository;
     recalculator: IAnalysisFileMetadataRecalculator;
     analysisRepository: IAnalysisRepository;
     analysisBucketRepository: IAnalysisBucketRepository;
-    analysisNodeRepository: IAnalysisNodeRepository;
     reach: IAnalysisReachService;
+    analysisBucketAccess: IAnalysisBucketAccess;
 };
 
 const REACH_TARGET: AnalysisReachTarget = {
@@ -58,9 +52,9 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
     protected analysisBucketRepository: IAnalysisBucketRepository;
 
-    protected analysisNodeRepository: IAnalysisNodeRepository;
-
     protected reach: IAnalysisReachService;
+
+    protected analysisBucketAccess: IAnalysisBucketAccess;
 
     protected validator: AnalysisBucketFileValidator;
 
@@ -70,23 +64,28 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         this.recalculator = ctx.recalculator;
         this.analysisRepository = ctx.analysisRepository;
         this.analysisBucketRepository = ctx.analysisBucketRepository;
-        this.analysisNodeRepository = ctx.analysisNodeRepository;
         this.reach = ctx.reach;
+        this.analysisBucketAccess = ctx.analysisBucketAccess;
         this.validator = new AnalysisBucketFileValidator();
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<AnalysisBucketFile>> {
-        return this.repository.findMany(await this.scopeRead(decodeQuery(query, { schema: analysisBucketFileSchema }), actor));
+        return this.reach.findMany(
+            this.repository,
+            decodeQuery(query, { schema: analysisBucketFileSchema }),
+            await this.resolveReadReach(actor),
+        );
     }
 
     /** Reads through the same reach as {@link getMany}; out of reach answers 404. */
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<AnalysisBucketFile> {
-        const scoped = await this.scopeRead(
-            decodeQuery(query, { schema: analysisBucketFileSchema, parameters: ['fields', 'relations'] }),
-            actor,
-        );
+        const decoded = decodeQuery(query, { schema: analysisBucketFileSchema, parameters: ['fields', 'relations'] });
 
-        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+        const { data: [entity] } = await this.reach.findMany(
+            this.repository,
+            appendQueryConditions(decoded, eq('id', id)),
+            await this.resolveReadReach(actor),
+        );
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'analysis-bucket-file' });
@@ -101,11 +100,11 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
      * — narrowed further by that grant's own reach. Without it, RESULT files are
      * left out rather than refused, so listings of the other types still work.
      */
-    protected async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+    protected async resolveReadReach(actor: ActorContext): Promise<AnalysisReach> {
         const code = await this.reach.resolve(actor, REACH_TARGET);
         const temp = await this.reach.resolve(actor, REACH_TARGET, { approvedOnly: true });
 
-        let result: ICondition | undefined | null;
+        let result: AnalysisReach | null;
 
         try {
             result = await this.reach.resolve(actor, REACH_TARGET, {
@@ -122,17 +121,15 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         // The result read narrows the approved-participant reach, never widens
         // it: a file's analysis must stay readable whenever the file is (D7).
-        if (result !== null && temp !== undefined) {
-            result = result === undefined ? temp : and(temp, result);
+        if (result !== null) {
+            result = intersectAnalysisReach(temp, result);
         }
 
-        const condition = buildAnalysisBucketTypeReach('analysisBucket.type', [
+        return buildAnalysisBucketTypeReach('analysisBucket.type', [
             { types: [AnalysisBucketType.CODE], reach: code },
             { types: [AnalysisBucketType.TEMP], reach: temp },
             { types: [AnalysisBucketType.RESULT], reach: result },
         ]);
-
-        return condition ? appendQueryConditions(query, condition) : query;
     }
 
     async create(data: Partial<AnalysisBucketFile>, actor: ActorContext): Promise<AnalysisBucketFile> {
@@ -149,18 +146,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         validated.realmId = bucket.realmId;
         validated.analysisId = bucket.analysisId;
 
-        if (bucket.type === AnalysisBucketType.CODE) {
-            await this.assertOwner(actor, analysis, validated);
-            this.assertUnlocked(analysis);
-        } else if (
-            !await this.isSystem(actor) &&
-            !await this.isParticipantUploader(analysis, {
-                realmId: this.getActorRealmId(actor),
-                clientId: actor.identity.type === 'client' ? actor.identity.id : undefined,
-            })
-        ) {
-            throw new PermissionDeniedError();
-        }
+        await this.analysisBucketAccess.assertWrite(actor, bucket, analysis, validated);
 
         if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
             throw new BadRequestError('Only a code file can be the root file.');
@@ -209,20 +195,12 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
 
         const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
 
-        // The analysis' realm writes the file, before and after (D3). The stored
-        // row is snapshotted, since typeorm's merge() writes into `entity`.
-        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
-
-        const current = { realm: analysis.realmId, data: { attributes: { ...entity } } };
+        const current = { ...entity };
         const merged = this.repository.merge(entity, validated);
 
-        await evaluateRecordUpdate(actor.permissionEvaluator, {
-            name: PermissionName.ANALYSIS_UPDATE,
-            current,
-            next: { realm: analysis.realmId, data: { attributes: merged } },
-        });
+        await this.analysisBucketAccess.assertOwnerUpdate(actor, analysis, current, merged);
 
-        await this.assertBucketWritable(actor, bucket, analysis);
+        await this.analysisBucketAccess.assertBucketWritable(actor, bucket, analysis);
 
         if (validated.root && bucket.type !== AnalysisBucketType.CODE) {
             throw new BadRequestError('Only a code file can be the root file.');
@@ -245,8 +223,7 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         // ponytail: a node deleting its OWN result upload needs the plan-021 client binding.
         const { bucket, analysis } = await this.resolveScope(entity.analysisBucketId);
 
-        await this.assertOwner(actor, analysis, entity);
-        await this.assertBucketWritable(actor, bucket, analysis);
+        await this.analysisBucketAccess.assertDelete(actor, bucket, analysis, entity);
 
         const entityId = entity.id;
 
@@ -335,39 +312,12 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         const analysis = await this.analysisRepository.findOneById(bucket.analysisId);
-        const participant = analysis && await this.isParticipantUploader(analysis, {
+        const participant = analysis && await this.analysisBucketAccess.isParticipantUploader(analysis, {
             realmId: file.realmId,
             clientId: file.actorType === 'client' ? file.actorId : undefined,
         });
 
         return participant ? undefined : 'the uploader is neither an approved analysis node nor the analysis client';
-    }
-
-    /**
-     * Interim RESULT/TEMP participation rule until plan 021: the analysis' own
-     * client (it sits in the owner realm, so it participates by binding — D8),
-     * or the realm of an approved analysis node.
-     */
-    protected async isParticipantUploader(
-        analysis: Analysis,
-        uploader: { realmId?: string | null, clientId?: string },
-    ): Promise<boolean> {
-        if (uploader.clientId && analysis.clientId === uploader.clientId) {
-            return true;
-        }
-
-        // typeorm drops an undefined key, which would match any approved node.
-        if (!uploader.realmId) {
-            return false;
-        }
-
-        const participant = await this.analysisNodeRepository.findOneBy({
-            analysisId: analysis.id,
-            nodeRealmId: uploader.realmId,
-            approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
-        });
-
-        return !!participant;
     }
 
     protected async resolveScope(analysisBucketId: string): Promise<{ bucket: AnalysisBucket, analysis: Analysis }> {
@@ -379,40 +329,5 @@ export class AnalysisBucketFileService extends AbstractEntityService implements 
         }
 
         return { bucket, analysis };
-    }
-
-    /** The system: a grant reaching every realm unconditionally (plan 021, Q4). */
-    protected async isSystem(actor: ActorContext): Promise<boolean> {
-        return hasUnboundedReach(actor.permissionEvaluator, PermissionName.ANALYSIS_UPDATE);
-    }
-
-    /** The analysis' realm writes the file, whichever realm uploaded it (D3). */
-    protected async assertOwner(actor: ActorContext, analysis: Analysis, file: Partial<AnalysisBucketFile>): Promise<void> {
-        await actor.permissionEvaluator.preEvaluate({ name: PermissionName.ANALYSIS_UPDATE });
-        await evaluateRecord(actor.permissionEvaluator, {
-            name: PermissionName.ANALYSIS_UPDATE,
-            realm: analysis.realmId,
-            data: { attributes: file },
-        });
-    }
-
-    protected assertUnlocked(analysis: Analysis): void {
-        if (analysis.configurationLocked) {
-            throw new BadRequestError('The analysis has already been locked and can therefore no longer be modified.');
-        }
-    }
-
-    /**
-     * Code files are frozen with the configuration; temp files belong to the
-     * system alone.
-     */
-    protected async assertBucketWritable(actor: ActorContext, bucket: AnalysisBucket, analysis: Analysis): Promise<void> {
-        if (bucket.type === AnalysisBucketType.CODE) {
-            this.assertUnlocked(analysis);
-        }
-
-        if (bucket.type === AnalysisBucketType.TEMP && !await this.isSystem(actor)) {
-            throw new PermissionDeniedError();
-        }
     }
 }

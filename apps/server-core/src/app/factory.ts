@@ -38,6 +38,7 @@ export function createApplication() {
         .withConfig()
         .withMessageBus({ silentRoutings: TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS })
         .withRedis()
+        .withTaggedCache()
         .withAuthupHook()
         .withAuthupClient();
 

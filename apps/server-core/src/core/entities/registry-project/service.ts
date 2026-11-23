@@ -5,17 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Node, RegistryProject } from '@privateaim/core-kit';
+import type { RegistryProject } from '@privateaim/core-kit';
 import {
     PermissionName,
     ValidatorGroup,
     isPropertySet,
 } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityRepositoryFindManyResult,
+    ReadScope,
+} from '@privateaim/server-kit';
 import {
     AbstractEntityService,
     appendQueryConditions,
+    findManyScoped,
     scopeReadQuery,
 } from '@privateaim/server-kit';
 import {
@@ -28,7 +33,7 @@ import type { IQuery } from '@rapiq/core';
 import { eq } from '@rapiq/core';
 import { decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
 import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
-import type { IRegistryManager } from '../node/types.ts';
+import type { INodeRepository, IRegistryManager } from '../node/types.ts';
 import type { IRegistryProjectRepository, IRegistryProjectService } from './types.ts';
 import { registryProjectSchema } from './schema.ts';
 import { RegistryProjectType, RegistryProjectValidator } from '@privateaim/core-kit';
@@ -36,7 +41,7 @@ import { RegistryProjectType, RegistryProjectValidator } from '@privateaim/core-
 type RegistryProjectServiceContext = {
     repository: IRegistryProjectRepository;
     registryManager?: IRegistryManager;
-    nodeRepository?: IEntityRepository<Node>;
+    nodeRepository?: Pick<INodeRepository, 'findOneByClientBinding'>;
 };
 
 /**
@@ -65,7 +70,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
 
     protected registryManager?: IRegistryManager;
 
-    protected nodeRepository?: IEntityRepository<Node>;
+    protected nodeRepository?: Pick<INodeRepository, 'findOneByClientBinding'>;
 
     protected validator: RegistryProjectValidator;
 
@@ -78,8 +83,8 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<RegistryProject>> {
-        const scoped = await this.scopeRead(decodeQuery(query, { schema: registryProjectSchema }), actor);
-        const result = await this.repository.findMany(scoped);
+        const scope = await this.scopeRead(decodeQuery(query, { schema: registryProjectSchema }), actor);
+        const result = await findManyScoped(this.repository, scope, actor);
 
         const hasSecrets = result.data.some((e) => this.hasSecretField(e));
 
@@ -91,12 +96,16 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<RegistryProject> {
-        const scoped = await this.scopeRead(
+        const scope = await this.scopeRead(
             decodeQuery(query, { schema: registryProjectSchema, parameters: ['fields', 'relations'] }),
             actor,
         );
 
-        const { data: [entity] } = await this.repository.findMany(appendQueryConditions(scoped, eq('id', id)));
+        const { data: [entity] } = await findManyScoped(
+            this.repository,
+            { ...scope, query: appendQueryConditions(scope.query, eq('id', id)) },
+            actor,
+        );
 
         if (!entity) {
             throw new EntityNotFoundError({ entity: 'registry-project' });
@@ -114,11 +123,11 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
      * query to its reach. A node's own client without that grant may still
      * read exactly its own project; if it does hold the grant, the grant wins.
      */
-    private async scopeRead(query: IQuery, actor: ActorContext): Promise<IQuery> {
+    private async scopeRead(query: IQuery, actor: ActorContext): Promise<ReadScope> {
         await preEvaluateRelationReads(query, actor, RELATION_READ_PERMISSIONS);
 
         try {
-            return await scopeReadQuery(query, actor, { names: REGISTRY_PROJECT_READ_PERMISSIONS });
+            return await scopeReadQuery(query, actor, { names: REGISTRY_PROJECT_READ_PERMISSIONS, schema: registryProjectSchema });
         } catch (e) {
             if (!isPermissionError(e)) {
                 throw e;
@@ -130,7 +139,11 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
                 throw e;
             }
 
-            return appendQueryConditions(query, eq('id', ownProjectId));
+            return {
+                query: appendQueryConditions(query, eq('id', ownProjectId)),
+                post: false,
+                names: REGISTRY_PROJECT_READ_PERMISSIONS,
+            };
         }
     }
 
@@ -144,7 +157,7 @@ export class RegistryProjectService extends AbstractEntityService implements IRe
             return undefined;
         }
 
-        const node = await this.nodeRepository.findOneBy({ clientId: actor.identity.id, realmId: actor.identity.realmId });
+        const node = await this.nodeRepository.findOneByClientBinding(actor.identity.id, actor.identity.realmId);
 
         return node?.registryProjectId ?? undefined;
     }

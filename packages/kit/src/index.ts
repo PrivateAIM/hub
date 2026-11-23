@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './capability';
 export * from './crypto';
 export * from './domains';
 export * from './domain-event';

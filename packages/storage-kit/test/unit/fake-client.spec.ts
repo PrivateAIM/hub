@@ -88,3 +88,54 @@ describe('FakeClient', () => {
         expect(client.requests[0].headers.authorization).toBe('Bearer abc');
     });
 });
+
+describe('FakeClient.withAuthorization', () => {
+    it('should send the resolved bearer token and hand the method to the resolver', async () => {
+        const client = createFakeClient({ handlers: { 'GET /buckets/:id': () => ({ data: { id: 'a' }, meta: {} }) } });
+        const methods : string[] = [];
+
+        const scoped = client.withAuthorization(async ({ method }) => {
+            methods.push(method);
+
+            return 'cap-token';
+        });
+
+        await scoped.bucket.getOne('a');
+
+        expect(methods).toEqual(['GET']);
+        expect(client.requests).toHaveLength(1);
+        expect(client.requests[0].headers.authorization).toBe('Bearer cap-token');
+    });
+
+    it('should leave the parent client without the header', async () => {
+        const client = createFakeClient();
+
+        client.withAuthorization(async () => 'cap-token');
+        await client.bucket.getMany();
+
+        expect(client.requests[0].headers.authorization).toBeUndefined();
+    });
+
+    it('should report a 401 or 403 answer to onRefused and rethrow it', async () => {
+        const client = createFakeClient({
+            handlers: {
+                'GET /buckets/:id': () => fakeResponse(401, { message: 'expired' }),
+                'DELETE /buckets/:id': () => fakeResponse(403, { message: 'denied' }),
+                'GET /buckets': () => fakeResponse(404, { message: 'missing' }),
+            },
+        });
+        const refused : string[] = [];
+
+        const scoped = client.withAuthorization(async () => 'cap-token', {
+            onRefused: ({ method }) => {
+                refused.push(method);
+            },
+        });
+
+        await expect(scoped.bucket.getOne('a')).rejects.toSatisfy(isClientError);
+        await expect(scoped.bucket.delete('a')).rejects.toSatisfy(isClientError);
+        await expect(scoped.bucket.getMany()).rejects.toSatisfy(isClientError);
+
+        expect(refused).toEqual(['GET', 'DELETE']);
+    });
+});

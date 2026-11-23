@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/client-vue-theme",
     "type": "module",
-    "version": "0.19.2",
+    "version": "0.20.0",
     "description": "PrivateAIM theme for vuecs components, built on top of @vuecs/theme-tailwind.",
     "license": "Apache-2.0",
     "exports": {
@@ -47,15 +47,15 @@
     },
     "homepage": "https://github.com/PrivateAim/hub#readme",
     "dependencies": {
-        "@authup/client-web-kit-theme": "^1.0.0-beta.72",
+        "@authup/client-web-kit-theme": "^1.0.0-beta.76",
         "@vuecs/design": "^1.2.2",
-        "@vuecs/theme-tailwind": "^6.5.1"
+        "@vuecs/theme-tailwind": "^6.5.2"
     },
     "peerDependencies": {
-        "@vuecs/core": "^3.6.0",
+        "@vuecs/core": "^3.6.1",
         "@vuecs/design": "^1.2.2",
-        "@vuecs/theme-tailwind": "^6.5.1",
-        "tailwindcss": "^4.3.3"
+        "@vuecs/theme-tailwind": "^6.5.2",
+        "tailwindcss": "^4.3.5"
     },
     "publishConfig": {
         "access": "public"

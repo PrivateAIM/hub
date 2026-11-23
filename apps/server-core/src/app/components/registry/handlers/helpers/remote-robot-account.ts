@@ -25,6 +25,7 @@ export async function ensureRemoteRegistryProjectAccount(
         try {
             robotAccount = await httpClient.robot.create({
                 name: context.name,
+                level: 'system',
                 permissions: [
                     {
                         namespace: context.name,

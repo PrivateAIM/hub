@@ -39,7 +39,7 @@ Unlike other services, the worker has no CLI interface. It starts directly via `
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `NODE_ENV` | `development` | Environment |
-| `PORT` | `3000` | Health-check HTTP port |
+| `PORT` | `3000` | HTTP port of `/`, `/livez` and `/readyz` (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
 | `REALM` | `master` | Authup realm |
 | `CLIENT_ID` | `system` | Authup client ID |
 | `CLIENT_SECRET` | `start123` | Authup client secret |

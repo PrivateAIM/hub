@@ -17,15 +17,15 @@
         }
     },
     "devDependencies": {
-        "@privateaim/core-kit": "^0.19.1",
-        "@privateaim/storage-kit": "^0.19.1",
-        "@privateaim/telemetry-kit": "^0.19.1",
+        "@privateaim/core-kit": "^0.20.0",
+        "@privateaim/storage-kit": "^0.20.0",
+        "@privateaim/telemetry-kit": "^0.20.0",
         "vitest": "^5.0.5"
     },
     "peerDependencies": {
-        "@privateaim/core-kit": "^0.19.1",
-        "@privateaim/storage-kit": "^0.19.1",
-        "@privateaim/telemetry-kit": "^0.19.1"
+        "@privateaim/core-kit": "^0.20.0",
+        "@privateaim/storage-kit": "^0.20.0",
+        "@privateaim/telemetry-kit": "^0.20.0"
     },
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",

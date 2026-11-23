@@ -7,6 +7,7 @@
 
 import type { Bucket } from '@privateaim/storage-kit';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import type { StorageCapability, StorageRequester } from '../../capability/types.ts';
 
 export interface IBucketRepository extends IEntityRepository<Bucket> {
     findOneByIdOrName(id: string): Promise<Bucket | null>;
@@ -19,11 +20,11 @@ export interface IBucketDispatcher {
 }
 
 export interface IBucketService {
-    getMany(query: Record<string, any>): Promise<EntityRepositoryFindManyResult<Bucket>>;
-    getOne(id: string, query?: Record<string, any>): Promise<Bucket>;
+    getMany(query: Record<string, any>, capability?: StorageCapability): Promise<EntityRepositoryFindManyResult<Bucket>>;
+    getOne(id: string, query?: Record<string, any>, capability?: StorageCapability): Promise<Bucket>;
     create(data: Partial<Bucket>, actor: ActorContext): Promise<Bucket>;
     update(id: string, data: Partial<Bucket>, actor: ActorContext): Promise<Bucket>;
     delete(id: string, actor: ActorContext): Promise<Bucket>;
     clear(id: string, actor: ActorContext): Promise<Bucket>;
-    checkUploadAccess(entity: Bucket, actor: ActorContext): Promise<void>;
+    checkUploadAccess(entity: Bucket, requester: StorageRequester): Promise<void>;
 }

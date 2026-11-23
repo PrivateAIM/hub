@@ -7,6 +7,7 @@
 
 export * from './analysis-node-state';
 export * from './color';
+export * from './download';
 export * from './entity-action-command';
 export * from './entity-assign-action';
 export * from './list';

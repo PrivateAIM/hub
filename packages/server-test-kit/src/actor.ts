@@ -52,6 +52,8 @@ export function createDenyAllActor(realmId?: string): FakeActorContext {
  * enforces it: an evaluation whose data names a `realmMatch` passes only when
  * `realmScopeMatches` does, and `compile()` returns the verdict authup lowers
  * the scope to. Evaluations without `realmMatch` (capability pre-gates) pass.
+ * With a `policy` the grant does not lower: `compile()` answers `post` and a
+ * record additionally has to satisfy the policy.
  */
 export function createScopedActor(options: ScopedActorOptions): FakeActorContext {
     const id = options.realmId ?? randomUUID();
@@ -66,9 +68,25 @@ export function createScopedActor(options: ScopedActorOptions): FakeActorContext
         if (!realmScopeMatches(options.realmScope, resourceRealmId, id)) {
             throw PermissionError.evaluationFailed(ctx.name);
         }
+
+        if (!options.policy) {
+            return;
+        }
+
+        const attributes = ctx.data.has(BuiltInPolicyType.ATTRIBUTES) ?
+            ctx.data.get<Record<string, any> | undefined>(BuiltInPolicyType.ATTRIBUTES) :
+            undefined;
+
+        if (!attributes || !options.policy(attributes)) {
+            throw PermissionError.evaluationFailed(ctx.name);
+        }
     });
 
-    permissionEvaluator.setCompileResult(compileRealmScope(options.realmScope, id));
+    permissionEvaluator.setCompileResult(
+        options.policy && options.realmScope !== 'none' ?
+            { verdict: 'post' } :
+            compileRealmScope(options.realmScope, id),
+    );
 
     return {
         permissionEvaluator,

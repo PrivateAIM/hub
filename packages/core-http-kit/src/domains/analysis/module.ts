@@ -5,71 +5,79 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RequestBaseOptions } from 'hapic';
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
-import type { Analysis, AnalysisCommand } from '@privateaim/core-kit';
-import { BaseAPI } from '../base';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import type {
+    Analysis,
+    AnalysisCommand,
+    AnalysisStorageToken,
+    AnalysisStorageTokenCreatePayload,
+} from '@privateaim/core-kit';
+import { BaseAPI } from 'hapic';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
+import { buildRequestConfig } from '../utils';
 import type { AnalysisCreatePayload, AnalysisUpdatePayload, IAnalysisAPI } from './types';
 
 export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
-    // todo: we properly don't need this anymore
-    getResultDownloadPath(id: Analysis['id']) {
+    getResultDownloadPath(id: Analysis['id']): string {
         return `analyses/${id}/result/download`;
-    }
-
-    getResultDownloadURL(id: Analysis['id']) {
-        return new URL(
-            this.getResultDownloadPath(id),
-            this.client.getBaseURL(),
-        ).href;
     }
 
     getFilesDownloadPath(id: Analysis['id']): string {
         return `analyses/${id}/files/download`;
     }
 
-    getFileDownloadURL(id: Analysis['id']) {
-        return new URL(
-            this.getFilesDownloadPath(id),
-            this.client.getBaseURL(),
-        ).href;
-    }
-
     async getMany(
-        options?: EntityQueryInput<Analysis>,
+        record?: EntityQueryInput<Analysis>,
+        options?: APIRequestOptions,
     ): Promise<EntityCollectionResponse<Analysis>> {
-        const { data: response } = await this.client.get(`analyses${buildQueryString(options)}`);
+        const { data: response } = await this.client.get(
+            `analyses${buildQueryString(record)}`,
+            buildRequestConfig(options),
+        );
 
         return response;
     }
 
     async getOne(
         id: Analysis['id'],
-        options?: EntityQueryInput<Analysis>,
-        requestConfig?: RequestBaseOptions,
+        record?: EntityQueryInput<Analysis>,
+        options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Analysis>> {
-        const { data: response } = await this.client
-            .get(`analyses/${id}${buildQueryString(options)}`, requestConfig);
+        const { data: response } = await this.client.get(
+            `analyses/${id}${buildQueryString(record)}`,
+            buildRequestConfig(options),
+        );
 
         return response;
     }
 
-    async delete(id: Analysis['id']): Promise<EntityRecordResponse<Analysis>> {
-        const { data: response } = await this.client.delete(`analyses/${id}`);
+    async delete(id: Analysis['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<Analysis>> {
+        const { data: response } = await this.client.delete(`analyses/${id}`, buildRequestConfig(options));
 
         return response;
     }
 
-    async update(id: Analysis['id'], data: AnalysisUpdatePayload): Promise<EntityRecordResponse<Analysis>> {
-        const { data: response } = await this.client.post(`analyses/${id}`, nullifyEmptyObjectProperties(data));
+    async update(
+        id: Analysis['id'],
+        data: AnalysisUpdatePayload,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<Analysis>> {
+        const { data: response } = await this.client.post(
+            `analyses/${id}`,
+            nullifyEmptyObjectProperties(data),
+            buildRequestConfig(options),
+        );
 
         return response;
     }
 
-    async create(data: AnalysisCreatePayload): Promise<EntityRecordResponse<Analysis>> {
-        const { data: response } = await this.client.post('analyses', nullifyEmptyObjectProperties(data));
+    async create(data: AnalysisCreatePayload, options?: APIRequestOptions): Promise<EntityRecordResponse<Analysis>> {
+        const { data: response } = await this.client.post(
+            'analyses',
+            nullifyEmptyObjectProperties(data),
+            buildRequestConfig(options),
+        );
 
         return response;
     }
@@ -78,18 +86,41 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
         id: Analysis['id'],
         command: `${AnalysisCommand}`,
         data: Record<string, any> = {},
+        options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Analysis>> {
-        const { data: response } = await this.client
-            .post(`analyses/${id}/command`, {
+        const { data: response } = await this.client.post(
+            `analyses/${id}/command`,
+            {
                 command,
                 ...data,
-            });
+            },
+            buildRequestConfig(options),
+        );
 
         return response;
     }
 
-    async streamFiles(id: Analysis['id']) : Promise<ReadableStream<any>> {
-        const response = await this.client.get(this.getFilesDownloadPath(id), { responseType: 'stream' });
+    async createStorageToken(
+        id: Analysis['id'],
+        data: AnalysisStorageTokenCreatePayload,
+        options?: APIRequestOptions,
+    ): Promise<AnalysisStorageToken> {
+        const { data: response } = await this.client.post(
+            `analyses/${id}/storage/token`,
+            data,
+            buildRequestConfig(options),
+        );
+
+        return response;
+    }
+
+    async streamFiles(id: Analysis['id'], options?: APIRequestOptions) : Promise<ReadableStream<any>> {
+        const response = await this.client.get(this.getFilesDownloadPath(id), {
+            responseType: 'stream',
+            // the timer would keep running while the body is read
+            timeout: 0,
+            ...buildRequestConfig(options),
+        });
 
         if (typeof response.data === 'undefined') {
             throw new Error('The stream response did not return a body.');
@@ -98,8 +129,13 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
         return response.data;
     }
 
-    async downloadResult(id: Analysis['id']) : Promise<ReadableStream<any>> {
-        const response = await this.client.get(this.getResultDownloadPath(id), { responseType: 'stream' });
+    async downloadResult(id: Analysis['id'], options?: APIRequestOptions) : Promise<ReadableStream<any>> {
+        const response = await this.client.get(this.getResultDownloadPath(id), {
+            responseType: 'stream',
+            // the timer would keep running while the body is read
+            timeout: 0,
+            ...buildRequestConfig(options),
+        });
 
         if (typeof response.data === 'undefined') {
             throw new Error('The stream response did not return a body.');

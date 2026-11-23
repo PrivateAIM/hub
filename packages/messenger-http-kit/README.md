@@ -8,7 +8,7 @@
 
 <p align="center">
   <b>HTTP client for the FLAME Hub messenger broker.</b><br>
-  Send, pull &amp; ack over the durable mailbox REST API.
+  Send, pull &amp; ack over the durable mailbox REST API, woken by its SSE stream.
 </p>
 
 <p align="center">
@@ -35,6 +35,32 @@ Built on [Hapic](https://github.com/tada5hi/hapic), this client wraps the broker
 npm install @privateaim/messenger-http-kit
 ```
 
+## Usage
+
+```typescript
+import { Client } from '@privateaim/messenger-http-kit';
+
+const client = new Client({ baseURL: 'https://hub.example/messenger/' });
+const controller = new AbortController();
+
+// One wakeup on connect, then one per stored message. Wakeups carry no
+// payload: pull, process, ack. Keep-alive comments are skipped.
+for await (const event of client.message.subscribe({ signal: controller.signal })) {
+    const { messages } = await client.message.pull({ limit: 100 });
+
+    // … process
+    await client.message.ack({ ids: messages.map((message) => message.id) });
+}
+
+// The loop ends without an error on controller.abort(). If it ends on its
+// own, the server closed the stream: reconnect, then pull once.
+```
+
+`subscribe()` passes `timeout: 0`, so a client-level `timeout` does not cut the
+open-ended stream, and it does not reconnect by itself. See the
+[reference](https://hub.docs.privateaim.net/reference/messenger/messenger-http-kit.html)
+for the event types and reconnect guidance.
+
 ## Testing
 
 The `Client` class implements `IMessengerClient`, so consumers can depend on the
@@ -55,6 +81,18 @@ const { messages } = await client.message.pull();
 
 // Every dispatched request is recorded, normalized.
 console.log(client.requests);
+```
+
+For `subscribe()`, serve a `FakeEventStream` (an open `text/event-stream`
+response you `write()` to and `close()`):
+
+```typescript
+import { FakeEventStream, createFakeClient } from '@privateaim/messenger-http-kit/testing';
+
+const stream = new FakeEventStream();
+const client = createFakeClient({ handlers: { 'GET /messages/stream': () => stream.response } });
+
+stream.write('event: messagePending\ndata: {"recipient":{"type":"client","id":"c1"}}\n\n');
 ```
 
 ## License

@@ -11,4 +11,9 @@ export type Config = BaseServerConfig & {
     publicURL: string;
     minioConnectionString?: string;
     storagePath?: string;
+    /**
+     * The Authup client (id, or name in `realm`) whose capability-token
+     * exchanges are accepted: the client server-core authenticates as.
+     */
+    capabilityClientId: string;
 };

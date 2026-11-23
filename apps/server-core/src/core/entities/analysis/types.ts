@@ -13,7 +13,18 @@ import type {
     IEntityRepository,
 } from '@privateaim/server-kit';
 
+/**
+ * The columns an analysis' client is bound by. A plain object, possibly a
+ * cache hit: never an entity to save, merge or remove.
+ */
+export type AnalysisClientBinding = Pick<Analysis, 'id' | 'clientId' | 'realmId'>;
+
 export interface IAnalysisRepository extends IEntityRepository<Analysis> {
+    /**
+     * The analysis bound to the client in the client's own realm, read
+     * through the read cache.
+     */
+    findOneByClientBinding(clientId: string, realmId: string): Promise<AnalysisClientBinding | null>;
     findOneWithProject(id: string): Promise<Analysis | null>;
     countByProject(projectId: string): Promise<number>;
     /**

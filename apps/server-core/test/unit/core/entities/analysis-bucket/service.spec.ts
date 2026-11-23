@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { BuiltInPolicyType, PermissionError } from '@authup/access';
-import type { Analysis, AnalysisBucket, Node } from '@privateaim/core-kit';
+import type { Analysis, AnalysisBucket } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityConflictError, EntityNotFoundError } from '@privateaim/errors';
 import {
@@ -27,6 +27,7 @@ import {
 import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
 import { createTestAnalysisNode } from '../../../../utils/domains/index.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
 
 function createFakeAnalysisBucketRepository() {
     const repo = new FakeEntityRepository<AnalysisBucket>();
@@ -81,7 +82,7 @@ describe('AnalysisBucketService', () => {
             reach: new AnalysisReachService({
                 analysisNodeRepository,
                 analysisRepository,
-                nodeRepository: new FakeEntityRepository<Node>(),
+                nodeRepository: new FakeNodeRepository(),
             }),
         });
     });
@@ -136,7 +137,7 @@ describe('AnalysisBucketService', () => {
                 approvalStatus: null,
             }));
 
-            const pending = await service.getMany({}, createAllowAllActor('realm-a'));
+            const pending = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(pending.data.map((e) => e.id)).toEqual(['code']);
 
@@ -145,7 +146,7 @@ describe('AnalysisBucketService', () => {
                 approvalStatus: AnalysisNodeApprovalStatus.APPROVED,
             });
 
-            const approved = await service.getMany({}, createAllowAllActor('realm-a'));
+            const approved = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(approved.data.map((e) => e.id).sort()).toEqual(['code', 'result', 'temp']);
         });
@@ -172,7 +173,7 @@ describe('AnalysisBucketService', () => {
                 }),
             ]);
 
-            const result = await service.getMany({}, createAllowAllActor('realm-a'));
+            const result = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(result.data.map((e) => e.id).sort()).toEqual(['code', 'result']);
         });
@@ -184,7 +185,7 @@ describe('AnalysisBucketService', () => {
 
             repository.seed(bucket);
 
-            const result = await service.getOne('ab-1', createAllowAllActor('realm-1'));
+            const result = await service.getOne('ab-1', createScopedActor({ realmId: 'realm-1', realmScope: 'own' }));
 
             expect(result.id).toBe('ab-1');
         });
@@ -206,7 +207,7 @@ describe('AnalysisBucketService', () => {
                 approvalStatus: null,
             }));
 
-            await expect(service.getOne('result', createAllowAllActor('realm-a'))).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('result', createScopedActor({ realmId: 'realm-a', realmScope: 'own' }))).rejects.toThrow(EntityNotFoundError);
         });
     });
 

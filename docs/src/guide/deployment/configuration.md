@@ -10,24 +10,127 @@ These variables are shared across all services:
 |----------|----------|-------------|
 | `PORT` | No | HTTP server port (default varies by service) |
 | `AUTHUP_URL` | Yes | Authup identity provider URL |
-| `REDIS_URL` | No | Redis connection URL (for pub/sub and caching) |
+| `REDIS_CONNECTION_STRING` | No | Redis connection URL (for pub/sub and caching) |
 | `AMQP_URL` | No | RabbitMQ connection URL |
 | `COOKIE_PREFIX` | No | Namespace prefixed onto the `access_token` cookie the authup middleware falls back to when a request carries no `Authorization` header (e.g. a bucket/file stream download). See [Frontend Variables](#frontend-variables-client-ui) — must match client-ui's `COOKIE_PREFIX`. |
+| `TRUST_PROXY` | No | Which `X-Forwarded-For` hops core, storage, telemetry and messenger trust when they derive the client address (audit trail, rate-limit key): `true` (every hop, the default), `false` (the socket address), a hop count (`1` for one reverse proxy) or a comma list of IPs, CIDRs or `loopback` / `linklocal` / `uniquelocal`. See [Client addresses and rate limiting](#client-addresses-and-rate-limiting). |
+| `SHUTDOWN_DELAY` | No | Seconds core, storage, telemetry and messenger keep serving after `SIGTERM`/`SIGINT` while `GET /readyz` already answers 503, so a load balancer stops routing to them first (0 to 3600, default `0`). The worker ignores it. See [Graceful shutdown](#graceful-shutdown). |
 
 ## Graceful shutdown
 
 The core, storage, telemetry and messenger CLI starts, and the worker entrypoint,
-handle `SIGINT` and `SIGTERM` by awaiting application teardown once. A signal during
-startup waits for setup before teardown; a failed setup also triggers cleanup.
-Shutdown has a **30-second deadline**, including handles left alive after teardown;
-expiry or a rejected setup/teardown exits with code 1. Successful cleanup lets buffered
-output drain before the process exits. Allow more than 30 seconds of termination grace
-in your process supervisor so Hub's deadline can run before a forced kill.
+handle `SIGINT` and `SIGTERM` by awaiting application teardown once. On the first
+signal `GET /readyz` answers 503. When startup had finished, the listeners then keep
+serving for `SHUTDOWN_DELAY` seconds (default 0) so a load balancer drains them; a
+second signal ends that wait early. A signal during startup skips the delay and waits
+for setup before teardown; a failed setup also triggers cleanup.
+After the delay, shutdown has a **30-second deadline**, including handles left alive
+after teardown; expiry or a rejected setup/teardown exits with code 1. Successful
+cleanup lets buffered output drain before the process exits. Allow more than
+`SHUTDOWN_DELAY` + 30 seconds of termination grace in your process supervisor
+(`terminationGracePeriodSeconds`, `stop_grace_period`) so Hub's deadline can run
+before a forced kill.
 Scheduled components finish an in-flight pass before their dependencies close.
 Core closes its Socket.IO clients before the HTTP listener. The installed Orkos
 lifecycle catches individual module teardown errors, so exit code 0 is not proof
 that every module cleaned up successfully; detecting those failures requires an
 upstream lifecycle change.
+
+## Read cache (Redis)
+
+Services that cache database reads keep the entries in Redis when `REDIS_CONNECTION_STRING` is set, each service
+under its own key prefix, and drop them by tag when a record changes.
+
+- Requires **Redis 5** or later.
+- Set `maxmemory-policy` to `noeviction` or a `volatile-*` policy; the cache's clock key never expires
+  and must not be evicted on its own.
+- Entries live **60 seconds**, which also bounds how long a lost invalidation (e.g. a write committed
+  during a Redis outage) can serve a stale read.
+- A Redis outage does not fail requests or the service start: reads fall through to the database,
+  and the failure is logged at most once every 10 seconds.
+- Without Redis each process keeps an in-memory cache. Run more than one replica of a service only
+  with Redis: otherwise a change written through one replica is answered stale by the others for up
+  to 60 seconds.
+
+## Client addresses and rate limiting
+
+The audit trail (`requestIpAddress` of an event) and the rate limiter take
+the client address from `X-Forwarded-For`, trusting the hops `TRUST_PROXY`
+names. The default trusts every hop, so a client can name any address it
+likes: behind a reverse proxy set `TRUST_PROXY` to its hop count (`1` for one
+proxy), or to its addresses.
+
+Every service rate-limits in two stages, per replica:
+
+- **Before authentication**, per client address: at most 300 requests a
+  minute that carry a credential and answer 401. An expired or revoked token
+  and a request without a credential are not counted, so users behind one NAT
+  address (a clinic network) are not locked out by ordinary token renewal.
+  This stage blocks the whole address, so it runs only once `TRUST_PROXY` is
+  set to something other than `true` or a list with a `/0` range: with every hop trusted, a client could
+  lock out any address by naming it in `X-Forwarded-For`.
+- **After authentication**, per identity (100 requests a second for a user,
+  1000 for a client), and per client address for an anonymous request (20 a
+  second). A storage capability token counts against its subject, the user or
+  client core minted it for, and shares that subject's budget. Hub's own
+  service clients are not limited.
+
+## Health endpoints
+
+Every service answers two anonymous paths, `GET` and `HEAD` alike, ahead of
+authentication, rate limiting and metrics:
+
+| Path | Question | Use it for |
+|------|----------|------------|
+| `/livez` | Does the process answer? | A liveness probe: failing it restarts the process |
+| `/readyz` | Can the process serve? | A readiness probe, a load balancer health check, `depends_on: service_healthy` |
+
+Both answer 200 or 503 with `Cache-Control: no-store` and a report naming each
+check, never error text:
+
+```json
+{ "healthy": false, "checks": [{ "name": "startup", "ok": true }, { "name": "database", "ok": false }, { "name": "shutdown", "ok": true }] }
+```
+
+| Service | `/livez` fails when | `/readyz` fails when |
+|---------|---------------------|----------------------|
+| core, storage, telemetry, messenger | startup has not finished | startup has not finished, the database does not answer `SELECT 1` within one second, or the stop signal arrived |
+| worker | startup (bus consumers included) has not finished | startup has not finished, or the stop signal arrived |
+
+- Both fail until every module finished setup (migrations included), so give a
+  Kubernetes `startupProbe` on `/livez` a window longer than your slowest migration.
+- `/livez` checks no dependency: a restart does not fix a database outage.
+- Redis, RabbitMQ and Authup are no readiness checks. They are shared by every
+  replica, so failing on them would take all replicas out of rotation at once;
+  the AMQP driver reconnects on its own. VictoriaLogs is none either for telemetry.
+- A database result is reused for one second, so frequent probes add no load.
+- `GET /` keeps its status document (version and timestamp, or a timestamp on
+  messenger and worker) and checks nothing; do not probe it.
+
+```yaml
+startupProbe:
+    httpGet:
+        path: /livez
+        port: 3000
+    periodSeconds: 5
+    failureThreshold: 60
+livenessProbe:
+    httpGet:
+        path: /livez
+        port: 3000
+    periodSeconds: 30
+readinessProbe:
+    httpGet:
+        path: /readyz
+        port: 3000
+    periodSeconds: 10
+```
+
+The image `HEALTHCHECK` requests `/livez` (the ui keeps `/`), so under Docker
+Swarm or autoheal a database outage does not turn into a restart loop. To make
+Docker health mean readiness (e.g. for Compose `depends_on: service_healthy`),
+set `HEALTHCHECK_PATH=/readyz` on the container. Kubernetes ignores the image
+`HEALTHCHECK`; use the probes above.
 
 ## Message delivery (RabbitMQ)
 
@@ -381,8 +484,11 @@ same table also gates:
   across realms.
 - **Registry projects and events** are narrowed by the grant's `realm_scope`:
   `own` returns the caller's realm, `ownOrNull` adds realm-less rows, `any`
-  returns all. A grant carrying a policy Hub cannot turn into a query falls back
-  to the caller's own realm.
+  returns all. A grant carrying a policy Hub cannot turn into a query is checked
+  row by row instead: the read returns exactly the rows the grant allows, in
+  whichever realm they are. Such a page can hold fewer rows than its `limit`
+  or none, while `meta.total` counts every candidate row, so paging by total
+  still reaches all allowed rows.
 - **A node client** reads its own registry project without any grant, on both
   `GET /registry-projects` (narrowed to that one project) and
   `GET /registry-projects/:id`. A read grant it is given applies as for any
@@ -466,7 +572,11 @@ lists analyses; pair it with `analysis_read`.
   realm or from its grants' realm scope. New analysis clients are given
   `analysis_read`; clients of analyses created before the upgrade are not.
 - **A grant carrying a policy** narrows every one of these reads by that
-  policy, evaluated against the analysis the row belongs to.
+  policy, evaluated against the analysis the row belongs to. A policy Hub
+  cannot turn into a query is checked analysis by analysis: the read returns
+  the rows of exactly the analyses the grant allows (plus those reached through
+  a node), in whichever realm they are. Such a page can hold fewer rows than
+  its `limit` or none, while `meta.total` counts every candidate row.
 - `GET /analysis-nodes` and `GET /analysis-node-events` return every row of a
   reachable analysis, so nodes see each other's approval and execution status.
 - **Buckets and their files depend on the bucket type:**
@@ -693,6 +803,95 @@ release. Hub needs no data changes:
 - **A token without the `global` scope introspects with no grants.** Hub already
   ignored such grants (see
   [Authup upgrade to beta.68](#authup-upgrade-to-beta-68)), so nothing changes.
+
+## Storage capability tokens
+
+Browsers reach server-storage with a capability token that server-core mints per analysis
+(`POST /analyses/:id/storage/token`) by exchanging the caller's access token at Authup
+(RFC 8693).
+
+::: warning Required from this release
+The UI's analysis file pages and downloads **require** the token exchange. There is no fallback to
+the login token: without the setup below the file lists, uploads and downloads fail. Complete the
+steps below before rolling out the UI.
+:::
+
+- **Authup 1.0.0-beta.75 or newer.** Older servers have no token exchange or capability tokens, and
+  1.0.0-beta.74 refuses the camelCase capability type `bucketFile`.
+- **Hub's core client may exchange tokens.** The client server-core authenticates as (`CLIENT_ID`,
+  default `system`) lists `urn:ietf:params:oauth:grant-type:token-exchange` in `grantTypes` (the grant
+  is opt-in) and holds a token exchange capability for the audience `storage`. Declared in an Authup
+  [provisioning file](https://authup.org/guide/deployment/provisioning.html):
+
+  ```yaml
+  realms:
+    - attributes:
+        name: master
+      relations:
+        clients:
+          - attributes:
+              name: system
+              grantTypes: client_credentials urn:ietf:params:oauth:grant-type:token-exchange
+            relations:
+              tokenExchangeCapabilities:
+                - strategy:
+                    type: merge
+                  attributes:
+                    audience: storage
+                    value: bucket bucketFile
+                    maxAge: 3600
+                    realmScope: any
+  ```
+
+  `value` lists the capability types the client may delegate (storage's domain types `bucket` and
+  `bucketFile`), `maxAge` caps a token's lifetime in seconds, and `realmScope: any` lets it act for
+  users and node clients of every realm. Keep the client's other `grantTypes` (a hub client normally
+  also needs `client_credentials`).
+- **Every realm whose users or node clients mint tokens needs an asymmetric signing key (RSA or
+  EC).** Authup's `/jwks` publishes no symmetric (OCT) keys and refuses to sign a capability token
+  with one, so a realm that only has an OCT key cannot issue them, and server-storage could not
+  verify them.
+- **server-storage verifies tokens locally** against `AUTHUP_URL`'s `/jwks`, and accepts only tokens
+  the core client exchanged. `CAPABILITY_CLIENT_ID` names that client and defaults to storage's own
+  `CLIENT_ID`: when server-core and server-storage authenticate as different clients, set it to the
+  core client's id (or name in `REALM`; a name is looked up once and needs `client_read`). Without it,
+  every capability request answers 401.
+
+### Rollout order
+
+1. **Authup**: upgrade to 1.0.0-beta.75 or newer, provision the core client (grant and `storage`
+   capability) and make sure every realm has an RSA or EC signing key.
+2. **server-storage**: until it runs the new version, a minted token is refused (401).
+3. **server-core**: it serves the mint route.
+4. **client-ui**: it asks for the tokens.
+
+### Upgrading from the `bucket-file` capability type
+
+The single-file capability type is `bucketFile`, the storage domain type of a file. Releases before
+it spelled the type `bucket-file`; `bucket` entries are unchanged. Neither spelling is accepted in
+place of the other: server-core mints only `bucketFile`, server-storage honours only `bucketFile`
+entries, and a server-storage of an earlier release refuses a token carrying one (401).
+
+1. **Authup**: upgrade to 1.0.0-beta.75 and provision both spellings for the rollout, so the
+   server-core of either release can mint: `value: bucket bucket-file bucketFile`. The `merge`
+   strategy overwrites the stored `value` on Authup's next start.
+2. **server-storage** and **server-core**: roll them out together. Between the two, single-file
+   downloads and deletes fail (a `bucket-file` entry covers nothing on the new server-storage, and a
+   `bucketFile` token is refused by the old one); bucket uploads, listings and downloads keep
+   working. A `bucket-file` token minted before the switch lives at most an hour (the UI's download
+   tokens 60 seconds) and is not honoured afterwards; a new mint replaces it.
+3. **client-ui**: the earlier server-core refuses its `bucketFile` mints (400).
+4. **Authup**: drop `bucket-file` from the value (`value: bucket bucketFile`).
+
+### Symptoms of a missing step
+
+| Symptom | Missing step |
+|---------|--------------|
+| Mint answers 501 | `AUTHUP_URL` is not set on server-core |
+| Mint answers 502 | Authup is too old or unreachable, the core client lacks the grant or the `storage` capability, a `realmScope` does not cover the caller's realm, or the realm has no RSA/EC signing key |
+| Mint answers 404 | Unknown analysis |
+| Mint succeeds, storage answers 401 | server-storage is not upgraded, or cannot reach Authup's `/jwks` (a `/jwks` outage answers 502) |
+| File pages and downloads fail in the UI | Any of the above; check the mint response first |
 
 ## Database Variables
 

@@ -12,7 +12,6 @@ import type {
     AnalysisBucket,
     AnalysisBucketFile,
     AnalysisNode,
-    Node,
 } from '@privateaim/core-kit';
 import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
@@ -25,6 +24,7 @@ import {
     it,
 } from 'vitest';
 import { AnalysisBucketFileService } from '../../../../../src/core/entities/analysis-bucket-file/service.ts';
+import { AnalysisBucketAccess } from '../../../../../src/core/services/analysis-bucket-access/index.ts';
 import { AnalysisReachService } from '../../../../../src/core/services/analysis-reach/index.ts';
 import { FakePermissionEvaluator } from '@authup/server-test-kit';
 import {
@@ -37,6 +37,7 @@ import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
 import { FakeAnalysisBucketFileRepository } from './fake-repository.ts';
 import { FakeAnalysisFileMetadataRecalculator } from './fake-metadata-recalculator.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
 
 const OWNER_REALM = 'realm-owner';
 const NODE_REALM = 'realm-node';
@@ -78,16 +79,22 @@ describe('AnalysisBucketFileService', () => {
             analysisBucketRepository.seed(buckets[type]);
         }
 
+        const reach = new AnalysisReachService({
+            analysisNodeRepository,
+            analysisRepository,
+            nodeRepository: new FakeNodeRepository(),
+        });
+
         service = new AnalysisBucketFileService({
             repository,
             recalculator,
             analysisRepository,
             analysisBucketRepository,
-            analysisNodeRepository,
-            reach: new AnalysisReachService({
-                analysisNodeRepository,
-                analysisRepository,
-                nodeRepository: new FakeEntityRepository<Node>(),
+            reach,
+            analysisBucketAccess: new AnalysisBucketAccess({
+                reach, 
+                analysisRepository, 
+                analysisNodeRepository, 
             }),
         });
     });
@@ -486,7 +493,7 @@ describe('AnalysisBucketFileService', () => {
                 seedFile(type);
             }
 
-            const actor = createAllowAllActor('realm-stranger');
+            const actor = createScopedActor({ realmId: 'realm-stranger', realmScope: 'own' });
 
             actor.permissionEvaluator = new ResultAnyEvaluator();
 
@@ -496,7 +503,7 @@ describe('AnalysisBucketFileService', () => {
         });
 
         function nodeActor(holdsResultRead = true) {
-            const actor = createAllowAllActor(NODE_REALM);
+            const actor = createScopedActor({ realmId: NODE_REALM, realmScope: 'own' });
 
             if (!holdsResultRead) {
                 actor.permissionEvaluator.setBehavior(({ method, ctx }) => {
@@ -567,9 +574,118 @@ describe('AnalysisBucketFileService', () => {
                 seedFile(type);
             }
 
-            const { data } = await service.getMany({}, createAllowAllActor('realm-stranger'));
+            const { data } = await service.getMany({}, createScopedActor({ realmId: 'realm-stranger', realmScope: 'own' }));
 
             expect(data).toHaveLength(0);
+        });
+
+        describe('with a grant that does not lower (post)', () => {
+            // A grant policy no column condition expresses, on the analysis.
+            const policy = (row: Record<string, any>) => row.name === 'open';
+
+            let closed: Analysis;
+
+            beforeEach(async () => {
+                analysis.name = 'open';
+                await analysisRepository.save(analysis);
+
+                closed = {
+                    id: randomUUID(),
+                    realmId: OWNER_REALM,
+                    name: 'closed',
+                } as Analysis;
+                analysisRepository.seed(closed);
+            });
+
+            function seedFiles(target: Analysis, overrides?: Partial<AnalysisBucketFile>) {
+                return Object.values(AnalysisBucketType).map((type) => seedFile(type, {
+                    analysisId: target.id,
+                    analysis: target,
+                    ...overrides,
+                }));
+            }
+
+            it('should return exactly the files of the analyses the evaluation allows', async () => {
+                const open = seedFiles(analysis);
+
+                // In the actor's realm, but its analysis is not granted.
+                seedFiles(closed);
+
+                const result = await service.getMany({}, createScopedActor({
+                    realmId: OWNER_REALM,
+                    realmScope: 'own',
+                    policy,
+                }));
+
+                expect(result.data.map((file) => file.id).sort()).toEqual(open.map((file) => file.id).sort());
+                // The candidate count: denied rows stay in the total.
+                expect(result.meta.total).toEqual(6);
+            });
+
+            it('should return the files of a foreign analysis the grant reaches', async () => {
+                const open = seedFiles(analysis);
+
+                const result = await service.getMany({}, createScopedActor({
+                    realmId: 'realm-stranger',
+                    realmScope: 'any',
+                    policy,
+                }));
+
+                expect(result.data.map((file) => file.id).sort()).toEqual(open.map((file) => file.id).sort());
+            });
+
+            it('should decide by the analysis, never by the realm of the file itself', async () => {
+                // Uploaded by the actor's realm into an analysis it does not reach.
+                seedFiles(analysis, { realmId: 'realm-stranger' });
+
+                const actor = createScopedActor({
+                    realmId: 'realm-stranger',
+                    realmScope: 'own',
+                    policy,
+                });
+                const { data } = await service.getMany({}, actor);
+
+                expect(data).toHaveLength(0);
+                expect(actor.permissionEvaluator.evaluateOneOfCalls.map((call) => call.data.get('realmMatch')))
+                    .not.toContain('realm-stranger');
+            });
+
+            it('should still reach a participant by its node, per bucket type', async () => {
+                seedFiles(analysis);
+
+                const actor = () => createScopedActor({
+                    realmId: NODE_REALM,
+                    realmScope: 'own',
+                    policy,
+                });
+
+                seedAnalysisNode(null);
+
+                await expect(listTypes(actor())).resolves.toEqual([AnalysisBucketType.CODE]);
+
+                analysisNodeRepository.clear();
+                seedAnalysisNode(AnalysisNodeApprovalStatus.APPROVED);
+
+                await expect(listTypes(actor())).resolves.toEqual([
+                    AnalysisBucketType.CODE,
+                    AnalysisBucketType.RESULT,
+                    AnalysisBucketType.TEMP,
+                ].sort());
+            });
+
+            it('should decide a record read like the list', async () => {
+                const [reached] = seedFiles(analysis);
+                const [unreached] = seedFiles(closed);
+
+                const actor = createScopedActor({
+                    realmId: OWNER_REALM,
+                    realmScope: 'own',
+                    policy,
+                });
+
+                await expect(service.getOne(reached.id, actor)).resolves.toMatchObject({ id: reached.id });
+                await expect(service.getOne(unreached.id, actor)).rejects.toThrow(EntityNotFoundError);
+            });
         });
 
         it('should refuse an actor without any analysis read permission', async () => {

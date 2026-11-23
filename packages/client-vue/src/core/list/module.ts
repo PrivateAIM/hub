@@ -663,7 +663,9 @@ export function createListRaw<
             }
         }
 
-        Promise.try(() => load())
+        // Started synchronously: an explicit load() issued later in the same
+        // tick (e.g. a parent's onMounted) must run after this default one.
+        load()
             .catch((e) => console.log(e));
     }
 

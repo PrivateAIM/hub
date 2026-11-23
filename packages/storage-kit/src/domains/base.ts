@@ -5,26 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createClient, isClient } from 'hapic';
-import type { IClient as IBaseClient, RequestBaseOptions } from 'hapic';
-import type { BaseAPIContext } from './types';
+import { BaseAPI } from 'hapic';
 
-export class BaseAPI {
-    protected client! : IBaseClient;
+export abstract class StorageBaseAPI extends BaseAPI {
+    /**
+     * Resolve a relative path against the base URL, appending rather than
+     * replacing: a base without a trailing slash would lose its last path
+     * segment (`https://host/storage` -> `https://host/<path>`).
+     */
+    protected resolveURL(path: string) : string {
+        const baseURL = this.client.getBaseURL() ?? '';
+        const base = baseURL.endsWith('/') ? baseURL : `${baseURL}/`;
 
-    // -----------------------------------------------------------------------------------
-
-    constructor(context?: BaseAPIContext) {
-        context = context || {};
-
-        this.setClient(context.client);
-    }
-
-    // -----------------------------------------------------------------------------------
-
-    setClient(input?: IBaseClient | RequestBaseOptions) {
-        this.client = isClient(input) ?
-            input :
-            createClient(input);
+        return new URL(path, base).href;
     }
 }

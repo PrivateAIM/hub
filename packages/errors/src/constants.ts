@@ -30,6 +30,16 @@ export enum ErrorCode {
     PERMISSION_EVALUATION_FAILED = 'permission_evaluation_failed',
     PERMISSION_NOT_FOUND = 'permission_not_found',
 
+    // Upstream Codes
+    // Adopted verbatim from authup's `UpstreamTimeoutError`: an outbound
+    // request that ran out of time.
+    UPSTREAM_TIMEOUT = 'upstream_timeout',
+
+    /**
+     * Too many requests (429), e.g. failed authentications from one address.
+     */
+    THROTTLED = 'throttled',
+
     // Storage Codes
     STORAGE_INSUFFICIENT = 'storage_insufficient',
 

@@ -25,13 +25,15 @@ grants and identity.
 ## Token verification and read scoping
 
 `createAuthupTokenVerifier` (`server-http-kit/src/middlewares/authup/token-verifier.ts`)
-passes a `creator`, so vouchly's `TokenVerifier` runs in remote mode (introspection),
-with a result cache (Redis, else memory) kept until the token's `exp`. The cache
-namespace (`buildAuthupTokenCacheNamespace`:
-`authup:remote:<baseURL>:client:<realm>:<clientId>`) includes the introspecting client,
-because authup answers `active: false` to a client without `token_introspect` reach into
-the token's realm. Services share entries only when they introspect as the same client;
-every verifier call site must pass `config.clientId` / `config.realm`.
+takes one `client` (`{ id, secret, realm }`) and builds from it both the client-credentials
+token creator, so vouchly's `TokenVerifier` runs in remote mode (introspection), and the
+namespace of its result cache (Redis, else memory, kept until the token's `exp`):
+`authup:remote:<baseURL>:client:<realm>:<id>`. The namespace names the introspecting
+client because authup answers `active: false` to a client without `token_introspect`
+reach into the token's realm; services share entries only when they introspect as the
+same client. Do not reintroduce a separate `creator` option: it lets the namespace and
+the minting client disagree. The string is a Redis key prefix; changing it drops every
+cached entry on rollout.
 
 - **Keep `IntrospectableTokenVerifier`'s non-compact-JWS guard.** vouchly forwards any
   non-empty string to introspection, and an Authup server below beta.70 (authup#3724)
@@ -55,16 +57,28 @@ The evaluator enforces only the data a call supplies: a service using only
 
 - Pre-evaluates a one-of of the entity's read and write/manage names; holding none is
   403. Holding a write implies read; there is no self-service fallback, by decision.
-- Lowers `compile()`: `allow` → unchanged, `conditional` → AND-appended, `deny` →
-  `inArray('id', [])`, `post` → `eq('realmId', actor.realm.id)` (nothing without a
-  realm). `post` narrowing by realm only ignores the unlowerable policy, a deliberate
-  simplification of authup's per-row evaluation.
+- Takes the entity `schema` and returns a `ReadScope { query, post, names }`, lowering
+  `compile()`: `allow` → unchanged, `conditional` → AND-appended, `deny` →
+  `inArray('id', [])`, `post` → the query unnarrowed with `post: true` and `checkFields`
+  (`fields.default`, the realm column, `id`).
+- **Run every scope through `findManyScoped(repository, scope, actor)`** (#2021). On
+  `post` it reads the page ONCE with its projection widened to `checkFields`
+  (`widenReadProjection`), keeps the rows `reachesRecordOneOf` allows on those columns
+  and their realm, and trims the columns loaded only for the check. A second read of the
+  page's rows is rejected: the rows returned and the rows evaluated would be two
+  snapshots (CodeRabbit on #2023; authup#3832). A gated column (`select: false`, outside
+  `fields.default`) is never a check field, and never shown to the policy even when the
+  read asks for it: the verdict would be an oracle on the secret. `id` is not trimmed:
+  `applyQuery` projects it anyway. Never answer `post` with the actor's realm, not even as a pre-filter: it
+  returns own-realm rows the policy denies and drops reachable global and foreign rows.
+  A `post` page may be short or empty and `meta.total` stays the candidate count: a
+  reduced total would end a total-driven pager before later pages with reachable rows.
 - `compile: false` leaves a capability gate only (the global catalogs: node,
   master-image(-group), registry).
 - Forward `realmAttributeName` only when a caller sets it: naming a realm column makes
   authup refuse to lower grant policies, degrading every lowerable policy to `post`.
-- Record reads reuse the scoped query (`appendQueryConditions(scoped, eq('id', id))`),
-  so list and record cannot disagree and an out-of-reach row is a 404, like a missing one.
+- Record reads reuse the scope with `eq('id', id)` appended to its query, so list and
+  record cannot disagree and an out-of-reach row is a 404, like a missing one.
 
 Client side: the Vue store batches verdict fetching and expiry; custom async navigation
 resolvers must watch `store.permissionRevision`.
@@ -187,8 +201,8 @@ registry-project and event compile, the global catalogs do not (#1940). Operator
 ## Analysis read reach
 
 `GET /analyses` and `/analysis-nodes` pre-gate a one-of over `ANALYSIS_READ` and every
-analysis write/lifecycle name, then narrow by `AnalysisReachService`
-(`core/services/analysis-reach/`), one condition for lists and records (#1955). Operator
+analysis write/lifecycle name, then read through `AnalysisReachService`
+(`core/services/analysis-reach/`), one reach for lists and records (#1955). Operator
 steps: [deployment configuration](../../docs/src/guide/deployment/configuration.md#reading-analyses-requires-analysis-read-and-reach).
 
 - Reach = the grant's `compile()` verdict OR'd, for users only, with
@@ -196,6 +210,18 @@ steps: [deployment configuration](../../docs/src/guide/deployment/configuration.
   (`IAnalysisNodeRepository.findAnalysisIds`). Ids are collected first rather than joined
   as a subquery, so lists, records and the in-memory fakes share one path; ceiling: a
   realm in many thousands of analyses.
+- **`resolve()` returns an `AnalysisReach`, executed only by the service's `findMany`**
+  (never append a condition by hand; combine reaches with `intersectAnalysisReach` /
+  `buildAnalysisBucketTypeReach`). A grant that does not lower (`post`) is decided per
+  analysis (#2021) on one read of the page, widened to the reach's `checkFields` (the
+  analysis id, `analysisBucket.type` for bucket files, the default row when the rows are
+  analyses) and trimmed again. The page's distinct analyses are loaded in one query of
+  the analysis table (the page rows themselves when they are analyses); each is reached
+  iff `reachesRecordOneOf` allows the **analysis row and its realm** or its id is among
+  the participation ids. Each row is then matched in memory: the lowered parts of a
+  combined reach already hold through `candidates` in the page read, and the bucket type
+  picks the row's branch (the branches' types are disjoint). No own-realm narrowing;
+  short pages and `meta.total` as for `findManyScoped`.
 - **No master-realm bypass**: a master user with `own` grants sees only master's analyses;
   the built-in `admin` role and `system` client hold `any`.
 - Node and analysis clients reach by binding only, and the binding counts only when the
@@ -293,4 +319,37 @@ No `REALM_MASTER_NAME` check exists outside tests. Operator notes:
 - **Rate limiter** (`server-http-kit/src/middlewares/rate-limit.ts`): a **client** is not
   throttled only if every `PermissionName` has unbounded reach, checked one name per
   `compile()` call (one call with all names is any-of, so a single `any`-scoped
-  `node_read` would exempt it). Users are always throttled.
+  `node_read` would exempt it). Users are always throttled. A capability request has no
+  identity but is keyed and budgeted by its token's subject, never as anonymous: nodes
+  share one egress address. A first stage before
+  authorization counts, after the response, only a 401 that carried a credential per
+  address (never a reservation at the start, so pending long-polls and uploads cannot
+  exhaust it); it reads the code the error middleware stores as `errorCode` (an expired
+  or inactive token is not counted), so that middleware must stay on the same app.
+
+## Capability tokens (storage)
+
+Resource-scoped tokens (`kind: capability_token`, `cap: type:id:actions`) let a browser reach one
+analysis's buckets and files. server-core mints them; server-storage verifies them locally. Operator
+steps: [deployment configuration](../../docs/src/guide/deployment/configuration.md#storage-capability-tokens).
+
+- **A capability request carries no identity, permission evaluator or access token** (only
+  `useRequestCapability`), so every `ForceLoggedInMiddleware` route answers it 401. Routes admit one
+  through `ForceIdentityOrCapabilityMiddleware`; a capability reaches storage only through the
+  kind-routed authorization middleware, never as an identity (it also refuses a non-access kind as one).
+- **A query token (`?dt=`) is valid only on the two `/stream` routes and only with `exp - iat <= 60`.**
+  A URL lands in logs, histories and referrers. Never verify an access token from the query; stream
+  responses send `Referrer-Policy: no-referrer`; never log a raw query string.
+- **Core decides access before the exchange, and every entry belongs to the one analysis in the path.**
+  An entry outside it fails the whole mint (400), never dropped silently. Core reuses the file
+  read/create/delete rules of `AnalysisBucketAccess`, so a minted token never exceeds the login rules.
+  Every exchange failure is 502, `invalid_grant` included: core already authenticated the caller, so a
+  refusal is a delegation problem, and a 401 would sign the user out.
+- **Storage judges coverage before fetching or streaming** (a bucket entry covers its files; a file
+  entry only itself) and narrows listings with `appendQueryConditions`; a check must not touch the
+  stream body (backpressure).
+- Verification is Authup's `TokenVerifier` with `capability: { audience: 'storage' }` (signature vs
+  `/jwks`, `aud`, `kind`, `exp`); `peekTokenKind` of the unverified payload only picks the verifier.
+- **Storage accepts only the core client's exchanges** (`act.sub` = `CAPABILITY_CLIENT_ID`,
+  `TrustedActorTokenVerifier`): Authup lets any client with a `storage` exchange capability mint
+  tokens, and only server-core judges analysis access before minting. Audience alone is not enough.

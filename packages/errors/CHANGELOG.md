@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.1...v0.20.0) (2026-11-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* @privateaim/core-http-kit and @privateaim/messenger-http-kit no longer export isClientError or isClientErrorWithStatusCode; import them from hapic.
+* core-http-kit, storage-kit and telemetry-kit no longer export BaseAPIContext; their API classes extend hapic's BaseAPI.
+* All workspaces and service deployments now require Node.js >=26.0.0.
+* Node.js >=24.0.0 is required. Import forwarded error helpers from @ebec/core, theme helpers from @authup/client-web-kit-theme, and permission evaluator test helpers from @authup/server-test-kit instead of the PrivateAIM barrels.
+
+### Features
+
+* authup beta.76, outbound timeouts, health probes and one-read post decisions ([#2026](https://github.com/PrivateAIM/hub/issues/2026)) ([3d27fe6](https://github.com/PrivateAIM/hub/commit/3d27fe670dd7c25423ded2c131220a5c64f54ac7))
+* trusted proxy hops, two-stage rate limiting, swagger-ui 5 ([#2034](https://github.com/PrivateAIM/hub/issues/2034)) ([cfeace3](https://github.com/PrivateAIM/hub/commit/cfeace3c55898195d1c3026d384c7bb666a7bf93))
+
+
+### Build System
+
+* require Node 26 across workspaces and CI ([3b1989e](https://github.com/PrivateAIM/hub/commit/3b1989eb5bdb44ca91c95092d0de38f8d3700153))
+* upgrade eslint config to v3 and require Node 24 ([652d794](https://github.com/PrivateAIM/hub/commit/652d794c872bf59177512a2a8ad10f26bb5545f1))
+
 ## [0.19.1](https://github.com/PrivateAIM/hub/compare/v0.19.0...v0.19.1) (2026-10-27)
 
 ## [0.19.0](https://github.com/PrivateAIM/hub/compare/v0.18.1...v0.19.0) (2026-10-20)

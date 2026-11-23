@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/core-http-kit",
     "type": "module",
-    "version": "0.19.2",
+    "version": "0.20.0",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -33,25 +33,25 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.72",
-        "@authup/kit": "^1.0.0-beta.72",
-        "@privateaim/core-kit": "^0.19.2",
-        "@privateaim/kit": "^0.19.2",
-        "@privateaim/telemetry-kit": "^0.19.2",
-        "@rapiq/codec-url": "^2.4.0",
-        "@rapiq/core": "^2.4.0",
-        "hapic": "^3.0.2",
-        "vitest": "^5.0.5"
+        "@authup/core-kit": "^1.0.0-beta.76",
+        "@authup/kit": "^1.0.0-beta.76",
+        "@privateaim/core-kit": "^0.20.0",
+        "@privateaim/kit": "^0.20.0",
+        "@privateaim/telemetry-kit": "^0.20.0",
+        "@rapiq/codec-url": "^2.4.1",
+        "@rapiq/core": "^2.4.1",
+        "hapic": "^3.1.0",
+        "vitest": "^5.1.0"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.72",
-        "@authup/kit": "^1.0.0-beta.72",
-        "@privateaim/core-kit": "^0.19.2",
-        "@privateaim/kit": "^0.19.2",
-        "@privateaim/telemetry-kit": "^0.19.2",
-        "@rapiq/codec-url": "^2.4.0",
-        "@rapiq/core": "^2.4.0",
-        "hapic": "^3.0.2"
+        "@authup/core-kit": "^1.0.0-beta.76",
+        "@authup/kit": "^1.0.0-beta.76",
+        "@privateaim/core-kit": "^0.20.0",
+        "@privateaim/kit": "^0.20.0",
+        "@privateaim/telemetry-kit": "^0.20.0",
+        "@rapiq/codec-url": "^2.4.1",
+        "@rapiq/core": "^2.4.1",
+        "hapic": "^3.1.0"
     },
     "publishConfig": {
         "access": "public"

@@ -6,7 +6,7 @@
  */
 
 import { isBoolTrue } from '@privateaim/kit';
-import { EnvironmentName } from '@privateaim/server-kit';
+import { EnvironmentName, canonicalizeTrustProxy } from '@privateaim/server-kit';
 import {
     oneOf,
     read,
@@ -14,6 +14,7 @@ import {
     readInt,
 } from 'envix';
 import { ConfigDefaults, EnvironmentInputKey } from './constants.ts';
+import type { TrustProxy } from '@privateaim/server-kit';
 import type { Config } from './types.ts';
 
 export function readConfigFromEnv(): Partial<Config> {
@@ -36,6 +37,8 @@ export function readConfigFromEnv(): Partial<Config> {
         publicURL: read(EnvironmentInputKey.PUBLIC_URL, `http://127.0.0.1:${port}/`),
 
         cookiePrefix: read(EnvironmentInputKey.COOKIE_PREFIX),
+        trustProxy: readTrustProxy(EnvironmentInputKey.TRUST_PROXY),
+        shutdownDelay: readInt(EnvironmentInputKey.SHUTDOWN_DELAY),
 
         masterImagesOwner: read(EnvironmentInputKey.MASTER_IMAGES_OWNER, ConfigDefaults.MASTER_IMAGES_OWNER),
         masterImagesRepository: read(EnvironmentInputKey.MASTER_IMAGES_REPOSITORY, ConfigDefaults.MASTER_IMAGES_REPOSITORY),
@@ -69,17 +72,15 @@ export function readConfigFromEnv(): Partial<Config> {
         config.redisConnectionString = ConfigDefaults.REDIS;
     }
 
-    // Vault
-    const vaultConnectionString = oneOf([
-        readBool(EnvironmentInputKey.VAULT_CONNECTION_STRING),
-        read(EnvironmentInputKey.VAULT_CONNECTION_STRING),
-    ]);
+    return config;
+}
 
-    if (typeof vaultConnectionString === 'string') {
-        config.vaultConnectionString = vaultConnectionString;
-    } else if (isBoolTrue(vaultConnectionString)) {
-        config.vaultConnectionString = ConfigDefaults.VAULT;
+function readTrustProxy(key: string): TrustProxy | undefined {
+    const raw = read(key);
+
+    if (typeof raw !== 'string' || raw.trim().length === 0) {
+        return undefined;
     }
 
-    return config;
+    return canonicalizeTrustProxy(raw);
 }

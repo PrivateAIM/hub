@@ -6,6 +6,7 @@
  */
 
 export * from './actor';
+export * from './capability';
 export * from './permission';
 export * from './env';
 export * from './identity';

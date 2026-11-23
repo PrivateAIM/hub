@@ -59,7 +59,7 @@ export default defineComponent({
                 emit('executed', AnalysisCommand.STORAGE_CHECK);
                 emit('updated', response);
             } catch (e) {
-                if (Error.isError(e)) {
+                if (e instanceof Error) {
                     emit('failed', e);
                 }
             }
@@ -72,7 +72,7 @@ export default defineComponent({
         };
 
         const retry = () => {
-            Promise.try(() => execute())
+            Promise.resolve().then(() => execute())
                 .then(() => refresh());
         };
 

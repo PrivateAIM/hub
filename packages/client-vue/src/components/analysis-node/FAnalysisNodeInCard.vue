@@ -216,6 +216,7 @@ export default defineComponent({
                             :entity="bucket"
                             :with-icon="true"
                             :with-text="false"
+                            @failed="handleFailed"
                         />
                     </template>
                 </FAnalysisBucket>

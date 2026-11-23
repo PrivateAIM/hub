@@ -275,11 +275,22 @@ describe('RegistryProjectMigration (real Harbor APIs, memory transport)', () => 
     });
 
     it('verifies copied destination inventory with the new robot credentials', async () => {
-        const { migration, connections } = createHarbor();
+        const {
+            migration,
+            connections,
+            requests,
+        } = createHarbor();
         const target = await migration.prepare(source, 'target');
 
         await migration.copy(source, target);
         expect(connections.at(-1)).toContain(`${target.accountName}:${target.accountSecret}@`);
+
+        // Harbor unescapes the repository path parameter twice: `nested/image` travels as `nested%252Fimage`.
+        const artifactPaths = requests
+            .map((request) => new URL(request.url).pathname)
+            .filter((path) => path.endsWith('/artifacts'));
+
+        expect(artifactPaths).toEqual(['/api/v2.0/projects/target/repositories/nested%252Fimage/artifacts']);
     });
 
     it('does not accept unusable destination robot credentials', async () => {

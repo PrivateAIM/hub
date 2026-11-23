@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2025.
+ * Copyright (c) 2026.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IClient as IBaseClient, RequestBaseOptions } from 'hapic';
-
-export type BaseAPIContext = {
-    /**
-     * hapic client INTERFACE, not its concrete class — see the identical note
-     * in @privateaim/core-http-kit.
-     */
-    client?: IBaseClient | RequestBaseOptions
+/**
+ * Per-call request options, the trailing argument of every api method:
+ * `signal` aborts the call, `timeout` (milliseconds) overrides the
+ * client's own for this call. Absent, the client defaults apply.
+ */
+export type APIRequestOptions = {
+    signal?: AbortSignal,
+    timeout?: number,
 };

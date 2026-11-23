@@ -10,6 +10,7 @@ export * from './analysis-bucket';
 export * from './analysis-bucket-file';
 export * from './analysis-log';
 export * from './analysis-node';
+export * from './analysis-storage-token';
 export * from './analysis-node-event';
 export * from './analysis-node-log';
 export * from './realm';

@@ -1,0 +1,33 @@
+/*
+ * Copyright (c) 2026.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import type { ITaggedCache } from '@rapiq/cache';
+import { TypedToken } from 'eldin';
+import type { ClientOptions } from 'redis-extension';
+
+export const TAGGED_CACHE_MODULE_NAME = 'taggedCache';
+
+export const TaggedCacheInjectionKey = new TypedToken<ITaggedCache>('TaggedCache');
+
+/**
+ * How long an entry lives, and how long reads bypass the cache after a
+ * lost invalidation (authup/authup#3688).
+ */
+export const TAGGED_CACHE_TTL = 60_000;
+
+export const TAGGED_CACHE_ERROR_LOG_INTERVAL = 10_000;
+
+export const TAGGED_CACHE_CONNECT_TIMEOUT = 1_000;
+
+// a cache outage must fall through to the database fast, never queue or hang.
+export const TAGGED_CACHE_REDIS_OPTIONS = {
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    commandTimeout: 500,
+    // ioredis 6 backs off to 5 s by default; a recovered cache should be picked up sooner.
+    retryStrategy: (times: number) => Math.min(times * 50, 2_000),
+} satisfies ClientOptions;

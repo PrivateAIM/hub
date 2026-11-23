@@ -41,7 +41,7 @@ apps/server-core/src/
 | Module | Name | Dependencies | Registers |
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
-| DatabaseModule | `database` | `entityEvent`?, `authupClient`? | `DataSource`, 12 repository adapters, `RegistryManager` |
+| DatabaseModule | `database` | `entityEvent`?, `authupClient`?, `taggedCache`?, `logger`? | `DataSource`, `QueryCache`, 12 repository adapters, `RegistryManager` |
 | ComponentsModule | `components` | `database`, `analysis`, `messageBus` | `RegistryComponentDispatcher` (bus dispatch, in-process only without a bus); starts the registry consumer and the node-client and analysis-reconciler scheduled components, stops them on teardown |
 | AnalysisModule | `analysis` | `database`, `messageBus` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
@@ -62,7 +62,8 @@ Test infrastructure lives in `test/app/`, matching authup's pattern:
 - `factory.ts` — `createTestApplication({ telemetryHandlers? })` returns `TestHTTPApplication`; `createTestDatabaseApplication()` returns `TestApplication`
 
 `createTestApplication()` wires config, logger, a `MessageBusModule` on the memory
-driver, `AuthupHookModule`, `AuthupClientModule`, the test database module,
+driver, `AuthupHookModule`, `AuthupClientModule`, `TaggedCacheModule` (memory driver),
+the test database module,
 `AnalysisModule` and `HTTPModule` (no `ComponentsModule`; a faked telemetry client
 only with `telemetryHandlers`):
 

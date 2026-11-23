@@ -40,6 +40,7 @@ import {
     createAuthupAggregator,
 } from '../../aggregators/index.ts';
 import { AnalysisBucketFileService } from '../../../core/index.ts';
+import { AnalysisBucketAccess } from '../../../core/services/analysis-bucket-access/index.ts';
 import { AnalysisReachService } from '../../../core/services/analysis-reach/index.ts';
 import { MasterImageBuilderService } from '../../../core/services/index.ts';
 import { AnalysisInjectionKey } from '../analysis/constants.ts';
@@ -66,6 +67,12 @@ export class AggregatorsModule implements IModule {
         const redisSubResult = container.tryResolve(RedisSubscribeClientInjectionKey);
 
         const config = container.resolve(ConfigInjectionKey);
+
+        const bucketFileReach = new AnalysisReachService({
+            analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+            analysisRepository,
+            nodeRepository: container.resolve(DatabaseInjectionKey.NodeRepository),
+        });
 
         this.aggregators = [
             createAuthupAggregator({
@@ -116,11 +123,11 @@ export class AggregatorsModule implements IModule {
                         recalculator: container.resolve(AnalysisInjectionKey.FileRecalculator),
                         analysisRepository,
                         analysisBucketRepository,
-                        analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
-                        reach: new AnalysisReachService({
-                            analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                        reach: bucketFileReach,
+                        analysisBucketAccess: new AnalysisBucketAccess({
+                            reach: bucketFileReach,
                             analysisRepository,
-                            nodeRepository: container.resolve(DatabaseInjectionKey.NodeRepository),
+                            analysisNodeRepository: container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
                         }),
                     }),
                     logger,

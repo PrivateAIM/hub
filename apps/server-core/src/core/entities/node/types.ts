@@ -13,7 +13,18 @@ import type {
     IEntityRepository,
 } from '@privateaim/server-kit';
 
+/**
+ * The columns a node's client is bound by, plus what its callers read. A
+ * plain object, possibly a cache hit: never an entity to save, merge or remove.
+ */
+export type NodeClientBinding = Pick<Node, 'id' | 'clientId' | 'realmId' | 'registryProjectId'>;
+
 export interface INodeRepository extends IEntityRepository<Node> {
+    /**
+     * The node bound to the client in the client's own realm, read through
+     * the read cache.
+     */
+    findOneByClientBinding(clientId: string, realmId: string): Promise<NodeClientBinding | null>;
     findOneWithExternalName(id: string): Promise<Node | null>;
     /**
      * Remove all entities in one transaction: all or nothing.

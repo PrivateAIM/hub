@@ -16,6 +16,9 @@ All endpoints (except health checks) require authentication via Authup. Include 
 Authorization: Bearer <token>
 ```
 
+Storage additionally accepts a short-lived **capability token** minted by
+`POST /analyses/:id/storage/token`; see [Storage capability tokens](#storage-capability-tokens).
+
 ## Response Shapes
 
 Every entity endpoint answers with one of two envelopes. Both carry the payload under `data` and
@@ -76,6 +79,7 @@ bespoke shapes stay flat.** These endpoints answer with their own shape and neve
 | `GET`/`POST` `/nodes/:id/client/credentials` | `ClientCredentials` | OAuth2 credential payload |
 | `GET`/`POST` `/analyses/:id/client/credentials` | `ClientCredentials` | OAuth2 credential payload |
 | `GET /nodes/:id/registry/credentials` | `RegistryCredentials` | Projection over registry + registry project, not a persisted record |
+| `POST /analyses/:id/storage/token` | `{ token, expiresAt }` | Credential payload |
 | `DELETE /analysis-logs` | `null` (202) | Bulk delete, nothing to return |
 | `DELETE /analysis-node-logs` | `null` (202) | Bulk delete, nothing to return |
 | `DELETE /logs` (telemetry) | `null` (202) | Bulk delete, nothing to return |
@@ -226,6 +230,8 @@ Every failure answers with the same flat object — never the `{ data, meta }` e
 - An authorization denial answers **403** with one of `permission_denied`,
   `permission_evaluation_failed` or `permission_not_found` (the last two are Authup's evaluator
   codes, passed through verbatim). Before this was fixed, an evaluator denial answered 400 or 500.
+- A request Hub makes to another service (Authup, telemetry, Harbor, …) that runs out of time
+  answers **504** with `upstream_timeout`.
 
 ### Reading `issues`
 
@@ -260,6 +266,7 @@ The **Shape** column tells you which envelope from [Response Shapes](#response-s
 | `POST` | `/analyses` | Create analysis | record, `meta: {}` |
 | `POST` | `/analyses/:id` | Update analysis | record, `meta: {}` |
 | `POST` | `/analyses/:id/command` | Run an analysis command | record, `meta: {}` |
+| `POST` | `/analyses/:id/storage/token` | Mint a storage capability token (body `{ cap: string[], lifetime?: number }`) | flat `{ token, expiresAt }` |
 | `DELETE` | `/analyses/:id` | Delete analysis | record, `meta: {}` |
 
 ### Projects
@@ -317,6 +324,16 @@ Base URL: `http://localhost:4001`
 | `GET` | `/bucket-files/:id` | Get bucket file by ID | record + `schema` |
 | `DELETE` | `/bucket-files/:id` | Delete bucket file | record, `meta: {}` |
 | `GET` | `/bucket-files/:id/stream` | Stream file contents | flat (binary) |
+
+### Storage capability tokens
+
+Server-core mints a token for one analysis's buckets and files; server-storage accepts it in the
+`Authorization` header on `GET /buckets`, `GET /buckets/:id`, `POST /buckets/:id/upload`,
+`GET /bucket-files`, `GET /bucket-files/:id` and `DELETE /bucket-files/:id`. Only the two `/stream`
+routes also take it as `?dt=<token>`, and only when the token lives at most 60 seconds. Bucket
+create, update, delete and clear need a login. Entry format, access rules and error statuses:
+[Core API](/reference/core/#storage-capability-tokens) and
+[Storage](/reference/storage/#capability-tokens).
 
 ## Telemetry Service
 

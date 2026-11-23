@@ -7,5 +7,6 @@
 
 export * from './data-source/index.ts';
 export * from './lock/index.ts';
+export * from './query-cache/index.ts';
 export * from './subscriber/index.ts';
 export * from './transformer/index.ts';

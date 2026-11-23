@@ -84,7 +84,7 @@ export default defineComponent({
             },
         });
 
-        Promise.try(() => analysisManager.resolve());
+        Promise.resolve().then(() => analysisManager.resolve());
 
         const setAnalysisBucketFile = (entity: AnalysisBucketFile | null) => {
             analysisBucketFileManager.data.value = entity;

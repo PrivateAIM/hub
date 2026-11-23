@@ -21,13 +21,13 @@ import {
 } from 'vitest';
 import { RegistryProjectService } from '../../../../../src/core/entities/registry-project/service.ts';
 import {
-    FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
     createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeRegistryManager } from '../node/fake-registry-manager.ts';
 import { FakeRegistryProjectRepository } from './fake-repository.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
 
 const READ_PERMISSIONS = [
     PermissionName.REGISTRY_PROJECT_READ,
@@ -78,13 +78,13 @@ function createTestRegistryProject(overrides?: Partial<RegistryProject>): Regist
 describe('RegistryProjectService', () => {
     let repository: FakeRegistryProjectRepository;
     let registryManager: FakeRegistryManager;
-    let nodeRepository: FakeEntityRepository<Node>;
+    let nodeRepository: FakeNodeRepository;
     let service: RegistryProjectService;
 
     beforeEach(() => {
         repository = createFakeRegistryProjectRepository();
         registryManager = new FakeRegistryManager();
-        nodeRepository = new FakeEntityRepository<Node>();
+        nodeRepository = new FakeNodeRepository();
         service = new RegistryProjectService({
             repository,
             registryManager,
@@ -236,10 +236,78 @@ describe('RegistryProjectService', () => {
                 expect(result.data.map((e) => e.id)).toEqual(['rp-2']);
             });
 
-            it('should narrow a post verdict to the actor realm', async () => {
-                const result = await service.getMany({}, createAllowAllActor('realm-1'));
+            describe('post', () => {
+                // A grant policy no column condition expresses.
+                const policy = (row: Record<string, any>) => row.name === 'open';
 
-                expect(result.data.map((e) => e.id)).toEqual(['rp-1']);
+                beforeEach(() => {
+                    repository.clear();
+                    repository.seed([
+                        createTestRegistryProject({
+                            id: 'own-open',
+                            realmId: 'realm-1',
+                            name: 'open',
+                        }),
+                        createTestRegistryProject({
+                            id: 'own-closed',
+                            realmId: 'realm-1',
+                            name: 'closed',
+                        }),
+                        createTestRegistryProject({
+                            id: 'foreign-open',
+                            realmId: 'realm-2',
+                            name: 'open',
+                        }),
+                        createTestRegistryProject({
+                            id: 'global-open',
+                            realmId: null,
+                            name: 'open',
+                        }),
+                    ]);
+                });
+
+                it('should return exactly the rows the evaluation allows, whatever the actor realm', async () => {
+                    const result = await service.getMany({}, createScopedActor({
+                        realmId: 'realm-1',
+                        realmScope: 'any',
+                        policy,
+                    }));
+
+                    // Not own-closed, although it is in the actor's realm; the
+                    // foreign and the global row the grant reaches are kept.
+                    expect(result.data.map((e) => e.id).sort()).toEqual(['foreign-open', 'global-open', 'own-open']);
+                    // The candidate count: denied rows stay in the total.
+                    expect(result.meta.total).toEqual(4);
+                });
+
+                it('should apply the realm scope of the grant per row', async () => {
+                    const own = await service.getMany({}, createScopedActor({
+                        realmId: 'realm-1',
+                        realmScope: 'own',
+                        policy,
+                    }));
+
+                    expect(own.data.map((e) => e.id)).toEqual(['own-open']);
+
+                    const ownOrNull = await service.getMany({}, createScopedActor({
+                        realmId: 'realm-1',
+                        realmScope: 'ownOrNull',
+                        policy,
+                    }));
+
+                    expect(ownOrNull.data.map((e) => e.id).sort()).toEqual(['global-open', 'own-open']);
+                });
+
+                it('should decide a record read like the list', async () => {
+                    const actor = createScopedActor({
+                        realmId: 'realm-1',
+                        realmScope: 'any',
+                        policy,
+                    });
+
+                    await expect(service.getOne('foreign-open', actor)).resolves.toMatchObject({ id: 'foreign-open' });
+                    await expect(service.getOne('own-closed', actor)).rejects.toThrow(EntityNotFoundError);
+                });
             });
 
             it('should return nothing on a deny verdict', async () => {
@@ -277,7 +345,7 @@ describe('RegistryProjectService', () => {
             repository.seed(createTestRegistryProject({ id: 'rp-1', realmId: 'other-realm' }));
 
             await expect(
-                service.getOne('rp-1', createAllowAllActor('realm-1')),
+                service.getOne('rp-1', createScopedActor({ realmId: 'realm-1', realmScope: 'own' })),
             ).rejects.toThrow(EntityNotFoundError);
         });
 

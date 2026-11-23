@@ -8,22 +8,31 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { App, serve } from 'routup';
+import { MemoryTokenCache, RedisTokenCache } from '@authup/server-adapter-kit';
+import { STORAGE_CAPABILITY_AUDIENCE } from '@privateaim/storage-kit';
 import {
     AUTHUP_CLIENT_MODULE_NAME,
     AuthupClientInjectionKey,
     EnvironmentName,
+    Health,
+    HealthInjectionKey,
     LoggerInjectionKey,
     MESSAGE_BUS_MODULE_NAME,
     RedisClientInjectionKey,
-    createAuthupClientTokenCreator,
+    createDatabaseHealthCheck,
+    createHealthLogObserver,
 } from '@privateaim/server-kit';
 import {
+    createAuthupCapabilityTokenVerifier,
     createAuthupTokenVerifier,
     mountErrorMiddleware,
+    mountHealthRoutes,
     mountMiddlewares,
 } from '@privateaim/server-http-kit';
 import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
+import { resolveAuthupClientId } from '../../../adapters/authup/trusted-client.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
+import { DatabaseInjectionKey } from '../database/constants.ts';
 import { createControllers } from './controller.ts';
 import type { HTTPServer } from './types.ts';
 import { HTTPInjectionKey } from './constants.ts';
@@ -49,11 +58,24 @@ export class HTTPModule implements IModule {
 
     private instance: HTTPServer | undefined;
 
+    private health: Health | undefined;
+
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
-        const app = new App();
+        // Every hop by default; TRUST_PROXY narrows whose X-Forwarded-For
+        // entries name the client (audit IP, rate-limit key).
+        const app = new App({ options: { trustProxy: config.trustProxy ?? true } });
+
+        // Ahead of every middleware: probes are neither authenticated, rate
+        // limited nor counted. Readiness waits on the database (1 s bound).
+        this.health = new Health({
+            readiness: [createDatabaseHealthCheck(container.resolve(DatabaseInjectionKey.DataSource))],
+            onReadinessChange: createHealthLogObserver(logger),
+        });
+        container.register(HealthInjectionKey, { useValue: this.health });
+        mountHealthRoutes(app, this.health);
 
         const isTestEnvironment = config.env === EnvironmentName.TEST;
 
@@ -74,7 +96,7 @@ export class HTTPModule implements IModule {
             basic: true,
             cors: true,
             prometheus: !isTestEnvironment,
-            rateLimit: !isTestEnvironment,
+            rateLimit: isTestEnvironment ? false : { trustProxy: config.trustProxy },
             authorization: {
                 authupClient: authupResult.success ?
                     authupResult.data :
@@ -83,16 +105,31 @@ export class HTTPModule implements IModule {
                     redisResult.data :
                     undefined,
                 cookiePrefix: config.cookiePrefix,
+                // Capability tokens are verified locally (signature against
+                // Authup's `/jwks`, `aud`, `kind`, `exp`); the cache keeps
+                // Authup's default namespace `authup:capability:storage:<baseURL>`.
+                capability: {
+                    verifier: createAuthupCapabilityTokenVerifier({
+                        baseURL: config.authupURL,
+                        audience: STORAGE_CAPABILITY_AUDIENCE,
+                        // Only server-core judges a request before minting.
+                        trustedClientId: () => resolveAuthupClientId(
+                            authupResult.success ? authupResult.data : undefined,
+                            config.capabilityClientId,
+                            config.realm,
+                        ),
+                        cache: redisResult.success ?
+                            new RedisTokenCache(redisResult.data) :
+                            new MemoryTokenCache(),
+                    }),
+                },
                 tokenVerifier: createAuthupTokenVerifier({
                     baseURL: config.authupURL,
-                    creator: createAuthupClientTokenCreator({
-                        baseURL: config.authupURL,
-                        clientId: config.clientId,
-                        clientSecret: config.clientSecret,
+                    client: {
+                        id: config.clientId,
+                        secret: config.clientSecret,
                         realm: config.realm,
-                    }),
-                    clientId: config.clientId,
-                    realm: config.realm,
+                    },
                     redisClient: redisResult.success ? redisResult.data : undefined,
                 }),
             },
@@ -130,8 +167,15 @@ export class HTTPModule implements IModule {
         }
     }
 
+    async onReady(): Promise<void> {
+        // Every module finished its setup: both probes may pass from now on.
+        this.health?.markStarted();
+    }
+
     async teardown(container: IContainer): Promise<void> {
         container.unregister(HTTPInjectionKey.App);
+        container.unregister(HealthInjectionKey);
+        this.health = undefined;
 
         if (!this.instance) {
             return;

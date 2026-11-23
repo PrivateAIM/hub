@@ -13,6 +13,7 @@ import {
     DDelete,
     DGet,
     DPath,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -60,14 +61,13 @@ export class MasterImageGroupController {
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<MasterImageGroup>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
-
-        event.response.status = 202;
 
         return { data: entity, meta: {} };
     }

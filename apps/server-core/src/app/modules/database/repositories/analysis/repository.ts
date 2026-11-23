@@ -6,13 +6,16 @@
  */
 
 import type { Analysis } from '@privateaim/core-kit';
+import { DomainType } from '@privateaim/core-kit';
 import { ProcessStatus } from '@privateaim/kit';
+import type { IQueryCache } from '@privateaim/server-db-kit';
 import type { DataSource, Repository } from 'typeorm';
 import { In, Raw } from 'typeorm';
 import {
     validateEntityJoinColumns,
 } from 'typeorm-extension';
 import type { IQuery } from '@rapiq/core';
+import { defineQuery } from '@rapiq/core';
 import { AnalysisEntity } from '../../../../../adapters/database/entities/analysis.ts';
 import { updateLockedEntity } from '../../../../../adapters/database/locked-update.ts';
 import type {
@@ -20,6 +23,7 @@ import type {
     EntityRepositoryFindManyResult,
 } from '@privateaim/server-kit';
 import type {
+    AnalysisClientBinding,
     IAnalysisRepository,
 } from '../../../../../core/index.ts';
 import { applyQuery } from '../query.ts';
@@ -29,9 +33,12 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
 
     protected repository: Repository<AnalysisEntity>;
 
-    constructor(dataSource: DataSource) {
+    protected cache: IQueryCache;
+
+    constructor(dataSource: DataSource, cache: IQueryCache) {
         this.dataSource = dataSource;
         this.repository = dataSource.getRepository(AnalysisEntity);
+        this.cache = cache;
     }
 
     async findMany(query: IQuery): Promise<EntityRepositoryFindManyResult<Analysis>> {
@@ -54,6 +61,40 @@ export class AnalysisRepositoryAdapter implements IAnalysisRepository {
 
     async findOneById(id: string): Promise<Analysis | null> {
         return this.repository.findOneBy({ id });
+    }
+
+    async findOneByClientBinding(clientId: string, realmId: string): Promise<AnalysisClientBinding | null> {
+        const where = { clientId, realmId };
+
+        return this.cache.rememberQuery<AnalysisClientBinding | null>(
+            {
+                key: `${DomainType.ANALYSIS}/clientBinding?${JSON.stringify([clientId, realmId])}`,
+                query: defineQuery<Analysis>({ filters: where }),
+                schema: DomainType.ANALYSIS,
+                // Scoped on `clientId` alone: a realm scope would drop the entry
+                // on every analysis write in the realm. The row's own writes
+                // still drop it through its record tag.
+                caseSensitive: ['clientId'],
+            },
+            async () => {
+                const row = await this.repository.findOne({
+                    select: {
+                        id: true,
+                        clientId: true,
+                        realmId: true,
+                    },
+                    where,
+                });
+
+                // the same plain shape a hit has
+                return row ? {
+                    id: row.id,
+                    clientId: row.clientId,
+                    realmId: row.realmId,
+                } : null;
+            },
+            { manager: this.repository.manager },
+        );
     }
 
     async findOneWithProject(id: string): Promise<Analysis | null> {

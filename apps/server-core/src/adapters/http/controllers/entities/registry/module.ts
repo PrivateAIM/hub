@@ -20,6 +20,7 @@ import {
     DGet,
     DPath,
     DPost,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -66,6 +67,7 @@ export class RegistryController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DStatus(201)
     async add(
         @DBody() data: RegistryCreatePayload,
         @DContext() event: IAppEvent,
@@ -73,12 +75,11 @@ export class RegistryController {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
 
-        event.response.status = 201;
-
         return { data: entity, meta: {} };
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async edit(
         @DPath('id') id: string,
         @DBody() data: RegistryUpdatePayload,
@@ -87,20 +88,17 @@ export class RegistryController {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
 
-        event.response.status = 202;
-
         return { data: entity, meta: {} };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Registry>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
-
-        event.response.status = 202;
 
         return { data: entity, meta: {} };
     }

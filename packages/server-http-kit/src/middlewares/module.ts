@@ -12,7 +12,7 @@ import { mountBasicMiddleware } from './basic';
 import { mountCorsMiddleware } from './cors';
 import { mountDecoratorsMiddleware } from './decorators';
 import { mountPrometheusMiddleware } from './prometheus';
-import { mountRateLimiterMiddleware } from './rate-limit';
+import { isAddressKeyTrusted, mountAuthenticationRateLimiterMiddleware, mountRateLimiterMiddleware } from './rate-limit';
 import { mountSwaggerMiddleware } from './swagger';
 import type { MiddlewareMountOptions } from './types';
 
@@ -20,6 +20,12 @@ export function mountMiddlewares(
     app: App,
     options: MiddlewareMountOptions = {},
 ) {
+    // First, so requests the middlewares below reject (401, 429, a
+    // preflight) are measured too.
+    if (options.prometheus) {
+        mountPrometheusMiddleware(app);
+    }
+
     if (options.cors) {
         mountCorsMiddleware(app);
     }
@@ -28,12 +34,14 @@ export function mountMiddlewares(
         mountBasicMiddleware(app);
     }
 
-    if (options.authorization) {
-        mountAuthorizationMiddleware(app, options.authorization);
+    // Before authorization: bounds failed authentications per address, when
+    // the address cannot be forged.
+    if (options.rateLimit && isAddressKeyTrusted(options.rateLimit)) {
+        mountAuthenticationRateLimiterMiddleware(app);
     }
 
-    if (options.prometheus) {
-        mountPrometheusMiddleware(app);
+    if (options.authorization) {
+        mountAuthorizationMiddleware(app, options.authorization);
     }
 
     if (options.rateLimit) {

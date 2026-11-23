@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/kit",
     "type": "module",
-    "version": "0.19.2",
+    "version": "0.20.0",
     "license": "Apache-2.0",
     "description": "",
     "module": "./dist/index.mjs",
@@ -29,18 +29,18 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.72",
-        "@authup/kit": "^1.0.0-beta.72",
+        "@authup/core-kit": "^1.0.0-beta.76",
+        "@authup/kit": "^1.0.0-beta.76",
         "cross-env": "^10.1.0",
         "unplugin-swc": "^2.0.0",
-        "vitest": "^5.0.5"
+        "vitest": "^5.1.0"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.72",
-        "@authup/kit": "^1.0.0-beta.72"
+        "@authup/core-kit": "^1.0.0-beta.76",
+        "@authup/kit": "^1.0.0-beta.76"
     },
     "dependencies": {
-        "nanoid": "^6.0.1",
+        "nanoid": "^6.0.2",
         "pathtrace": "^2.2.3",
         "validup": "^2.0.1"
     },

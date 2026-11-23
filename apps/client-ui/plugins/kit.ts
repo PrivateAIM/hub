@@ -39,6 +39,8 @@ export default defineNuxtPlugin((ctx) => {
         coreURL,
         storageURL,
         telemetryURL,
+        // An unanswered API call would otherwise stall an SSR render forever.
+        httpTimeout: 30_000,
         // `installSocketManager` is opt-in as of the contract-first client work;
         // without this, realtime silently stops working.
         realtime: true,

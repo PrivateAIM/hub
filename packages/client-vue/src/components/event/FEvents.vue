@@ -89,7 +89,7 @@ export default defineComponent({
             }
         };
 
-        Promise.try(() => resolve(props.query));
+        Promise.resolve().then(() => resolve(props.query));
 
         return {
             handleDeleted,

@@ -9,11 +9,13 @@ import type { AuthupClientTokenCreatorCreateContext, AuthupUserTokenCreatorCreat
 
 import type { TokenCreator } from '@authup/core-http-kit';
 import { OAuth2Client } from '@hapic/oauth2';
+import { HTTPClientTimeout } from '../constants';
 
-
-
+/**
+ * authup's remote token verifier bounds the token mint only by this client.
+ */
 export function createAuthupClientTokenCreator(ctx: AuthupClientTokenCreatorCreateContext): TokenCreator {
-    const client = new OAuth2Client({ request: { baseURL: ctx.baseURL } });
+    const client = new OAuth2Client({ request: { baseURL: ctx.baseURL, timeout: HTTPClientTimeout.AUTHUP } });
 
     // OAuth2 token-request parameters — spec-frozen, snake_case forever.
     return () => client.token.createWithClientCredentials({
@@ -26,7 +28,7 @@ export function createAuthupClientTokenCreator(ctx: AuthupClientTokenCreatorCrea
 
 
 export function createAuthupUserTokenCreator(ctx: AuthupUserTokenCreatorCreateContext): TokenCreator {
-    const client = new OAuth2Client({ request: { baseURL: ctx.baseURL } });
+    const client = new OAuth2Client({ request: { baseURL: ctx.baseURL, timeout: HTTPClientTimeout.AUTHUP } });
 
     // OAuth2 token-request parameters — spec-frozen, snake_case forever.
     return () => client.token.createWithPassword({

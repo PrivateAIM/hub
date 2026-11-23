@@ -6,7 +6,6 @@
  */
 
 import type { ObjectLiteral, SchemaDescription } from '@rapiq/core';
-import type { IClient as IBaseClient, RequestBaseOptions } from 'hapic';
 import type { EntityQueryInput } from '../utils';
 
 /**
@@ -63,28 +62,32 @@ export type DomainEntityID<T> = T extends DomainEntityWithID ?
     never;
 
 /**
+ * Per-call request options, the trailing argument of every api method:
+ * `signal` aborts the call, `timeout` (milliseconds) overrides the
+ * client's own for this call. Absent, the client defaults apply.
+ */
+export type APIRequestOptions = {
+    signal?: AbortSignal,
+    timeout?: number,
+};
+
+/**
  * Contract of an entity API that has no update verb. `TCreate` carries the
  * endpoint's named create payload (e.g. `AnalysisBucketCreatePayload`); it
  * defaults to `Partial<T>` so every existing positional use stays
  * source-compatible.
  */
 export interface IEntityAPISlim<T extends ObjectLiteral, TCreate = Partial<T>> {
-    getMany(record?: EntityQueryInput<T>) : Promise<EntityCollectionResponse<T>>;
-    getOne(id: DomainEntityID<T>, record?: EntityQueryInput<T>) : Promise<EntityRecordResponse<T>>;
-    delete(id: DomainEntityID<T>) : Promise<EntityRecordResponse<T>>;
-    create(data: TCreate) : Promise<EntityRecordResponse<T>>;
+    getMany(record?: EntityQueryInput<T>, options?: APIRequestOptions) : Promise<EntityCollectionResponse<T>>;
+    getOne(
+        id: DomainEntityID<T>,
+        record?: EntityQueryInput<T>,
+        options?: APIRequestOptions,
+    ) : Promise<EntityRecordResponse<T>>;
+    delete(id: DomainEntityID<T>, options?: APIRequestOptions) : Promise<EntityRecordResponse<T>>;
+    create(data: TCreate, options?: APIRequestOptions) : Promise<EntityRecordResponse<T>>;
 }
 
 export interface IEntityAPI<T extends ObjectLiteral, TCreate = Partial<T>, TUpdate = Partial<T>> extends IEntityAPISlim<T, TCreate> {
-    update(id: DomainEntityID<T>, data: TUpdate) : Promise<EntityRecordResponse<T>>;
+    update(id: DomainEntityID<T>, data: TUpdate, options?: APIRequestOptions) : Promise<EntityRecordResponse<T>>;
 }
-
-export type BaseAPIContext = {
-    /**
-     * hapic's client INTERFACE, not its concrete class: `BaseAPI` only ever
-     * calls the interface surface, and keeping this structural means a
-     * subclass — or a second declaration copy of the package — satisfies it
-     * without tripping over `BaseAPI`'s own `protected client`.
-     */
-    client?: IBaseClient | RequestBaseOptions
-};

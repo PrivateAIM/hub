@@ -24,10 +24,18 @@ import {
     DGet,
     DPath,
     DPost,
+    DProduces,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
-import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
+import {
+    ForceIdentityOrCapabilityMiddleware,
+    ForceIdentityOrStreamCapabilityMiddleware,
+    ForceLoggedInMiddleware,
+    buildActorContext,
+    useRequestIdentityOrFail,
+} from '@privateaim/server-http-kit';
 import type { IAppEvent } from 'routup';
 import {
     sendStream,
@@ -39,7 +47,9 @@ import type { IBucketFileRepository, IBucketService } from '../../../../core/ent
 import { bucketSchema } from '../../../../core/entities/index.ts';
 import { toBucketName } from '../../../../core/utils/bucket-name.ts';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
+import { useStorageCapability, useStorageRequester } from '../../requester.ts';
 import { uploadRequestFilesToBucket } from './upload.ts';
+import type { BucketFileUploader } from './types.ts';
 import { packBucketFiles } from './stream.ts';
 
 type BucketControllerContext = {
@@ -78,22 +88,27 @@ export class BucketController {
         this.logger = ctx.logger;
     }
 
-    @DGet('', [ForceLoggedInMiddleware])
+    @DGet('', [ForceIdentityOrCapabilityMiddleware])
     async getMany(
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<Bucket>> {
         const query = useRequestQuery(event);
-        const { data, meta } = await this.service.getMany(query);
+        const { data, meta } = await this.service.getMany(query, useStorageCapability(event));
 
         return { data, meta: { ...meta, schema: describeQuerySchema(bucketSchema) } };
     }
 
-    @DGet('/:id/stream', [ForceLoggedInMiddleware])
+    @DGet('/:id/stream', [ForceIdentityOrStreamCapabilityMiddleware])
+    @DProduces('application/x-tar')
     async stream(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
-    ) {
-        const entity = await this.service.getOne(id);
+    ): Promise<Response> {
+        // The URL may carry a capability token (`?dt=`): never pass it on.
+        event.response.headers.set('referrer-policy', 'no-referrer');
+
+        // Judged before a single byte is packed.
+        const entity = await this.service.getOne(id, undefined, useStorageCapability(event));
 
         const files = await this.bucketFileRepository.findManyBy({ bucketId: entity.id });
 
@@ -112,19 +127,45 @@ export class BucketController {
         return sendStream(event, stream);
     }
 
-    @DPost('/:id/upload', [ForceLoggedInMiddleware])
+    @DPost('/:id/upload', [ForceIdentityOrCapabilityMiddleware])
+    @DStatus(201)
     async upload(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ) {
-        const actor = buildActorContext(event);
+        const requester = useStorageRequester(event);
         const entity = await this.service.getOne(id);
 
-        await this.service.checkUploadAccess(entity, actor);
+        await this.service.checkUploadAccess(entity, requester);
 
-        const files = await uploadRequestFilesToBucket(event, entity, this.bucketFileComponent, this.bucketFileEventDispatcher);
+        let uploader: BucketFileUploader;
 
-        event.response.status = 201;
+        if (requester.type === 'capability') {
+            // server-core judges the subject's upload when it registers the file.
+            const { subject } = requester.capability;
+
+            uploader = {
+                type: subject.type,
+                id: subject.id,
+                realmId: subject.realmId,
+            };
+        } else {
+            const identity = useRequestIdentityOrFail(event);
+
+            uploader = {
+                type: identity.type,
+                id: identity.id,
+                realmId: identity.realmId,
+            };
+        }
+
+        const files = await uploadRequestFilesToBucket(
+            event,
+            entity,
+            uploader,
+            this.bucketFileComponent,
+            this.bucketFileEventDispatcher,
+        );
 
         return {
             data: files,
@@ -133,6 +174,7 @@ export class BucketController {
     }
 
     @DPost('/:id/clear', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async clear(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
@@ -140,18 +182,20 @@ export class BucketController {
         const actor = buildActorContext(event);
         const entity = await this.service.clear(id, actor);
 
-        event.response.status = 202;
-
         return { data: entity, meta: {} };
     }
 
-    @DGet('/:id', [ForceLoggedInMiddleware])
+    @DGet('/:id', [ForceIdentityOrCapabilityMiddleware])
     async getOne(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Bucket>> {
         const query = useRequestQuery(event);
-        const entity = await this.service.getOne(id, Object.keys(query).length > 0 ? query : undefined);
+        const entity = await this.service.getOne(
+            id,
+            Object.keys(query).length > 0 ? query : undefined,
+            useStorageCapability(event),
+        );
 
         return {
             data: entity,
@@ -160,6 +204,7 @@ export class BucketController {
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async update(
         @DPath('id') id: string,
         @DBody() data: Partial<BucketCreatePayload>,
@@ -168,12 +213,11 @@ export class BucketController {
         const actor = buildActorContext(event);
         const entity = await this.service.update(id, data, actor);
 
-        event.response.status = 202;
-
         return { data: entity, meta: {} };
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DStatus(201)
     async add(
         @DBody() data: BucketCreatePayload,
         @DContext() event: IAppEvent,
@@ -181,20 +225,17 @@ export class BucketController {
         const actor = buildActorContext(event);
         const entity = await this.service.create(data, actor);
 
-        event.response.status = 201;
-
         return { data: entity, meta: {} };
     }
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async drop(
         @DPath('id') id: string,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<Bucket>> {
         const actor = buildActorContext(event);
         const entity = await this.service.delete(id, actor);
-
-        event.response.status = 202;
 
         return { data: entity, meta: {} };
     }

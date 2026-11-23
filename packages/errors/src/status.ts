@@ -33,8 +33,14 @@ export const ERROR_CODE_TO_STATUS: Readonly<Partial<Record<`${ErrorCode}`, numbe
     // 409
     [ErrorCode.ENTITY_CONFLICT]: 409,
 
+    // 429
+    [ErrorCode.THROTTLED]: 429,
+
     // 500
     [ErrorCode.INTERNAL_ERROR]: 500,
+
+    // 504
+    [ErrorCode.UPSTREAM_TIMEOUT]: 504,
 
     // 507
     [ErrorCode.STORAGE_INSUFFICIENT]: 507,

@@ -6,6 +6,7 @@
  */
 
 import type { IContainer } from 'eldin';
+import type { IQueryCache } from '@privateaim/server-db-kit';
 import type { DataSource } from 'typeorm';
 import { NodeRepositoryAdapter } from './repositories/node/index.ts';
 import { RegistryRepositoryAdapter } from './repositories/registry/index.ts';
@@ -23,14 +24,14 @@ import { ComponentsInjectionKey } from '../components/constants.ts';
 import { RegistryManagerAdapter } from '../registry/index.ts';
 import { DatabaseInjectionKey } from './constants.ts';
 
-export function registerRepositories(container: IContainer, dataSource: DataSource): void {
-    container.register(DatabaseInjectionKey.NodeRepository, { useValue: new NodeRepositoryAdapter(dataSource) });
+export function registerRepositories(container: IContainer, dataSource: DataSource, queryCache: IQueryCache): void {
+    container.register(DatabaseInjectionKey.NodeRepository, { useValue: new NodeRepositoryAdapter(dataSource, queryCache) });
     container.register(DatabaseInjectionKey.RegistryRepository, { useValue: new RegistryRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.MasterImageRepository, { useValue: new MasterImageRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.MasterImageGroupRepository, { useValue: new MasterImageGroupRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.ProjectRepository, { useValue: new ProjectRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.RegistryProjectRepository, { useValue: new RegistryProjectRepositoryAdapter(dataSource) });
-    container.register(DatabaseInjectionKey.AnalysisRepository, { useValue: new AnalysisRepositoryAdapter(dataSource) });
+    container.register(DatabaseInjectionKey.AnalysisRepository, { useValue: new AnalysisRepositoryAdapter(dataSource, queryCache) });
     container.register(DatabaseInjectionKey.AnalysisBucketRepository, { useValue: new AnalysisBucketRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.AnalysisBucketFileRepository, { useValue: new AnalysisBucketFileRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.ProjectNodeRepository, { useValue: new ProjectNodeRepositoryAdapter(dataSource) });

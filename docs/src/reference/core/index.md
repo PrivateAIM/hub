@@ -31,7 +31,6 @@ docker run -e ... privateaim/hub core cli start
 |----------|---------|-------------|
 | `HARBOR_URL` | — | Harbor registry URL |
 | `TELEMETRY_URL` | — | Telemetry service URL |
-| `VAULT_CONNECTION_STRING` | `start123@http://127.0.0.1:8090/v1/` | Vault connection for secrets |
 | `MASTER_IMAGES_OWNER` | `PrivateAim` | GitHub owner for master images |
 | `MASTER_IMAGES_REPOSITORY` | `master-images` | GitHub repository name |
 | `MASTER_IMAGES_BRANCH` | `master` | GitHub branch |
@@ -54,7 +53,9 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `GET/POST` | `/nodes/:id/client/credentials` | Read / update the node's OAuth2 client credentials (secret, name, display name) — usable by the node's own client or a `NODE_UPDATE` manager |
 | `GET` | `/nodes/:id/registry/credentials` | Read the node's own registry project (Harbor robot) credentials — accessible to the node's own client without any management permission |
 | `GET/POST` | `/analyses/:id/client/credentials` | Read / rotate the analysis's OAuth2 client credentials |
+| `POST` | `/analyses/:id/storage/token` | Mint a storage capability token for buckets and files of the analysis (see below) |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
+| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
 
 ## Response Shapes
 
@@ -69,7 +70,7 @@ bulk-delete shapes rather than entity records:
 |----------|-------|
 | `GET /` | `{ version, timestamp }` — service metadata |
 | `POST /services/:id/hook`, `POST /services/:id/command` | `null` (202) — Harbor webhook / command protocol |
-| `GET`/`POST` `/nodes/:id/client/credentials`, `GET`/`POST` `/analyses/:id/client/credentials`, `GET /nodes/:id/registry/credentials` | credential payloads |
+| `GET`/`POST` `/nodes/:id/client/credentials`, `GET`/`POST` `/analyses/:id/client/credentials`, `GET /nodes/:id/registry/credentials`, `POST /analyses/:id/storage/token` | credential payloads |
 | `DELETE /analysis-logs`, `DELETE /analysis-node-logs` | `null` (202) |
 
 `GET /analyses/:id/client/permissions` is a collection but carries **no** `meta.schema` — it proxies
@@ -77,6 +78,46 @@ Authup `ClientPermission` records, for which no Hub-side query schema exists.
 
 See [API Reference](/guide/development/api#response-shapes) for the full contract and the
 `meta.schema` reading rules.
+
+## Storage Capability Tokens
+
+`POST /analyses/:id/storage/token` mints a short-lived, resource-scoped token that
+[server-storage](/reference/storage/#capability-tokens) accepts instead of the caller's login. A
+browser then reaches only the buckets and files of one analysis, for only the requested actions.
+
+```http
+POST /analyses/:id/storage/token
+Authorization: Bearer <access token>
+
+{ "cap": ["bucket:<bucketId>:read,write", "bucketFile:<fileId>:read"], "lifetime": 60 }
+```
+
+| Field | Description |
+|-------|-------------|
+| `cap` | 1 to 32 entries `type:id:actions` (actions comma-separated). Types `bucket` (`read`, `write`, `delete`) and `bucketFile` (`read`, `delete`). `id` is the **storage** bucket or file id. |
+| `lifetime` | Optional, seconds, 1 to 3600 (default 3600). |
+
+The answer is flat (no `{ data, meta }` envelope): `{ "token": "...", "expiresAt": "<ISO date>" }`.
+
+Core decides access first, then exchanges the caller's access token for a capability token at
+Authup (RFC 8693), acting as the Hub client (`CLIENT_ID`). Every entry must belong to the analysis in
+the path, and the caller must be allowed every requested action:
+
+| Action | Rule |
+|--------|------|
+| `read` | The file read rule of the bucket's type: `CODE` needs any participation, `TEMP` an approved node, `RESULT` an approved node plus `analysis_result_read` |
+| `write` | The file create rule: `CODE` owner and unlocked, `RESULT`/`TEMP` system or participant uploader |
+| `delete` | The file delete rule: owner plus a writable bucket |
+
+| Status | Cause |
+|--------|-------|
+| 200 | Token minted |
+| 400 | Malformed entry, unsupported type or action, or an entry outside the analysis (the whole request fails) |
+| 401 | No access token, or core refused it |
+| 403 | An action is not allowed |
+| 404 | Unknown analysis |
+| 501 | `AUTHUP_URL` is not configured |
+| 502 | Authup refused the exchange (any refusal, including `invalid_grant`) or is unreachable (check the [deployment setup](/guide/deployment/configuration#storage-capability-tokens)) |
 
 ## Architecture
 
@@ -86,6 +127,19 @@ The Core API follows the [hexagonal architecture](/getting-started/architecture)
 - **AMQP aggregators** consuming events from other services (builder, distributor, storage, authup)
 - **AMQP task consumers** for registry and analysis metadata processing
 - **TypeORM subscribers** publishing domain events on entity changes
+
+### Read Cache
+
+The lookup of the node or analysis bound to a calling client, made whenever a node or analysis
+client reads analyses, their nodes, buckets and files, registry projects or credentials, is cached
+for up to 60 seconds (`QueryCache` from
+[`@privateaim/server-db-kit`](/reference/shared/server-db-kit#read-cache)). A write to a node or
+analysis through its entity (`save`, `remove`) drops the affected entries when its transaction
+commits. Raw SQL drops nothing and a criteria `update` or `delete` does not reach every entry, so
+such a write can be answered stale until the entry expires. The entries live in Redis when
+`REDIS_CONNECTION_STRING` is set (key prefix `hub-core`), else in process memory; see
+[Read cache (Redis)](/guide/deployment/configuration#read-cache-redis) for the Redis requirements
+and for running several replicas.
 
 ## Stuck Builds and Distributions
 

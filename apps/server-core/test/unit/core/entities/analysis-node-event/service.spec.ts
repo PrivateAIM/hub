@@ -7,7 +7,7 @@
 
 import { PermissionError } from '@authup/access';
 import { randomUUID } from 'node:crypto';
-import type { Analysis, AnalysisNodeEvent, Node } from '@privateaim/core-kit';
+import type { Analysis, AnalysisNodeEvent } from '@privateaim/core-kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import {
     beforeEach,
@@ -21,8 +21,11 @@ import {
     FakeEntityRepository,
     createAllowAllActor,
     createDenyAllActor,
+    createScopedActor,
 } from '@privateaim/server-test-kit';
 import { FakeAnalysisNodeRepository } from '../analysis-node/fake-repository.ts';
+import { FakeNodeRepository } from '../node/fake-repository.ts';
+import { FakeAnalysisRepository } from '../analysis/fake-repository.ts';
 
 function createTestAnalysisNodeEvent(overrides?: Partial<AnalysisNodeEvent>): AnalysisNodeEvent {
     const analysisId = overrides?.analysisId ?? randomUUID();
@@ -61,8 +64,8 @@ describe('AnalysisNodeEventService', () => {
             repository,
             reach: new AnalysisReachService({
                 analysisNodeRepository: new FakeAnalysisNodeRepository(),
-                analysisRepository: new FakeEntityRepository<Analysis>(),
-                nodeRepository: new FakeEntityRepository<Node>(),
+                analysisRepository: new FakeAnalysisRepository(),
+                nodeRepository: new FakeNodeRepository(),
             }),
         });
     });
@@ -94,7 +97,7 @@ describe('AnalysisNodeEventService', () => {
                 createTestAnalysisNodeEvent({ id: 'foreign', analysisRealmId: 'realm-c' }),
             ]);
 
-            const result = await service.getMany({}, createAllowAllActor('realm-a'));
+            const result = await service.getMany({}, createScopedActor({ realmId: 'realm-a', realmScope: 'own' }));
 
             expect(result.data.map((e) => e.id)).toEqual(['own']);
         });
@@ -123,7 +126,7 @@ describe('AnalysisNodeEventService', () => {
         it('should answer an event out of reach like a missing one', async () => {
             repository.seed(createTestAnalysisNodeEvent({ id: 'foreign', analysisRealmId: 'realm-c' }));
 
-            await expect(service.getOne('foreign', createAllowAllActor('realm-a'))).rejects.toThrow(EntityNotFoundError);
+            await expect(service.getOne('foreign', createScopedActor({ realmId: 'realm-a', realmScope: 'own' }))).rejects.toThrow(EntityNotFoundError);
         });
     });
 });

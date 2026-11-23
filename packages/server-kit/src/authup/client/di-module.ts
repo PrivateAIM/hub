@@ -10,6 +10,7 @@ import type { AuthupClientModuleOptions } from './types';
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { CONFIG_MODULE_NAME, ConfigInjectionKey } from '../../config/constants';
+import { HTTPClientTimeout } from '../../constants';
 import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '../client-hook/constants';
 import { AUTHUP_CLIENT_MODULE_NAME, AuthupClientInjectionKey } from './constants';
 import { AuthupClient } from './module';
@@ -41,20 +42,19 @@ export class AuthupClientModule implements IModule {
             }
         }
 
-        // Fake-wins guard. This module is MANDATORY in every app harness (it
-        // feeds the authorization middleware across four apps), so a test
-        // cannot simply omit it the way it can omit the core/storage/telemetry
-        // client modules. Without this, an already-registered fake would be
-        // clobbered by the real client.
+        // Without a URL the token stays UNBOUND: consumers rely on
+        // `tryResolve` yielding undefined (node/analysis client provisioning
+        // is skipped, the authorization middleware refuses every token).
         //
-        // Deliberately AFTER the `baseURL` early return: that path legitimately
-        // leaves the token UNBOUND and consumers rely on `tryResolve` yielding
-        // undefined there.
-        if (container.has(AuthupClientInjectionKey)) {
+        // Fake-wins guard: this module is MANDATORY in every app harness (it
+        // feeds the authorization middleware across four apps), so a test
+        // cannot omit it the way it can omit the core/storage/telemetry client
+        // modules. An already-registered fake must not be clobbered.
+        if (!baseURL || container.has(AuthupClientInjectionKey)) {
             return;
         }
 
-        const client = new AuthupClient({ baseURL });
+        const client = new AuthupClient({ baseURL, timeout: HTTPClientTimeout.AUTHUP });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
 

@@ -105,6 +105,23 @@ terminates client connections directly, `proxy_set_header X-Forwarded-For $remot
 rather than append) closes that today.
 :::
 
+::: warning Do not log the query of `*/stream` requests
+A browser download carries a short-lived capability token in the query string (`?dt=`) of
+`/storage/.../stream`. It is a bearer credential for that file or bucket until it expires, so keep
+it out of the proxy's access log: log `$uri` instead of `$request` (which includes the query), or
+blank the query for the stream paths.
+
+```nginx
+map $request_uri $loggable_request_uri {
+    ~^(?<path>/storage/[^?]*/stream)\?   $path;
+    default                               $request_uri;
+}
+
+log_format hub '$remote_addr [$time_local] "$request_method $loggable_request_uri" $status $body_bytes_sent';
+access_log /var/log/nginx/access.log hub;
+```
+:::
+
 ::: tip
 For production, add SSL termination, rate limiting, and appropriate `proxy_read_timeout` values for long-running WebSocket connections.
 :::

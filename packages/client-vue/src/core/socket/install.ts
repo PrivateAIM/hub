@@ -40,7 +40,7 @@ export function installSocketManager(app: App, options: SocketManagerInstallOpti
     storeDispatcher.on(
         StoreDispatcherEventName.ACCESS_TOKEN_UPDATED,
         () => {
-            Promise.try(() => manager.reconnect());
+            Promise.resolve().then(() => manager.reconnect());
         },
     );
 

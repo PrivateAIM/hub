@@ -15,6 +15,7 @@ import {
     DController,
     DDelete,
     DGet,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -98,6 +99,7 @@ export class AnalysisLogController {
     }
 
     @DDelete('', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async drop(
         @DContext() event: IAppEvent,
     ) {
@@ -133,8 +135,6 @@ export class AnalysisLogController {
         if (this.telemetryClient) {
             await this.telemetryClient.log.deleteMany({ filters });
         }
-
-        event.response.status = 202;
 
         return null;
     }

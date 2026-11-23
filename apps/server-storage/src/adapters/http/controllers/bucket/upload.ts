@@ -7,6 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import type { ReadableStream } from 'node:stream/web';
 import {
     BucketFileCommand,
@@ -18,13 +19,14 @@ import Busboy from 'busboy';
 import path from 'node:path';
 import type { IAppEvent } from 'routup';
 import { BadRequestError } from '@privateaim/errors';
-import { useRequestIdentityOrFail } from '@privateaim/server-http-kit';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import type { BucketEntity } from '../../../database/index.ts';
+import type { BucketFileUploader } from './types.ts';
 
 export async function uploadRequestFilesToBucket(
     event: IAppEvent,
     bucket: BucketEntity,
+    uploader: BucketFileUploader,
     bucketFileComponent: BucketFileComponent,
     bucketFileEventDispatcher?: BucketFileEventDispatcher,
 ) {
@@ -43,14 +45,16 @@ export async function uploadRequestFilesToBucket(
         preservePath: true,
     });
 
-    const actor = useRequestIdentityOrFail(event);
-
-    const identity = useRequestIdentityOrFail(event);
-
     return new Promise<BucketFileCreationFinishedEventPayload[]>((resolve, reject) => {
         const entries : Promise<BucketFileCreationFinishedEventPayload>[] = [];
 
         instance.on('file', (_, file, info) => {
+            // An abort destroys the file stream with an error, possibly before
+            // the create handler pipes it (it awaits the data source first).
+            // Without a listener that error is uncaught; the handler still
+            // sees it, as its pipeline rejects on an errored stream.
+            file.on('error', () => {});
+
             if (typeof info.filename === 'undefined') {
                 file.resume();
 
@@ -67,12 +71,12 @@ export async function uploadRequestFilesToBucket(
                         {
                             meta: {
                                 id: randomUUID(),
-                                actorType: actor.type,
-                                actorId: actor.id,
+                                actorType: uploader.type,
+                                actorId: uploader.id,
                                 name: path.basename(info.filename),
                                 path: info.filename,
                                 directory: path.dirname(info.filename),
-                                realmId: identity.realmId,
+                                realmId: uploader.realmId,
                                 bucketId: bucket.id,
                                 bucket,
                             },
@@ -117,6 +121,16 @@ export async function uploadRequestFilesToBucket(
                 .catch((e) => reject(e));
         });
 
-        Readable.fromWeb(event.request.body as ReadableStream).pipe(instance);
+        // pipeline, not pipe: when the client aborts the upload, the request
+        // stream errors, busboy is destroyed with it and fails the open file
+        // stream, so neither this promise nor a storage write hangs.
+        pipeline(Readable.fromWeb(event.request.body as ReadableStream), instance)
+            .catch(async (e) => {
+                // 'finish' never comes: settle the file writes still open
+                // before failing the request.
+                await Promise.allSettled(entries);
+
+                reject(e);
+            });
     });
 }

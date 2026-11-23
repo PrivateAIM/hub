@@ -29,6 +29,7 @@ import {
 } from '../../../../src/adapters/database/index.ts';
 import { StorageBucketFileCreationFinishedHandler } from '../../../../src/app/aggregators/storage/bucket-file/handlers/creation_finished.ts';
 import { AnalysisBucketFileService } from '../../../../src/core/index.ts';
+import { AnalysisBucketAccess } from '../../../../src/core/services/analysis-bucket-access/index.ts';
 import { AnalysisReachService } from '../../../../src/core/services/analysis-reach/index.ts';
 import { DatabaseInjectionKey } from '../../../../src/app/modules/database/index.ts';
 import { createTestDatabaseApplication } from '../../../app';
@@ -60,17 +61,23 @@ describe('storage bucket-file aggregator', () => {
 
         const analysisRepository = suite.container.resolve(DatabaseInjectionKey.AnalysisRepository);
 
+        const reach = new AnalysisReachService({
+            analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+            analysisRepository,
+            nodeRepository: suite.container.resolve(DatabaseInjectionKey.NodeRepository),
+        });
+
         handler = new StorageBucketFileCreationFinishedHandler({
             service: new AnalysisBucketFileService({
                 repository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketFileRepository),
                 recalculator: new FakeAnalysisFileMetadataRecalculator(analysisRepository),
                 analysisRepository,
                 analysisBucketRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisBucketRepository),
-                analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
-                reach: new AnalysisReachService({
-                    analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
+                reach,
+                analysisBucketAccess: new AnalysisBucketAccess({
+                    reach,
                     analysisRepository,
-                    nodeRepository: suite.container.resolve(DatabaseInjectionKey.NodeRepository),
+                    analysisNodeRepository: suite.container.resolve(DatabaseInjectionKey.AnalysisNodeRepository),
                 }),
             }),
             bucketFileDispatcher,

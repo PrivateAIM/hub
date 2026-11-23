@@ -8,43 +8,69 @@
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
 import type { AnalysisBucketFile } from '@privateaim/core-kit';
-import { BaseAPI } from '../base';
-import type { EntityCollectionResponse, EntityRecordResponse } from '../types';
+import { BaseAPI } from 'hapic';
+import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
+import { buildRequestConfig } from '../utils';
 import type { AnalysisBucketFileCreatePayload, AnalysisBucketFileUpdatePayload, IAnalysisBucketFileAPI } from './types';
 
 export class AnalysisBucketFileAPI extends BaseAPI implements IAnalysisBucketFileAPI {
     async getMany(
-        options?: EntityQueryInput<AnalysisBucketFile>,
+        record?: EntityQueryInput<AnalysisBucketFile>,
+        options?: APIRequestOptions,
     ): Promise<EntityCollectionResponse<AnalysisBucketFile>> {
-        const response = await this.client.get(`analysis-bucket-files${buildQueryString(options)}`);
+        const response = await this.client.get(
+            `analysis-bucket-files${buildQueryString(record)}`,
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }
 
     async getOne(
         id: AnalysisBucketFile['id'],
+        record?: EntityQueryInput<AnalysisBucketFile>,
+        options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisBucketFile>> {
-        const response = await this.client.get(`analysis-bucket-files/${id}`);
+        const response = await this.client.get(
+            `analysis-bucket-files/${id}${buildQueryString(record)}`,
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }
 
     async delete(
         id: AnalysisBucketFile['id'],
+        options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisBucketFile>> {
-        const response = await this.client.delete(`analysis-bucket-files/${id}`);
+        const response = await this.client.delete(`analysis-bucket-files/${id}`, buildRequestConfig(options));
 
         return response.data;
     }
 
-    async update(id: AnalysisBucketFile['id'], data: AnalysisBucketFileUpdatePayload): Promise<EntityRecordResponse<AnalysisBucketFile>> {
-        const { data: response } = await this.client.post(`analysis-bucket-files/${id}`, nullifyEmptyObjectProperties(data));
+    async update(
+        id: AnalysisBucketFile['id'],
+        data: AnalysisBucketFileUpdatePayload,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<AnalysisBucketFile>> {
+        const { data: response } = await this.client.post(
+            `analysis-bucket-files/${id}`,
+            nullifyEmptyObjectProperties(data),
+            buildRequestConfig(options),
+        );
 
         return response;
     }
 
-    async create(data: AnalysisBucketFileCreatePayload): Promise<EntityRecordResponse<AnalysisBucketFile>> {
-        const { data: response } = await this.client.post('analysis-bucket-files', nullifyEmptyObjectProperties(data));
+    async create(
+        data: AnalysisBucketFileCreatePayload,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<AnalysisBucketFile>> {
+        const { data: response } = await this.client.post(
+            'analysis-bucket-files',
+            nullifyEmptyObjectProperties(data),
+            buildRequestConfig(options),
+        );
 
         return response;
     }

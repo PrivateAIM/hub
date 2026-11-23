@@ -32,6 +32,21 @@ const { data: created } = await client.bucket.create({ name: 'analysis-bucket' }
 const stream = await client.bucketFile.stream(fileId);
 ```
 
+### Timeouts
+
+`timeout` (milliseconds) bounds each request, including reading its response body; none is set
+by default. `bucket.stream`, `bucketFile.stream` and `bucket.upload` pass `timeout: 0`, so a long
+transfer is never cut off. A client from `withAuthorization()` keeps the parent's timeout.
+
+Every API method takes one optional `APIRequestOptions` object (`{ signal?, timeout? }`) as its
+last parameter: `signal` aborts the call, `timeout` overrides the client's for this call (and
+replaces the `timeout: 0` of `stream` and `upload`). Semantics as in
+[`@privateaim/core-http-kit`](/reference/core/core-http-kit#cancellation-per-call-timeouts).
+
+```typescript
+const stream = await client.bucketFile.stream(fileId, { signal: controller.signal });
+```
+
 ### Response Shapes
 
 Every single-record method (`getOne`, `create`, `update`, `delete`, `clear`) resolves to the
@@ -73,6 +88,9 @@ import { Bucket, BucketFile } from '@privateaim/storage-kit';
 | `pickEntityAPI` | Resolve a sub-API by `DomainType` string, with a compile-time record-type check |
 | `./testing` (subpath) | `FakeClient`, `createFakeClient`, `fakeResponse`, `matchRoute` |
 | `domains` | `Bucket`, `BucketFile` types and validators |
+| `StorageCapabilityType` / `StorageCapabilityAction` / `assertStorageCapabilityEntry` | Capability vocabulary: types `bucket`, `bucketFile` (the storage `DomainType` values); actions `read`, `write`, `delete`; `capabilityCoversBucket` / `capabilityCoversBucketFile` decide coverage (a bucket entry covers its files) |
+| `StorageCapabilityTokenProvider` / `IStorageCapabilityTokenProvider` | Caches a minted token per cap set (re-mints within 60 s of expiry, shares concurrent mints, never caches a failure) |
+| `IStorageClient.withAuthorization(resolve)` | A scoped client that sends `Authorization: Bearer <await resolve({ method })>` on each request. It copies the parent's base URL, timeout, headers and transport, but none of its hooks |
 
 ## Contract
 
@@ -115,6 +133,9 @@ const { data: bucket } = await client.bucket.getOne('abc');
 - The query string is ignored and `'*'` is a catch-all that always loses to a specific pattern.
 - A handler returns the response **body**; return `fakeResponse(status, body)` for a non-2xx.
 - Unmatched requests fall back to `{ data: [], meta: { total: 0 } }`.
+- A recorded request's `options` holds the `signal` and `timeout` it was sent with (client
+  defaults included), each key only when set. A client from `withAuthorization()` records
+  empty `options`.
 - Keep the default path-free `baseURL` — a `baseURL` carrying a path shifts every
   pathname, and patterns silently stop matching.
 

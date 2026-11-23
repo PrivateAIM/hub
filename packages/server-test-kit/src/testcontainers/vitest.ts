@@ -17,7 +17,7 @@ import {
     hasDatabaseEnv,
     resolveAuthupDatabaseEnv,
 } from './env.ts';
-import type { DatabaseConnection } from './types.ts';
+import type { AuthupProvisioningOptions, DatabaseConnection } from './types.ts';
 
 
 /**
@@ -64,7 +64,11 @@ export async function provideDatabase(project: TestProject, suite: string): Prom
  * given permission names (the set the calling service actually checks). The
  * resolved URL is published to the test workers.
  */
-export async function provideAuthup(project: TestProject, permissionNames: string[]): Promise<void> {
+export async function provideAuthup(
+    project: TestProject,
+    permissionNames: string[],
+    options: AuthupProvisioningOptions = {},
+): Promise<void> {
     if (hasAuthupEnv()) {
         const externalURL = process.env.AUTHUP_URL as string;
 
@@ -75,7 +79,7 @@ export async function provideAuthup(project: TestProject, permissionNames: strin
         return;
     }
 
-    const url = await startAuthupContainer(permissionNames, resolveAuthupDatabaseEnv());
+    const url = await startAuthupContainer(permissionNames, resolveAuthupDatabaseEnv(), options);
 
     // Verified here, in global setup, rather than left to surface as a wall of
     // authorization failures once the suite is already running.

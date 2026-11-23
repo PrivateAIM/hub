@@ -29,6 +29,7 @@ docker run -e ... privateaim/hub storage cli start
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `MINIO_CONNECTION_STRING` | `http://admin:start123@127.0.0.1:9000` | MinIO connection (**required**) |
+| `CAPABILITY_CLIENT_ID` | `CLIENT_ID` | The Authup client (id, or name in `REALM`) whose capability-token exchanges are accepted: the client server-core authenticates as. A token another client exchanged is refused (401). A name is looked up once through Authup, which needs `client_read` for storage's own client; an id needs no lookup. |
 
 ### Inherited
 
@@ -38,6 +39,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](../../guide/deployment/configuration.md#health-endpoints)) |
 | `GET` | `/buckets` | List buckets |
 | `POST` | `/buckets` | Create bucket (no `refId`, see below) |
 | `GET` | `/buckets/:id` | Get bucket |
@@ -71,6 +73,38 @@ a `refId` (e.g. an analysis bucket) accepts uploads from any authenticated calle
 legitimate uploaders span realms and storage cannot evaluate the referencing service's permissions:
 the owning service checks each upload when it registers it (see
 [Writing analysis buckets and files](/guide/deployment/configuration#writing-analysis-buckets-and-files-requires-analysis-update)).
+
+## Capability Tokens
+
+Besides a login, server-storage accepts an Authup **capability token** (`kind: capability_token`,
+audience `storage`) minted by server-core through
+[`POST /analyses/:id/storage/token`](/reference/core/#storage-capability-tokens). It is verified
+locally (signature against Authup's `/jwks`, `aud`, `kind`, `exp`) and grants only the actions on the
+resources in its `cap` claim. Only a token exchanged by `CAPABILITY_CLIENT_ID` (its `act.sub`) is
+accepted, as Authup lets every client with a `storage` exchange capability mint one. A capability request carries no identity: every route not listed below
+answers it 401.
+
+| Where | Routes |
+|-------|--------|
+| `Authorization: Bearer` header | `GET /buckets`, `GET /buckets/:id`, `POST /buckets/:id/upload`, `GET /bucket-files`, `GET /bucket-files/:id`, `DELETE /bucket-files/:id` |
+| `?dt=<token>` query parameter | `GET /buckets/:id/stream`, `GET /bucket-files/:id/stream` only, and only for a token living at most 60 s (`exp - iat`) |
+
+Bucket create, update, delete and clear are login only. A token in the query is never accepted on any
+other route, and a query token that lives longer than 60 s is refused (401). Only one `dt` is allowed.
+
+`cap` entries are `type:id:actions`:
+
+| Entry | Covers |
+|-------|--------|
+| `bucket:<id>:read` | The bucket, its tar stream and every file in it |
+| `bucket:<id>:write` | Uploads into the bucket |
+| `bucket:<id>:delete` | Deleting files of the bucket |
+| `bucketFile:<id>:read` / `:delete` | That one file only |
+
+Listings are narrowed to the covered buckets and files: a filter on another bucket returns nothing.
+Stream responses send `Referrer-Policy: no-referrer` so a token in the URL does not leak, and the
+query string is never logged. Login requests behave as before; server-core remains the authority on
+who may upload (it judges each file when it registers it).
 
 ## Response Shapes
 

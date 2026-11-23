@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MemoryTransport } from 'hapic';
+import { HookName, MemoryTransport } from 'hapic';
 import type { MemoryResponseInit, TransportRequest } from 'hapic';
 import { Client } from '../client';
+import type { APIRequestOptions } from '../domains';
 import { matchRoute } from './matcher';
 import type {
     FakeClientOptions,
@@ -55,6 +56,44 @@ function normalizeBody(input: unknown) : unknown {
 }
 
 /**
+ * Tie a response body to the request's signal, as `fetch` does: an abort (a
+ * caller signal or hapic's `timeout`) cancels the source and errors the body
+ * with the signal's reason. Without it an in-memory stream would outlive
+ * every deadline and a test could not tell `timeout: 0` from no option.
+ */
+function bindResponseSignal(response: Response, signal?: AbortSignal | null) : Response {
+    if (!signal || !response.body) {
+        return response;
+    }
+
+    const body = response.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>(), { signal });
+
+    return new Response(body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+    });
+}
+
+/**
+ * The `signal` and `timeout` a request is sent with; a key is set only when
+ * the request carries it.
+ */
+function pickRequestOptions(input: { signal?: AbortSignal | null, timeout?: number }) : APIRequestOptions {
+    const output : APIRequestOptions = {};
+
+    if (input.signal) {
+        output.signal = input.signal;
+    }
+
+    if (typeof input.timeout !== 'undefined') {
+        output.timeout = input.timeout;
+    }
+
+    return output;
+}
+
+/**
  * A REAL `Client` wired to an in-memory transport.
  *
  * Because only the transport is replaced, everything above it still runs: the
@@ -86,6 +125,7 @@ export class FakeClient extends Client {
         const requests : FakeRequest[] = [];
         const map : FakeHandlerMap = handlers ?? {};
         const fb : FakeHandler = fallback ?? defaultFallback;
+        const sent = new WeakMap<Headers, APIRequestOptions>();
 
         const transport = new MemoryTransport({
             fetch: async (req: TransportRequest) : Promise<Response | MemoryResponseInit> => {
@@ -111,6 +151,7 @@ export class FakeClient extends Client {
                     body: normalizeBody(req.body),
                     params: match ? match.params : {},
                     headers,
+                    options: (req.headers instanceof Headers ? sent.get(req.headers) : undefined) ?? {},
                 };
 
                 requests.push(request);
@@ -120,7 +161,7 @@ export class FakeClient extends Client {
                     await fb(request);
 
                 if (data instanceof Response) {
-                    return data;
+                    return bindResponseSignal(data, req.signal);
                 }
 
                 // MemoryResponseInit — a bare `{ data, meta }` would carry no
@@ -136,6 +177,18 @@ export class FakeClient extends Client {
         });
 
         this.requests = requests;
+
+        // The transport sees only hapic's derived signal, never the call's
+        // own `signal` / `timeout`. The request hook does, after the client
+        // defaults are merged in; it keys them by the request's `Headers`
+        // instance, which hapic hands on to the transport unchanged.
+        this.on(HookName.REQUEST, (config) => {
+            if (config.headers instanceof Headers) {
+                sent.set(config.headers, pickRequestOptions(config));
+            }
+
+            return config;
+        });
     }
 }
 

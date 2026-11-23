@@ -18,7 +18,12 @@ import { MessagePartyKind } from '@privateaim/messenger-kit';
 import type { ActorContext } from '@privateaim/server-kit';
 import { MemoryMessageWakeup } from '../../services/wakeup/index.ts';
 import type { IMessageWakeup } from '../../services/wakeup/index.ts';
-import type { IMessageRepository, IMessageService, MessagePersistInput } from './types.ts';
+import type {
+    IMessageRepository,
+    IMessageService,
+    MessagePersistInput,
+    MessagePullOptions,
+} from './types.ts';
 
 const DEFAULT_PULL_LIMIT = 50;
 const MAX_PULL_LIMIT = 100;
@@ -75,7 +80,12 @@ export class MessageService implements IMessageService {
         return messages;
     }
 
-    async pull(query: MessagePullQuery, actor: ActorContext): Promise<MessagePullResponse> {
+    async pull(
+        query: MessagePullQuery,
+        actor: ActorContext,
+        options: MessagePullOptions = {},
+    ): Promise<MessagePullResponse> {
+        const { signal: abortSignal } = options;
         const recipient = this.requireIdentity(actor);
 
         const limit = this.resolveLimit(query.limit);
@@ -90,9 +100,9 @@ export class MessageService implements IMessageService {
         try {
             let messages = await this.repository.findManyForRecipient(recipient, limit, new Date());
 
-            if (messages.length === 0 && waitMs > 0) {
-                // long-poll: park until a message is pending for this recipient or the
-                // budget elapses, then re-query once.
+            if (messages.length === 0 && waitMs > 0 && !abortSignal?.aborted) {
+                // long-poll: park until a message is pending for this recipient, the
+                // budget elapses or the caller leaves, then re-query once.
                 let timer: ReturnType<typeof setTimeout> | undefined;
                 const timeout = new Promise<void>((resolve) => {
                     timer = setTimeout(resolve, waitMs);
@@ -102,15 +112,24 @@ export class MessageService implements IMessageService {
                     }
                 });
 
+                const { promise: abandoned, resolve: abandon } = Promise.withResolvers<void>();
+                const onAbort = () => abandon();
+
+                abortSignal?.addEventListener('abort', onAbort, { once: true });
+
                 try {
-                    await Promise.race([pending, timeout]);
+                    await Promise.race([pending, timeout, abandoned]);
                 } finally {
                     if (timer) {
                         clearTimeout(timer);
                     }
+
+                    abortSignal?.removeEventListener('abort', onAbort);
                 }
 
-                messages = await this.repository.findManyForRecipient(recipient, limit, new Date());
+                if (!abortSignal?.aborted) {
+                    messages = await this.repository.findManyForRecipient(recipient, limit, new Date());
+                }
             }
 
             return { messages };

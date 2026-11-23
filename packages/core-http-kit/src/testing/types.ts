@@ -6,6 +6,7 @@
  */
 
 import type { ClientOptions } from '../client';
+import type { APIRequestOptions } from '../domains';
 
 /**
  * A dispatched request, normalized for assertions: the route pattern's
@@ -17,7 +18,14 @@ export type FakeRequest = {
     url: string,
     body?: unknown,
     params: Record<string, string>,
-    headers: Record<string, string>
+    headers: Record<string, string>,
+    /**
+     * The `signal` and `timeout` the request was sent with, client defaults
+     * included (a stream method's `timeout: 0` shows here); a key is present
+     * only when set. Optional so a request literal built outside the fake
+     * stays valid.
+     */
+    options?: APIRequestOptions,
 };
 
 /**

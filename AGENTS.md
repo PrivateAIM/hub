@@ -83,15 +83,15 @@ Open work is tracked in GitHub issues and in the local roadmap `.agents/plans/00
 
 - **Analysis check hardening**: race-safe verdicts shipped (#1954); narrow ports, precise registry classification and check observability remain.
 - **Per-analysis Authup client**: `analysis.clientId` provisioning (#1693), capability management and credential rotation exist; typed HTTP-client methods, capability UI and verified node consumption remain.
-- **Analysis capability tokens**: proposed. Resource-scoped tokens issued by server-core so analyses use storage, telemetry and messenger only for owned or shared resources.
+- **Analysis capability tokens**: storage tokens shipped (mint route, storage verification, client-vue use). Enforcement for login requests, telemetry and messenger remain.
 - **Message broker rewrite**: durable mailbox and REST API (#1711, #1715) and the payload-free `messagePending` wakeup (#1717) shipped. The legacy relay/presence stays until decommission; the external TS node broker and the rollout remain.
-- **Open findings**: run ids for process status, trusted-proxy hop counting for audit IPs, direct storage authorization.
+- **Open findings**: run ids for process status, direct storage authorization. `TRUST_PROXY` defaults to every hop, so audit IPs stay forgeable until a deployment sets it.
 
 Delivered work is recorded as invariants in the [topic files](.agents/architecture.md#topic-files), not here.
 
 ## Operational Invariants
 
-- Production starts use `startApplication` from server-kit: one-shot SIGINT/SIGTERM teardown bounded to 30 s. server-core closes its Socket.IO server before HTTP.
+- Production starts use `startApplication` from server-kit with `createHealthShutdownHook`: the first SIGINT/SIGTERM turns `/readyz` 503, waits `SHUTDOWN_DELAY` (after startup only; a second signal ends it), then a one-shot teardown bounded to 30 s that starts after the delay. Health routes mount before every middleware; both probes fail until every module's `onReady`, and readiness checks only the database (never Redis, RabbitMQ or Authup). server-core closes its Socket.IO server before HTTP.
 - The analysis reconciler is registered only with `RemoteMessageBusInjectionKey` (AMQP).
 - An analysis update with an unchanged non-null client binding skips the Authup lookup; remote client deletion is not repaired on incidental saves.
 - Node-log creation requires an existing analysis-node pair (approval not required). Execution progress and status require node authority on the analysis-node update route; assignment creation ignores execution, approval and comment fields.

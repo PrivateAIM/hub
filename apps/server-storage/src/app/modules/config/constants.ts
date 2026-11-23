@@ -28,6 +28,7 @@ export enum EnvironmentInputKey {
 
     CLIENT_ID = 'CLIENT_ID',
     CLIENT_SECRET = 'CLIENT_SECRET',
+    CAPABILITY_CLIENT_ID = 'CAPABILITY_CLIENT_ID',
 
     REALM = 'REALM',
 
@@ -41,4 +42,6 @@ export enum EnvironmentInputKey {
     PUBLIC_URL = 'PUBLIC_URL',
 
     COOKIE_PREFIX = 'COOKIE_PREFIX',
+    TRUST_PROXY = 'TRUST_PROXY',
+    SHUTDOWN_DELAY = 'SHUTDOWN_DELAY',
 }

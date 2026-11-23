@@ -8,6 +8,7 @@
 export * from './actor.ts';
 export * from './fake-authup-client.ts';
 export * from './authup-token.ts';
+export * from './capability-token.ts';
 export * from './column-naming.ts';
 export * from './database/index.ts';
 export * from './fake-entity-repository.ts';

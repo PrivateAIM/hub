@@ -13,15 +13,19 @@ import {
     AUTHUP_CLIENT_MODULE_NAME,
     AuthupClientInjectionKey,
     EnvironmentName,
+    Health,
+    HealthInjectionKey,
     LoggerInjectionKey,
     RedisClientInjectionKey,
     RedisPublishClientInjectionKey,
     RedisSubscribeClientInjectionKey,
-    createAuthupClientTokenCreator,
+    createDatabaseHealthCheck,
+    createHealthLogObserver,
 } from '@privateaim/server-kit';
 import {
     createAuthupTokenVerifier,
     mountErrorMiddleware,
+    mountHealthRoutes,
     mountMiddlewares,
 } from '@privateaim/server-http-kit';
 import {
@@ -30,6 +34,7 @@ import {
     mountLoggingMiddleware,
 } from '@privateaim/server-realtime-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
+import { DatabaseInjectionKey } from '../database/constants.ts';
 import { registerControllers } from '../../../adapters/socket/register.ts';
 import { createControllers } from './controller.ts';
 import type { HTTPServer } from './types.ts';
@@ -55,11 +60,24 @@ export class HTTPModule implements IModule {
 
     private instance: HTTPServer | undefined;
 
+    private health: Health | undefined;
+
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
         const logger = container.resolve(LoggerInjectionKey);
 
-        const app = new App();
+        // Every hop by default; TRUST_PROXY narrows whose X-Forwarded-For
+        // entries name the client (audit IP, rate-limit key).
+        const app = new App({ options: { trustProxy: config.trustProxy ?? true } });
+
+        // Ahead of every middleware: probes are neither authenticated, rate
+        // limited nor counted. Readiness waits on the database (1 s bound).
+        this.health = new Health({
+            readiness: [createDatabaseHealthCheck(container.resolve(DatabaseInjectionKey.DataSource))],
+            onReadinessChange: createHealthLogObserver(logger),
+        });
+        container.register(HealthInjectionKey, { useValue: this.health });
+        mountHealthRoutes(app, this.health);
 
         const isTestEnvironment = config.env === EnvironmentName.TEST;
 
@@ -74,7 +92,7 @@ export class HTTPModule implements IModule {
             basic: true,
             cors: true,
             prometheus: !isTestEnvironment,
-            rateLimit: !isTestEnvironment,
+            rateLimit: isTestEnvironment ? false : { trustProxy: config.trustProxy },
             authorization: {
                 authupClient: authupResult.success ?
                     authupResult.data :
@@ -85,14 +103,11 @@ export class HTTPModule implements IModule {
                 cookiePrefix: config.cookiePrefix,
                 tokenVerifier: createAuthupTokenVerifier({
                     baseURL: config.authupURL,
-                    creator: createAuthupClientTokenCreator({
-                        baseURL: config.authupURL,
-                        clientId: config.clientId,
-                        clientSecret: config.clientSecret,
+                    client: {
+                        id: config.clientId,
+                        secret: config.clientSecret,
                         realm: config.realm,
-                    }),
-                    clientId: config.clientId,
-                    realm: config.realm,
+                    },
                     redisClient: redisResult.success ? redisResult.data : undefined,
                 }),
             },
@@ -139,14 +154,11 @@ export class HTTPModule implements IModule {
                 baseURL: config.authupURL,
                 tokenVerifier: createAuthupTokenVerifier({
                     baseURL: config.authupURL,
-                    creator: createAuthupClientTokenCreator({
-                        baseURL: config.authupURL,
-                        clientId: config.clientId,
-                        clientSecret: config.clientSecret,
+                    client: {
+                        id: config.clientId,
+                        secret: config.clientSecret,
                         realm: config.realm,
-                    }),
-                    clientId: config.clientId,
-                    realm: config.realm,
+                    },
                     redisClient: redisPublishResult.success ? redisPublishResult.data : undefined,
                 }),
                 logger,
@@ -164,7 +176,15 @@ export class HTTPModule implements IModule {
         }
     }
 
+    async onReady(): Promise<void> {
+        // Every module finished its setup: both probes may pass from now on.
+        this.health?.markStarted();
+    }
+
     async teardown(container: IContainer): Promise<void> {
+        container.unregister(HealthInjectionKey);
+        this.health = undefined;
+
         const socketResult = container.tryResolve(HTTPInjectionKey.SocketServer);
 
         if (socketResult.success) {

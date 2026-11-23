@@ -9,7 +9,7 @@ import { createRequire } from 'node:module';
 import type { StartedNetwork, StartedTestContainer } from 'testcontainers';
 import { GenericContainer, Network, Wait } from 'testcontainers';
 import { buildAuthupProvisioningModule } from './provisioning.ts';
-import type { DatabaseConnection } from './types.ts';
+import type { AuthupProvisioningOptions, DatabaseConnection } from './types.ts';
 
 /**
  * Tag the Authup container with the **installed** `@authup/core-kit` version,
@@ -80,7 +80,8 @@ const STARTUP_TIMEOUT = 180_000;
 
 /**
  * How many trailing Authup log lines a failed start reports. A startup timeout
- * from the wait strategy says only that `/` never answered; the container's own
+ * from the wait strategy says only that `/readyz` never answered 200 (it does
+ * once Authup's database answers); the container's own
  * output (a crashed migration, an unreachable database) is the cause, and it is
  * gone once testcontainers removes the container.
  */
@@ -177,6 +178,7 @@ async function startAuthupDatabaseContainer(
 export async function startAuthupContainer(
     permissionNames: string[],
     databaseEnv: Record<string, string>,
+    options: AuthupProvisioningOptions = {},
 ): Promise<string> {
     let builder = new GenericContainer(AUTHUP_IMAGE).withExposedPorts(AUTHUP_PORT);
     let resolvedDatabaseEnv = databaseEnv;
@@ -218,11 +220,11 @@ export async function startAuthupContainer(
             })
             .withCopyContentToContainer([
                 {
-                    content: buildAuthupProvisioningModule(permissionNames),
+                    content: buildAuthupProvisioningModule(permissionNames, options),
                     target: AUTHUP_PROVISIONING_TARGET,
                 },
             ])
-            .withWaitStrategy(Wait.forHttp('/', AUTHUP_PORT).forStatusCode(200))
+            .withWaitStrategy(Wait.forHttp('/readyz', AUTHUP_PORT).forStatusCode(200))
             .withStartupTimeout(STARTUP_TIMEOUT)
             .start();
     } catch (e) {

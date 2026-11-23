@@ -26,6 +26,7 @@ import {
     SchemaError,
     buildIssue,
 } from '@rapiq/core';
+import { ErrorCode as ClientErrorCode, createClientError } from 'hapic';
 import { ValidupError } from 'validup';
 import { describe, expect, it } from 'vitest';
 import { sanitizeError } from '../../src/core';
@@ -237,5 +238,27 @@ describe('core/error/sanitize', () => {
 
         expect(output.code).toEqual(input.code);
         expect(statusOf(output)).toEqual(status);
+    });
+
+    it('should answer an outbound request that timed out with 504', () => {
+        const input = createClientError({
+            code: ClientErrorCode.CONNECTION_TIMEOUT,
+            request: { method: 'GET', url: 'http://telemetry.internal/logs' },
+        });
+
+        const output = sanitizeError(input);
+
+        expect(output.code).toEqual(HubErrorCode.UPSTREAM_TIMEOUT);
+        expect(statusOf(output)).toEqual(504);
+        expect(output.message).not.toContain('telemetry.internal');
+    });
+
+    it('should not answer an aborted outbound request with 504', () => {
+        const input = createClientError({
+            code: ClientErrorCode.CONNECTION_ABORTED,
+            request: { method: 'GET', url: 'http://telemetry.internal/logs' },
+        });
+
+        expect(statusOf(sanitizeError(input))).not.toEqual(504);
     });
 });

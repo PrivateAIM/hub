@@ -19,6 +19,7 @@ import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/s
 import {
     AbstractEntityService,
     appendQueryConditions,
+    findManyScoped,
     scopeReadQuery,
 } from '@privateaim/server-kit';
 import { eq } from '@rapiq/core';
@@ -72,10 +73,14 @@ export class NodeService extends AbstractEntityService implements INodeService {
         const scoped = await scopeReadQuery(
             decoded,
             actor,
-            { names: NODE_READ_PERMISSIONS, compile: false },
+            {
+                names: NODE_READ_PERMISSIONS, 
+                schema: nodeSchema, 
+                compile: false, 
+            },
         );
 
-        return this.repository.findMany(scoped);
+        return findManyScoped(this.repository, scoped, actor);
     }
 
     async getOne(id: string, actor: ActorContext, query?: Record<string, any>): Promise<Node> {

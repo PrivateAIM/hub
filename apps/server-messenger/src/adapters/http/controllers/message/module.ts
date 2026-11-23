@@ -9,6 +9,7 @@ import { BadRequestError } from '@privateaim/errors';
 import type {
     MessageAckRequest,
     MessageParty,
+    MessagePendingEvent,
     MessagePullQuery,
     SendMessageRequest,
 } from '@privateaim/messenger-kit';
@@ -20,6 +21,7 @@ import {
     DController,
     DGet,
     DPost,
+    DStatus,
     DTags,
 } from '@routup/decorators';
 import { useRequestQuery } from '@routup/basic/query';
@@ -49,14 +51,13 @@ export class MessageController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async send(
         @DBody() data: SendMessageRequest,
         @DContext() event: IAppEvent,
     ) {
         const actor = buildActorContext(event);
         const messages = await this.service.send(data, actor);
-
-        event.response.status = 202;
 
         return { data: messages.map((message) => message.id) };
     }
@@ -68,10 +69,11 @@ export class MessageController {
         const actor = buildActorContext(event);
         const query = useRequestQuery(event);
 
-        return this.service.pull(this.parsePullQuery(query), actor);
+        return this.service.pull(this.parsePullQuery(query), actor, { signal: event.signal });
     }
 
     @DPost('/ack', [ForceLoggedInMiddleware])
+    @DStatus(202)
     async ack(
         @DBody() data: MessageAckRequest,
         @DContext() event: IAppEvent,
@@ -79,7 +81,6 @@ export class MessageController {
         const actor = buildActorContext(event);
 
         await this.service.ack(data, actor);
-        event.response.status = 202;
 
         return { data: data.ids };
     }
@@ -102,7 +103,7 @@ export class MessageController {
 
         const push = () => stream.write({
             event: WakeupEventName.MESSAGE_PENDING,
-            data: JSON.stringify({ recipient }),
+            data: JSON.stringify({ recipient } satisfies MessagePendingEvent),
         });
 
         // nudge the client to pull on connect (catch up on anything pending before the stream opened)
@@ -110,22 +111,34 @@ export class MessageController {
 
         const unsubscribe = this.wakeup.subscribe(recipient, push);
 
-        const heartbeat = setInterval(() => {
-            // `write` returns false once the client disconnects — use it to drive cleanup
-            const alive = stream.write({ event: 'ping', data: `${Date.now()}` });
-
-            if (alive) {
+        let heartbeat: ReturnType<typeof setInterval> | undefined;
+        let closed = false;
+        const close = () => {
+            if (closed) {
                 return;
             }
 
+            closed = true;
             clearInterval(heartbeat);
             unsubscribe();
             stream.end();
+        };
+
+        heartbeat = setInterval(() => {
+            // A comment line keeps the connection alive without dispatching an
+            // event to the client; it fails once the client is gone.
+            if (!stream.writeComment('ping')) {
+                close();
+            }
         }, SSE_HEARTBEAT_MS);
 
         if (typeof heartbeat.unref === 'function') {
             heartbeat.unref();
         }
+
+        // A disconnect aborts the request signal: release the wakeup
+        // subscription now rather than at the next heartbeat.
+        event.signal.addEventListener('abort', close, { once: true });
 
         return stream.response;
     }

@@ -68,11 +68,52 @@ message) and `createWorkerCallerLogHooks` is now `createRemoteWorkerLogHooks`.
 import { RedisModule } from '@privateaim/server-kit';
 ```
 
+### Tagged Cache
+
+`TaggedCacheModule` registers a tag-invalidated read cache ([`@rapiq/cache`](https://github.com/tada5hi/rapiq))
+under `TaggedCacheInjectionKey` (typed `ITaggedCache`). Its `prefix` option is required: services share one
+Redis, so each names its own namespace.
+
+```typescript
+import { TaggedCacheInjectionKey, TaggedCacheModule } from '@privateaim/server-kit';
+
+new TaggedCacheModule({ prefix: 'hub-core' });
+
+const cache = container.resolve(TaggedCacheInjectionKey);
+const node = await cache.remember(`node:${id}`, () => repository.findOneBy({ id }), {
+    tags: () => [`node:${id}`],
+});
+await cache.invalidate([`node:${id}`]);
+```
+
+- With a client under `RedisClientInjectionKey` (`RedisModule`, optional dependency) the cache uses the
+  `@rapiq/cache-redis` driver on a **duplicate** of that client. The duplicate fails fast
+  (`maxRetriesPerRequest: 1`, no offline queue, `commandTimeout: 500`, reconnect backoff capped at 2 s)
+  and carries no `keyPrefix` (the driver refuses one); the service client's `keyPrefix` is prepended to
+  `prefix` instead. Without Redis each process uses an in-memory driver.
+- Entries live `TAGGED_CACHE_TTL` (60 s); a lost invalidation is therefore bounded by one minute.
+- `setup()` awaits the connection for at most `TAGGED_CACHE_CONNECT_TIMEOUT` (1 s) and never fails on a
+  Redis outage; reads then fall through to the database.
+- Failures are logged as one `warn` line per `TAGGED_CACHE_ERROR_LOG_INTERVAL` (10 s) through the
+  `LoggerModule` logger (optional dependency).
+- `teardown()` unregisters the key and closes only the duplicate, never the service client.
+
+`createTaggedCache({ redis?, prefix, onError })` builds the same cache without the container and returns
+`{ cache, ready, dispose }`; `throttle(fn, interval, now?)` is the log throttle.
+
 ### Authup Integration
 
 ```typescript
 import { AuthupModule } from '@privateaim/server-kit';
 ```
+
+### Outbound HTTP Timeouts
+
+`HTTPClientTimeout` holds the request deadline in milliseconds for each kind of peer:
+`AUTHUP` (10 000, the Authup client and the OAuth2 token creators), `SERVICE` (30 000, the core,
+storage and telemetry clients and GitHub), `HARBOR` (60 000) and `VICTORIA_LOGS` (30 000). A call
+that streams a request or response body passes `timeout: 0`. A timed-out request inside an HTTP
+request is answered `504` with the code `upstream_timeout`; the worker retries it.
 
 ### Query Schema Description
 
@@ -114,15 +155,16 @@ class MyAppBuilder extends BaseApplicationBuilder {
 
 | Module | Description |
 |--------|-------------|
-| `app` | `BaseApplicationBuilder`, `Application` base class |
+| `app` | `BaseApplicationBuilder`, `Application` base class; `startApplication(app, { onSignal })` — one-shot SIGINT/SIGTERM shutdown with drain delay; `Health`, `HealthInjectionKey`, `createDatabaseHealthCheck` (1 s bound, 1 s reuse), `createHealthShutdownHook`, `createHealthLogObserver` — the state behind `/livez` and `/readyz` (routes: `mountHealthRoutes` in `@privateaim/server-http-kit`) |
 | `logger` | Winston logger setup and `LoggerModule` |
 | `message-bus` | `MessageBusModule`, `MessageBusInjectionKey`, `MESSAGE_BUS_TOPIC_EXCHANGE` — DI wiring for the `hubwire` message bus; `createMessageBusLogHooks`, `createAmqpDriverLogHooks`, `createRemoteWorkerLogHooks`, `createScheduledComponentLogHooks` — hubwire `hooks` that log through a hub logger |
 | `redis` | Redis module and connection helpers |
-| `authup` | Authup authentication middleware module |
+| `cache` | `TaggedCacheModule`, `TaggedCacheInjectionKey`, `TAGGED_CACHE_MODULE_NAME`, `TAGGED_CACHE_TTL`, `TAGGED_CACHE_ERROR_LOG_INTERVAL`, `createTaggedCache()`, `throttle()` — the tag-invalidated read cache |
+| `authup` | Authup authentication middleware module; `exchangeAuthupToken` (RFC 8693 token exchange as the Hub client) |
 | `config` | Configuration reading via `envix` |
 | `core/query` | `describeQuerySchema()`, `RECORD_QUERY_PARAMETERS` — rapiq schema description for `meta.schema`; `collectRootFilterValues()` — flattens an `and`-of-`eq` filter tree into label equalities for the log endpoints and rejects any other operator with a 400 |
 | `entity-event` | Entity event pub/sub system |
-| `constants` | Module names, injection keys |
+| `constants` | Module names, injection keys, `HTTPClientTimeout` |
 
 ### Shared DI Modules
 
@@ -130,6 +172,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 |-------------|---------|
 | `LoggerModule` | Winston logger with optional telemetry transport |
 | `RedisModule` | Redis client registration |
+| `TaggedCacheModule` | Tag-invalidated read cache (`@rapiq/cache`) on a duplicate of the Redis client, or in memory without Redis; options `{ prefix }` |
 | `MessageBusModule` | Registers the `hubwire` message bus (AMQP or memory driver) with log hooks, and as `RemoteMessageBusInjectionKey` unless it is the memory driver; closes it on teardown. `silentRoutings`: routings whose publishes are not logged |
 | `AuthupModule` | Authup middleware and token validation |
 | `EntityEventModule` | Domain event dispatching |
@@ -140,6 +183,7 @@ class MyAppBuilder extends BaseApplicationBuilder {
 - `@ebec/http` — HTTP error types
 - `@hapic/oauth2` — OAuth2 client
 - `@rapiq/core` — Query schema definition and description (`describeQuerySchema`)
+- `@rapiq/cache`, `@rapiq/cache-redis` — Tagged read cache and its Redis driver (`TaggedCacheModule`)
 - `orkos` — Module system (`IModule`)
 - `eldin` — DI container (`TypedToken`)
 - `envix` — Environment variable reading

@@ -24,13 +24,14 @@ File/object storage service, backed by MinIO/S3 or the local filesystem behind t
 ```
 apps/server-storage/src/
 ├── core/
+│   ├── capability/                # capability-token coverage of buckets and files
 │   ├── entities/                  # bucket, bucket-file: ports, services, rapiq schemas
 │   ├── query/
 │   ├── storage/                   # IStorageAdapter port
 │   └── utils/
 ├── adapters/
 │   ├── database/                  # entities/, subscribers/, migrations/{mysql,postgres}
-│   ├── http/controllers/          # bucket, bucket-file, root
+│   ├── http/controllers/          # bucket, bucket-file, root (`requester.ts` maps capability or actor)
 │   └── storage/                   # minio.ts, fs.ts
 ├── app/
 │   ├── modules/                   # DI modules; database/repositories/, http/dispatchers/

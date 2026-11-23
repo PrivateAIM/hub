@@ -33,6 +33,18 @@ const { data: event } = await client.event.create({
 const { data: entity } = await client.event.getOne(eventId);
 ```
 
+`timeout` (milliseconds) bounds each request; none is set by default. A timed-out request
+rejects with a hapic client error whose `code` is `ETIMEDOUT`.
+
+Every API method takes one optional `APIRequestOptions` object (`{ signal?, timeout? }`) as its
+last parameter: `signal` aborts the call, `timeout` overrides the client's for this call.
+Semantics as in
+[`@privateaim/core-http-kit`](/reference/core/core-http-kit#cancellation-per-call-timeouts).
+
+```typescript
+const { data: logs } = await client.log.getMany(undefined, { timeout: 5_000 });
+```
+
 ### Response Shapes
 
 Every single-record method (`getOne`, `create`, `delete`) resolves to the
@@ -122,6 +134,8 @@ const { data: logs } = await client.log.getMany();
 - The query string is ignored and `'*'` is a catch-all that always loses to a specific pattern.
 - A handler returns the response **body**; return `fakeResponse(status, body)` for a non-2xx.
 - Unmatched requests fall back to `{ data: [], meta: { total: 0 } }`.
+- A recorded request's `options` holds the `signal` and `timeout` it was sent with (client
+  defaults included), each key only when set.
 - Keep the default path-free `baseURL` — a `baseURL` carrying a path shifts every
   pathname, and patterns silently stop matching.
 

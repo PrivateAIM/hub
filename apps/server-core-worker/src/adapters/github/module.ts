@@ -6,6 +6,7 @@
  */
 
 import { createNanoID } from '@privateaim/kit';
+import { HTTPClientTimeout } from '@privateaim/server-kit';
 import { Client } from 'hapic';
 import type { RequestBaseOptions } from 'hapic';
 import fs from 'node:fs';
@@ -22,9 +23,11 @@ import type {
 
 export class GitHubClient extends Client {
     constructor(options: RequestBaseOptions = {}) {
-        options.baseURL = options.baseURL || 'https://api.github.com/';
-
-        super(options);
+        super({
+            ...options,
+            baseURL: options.baseURL || 'https://api.github.com/',
+            timeout: options.timeout ?? HTTPClientTimeout.SERVICE,
+        });
     }
 
     async getRepositoryBranch(owner: string, repo: string, branch: string): Promise<GitHubRepositoryBranch> {
@@ -48,7 +51,11 @@ export class GitHubClient extends Client {
     async getRepositoryTarball(options: GitHubRepositoryTarballOptions): Promise<ReadableStream<any>> {
         const response = await this.get(
             `repos/${options.owner}/${options.repository}/tarball/${options.branch}`,
-            { responseType: 'stream' },
+            {
+                responseType: 'stream',
+                // the timer would keep running while the tarball is read
+                timeout: 0,
+            },
         );
 
         return response.data;

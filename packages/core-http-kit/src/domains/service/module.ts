@@ -7,8 +7,10 @@
 
 import type { Registry, RegistryAPICommand, RegistryProject } from '@privateaim/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
-import { BaseAPI } from '../base';
+import { BaseAPI } from 'hapic';
 import { nullifyEmptyObjectProperties } from '../../utils';
+import type { APIRequestOptions } from '../types';
+import { buildRequestConfig } from '../utils';
 import type { IServiceAPI } from './types';
 
 export class ServiceAPI extends BaseAPI implements IServiceAPI {
@@ -21,10 +23,15 @@ export class ServiceAPI extends BaseAPI implements IServiceAPI {
         id: `${ServiceID}`,
         command: string,
         data?: Record<string, any>,
+        options?: APIRequestOptions,
     ): Promise<void> {
         data = data || {};
 
-        await this.client.post(`services/${id}/command`, nullifyEmptyObjectProperties({ command, ...data }));
+        await this.client.post(
+            `services/${id}/command`,
+            nullifyEmptyObjectProperties({ command, ...data }),
+            buildRequestConfig(options),
+        );
     }
 
     async runRegistryCommand(
@@ -33,7 +40,8 @@ export class ServiceAPI extends BaseAPI implements IServiceAPI {
             id: Registry['id'] | RegistryProject['id'],
             [key: string]: any
         },
+        options?: APIRequestOptions,
     ): Promise<void> {
-        return this.runCommand(ServiceID.REGISTRY, command, data);
+        return this.runCommand(ServiceID.REGISTRY, command, data, options);
     }
 }

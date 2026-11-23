@@ -47,6 +47,7 @@ type Options = {
     coreURL: string,            // Core API base URL (required)
     storageURL: string,         // Storage service base URL (required)
     telemetryURL: string,       // Telemetry service base URL (required)
+    httpTimeout?: number,       // Request timeout (ms) of the clients built from the URLs
     components?: boolean | string[],  // Register globally (true = all, string[] = selective)
     translatorLocale?: string,  // Locale for translations
     isServer?: boolean,         // SSR mode flag
@@ -142,6 +143,7 @@ app.use(install, {
 | Option | Purpose |
 |--------|---------|
 | `coreURL` / `storageURL` / `telemetryURL` | Base URLs used to construct the clients |
+| `httpTimeout` | Request timeout in ms of those clients (default none; client-ui sets 30 s so a hung service cannot stall an SSR render). Streams and uploads opt out per call |
 | `coreHTTPClient` / `storageHTTPClient` / `telemetryHTTPClient` | Pre-built clients used INSTEAD of constructing from the URLs |
 | `pinia` | Pinia instance backing authup's store; required outside Nuxt, and forwarded to the socket manager |
 | `realtime` | Install the socket manager (default off) |
@@ -154,6 +156,13 @@ same app — `setupBaseHTTPClient` calls `injectHTTPClientAuthenticationHook(app
 and the permission-check composables call `injectStore()`. Installing only
 client-vue throws.
 :::
+
+### Analysis file access
+
+`FBucketFilesManager` requires an `analysisId`. It provides a scoped storage client to its subtree
+that authorizes each request with a cached [storage capability token](/reference/core/#storage-capability-tokens)
+(`GET` reads, `POST` writes, `DELETE` deletes). Downloads mint a fresh 60 second token per click
+and pass it as `?dt=` to the stream route.
 
 ### Testing with a fake client
 

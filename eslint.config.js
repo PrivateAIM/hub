@@ -51,6 +51,23 @@ export default [
         },
     },
     {
+        // Browser-shipped code: `Error.isError` and `Promise.try` are missing
+        // in browsers the UI still supports, and nothing polyfills them.
+        files: [
+            'apps/client-ui/**/*.{ts,vue}',
+            'packages/client-vue/**/*.{ts,vue}',
+            'packages/client-vue-theme/**/*.ts',
+            'packages/kit/**/*.ts',
+            'packages/errors/**/*.ts',
+            'packages/*-kit/**/*.ts',
+        ],
+        ignores: ['packages/server-*/**'],
+        rules: {
+            'unicorn/prefer-error-is-error': 'off',
+            'unicorn/prefer-promise-try': 'off',
+        },
+    },
+    {
         // SFCs are browser/SSR code — the shared config only registers Node
         // globals for `.vue` files, so DOM-only globals (DragEvent, FileList,
         // HTMLInputElement, …) otherwise trip `no-undef`.

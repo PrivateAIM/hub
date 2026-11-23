@@ -5,11 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BuiltInPolicyType, reachesRecordOneOf } from '@authup/access';
 import type { IQuery } from '@rapiq/core';
-import { eq, inArray } from '@rapiq/core';
+import { inArray } from '@rapiq/core';
 import type { ActorContext } from '../actor/index.ts';
+import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
 import { appendQueryConditions } from './conditions.ts';
-import type { ScopeReadQueryOptions } from './types.ts';
+import { 
+    buildCheckFields, 
+    readCheckAttributes, 
+    trimReadProjection, 
+    widenReadProjection, 
+} from './projection.ts';
+import type { ReadScope, ScopeReadQueryOptions } from './types.ts';
 
 /**
  * The gate every read runs: pre-gate the read permissions (a missing grant
@@ -19,24 +27,28 @@ import type { ScopeReadQueryOptions } from './types.ts';
  * - `allow`       → the query unchanged.
  * - `conditional` → the compiled reach AND-appended (non-displaceable).
  * - `deny`        → matches nothing.
- * - `post`        → a grant policy that cannot lower onto a column; narrowed
- *                   to the actor's own realm. An actor without a realm gets
- *                   nothing.
- *
- * Deliberate simplification: `post` narrows by realm only and ignores the
- * unlowerable grant policy, so within the actor's realm it can return rows
- * that policy would exclude. Add per-row evaluation (as authup's role/event
- * services do) once deployments attach such policies to read grants.
+ * - `post`        → the reach cannot be expressed as a condition (a grant
+ *                   policy that does not lower): the query is returned
+ *                   unnarrowed and flagged with the fields the decision
+ *                   reads, and each row is decided by evaluation. Run the
+ *                   scope through {@link findManyScoped}, which does that;
+ *                   the actor's realm is never the answer.
  */
 export async function scopeReadQuery(
     query: IQuery,
     actor: ActorContext,
     options: ScopeReadQueryOptions,
-): Promise<IQuery> {
+): Promise<ReadScope> {
+    const base = {
+        query,
+        names: options.names,
+        ...(options.realmAttributeName ? { realmAttributeName: options.realmAttributeName } : {}),
+    };
+
     await actor.permissionEvaluator.preEvaluateOneOf({ name: options.names });
 
     if (options.compile === false) {
-        return query;
+        return { ...base, post: false };
     }
 
     // Forward the realm column only when set, like authup: naming one tells
@@ -50,24 +62,85 @@ export async function scopeReadQuery(
 
     switch (compiled.verdict) {
         case 'allow':
-            return query;
+            return { ...base, post: false };
         case 'conditional':
-            return appendQueryConditions(query, compiled.condition);
+            return {
+                ...base, 
+                query: appendQueryConditions(query, compiled.condition), 
+                post: false, 
+            };
         case 'deny':
-            return appendQueryConditions(query, matchNothing());
-        default: {
-            // `post`: fall back to the actor's own realm.
-            if (!actor.realm) {
-                return appendQueryConditions(query, matchNothing());
-            }
-
-            const realmAttributeName = options.realmAttributeName ?? 'realmId';
-
-            return appendQueryConditions(query, eq(realmAttributeName, actor.realm.id));
-        }
+            return {
+                ...base, 
+                query: appendQueryConditions(query, inArray('id', [])), 
+                post: false, 
+            };
+        default:
+            return {
+                ...base,
+                post: true,
+                checkFields: buildCheckFields(options.schema, options.realmAttributeName),
+            };
     }
 }
 
-function matchNothing() {
-    return inArray('id', []);
+/**
+ * Run a scoped read. A lowered scope is the repository's answer as it is.
+ *
+ * A `post` scope is decided per row on ONE read: its projection is widened
+ * to the scope's `checkFields` (the schema's defaults, the realm column and
+ * the key), so each row is evaluated on its stored realm and every attribute
+ * a policy can read, and the rows returned are the rows evaluated. What the
+ * widening loaded beyond the asked projection is trimmed from the response;
+ * a gated field (`select: false`, outside `fields.default`) is never loaded
+ * for the check and, when the read asks for it, never shown to the policy.
+ * The page may come back short or empty; `meta.total` stays the candidate
+ * count, so a client paging by total still requests every page and no
+ * reachable row on a later page is cut off.
+ *
+ * A record read appends `eq('id', id)` to the scope's query and runs it
+ * through here too, so list and record share the decision.
+ */
+export async function findManyScoped<T extends object>(
+    repository: Pick<IEntityRepository<T>, 'findMany'>,
+    scope: ReadScope,
+    actor: ActorContext,
+): Promise<EntityRepositoryFindManyResult<T>> {
+    if (!scope.post) {
+        return repository.findMany(scope.query);
+    }
+
+    const projection = widenReadProjection(scope.query, scope.checkFields);
+    const result = await repository.findMany(projection.query);
+
+    const data: T[] = [];
+
+    for (const row of result.data) {
+        const attributes = readCheckAttributes(row, projection);
+        const isReached = await reachesRecordOneOf(actor.permissionEvaluator, {
+            name: scope.names,
+            realm: readRealm(attributes, scope.realmAttributeName ?? 'realmId'),
+            data: { [BuiltInPolicyType.ATTRIBUTES]: attributes },
+        });
+
+        if (isReached) {
+            data.push(row);
+        }
+    }
+
+    return { data: trimReadProjection(data, projection), meta: result.meta };
+}
+
+/**
+ * The row's realm, raw. Anything but a realm id or `null` reads as
+ * `undefined`, which the record helpers refuse instead of matching.
+ */
+function readRealm(row: object, attributeName: string): string | null | undefined {
+    const value: unknown = Reflect.get(row, attributeName);
+
+    if (typeof value === 'string') {
+        return value;
+    }
+
+    return value === null ? null : undefined;
 }

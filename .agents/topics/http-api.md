@@ -25,9 +25,9 @@ async getOne(@DPath('id') id: string, @DContext() event: IAppEvent): Promise<Ent
 }
 
 @DPost('', [ForceLoggedInMiddleware])
+@DStatus(201)
 async add(@DBody() data: NodeCreatePayload, @DContext() event: IAppEvent): Promise<EntityRecordResponse<Node>> {
     const entity = await this.service.create(data, buildActorContext(event));
-    event.response.status = 201;
     return { data: entity, meta: {} };
 }
 ```
@@ -76,7 +76,8 @@ records); `POST /buckets/:id/upload`.
 - **Never mutate a description**: it is memoized, deep-frozen and shared. Spread
   (`meta: { ...meta, schema: … }`); `meta.schema = …` throws a `TypeError`.
 - No `send()`/`sendCreated()` helpers (only `sendStream` in storage): return the value
-  and set `event.response.status`.
+  and declare a non-200 success status with `@DStatus(n)`, never `event.response.status`
+  (trapi documents only the decorator, so an assignment leaves the operation listed as 200).
 
 ## Field Selection Conventions
 
@@ -119,6 +120,12 @@ read methods take an `ActorContext`:
 
 Field names are `satisfies keyof T` constants, so a rename cannot leave a stale string
 that silently skips the gate.
+
+## Outbound Timeouts
+
+- Every outbound hapic client sets `timeout` from `HTTPClientTimeout` (`@privateaim/server-kit`), one value per kind of peer; a new client takes its peer's value, never an inline number.
+- hapic's timer keeps running while a body is read, so every call that streams a request or response body (`stream`, `upload`, `streamFiles`, `downloadResult`, the GitHub tarball) passes `timeout: 0`; `timeout.spec.ts` in core-http-kit and storage-kit fails when one does not. A timed-out call answers 504 `upstream_timeout` (`sanitizeError`) and is transient for the worker.
+- Every method of the four kits' `I*API` takes `options?: APIRequestOptions` (`{ signal, timeout }`) last and forwards it through the kit's `buildRequestConfig()`, spread after a stream's `timeout: 0` so a caller's timeout wins; `request-options.spec.ts` in each kit enumerates the sub-API methods and fails on one that drops it.
 
 ## Transport-level FakeClient
 

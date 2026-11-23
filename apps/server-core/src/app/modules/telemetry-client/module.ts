@@ -8,7 +8,7 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { APIClient } from '@privateaim/telemetry-kit';
-import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey } from '@privateaim/server-kit';
+import { AUTHUP_HOOK_MODULE_NAME, AuthupClientAuthenticationHookInjectionKey, HTTPClientTimeout } from '@privateaim/server-kit';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { TelemetryClientInjectionKey } from './constants.ts';
 
@@ -27,7 +27,7 @@ export class TelemetryClientModule implements IModule {
             return;
         }
 
-        const client = new APIClient({ baseURL: config.telemetryURL });
+        const client = new APIClient({ baseURL: config.telemetryURL, timeout: HTTPClientTimeout.SERVICE });
 
         const hookResult = container.tryResolve(AuthupClientAuthenticationHookInjectionKey);
 

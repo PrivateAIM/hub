@@ -12,9 +12,8 @@ export default defineConfig({
             name: 'FLAME Hub Telemetry API',
             securityDefinitions: {
                 bearer: {
-                    type: 'apiKey',
-                    name: 'Authorization',
-                    in: 'header',
+                    type: 'http',
+                    scheme: 'bearer',
                 },
                 basicAuth: {
                     type: 'http',

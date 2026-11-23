@@ -94,7 +94,7 @@ export default defineComponent({
             form.masterImageId = props.entity.id;
         }
 
-        Promise.try(() => manager.resolve());
+        Promise.resolve().then(() => manager.resolve());
 
         const v = useValidup(new MasterImagePickerValidator(), form, { detached: true });
 

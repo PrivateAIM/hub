@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Client as AuthupClient } from '@authup/core-http-kit';
 import { createAdminAccessToken } from '../authup-token.ts';
-import type { AuthupIntrospectionResult, AuthupProvisioning } from './types.ts';
+import type { AuthupIntrospectionResult, AuthupProvisioning, AuthupProvisioningOptions } from './types.ts';
 
 /**
  * Build the Authup provisioning payload for a service's test suite from the set of
@@ -18,16 +19,50 @@ import type { AuthupIntrospectionResult, AuthupProvisioning } from './types.ts';
  * service's permission set, which is what the (now enforcing) authorization
  * middleware evaluates via introspection.
  */
-export function buildAuthupProvisioning(permissionNames: string[]): AuthupProvisioning {
-    return { permissions: permissionNames.map((name) => ({ attributes: { name } })) };
+export function buildAuthupProvisioning(
+    permissionNames: string[],
+    options: AuthupProvisioningOptions = {},
+): AuthupProvisioning {
+    const provisioning: AuthupProvisioning = { permissions: permissionNames.map((name) => ({ attributes: { name } })) };
+
+    if (options.tokenExchange) {
+        // Merged onto the built-in `system` client (CLIENT_SYSTEM_ENABLED), which
+        // is opt-in for the exchange grant: the URN has to be listed, and the
+        // capability is replaced per audience on every boot.
+        provisioning.realms = [{
+            attributes: { name: 'master' },
+            strategy: { type: 'merge' },
+            relations: {
+                clients: [{
+                    attributes: {
+                        name: 'system',
+                        // literals: server-test-kit does not depend on @authup/specs
+                        grantTypes: 'client_credentials urn:ietf:params:oauth:grant-type:token-exchange',
+                    },
+                    strategy: { type: 'merge' },
+                    relations: {
+                        tokenExchangeCapabilities: [{
+                            attributes: options.tokenExchange,
+                            strategy: { type: 'replace' },
+                        }],
+                    },
+                }],
+            },
+        }];
+    }
+
+    return provisioning;
 }
 
 /**
  * Serialize the provisioning payload as an ES module with a `default` export,
  * the form Authup's `FileProvisioningSource` expects for `.mjs` files.
  */
-export function buildAuthupProvisioningModule(permissionNames: string[]): string {
-    return `export default ${JSON.stringify(buildAuthupProvisioning(permissionNames), null, 4)};\n`;
+export function buildAuthupProvisioningModule(
+    permissionNames: string[],
+    options: AuthupProvisioningOptions = {},
+): string {
+    return `export default ${JSON.stringify(buildAuthupProvisioning(permissionNames, options), null, 4)};\n`;
 }
 
 /**
@@ -57,23 +92,21 @@ export async function assertAuthupProvisioning(
     }
 
     const token = await createAdminAccessToken(baseURL);
+    const client = new AuthupClient({ baseURL });
 
-    const response = await fetch(new URL('token/introspect', baseURL), {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json',
-            authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ token }),
-    });
+    let body: AuthupIntrospectionResult;
 
-    if (!response.ok) {
+    try {
+        body = await client.token.introspect<AuthupIntrospectionResult>(
+            { token },
+            { authorizationHeader: { type: 'Bearer', token } },
+        );
+    } catch (e) {
         throw new Error(
-            `Authup token introspection failed (${response.status}) while verifying provisioning at ${baseURL}.`,
+            `Authup token introspection failed while verifying provisioning at ${baseURL}.`,
+            { cause: e },
         );
     }
-
-    const body: AuthupIntrospectionResult = await response.json();
 
     if (!body.active) {
         throw new Error(

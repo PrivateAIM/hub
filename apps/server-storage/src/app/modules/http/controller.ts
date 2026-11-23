@@ -67,7 +67,6 @@ export function createControllers(container: IContainer): Record<string, any>[] 
         }),
         new BucketFileController({
             service: bucketFileService,
-            bucketFileRepository,
             storage,
             logger,
         }),

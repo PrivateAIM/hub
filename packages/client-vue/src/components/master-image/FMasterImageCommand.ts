@@ -60,7 +60,7 @@ export default defineComponent({
                 emit('executed', props.command);
                 emit('updated', response);
             } catch (e) {
-                if (Error.isError(e)) {
+                if (e instanceof Error) {
                     emit('failed', e);
                 }
             }

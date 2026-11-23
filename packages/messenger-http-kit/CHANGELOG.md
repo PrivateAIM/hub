@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.18.0...v0.20.0) (2026-11-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* @privateaim/core-http-kit and @privateaim/messenger-http-kit no longer export isClientError or isClientErrorWithStatusCode; import them from hapic.
+* core-http-kit, storage-kit and telemetry-kit no longer export BaseAPIContext; their API classes extend hapic's BaseAPI.
+* All workspaces and service deployments now require Node.js >=26.0.0.
+* Node.js >=24.0.0 is required. Import forwarded error helpers from @ebec/core, theme helpers from @authup/client-web-kit-theme, and permission evaluator test helpers from @authup/server-test-kit instead of the PrivateAIM barrels.
+
+### Features
+
+* adopt hapic and routup features, keep plugin error statuses, handle aborts ([#2033](https://github.com/PrivateAIM/hub/issues/2033)) ([d702cee](https://github.com/PrivateAIM/hub/commit/d702cee7250ef0aa80f4b9b495e3d38d1e94b8fa))
+* authup beta.76, outbound timeouts, health probes and one-read post decisions ([#2026](https://github.com/PrivateAIM/hub/issues/2026)) ([3d27fe6](https://github.com/PrivateAIM/hub/commit/3d27fe670dd7c25423ded2c131220a5c64f54ac7))
+
+
+### Bug Fixes
+
+* align core-realtime-kit and messenger kits with release group ([070331d](https://github.com/PrivateAIM/hub/commit/070331dd3acb733d57ff7b3f6bc22d9b06e87f93))
+* **deps:** bump minorandpatch group and dev majors except typescript ([#1977](https://github.com/PrivateAIM/hub/issues/1977)) ([17d5922](https://github.com/PrivateAIM/hub/commit/17d5922db81fb29dc46c7b40133eb903e14596aa))
+
+
+### Build System
+
+* require Node 26 across workspaces and CI ([3b1989e](https://github.com/PrivateAIM/hub/commit/3b1989eb5bdb44ca91c95092d0de38f8d3700153))
+* upgrade eslint config to v3 and require Node 24 ([652d794](https://github.com/PrivateAIM/hub/commit/652d794c872bf59177512a2a8ad10f26bb5545f1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/messenger-kit bumped from ^0.18.0 to ^0.20.0
+  * peerDependencies
+    * @privateaim/messenger-kit bumped from ^0.18.0 to ^0.20.0
+
 ## [0.18.0](https://github.com/PrivateAIM/hub/compare/v0.17.1...v0.18.0) (2026-10-27)
 
 

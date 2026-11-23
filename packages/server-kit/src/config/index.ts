@@ -6,4 +6,5 @@
  */
 
 export * from './constants';
+export * from './trust-proxy';
 export * from './types';
