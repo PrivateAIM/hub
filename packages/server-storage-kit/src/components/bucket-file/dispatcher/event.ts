@@ -5,24 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentMetadata, RemoteDispatcherOptions } from 'hubwire';
+import type { RemoteDispatcherOptions } from 'hubwire';
 import { RemoteDispatcher } from 'hubwire';
-import {
-    BucketFileCommand,
-    BucketFileEventMessageBusRouting,
-} from '../constants';
-import type { BucketFileCreateCommandPayload, BucketFileDeleteCommandPayload } from '../handlers';
+import { BucketFileEventMessageBusRouting } from '../constants';
 
+/**
+ * Publishes bucket-file events (`BucketFileEvent`) onto the event routing.
+ * Commands go through `BucketFileTaskDispatcher`.
+ */
 export class BucketFileEventDispatcher extends RemoteDispatcher {
     constructor(options: Omit<RemoteDispatcherOptions, 'routing'>) {
         super({ ...options, routing: BucketFileEventMessageBusRouting });
-    }
-
-    async dispatchCreate(payload: BucketFileCreateCommandPayload, metadata: ComponentMetadata = {}): Promise<void> {
-        await this.dispatch(BucketFileCommand.CREATE, payload, metadata);
-    }
-
-    async dispatchDelete(payload: BucketFileDeleteCommandPayload, metadata: ComponentMetadata = {}): Promise<void> {
-        await this.dispatch(BucketFileCommand.DELETE, payload, metadata);
     }
 }
