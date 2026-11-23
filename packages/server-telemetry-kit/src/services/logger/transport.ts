@@ -24,7 +24,13 @@ export class LoggerTransport extends WinstonTransport {
     log(info: Record<PropertyKey, any>, next: () => void): any {
         const payload = this.normalizeInput(info);
 
+        // A failing sink must not surface as an unhandled rejection. 'warn'
+        // is winston-transport's non-fatal event; 'error' would throw
+        // without a listener, and logging the failure would loop.
         Promise.try(() => this.save(payload))
+            .catch((err: unknown) => {
+                this.emit('warn', err);
+            })
             .finally(() => next());
     }
 
