@@ -3,7 +3,7 @@
     "type": "module",
     "version": "0.20.0",
     "license": "Apache-2.0",
-    "description": "Shared test fakes and helpers for PrivateAIM server packages.",
+    "description": "Test fakes and Testcontainers helpers for FLAME Hub services: in-memory repositories, actors, Authup and databases.",
     "exports": {
         "./package.json": "./package.json",
         ".": {

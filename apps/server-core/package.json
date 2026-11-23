@@ -9,7 +9,7 @@
     },
     "license": "Apache-2.0",
     "version": "0.20.0",
-    "description": "This package contains the server core service.",
+    "description": "Core REST API of FLAME Hub for analyses, projects, nodes, registries and master images.",
     "main": "./dist/cli/index.mjs",
     "module": "./dist/index.mjs",
     "dependencies": {

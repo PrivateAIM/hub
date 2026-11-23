@@ -20,7 +20,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "Apache-2.0",
-    "description": "This package contains server side db helpers & utilities.",
+    "description": "Message bus contract of the FLAME Hub storage service: bucket and bucket-file commands, events and dispatchers.",
     "devDependencies": {
         "@privateaim/kit": "^0.20.0",
         "@privateaim/server-kit": "^0.20.0",

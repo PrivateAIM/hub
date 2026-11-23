@@ -1,49 +1,63 @@
+<div align="center">
+
+<a href="https://privateaim.de"><img src="./.github/assets/hero.svg" alt="FLAME Hub" width="128" height="128" /></a>
+
+<h1>FLAME Hub</h1>
+
+</div>
+
+[![CI](https://github.com/PrivateAIM/hub/actions/workflows/main.yml/badge.svg)](https://github.com/PrivateAIM/hub/actions/workflows/main.yml)
+[![CodeQL](https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml/badge.svg)](https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20701036.svg)](https://doi.org/10.5281/zenodo.20701036)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE)
+
+**Federated analytics across institutions. The data never moves.**
+
+A FLAME analysis is a container that travels to the data. Hub builds the analysis image, ships it to
+the nodes that joined a project, and collects the results, without ever seeing a row.
+
+[Why FLAME Hub?](#why-flame-hub) · [How it works](#how-it-works) · [Quick start](#quick-start) ·
+[Services](#services) · [Packages](#packages) · [Documentation](https://hub.docs.privateaim.net)
+
+---
+
+## Why FLAME Hub?
+
+Research on data from several hospitals or institutes usually starts by pooling it: every site signs a
+data transfer agreement, exports its records, and one place ends up holding all of them. That copy is the
+privacy risk, and many sites cannot make it at all.
+
+Institutions each run a **node** ([PrivateAIM/node](https://github.com/PrivateAIM/node)); Hub is the
+centre that decides what runs where. This monorepo is the central half: five backend services, a Nuxt
+frontend, 19 shared TypeScript libraries, and the documentation site.
+
+| Concern | Pooling the data centrally | FLAME Hub |
+|---|---|---|
+| **Where the data is** | Copied from every site into one store | Stays at each node; the analysis image comes to it, only results come back |
+| **Who agrees to take part** | Per-site agreements, tracked outside the system | Each node approves or rejects joining a project; analyses exist only in approved projects |
+| **What actually runs** | Scripts passed around, versions drift between sites | One image built from the code and a master image; every node approves that built image (hash, size, OS) before it is distributed, and a new build resets every approval |
+| **Getting it to the sites** | Manual copying or per-site deployment | Hub pushes the image to each node's project in the container registry; the node pulls and runs it |
+| **Identity** | Shared accounts or per-site credentials | Users, nodes and analyses authenticate through [Authup](https://authup.org) (OAuth2) |
+| **Following a run** | Ask each site | Node status and progress land in the core API; analysis logs are collected by the telemetry service |
+
 <p align="center">
-    <a href="https://privateaim.de"><img src="./.github/assets/hero.svg" alt="FLAME Hub" width="128" height="128" /></a>
+    <img src="./.github/assets/flow.svg" alt="The analysis code is uploaded to the hub. The worker builds a container image from it and a master image. Every node approves the built image, then the hub pushes it to each node's registry project. Each node pulls the image and runs it next to its own data, which never leaves the institution. Only results flow back to the hub's storage." width="100%" />
 </p>
-
-<h1 align="center">FLAME Hub</h1>
-
-<p align="center">
-    <b>Federated analytics across institutions. The data never moves.</b><br>
-    A FLAME analysis is a container that travels to the data. Hub builds the analysis image,<br>
-    ships it to the nodes that joined a project, and collects the results, without ever seeing a row.
-</p>
-
-<p align="center">
-    <a href="https://github.com/PrivateAIM/hub/actions/workflows/main.yml"><img src="https://github.com/PrivateAIM/hub/actions/workflows/main.yml/badge.svg" alt="CI" /></a>
-    <a href="https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml"><img src="https://github.com/PrivateAIM/hub/actions/workflows/codeql.yml/badge.svg" alt="CodeQL" /></a>
-    <img src="https://img.shields.io/badge/node-24-3c873a?logo=node.js&logoColor=fff" alt="node 24" />
-    <a href="https://doi.org/10.5281/zenodo.20701036"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.20701036.svg" alt="DOI" /></a>
-    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="license" /></a>
-</p>
-
-<p align="center">
-    <a href="https://hub.docs.privateaim.net"><b>Documentation</b></a>
-    ·
-    <a href="#quick-start">Quick start</a>
-    ·
-    <a href="#services">Services</a>
-    ·
-    <a href="#packages">Packages</a>
-    ·
-    <a href="./CONTRIBUTING.md">Contributing</a>
-</p>
-
-Institutions each run a **node** ([PrivateAIM/node](https://github.com/PrivateAIM/node)); Hub is
-the centre that decides what runs where. This monorepo is the central half: five backend services,
-a Nuxt frontend, 19 shared TypeScript libraries, and the documentation site.
 
 ## How it works
 
 1. **Project.** A researcher proposes a project and picks the nodes it should run on. Each node's
    institution approves or rejects taking part.
-2. **Analysis.** Within the project, the researcher uploads analysis code and picks a master
-   image. Each node approves the analysis again before its configuration is locked.
-3. **Build.** The worker builds a container image from the code and the master image and pushes
-   it to each node's project in the container registry.
-4. **Run.** Each node pulls the image and runs it next to its own data. Only results flow back to
-   Hub's storage; the data itself never leaves the institution.
+2. **Analysis.** Within the project, the researcher uploads analysis code, picks a master image and
+   locks the configuration.
+3. **Build.** The worker builds a container image from the code and the master image. The build does
+   not wait for approvals.
+4. **Approve.** Each node reviews the built image together with the code and approves or rejects it.
+   Distribution starts only once every node has approved; a new build or unlocking the configuration
+   resets the approvals.
+5. **Run.** Hub pushes the image to each node's project in the container registry. Each node pulls it
+   and runs it next to its own data. Only results flow back to Hub's storage; the data itself never
+   leaves the institution.
 
 📖 [Projects](https://hub.docs.privateaim.net/guide/user/projects.html) ·
 [Analyses](https://hub.docs.privateaim.net/guide/user/analyses.html) ·
@@ -63,7 +77,7 @@ npm run lint    # lint
 ```bash
 docker compose up -d                            # MySQL + Postgres only
 
-npm run dev --workspace=apps/server-core        # Core API
+npm run cli --workspace=apps/server-core -- start   # Core API (after npm run build)
 npm run dev --workspace=apps/client-ui          # Nuxt frontend
 npm run dev --workspace=docs                    # Documentation site
 ```
@@ -121,8 +135,8 @@ source to build a valid query.
 
 | Service | Responsibility |
 |---------|----------------|
-| [`server-core`](apps/server-core) | Main REST API — analyses, projects, nodes, registries |
-| [`server-core-worker`](apps/server-core-worker) | Background worker — Docker image build &amp; distribution |
+| [`server-core`](apps/server-core) | Main REST API: analyses, projects, nodes, registries |
+| [`server-core-worker`](apps/server-core-worker) | Background worker: Docker image build &amp; distribution |
 | [`server-storage`](apps/server-storage) | File and object storage, on MinIO / S3 or the filesystem |
 | [`server-telemetry`](apps/server-telemetry) | Log aggregation and events, backed by VictoriaLogs |
 | [`server-messenger`](apps/server-messenger) | Durable store-and-forward message broker |
@@ -173,7 +187,7 @@ Building blocks shared across the backend services.
 | Package | Responsibility | Version |
 |---------|----------------|---------|
 | [`client-vue`](packages/client-vue) | Vue 3 component library | [![npm][client-vue-badge]][client-vue-npm] |
-| [`client-vue-theme`](packages/client-vue-theme) | vuecs-based theme — design tokens and chrome | [![npm][client-vue-theme-badge]][client-vue-theme-npm] |
+| [`client-vue-theme`](packages/client-vue-theme) | vuecs-based theme: design tokens and chrome | [![npm][client-vue-theme-badge]][client-vue-theme-npm] |
 
 ## Built with
 
@@ -195,7 +209,7 @@ Before starting work on a pull request, please review the
 Created and maintained by [Peter Placzek](https://tada5hi.net) ([@tada5hi](https://github.com/tada5hi)),
 with contributions from the [PrivateAIM team](https://github.com/PrivateAIM/hub/graphs/contributors).
 
-If you use FLAME Hub in academic work, please cite it — citation metadata lives in
+If you use FLAME Hub in academic work, please cite it; citation metadata lives in
 [`CITATION.cff`](./CITATION.cff), which GitHub renders as a **"Cite this repository"** button.
 
 ## License

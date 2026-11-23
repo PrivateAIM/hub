@@ -9,7 +9,7 @@
         "email": "contact@tada5hi.net",
         "url": "https://tada5hi.net"
     },
-    "description": "This package contains the frontend application of the HUB Ecosystem.",
+    "description": "Nuxt 4 web application of FLAME Hub for projects, analyses, nodes and administration.",
     "scripts": {
         "dev": "nuxi dev",
         "build": "npm run build:js && npm run build:types",

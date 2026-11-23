@@ -20,7 +20,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "Apache-2.0",
-    "description": "This package contains the realtime application which connects the API with socket based clients.",
+    "description": "Socket.IO helpers for FLAME Hub services: a Redis-adapted server, Authup socket authentication and room subscriptions.",
     "dependencies": {
         "@authup/access": "^1.0.0-beta.76",
         "@authup/core-http-kit": "^1.0.0-beta.76",

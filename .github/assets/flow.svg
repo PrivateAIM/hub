@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" width="960" height="420" role="img" aria-labelledby="fl-title fl-desc">
+    <title id="fl-title">How an analysis travels to the data</title>
+    <desc id="fl-desc">The analysis code is uploaded to the hub. The worker builds a container image from it and a master image. Every node approves the built image, then the hub pushes it to each node's registry project. Each node pulls the image and runs it next to its own data, which never leaves the institution. Only results flow back to the hub's storage.</desc>
+
+    <style>
+        :root {
+            --fl-panel: #fdf7f3;
+            --fl-panel-edge: #ecd9cc;
+            --fl-card: #ffffff;
+            --fl-text: #2b1d16;
+            --fl-muted: #6b574b;
+            --fl-hub: #e2541f;
+            --fl-node: #0f7a8a;
+            --fl-result: #2f8a3e;
+            --fl-data: #5b6bb5;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --fl-panel: #1d1612;
+                --fl-panel-edge: #3d2d24;
+                --fl-card: #271e19;
+                --fl-text: #f3e8e1;
+                --fl-muted: #bfa99b;
+                --fl-hub: #f7813f;
+                --fl-node: #3fb8c8;
+                --fl-result: #5cc46c;
+                --fl-data: #8f9ce0;
+            }
+        }
+        .fl-panel { fill: var(--fl-panel); stroke: var(--fl-panel-edge); stroke-width: 1.5; }
+        .fl-card { fill: var(--fl-card); stroke-width: 1.5; }
+        .fl-hub { stroke: var(--fl-hub); }
+        .fl-node { stroke: var(--fl-node); }
+        .fl-result { stroke: var(--fl-result); }
+        .fl-h { font: 600 16px system-ui, -apple-system, 'Segoe UI', sans-serif; fill: var(--fl-text); }
+        .fl-t { font: 600 14px system-ui, -apple-system, 'Segoe UI', sans-serif; fill: var(--fl-text); }
+        .fl-s { font: 12px system-ui, -apple-system, 'Segoe UI', sans-serif; fill: var(--fl-muted); }
+        .fl-n { font: 700 12px system-ui, -apple-system, 'Segoe UI', sans-serif; }
+        .fl-arrow { fill: none; stroke-width: 2; }
+    </style>
+
+    <defs>
+        <marker id="fl-ah-hub" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0L10 5L0 10z" style="fill: var(--fl-hub)" />
+        </marker>
+        <marker id="fl-ah-result" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0L10 5L0 10z" style="fill: var(--fl-result)" />
+        </marker>
+    </defs>
+
+    <!-- Hub panel -->
+    <rect class="fl-panel" x="16" y="16" width="568" height="388" rx="14" />
+    <text class="fl-h" x="36" y="48">FLAME Hub</text>
+    <text class="fl-s" x="128" y="48">sees code, images and results, never a data row</text>
+
+    <!-- Step cards -->
+    <g>
+        <rect class="fl-card fl-hub" x="36" y="76" width="120" height="104" rx="10" />
+        <text class="fl-n" x="50" y="100" style="fill: var(--fl-hub)">1</text>
+        <text class="fl-t" x="64" y="100">Upload</text>
+        <text class="fl-s" x="50" y="128">analysis code</text>
+        <text class="fl-s" x="50" y="146">into the CODE</text>
+        <text class="fl-s" x="50" y="164">bucket</text>
+    </g>
+    <g>
+        <rect class="fl-card fl-hub" x="176" y="76" width="120" height="104" rx="10" />
+        <text class="fl-n" x="190" y="100" style="fill: var(--fl-hub)">2</text>
+        <text class="fl-t" x="204" y="100">Build</text>
+        <text class="fl-s" x="190" y="128">worker builds</text>
+        <text class="fl-s" x="190" y="146">an image on a</text>
+        <text class="fl-s" x="190" y="164">master image</text>
+    </g>
+    <g>
+        <rect class="fl-card fl-hub" x="316" y="76" width="120" height="104" rx="10" />
+        <text class="fl-n" x="330" y="100" style="fill: var(--fl-hub)">3</text>
+        <text class="fl-t" x="344" y="100">Approve</text>
+        <text class="fl-s" x="330" y="128">every node</text>
+        <text class="fl-s" x="330" y="146">reviews the</text>
+        <text class="fl-s" x="330" y="164">built image</text>
+    </g>
+    <g>
+        <rect class="fl-card fl-hub" x="456" y="76" width="112" height="104" rx="10" />
+        <text class="fl-n" x="470" y="100" style="fill: var(--fl-hub)">4</text>
+        <text class="fl-t" x="484" y="100">Distribute</text>
+        <text class="fl-s" x="470" y="128">push to each</text>
+        <text class="fl-s" x="470" y="146">node's registry</text>
+        <text class="fl-s" x="470" y="164">project</text>
+    </g>
+
+    <path class="fl-arrow" d="M156 128H174" style="stroke: var(--fl-hub)" marker-end="url(#fl-ah-hub)" />
+    <path class="fl-arrow" d="M296 128H314" style="stroke: var(--fl-hub)" marker-end="url(#fl-ah-hub)" />
+    <path class="fl-arrow" d="M436 128H454" style="stroke: var(--fl-hub)" marker-end="url(#fl-ah-hub)" />
+
+    <!-- Result card -->
+    <g>
+        <rect class="fl-card fl-result" x="36" y="252" width="532" height="128" rx="10" />
+        <text class="fl-n" x="50" y="278" style="fill: var(--fl-result)">6</text>
+        <text class="fl-t" x="64" y="278">Collect results</text>
+        <text class="fl-s" x="50" y="306">Nodes upload what the analysis returns into the RESULT bucket</text>
+        <text class="fl-s" x="50" y="324">of server-storage. Hub stores the output, not the input: the</text>
+        <text class="fl-s" x="50" y="342">records the analysis ran on stay at each institution.</text>
+    </g>
+
+    <!-- Nodes panel -->
+    <rect class="fl-panel" x="616" y="16" width="328" height="388" rx="14" />
+    <text class="fl-h" x="636" y="48">Nodes</text>
+    <text class="fl-s" x="690" y="48">one per institution</text>
+
+    <g>
+        <rect class="fl-card fl-node" x="636" y="70" width="288" height="96" rx="10" />
+        <text class="fl-n" x="650" y="96" style="fill: var(--fl-node)">5</text>
+        <text class="fl-t" x="664" y="96">Node A runs the image</text>
+        <text class="fl-s" x="650" y="122">pulls it from its registry project</text>
+        <text class="fl-s" x="650" y="142">and runs it next to local data</text>
+        <g transform="translate(878 106)">
+            <ellipse cx="16" cy="0" rx="16" ry="5" fill="none" style="stroke: var(--fl-data)" stroke-width="1.5" />
+            <path d="M0 0V26A16 5 0 0 0 32 26V0" fill="none" style="stroke: var(--fl-data)" stroke-width="1.5" />
+            <path d="M0 13A16 5 0 0 0 32 13" fill="none" style="stroke: var(--fl-data)" stroke-width="1.5" />
+        </g>
+    </g>
+    <g>
+        <rect class="fl-card fl-node" x="636" y="182" width="288" height="96" rx="10" />
+        <text class="fl-n" x="650" y="208" style="fill: var(--fl-node)">5</text>
+        <text class="fl-t" x="664" y="208">Node B runs the image</text>
+        <text class="fl-s" x="650" y="234">the data never leaves</text>
+        <text class="fl-s" x="650" y="254">the institution</text>
+        <g transform="translate(878 218)">
+            <ellipse cx="16" cy="0" rx="16" ry="5" fill="none" style="stroke: var(--fl-data)" stroke-width="1.5" />
+            <path d="M0 0V26A16 5 0 0 0 32 26V0" fill="none" style="stroke: var(--fl-data)" stroke-width="1.5" />
+            <path d="M0 13A16 5 0 0 0 32 13" fill="none" style="stroke: var(--fl-data)" stroke-width="1.5" />
+        </g>
+    </g>
+    <g>
+        <rect class="fl-card fl-node" x="636" y="294" width="288" height="86" rx="10" />
+        <text class="fl-n" x="650" y="320" style="fill: var(--fl-node)">5</text>
+        <text class="fl-t" x="664" y="320">Node N …</text>
+        <text class="fl-s" x="650" y="346">same image, its own data</text>
+        <g transform="translate(878 326)">
+            <ellipse cx="16" cy="0" rx="16" ry="5" fill="none" style="stroke: var(--fl-data)" stroke-width="1.5" />
+            <path d="M0 0V26A16 5 0 0 0 32 26V0" fill="none" style="stroke: var(--fl-data)" stroke-width="1.5" />
+            <path d="M0 13A16 5 0 0 0 32 13" fill="none" style="stroke: var(--fl-data)" stroke-width="1.5" />
+        </g>
+    </g>
+
+    <!-- Image out, results back -->
+    <path class="fl-arrow" d="M568 120C600 120 604 118 634 118" style="stroke: var(--fl-hub)" marker-end="url(#fl-ah-hub)" />
+    <path class="fl-arrow" d="M568 136C604 140 600 228 634 228" style="stroke: var(--fl-hub)" marker-end="url(#fl-ah-hub)" />
+    <path class="fl-arrow" d="M568 150C610 160 596 334 634 334" style="stroke: var(--fl-hub)" marker-end="url(#fl-ah-hub)" />
+    <path class="fl-arrow" d="M634 360C604 360 600 330 570 330" style="stroke: var(--fl-result)" stroke-dasharray="6 4" marker-end="url(#fl-ah-result)" />
+</svg>

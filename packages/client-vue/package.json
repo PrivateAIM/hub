@@ -3,7 +3,7 @@
     "type": "module",
     "version": "0.20.0",
     "license": "Apache-2.0",
-    "description": "This package contains vue components.",
+    "description": "Vue 3 components for FLAME Hub: lists, forms and detail views for analyses, projects, nodes, registries and files.",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
     "style": "./dist/style.css",

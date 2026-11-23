@@ -20,7 +20,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "Apache-2.0",
-    "description": "This package contains common constants, functions, types, ... for the server side.",
+    "description": "Shared foundation of the FLAME Hub services: DI modules, startup, health, logging, message bus, cache and Authup.",
     "scripts": {
         "build:js": "rimraf ./dist && tsdown",
         "build:types": "tsc --noEmit -p tsconfig.build.json",

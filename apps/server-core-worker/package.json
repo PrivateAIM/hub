@@ -18,7 +18,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "Apache-2.0",
-    "description": "This project contains the core worker service.",
+    "description": "Background worker of FLAME Hub that builds and distributes analysis and master images with Docker.",
     "scripts": {
         "lint": "eslint --ext .ts src/",
         "lint:fix": "npm run lint -- --fix",

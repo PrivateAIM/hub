@@ -20,7 +20,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "Apache-2.0",
-    "description": "This package contains server side db helpers & utilities.",
+    "description": "Send FLAME Hub logs and audit events to server-telemetry: Winston transport, entity event handler and dispatchers.",
     "dependencies": {
         "hubwire": "^0.2.3",
         "smob": "^1.6.2",

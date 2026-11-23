@@ -2,7 +2,7 @@
     "name": "@privateaim/client-vue-theme",
     "type": "module",
     "version": "0.20.0",
-    "description": "PrivateAIM theme for vuecs components, built on top of @vuecs/theme-tailwind.",
+    "description": "Tailwind CSS v4 theme for FLAME Hub clients: design tokens, light and dark chrome, cards and a vuecs theme.",
     "license": "Apache-2.0",
     "exports": {
         "./package.json": "./package.json",

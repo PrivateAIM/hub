@@ -18,7 +18,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "Apache-2.0",
-    "description": "This package contains the realtime application which connects the API with socket based clients.",
+    "description": "Durable store-and-forward message broker of FLAME Hub, with REST send, pull and ack and a push wakeup.",
     "dependencies": {
         "@authup/core-kit": "^1.0.0-beta.76",
         "@authup/kit": "^1.0.0-beta.76",

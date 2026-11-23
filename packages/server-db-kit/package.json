@@ -20,7 +20,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "Apache-2.0",
-    "description": "This package contains server side db helpers & utilities.",
+    "description": "TypeORM helpers for FLAME Hub services: UTC-pinned options, boot locks, a tagged read cache and event subscribers.",
     "dependencies": {
         "@authup/kit": "^1.0.0-beta.76",
         "@privateaim/kit": "^0.20.0",

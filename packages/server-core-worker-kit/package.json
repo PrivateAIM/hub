@@ -3,7 +3,7 @@
     "type": "module",
     "version": "0.20.0",
     "license": "Apache-2.0",
-    "description": "",
+    "description": "Command and event contracts between the FLAME Hub core service and its background worker.",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "files": [

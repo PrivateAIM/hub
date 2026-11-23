@@ -3,7 +3,7 @@
     "type": "module",
     "version": "0.20.0",
     "license": "Apache-2.0",
-    "description": "",
+    "description": "HTTP client for the FLAME Hub messenger broker: send, pull and ack messages, woken by an SSE stream.",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "files": [

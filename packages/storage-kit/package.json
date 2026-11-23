@@ -3,7 +3,7 @@
     "type": "module",
     "version": "0.20.0",
     "license": "Apache-2.0",
-    "description": "",
+    "description": "Bucket and file types, capability tokens and a typed HTTP client for the FLAME Hub storage service.",
     "exports": {
         "./package.json": "./package.json",
         ".": {
