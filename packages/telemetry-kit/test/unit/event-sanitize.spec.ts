@@ -6,6 +6,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
+import { EventScope } from '../../src/domains/event/constants';
 import { EventValidator, sanitizeEventData } from '../../src/domains/event/validator';
 
 describe('sanitizeEventData', () => {
@@ -39,9 +40,9 @@ describe('sanitizeEventData', () => {
 describe('EventValidator client-controlled bounds', () => {
     const validator = new EventValidator();
     const base = {
-        refType: 'project', 
-        scope: 'entity', 
-        name: 'created', 
+        refType: 'project',
+        scope: EventScope.ENTITY,
+        name: 'created',
     };
 
     // A bound that THROWS does not drop the field — EventComponentCreateHandler
@@ -69,6 +70,7 @@ describe('EventValidator client-controlled bounds', () => {
     });
 
     it('still rejects producer-controlled vocabulary', async () => {
+        // @ts-expect-error 'model' is outside EventScope on purpose
         await expect(validator.run({ ...base, scope: 'model' })).rejects.toThrow();
     });
 });

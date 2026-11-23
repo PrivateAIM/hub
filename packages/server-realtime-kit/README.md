@@ -98,15 +98,12 @@ only when the last subscription is gone, so two views subscribing to the same ro
 | `createServer` | function | Socket.IO server with optional Redis adapter |
 | `mountAuthorizationMiddleware`, `createAuthorizationMiddleware`, `AuthorizationMiddlewareRegistrationOptions` | functions, type | Authup handshake authentication |
 | `mountLoggingMiddleware` | function | Debug logs of connects, disconnects and namespace errors |
-| `mountForceLoggedInMiddleware` | function | See [Notes](#notes) |
+| `mountForceLoggedInMiddleware` | function | Refuses a socket without an identity with `UnauthorizedError`; mount it after the authorization middleware |
 | `isSocketAuthenticated`, `subscribeSocketRoom`, `unsubscribeSocketRoom` | functions | Socket helpers |
 | `Server`, `Namespace`, `Socket`, `Middleware`, `SocketData`, `SocketIdentity` | types | Socket.IO types bound to Hub's `SocketData` |
 
 ## Notes
 
-- **`mountForceLoggedInMiddleware` refuses authenticated sockets.** Its check is inverted: it lets a socket without an identity
-  through and rejects one with an identity. No Hub service mounts it; use `mountAuthorizationMiddleware`, which already refuses
-  unauthenticated connections.
 - **Both Redis clients or none.** The adapter needs a publish and a subscribe client; passing only one logs a warning and
   leaves broadcasts local to the replica.
 

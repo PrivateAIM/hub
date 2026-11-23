@@ -122,8 +122,8 @@ The package also exports the command and event names server-telemetry handles (`
 
 - **Silence the telemetry routings.** Without `TELEMETRY_SILENT_MESSAGE_BUS_ROUTINGS` in `silentRoutings`, publishing a log line
   writes a bus log line, which the transport publishes again.
-- **Catch errors in `save`.** The transport calls Winston's `next()` once `save` settles, but does not catch a rejection: a
-  `save` that throws becomes an unhandled promise rejection.
+- **A failing `save` emits `warn`, nothing else.** The transport catches the rejection, emits it as the transport's `warn`
+  event and calls Winston's `next()`; the entry is lost. Listen on `warn` if you need to know.
 - **Credentials and timestamps never enter a diff.** Keys matching `EVENT_DATA_SECRET_KEY_REGEX` (`password`, `secret`, `hash`,
   `token`, `credential`) are skipped, as are `createdAt`, `updatedAt` and `expiresAt`. The timestamp list is explicit: a new
   timestamp column appears in diffs until it is added to that list.

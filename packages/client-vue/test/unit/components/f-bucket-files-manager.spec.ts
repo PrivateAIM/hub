@@ -6,6 +6,7 @@
  */
 
 import { flushPromises } from '@vue/test-utils';
+import type { ComponentPublicInstance } from 'vue';
 import { fakeResponse } from '@privateaim/core-http-kit/testing';
 import { describe, expect, it } from 'vitest';
 import { FBucketFileDownload } from '../../../src/components/bucket-file/FBucketFileDownload';
@@ -21,7 +22,6 @@ function isMintBody(input: unknown): input is { cap: string[] } {
     return typeof input === 'object' && input !== null && 'cap' in input && Array.isArray(input.cap);
 }
 
-type UploadVM = { tempFiles: { file: File, path: string }[], upload(): Promise<void> };
 
 function mountManager() {
     return mountClientVueComponent(
@@ -72,7 +72,7 @@ describe('FBucketFilesManager', () => {
         wrapper.vm.add();
         await flushPromises();
 
-        const upload = wrapper.findComponent<UploadVM>(FBucketFilesUpload);
+        const upload = wrapper.findComponent(FBucketFilesUpload);
 
         expect(upload.exists()).toBe(true);
 
@@ -158,7 +158,8 @@ describe('FBucketFilesManager', () => {
 
         await flushPromises();
 
-        const files = wrapper.findComponent<{ delete(id: string): Promise<void> }>(FBucketFiles);
+        // `delete` is exposed via expose(), which the inferred component type does not carry.
+        const files = wrapper.findComponent<ComponentPublicInstance & { delete(id: string): Promise<void> }>(FBucketFiles);
         const deleteMints = () => coreClient.requests
             .filter((r) => r.method === 'POST' && isMintBody(r.body) && r.body.cap[0] === `bucket:${BUCKET_ID}:delete`);
 

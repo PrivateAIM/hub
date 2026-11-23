@@ -39,7 +39,8 @@ export class CryptoAsymmetricAlgorithm {
             this.keyPair = await crypto.subtle.generateKey(
                 this.algorithm,
                 true,
-                ['deriveKey'],
+                // sealMessage/openMessage derive the shared secret with deriveBits.
+                ['deriveBits', 'deriveKey'],
             );
 
             return this.keyPair;

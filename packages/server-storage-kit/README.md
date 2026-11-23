@@ -129,9 +129,8 @@ The payload types are exported individually:
   uploaded while the clear ran is not in it and stays in the bucket.
 - **`BucketFileCommand.CREATE` carries a stream.** Its `data` is a Node.js `Readable`, so server-storage handles it in-process
   during an upload and publishes only the resulting events. Do not send it through `BucketFileTaskDispatcher`.
-- **`BucketFileEventDispatcher` publishes onto the event routing.** Its `dispatchCreate` / `dispatchDelete` helpers send the
-  `create` / `delete` command keys onto `storageBucketFileEvents`, which no consumer handles. Use its generic `dispatch()` with a
-  `BucketFileEvent` key.
+- **`BucketFileEventDispatcher` publishes events only.** It has no command helpers; publish with its generic `dispatch()` and a
+  `BucketFileEvent` key. Commands go through `BucketFileTaskDispatcher`.
 
 ## Contributing
 

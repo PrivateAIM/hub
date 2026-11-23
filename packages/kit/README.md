@@ -198,10 +198,9 @@ buildDomainNamespaceName('realm-id'); // '/resources:realm-id'
 
 ## Notes
 
-- **ECDH key pairs from `CryptoAsymmetricAlgorithm` cannot seal directly.** `generateKeyPair()` grants only the
-  `deriveKey` usage, while `sealMessage()` and `openMessage()` call `deriveBits` and reject with
-  `baseKey does not have deriveBits usage`. Export the private key with `exportAsymmetricPrivateKey()` and import it
-  with `importAsymmetricPrivateKey()`, whose default usages include `deriveBits`.
+- **A key used by `sealMessage()` / `openMessage()` needs the `deriveBits` usage.** `CryptoAsymmetricAlgorithm` and
+  `importAsymmetricPrivateKey()` grant it by default; a key you generate or import yourself with only `deriveKey`
+  rejects with `baseKey does not have deriveBits usage`.
 - **`detectProxyConnectionConfig()` needs a full URL.** It returns `undefined` unless the proxy URL carries protocol,
   user name, password and port.
 - **`MONTH_IN_MS` is four weeks**, not a calendar month.

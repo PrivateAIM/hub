@@ -7,6 +7,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+    CryptoAsymmetricAlgorithm,
     exportAsymmetricPrivateKey,
     exportAsymmetricPublicKey,
     importAsymmetricPrivateKey,
@@ -135,5 +136,24 @@ describe('crypto/message', () => {
         });
 
         expect(decode(opened)).toBe('pem round-trip');
+    });
+
+    it('should seal and open with key pairs from CryptoAsymmetricAlgorithm', async () => {
+        const sender = await new CryptoAsymmetricAlgorithm(ECDH_PARAMS).generateKeyPair();
+        const recipient = await new CryptoAsymmetricAlgorithm(ECDH_PARAMS).generateKeyPair();
+
+        const payload = await sealMessage({
+            privateKey: sender.privateKey,
+            publicKey: recipient.publicKey,
+            data: 'generated keys',
+        });
+
+        const opened = await openMessage({
+            privateKey: recipient.privateKey,
+            publicKey: sender.publicKey,
+            payload,
+        });
+
+        expect(decode(opened)).toBe('generated keys');
     });
 });
