@@ -14,7 +14,7 @@ import type { LoggerTransport } from '../types';
 export class LoggerConsoleTransport extends transports.Console {
     constructor(options: TransportStreamOptions = {}) {
         super({
-            level: read('env') === EnvironmentName.PRODUCTION ?
+            level: read('NODE_ENV') === EnvironmentName.PRODUCTION ?
                 'info' :
                 'debug',
             ...options,
