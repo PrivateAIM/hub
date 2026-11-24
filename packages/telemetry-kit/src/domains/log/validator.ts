@@ -8,7 +8,7 @@
 import { createValidator } from '@validup/zod';
 import { TypedContainer } from '@privateaim/kit';
 import zod from 'zod';
-import { LogChannel, LogLevel } from './constants';
+import { LOG_MESSAGE_MAX_LENGTH, LogChannel, LogLevel } from './constants';
 import type { LogInput } from './types';
 
 export class LogValidator extends TypedContainer<LogInput> {
@@ -32,7 +32,7 @@ export class LogValidator extends TypedContainer<LogInput> {
                 zod
                     .string()
                     .min(3)
-                    .max(4096),
+                    .max(LOG_MESSAGE_MAX_LENGTH),
             ),
         );
 
