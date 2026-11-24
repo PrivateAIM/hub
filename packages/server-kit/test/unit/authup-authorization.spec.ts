@@ -8,6 +8,7 @@
 import type { AuthorizationCatalog } from '@authup/access';
 import { BuiltInPolicyType, definePolicyData, isPermissionError } from '@authup/access';
 import { Client } from '@authup/core-http-kit';
+import { AuthorizationCatalogCache } from '@authup/server-kit/core';
 import { MemoryTransport } from 'hapic';
 import { describe, expect, it } from 'vitest';
 import { createAuthupPermissionEvaluator, resolveAuthupPolicySubject } from '../../src/authup/authorization.ts';
@@ -22,6 +23,7 @@ const catalog: AuthorizationCatalog = {
     }],
     policies: { binding: { type: 'permissionBinding' }, restricted: { type: 'attributes', query: { name: 'allowed' } } },
 };
+const cacheOf = (client: Client) => new AuthorizationCatalogCache({ read: () => client.authorization.get() });
 const identity = {
     id: '00000000-0000-4000-8000-000000000001',
     type: 'user' as const,
@@ -43,7 +45,7 @@ describe('Authup authorization catalog', () => {
                 },
             }),
         });
-        const evaluator = await createAuthupPermissionEvaluator(client, {
+        const evaluator = await createAuthupPermissionEvaluator(cacheOf(client), {
             identity,
             grants: [{
                 name: 'node_update',
@@ -65,10 +67,37 @@ describe('Authup authorization catalog', () => {
         expect(requests).toBe(1);
     });
 
+    it('reads the catalog once for evaluators created from one cache within maxAge', async () => {
+        let requests = 0;
+        const client = new Client({
+            baseURL: 'http://authup.test',
+            transport: new MemoryTransport({
+                fetch: () => {
+                    requests += 1;
+
+                    return { status: 200, body: catalog };
+                },
+            }),
+        });
+        const cache = cacheOf(client);
+        const grants = [{ name: 'node_update', realm_scope: 'any' as const }];
+
+        const first = await createAuthupPermissionEvaluator(cache, { identity, grants });
+        const second = await createAuthupPermissionEvaluator(cache, { identity, grants });
+
+        await expect(first.preEvaluate({ name: 'node_update' })).resolves.toBeUndefined();
+        await expect(second.preEvaluate({ name: 'node_update' })).resolves.toBeUndefined();
+        expect(requests).toBe(1);
+
+        // Negative control: a separate cache reads again.
+        await createAuthupPermissionEvaluator(cacheOf(client), { identity, grants });
+        expect(requests).toBe(2);
+    });
+
     it('fails closed when the catalog cannot be loaded', async () => {
         const client = new Client({ baseURL: 'http://authup.test', transport: new MemoryTransport({ fetch: () => ({ status: 403 }) }) });
 
-        await expect(createAuthupPermissionEvaluator(client, { identity, grants: [] })).rejects.toThrow();
+        await expect(createAuthupPermissionEvaluator(cacheOf(client), { identity, grants: [] })).rejects.toThrow();
     });
 
     describe('policy subject', () => {
@@ -90,7 +119,7 @@ describe('Authup authorization catalog', () => {
 
             expect(subject.identity).toEqual({ ...identity, clientId: null });
 
-            const evaluator = await createAuthupPermissionEvaluator(client(), subject);
+            const evaluator = await createAuthupPermissionEvaluator(cacheOf(client()), subject);
 
             await expect(evaluator.preEvaluate({ name: 'node_update' })).resolves.toBeUndefined();
         });
@@ -104,7 +133,7 @@ describe('Authup authorization catalog', () => {
 
             expect(subject).toEqual({ identity: { ...identity, clientId: null }, grants: [] });
 
-            const evaluator = await createAuthupPermissionEvaluator(client(), subject);
+            const evaluator = await createAuthupPermissionEvaluator(cacheOf(client()), subject);
             // A permission DENIAL specifically (answered 403), not just any
             // throw: a TypeError or validation error here would answer 500.
             const error = await evaluator.preEvaluate({ name: 'node_update' }).then(() => undefined, (e: unknown) => e);
@@ -132,14 +161,14 @@ describe('Authup authorization catalog', () => {
                 transport: new MemoryTransport({ fetch: () => ({ status: 200, body: identityCatalog }) }),
             });
 
-            const evaluator = await createAuthupPermissionEvaluator(identityClient, resolveAuthupPolicySubject(token('openid')));
+            const evaluator = await createAuthupPermissionEvaluator(cacheOf(identityClient), resolveAuthupPolicySubject(token('openid')));
 
             await expect(evaluator.evaluate({ name: 'user_only' })).resolves.toBeUndefined();
 
             // Negative control: the same definition denies a client identity,
             // so the pass above is the identity being read, not a vacuous allow.
             const clientEvaluator = await createAuthupPermissionEvaluator(
-                identityClient,
+                cacheOf(identityClient),
                 resolveAuthupPolicySubject(token('openid', 'client')),
             );
             const error = await clientEvaluator.evaluate({ name: 'user_only' }).then(() => undefined, (e: unknown) => e);

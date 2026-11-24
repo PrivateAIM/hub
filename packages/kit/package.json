@@ -29,20 +29,20 @@
         "test": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts"
     },
     "devDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.76",
-        "@authup/kit": "^1.0.0-beta.76",
+        "@authup/core-kit": "^1.0.0-beta.77",
+        "@authup/kit": "^1.0.0-beta.77",
         "cross-env": "^10.1.0",
         "unplugin-swc": "^2.0.0",
-        "vitest": "^5.1.0"
+        "vitest": "^5.1.1"
     },
     "peerDependencies": {
-        "@authup/core-kit": "^1.0.0-beta.76",
-        "@authup/kit": "^1.0.0-beta.76"
+        "@authup/core-kit": "^1.0.0-beta.77",
+        "@authup/kit": "^1.0.0-beta.77"
     },
     "dependencies": {
         "nanoid": "^6.0.2",
         "pathtrace": "^2.2.3",
-        "validup": "^2.0.1"
+        "validup": "^2.0.2"
     },
     "gitHead": "5d3b6f4ce1edf2383bdfbf66e913a08c8a3a2e40",
     "publishConfig": {

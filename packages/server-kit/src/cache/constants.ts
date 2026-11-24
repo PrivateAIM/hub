@@ -14,8 +14,8 @@ export const TAGGED_CACHE_MODULE_NAME = 'taggedCache';
 export const TaggedCacheInjectionKey = new TypedToken<ITaggedCache>('TaggedCache');
 
 /**
- * How long an entry lives, and how long reads bypass the cache after a
- * lost invalidation (authup/authup#3688).
+ * How long an entry lives. A lost invalidation stays pending in the
+ * `TaggedCache` for this long plus 5 s (tada5hi/rapiq#993).
  */
 export const TAGGED_CACHE_TTL = 60_000;
 

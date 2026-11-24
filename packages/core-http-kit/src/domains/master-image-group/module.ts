@@ -12,6 +12,7 @@ import { BaseAPI } from 'hapic';
 
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { IMasterImageGroupAPI } from './types';
 
 export class MasterImageGroupAPI extends BaseAPI implements IMasterImageGroupAPI {
@@ -33,7 +34,7 @@ export class MasterImageGroupAPI extends BaseAPI implements IMasterImageGroupAPI
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<MasterImageGroup>> {
         const response = await this.client.get(
-            `master-image-groups/${id}${buildQueryString(record)}`,
+            `master-image-groups/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 
@@ -44,7 +45,7 @@ export class MasterImageGroupAPI extends BaseAPI implements IMasterImageGroupAPI
         id: MasterImageGroup['id'],
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<MasterImageGroup>> {
-        const response = await this.client.delete(`master-image-groups/${id}`, buildRequestConfig(options));
+        const response = await this.client.delete(`master-image-groups/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response.data;
     }

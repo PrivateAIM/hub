@@ -36,7 +36,8 @@ export default defineEventHandler((event) => {
         throw createError({ statusCode: 404, statusMessage: 'Not Found' });
     }
 
-    const { storageUrl } = useRuntimeConfig(event);
+    const runtimeConfig = useRuntimeConfig(event);
+    const storageUrl = runtimeConfig.storageUrl || runtimeConfig.public.storageUrl;
 
     // Streams chunk-by-chunk and preserves Content-Disposition, so the browser
     // downloads through its own download manager instead of the tab buffering

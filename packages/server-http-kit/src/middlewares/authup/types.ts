@@ -31,11 +31,30 @@ export type AuthTokenVerifierCreateContext = {
      */
     client: AuthTokenVerifierClientContext,
     /**
-     * The result cache. Defaults to Redis when `redisClient` is set, else
-     * process memory.
+     * The result cache. Build it with `createAuthupTokenCache`, which runs a
+     * Redis cache on a dedicated bounded client. Default: process memory.
      */
     cache?: ITokenCache,
-    redisClient?: RedisClient,
+};
+
+export type AuthupTokenCacheCreateInput = {
+    /**
+     * The service's Redis client. The cache runs on a duplicate of it; the
+     * client itself is left as it is.
+     */
+    redis?: RedisClient,
+    /**
+     * Called with each error of the dedicated client.
+     */
+    onError?: (error: Error) => void,
+};
+
+export type AuthupTokenCacheCreateResult = {
+    cache: ITokenCache,
+    /**
+     * Disconnects the dedicated Redis client. Call it on teardown.
+     */
+    dispose: () => void,
 };
 
 export type AuthCapabilityTokenVerifierCreateContext = {

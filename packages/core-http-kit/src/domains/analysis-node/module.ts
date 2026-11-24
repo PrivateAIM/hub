@@ -11,6 +11,7 @@ import type { AnalysisNode } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { AnalysisNodeCreatePayload, AnalysisNodeUpdatePayload, IAnalysisNodeAPI } from './types';
 
 export class AnalysisNodeAPI extends BaseAPI implements IAnalysisNodeAPI {
@@ -32,7 +33,7 @@ export class AnalysisNodeAPI extends BaseAPI implements IAnalysisNodeAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisNode>> {
         const { data: response } = await this.client.get(
-            `analysis-nodes/${id}${buildQueryString(record)}`,
+            `analysis-nodes/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 
@@ -40,7 +41,7 @@ export class AnalysisNodeAPI extends BaseAPI implements IAnalysisNodeAPI {
     }
 
     async delete(id: AnalysisNode['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<AnalysisNode>> {
-        const { data: response } = await this.client.delete(`analysis-nodes/${id}`, buildRequestConfig(options));
+        const { data: response } = await this.client.delete(`analysis-nodes/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response;
     }
@@ -50,7 +51,7 @@ export class AnalysisNodeAPI extends BaseAPI implements IAnalysisNodeAPI {
         data: AnalysisNodeUpdatePayload,
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisNode>> {
-        const { data: response } = await this.client.post(`analysis-nodes/${id}`, data, buildRequestConfig(options));
+        const { data: response } = await this.client.post(`analysis-nodes/${encodePathSegment(id)}`, data, buildRequestConfig(options));
 
         return response;
     }

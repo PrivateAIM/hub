@@ -22,11 +22,11 @@ applies. Part of the [FLAME Hub](https://github.com/PrivateAIM/hub) monorepo.
 ## Installation
 
 ```bash
-npm install @privateaim/telemetry-kit @privateaim/kit hapic @rapiq/core @rapiq/codec-url @authup/core-kit @authup/kit
+npm install @privateaim/telemetry-kit @privateaim/kit hapic @rapiq/core @rapiq/codec-url @authup/core-http-kit @authup/core-kit @authup/kit
 ```
 
 The package is ESM only and needs Node.js `>=26.0.0`. `@privateaim/kit`, `hapic`, `@rapiq/core`, `@rapiq/codec-url`,
-`@authup/core-kit` and `@authup/kit` are peer dependencies; `validup`, `@validup/zod` and `zod` come along as dependencies.
+`@authup/core-http-kit`, `@authup/core-kit` and `@authup/kit` are peer dependencies; `validup`, `@validup/zod` and `zod` come along as dependencies.
 
 ## Usage
 

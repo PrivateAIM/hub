@@ -16,15 +16,16 @@ import type {
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { AnalysisCreatePayload, AnalysisUpdatePayload, IAnalysisAPI } from './types';
 
 export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
     getResultDownloadPath(id: Analysis['id']): string {
-        return `analyses/${id}/result/download`;
+        return `analyses/${encodePathSegment(id)}/result/download`;
     }
 
     getFilesDownloadPath(id: Analysis['id']): string {
-        return `analyses/${id}/files/download`;
+        return `analyses/${encodePathSegment(id)}/files/download`;
     }
 
     async getMany(
@@ -45,7 +46,7 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Analysis>> {
         const { data: response } = await this.client.get(
-            `analyses/${id}${buildQueryString(record)}`,
+            `analyses/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 
@@ -53,7 +54,7 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
     }
 
     async delete(id: Analysis['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<Analysis>> {
-        const { data: response } = await this.client.delete(`analyses/${id}`, buildRequestConfig(options));
+        const { data: response } = await this.client.delete(`analyses/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response;
     }
@@ -64,7 +65,7 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Analysis>> {
         const { data: response } = await this.client.post(
-            `analyses/${id}`,
+            `analyses/${encodePathSegment(id)}`,
             nullifyEmptyObjectProperties(data),
             buildRequestConfig(options),
         );
@@ -89,7 +90,7 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Analysis>> {
         const { data: response } = await this.client.post(
-            `analyses/${id}/command`,
+            `analyses/${encodePathSegment(id)}/command`,
             {
                 command,
                 ...data,
@@ -106,7 +107,7 @@ export class AnalysisAPI extends BaseAPI implements IAnalysisAPI {
         options?: APIRequestOptions,
     ): Promise<AnalysisStorageToken> {
         const { data: response } = await this.client.post(
-            `analyses/${id}/storage/token`,
+            `analyses/${encodePathSegment(id)}/storage/token`,
             data,
             buildRequestConfig(options),
         );

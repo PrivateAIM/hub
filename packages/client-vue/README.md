@@ -105,7 +105,7 @@ import { FAnalyses, FEntityDelete, FProjectForm } from '@privateaim/client-vue';
 | Registry | `RegistryList`, `RegistryForm`, `RegistrySetup`, `RegistryCleanup`, `RegistryProjectList`, `RegistryProjectDetails`, `RegistryProjectForm` |
 | Master image | `FMasterImages`, `FMasterImage`, `FMasterImageCard`, `FMasterImagePicker`, `FMasterImageCommand`, `MasterImageGroupList` |
 | Event and log | `FEvents`, `FEvent`, `FEventActor`, `FEventRef`, `FEventExpiring`, `FLogs`, `FLog`, `FLogsRefresh` |
-| Utility | `FEntityDelete`, `FProcessStatus`, `FDisplayName`, `FContentAction`, `FSegments`, `FProgressBar`, `FTranslation`, `FItemToggle`, `LoginForm` |
+| Utility | `FEntityDelete`, `FProcessStatus`, `FDisplayName`, `FContentAction`, `FProgressBar`, `FTranslation`, `FItemToggle`, `LoginForm` |
 
 The registry, master-image-group and login components are exported without the `F` prefix; `components: true` registers every
 component under its export name.

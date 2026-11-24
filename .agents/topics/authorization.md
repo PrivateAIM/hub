@@ -4,11 +4,9 @@ Read before changing permission checks, read scoping, record reach, socket subsc
 
 ## Authorization catalog
 
-HTTP and socket middleware fetch `GET /authorization` once per authenticated
-request/connection with the service Authup client; `createAuthupPermissionEvaluator`
-(`server-kit/src/authup/authorization.ts`, wrapping `@authup/access`'s
-`createAuthorizationEvaluator`) combines it with the caller's complete introspection
-grants and identity.
+HTTP and socket middleware read `GET /authorization` with the service Authup client;
+`createAuthupPermissionEvaluator` (`server-kit/src/authup/authorization.ts`) combines it
+with the caller's complete introspection grants and identity.
 
 - Never flatten grants to permission names: that loses definition policies, junction
   policies and realm reach.
@@ -17,8 +15,10 @@ grants and identity.
   otherwise, so every permission denies with 403). Identity-based checks (credential
   ownership, messenger mailbox, bucket ownership, socket rooms) still see the real
   caller. Same rule as authup#3723.
+- The catalog is cached per process for 60 s through authup's `AuthorizationCatalogCache`
+  (one per middleware): a policy edit applies within 60 s; a stale catalog is re-read once.
 - The service credential needs `permission_read` at `ownOrNull` or wider. Fetch failures
-  propagate; there is no cross-request catalog cache and no name-only fallback.
+  propagate; there is no name-only fallback.
 - Every authup error keeps authup's code and status (`HubError.status`): denial 403,
   dead bearer 401, throttle 429, upstream failure 502; a stale catalog is 500.
 
@@ -27,7 +27,9 @@ grants and identity.
 `createAuthupTokenVerifier` (`server-http-kit/src/middlewares/authup/token-verifier.ts`)
 takes one `client` (`{ id, secret, realm }`) and builds from it both the client-credentials
 token creator, so vouchly's `TokenVerifier` runs in remote mode (introspection), and the
-namespace of its result cache (Redis, else memory, kept until the token's `exp`):
+namespace of its result cache (`cache`, else memory, kept until the token's `exp`; each
+HTTP module builds it with `createAuthupTokenCache`, a duplicate of the service Redis client
+with authup's bounded `REDIS_TOKEN_CACHE_CLIENT_OPTIONS`, and disconnects it on teardown):
 `authup:remote:<baseURL>:client:<realm>:<id>`. The namespace names the introspecting
 client because authup answers `active: false` to a client without `token_introspect`
 reach into the token's realm; services share entries only when they introspect as the
@@ -43,11 +45,11 @@ cached entry on rollout.
 - **No `AUTHUP_URL` → `UnconfiguredTokenVerifier`** (refuses every token, 401).
   beta.70's `TokenVerifier` constructor throws without a base URL, so constructing it
   directly crashes boot.
-- **An Authup outage answers 502, never 401.** vouchly reports any failed introspection
-  request (unreachable, 5xx, 429, refused service credential, failed mint) as
-  `invalid_token`; `IntrospectableTokenVerifier` rethrows it as `upstream_error` (502),
-  so client hooks do not drop a session over an outage. A judged token (inactive,
-  expired) stays 401.
+- **An Authup outage answers 502, never 401.** authup's `TokenVerifier` answers any failed
+  introspection or `/jwks` request (unreachable, 5xx, 429, refused service credential,
+  failed mint) with an `UpstreamError` (502) and a timeout with `UpstreamTimeoutError`
+  (504), so client hooks do not drop a session over an outage; hub adds no wrapper. A
+  judged token (inactive, expired, an introspection 400) stays 401.
 
 The evaluator enforces only the data a call supplies: a service using only
 `preEvaluate` has only a pre-gate.
@@ -55,7 +57,7 @@ The evaluator enforces only the data a call supplies: a service using only
 `scopeReadQuery(query, actor, { names, compile?, realmAttributeName? })`
 (`server-kit/src/core/query/scope.ts`):
 
-- Pre-evaluates a one-of of the entity's read and write/manage names; holding none is
+- Delegates to `@authup/access`'s `scopeReadQuery`, which pre-evaluates a one-of of the entity's read and write/manage names; holding none is
   403. Holding a write implies read; there is no self-service fallback, by decision.
 - Takes the entity `schema` and returns a `ReadScope { query, post, names }`, lowering
   `compile()`: `allow` → unchanged, `conditional` → AND-appended, `deny` →

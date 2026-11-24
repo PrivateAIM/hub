@@ -12,6 +12,7 @@ import type {
     ObjectLiteral,
     SaveOptions,
 } from 'typeorm';
+import { isRowLockSupported } from 'typeorm-extension';
 
 /**
  * Read one row under a write lock, let `fn` check and mutate it, and save it —
@@ -47,7 +48,7 @@ export async function updateLockedEntity<T extends ObjectLiteral>(
     return dataSource.transaction(async (manager) => {
         const entity = await manager.findOne(target, {
             where,
-            ...(dataSource.options.type === 'better-sqlite3' ? {} : { lock: { mode: 'pessimistic_write' } }),
+            ...(isRowLockSupported(manager) ? { lock: { mode: 'pessimistic_write' } } : {}),
         });
 
         if (!entity || !fn(entity)) {

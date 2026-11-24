@@ -13,7 +13,6 @@ import {
     it,
 } from 'vitest';
 import { QueryCache } from '@privateaim/server-db-kit';
-import { TAGGED_CACHE_TTL } from '@privateaim/server-kit';
 import { DataSource } from 'typeorm';
 import { DataSourceOptionsBuilder } from '../../../../src/app/modules/database/index.ts';
 import { AnalysisRepositoryAdapter } from '../../../../src/app/modules/database/repositories/analysis/repository.ts';
@@ -67,7 +66,6 @@ describe('core/query analysis include=masterImage', () => {
         const repository = new AnalysisRepositoryAdapter(dataSource, new QueryCache({
             dataSource, 
             registry: schemaRegistry, 
-            ttl: TAGGED_CACHE_TTL, 
         }));
 
         const { data } = await repository.findMany(query);
@@ -86,7 +84,6 @@ describe('core/query analysis include=masterImage', () => {
         const repository = new AnalysisRepositoryAdapter(dataSource, new QueryCache({
             dataSource, 
             registry: schemaRegistry, 
-            ttl: TAGGED_CACHE_TTL, 
         }));
 
         const { data } = await repository.findMany(query);

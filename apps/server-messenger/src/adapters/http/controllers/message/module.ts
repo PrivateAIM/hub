@@ -17,6 +17,7 @@ import { WakeupEventName } from '@privateaim/messenger-kit';
 import { ForceLoggedInMiddleware, buildActorContext } from '@privateaim/server-http-kit';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DGet,
@@ -51,6 +52,7 @@ export class MessageController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async send(
         @DBody() data: SendMessageRequest,
@@ -73,6 +75,7 @@ export class MessageController {
     }
 
     @DPost('/ack', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async ack(
         @DBody() data: MessageAckRequest,

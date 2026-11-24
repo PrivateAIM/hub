@@ -32,8 +32,8 @@ export function mountErrorMiddleware(app: App, options: ErrorMiddlewareOptions =
     app.use(defineErrorHandler((error, event) => {
         // routup wraps a thrown error as the cause of its AppError; an error
         // routup or a plugin raised itself (invalid JSON 400, body limit 413,
-        // handler timeout 408) carries its options bag as cause instead, and
-        // must keep its own status.
+        // content type 415, handler timeout 408) has no error cause and
+        // keeps its own status.
         const source = Error.isError(error.cause) ? error.cause : error;
         const next: HubError = sanitizeError(source);
 

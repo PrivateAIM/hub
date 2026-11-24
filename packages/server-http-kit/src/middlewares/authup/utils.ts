@@ -6,7 +6,7 @@
  */
 
 import { OAuth2SubKind, OAuth2TokenKind, unwrapOAuth2Scope } from '@authup/specs';
-import type { IClient } from '@authup/core-http-kit';
+import type { IAuthorizationCatalogCache } from '@authup/server-kit/core';
 import { UnauthorizedError } from '@privateaim/errors';
 import type { CapabilityEntry } from '@privateaim/kit';
 import { isObject, parseCapabilityEntries } from '@privateaim/kit';
@@ -171,11 +171,11 @@ export function buildRequestCapability(
 export async function applyTokenVerificationData(
     event: IAppEvent,
     data: TokenVerificationDataMinimal,
-    authupClient: IClient,
+    catalogCache: IAuthorizationCatalogCache,
 ) {
     const scopes = unwrapOAuth2Scope(data.scope || []);
 
-    const permissionEvaluator = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject(data));
+    const permissionEvaluator = await createAuthupPermissionEvaluator(catalogCache, resolveAuthupPolicySubject(data));
 
     setRequestEnv(event, 'permissionEvaluator', permissionEvaluator);
 

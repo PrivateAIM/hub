@@ -18,7 +18,7 @@ import type { Node } from '@privateaim/core-kit';
 import { describe, expect, it } from 'vitest';
 import { nodeSchema } from '../../../../src/core/entities/node/schema.ts';
 import { decodeQuery } from '../../../../src/core/query/index.ts';
-import { appendQueryConditions } from '@privateaim/server-kit';
+import { appendQueryConditions } from '@authup/access';
 
 // `appendQueryConditions` is how a server-derived scope (route realm, owner)
 // becomes part of a decoded query. The contract these tests pin: the appended

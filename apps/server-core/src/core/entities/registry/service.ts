@@ -15,9 +15,9 @@ import {
 } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, IEntityRepository } from '@privateaim/server-kit';
+import { appendQueryConditions } from '@authup/access';
 import {
     AbstractEntityService,
-    appendQueryConditions,
     findManyScoped,
     scopeReadQuery,
 } from '@privateaim/server-kit';

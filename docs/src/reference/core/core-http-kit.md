@@ -339,5 +339,6 @@ All dependencies are peer dependencies:
 
 - `@privateaim/core-kit`, `@privateaim/kit`, `@privateaim/telemetry-kit` — Domain types
 - `@authup/core-kit`, `@authup/kit` — Authup types
+- `@authup/core-http-kit` — `encodePathSegment`, which refuses an empty, `.` or `..` id and percent-encodes every other one into a single path segment
 - `hapic` — HTTP client base; every sub-API extends hapic's `BaseAPI`
 - `@rapiq/core`, `@rapiq/codec-url` — Query parameter building

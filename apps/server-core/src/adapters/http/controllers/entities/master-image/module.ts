@@ -9,6 +9,7 @@ import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
 import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DDelete,
@@ -60,6 +61,7 @@ export class MasterImageController {
     }
 
     @DPost('/command', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async runCommand(
         @DBody() data: {

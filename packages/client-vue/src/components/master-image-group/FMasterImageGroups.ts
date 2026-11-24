@@ -27,7 +27,7 @@ export default defineComponent({
             setup: ctx,
         });
 
-        setDefaults({ noMore: { content: 'No more master-image-groups available...' } });
+        setDefaults({ noMore: { content: 'No master image groups yet' } });
 
         return () => render();
     },

@@ -9,6 +9,7 @@ import type { RegistryAPICommand } from '@privateaim/core-kit';
 import { ServiceID } from '@privateaim/core-kit';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DPost,
@@ -40,6 +41,7 @@ export class ServiceController {
     }
 
     @DPost('/:id/hook', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async handleHarborHook(
         @DContext() event: IAppEvent,
@@ -57,6 +59,7 @@ export class ServiceController {
     }
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async execHarborTask(
         @DContext() event: IAppEvent,

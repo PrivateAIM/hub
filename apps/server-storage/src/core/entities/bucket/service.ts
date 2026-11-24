@@ -17,8 +17,12 @@ import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@pr
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { toBucketName } from '../../utils/bucket-name.ts';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
-import { evaluateRecord, evaluateRecordUpdate } from '@authup/access';
+import { AbstractEntityService } from '@privateaim/server-kit';
+import {
+    appendQueryConditions,
+    evaluateRecord,
+    evaluateRecordUpdate,
+} from '@authup/access';
 import { decodeQuery } from '../../query/index.ts';
 import type { IBucketDispatcher, IBucketRepository, IBucketService } from './types.ts';
 import { bucketSchema } from './schema.ts';

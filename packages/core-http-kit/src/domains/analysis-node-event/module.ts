@@ -11,6 +11,7 @@ import type { AnalysisNodeEvent } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { IAnalysisNodeEventAPI } from './types';
 
 export class AnalysisNodeEventAPI extends BaseAPI implements IAnalysisNodeEventAPI {
@@ -32,7 +33,7 @@ export class AnalysisNodeEventAPI extends BaseAPI implements IAnalysisNodeEventA
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisNodeEvent>> {
         const { data: response } = await this.client.get(
-            `analysis-node-events/${id}${buildQueryString(record)}`,
+            `analysis-node-events/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 

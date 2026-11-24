@@ -45,7 +45,7 @@ export default defineComponent({
         setDefaults({
             item: { textPropName: 'virtualPath' },
 
-            noMore: { content: 'No more master-images available...' },
+            noMore: { content: 'No master images yet' },
         });
 
         return () => render();

@@ -225,7 +225,7 @@ export default defineComponent({
                 },
             },
 
-            noMore: { content: `No more ${props.target} available...` },
+            noMore: { content: props.target === DomainType.NODE ? 'No nodes yet' : 'No analyses yet' },
         });
 
         return () => render();

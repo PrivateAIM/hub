@@ -11,6 +11,7 @@ import type { Node } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type {
     INodeAPI,
     NodeClientCredentials,
@@ -32,7 +33,7 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
         record?: EntityQueryInput<Node>,
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Node>> {
-        const response = await this.client.get(`nodes/${id}${buildQueryString(record)}`, buildRequestConfig(options));
+        const response = await this.client.get(`nodes/${encodePathSegment(id)}${buildQueryString(record)}`, buildRequestConfig(options));
 
         return response.data;
     }
@@ -45,7 +46,7 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
 
     async update(id: Node['id'], data: NodeUpdatePayload, options?: APIRequestOptions): Promise<EntityRecordResponse<Node>> {
         const response = await this.client.post(
-            `nodes/${id}`,
+            `nodes/${encodePathSegment(id)}`,
             nullifyEmptyObjectProperties(data),
             buildRequestConfig(options),
         );
@@ -54,7 +55,7 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
     }
 
     async delete(id: Node['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<Node>> {
-        const response = await this.client.delete(`nodes/${id}`, buildRequestConfig(options));
+        const response = await this.client.delete(`nodes/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response.data;
     }
@@ -65,13 +66,13 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
         data: Record<string, any>,
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Node>> {
-        const response = await this.client.post(`nodes/${id}/task`, { task, ...data }, buildRequestConfig(options));
+        const response = await this.client.post(`nodes/${encodePathSegment(id)}/task`, { task, ...data }, buildRequestConfig(options));
 
         return response.data;
     }
 
     async getClientCredentials(id: Node['id'], options?: APIRequestOptions): Promise<NodeClientCredentials> {
-        const response = await this.client.get(`nodes/${id}/client/credentials`, buildRequestConfig(options));
+        const response = await this.client.get(`nodes/${encodePathSegment(id)}/client/credentials`, buildRequestConfig(options));
 
         return response.data;
     }
@@ -87,7 +88,7 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
         options?: APIRequestOptions,
     ): Promise<NodeClientCredentials> {
         const response = await this.client.post(
-            `nodes/${id}/client/credentials`,
+            `nodes/${encodePathSegment(id)}/client/credentials`,
             data ?? {},
             buildRequestConfig(options),
         );
@@ -101,7 +102,7 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
      * node's own client without holding any management permission.
      */
     async getRegistryCredentials(id: Node['id'], options?: APIRequestOptions): Promise<NodeRegistryCredentials> {
-        const response = await this.client.get(`nodes/${id}/registry/credentials`, buildRequestConfig(options));
+        const response = await this.client.get(`nodes/${encodePathSegment(id)}/registry/credentials`, buildRequestConfig(options));
 
         return response.data;
     }

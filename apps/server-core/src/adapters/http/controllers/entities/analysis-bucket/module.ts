@@ -13,6 +13,7 @@ import type {
 } from '@privateaim/core-http-kit';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DDelete,
@@ -66,6 +67,7 @@ export class AnalysisBucketController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(201)
     async add(
         @DBody() data: AnalysisBucketCreatePayload,
@@ -78,6 +80,7 @@ export class AnalysisBucketController {
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async edit(
         @DPath('id') id: string,

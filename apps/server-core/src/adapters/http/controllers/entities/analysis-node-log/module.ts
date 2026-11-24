@@ -14,6 +14,7 @@ import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { BadRequestError } from '@privateaim/errors';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DDelete,
@@ -105,6 +106,7 @@ export class AnalysisNodeLogController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async add(
         @DBody() body: Partial<AnalysisNodeLog>,

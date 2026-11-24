@@ -234,7 +234,7 @@ const module = new EntityEventModule({
 | `createAuthupClientTokenCreator(ctx)` / `createAuthupUserTokenCreator(ctx)` | Token creators (client credentials or password grant) for an Authup client hook, bounded by `HTTPClientTimeout.AUTHUP` |
 | `exchangeAuthupToken(ctx, input)` | RFC 8693 token exchange as the acting client, for a capability token (`{ token, expiresIn }`) |
 | `resolveAuthupPolicySubject(data)` | The policy subject of an introspected token: always its identity, its grants only when the scope includes `global` |
-| `createAuthupPermissionEvaluator(client, subject)` | An `IPermissionEvaluator` from one authorization catalog read |
+| `createAuthupPermissionEvaluator(cache, subject)` | An `IPermissionEvaluator` over an `AuthorizationCatalogCache` (`@authup/server-kit/core`) |
 | `isIntrospectableToken(token)` / `assertIntrospectableToken(token)` | Compact-JWS shape and length guard run before introspection |
 | `AuthupClient`, `AuthupClientModule`, `AuthupHookModule` | The Authup HTTP client and its DI wiring |
 
@@ -252,12 +252,10 @@ const scope = await scopeReadQuery(query, actor, { names: ['node_read'], schema:
 const { data, meta } = await findManyScoped(repository, scope, actor);
 ```
 
-- `scopeReadQuery` pre-gates the read permissions (any of `names`, a missing grant throws) and lowers the caller's reach onto the
+- `scopeReadQuery` runs authup's `scopeReadQuery` (`@authup/access`), which pre-gates the read permissions (any of `names`, a missing grant throws) and lowers the caller's reach onto the
   query: unchanged for `allow`, the compiled condition AND-appended for `conditional`, matching nothing for `deny`. For `post` (a
   grant policy that does not lower) the query stays unnarrowed and `findManyScoped` decides each row by evaluation on one read,
   widening the projection for the check and trimming it again. `compile: false` skips the reach for global catalogs.
-- `appendQueryConditions(query, ...conditions)` AND-wraps server-derived conditions onto a decoded query, so a client filter on the
-  same field intersects with them instead of replacing them.
 - `describeQuerySchema(schema, parameters?)` serializes a rapiq schema into the `SchemaDescription` controllers publish under
   `meta.schema`; pass `RECORD_QUERY_PARAMETERS` on single-record reads. See
   [query capability discovery](https://hub.docs.privateaim.net/guide/development/api.html#query-capability-discovery).
@@ -292,7 +290,7 @@ The deadline covers dispatch and reading the response body, so a call that strea
 | Cache | `TaggedCacheModule`, `TaggedCacheInjectionKey`, `createTaggedCache`, `throttle`, `TAGGED_CACHE_TTL`, `TAGGED_CACHE_CONNECT_TIMEOUT`, `TAGGED_CACHE_ERROR_LOG_INTERVAL` |
 | Entity events | `EntityEventModule`, `EntityEventPublisher`, `EntityEventPublisherInjectionKey`, `EntityEventRedisHandler`, `EntityEventSocketHandler`, `buildEntityEventRedisChannel` |
 | Authup | see [Authup](#authup) |
-| Core | `IEntityRepository`, `ActorContext`, `AbstractEntityService`, `scopeReadQuery`, `findManyScoped`, `appendQueryConditions`, `describeQuerySchema`, `RECORD_QUERY_PARAMETERS`, `collectRootFilterValues`, `widenReadProjection`, `trimReadProjection` |
+| Core | `IEntityRepository`, `ActorContext`, `AbstractEntityService`, `scopeReadQuery`, `findManyScoped`, `describeQuerySchema`, `RECORD_QUERY_PARAMETERS`, `collectRootFilterValues`, `widenReadProjection`, `trimReadProjection` |
 | Misc | `HTTPClientTimeout`, `ObjectLiteral`, `hasOwnProperty` |
 
 ## Notes

@@ -18,6 +18,7 @@ import { LogFlag } from '@privateaim/telemetry-kit';
 import type { BucketFileEventDispatcher } from '@privateaim/server-storage-kit';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DDelete,
@@ -204,6 +205,7 @@ export class BucketController {
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async update(
         @DPath('id') id: string,
@@ -217,6 +219,7 @@ export class BucketController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(201)
     async add(
         @DBody() data: BucketCreatePayload,

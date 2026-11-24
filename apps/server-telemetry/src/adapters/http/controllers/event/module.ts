@@ -7,6 +7,7 @@
 
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DDelete,
@@ -42,6 +43,7 @@ export class EventController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(201)
     async create(
         @DBody() data: Partial<Event>,

@@ -14,11 +14,14 @@ import {
     isHex,
 } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
-import { evaluateRecord, evaluateRecordUpdate } from '@authup/access';
+import {
+    appendQueryConditions,
+    evaluateRecord,
+    evaluateRecordUpdate,
+} from '@authup/access';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import {
     AbstractEntityService,
-    appendQueryConditions,
     findManyScoped,
     scopeReadQuery,
 } from '@privateaim/server-kit';

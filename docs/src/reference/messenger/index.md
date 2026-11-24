@@ -28,8 +28,8 @@ docker run -e ... ghcr.io/privateaim/hub messenger cli start
 - **Authup** — OAuth2 identity provider (token validation on REST + socket connect).
   **Mandatory**: without it every request and socket connection is rejected as
   unauthenticated (401). The service's own client (`CLIENT_ID`) must hold
-  `permission_read` — each authenticated request and socket connection reads
-  Authup's authorization catalog (`GET /authorization`). See
+  `permission_read` — authenticated requests and socket connections read
+  Authup's authorization catalog (`GET /authorization`, cached for 60 seconds). See
   [Configuration — Authup is mandatory for server-messenger](/guide/deployment/configuration#server-messenger-authenticates-against-authup).
 
 ## REST API

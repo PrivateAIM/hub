@@ -22,11 +22,11 @@ instead of hand-built requests against the storage API. Part of the [FLAME Hub](
 ## Installation
 
 ```bash
-npm install @privateaim/storage-kit @privateaim/kit hapic @rapiq/core @rapiq/codec-url @authup/core-kit
+npm install @privateaim/storage-kit @privateaim/kit hapic @rapiq/core @rapiq/codec-url @authup/core-http-kit @authup/core-kit
 ```
 
-The package is ESM only and needs Node.js `>=26.0.0`. `@privateaim/kit`, `hapic`, `@rapiq/core`, `@rapiq/codec-url` and
-`@authup/core-kit` are peer dependencies.
+The package is ESM only and needs Node.js `>=26.0.0`. `@privateaim/kit`, `hapic`, `@rapiq/core`, `@rapiq/codec-url`,
+`@authup/core-http-kit` and `@authup/core-kit` are peer dependencies.
 
 ## Usage
 
