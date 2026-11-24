@@ -84,16 +84,6 @@ export async function packDockerContainerWithTarStream(
         extract.on('error', fail);
 
         extract.on('entry', (headers, stream, callback) => {
-            // streamx re-throws an 'error' that has no listener as an
-            // uncaughtException, which kills the worker before the caller can
-            // remove its container. Both this entry stream and the pack sink
-            // below are destroyed on the failure paths — the error itself is
-            // surfaced through `fail`, so these listeners only need to exist.
-            // This one is NOT the handler further down: it has to be registered
-            // before the `validateEntry` catch returns early, which is a path
-            // that handler never reaches.
-            stream.on('error', () => { /* surfaced through fail */ });
-
             if (options.onEntryPackStarted) {
                 options.onEntryPackStarted(headers);
             }
@@ -162,6 +152,10 @@ export async function packDockerContainerWithTarStream(
                 },
             );
 
+            // streamx re-throws an 'error' without a listener as an
+            // uncaughtException, which kills the worker. The failure itself
+            // surfaces through `fail`. tar-stream (>= 3.3) guards the
+            // extract entry streams itself, not the pack sink.
             entry.on('error', () => { /* surfaced through fail */ });
 
             stream.on('data', (chunk) => {
