@@ -23,7 +23,7 @@ export default defineComponent({
             query: { sorts: { name: 'ASC' } },
         });
 
-        setDefaults({ noMore: { content: 'No more nodes available...' } });
+        setDefaults({ noMore: { content: 'No nodes yet' } });
 
         return () => render();
     },

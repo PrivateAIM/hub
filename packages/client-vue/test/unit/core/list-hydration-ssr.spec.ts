@@ -79,7 +79,7 @@ describe('core/list hydration (server)', () => {
         expect(coreClient.requests).toHaveLength(1);
         // The render finished rather than aborting on the rejection — it just
         // shipped the empty-list chrome.
-        expect(html).toContain('No more analyses available...');
+        expect(html).toContain('No analyses yet');
 
         // An adopted snapshot SUPPRESSES the client's own load, so recording
         // what a failed load left behind strands the list on an empty result

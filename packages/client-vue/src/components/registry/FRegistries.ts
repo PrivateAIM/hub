@@ -22,7 +22,7 @@ export default defineComponent({
             setup,
         });
 
-        setDefaults({ noMore: { content: 'No more registries available...' } });
+        setDefaults({ noMore: { content: 'No registries yet' } });
 
         return () => render();
     },

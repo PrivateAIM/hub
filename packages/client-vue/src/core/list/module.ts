@@ -15,8 +15,10 @@ import {
     VCListItem,
     VCListLoading,
 } from '@vuecs/list';
+import { VCEmptyState } from '@vuecs/elements';
 import { VCIcon } from '@vuecs/icon';
 import type { FiltersBuildInput, QueryBuildInput, SortsBuildInput } from '@rapiq/core';
+import { isCondition } from '@rapiq/core';
 import type { Ref, VNodeArrayChildren, VNodeChild } from 'vue';
 import {
     Fragment,
@@ -72,6 +74,12 @@ export function createListRaw<
     const busy = ref(false);
     const total = ref(0);
     const meta = ref({ pagination: { limit: 10 } }) as Ref<ListMeta<RECORD>>;
+
+    // Whether the last completed load was called with filters of its own (a
+    // search, e.g. FSearch's `or(contains(…))`), as opposed to only the page's
+    // scoping query. Read before `queryFilters` runs, which adds scoping
+    // filters to the same bag. Picks the empty state's `noResults` variant.
+    const searched = ref(false);
 
     const realmId = computed<string | undefined>(
         () => {
@@ -158,6 +166,10 @@ export function createListRaw<
         let drained = false;
 
         try {
+            const searching = pinned ?
+                searched.value :
+                !!input.filters && (isCondition(input.filters) || Object.keys(input.filters).length > 0);
+
             if (context.queryFilters) {
                 const filters = (input.filters || {}) as FiltersBuildInput<Entity<RECORD>>;
 
@@ -223,6 +235,7 @@ export function createListRaw<
             }
 
             total.value = response.meta.total;
+            searched.value = searching;
 
             meta.value.total = response.meta.total;
             meta.value.pagination = {
@@ -573,7 +586,20 @@ export function createListRaw<
                 !busy.value &&
                 total.value === 0
             ) {
-                const noMoreVNode = renderChrome(EntityListSlotName.NO_MORE, noMoreOpt, 'vc-list-no-more', false);
+                // String content is an empty-state title. A search that
+                // matched nothing gets the generic `noResults` copy instead:
+                // "No analyses yet" would misreport a narrowed result. The
+                // `noResults` variant defaults a Reset button the list has no
+                // handler for, hence the empty `actionLabel`.
+                let noMoreVNode: VNodeChild | null;
+
+                if (!slots[EntityListSlotName.NO_MORE] && typeof noMoreOpt?.content === 'string') {
+                    noMoreVNode = searched.value ?
+                        h(VCEmptyState, { variant: 'noResults', actionLabel: '' }) :
+                        h(VCEmptyState, { variant: 'empty', title: noMoreOpt.content });
+                } else {
+                    noMoreVNode = renderChrome(EntityListSlotName.NO_MORE, noMoreOpt, 'vc-list-no-more', false);
+                }
 
                 if (noMoreVNode) {
                     children.push(noMoreVNode);
