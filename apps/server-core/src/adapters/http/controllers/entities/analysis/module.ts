@@ -20,6 +20,7 @@ import type {
 } from '@privateaim/core-http-kit';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DDelete,
@@ -78,6 +79,7 @@ export class AnalysisController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(201)
     async add(
         @DBody() data: AnalysisCreatePayload,
@@ -90,6 +92,7 @@ export class AnalysisController {
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async edit(
         @DPath('id') id: string,
@@ -103,6 +106,7 @@ export class AnalysisController {
     }
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async doTask(
         @DPath('id') id: string,
@@ -117,6 +121,7 @@ export class AnalysisController {
 
     // A credential endpoint: the response is flat, not a { data, meta } envelope.
     @DPost('/:id/storage/token', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     async mintStorageToken(
         @DPath('id') id: string,
         @DBody() data: AnalysisStorageTokenCreatePayload,

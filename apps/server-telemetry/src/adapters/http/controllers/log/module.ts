@@ -13,6 +13,7 @@ import type {
 } from '@privateaim/telemetry-kit';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DDelete,
@@ -36,6 +37,7 @@ export class LogController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(201)
     async create(
         @DBody() body: LogInput,
