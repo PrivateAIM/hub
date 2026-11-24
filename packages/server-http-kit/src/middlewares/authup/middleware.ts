@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IClient } from '@authup/core-http-kit';
 import type { ITokenVerifier } from '@authup/server-adapter-kit';
 import { extractBearerToken } from '@authup/server-adapter-kit';
+import type { IAuthorizationCatalogCache } from '@authup/server-kit/core';
+import { AuthorizationCatalogCache } from '@authup/server-kit/core';
 import { OAuth2TokenKind } from '@authup/specs';
 import { UnauthorizedError } from '@privateaim/errors';
 import { useRequestCookie } from '@routup/basic/cookie';
@@ -37,7 +38,7 @@ async function applyIdentityToken(
     event: IAppEvent,
     token: string,
     tokenVerifier: ITokenVerifier,
-    authupClient: IClient,
+    catalogCache: IAuthorizationCatalogCache,
 ) {
     // A caller that went away stops the introspection round trip too.
     const data = await tokenVerifier.verify(token, { signal: event.signal });
@@ -48,7 +49,7 @@ async function applyIdentityToken(
         throw new UnauthorizedError('Only an access token identifies a caller.');
     }
 
-    await applyTokenVerificationData(event, data, authupClient);
+    await applyTokenVerificationData(event, data, catalogCache);
 
     setRequestEnv(event, 'token', token);
 }
@@ -96,6 +97,10 @@ export function mountAuthorizationMiddleware(
         return;
     }
 
+    // One catalog cache per mount: the catalog is read at most once per
+    // `maxAge` (60 s) instead of once per request.
+    const catalogCache = new AuthorizationCatalogCache({ read: () => authupClient.authorization.get() });
+
     const { tokenVerifier, capability } = options;
 
     app.use(defineCoreHandler(async (event) => {
@@ -109,7 +114,7 @@ export function mountAuthorizationMiddleware(
                 if (capability && isCapabilityTokenKind(peekTokenKind(headerToken))) {
                     await applyCapabilityToken(event, headerToken, capability.verifier, 'header');
                 } else {
-                    await applyIdentityToken(event, headerToken, tokenVerifier, authupClient);
+                    await applyIdentityToken(event, headerToken, tokenVerifier, catalogCache);
                 }
 
                 return event.next();
@@ -143,7 +148,7 @@ export function mountAuthorizationMiddleware(
                 const token = extractBearerToken(cookieToken.startsWith('Bearer ') ? cookieToken : `Bearer ${cookieToken}`);
 
                 if (token) {
-                    await applyIdentityToken(event, token, tokenVerifier, authupClient);
+                    await applyIdentityToken(event, token, tokenVerifier, catalogCache);
                 }
             }
         } catch (err) {

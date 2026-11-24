@@ -9,6 +9,7 @@ import { once } from 'node:events';
 import type { Server } from 'node:http';
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
+import { isUpstreamError } from '@authup/errors';
 import { isJWTError } from '@authup/specs';
 import { isHubError } from '@privateaim/errors';
 import {
@@ -77,8 +78,8 @@ describe('createAuthupCapabilityTokenVerifier', () => {
 
         const error = await verifier.verify(buildToken(baseURL)).then(() => undefined, (e: unknown) => e);
 
-        expect(isHubError(error)).toBe(true);
-        expect(error).toMatchObject({ status: 502, code: 'upstream_error' });
+        expect(isUpstreamError(error)).toBe(true);
+        expect(error).toMatchObject({ code: 'upstream_error' });
     });
 
     it('keeps answering 401 for a key the issuer does not know', async () => {

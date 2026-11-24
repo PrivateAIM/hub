@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionError } from '@authup/access';
+import { PermissionError, appendQueryConditions } from '@authup/access';
 import { FakePermissionEvaluator } from '@authup/server-test-kit';
 import {
     Field,
@@ -19,7 +19,7 @@ import {
 } from '@rapiq/core';
 import type { ICondition, IQuery } from '@rapiq/core';
 import { describe, expect, it } from 'vitest';
-import { appendQueryConditions, findManyScoped, scopeReadQuery } from '../../../src';
+import { findManyScoped, scopeReadQuery } from '../../../src';
 import type { EntityRepositoryFindManyResult, ReadScope } from '../../../src';
 
 function createActor(realm?: { id: string, name: string }) {

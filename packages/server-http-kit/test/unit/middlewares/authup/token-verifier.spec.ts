@@ -10,7 +10,7 @@ import { once } from 'node:events';
 import type { Server } from 'node:http';
 import { createServer } from 'node:http';
 import type { ITokenCache } from '@authup/server-adapter-kit';
-import { isUpstreamTimeoutError } from '@authup/errors';
+import { isUpstreamError, isUpstreamTimeoutError } from '@authup/errors';
 import { isHubError, isUnauthorizedError } from '@privateaim/errors';
 import { ErrorCode, createClientError } from 'hapic';
 import {
@@ -246,10 +246,9 @@ describe('createAuthupTokenVerifier cache namespace', () => {
 });
 
 /**
- * vouchly reports a failed introspection request as `introspection_failed`,
- * which authup's adapter turns into `invalid_token` (401) — a status every
- * authup client hook answers by dropping its session, although the caller's
- * token was never judged. Hub answers such a failure 502.
+ * A failed introspection request never judged the caller's token, so it must
+ * not answer 401 (every authup client hook drops its session on one):
+ * authup's verifier answers it with an UpstreamError (502).
  */
 describe('createAuthupTokenVerifier upstream failures', () => {
     async function verifyAgainst(status: number, body: Record<string, any>): Promise<unknown> {
@@ -266,8 +265,15 @@ describe('createAuthupTokenVerifier upstream failures', () => {
     it.each([503, 500, 429])('answers 502 when the introspection endpoint answers %s', async (status) => {
         const error = await verifyAgainst(status, { code: 'internal_error', message: 'down' });
 
-        expect(isHubError(error)).toBe(true);
-        expect(error).toMatchObject({ code: 'upstream_error', status: 502 });
+        expect(isUpstreamError(error)).toBe(true);
+        expect(error).toMatchObject({ code: 'upstream_error' });
+    });
+
+    it('keeps the 401 of an introspection request Authup refused as malformed', async () => {
+        const error = await verifyAgainst(400, { code: 'invalid_request', message: 'bad token' });
+
+        expect(isUpstreamError(error)).toBe(false);
+        expect(isHubError(error)).toBe(false);
     });
 
     it('answers 502 when Authup is unreachable', async () => {
@@ -278,7 +284,8 @@ describe('createAuthupTokenVerifier upstream failures', () => {
 
         const error = await verifier.verify(jws).then(() => undefined, (e: unknown) => e);
 
-        expect(error).toMatchObject({ code: 'upstream_error', status: 502 });
+        expect(isUpstreamError(error)).toBe(true);
+        expect(error).toMatchObject({ code: 'upstream_error' });
     });
 
     it('keeps the 401 of a token Authup judged inactive', async () => {

@@ -12,6 +12,7 @@ import type {
     STSEvents,
 } from '@privateaim/core-realtime-kit';
 import { createAuthupTokenVerifier } from '@privateaim/server-http-kit';
+import type { AuthupTokenCacheCreateResult } from '@privateaim/server-http-kit';
 import type { BaseServerConfig, Logger } from '@privateaim/server-kit';
 import type { Socket, SocketData } from '@privateaim/server-realtime-kit';
 import {
@@ -33,6 +34,10 @@ type SocketServerContext = {
     logger?: Logger;
     redisPublishClient?: RedisClient;
     redisSubscribeClient?: RedisClient;
+    /**
+     * The token result cache, shared with the HTTP verifier.
+     */
+    tokenCache?: AuthupTokenCacheCreateResult['cache'];
 };
 
 export function createSocketServer(
@@ -66,7 +71,7 @@ export function createSocketServer(
                 secret: ctx.config.clientSecret,
                 realm: ctx.config.realm,
             },
-            redisClient: ctx.redisPublishClient,
+            cache: ctx.tokenCache,
         }),
         logger: ctx.logger,
     });

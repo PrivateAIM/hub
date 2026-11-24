@@ -11,8 +11,9 @@ import { AnalysisBucketType, AnalysisNodeApprovalStatus } from '@privateaim/core
 import { PermissionName } from '@privateaim/kit';
 import { BadRequestError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
+import { AbstractEntityService } from '@privateaim/server-kit';
 import {
+    appendQueryConditions,
     evaluateRecord,
     evaluateRecordUpdate,
     hasUnboundedReach,

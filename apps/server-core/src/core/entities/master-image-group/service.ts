@@ -10,9 +10,9 @@ import type { MasterImageGroup } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
+import { appendQueryConditions } from '@authup/access';
 import {
     AbstractEntityService,
-    appendQueryConditions,
     findManyScoped,
     scopeReadQuery,
 } from '@privateaim/server-kit';

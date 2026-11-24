@@ -7,6 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { Client } from '@authup/core-http-kit';
+import { AuthorizationCatalogCache } from '@authup/server-kit/core';
 import type { RegistryProject } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { ActorContext } from '@privateaim/server-kit';
@@ -101,7 +102,11 @@ describe('a post verdict against a real Authup', () => {
         const data = await verifier.verify(token);
 
         return {
-            permissionEvaluator: await createAuthupPermissionEvaluator(catalogClient, resolveAuthupPolicySubject(data)),
+            // A cache per actor: the suite provisions policies between actors.
+            permissionEvaluator: await createAuthupPermissionEvaluator(
+                new AuthorizationCatalogCache({ read: () => catalogClient.authorization.get() }),
+                resolveAuthupPolicySubject(data),
+            ),
             realm: { id: data.realm_id, name: data.realm_name },
         };
     }

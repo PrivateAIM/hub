@@ -317,12 +317,13 @@ with `realmScope: "ownOrNull"` for a single realm, or `"any"` when serving multi
 realms. The default `"own"` grant cannot read global policy definitions. The
 built-in `system` client already has the required access.
 
-Each authenticated HTTP request and socket connection fetches one catalog and
-combines it with the caller's introspected grants. All permission checks within
-that request/connection reuse the local evaluator. Catalog errors fail the
-request; there is no fallback to permission names. Catalogs are not cached across
-requests. Existing token-introspection caching and socket-session lifetimes still
-apply, so changes to grants are visible when those are refreshed.
+Each service caches the catalog in process for 60 seconds and combines it with
+the caller's introspected grants; all permission checks of a request/connection
+run locally. A policy edited in Authup therefore applies within 60 seconds; a
+catalog that a grant finds stale is read again once. Catalog errors fail the
+request; there is no fallback to permission names. Existing token-introspection
+caching and socket-session lifetimes still apply, so changes to grants are
+visible when those are refreshed.
 
 Scope restricts what a caller can do, not who it is. Grants are only evaluated
 for tokens carrying the `global` scope; a token issued without it (e.g. a custom
@@ -365,8 +366,8 @@ What an operator must do:
 
 - Grant the messenger's service client (`CLIENT_ID`, default `system`)
   `permission_read`, with the same `realmScope` guidance as in
-  [Authup upgrade to beta.68](#authup-upgrade-to-beta-68) — every authenticated
-  request reads the authorization catalog. The built-in `system` client already
+  [Authup upgrade to beta.68](#authup-upgrade-to-beta-68) — authenticated
+  requests read the authorization catalog (cached for 60 seconds). The built-in `system` client already
   has it.
 - Make sure `AUTHUP_URL`, `CLIENT_ID` and `CLIENT_SECRET` are set for the
   messenger. Every Hub service now fails closed without Authup: no identity is

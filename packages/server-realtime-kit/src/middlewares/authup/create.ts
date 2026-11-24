@@ -8,6 +8,7 @@
 import { UnauthorizedError } from '@privateaim/errors';
 import { LogChannel, LogFlag } from '@privateaim/telemetry-kit';
 import { createMiddleware } from '@authup/server-adapter-socket-io';
+import { AuthorizationCatalogCache } from '@authup/server-kit/core';
 import type {
     Middleware,
     Namespace,
@@ -30,6 +31,10 @@ export function createAuthorizationMiddleware(
         return (_socket, next) => next();
     }
 
+    // One catalog cache per middleware: the catalog is read at most once per
+    // `maxAge` (60 s) instead of once per connection.
+    const catalogCache = new AuthorizationCatalogCache({ read: () => authupClient.authorization.get() });
+
     const { tokenVerifier } = options;
 
     return createMiddleware({
@@ -39,7 +44,7 @@ export function createAuthorizationMiddleware(
         tokenVerifierHandler: (
             socket: Socket,
             data,
-        ) => applyTokenVerificationData(socket, data, authupClient),
+        ) => applyTokenVerificationData(socket, data, catalogCache),
     });
 }
 

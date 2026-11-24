@@ -5,7 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuiltInPolicyType, reachesRecordOneOf } from '@authup/access';
+import {
+    BuiltInPolicyType,
+    appendQueryConditions,
+    reachesRecordOneOf,
+} from '@authup/access';
 import type { ICondition, IQuery } from '@rapiq/core';
 import {
     Query,
@@ -21,7 +25,6 @@ import type {
     ReadProjection,
 } from '@privateaim/server-kit';
 import {
-    appendQueryConditions,
     buildCheckFields,
     readCheckAttributes,
     readPath,

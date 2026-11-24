@@ -8,7 +8,6 @@
 import type { IContainer } from 'eldin';
 import type { IModule, ModuleDependency } from 'orkos';
 import { App, serve } from 'routup';
-import { MemoryTokenCache, RedisTokenCache } from '@authup/server-adapter-kit';
 import { STORAGE_CAPABILITY_AUDIENCE } from '@privateaim/storage-kit';
 import {
     AUTHUP_CLIENT_MODULE_NAME,
@@ -24,12 +23,13 @@ import {
 } from '@privateaim/server-kit';
 import {
     createAuthupCapabilityTokenVerifier,
+    createAuthupTokenCache,
     createAuthupTokenVerifier,
     mountErrorMiddleware,
     mountHealthRoutes,
     mountMiddlewares,
 } from '@privateaim/server-http-kit';
-import type { MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
+import type { AuthupTokenCacheCreateResult, MiddlewareSwaggerOptions } from '@privateaim/server-http-kit';
 import { resolveAuthupClientId } from '../../../adapters/authup/trusted-client.ts';
 import { ConfigInjectionKey } from '../config/constants.ts';
 import { DatabaseInjectionKey } from '../database/constants.ts';
@@ -59,6 +59,8 @@ export class HTTPModule implements IModule {
     private instance: HTTPServer | undefined;
 
     private health: Health | undefined;
+
+    private tokenCache: AuthupTokenCacheCreateResult | undefined;
 
     async setup(container: IContainer): Promise<void> {
         const config = container.resolve(ConfigInjectionKey);
@@ -92,6 +94,14 @@ export class HTTPModule implements IModule {
         const authupResult = container.tryResolve(AuthupClientInjectionKey);
         const redisResult = container.tryResolve(RedisClientInjectionKey);
 
+        // One bounded Redis client for every token verifier of this service.
+        const tokenCache = createAuthupTokenCache({
+            redis: redisResult.success ? redisResult.data : undefined,
+            onError: (error) => logger.warn(`Token cache: ${error.message}`),
+        });
+
+        this.tokenCache = tokenCache;
+
         mountMiddlewares(app, {
             basic: true,
             cors: true,
@@ -118,9 +128,7 @@ export class HTTPModule implements IModule {
                             config.capabilityClientId,
                             config.realm,
                         ),
-                        cache: redisResult.success ?
-                            new RedisTokenCache(redisResult.data) :
-                            new MemoryTokenCache(),
+                        cache: tokenCache.cache,
                     }),
                 },
                 tokenVerifier: createAuthupTokenVerifier({
@@ -130,7 +138,7 @@ export class HTTPModule implements IModule {
                         secret: config.clientSecret,
                         realm: config.realm,
                     },
-                    redisClient: redisResult.success ? redisResult.data : undefined,
+                    cache: tokenCache.cache,
                 }),
             },
             swagger,
@@ -162,6 +170,7 @@ export class HTTPModule implements IModule {
             container.register(HTTPInjectionKey.Server, { useValue: server });
         } catch (e) {
             await server.close().catch(() => undefined);
+            this.disposeTokenCache();
 
             throw e;
         }
@@ -178,12 +187,23 @@ export class HTTPModule implements IModule {
         this.health = undefined;
 
         if (!this.instance) {
+            this.disposeTokenCache();
+
             return;
         }
 
         container.unregister(HTTPInjectionKey.Server);
 
-        await this.instance.close();
-        this.instance = undefined;
+        try {
+            await this.instance.close();
+        } finally {
+            this.instance = undefined;
+            this.disposeTokenCache();
+        }
+    }
+
+    private disposeTokenCache(): void {
+        this.tokenCache?.dispose();
+        this.tokenCache = undefined;
     }
 }

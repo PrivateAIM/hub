@@ -5,12 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuiltInPolicyType, reachesRecordOneOf } from '@authup/access';
+import { BuiltInPolicyType, reachesRecordOneOf, scopeReadQuery as scopeAuthupReadQuery } from '@authup/access';
 import type { IQuery } from '@rapiq/core';
-import { inArray } from '@rapiq/core';
 import type { ActorContext } from '../actor/index.ts';
 import type { EntityRepositoryFindManyResult, IEntityRepository } from '../types.ts';
-import { appendQueryConditions } from './conditions.ts';
 import { 
     buildCheckFields, 
     readCheckAttributes, 
@@ -20,9 +18,9 @@ import {
 import type { ReadScope, ScopeReadQueryOptions } from './types.ts';
 
 /**
- * The gate every read runs: pre-gate the read permissions (a missing grant
- * throws, i.e. 403), then lower the caller's reach onto the query (port of
- * authup's app-level `scopeReadQuery`, apps/server-core/src/core/query/scope.ts).
+ * The gate every read runs: authup's `scopeReadQuery` pre-gates the read
+ * permissions (a missing grant throws, i.e. 403), then lowers the caller's
+ * reach onto the query; hub adds the fields a `post` decision reads.
  *
  * - `allow`       → the query unchanged.
  * - `conditional` → the compiled reach AND-appended (non-displaceable).
@@ -45,43 +43,29 @@ export async function scopeReadQuery(
         ...(options.realmAttributeName ? { realmAttributeName: options.realmAttributeName } : {}),
     };
 
-    await actor.permissionEvaluator.preEvaluateOneOf({ name: options.names });
-
-    if (options.compile === false) {
-        return { ...base, post: false };
-    }
-
-    // Forward the realm column only when set, like authup: naming one tells
-    // authup the row may not carry a grant policy's fields, which turns every
-    // lowerable grant policy into `post`. Without it the reach lowers onto
-    // `realmId`.
-    const compiled = await actor.permissionEvaluator.compile({
-        name: options.names,
+    const scope = await scopeAuthupReadQuery(query, actor.permissionEvaluator, {
+        names: options.names,
+        ...(typeof options.compile !== 'undefined' ? { compile: options.compile } : {}),
+        // Forward the realm column only when set: naming one tells authup the
+        // row may not carry a grant policy's fields, which turns every
+        // lowerable grant policy into `post`. Without it the reach lowers
+        // onto `realmId`.
         ...(options.realmAttributeName ? { realmAttributeName: options.realmAttributeName } : {}),
     });
 
-    switch (compiled.verdict) {
-        case 'allow':
-            return { ...base, post: false };
-        case 'conditional':
-            return {
-                ...base, 
-                query: appendQueryConditions(query, compiled.condition), 
-                post: false, 
-            };
-        case 'deny':
-            return {
-                ...base, 
-                query: appendQueryConditions(query, inArray('id', [])), 
-                post: false, 
-            };
-        default:
-            return {
-                ...base,
-                post: true,
-                checkFields: buildCheckFields(options.schema, options.realmAttributeName),
-            };
+    if (!scope.post) {
+        return {
+            ...base, 
+            query: scope.query, 
+            post: false, 
+        };
     }
+
+    return {
+        ...base,
+        post: true,
+        checkFields: buildCheckFields(options.schema, options.realmAttributeName),
+    };
 }
 
 /**

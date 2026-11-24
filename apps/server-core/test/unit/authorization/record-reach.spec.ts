@@ -8,6 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import { hasUnboundedReach, reachesRecord } from '@authup/access';
 import { Client } from '@authup/core-http-kit';
+import { AuthorizationCatalogCache } from '@authup/server-kit/core';
 import { PermissionName } from '@privateaim/kit';
 import type { ActorContext } from '@privateaim/server-kit';
 import {
@@ -93,7 +94,11 @@ describe('record reach against a real Authup', () => {
         const data = await verifier.verify(token);
 
         return {
-            permissionEvaluator: await createAuthupPermissionEvaluator(catalogClient, resolveAuthupPolicySubject(data)),
+            // A cache per actor: the suite provisions policies between actors.
+            permissionEvaluator: await createAuthupPermissionEvaluator(
+                new AuthorizationCatalogCache({ read: () => catalogClient.authorization.get() }),
+                resolveAuthupPolicySubject(data),
+            ),
             realm: { id: data.realm_id, name: data.realm_name },
         };
     }
