@@ -11,6 +11,7 @@ import type { AnalysisBucketFile } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { AnalysisBucketFileCreatePayload, AnalysisBucketFileUpdatePayload, IAnalysisBucketFileAPI } from './types';
 
 export class AnalysisBucketFileAPI extends BaseAPI implements IAnalysisBucketFileAPI {
@@ -32,7 +33,7 @@ export class AnalysisBucketFileAPI extends BaseAPI implements IAnalysisBucketFil
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisBucketFile>> {
         const response = await this.client.get(
-            `analysis-bucket-files/${id}${buildQueryString(record)}`,
+            `analysis-bucket-files/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 
@@ -43,7 +44,7 @@ export class AnalysisBucketFileAPI extends BaseAPI implements IAnalysisBucketFil
         id: AnalysisBucketFile['id'],
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisBucketFile>> {
-        const response = await this.client.delete(`analysis-bucket-files/${id}`, buildRequestConfig(options));
+        const response = await this.client.delete(`analysis-bucket-files/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response.data;
     }
@@ -54,7 +55,7 @@ export class AnalysisBucketFileAPI extends BaseAPI implements IAnalysisBucketFil
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisBucketFile>> {
         const { data: response } = await this.client.post(
-            `analysis-bucket-files/${id}`,
+            `analysis-bucket-files/${encodePathSegment(id)}`,
             nullifyEmptyObjectProperties(data),
             buildRequestConfig(options),
         );

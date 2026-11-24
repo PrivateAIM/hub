@@ -11,6 +11,7 @@ import type { AnalysisBucket } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { AnalysisBucketCreatePayload, IAnalysisBucketAPI } from './types';
 
 export class AnalysisBucketAPI extends BaseAPI implements IAnalysisBucketAPI {
@@ -32,7 +33,7 @@ export class AnalysisBucketAPI extends BaseAPI implements IAnalysisBucketAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisBucket>> {
         const response = await this.client.get(
-            `analysis-buckets/${id}${buildQueryString(record)}`,
+            `analysis-buckets/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 
@@ -52,7 +53,7 @@ export class AnalysisBucketAPI extends BaseAPI implements IAnalysisBucketAPI {
         id: AnalysisBucket['id'],
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<AnalysisBucket>> {
-        const response = await this.client.delete(`analysis-buckets/${id}`, buildRequestConfig(options));
+        const response = await this.client.delete(`analysis-buckets/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response.data;
     }

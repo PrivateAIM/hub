@@ -10,6 +10,7 @@ import { buildQueryString } from '../../utils';
 import type { Event, IEventAPI } from './types';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import { BaseAPI } from 'hapic';
 
 export class EventAPI extends BaseAPI implements IEventAPI {
@@ -25,7 +26,7 @@ export class EventAPI extends BaseAPI implements IEventAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Event>> {
         const { data: response } = await this.client.get(
-            `events/${id}${buildQueryString(record)}`,
+            `events/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 
@@ -33,7 +34,7 @@ export class EventAPI extends BaseAPI implements IEventAPI {
     }
 
     async delete(id: Event['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<Event>> {
-        const { data: response } = await this.client.delete(`events/${id}`, buildRequestConfig(options));
+        const { data: response } = await this.client.delete(`events/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response;
     }

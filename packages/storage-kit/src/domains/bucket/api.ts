@@ -10,6 +10,7 @@ import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { Bucket, BucketCreatePayload, IBucketAPI } from './types';
 import { StorageBaseAPI } from '../base';
 import type { BucketFile } from '../bucket-file';
@@ -26,7 +27,7 @@ export class BucketAPI extends StorageBaseAPI implements IBucketAPI {
         record?: EntityQueryInput<Bucket>,
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Bucket>> {
-        const response = await this.client.get(`buckets/${id}${buildQueryString(record)}`, buildRequestConfig(options));
+        const response = await this.client.get(`buckets/${encodePathSegment(id)}${buildQueryString(record)}`, buildRequestConfig(options));
 
         return response.data;
     }
@@ -38,13 +39,13 @@ export class BucketAPI extends StorageBaseAPI implements IBucketAPI {
     }
 
     async delete(id: Bucket['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<Bucket>> {
-        const response = await this.client.delete(`buckets/${id}`, buildRequestConfig(options));
+        const response = await this.client.delete(`buckets/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response.data;
     }
 
     async clear(id: Bucket['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<Bucket>> {
-        const response = await this.client.post(`buckets/${id}/clear`, undefined, buildRequestConfig(options));
+        const response = await this.client.post(`buckets/${encodePathSegment(id)}/clear`, undefined, buildRequestConfig(options));
 
         return response.data;
     }
@@ -55,7 +56,7 @@ export class BucketAPI extends StorageBaseAPI implements IBucketAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Bucket>> {
         const response = await this.client.post(
-            `buckets/${id}`,
+            `buckets/${encodePathSegment(id)}`,
             nullifyEmptyObjectProperties(data),
             buildRequestConfig(options),
         );
@@ -68,7 +69,7 @@ export class BucketAPI extends StorageBaseAPI implements IBucketAPI {
         formData: FormData,
         options?: APIRequestOptions,
     ): Promise<EntityCollectionResponse<BucketFile>> {
-        const response = await this.client.post(`buckets/${id}/upload`, formData, {
+        const response = await this.client.post(`buckets/${encodePathSegment(id)}/upload`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
             // an upload streams its body; the timer would cut it off
             timeout: 0,
@@ -79,7 +80,7 @@ export class BucketAPI extends StorageBaseAPI implements IBucketAPI {
     }
 
     getStreamPath(id: string): string {
-        return `buckets/${id}/stream`;
+        return `buckets/${encodePathSegment(id)}/stream`;
     }
 
     getStreamURL(id: BucketFile['id']) : string {

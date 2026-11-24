@@ -143,6 +143,7 @@ const { data: bucket } = await client.bucket.getOne('abc');
 
 - `@privateaim/kit` — Core utilities (peer)
 - `@authup/core-kit` — Authup types (peer)
+- `@authup/core-http-kit` — Path-segment encoding of ids (peer)
 - `hapic` — HTTP client base (peer)
 - `@rapiq/core`, `@rapiq/codec-url` — Query parameter building (peer)
 - `@privateaim/errors` — Shared error types

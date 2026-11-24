@@ -11,6 +11,7 @@ import type { Registry } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { IRegistryAPI, RegistryCreatePayload, RegistryUpdatePayload } from './types';
 
 export class RegistryAPI extends BaseAPI implements IRegistryAPI {
@@ -25,7 +26,7 @@ export class RegistryAPI extends BaseAPI implements IRegistryAPI {
         record?: EntityQueryInput<Registry>,
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Registry>> {
-        const response = await this.client.get(`registries/${id}${buildQueryString(record)}`, buildRequestConfig(options));
+        const response = await this.client.get(`registries/${encodePathSegment(id)}${buildQueryString(record)}`, buildRequestConfig(options));
 
         return response.data;
     }
@@ -42,7 +43,7 @@ export class RegistryAPI extends BaseAPI implements IRegistryAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<Registry>> {
         const response = await this.client.post(
-            `registries/${id}`,
+            `registries/${encodePathSegment(id)}`,
             nullifyEmptyObjectProperties(data),
             buildRequestConfig(options),
         );
@@ -51,7 +52,7 @@ export class RegistryAPI extends BaseAPI implements IRegistryAPI {
     }
 
     async delete(id: Registry['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<Registry>> {
-        const response = await this.client.delete(`registries/${id}`, buildRequestConfig(options));
+        const response = await this.client.delete(`registries/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response.data;
     }

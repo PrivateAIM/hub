@@ -31,7 +31,7 @@ server. Built on [hapic](https://github.com/tada5hi/hapic); part of the [FLAME H
 ## Installation
 
 ```bash
-npm install @privateaim/core-http-kit @privateaim/core-kit @privateaim/kit hapic @rapiq/core @rapiq/codec-url @authup/core-kit @authup/kit
+npm install @privateaim/core-http-kit @privateaim/core-kit @privateaim/kit hapic @rapiq/core @rapiq/codec-url @authup/core-http-kit @authup/core-kit @authup/kit
 ```
 
 The package is ESM only and needs Node.js `>=26.0.0`. Everything above besides the kit itself is a peer dependency, so your

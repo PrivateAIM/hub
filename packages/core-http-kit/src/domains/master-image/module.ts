@@ -12,6 +12,7 @@ import type { MasterImage, MasterImageCommand } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { IMasterImageAPI } from './types';
 
 export class MasterImageAPI extends BaseAPI implements IMasterImageAPI {
@@ -30,7 +31,7 @@ export class MasterImageAPI extends BaseAPI implements IMasterImageAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<MasterImage>> {
         const response = await this.client.get(
-            `master-images/${id}${buildQueryString(record)}`,
+            `master-images/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 
@@ -38,7 +39,7 @@ export class MasterImageAPI extends BaseAPI implements IMasterImageAPI {
     }
 
     async delete(id: MasterImage['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<MasterImage>> {
-        const response = await this.client.delete(`master-images/${id}`, buildRequestConfig(options));
+        const response = await this.client.delete(`master-images/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response.data;
     }
