@@ -34,7 +34,7 @@ import {
 import { AnalysisContainerPath } from '../../constants';
 import { BuilderError } from '../../error';
 import { createBuildContext, generateDockerFileContent } from '../../helpers';
-import { isRetryableFailure, startHeartbeat } from '../../../helpers.ts';
+import { formatBuildFailure, isRetryableFailure, startHeartbeat } from '../../../helpers.ts';
 
 export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisBuilderEventMap, AnalysisBuilderCommand.EXECUTE> {
     protected coreClient: CoreClient;
@@ -142,7 +142,8 @@ export class AnalysisBuilderExecuteHandler implements ComponentHandler<AnalysisB
                 },
             });
         } catch (e) {
-            this.logger?.error('Building image failed', {
+            this.logger?.error({
+                message: formatBuildFailure(e),
                 command: AnalysisBuilderCommand.EXECUTE,
                 analysisId: analysis.id,
                 [LogFlag.REF_ID]: analysis.id,

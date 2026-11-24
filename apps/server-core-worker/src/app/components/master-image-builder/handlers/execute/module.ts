@@ -25,7 +25,7 @@ import path from 'node:path';
 import tar from 'tar-fs';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
 import { buildDockerImageURL } from '../../../../../adapters/docker/index.ts';
-import { isRetryableFailure } from '../../../helpers.ts';
+import { formatBuildFailure, isRetryableFailure } from '../../../helpers.ts';
 
 export class MasterImageBuilderExecuteHandler implements ComponentHandler<
     MasterImageBuilderEventMap,
@@ -106,7 +106,7 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
             });
         } catch (e) {
             this.logger?.error({
-                message: 'Building image failed',
+                message: formatBuildFailure(e),
                 command: MasterImageBuilderCommand.EXECUTE,
                 masterImageId: masterImage.id,
                 [LogFlag.REF_ID]: masterImage.id,
