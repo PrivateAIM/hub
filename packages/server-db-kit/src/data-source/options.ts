@@ -10,6 +10,7 @@ import type { DataSourceOptionsEntities, DataSourceOptionsSubscribers } from './
 import type { DataSourceOptions } from 'typeorm';
 import {
     CodeTransformation,
+    assertEnvDataSourceOptions,
     isCodeTransformation,
     pinTimezone,
     readDataSourceOptionsFromEnv,
@@ -37,6 +38,9 @@ export class DataSourceOptionsBuilder {
     // ------------------------------------------------------------------
 
     buildWithEnv() {
+        // names what is missing, e.g. DB_HOST set but no DB_TYPE.
+        assertEnvDataSourceOptions({ required: true });
+
         const options = readDataSourceOptionsFromEnv();
 
         if (!options) {
