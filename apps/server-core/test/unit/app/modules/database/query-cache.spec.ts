@@ -13,11 +13,11 @@ import {
     LoggerMemoryTransport,
     LoggerModule,
     TAGGED_CACHE_MODULE_NAME,
+    TAGGED_CACHE_TTL,
     TaggedCacheInjectionKey,
-    createTaggedCache,
 } from '@privateaim/server-kit';
 import type { ITaggedCache } from '@rapiq/cache';
-import { buildCollectionTag } from '@rapiq/cache';
+import { MemoryCacheDriver, TaggedCache, buildCollectionTag } from '@rapiq/cache';
 import { CacheInvalidationSubscriber } from '@rapiq/cache/typeorm';
 import type { IModule } from 'orkos';
 import type { EntityTarget, ObjectLiteral } from 'typeorm';
@@ -45,34 +45,22 @@ import {
 } from '../../../../app/index.ts';
 import { createTestNode } from '../../../../utils/domains/node.ts';
 
-type FailingTaggedCache = {
-    cache: ITaggedCache,
-    /** How many of the next invalidations reject without bumping. */
-    fail: (count?: number) => void,
-};
+/**
+ * A memory driver whose next `invalidate` calls reject without bumping,
+ * as a store outage does.
+ */
+class FailingCacheDriver extends MemoryCacheDriver {
+    failures = 0;
 
-function createFailingTaggedCache(): FailingTaggedCache {
-    const { cache } = createTaggedCache({ prefix: 'hub-core', onError: () => {} });
-    let failures = 0;
+    override async invalidate(tags: string[]): Promise<void> {
+        if (this.failures > 0) {
+            this.failures--;
 
-    return {
-        cache: {
-            remember: (key, read, options) => cache.remember(key, read, options),
-            invalidate: (tags) => {
-                if (failures > 0) {
-                    failures--;
+            throw new Error('The cache store is unreachable.');
+        }
 
-                    return Promise.reject(new Error('The cache store is unreachable.'));
-                }
-
-                return cache.invalidate(tags);
-            },
-            drop: (keys) => cache.drop(keys),
-        },
-        fail: (count = 1) => {
-            failures = count;
-        },
-    };
+        return super.invalidate(tags);
+    }
 }
 
 /** Stands in for the tagged cache module, so the database module wires this store. */
@@ -440,7 +428,12 @@ describe('app/modules/database/query-cache (client bindings)', () => {
 
 describe('app/modules/database/query-cache after a lost invalidation', () => {
     const transport = new LoggerMemoryTransport();
-    const tagged = createFailingTaggedCache();
+    const driver = new FailingCacheDriver({ maxTtl: TAGGED_CACHE_TTL });
+    const tagged = new TaggedCache({
+        driver, 
+        ttl: TAGGED_CACHE_TTL, 
+        onError: () => {}, 
+    });
 
     // registered after the database module: the dependency still orders it first.
     const suite = new TestApplication({
@@ -448,7 +441,7 @@ describe('app/modules/database/query-cache after a lost invalidation', () => {
             new ConfigModule(),
             new LoggerModule({ transports: [transport] }),
             createTestDatabaseModule(),
-            createTaggedCacheModule(tagged.cache),
+            createTaggedCacheModule(tagged),
         ],
     });
 
@@ -458,6 +451,7 @@ describe('app/modules/database/query-cache after a lost invalidation', () => {
 
     afterAll(async () => {
         await suite.teardown();
+        tagged.dispose();
     });
 
     it('should wire the cache module registered after it', () => {
@@ -467,7 +461,7 @@ describe('app/modules/database/query-cache after a lost invalidation', () => {
     it('should commit a write whose bump is lost and log it once', async () => {
         const repository = suite.dataSource.getRepository(NodeEntity);
 
-        tagged.fail(2);
+        driver.failures = 2;
 
         const first = await repository.save(repository.create({ ...createTestNode(), realmId: faker.string.uuid() }));
         const second = await repository.save(repository.create({ ...createTestNode(), realmId: faker.string.uuid() }));
@@ -489,7 +483,7 @@ describe('app/modules/database/query-cache after a lost invalidation', () => {
 
         expect(await nodes.findOneByClientBinding(clientId, node.realmId)).not.toBeNull();
 
-        tagged.fail();
+        driver.failures = 1;
 
         node.clientId = faker.string.uuid();
         await repository.save(node);
