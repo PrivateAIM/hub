@@ -64,11 +64,6 @@ export function startHeartbeat(
  * permanent; their text is the only signal and is not parsed.
  */
 export function isTransientError(error: unknown): boolean {
-    // docken wraps every failed stream; the original error is its cause.
-    if (isModemStreamError(error)) {
-        return isTransientError(error.cause);
-    }
-
     if (isClientError(error)) {
         if (!error.response) {
             return true;
