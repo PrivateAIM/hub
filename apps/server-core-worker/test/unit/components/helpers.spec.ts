@@ -109,10 +109,20 @@ describe('formatBuildFailure', () => {
         expect(message).not.toContain(output[0]);
     });
 
-    it('should keep only the first line when the output cannot fit', () => {
-        const message = formatBuildFailure(new ModemStreamError('code: 1', { output: ['y'.repeat(10_000)] }));
+    it('should keep the end of an over-long last output line', () => {
+        const line = `${'a'.repeat(9_990)}TAIL-END!!`;
+        const message = formatBuildFailure(new ModemStreamError('code: 1', { output: [line] }));
 
-        expect(message).toBe('Building image failed: code: 1');
+        expect(message.length).toBe(4096);
+        expect(message.startsWith('Building image failed: code: 1\n…')).toBe(true);
+        expect(message.endsWith('TAIL-END!!')).toBe(true);
+    });
+
+    it('should return the head only when no budget is left', () => {
+        const head = 'Building image failed: code: 1';
+        const message = formatBuildFailure(new ModemStreamError('code: 1', { output: ['y'.repeat(100)] }), head.length + 2);
+
+        expect(message).toBe(head);
     });
 
     it('should cut an oversized reason to the maximum length', () => {

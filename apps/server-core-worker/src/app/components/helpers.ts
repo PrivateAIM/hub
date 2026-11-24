@@ -100,8 +100,10 @@ export function isTransientError(error: unknown): boolean {
 /**
  * One telemetry message for a failed image build: the reason, then (for a
  * docken stream failure) the tail of the build output, oldest lines dropped
- * until it fits `maxLength`. A reason that alone exceeds `maxLength` is cut
- * and carries no output.
+ * until it fits `maxLength`. If even the newest line alone does not fit, it is
+ * kept cut to the remaining budget, keeping its end and prefixed with `…`; with
+ * less than 2 characters left only the reason is returned. A reason that alone
+ * exceeds `maxLength` is cut and carries no output.
  */
 export function formatBuildFailure(
     error: unknown,
@@ -122,7 +124,18 @@ export function formatBuildFailure(
         message = [head, ...lines].join('\n');
     }
 
-    return message.length > maxLength ? head : message;
+    if (lines.length > 0 || error.output.length === 0) {
+        return message.length <= maxLength ? message : head;
+    }
+
+    const newest = error.output[error.output.length - 1];
+    const budget = maxLength - head.length - 1;
+
+    if (budget < 2) {
+        return head;
+    }
+
+    return `${head}\n…${newest.slice(newest.length - (budget - 1))}`;
 }
 
 /**
