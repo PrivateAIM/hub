@@ -25,28 +25,30 @@ docker run -e ... ghcr.io/privateaim/hub ui start
 
 Nuxt runtime variables, read when the server starts. Each one falls back to the unprefixed variable (`CORE_URL`, `AUTHUP_URL`, `AUTHUP_CLIENT_ID`, `ACCOUNT_URL`, `STORAGE_URL`, `TELEMETRY_URL`, `COOKIE_DOMAIN`, `COOKIE_PREFIX`) that was set when the app was built.
 
+The runtime config is validated against a schema when the server starts. The four **required** variables below must be set, either at runtime or as their unprefixed variable at build time; a server missing any of them (or given a value of the wrong type) refuses to start with one `[NUXT_E8014]` error that lists every problem. The URL format itself is not checked.
+
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `NUXT_PUBLIC_CORE_URL` | — | Core API base URL, used by the browser; realtime updates use its Socket.IO server |
-| `NUXT_PUBLIC_AUTHUP_URL` | — | Authup URL |
+| `NUXT_PUBLIC_CORE_URL` | **required** | Core API base URL, used by the browser; realtime updates use its Socket.IO server |
+| `NUXT_PUBLIC_AUTHUP_URL` | **required** | Authup URL |
 | `NUXT_AUTHUP_URL` | `AUTHUP_URL` at build time | Address the server render dials Authup on (e.g. an in-cluster service). Only requests are sent there: every URL in the rendered page (identity-provider links, OAuth2 endpoints) keeps `NUXT_PUBLIC_AUTHUP_URL` |
 | `NUXT_PUBLIC_AUTHUP_CLIENT_ID` | `admin-console` | OAuth2 client used for the login (authorization-code) flow |
 | `NUXT_PUBLIC_ACCOUNT_URL` | `<NUXT_PUBLIC_AUTHUP_URL>/console/account` | Authup account console, linked from the header's account icon |
-| `NUXT_PUBLIC_STORAGE_URL` | — | Storage service URL |
-| `NUXT_PUBLIC_TELEMETRY_URL` | — | Telemetry service URL |
+| `NUXT_PUBLIC_STORAGE_URL` | **required** | Storage service URL |
+| `NUXT_PUBLIC_TELEMETRY_URL` | **required** | Telemetry service URL |
 | `NUXT_PUBLIC_COOKIE_DOMAIN` | — (host-only) | `Domain` attribute for the session cookies. Leave empty unless a sibling host must read them — see [Session cookies](#session-cookies) |
 | `NUXT_PUBLIC_AUTHUP_COOKIE_PREFIX` | — (none) | Namespace prefixed onto every session cookie name. Set alongside a widened `NUXT_PUBLIC_COOKIE_DOMAIN` — see [Session cookies](#session-cookies) |
 | `NUXT_CORE_URL` | `CORE_URL` at build time | Address the server render calls the core API on (e.g. an in-cluster service) |
 | `NUXT_STORAGE_URL` | `STORAGE_URL` at build time | Address the server render and the download proxy call storage on |
 | `NUXT_TELEMETRY_URL` | `TELEMETRY_URL` at build time | Address the server render calls telemetry on |
 
-The server render uses `NUXT_STORAGE_URL` and `NUXT_TELEMETRY_URL` only when a server-side core URL (`NUXT_CORE_URL`, or `CORE_URL` at build time) is set, and otherwise the public ones. Set the server-side addresses together.
+The server render uses `NUXT_STORAGE_URL` and `NUXT_TELEMETRY_URL` only when a server-side core URL (`NUXT_CORE_URL`, or `CORE_URL` at build time) is set; an unset server-side address falls back to its public one. The download proxy uses `NUXT_STORAGE_URL`, or `NUXT_PUBLIC_STORAGE_URL` when it is unset.
 
 ## Authentication
 
 The UI signs in with the **OAuth2 Authorization Code flow (PKCE)** — credentials are
 never entered in the Hub UI itself. On the login page the user picks a **realm**
-(`ARealmGrid`, which reveals a search field once more than 8 realms exist); the app
+(`ARealmPicker`, which reveals a search field once more than 8 realms exist); the app
 then builds an authorize URL and redirects to Authup's `/authorize` endpoint, where the
 login form and configured identity providers live. Authup redirects back to
 `<ui-origin>/login/callback`, and the `@authup/client-web-nuxt` routing interceptor

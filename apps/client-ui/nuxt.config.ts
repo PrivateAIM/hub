@@ -10,7 +10,24 @@ import path from 'node:path';
 import { defineNuxtConfig } from 'nuxt/config';
 import tailwindcss from '@tailwindcss/vite';
 import { NuxtIconBundle } from '@nuxt/icon/vite';
+import { z } from 'zod';
 import { iconBundleOptions } from './icon-bundle.config.ts';
+
+// Each value falls back to the variable set at build time: a schema gets that
+// value as its default only when it is set, so no value becomes required that
+// was optional before — apart from the four public service URLs, which the
+// app cannot work without.
+function optionalURL(buildValue: string | undefined) {
+    return buildValue ? z.url().default(buildValue) : z.url().optional();
+}
+
+function requiredURL(buildValue: string | undefined) {
+    return buildValue ? z.url().default(buildValue) : z.url();
+}
+
+function optionalString(buildValue: string | undefined) {
+    return buildValue ? z.string().default(buildValue) : z.string().optional();
+}
 
 export default defineNuxtConfig({
     vite: {
@@ -37,18 +54,29 @@ export default defineNuxtConfig({
         // Every `useRoute()` MUST pass its route name — without the generic it
         // returns a union of all routes and no `params` member resolves.
         typedPages: true,
+        // Freezes the route table at build time (nuxt >= 4.7): the server
+        // builds the matcher once instead of per request and answers paths no
+        // page matches with an early 404. `router.addRoute()` /
+        // `removeRoute()` / `clearRoutes()` throw, so nothing here (nor
+        // @authup/client-web-nuxt) may register routes at runtime.
+        staticRoutes: true,
     },
 
-    devtools: { componentInspector: false },
+    // Standard-Schema validated (nuxt >= 4.7). When the server starts, Nuxt
+    // applies the `NUXT_*` environment variables and checks the result against
+    // the schema's JSON Schema — presence and type, NOT `format`, so a
+    // malformed URL is not caught — and refuses to start with one error
+    // listing every issue. One schema for the whole object rather than one
+    // per key: a per-key schema is type-checked against the generated
+    // `RuntimeConfig`, whose optionality flips with the build environment.
+    runtimeConfig: z.object({
+        authupUrl: optionalURL(process.env.AUTHUP_URL),
+        coreUrl: optionalURL(process.env.CORE_URL),
+        storageUrl: optionalURL(process.env.STORAGE_URL),
+        telemetryUrl: optionalURL(process.env.TELEMETRY_URL),
 
-    runtimeConfig: {
-        authupUrl: process.env.AUTHUP_URL,
-        coreUrl: process.env.CORE_URL,
-        storageUrl: process.env.STORAGE_URL,
-        telemetryUrl: process.env.TELEMETRY_URL,
-
-        public: {
-            authupUrl: process.env.AUTHUP_URL,
+        public: z.object({
+            authupUrl: requiredURL(process.env.AUTHUP_URL),
             // OAuth2 client the UI uses for the authorization-code (PKCE) login
             // flow. Defaults to the Authup built-in "admin-console" client
             // (CLIENT_ADMIN_CONSOLE_NAME) at the call site; override per
@@ -58,7 +86,7 @@ export default defineNuxtConfig({
             // `**` is required since authup `1.0.0-beta.63`, which carries the
             // post-login destination in the callback URI's query and matches
             // registrations against the full URL including that query.
-            authupClientId: process.env.AUTHUP_CLIENT_ID,
+            authupClientId: optionalString(process.env.AUTHUP_CLIENT_ID),
             // Self-service account console (profile, password, authenticators,
             // sessions, applications), served by Authup's server-core on the
             // IdP origin as of v1.0.0-beta.59, at `/console/account` since
@@ -66,15 +94,15 @@ export default defineNuxtConfig({
             // links here instead. Empty falls back to
             // `<authupUrl>/console/account` at the call site; override per
             // deployment (NUXT_PUBLIC_ACCOUNT_URL at container runtime).
-            accountUrl: process.env.ACCOUNT_URL || '',
-            coreUrl: process.env.CORE_URL,
-            storageUrl: process.env.STORAGE_URL,
-            telemetryUrl: process.env.TELEMETRY_URL,
+            accountUrl: z.string().default(process.env.ACCOUNT_URL || ''),
+            coreUrl: requiredURL(process.env.CORE_URL),
+            storageUrl: requiredURL(process.env.STORAGE_URL),
+            telemetryUrl: requiredURL(process.env.TELEMETRY_URL),
 
-            cookieDomain: process.env.COOKIE_DOMAIN,
-            version: process.env.npm_package_version,
-        },
-    },
+            cookieDomain: optionalString(process.env.COOKIE_DOMAIN),
+            version: optionalString(process.env.npm_package_version),
+        }),
+    }),
 
     telemetry: false,
     ssr: true,
