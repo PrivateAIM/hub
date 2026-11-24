@@ -48,7 +48,7 @@ rule, because applying it would disturb release-please's `node-workspace` plugin
 
 - The root `devDependencies.ioredis` (`^6`) is a hoisting lever: the optional `^5` peers of `typeorm`
   and `unstorage` otherwise keep ioredis 6 off the root, and npm nests a copy of ioredis,
-  `redis-extension` and `@authup/server-adapter-kit` under each workspace. `npm dedupe` then
+  `redis-extension` and `@authup/server-adapter-redis` (which peers ioredis `^6`) under each workspace. `npm dedupe` then
   ERESOLVEs on those peers; re-hoist by deleting the nested lock entries and running `npm install`.
   Only `nitropack`'s nested ioredis 5 is expected. Drop the entry once `typeorm` admits `^6`.
 - Never regenerate the lockfile with `npm install --package-lock-only`: it

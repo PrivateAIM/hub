@@ -22,14 +22,15 @@
     "license": "Apache-2.0",
     "description": "Socket.IO helpers for FLAME Hub services: a Redis-adapted server, Authup socket authentication and room subscriptions.",
     "dependencies": {
-        "@authup/access": "^1.0.0-beta.76",
-        "@authup/core-http-kit": "^1.0.0-beta.76",
-        "@authup/core-kit": "^1.0.0-beta.76",
-        "@authup/core-realtime-kit": "^1.0.0-beta.76",
-        "@authup/kit": "^1.0.0-beta.76",
-        "@authup/server-adapter-kit": "^1.0.0-beta.76",
-        "@authup/server-adapter-socket-io": "^1.0.0-beta.76",
-        "@authup/specs": "^1.0.0-beta.76",
+        "@authup/access": "^1.0.0-beta.77",
+        "@authup/core-http-kit": "^1.0.0-beta.77",
+        "@authup/core-kit": "^1.0.0-beta.77",
+        "@authup/core-realtime-kit": "^1.0.0-beta.77",
+        "@authup/kit": "^1.0.0-beta.77",
+        "@authup/server-adapter-kit": "^1.0.0-beta.77",
+        "@authup/server-adapter-socket-io": "^1.0.0-beta.77",
+        "@authup/server-kit": "^1.0.0-beta.77",
+        "@authup/specs": "^1.0.0-beta.77",
         "@privateaim/errors": "^0.20.0",
         "@privateaim/kit": "^0.20.0",
         "@privateaim/server-kit": "^0.20.0",
@@ -40,7 +41,7 @@
         "redis-extension": "^3.0.0",
         "socket.io": "^4.8.4",
         "socket.io-client": "^4.8.4",
-        "vitest": "^5.1.0"
+        "vitest": "^5.1.1"
     },
     "peerDependencies": {
         "redis-extension": "^3.0.0",
