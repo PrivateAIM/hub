@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { ModemStreamError } from 'docken';
 import {
     afterEach,
     beforeEach,
@@ -14,7 +15,7 @@ import {
     vi,
 } from 'vitest';
 import { ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS, ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS } from '../../../src/app/components/constants';
-import { startHeartbeat } from '../../../src/app/components/helpers';
+import { formatBuildFailure, startHeartbeat } from '../../../src/app/components/helpers';
 
 describe('startHeartbeat', () => {
     beforeEach(() => {
@@ -81,5 +82,40 @@ describe('startHeartbeat', () => {
         // server-core's ANALYSIS_PROCESS_STALE_THRESHOLD_MS (15 min); not
         // imported, the worker does not depend on server-core.
         expect(ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS * 2).toBeLessThan(15 * 60 * 1000);
+    });
+});
+
+describe('formatBuildFailure', () => {
+    it('should append the build output after the reason', () => {
+        expect(formatBuildFailure(new ModemStreamError('code: 1', { output: ['a', 'b'] })))
+            .toBe('Building image failed: code: 1\na\nb');
+    });
+
+    it('should report a plain error by its message', () => {
+        expect(formatBuildFailure(new Error('x'))).toBe('Building image failed: x');
+    });
+
+    it('should fall back for a non-error', () => {
+        expect(formatBuildFailure('nope')).toBe('Building image failed: unknown error');
+    });
+
+    it('should drop the oldest output lines to fit', () => {
+        const output = Array.from({ length: 200 }, (_, i) => `${String(i).padStart(3, '0')}${'x'.repeat(47)}`);
+        const message = formatBuildFailure(new ModemStreamError('code: 1', { output }));
+
+        expect(message.length).toBeLessThanOrEqual(4096);
+        expect(message.startsWith('Building image failed: ')).toBe(true);
+        expect(message.endsWith(output[199])).toBe(true);
+        expect(message).not.toContain(output[0]);
+    });
+
+    it('should keep only the first line when the output cannot fit', () => {
+        const message = formatBuildFailure(new ModemStreamError('code: 1', { output: ['y'.repeat(10_000)] }));
+
+        expect(message).toBe('Building image failed: code: 1');
+    });
+
+    it('should cut an oversized reason to the maximum length', () => {
+        expect(formatBuildFailure(new Error('z'.repeat(10_000))).length).toBe(4096);
     });
 });

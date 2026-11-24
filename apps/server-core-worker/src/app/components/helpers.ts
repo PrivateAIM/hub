@@ -7,7 +7,9 @@
 
 import type { Logger } from '@privateaim/server-kit';
 import type { ComponentMetadata, MessageDelivery } from 'hubwire';
+import { isModemStreamError } from 'docken';
 import { isClientError } from 'hapic';
+import { LOG_MESSAGE_MAX_LENGTH } from '@privateaim/telemetry-kit';
 import {
     ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS,
     ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS,
@@ -62,6 +64,11 @@ export function startHeartbeat(
  * permanent; their text is the only signal and is not parsed.
  */
 export function isTransientError(error: unknown): boolean {
+    // docken wraps every failed stream; the original error is its cause.
+    if (isModemStreamError(error)) {
+        return isTransientError(error.cause);
+    }
+
     if (isClientError(error)) {
         if (!error.response) {
             return true;
@@ -88,6 +95,34 @@ export function isTransientError(error: unknown): boolean {
     }
 
     return false;
+}
+
+/**
+ * One telemetry message for a failed image build: the reason, then (for a
+ * docken stream failure) the tail of the build output, oldest lines dropped
+ * until it fits `maxLength`. A reason that alone exceeds `maxLength` is cut
+ * and carries no output.
+ */
+export function formatBuildFailure(
+    error: unknown,
+    maxLength: number = LOG_MESSAGE_MAX_LENGTH,
+): string {
+    const reason = Error.isError(error) && error.message ? error.message : 'unknown error';
+    const head = `Building image failed: ${reason}`.slice(0, maxLength);
+
+    if (!isModemStreamError(error)) {
+        return head;
+    }
+
+    const lines = [...error.output];
+    let message = [head, ...lines].join('\n');
+
+    while (lines.length > 0 && message.length > maxLength) {
+        lines.shift();
+        message = [head, ...lines].join('\n');
+    }
+
+    return message.length > maxLength ? head : message;
 }
 
 /**
