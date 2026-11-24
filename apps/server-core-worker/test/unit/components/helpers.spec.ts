@@ -91,6 +91,18 @@ describe('formatBuildFailure', () => {
             .toBe('Building image failed: code: 1\na\nb');
     });
 
+    it('should keep the newest lines of a full build log within the limit', () => {
+        const output = Array.from({ length: 200_000 }, (_, index) => `line ${index} ${'x'.repeat(40)}`);
+        const message = formatBuildFailure(new ModemStreamError('code: 1', { output }));
+        const lines = message.split('\n');
+
+        expect(message.length).toBeLessThanOrEqual(4096);
+        expect(lines[0]).toBe('Building image failed: code: 1');
+        expect(lines.slice(1)).toEqual(output.slice(output.length - (lines.length - 1)));
+        // the next older line would not have fit
+        expect(message.length + 1 + output[output.length - lines.length].length).toBeGreaterThan(4096);
+    });
+
     it('should report a plain error by its message', () => {
         expect(formatBuildFailure(new Error('x'))).toBe('Building image failed: x');
     });

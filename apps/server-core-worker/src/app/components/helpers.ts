@@ -116,19 +116,27 @@ export function formatBuildFailure(
         return head;
     }
 
-    const lines = [...error.output];
-    let message = [head, ...lines].join('\n');
+    // `output` holds the full build log (thousands of lines): walk back from the
+    // newest line and stop at the budget instead of re-joining the whole log.
+    const { output } = error;
 
-    while (lines.length > 0 && message.length > maxLength) {
-        lines.shift();
-        message = [head, ...lines].join('\n');
+    if (output.length === 0) {
+        return head;
     }
 
-    if (lines.length > 0 || error.output.length === 0) {
-        return message.length <= maxLength ? message : head;
+    let start = output.length;
+    let { length } = head;
+
+    while (start > 0 && length + 1 + output[start - 1].length <= maxLength) {
+        start--;
+        length += 1 + output[start].length;
     }
 
-    const newest = error.output[error.output.length - 1];
+    if (start < output.length) {
+        return [head, ...output.slice(start)].join('\n');
+    }
+
+    const newest = output[output.length - 1];
     const budget = maxLength - head.length - 1;
 
     if (budget < 2) {
