@@ -24,6 +24,7 @@ import type {
     IRegistryProjectRepository,
     IRegistryRepository,
 } from '../../../core/index.ts';
+import type { INodeStatusService } from '../../../core/services/node-status/index.ts';
 
 export const DatabaseInjectionKey = {
     DataSource: new TypedToken<DataSource>('DataSource'),
@@ -42,6 +43,9 @@ export const DatabaseInjectionKey = {
     ProjectNodeRepository: new TypedToken<IProjectNodeRepository>('ProjectNodeRepository'),
     AnalysisNodeRepository: new TypedToken<IAnalysisNodeRepository>('AnalysisNodeRepository'),
     AnalysisNodeEventRepository: new TypedToken<IAnalysisNodeEventRepository>('AnalysisNodeEventRepository'),
+
+    /** Shared by the node status report routes and the offline sweep. */
+    NodeStatusService: new TypedToken<INodeStatusService>('NodeStatusService'),
 
     RegistryManager: new TypedToken<IRegistryManager>('RegistryManager'),
 } as const;

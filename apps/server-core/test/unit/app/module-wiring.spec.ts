@@ -18,6 +18,7 @@ import { AnalysisBuilder } from '../../../src/core/services/analysis-builder/mod
 import { AnalysisConfigurator } from '../../../src/core/services/analysis-configurator/module.ts';
 import { AnalysisDistributor } from '../../../src/core/services/analysis-distributor/module.ts';
 import { AnalysisStorageManager } from '../../../src/core/services/analysis-storage-manager/module.ts';
+import { NodeStatusService } from '../../../src/core/services/node-status/index.ts';
 import { createTestDatabaseApplication } from '../../app';
 
 describe('DI module wiring', () => {
@@ -108,5 +109,14 @@ describe('DI module wiring', () => {
         const result = suite.container.tryResolve(DatabaseInjectionKey.RegistryManager);
 
         expect(result.success).toBe(true);
+    });
+
+    // --- NodeStatusService is one shared instance (report routes + offline sweep) ---
+
+    it('should resolve NodeStatusService', () => {
+        const service = suite.container.resolve(DatabaseInjectionKey.NodeStatusService);
+
+        expect(service).toBeInstanceOf(NodeStatusService);
+        expect(suite.container.resolve(DatabaseInjectionKey.NodeStatusService)).toBe(service);
     });
 });

@@ -6,6 +6,7 @@
  */
 
 import type { NodeComponent } from '@privateaim/core-kit';
+import { PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
 import {
     AbstractEntityService,
@@ -14,6 +15,8 @@ import {
 } from '@privateaim/server-kit';
 import { decodeQuery, preEvaluateRelationReads } from '../../query/index.ts';
 import { NODE_READ_PERMISSIONS } from '../node/service.ts';
+import { REGISTRY_READ_PERMISSIONS } from '../registry/service.ts';
+import { REGISTRY_PROJECT_READ_PERMISSIONS } from '../registry-project/service.ts';
 import { nodeComponentSchema } from './schema.ts';
 import type {
     INodeComponentRepository,
@@ -21,8 +24,17 @@ import type {
     NodeComponentServiceContext,
 } from './types.ts';
 
-/** Relations an `include` can join, each guarded by its own read grant. */
-const RELATION_READ_PERMISSIONS = { node: NODE_READ_PERMISSIONS } satisfies Partial<Record<keyof NodeComponent, string[]>>;
+/**
+ * Every relation path an `include` may join, each guarded by its own read grant,
+ * nested paths included (`node.registry` reaches the registry through the node).
+ * A path not listed here is refused, so a relation the node schema adds later
+ * stays closed until it is mapped.
+ */
+const RELATION_READ_PERMISSIONS: Record<string, string[]> = {
+    node: NODE_READ_PERMISSIONS,
+    'node.registry': REGISTRY_READ_PERMISSIONS,
+    'node.registryProject': REGISTRY_PROJECT_READ_PERMISSIONS,
+};
 
 /**
  * Components are read like the nodes they belong to: a node read grant reads
@@ -38,6 +50,12 @@ export class NodeComponentService extends AbstractEntityService implements INode
 
     async getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<NodeComponent>> {
         const decoded = decodeQuery(query, { schema: nodeComponentSchema });
+
+        for (const relation of decoded.relations.value) {
+            if (!Object.hasOwn(RELATION_READ_PERMISSIONS, relation.name)) {
+                throw new PermissionDeniedError(`The relation ${relation.name} can not be included.`);
+            }
+        }
 
         await preEvaluateRelationReads(decoded, actor, RELATION_READ_PERMISSIONS);
 

@@ -21,13 +21,18 @@ import { AnalysisBucketFileRepositoryAdapter } from './repositories/analysis-buc
 import { ProjectNodeRepositoryAdapter } from './repositories/project-node/index.ts';
 import { AnalysisNodeRepositoryAdapter } from './repositories/analysis-node/index.ts';
 import { AnalysisNodeEventRepositoryAdapter } from './repositories/analysis-node-event/index.ts';
+import { NodeStatusService } from '../../../core/services/node-status/index.ts';
 import { ComponentsInjectionKey } from '../components/constants.ts';
 import { RegistryManagerAdapter } from '../registry/index.ts';
 import { DatabaseInjectionKey } from './constants.ts';
 
 export function registerRepositories(container: IContainer, dataSource: DataSource, queryCache: IQueryCache): void {
-    container.register(DatabaseInjectionKey.NodeRepository, { useValue: new NodeRepositoryAdapter(dataSource, queryCache) });
-    container.register(DatabaseInjectionKey.NodeComponentRepository, { useValue: new NodeComponentRepositoryAdapter(dataSource) });
+    const nodeRepository = new NodeRepositoryAdapter(dataSource, queryCache);
+    const nodeComponentRepository = new NodeComponentRepositoryAdapter(dataSource);
+
+    container.register(DatabaseInjectionKey.NodeRepository, { useValue: nodeRepository });
+    container.register(DatabaseInjectionKey.NodeComponentRepository, { useValue: nodeComponentRepository });
+    container.register(DatabaseInjectionKey.NodeStatusService, { useValue: new NodeStatusService({ nodeRepository, nodeComponentRepository }) });
     container.register(DatabaseInjectionKey.RegistryRepository, { useValue: new RegistryRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.MasterImageRepository, { useValue: new MasterImageRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.MasterImageGroupRepository, { useValue: new MasterImageGroupRepositoryAdapter(dataSource) });
