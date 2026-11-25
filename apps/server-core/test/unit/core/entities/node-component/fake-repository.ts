@@ -6,6 +6,7 @@
  */
 
 import type { NodeComponent } from '@privateaim/core-kit';
+import { EntityNotFoundError } from '@privateaim/errors';
 import { FakeEntityRepository } from '@privateaim/server-test-kit';
 import type {
     INodeComponentRepository,
@@ -29,6 +30,8 @@ export class FakeNodeComponentRepository extends FakeEntityRepository<NodeCompon
     }
 
     async replaceForNode(nodeId: string, writes: NodeComponentWrite[], reportedAt: string): Promise<NodeComponent[]> {
+        await this.assertNode(nodeId);
+
         const named = new Set(writes.map((write) => write.name));
         const stored = await this.findManyBy({ nodeId });
 
@@ -48,6 +51,8 @@ export class FakeNodeComponentRepository extends FakeEntityRepository<NodeCompon
     }
 
     async upsertForNode(nodeId: string, write: NodeComponentWrite, reportedAt: string): Promise<NodeComponent> {
+        await this.assertNode(nodeId);
+
         const current = await this.findOneBy({ nodeId, name: write.name });
         const data = mergeNodeComponent(current ?? undefined, write.report, reportedAt);
 
@@ -72,5 +77,11 @@ export class FakeNodeComponentRepository extends FakeEntityRepository<NodeCompon
                 .filter((component) => component.nodeId === node.id)
                 .every((component) => new Date(component.reportedAt).getTime() < threshold))
             .map((node) => node.id);
+    }
+
+    protected async assertNode(nodeId: string): Promise<void> {
+        if (!await this.nodeRepository.findOneById(nodeId)) {
+            throw new EntityNotFoundError({ entity: 'node' });
+        }
     }
 }

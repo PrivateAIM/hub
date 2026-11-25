@@ -6,6 +6,7 @@
  */
 
 import type { NodeComponent } from '@privateaim/core-kit';
+import { EntityNotFoundError } from '@privateaim/errors';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
@@ -151,6 +152,7 @@ export class NodeComponentRepositoryAdapter implements INodeComponentRepository 
      * Run `fn` in one transaction that holds a write lock on the node row, so
      * a snapshot and a component report for the same node serialize, and
      * hand it the node's components as they are after the lock was taken.
+     * Throws EntityNotFoundError when the node does not exist.
      *
      * better-sqlite3 has no row locks (typeorm throws
      * LockNotSupportedOnGivenDriverError), so it runs unlocked. Its one
@@ -167,18 +169,24 @@ export class NodeComponentRepositoryAdapter implements INodeComponentRepository 
                 { lock: { mode: 'pessimistic_write' } } :
                 {};
 
-            await manager.findOne(NodeEntity, {
+            const node = await manager.findOne(NodeEntity, {
                 select: { id: true },
                 where: { id: nodeId },
                 ...lock,
             });
 
-            // A locking read: under MySQL's REPEATABLE READ a plain read could
-            // return a snapshot older than the writer that held the lock before.
-            const stored = await manager.find(NodeComponentEntity, {
-                where: { nodeId },
-                ...lock,
-            });
+            if (!node) {
+                throw new EntityNotFoundError({ entity: 'node' });
+            }
+
+            // A plain read, not a locking one. It still sees what the previous
+            // lock holder committed: InnoDB opens the REPEATABLE READ snapshot
+            // at the first non-locking read, which is this one, after the node
+            // lock; under Postgres READ COMMITTED every statement sees rows
+            // committed before it starts. A locking read would take a gap lock
+            // on UNIQUE(node_id, name) for a node without rows, and two such
+            // nodes in one gap deadlock on their first inserts (MySQL).
+            const stored = await manager.find(NodeComponentEntity, { where: { nodeId } });
 
             return fn(manager, stored);
         });

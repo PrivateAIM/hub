@@ -7,6 +7,7 @@
 
 import { faker } from '@faker-js/faker';
 import type { Node } from '@privateaim/core-kit';
+import { EntityNotFoundError } from '@privateaim/errors';
 import {
     afterAll,
     beforeAll,
@@ -24,6 +25,10 @@ const type = readDataSourceOptionsFromEnv()?.type;
 // better-sqlite3 has no row locks and one shared connection: a second
 // concurrent transaction fails to start instead of waiting.
 const lockable = type === 'mysql' || type === 'postgres';
+
+function highUUID(counter: number): string {
+    return `ffffffff-ffff-4fff-8fff-${counter.toString(16).padStart(12, '0')}`;
+}
 
 function minutesAgo(minutes: number): string {
     return new Date(Date.now() - minutes * 60 * 1000).toISOString();
@@ -132,6 +137,46 @@ describe('node component repository', () => {
         expect(rows).toHaveLength(1);
         expect(rows[0].version).toEqual('1');
         expect(rows[0].uptime).toEqual(5);
+    });
+
+    // Two nodes without rows sit in the same gap of UNIQUE(node_id, name): a
+    // locking component read would take compatible gap locks on both sides
+    // and deadlock the two first inserts on MySQL.
+    it.skipIf(!lockable)('should let two nodes write their first snapshot at once', async () => {
+        const writes = ['a', 'b', 'c'].map((name) => ({ name, report: { name, status: 'ok' as const } }));
+
+        for (let i = 0; i < 5; i++) {
+            // ids above every stored one, so both land in the same (last) gap
+            const base = Date.now() * 10;
+            const [x, y] = await Promise.all([
+                createNode({ id: highUUID(base) }),
+                createNode({ id: highUUID(base + 1) }),
+            ]);
+            const reportedAt = new Date().toISOString();
+
+            await Promise.all([dataSource.query('SELECT 1'), dataSource.query('SELECT 1')]);
+
+            const results = await Promise.allSettled([
+                repository.replaceForNode(x.id, writes, reportedAt),
+                repository.replaceForNode(y.id, writes, reportedAt),
+            ]);
+
+            expect(results.filter((result) => result.status === 'rejected')).toEqual([]);
+            expect(await names(x.id)).toEqual(['a', 'b', 'c']);
+            expect(await names(y.id)).toEqual(['a', 'b', 'c']);
+        }
+    });
+
+    it('should reject a write for a node that does not exist', async () => {
+        const reportedAt = new Date().toISOString();
+
+        await expect(repository.upsertForNode(faker.string.uuid(), {
+            name: 'a',
+            report: { status: 'ok' },
+        }, reportedAt)).rejects.toThrow(EntityNotFoundError);
+        await expect(repository.replaceForNode(faker.string.uuid(), [
+            { name: 'a', report: { name: 'a', status: 'ok' } },
+        ], reportedAt)).rejects.toThrow(EntityNotFoundError);
     });
 
     it('should find online nodes whose newest report is older than the threshold', async () => {
