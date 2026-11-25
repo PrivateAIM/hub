@@ -7,7 +7,7 @@
 
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { Client as DockerClient, ModemStreamWaitOptions } from 'docken';
-import { waitForStream } from 'docken';
+import { buildImage } from 'docken';
 import type { MasterImage } from '@privateaim/core-kit';
 import { REGISTRY_MASTER_IMAGE_PROJECT_NAME } from '@privateaim/core-kit';
 import type {
@@ -22,7 +22,6 @@ import type { Logger } from '@privateaim/server-kit';
 import type { ComponentHandler, ComponentHandlerContext } from 'hubwire';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import path from 'node:path';
-import tar from 'tar-fs';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../../constants';
 import { buildDockerImageURL } from '../../../../../adapters/docker/index.ts';
 import { formatBuildFailure, isRetryableFailure } from '../../../helpers.ts';
@@ -140,24 +139,12 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
 
         const imageFilePath = path.join(MASTER_IMAGES_DIRECTORY_PATH, masterImage.path);
 
-        // `tar.pack` returns a streamx `Pack`, which is NOT a node `Readable` —
-        // it has no `isPaused`/`unpipe`/`wrap` — so it does not really satisfy
-        // dockerode's `NodeJS.ReadableStream` parameter. It compiles because
-        // `@types/tar-stream` declares `Pack extends stream.Readable` (tar-fs
-        // ships no types of its own; `@types/tar-fs` only forwards that `Pack`),
-        // and it works because docker-modem only ever calls `.on('error')` and
-        // `.pipe()` on what it is handed. `container-pack.ts` leans on the same
-        // false declaration for `putArchive`. Deliberately uncast; pinned
-        // end-to-end by test/unit/components/master-image-builder/execute.spec.ts
-        // (#1863).
-        const pack = tar.pack(imageFilePath);
-        const stream = await this.docker
-            .buildImage(pack, {
-                t: imageTag,
-                platform: 'linux/amd64',
-            });
-
-        await waitForStream(this.docker, stream, {
+        // docken packs the directory (honouring .dockerignore) and awaits the stream.
+        await buildImage(this.docker, {
+            context: imageFilePath,
+            t: imageTag,
+            platform: 'linux/amd64',
+        }, {
             onFinished: () => {
                 this.logger?.info({
                     message: 'Built image',

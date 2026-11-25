@@ -106,37 +106,39 @@ export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
             groups: [],
         };
 
-        const result = await scanDirectory(directoryPath);
+        // a failed validation rejects with a ScanValidationError naming the item's path
+        const result = await scanDirectory(directoryPath, {
+            validate: {
+                image: (attributes) => this.imageValidator.run(attributes),
+                group: (attributes) => this.groupValidator.run(attributes),
+            },
+        });
 
-        for (let i = 0; i < result.images.length; i++) {
-            const attributes = await this.imageValidator.run(result.images[i].attributes);
-
+        for (const image of result.images) {
             output.images.push({
-                path: result.images[i].path,
-                virtualPath: result.images[i].virtualPath,
-                name: result.images[i].path.split('/').pop() || result.images[i].path,
-                command: attributes.command,
-                commandArguments: attributes.commandArguments || [],
+                path: image.path,
+                virtualPath: image.virtualPath,
+                name: image.path.split('/').pop() || image.path,
+                command: image.attributes.command,
+                commandArguments: image.attributes.commandArguments || [],
             });
         }
 
-        for (let i = 0; i < result.groups.length; i++) {
-            const attributes = await this.groupValidator.run(result.groups[i].attributes);
-
+        for (const group of result.groups) {
             let name : string;
 
-            if (attributes.name) {
-                name = attributes.name;
+            if (group.attributes.name) {
+                name = group.attributes.name;
             } else {
-                const parts = result.groups[i].path.split('/');
+                const parts = group.path.split('/');
 
                 name = parts.slice(0, -1).join('/');
             }
 
             output.groups.push({
-                path: result.groups[i].path,
-                virtualPath: result.groups[i].virtualPath,
-                name: name || result.groups[i].path,
+                path: group.path,
+                virtualPath: group.virtualPath,
+                name: name || group.path,
             });
         }
 

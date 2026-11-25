@@ -6,7 +6,7 @@
  */
 
 import type { Client } from 'docken';
-import { waitForStream } from 'docken';
+import { pushImage } from 'docken';
 import type { AuthConfig, Image } from 'dockerode';
 
 export async function pushDockerImage(
@@ -14,20 +14,9 @@ export async function pushDockerImage(
     input: Image | string,
     authConfig: AuthConfig,
 ) {
-    let imageLatest : Image;
+    const image = typeof input === 'string' ? docker.getImage(input) : input;
 
-    if (typeof input === 'string') {
-        imageLatest = docker.getImage(input);
-    } else {
-        imageLatest = input;
-    }
+    await pushImage(docker, image, { authconfig: authConfig });
 
-    // dockerode's `Image.push()` returns `Promise<ReadableStream>`, not
-    // `Array.prototype.push` — the return value is consumed on the next line.
-    // eslint-disable-next-line unicorn/no-return-array-push
-    const stream = await imageLatest.push({ authconfig: authConfig });
-
-    await waitForStream(docker, stream);
-
-    await imageLatest.remove({ force: true });
+    await image.remove({ force: true });
 }

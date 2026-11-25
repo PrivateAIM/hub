@@ -22,13 +22,8 @@ import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../src/constants';
 import { FakeComponentHandlerContext } from '../fakes/fake-component-handler-context';
 import { FakeLogger } from '../fakes/fake-logger';
 
-// Needs a real docker daemon, like test/unit/docker/pack.spec.ts. This is the
-// only coverage of the tar-fs -> `buildImage` hand-off described in issue #1863:
-// `tar.pack()` returns a streamx `Pack` that is not a node `Readable`, so the
-// day docker-modem reaches for `isPaused`/`unpipe`/`wrap`, this fails instead of
-// shipping broken. (The other half of that hazard — `@types/tar-stream` learning
-// that `Pack` is not a node stream — surfaces as a `build:types` failure, not
-// here.)
+// Needs a real docker daemon, like test/unit/docker/pack.spec.ts: the
+// directory is packed and built by docken's `buildImage`.
 
 const ID = '44444444-4444-4444-4444-444444444444';
 
