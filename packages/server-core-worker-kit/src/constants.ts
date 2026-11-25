@@ -10,6 +10,7 @@ export enum ComponentName {
     ANALYSIS_BUILDER = 'analysisBuilder',
 
     MASTER_IMAGE_BUILDER = 'masterImageBuilder',
+    MASTER_IMAGE_SYNCHRONIZER = 'masterImageSynchronizer',
 }
 
 export enum ErrorCode {

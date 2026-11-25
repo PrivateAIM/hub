@@ -54,20 +54,24 @@ export class MasterImageBuilderExecuteHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(payload, context);
         } catch (e) {
+            const reason = Error.isError(e) ? e.message : String(e);
+
             if (isRetryableFailure(e, context.metadata)) {
                 this.logger?.warn({
-                    message: e,
+                    message: `Building image failed, retrying: ${reason}`,
                     command: MasterImageBuilderCommand.EXECUTE,
                     retry: true,
+                    [LogFlag.REF_ID]: payload.id,
                 });
 
                 throw e;
             }
 
             this.logger?.error({
-                message: e,
+                message: `Reporting the image build as failed: ${reason}`,
                 command: MasterImageBuilderCommand.EXECUTE,
                 event: MasterImageBuilderEvent.EXECUTION_FAILED,
+                [LogFlag.REF_ID]: payload.id,
             });
 
             await context.handle(
