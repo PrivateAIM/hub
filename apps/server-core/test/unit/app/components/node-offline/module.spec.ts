@@ -14,6 +14,7 @@ import {
 import type { IComponent } from 'hubwire';
 import type { INodeStatusService } from '../../../../../src/core/services/node-status/index.ts';
 import { createNodeOfflineComponent } from '../../../../../src/app/components/node-offline/index.ts';
+import { FakeLogger } from '../../aggregators/fake-logger.ts';
 
 class FakeNodeStatusService implements Pick<INodeStatusService, 'markStaleNodesOffline'> {
     calls = 0;
@@ -50,6 +51,26 @@ describe('createNodeOfflineComponent', () => {
 
         expect(service.calls).toBe(1);
         expect(component.status().lastSuccessAt).toBeTypeOf('number');
+    });
+
+    it('should pluralize the summary line', async () => {
+        const service = new FakeNodeStatusService();
+        const logger = new FakeLogger();
+
+        service.result = ['n1'];
+        component = createNodeOfflineComponent({ service, logger });
+        await component.start();
+        await component.stop();
+
+        service.result = ['n1', 'n2'];
+        component = createNodeOfflineComponent({ service, logger });
+        await component.start();
+
+        const summaries = logger.entries
+            .map((entry) => entry.message)
+            .filter((message) => typeof message === 'string' && message.startsWith('Marked ') && !message.startsWith('Marked node'));
+
+        expect(summaries).toEqual(['Marked 1 node offline', 'Marked 2 nodes offline']);
     });
 
     it('should not report success when the pass fails', async () => {

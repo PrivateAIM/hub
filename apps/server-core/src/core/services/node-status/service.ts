@@ -26,9 +26,12 @@ export class NodeStatusService implements INodeStatusService {
 
     protected nodeComponentRepository: INodeComponentRepository;
 
+    protected startedAt: Date;
+
     constructor(ctx: NodeStatusServiceContext) {
         this.nodeRepository = ctx.nodeRepository;
         this.nodeComponentRepository = ctx.nodeComponentRepository;
+        this.startedAt = ctx.startedAt ?? new Date();
     }
 
     async reportStatus(nodeId: string, data: unknown, actor: ActorContext): Promise<NodeComponent[]> {
@@ -75,6 +78,11 @@ export class NodeStatusService implements INodeStatusService {
     }
 
     async markStaleNodesOffline(now: Date = new Date()): Promise<string[]> {
+        // After a hub outage every node looks silent: hub downtime is not node downtime.
+        if (now.getTime() - this.startedAt.getTime() < NODE_OFFLINE_THRESHOLD_MS) {
+            return [];
+        }
+
         const before = new Date(now.getTime() - NODE_OFFLINE_THRESHOLD_MS).toISOString();
         const ids = await this.nodeComponentRepository.findStaleOnlineNodeIds(before);
 

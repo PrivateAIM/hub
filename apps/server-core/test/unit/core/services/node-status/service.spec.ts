@@ -37,10 +37,15 @@ function clientActor(clientId: string, realmId: string): ActorContext {
     });
 }
 
-async function setup(overrides: Partial<Node> = {}) {
+async function setup(overrides: Partial<Node> = {}, startedAt: Date = new Date(0)) {
     const nodeRepository = new CountingNodeRepository();
     const nodeComponentRepository = new FakeNodeComponentRepository(nodeRepository);
-    const service = new NodeStatusService({ nodeRepository, nodeComponentRepository });
+    // started long ago by default, so the offline sweep is past its grace period
+    const service = new NodeStatusService({
+        nodeRepository,
+        nodeComponentRepository,
+        startedAt,
+    });
 
     const clientId = randomUUID();
     const realmId = randomUUID();
@@ -321,5 +326,31 @@ describe('NodeStatusService', () => {
         expect(changed).toEqual([]);
         // only the hook's own save
         expect(nodeRepository.saves).toBe(1);
+    });
+
+    it('does not sweep within the threshold after start, and sweeps after it', async () => {
+        // the hub (re)starts well after the node's last report, as after an outage
+        const startedAt = new Date(Date.now() + NODE_OFFLINE_THRESHOLD_MS + 60_000);
+        const {
+            service,
+            node,
+            actor,
+            nodeRepository,
+        } = await setup({}, startedAt);
+
+        await service.reportStatus(node.id, snapshot, actor);
+        nodeRepository.saves = 0;
+
+        // the components are stale relative to this `now`, but the hub only just started
+        const insideGrace = new Date(startedAt.getTime() + NODE_OFFLINE_THRESHOLD_MS - 1);
+
+        expect(await service.markStaleNodesOffline(insideGrace)).toEqual([]);
+        expect((await nodeRepository.findOneById(node.id))?.online).toBe(true);
+        expect(nodeRepository.saves).toBe(0);
+
+        const afterGrace = new Date(startedAt.getTime() + NODE_OFFLINE_THRESHOLD_MS);
+
+        expect(await service.markStaleNodesOffline(afterGrace)).toEqual([node.id]);
+        expect((await nodeRepository.findOneById(node.id))?.online).toBe(false);
     });
 });

@@ -34,7 +34,7 @@ export function createNodeOfflineComponent(ctx: NodeOfflineComponentContext): IS
                 return;
             }
 
-            ctx.logger?.info(`Marked ${ids.length} nodes offline`);
+            ctx.logger?.info(`Marked ${ids.length} ${ids.length === 1 ? 'node' : 'nodes'} offline`);
 
             for (const id of ids) {
                 ctx.logger?.info('Marked node offline', {

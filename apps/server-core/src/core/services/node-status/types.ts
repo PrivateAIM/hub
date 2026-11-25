@@ -13,11 +13,16 @@ import type { INodeRepository } from '../../entities/node/types.ts';
 export interface INodeStatusService {
     reportStatus(nodeId: string, data: unknown, actor: ActorContext): Promise<NodeComponent[]>;
     reportComponentStatus(nodeId: string, name: string, data: unknown, actor: ActorContext): Promise<NodeComponent>;
-    /** Clears `online` on nodes silent since `now - 5 min`. Returns the ids changed. */
+    /**
+     * Clears `online` on nodes silent since `now - 5 min`, but not within 5 min
+     * of `startedAt`. Returns the ids changed.
+     */
     markStaleNodesOffline(now?: Date): Promise<string[]>;
 }
 
 export type NodeStatusServiceContext = {
     nodeRepository: INodeRepository;
     nodeComponentRepository: INodeComponentRepository;
+    /** When the process started; the offline sweep waits one threshold after it. Defaults to now. */
+    startedAt?: Date;
 };
