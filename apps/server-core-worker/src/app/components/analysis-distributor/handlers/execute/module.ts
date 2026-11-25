@@ -20,9 +20,13 @@ import { REGISTRY_ARTIFACT_TAG_LATEST } from '@privateaim/core-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { ICoreClient as CoreClient } from '@privateaim/core-http-kit';
 import { getManyAll } from '@privateaim/core-http-kit';
-import type { Client as DockerClient, ModemStreamWaitOptions, Progress } from 'docken';
-import type { ImagePushOptions } from 'dockerode';
-import { waitForStream } from 'docken';
+import type {
+    Client as DockerClient,
+    ModemStreamWaitOptions,
+    Progress,
+    PushImageInput,
+} from 'docken';
+import { pushImage } from 'docken';
 import {
     buildDockerAuthConfigFromRegistry,
     buildDockerImageURL,
@@ -286,7 +290,7 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
     protected async pushImages(
         analysis: Analysis,
         tags: string[],
-        options: { push: ImagePushOptions, stream: ModemStreamWaitOptions },
+        options: { push: PushImageInput, stream: ModemStreamWaitOptions },
     ) {
         this.logger?.info({
             message: 'Pushing images',
@@ -307,15 +311,9 @@ export class AnalysisDistributorExecuteHandler implements ComponentHandler<Analy
 
         try {
             for (const [i, tag] of tags.entries()) {
-                const image = this.docker.getImage(tag);
-
-                // dockerode's `Image.push()` returns `Promise<ReadableStream>`, not
-                // `Array.prototype.push` — the return value is consumed below.
-                // eslint-disable-next-line unicorn/no-return-array-push
-                const stream = await image.push(options.push);
-
-                await waitForStream(this.docker, stream, {
-                    onPushing: async (process) => {
+                // onPushingTotal: progress across all layers of the image, not per layer
+                await pushImage(this.docker, tag, options.push, {
+                    onPushingTotal: async (process) => {
                         if (!options.stream.onPushing) {
                             return;
                         }

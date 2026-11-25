@@ -86,3 +86,8 @@ export enum LogChannel {
     BACKGROUND = 'background',
     SYSTEM = 'system',
 }
+
+/**
+ * Maximum length of a log message in characters.
+ */
+export const LOG_MESSAGE_MAX_LENGTH = 4096;

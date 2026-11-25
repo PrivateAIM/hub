@@ -7,7 +7,9 @@
 
 import type { Logger } from '@privateaim/server-kit';
 import type { ComponentMetadata, MessageDelivery } from 'hubwire';
+import { isModemStreamError } from 'docken';
 import { isClientError } from 'hapic';
+import { LOG_MESSAGE_MAX_LENGTH } from '@privateaim/telemetry-kit';
 import {
     ANALYSIS_PROCESS_HEARTBEAT_INTERVAL_MS,
     ANALYSIS_PROCESS_HEARTBEAT_MAX_SILENCE_MS,
@@ -88,6 +90,55 @@ export function isTransientError(error: unknown): boolean {
     }
 
     return false;
+}
+
+/**
+ * One telemetry message for a failed image build: the reason, then (for a
+ * docken stream failure) the tail of the build output, oldest lines dropped
+ * until it fits `maxLength`. If even the newest line alone does not fit, it is
+ * kept cut to the remaining budget, keeping its end and prefixed with `…`; with
+ * less than 2 characters left only the reason is returned. A reason that alone
+ * exceeds `maxLength` is cut and carries no output.
+ */
+export function formatBuildFailure(
+    error: unknown,
+    maxLength: number = LOG_MESSAGE_MAX_LENGTH,
+): string {
+    const reason = Error.isError(error) && error.message ? error.message : 'unknown error';
+    const head = `Building image failed: ${reason}`.slice(0, maxLength);
+
+    if (!isModemStreamError(error)) {
+        return head;
+    }
+
+    // `output` holds the full build log (thousands of lines): walk back from the
+    // newest line and stop at the budget instead of re-joining the whole log.
+    const { output } = error;
+
+    if (output.length === 0) {
+        return head;
+    }
+
+    let start = output.length;
+    let { length } = head;
+
+    while (start > 0 && length + 1 + output[start - 1].length <= maxLength) {
+        start--;
+        length += 1 + output[start].length;
+    }
+
+    if (start < output.length) {
+        return [head, ...output.slice(start)].join('\n');
+    }
+
+    const newest = output[output.length - 1];
+    const budget = maxLength - head.length - 1;
+
+    if (budget < 2) {
+        return head;
+    }
+
+    return `${head}\n…${newest.slice(newest.length - (budget - 1))}`;
 }
 
 /**

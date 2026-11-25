@@ -7,6 +7,7 @@
 
 import { createFakeClient } from '@privateaim/core-http-kit/testing';
 import { MasterImageBuilderCommand, MasterImageBuilderEvent } from '@privateaim/server-core-worker-kit';
+import { LogFlag } from '@privateaim/telemetry-kit';
 import { createClient } from 'docken';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,14 +20,10 @@ import {
 import { MasterImageBuilderExecuteHandler } from '../../../../src/app/components/master-image-builder/handlers/execute/module';
 import { MASTER_IMAGES_DIRECTORY_PATH } from '../../../../src/constants';
 import { FakeComponentHandlerContext } from '../fakes/fake-component-handler-context';
+import { FakeLogger } from '../fakes/fake-logger';
 
-// Needs a real docker daemon, like test/unit/docker/pack.spec.ts. This is the
-// only coverage of the tar-fs -> `buildImage` hand-off described in issue #1863:
-// `tar.pack()` returns a streamx `Pack` that is not a node `Readable`, so the
-// day docker-modem reaches for `isPaused`/`unpipe`/`wrap`, this fails instead of
-// shipping broken. (The other half of that hazard — `@types/tar-stream` learning
-// that `Pack` is not a node stream — surfaces as a `build:types` failure, not
-// here.)
+// Needs a real docker daemon, like test/unit/docker/pack.spec.ts: the
+// directory is packed and built by docken's `buildImage`.
 
 const ID = '44444444-4444-4444-4444-444444444444';
 
@@ -37,6 +34,10 @@ const VIRTUAL_PATH = 'spec/master-image-builder';
 const TAG = `master/${VIRTUAL_PATH}:latest`;
 
 const directory = path.join(MASTER_IMAGES_DIRECTORY_PATH, RELATIVE_PATH);
+
+const FAILING_RELATIVE_PATH = 'data/spec/master-image-builder-failing';
+const FAILING_VIRTUAL_PATH = 'spec/master-image-builder-failing';
+const failingDirectory = path.join(MASTER_IMAGES_DIRECTORY_PATH, FAILING_RELATIVE_PATH);
 
 const docker = createClient();
 
@@ -63,6 +64,7 @@ describe('MasterImageBuilderExecuteHandler', () => {
         await docker.getImage(TAG).remove({ force: true }).catch(() => { /* never built */ });
 
         fs.rmSync(directory, { recursive: true, force: true });
+        fs.rmSync(failingDirectory, { recursive: true, force: true });
     }, 60_000);
 
     it('should build the image from the master image directory', async () => {
@@ -87,14 +89,51 @@ describe('MasterImageBuilderExecuteHandler', () => {
         await new MasterImageBuilderExecuteHandler({ coreClient, docker })
             .handle({ id: ID }, context);
 
-        // THE assertion. `handleInternal` catches a failing build, logs it and
-        // still emits EXECUTION_FINISHED, so the emitted events look identical
-        // whether the build worked or not — only the image proves it did.
+        // THE assertion. A failing build is caught by `handle`, which emits
+        // EXECUTION_FAILED instead, so only the image proves the build worked.
         const image = await docker.getImage(TAG).inspect();
 
         expect(image.RepoTags).toContain(TAG);
 
         expect(context.eventsOf(MasterImageBuilderEvent.EXECUTION_FINISHED)).toHaveLength(1);
         expect(coreClient.requests[0]).toMatchObject({ method: 'GET', params: { id: ID } });
+    }, 30_000);
+
+    it('should log the build output when the build fails', async () => {
+        fs.mkdirSync(failingDirectory, { recursive: true });
+        fs.writeFileSync(path.join(failingDirectory, 'Dockerfile'), 'FROM scratch\nCOPY does-not-exist.txt /x\n');
+
+        const coreClient = createFakeClient({
+            handlers: {
+                'GET /master-images/:id': () => ({
+                    data: {
+                        id: ID,
+                        name: 'spec',
+                        path: FAILING_RELATIVE_PATH,
+                        virtualPath: FAILING_VIRTUAL_PATH,
+                    },
+                    meta: {},
+                }),
+            },
+        });
+
+        const logger = new FakeLogger();
+        const context = new FakeComponentHandlerContext(MasterImageBuilderCommand.EXECUTE);
+
+        await new MasterImageBuilderExecuteHandler({
+            coreClient, 
+            docker, 
+            logger, 
+        })
+            .handle({ id: ID }, context);
+
+        expect(context.eventsOf(MasterImageBuilderEvent.EXECUTION_FAILED)).toHaveLength(1);
+
+        const entry = logger.entriesOf('error')
+            .find((e) => e.message.startsWith('Building image failed: '));
+
+        expect(entry).toBeDefined();
+        expect(entry.message).toContain('Step 2/2 : COPY does-not-exist.txt');
+        expect(entry.meta[LogFlag.REF_ID]).toBe(ID);
     }, 30_000);
 });

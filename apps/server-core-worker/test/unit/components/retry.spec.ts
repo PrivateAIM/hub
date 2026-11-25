@@ -10,6 +10,7 @@ import { createFakeClient as createFakeStorageClient } from '@privateaim/storage
 import { AnalysisBuilderCommand, AnalysisBuilderEvent } from '@privateaim/server-core-worker-kit';
 import { MESSAGE_BUS_MAX_ATTEMPTS } from '@privateaim/server-kit';
 import type { Client as DockerClient } from 'docken';
+import { ModemStreamError } from 'docken';
 import { createClientError } from 'hapic';
 import { describe, expect, it } from 'vitest';
 import { AnalysisBuilderExecuteHandler } from '../../../src/app/components/analysis-builder/handlers/execute/module';
@@ -40,6 +41,7 @@ describe('isTransientError', () => {
         ['a refused connection', createNodeError('ECONNREFUSED', 'connect')],
         ['a socket hang up', createNodeError('ECONNRESET')],
         ['a missing docker socket', createNodeError('ENOENT', 'connect')],
+        ['a stream failure caused by a reset socket', new ModemStreamError('socket hang up', { output: [], cause: createNodeError('ECONNRESET') })],
     ])('should classify %s as transient', (_, error) => {
         expect(isTransientError(error)).toBe(true);
     });
@@ -51,6 +53,7 @@ describe('isTransientError', () => {
         ['a missing file', createNodeError('ENOENT', 'open')],
         ['a build error', new Error('The command \'/bin/sh -c exit 1\' returned a non-zero code: 1')],
         ['a non-error', 'boom'],
+        ['a stream failure caused by a build error', new ModemStreamError('returned a non-zero code: 1', { output: ['x'], cause: new Error('returned a non-zero code: 1') })],
     ])('should classify %s as permanent', (_, error) => {
         expect(isTransientError(error)).toBe(false);
     });

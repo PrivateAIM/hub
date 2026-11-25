@@ -9,7 +9,6 @@ export * from './auth-config.ts';
 export * from './container-pack.ts';
 export * from './error.ts';
 export * from './image-cleanup.ts';
-export * from './image-push.ts';
 export * from './registry.ts';
 export * from './types.ts';
 export * from './utils.ts';
