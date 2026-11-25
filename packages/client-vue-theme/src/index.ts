@@ -31,6 +31,10 @@ export default function clientVueTheme() {
     return defineTheme({
         elements: {
             tableHeadCell: { classes: { root: 'px-3 font-medium' } },
+            // Upstream: tada5hi/vuecs#1795 (local fix until @vuecs/theme-tailwind centers it)
+            // The description is capped at `max-w-prose` but not centered,
+            // so in an empty state wider than 65ch it sits left of the icon.
+            emptyState: { classes: { description: extend('mx-auto') } },
             /*
              * Hovering / focusing a page button previews the active-page
              * paint ("click → this page"). `extend()` appends to the
