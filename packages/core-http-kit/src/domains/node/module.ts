@@ -7,7 +7,12 @@
 
 import type { EntityQueryInput } from '../../utils';
 import { buildQueryString, nullifyEmptyObjectProperties } from '../../utils';
-import type { Node } from '@privateaim/core-kit';
+import type {
+    Node,
+    NodeComponent,
+    NodeComponentReport,
+    NodeStatusReport,
+} from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
@@ -103,6 +108,31 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
      */
     async getRegistryCredentials(id: Node['id'], options?: APIRequestOptions): Promise<NodeRegistryCredentials> {
         const response = await this.client.get(`nodes/${encodePathSegment(id)}/registry/credentials`, buildRequestConfig(options));
+
+        return response.data;
+    }
+
+    async reportStatus(
+        id: Node['id'],
+        data: NodeStatusReport,
+        options?: APIRequestOptions,
+    ): Promise<EntityCollectionResponse<NodeComponent>> {
+        const response = await this.client.put(`nodes/${encodePathSegment(id)}/status`, data, buildRequestConfig(options));
+
+        return response.data;
+    }
+
+    async reportComponentStatus(
+        id: Node['id'],
+        name: string,
+        data: NodeComponentReport,
+        options?: APIRequestOptions,
+    ): Promise<EntityRecordResponse<NodeComponent>> {
+        const response = await this.client.put(
+            `nodes/${encodePathSegment(id)}/components/${encodePathSegment(name)}/status`,
+            data,
+            buildRequestConfig(options),
+        );
 
         return response.data;
     }

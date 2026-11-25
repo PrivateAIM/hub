@@ -6,8 +6,20 @@
  */
 
 import type { Client } from '@authup/core-kit';
-import type { Node, Registry, RegistryProject } from '@privateaim/core-kit';
-import type { APIRequestOptions, EntityRecordResponse, IEntityAPI } from '../types';
+import type { 
+    Node, 
+    NodeComponent, 
+    NodeComponentReport, 
+    NodeStatusReport, 
+    Registry, 
+    RegistryProject, 
+} from '@privateaim/core-kit';
+import type { 
+    APIRequestOptions, 
+    EntityCollectionResponse, 
+    EntityRecordResponse, 
+    IEntityAPI, 
+} from '../types';
 
 export type NodeCreatePayload =    & Pick<Node, 'name'> &
     Partial<Pick<Node, 'type' | 'hidden' | 'publicKey' | 'externalName' | 'registryId' | 'clientId' | 'realmId'>>;
@@ -45,4 +57,16 @@ export interface INodeAPI extends IEntityAPI<Node, NodeCreatePayload, NodeUpdate
         options?: APIRequestOptions,
     ) : Promise<NodeClientCredentials>;
     getRegistryCredentials(id: Node['id'], options?: APIRequestOptions) : Promise<NodeRegistryCredentials>;
+
+    reportStatus(
+        id: Node['id'],
+        data: NodeStatusReport,
+        options?: APIRequestOptions,
+    ) : Promise<EntityCollectionResponse<NodeComponent>>;
+    reportComponentStatus(
+        id: Node['id'],
+        name: string,
+        data: NodeComponentReport,
+        options?: APIRequestOptions,
+    ) : Promise<EntityRecordResponse<NodeComponent>>;
 }

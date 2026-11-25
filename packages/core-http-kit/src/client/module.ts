@@ -17,6 +17,7 @@ import {
     MasterImageAPI,
     MasterImageGroupAPI,
     NodeAPI,
+    NodeComponentAPI,
     ProjectAPI,
     ProjectNodeAPI,
     RegistryAPI,
@@ -39,6 +40,8 @@ export class Client extends BaseClient implements ICoreClient {
     public readonly registryProject : RegistryProjectAPI;
 
     public readonly node : NodeAPI;
+
+    public readonly nodeComponent : NodeComponentAPI;
 
     public readonly analysis : AnalysisAPI;
 
@@ -66,6 +69,7 @@ export class Client extends BaseClient implements ICoreClient {
         this.registry = new RegistryAPI({ client: this });
         this.registryProject = new RegistryProjectAPI({ client: this });
         this.node = new NodeAPI({ client: this });
+        this.nodeComponent = new NodeComponentAPI({ client: this });
         this.analysis = new AnalysisAPI({ client: this });
         this.analysisBucket = new AnalysisBucketAPI({ client: this });
         this.analysisBucketFile = new AnalysisBucketFileAPI({ client: this });
