@@ -5,40 +5,35 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImageGroup } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import type { MasterImageSynchronizerEventMap } from '@privateaim/server-core-worker-kit';
 import {
     MasterImageSynchronizerEvent,
 } from '@privateaim/server-core-worker-kit';
-import type { IEntityRepository, Logger } from '@privateaim/server-kit';
-import type { IMasterImageRepository } from '../../../../core/entities/master-image/types.ts';
 import { Component } from 'hubwire';
-import type { EventComponentDispatcher } from '@privateaim/server-telemetry-kit';
+import { extractPayloadErrorMessage } from '../helpers.ts';
 import {
     handleMasterImageSynchronizerExecutionFinishedEvent,
 } from './handler.ts';
-
-type MasterImageSynchronizerAggregatorContext = {
-    imageRepository: IMasterImageRepository;
-    groupRepository: IEntityRepository<MasterImageGroup>;
-    eventComponentDispatcher?: EventComponentDispatcher;
-    logger?: Logger;
-};
+import type { MasterImageSynchronizerAggregatorContext } from './types.ts';
 
 export class MasterImageSynchronizerAggregator extends Component<MasterImageSynchronizerEventMap> {
     constructor(ctx: MasterImageSynchronizerAggregatorContext) {
         super();
 
-        const recordEvent = async (name: string) => {
-            if (ctx.eventComponentDispatcher) {
-                await ctx.eventComponentDispatcher.dispatchCreate({
-                    name,
-                    data: {},
-                    refType: DomainType.MASTER_IMAGE,
-                    scope: 'synchronizer',
-                });
+        const recordEvent = async (name: string, payload?: unknown) => {
+            if (!ctx.eventComponentDispatcher) {
+                return;
             }
+
+            const error = extractPayloadErrorMessage(payload);
+
+            await ctx.eventComponentDispatcher.dispatchCreate({
+                name,
+                data: error ? { error } : {},
+                refType: DomainType.MASTER_IMAGE,
+                scope: 'synchronizer',
+            });
         };
 
         // A specific handler shadows '*', so it records its own telemetry event.
@@ -51,7 +46,7 @@ export class MasterImageSynchronizerAggregator extends Component<MasterImageSync
             );
             await recordEvent(context.key);
         });
-        this.mount('*', (_payload, context) => recordEvent(context.key));
+        this.mount('*', (payload, context) => recordEvent(context.key, payload));
     }
 
     async start() : Promise<void> {

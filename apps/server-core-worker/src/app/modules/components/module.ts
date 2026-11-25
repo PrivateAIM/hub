@@ -114,6 +114,26 @@ export class ComponentsModule implements IModule {
             ],
         });
 
+        // Sync is a repository-wide run, so its lines carry the master-image
+        // ref type but no ref id; the component label tells them apart.
+        const masterImageSynchronizerLogger = createLogger({
+            options: { defaultMeta: { component: ComponentName.MASTER_IMAGE_SYNCHRONIZER } },
+            transports: [
+                new LoggerConsoleTransport(),
+                new LoggerTransport({
+                    labels: {
+                        [LogFlag.SERVICE]: 'hub-server-worker',
+                        [LogFlag.CHANNEL]: LogChannel.SYSTEM,
+                        [LogFlag.COMPONENT]: ComponentName.MASTER_IMAGE_SYNCHRONIZER,
+                        [LogFlag.REF_TYPE]: DomainType.MASTER_IMAGE,
+                    },
+                    save: async (data) => {
+                        await logDispatcher?.dispatchWrite(data);
+                    },
+                }),
+            ],
+        });
+
         this.components = [
             new RemoteWorker(
                 new AnalysisBuilderComponent({
@@ -156,12 +176,12 @@ export class ComponentsModule implements IModule {
                 },
             ),
             new RemoteWorker(
-                new MasterImageSynchronizerComponent({ logger: masterImageBuilderLogger }),
+                new MasterImageSynchronizerComponent({ logger: masterImageSynchronizerLogger }),
                 {
                     publish: MasterImageSynchronizerEventMessageBusRouting,
                     consume: MasterImageSynchronizerTaskMessageBusRouting,
                     messageBus,
-                    hooks: createRemoteWorkerLogHooks(masterImageBuilderLogger),
+                    hooks: createRemoteWorkerLogHooks(masterImageSynchronizerLogger),
                 },
             ),
         ];

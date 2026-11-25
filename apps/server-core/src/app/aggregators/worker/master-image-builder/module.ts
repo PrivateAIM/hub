@@ -11,6 +11,7 @@ import {
     MasterImageBuilderEvent,
 } from '@privateaim/server-core-worker-kit';
 import { Component } from 'hubwire';
+import { extractPayloadErrorMessage } from '../helpers.ts';
 import type { MasterImageBuilderAggregatorContext } from './types.ts';
 
 export class MasterImageBuilderAggregator extends Component<MasterImageBuilderEventMap> {
@@ -20,19 +21,26 @@ export class MasterImageBuilderAggregator extends Component<MasterImageBuilderEv
         const handler = async (value, context) => {
             const saved = await ctx.service.applyEvent(context.key, value);
 
-            if (!saved) {
+            // A build reports progress many times; the entity holds the latest
+            // percentage, so recording each tick as an event only buries the
+            // ones an admin investigates (started, failed, finished).
+            if (
+                !saved ||
+                !ctx.eventComponentDispatcher ||
+                context.key === MasterImageBuilderEvent.EXECUTION_PROGRESS
+            ) {
                 return;
             }
 
-            if (ctx.eventComponentDispatcher) {
-                await ctx.eventComponentDispatcher.dispatchCreate({
-                    name: context.key,
-                    data: {},
-                    refType: DomainType.MASTER_IMAGE,
-                    refId: saved.id,
-                    scope: 'builder',
-                });
-            }
+            const error = extractPayloadErrorMessage(value);
+
+            await ctx.eventComponentDispatcher.dispatchCreate({
+                name: context.key,
+                data: error ? { error } : {},
+                refType: DomainType.MASTER_IMAGE,
+                refId: saved.id,
+                scope: 'builder',
+            });
         };
 
         this.mount(MasterImageBuilderEvent.EXECUTION_PROGRESS, handler);

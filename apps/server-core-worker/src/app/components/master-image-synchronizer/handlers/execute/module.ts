@@ -49,9 +49,11 @@ export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
             // todo: check if image exists, otherwise local queue task
             await this.handleInternal(payload, context);
         } catch (e) {
+            const reason = Error.isError(e) ? e.message : String(e);
+
             if (isRetryableFailure(e, context.metadata)) {
                 this.logger?.warn({
-                    message: e,
+                    message: `Synchronizing master images failed, retrying: ${reason}`,
                     command: MasterImageSynchronizerCommand.EXECUTE,
                     retry: true,
                 });
@@ -60,7 +62,7 @@ export class MasterImageSynchronizerExecuteHandler implements ComponentHandler<
             }
 
             this.logger?.error({
-                message: e,
+                message: `Synchronizing master images failed: ${reason}`,
                 command: MasterImageSynchronizerCommand.EXECUTE,
                 event: MasterImageSynchronizerEvent.EXECUTION_FAILED,
             });
