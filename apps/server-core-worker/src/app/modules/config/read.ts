@@ -12,15 +12,15 @@ import type { Config } from './types.ts';
 
 export function readConfigFromEnv(): Partial<Config> {
     return {
-        env: read(EnvironmentInputKey.ENV, EnvironmentName.DEVELOPMENT) as `${EnvironmentName}`,
-        port: readInt(EnvironmentInputKey.PORT, ConfigDefaults.PORT),
+        env: read(EnvironmentInputKey.ENV, { default: EnvironmentName.DEVELOPMENT }) as `${EnvironmentName}`,
+        port: readInt(EnvironmentInputKey.PORT, { default: ConfigDefaults.PORT }),
 
-        clientId: read(EnvironmentInputKey.CLIENT_ID, ConfigDefaults.CLIENT_ID),
-        clientSecret: read(EnvironmentInputKey.CLIENT_SECRET, ConfigDefaults.CLIENT_SECRET),
+        clientId: read(EnvironmentInputKey.CLIENT_ID, { default: ConfigDefaults.CLIENT_ID }),
+        clientSecret: read(EnvironmentInputKey.CLIENT_SECRET, { default: ConfigDefaults.CLIENT_SECRET }),
 
-        realm: read(EnvironmentInputKey.REALM, ConfigDefaults.REALM),
+        realm: read(EnvironmentInputKey.REALM, { default: ConfigDefaults.REALM }),
 
-        rabbitMqConnectionString: read(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING, ConfigDefaults.RABBITMQ),
+        rabbitMqConnectionString: read(EnvironmentInputKey.RABBITMQ_CONNECTION_STRING, { default: ConfigDefaults.RABBITMQ }),
 
         coreURL: orFail(read(EnvironmentInputKey.CORE_URL)),
         authupURL: orFail(read(EnvironmentInputKey.AUTHUP_URL)),
