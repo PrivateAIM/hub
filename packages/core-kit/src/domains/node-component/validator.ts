@@ -8,30 +8,13 @@
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { TypedContainer } from '@privateaim/kit';
-import { NODE_COMPONENT_NAME_PATTERN, NodeComponentStatus } from './constants.ts';
-import type { NodeComponentReport } from './types.ts';
+import { reportShape } from './schemas.ts';
+import type { NodeComponentProbeReport, NodeComponentReport } from './types.ts';
 
-export const reportShape = {
-    status: z.enum(NodeComponentStatus),
-    version: z.string().min(1).max(64).nullish(),
-    message: z.string().max(1024).nullish(),
-    uptime: z.number().int().min(0).nullish(),
-};
+// probe keys are mounted only to be rejected
+type ComponentReportInput = NodeComponentReport & Pick<NodeComponentProbeReport, 'latency' | 'checksTotal' | 'checksSuccessful'>;
 
-const strictReportSchema = z.object(reportShape).strict();
-
-export const probeReportSchema = z.object({
-    ...reportShape,
-    name: z.string().min(1).max(64).regex(NODE_COMPONENT_NAME_PATTERN),
-    latency: z.number().min(0).nullish(),
-    checksTotal: z.number().int().min(0).nullish(),
-    checksSuccessful: z.number().int().min(0).nullish(),
-}).strict().refine(
-    (c) => c.checksTotal == null || c.checksSuccessful == null || c.checksSuccessful <= c.checksTotal,
-    { message: 'checksSuccessful must not exceed checksTotal', path: ['checksSuccessful'] },
-);
-
-export class NodeComponentReportValidator extends TypedContainer<NodeComponentReport> {
+export class NodeComponentReportValidator extends TypedContainer<ComponentReportInput> {
     protected override initialize() {
         super.initialize();
 
@@ -39,12 +22,14 @@ export class NodeComponentReportValidator extends TypedContainer<NodeComponentRe
         this.mount('version', { optional: true }, createValidator(reportShape.version));
         this.mount('message', { optional: true }, createValidator(reportShape.message));
         this.mount('uptime', { optional: true }, createValidator(reportShape.uptime));
-    }
 
-    // Mounted keys ignore unknown input keys; the strict schema rejects them (e.g. probe fields).
-    override async run(...args: Parameters<TypedContainer<NodeComponentReport>['run']>) {
-        strictReportSchema.parse(args[0]);
-
-        return super.run(...args);
+        // probe fields are measured by the hub, never reported by a component
+        for (const key of ['latency', 'checksTotal', 'checksSuccessful'] as const) {
+            this.mount(
+                key,
+                { optional: true },
+                createValidator(z.never({ error: 'probe fields are not accepted on a component report' })),
+            );
+        }
     }
 }

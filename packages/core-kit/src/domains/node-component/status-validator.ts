@@ -8,7 +8,7 @@
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { TypedContainer } from '@privateaim/kit';
-import { probeReportSchema } from './validator.ts';
+import { probeReportSchema } from './schemas.ts';
 import type { NodeStatusReport } from './types.ts';
 
 export class NodeStatusReportValidator extends TypedContainer<NodeStatusReport> {

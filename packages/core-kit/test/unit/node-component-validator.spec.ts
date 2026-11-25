@@ -6,6 +6,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
+import { isValidupError } from 'validup';
 import { NodeComponentReportValidator, NodeStatusReportValidator } from '../../src';
 
 describe('NodeStatusReportValidator', () => {
@@ -65,7 +66,7 @@ describe('NodeStatusReportValidator', () => {
         { components: [{ ...component, extra: 1 }] },
         { deployment: { name: 'x' }, components: [component] },
     ] as Record<string, any>[])('rejects %#', async (input) => {
-        await expect(validator.run(input)).rejects.toBeDefined();
+        await expect(validator.run(input)).rejects.toSatisfy(isValidupError);
     });
 });
 
@@ -84,9 +85,11 @@ describe('NodeComponentReportValidator', () => {
 
     it.each([
         { status: 'ok', latency: 3 },
+        { status: 'ok', latency: null },
+        { status: 'ok', checksSuccessful: 3 },
         { status: 'ok', checksTotal: 3 },
         {},
     ] as Record<string, any>[])('rejects %#', async (input) => {
-        await expect(validator.run(input)).rejects.toBeDefined();
+        await expect(validator.run(input)).rejects.toSatisfy(isValidupError);
     });
 });
