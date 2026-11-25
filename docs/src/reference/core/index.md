@@ -70,14 +70,14 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 
 A node reports its health to the Hub, which keeps the **latest** state only. Two routes write it, both only for the node's own client (any other caller gets `403`, an unknown node `404`, an invalid body or component name `400`; the body is validated before authorization):
 
-- `PUT /nodes/:id/status` is the adapter's snapshot. It **replaces** the node's component set. Body: optional `deployment { name, version }` and a non-empty, unique-by-name `components[]`. Each component carries `name` (`^[a-z0-9]+(?:[-_][a-z0-9]+)*$`, at most 64 characters), `status` (`ok`, `error` or `disabled`) and optionally `version`, `message` (at most 1024 characters), `latency` (ms), `uptime` (s), `checksTotal` and `checksSuccessful` (probe counts of the last 24 hours).
+- `PUT /nodes/:id/status` is the adapter's snapshot. It **replaces** the node's component set. Body: optional `deployment { name, version }` and a non-empty, unique-by-name `components[]`. Each component carries `name` (`^[a-z0-9]+(?:[-_][a-z0-9]+)*$`, at most 64 characters), `status` (`ok`, `error` or `disabled`) and optionally `version`, `message` (at most 1024 characters), `latency` (ms), `uptime` (s), `checksTotal` and `checksSuccessful` (probe counts of the last 24 hours). A snapshot carries at most 64 components; `uptime`, `checksTotal` and `checksSuccessful` are non-negative integers up to 2147483647, and `checksSuccessful` must not exceed `checksTotal`.
 - `PUT /nodes/:id/components/:name/status` is a component reporting itself. It **upserts** one row. Body: `status` and optionally `version`, `message`, `uptime`. The probe fields (`latency`, `checksTotal`, `checksSuccessful`) are rejected.
 
 An omitted or `null` field keeps the stored value, except `message`, which is replaced together with `status`. The Hub stamps `reportedAt` on receipt; the body carries no timestamps. The last write wins.
 
-A report sets the node's `online` flag and, when the snapshot carries a `deployment`, `deploymentVersion`. A node is online while any of its components reported within the last 5 minutes. A scheduled job (every minute, and once at start) clears `online` on nodes that went silent.
+A report sets the node's `online` flag and, when the snapshot carries a `deployment`, `deploymentVersion`. A node is online while any of its components reported within the last 5 minutes. A scheduled job clears `online` on nodes that went silent, every minute. It changes nothing during the first 5 minutes after the Hub starts, so Hub downtime does not mark nodes offline.
 
-`GET /node-components` is readable with the same permission as nodes. `include=node` is allowed; `node.registry` and `node.registryProject` additionally need the registry and registry-project read permissions.
+`GET /node-components` is readable with the same permission as nodes. `include=node` is allowed; `node.registry` and `node.registryProject` additionally need the registry and registry-project read permissions. Any other include path is refused with `403`.
 
 ## Response Shapes
 

@@ -57,7 +57,8 @@ A node reports the version of its deployment and the health of each of its compo
 check counts). The Hub keeps the latest report only.
 
 - A node is **online** while any of its components reported within the last 5 minutes. The
-  Hub marks silent nodes offline once a minute.
+  Hub marks silent nodes offline once a minute, but not during the first 5 minutes after it
+  starts, so Hub downtime does not count as node downtime.
 - A component is **stale** when it has not reported for 5 minutes; its last values are shown
   as of the last report.
 
