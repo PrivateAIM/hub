@@ -23,7 +23,7 @@ export class NodeComponentReportValidator extends TypedContainer<ComponentReport
         this.mount('message', { optional: true }, createValidator(reportShape.message));
         this.mount('uptime', { optional: true }, createValidator(reportShape.uptime));
 
-        // probe fields are measured by the hub, never reported by a component
+        // probe fields are measured by the node's adapter and sent in a snapshot, never on a component report
         for (const key of ['latency', 'checksTotal', 'checksSuccessful'] as const) {
             this.mount(
                 key,

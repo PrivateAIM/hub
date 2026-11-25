@@ -31,6 +31,25 @@ describe('NodeStatusReportValidator', () => {
         await expect(validator.run(input)).resolves.toEqual(input);
     });
 
+    it('accepts integers at the 32-bit maximum', async () => {
+        const input = {
+            components: [{
+                ...component,
+                uptime: 2147483647,
+                checksTotal: 2147483647,
+                checksSuccessful: 2147483647,
+            }],
+        };
+
+        await expect(validator.run(input)).resolves.toEqual(input);
+    });
+
+    it('accepts 64 components', async () => {
+        const input = { components: Array.from({ length: 64 }, (_, i) => ({ name: `c${i}`, status: 'ok' as const })) };
+
+        await expect(validator.run(input)).resolves.toEqual(input);
+    });
+
     it('preserves null values', async () => {
         const input = {
             components: [{
@@ -65,6 +84,16 @@ describe('NodeStatusReportValidator', () => {
         { components: [{ ...component, message: 'x'.repeat(1025) }] },
         { components: [{ ...component, extra: 1 }] },
         { deployment: { name: 'x' }, components: [component] },
+        { components: [{ ...component, uptime: 2147483648 }] },
+        { components: [{ ...component, checksTotal: 2147483648 }] },
+        {
+            components: [{
+                ...component, 
+                checksTotal: null, 
+                checksSuccessful: 2147483648, 
+            }], 
+        },
+        { components: Array.from({ length: 65 }, (_, i) => ({ name: `c${i}`, status: 'ok' })) },
     ] as Record<string, any>[])('rejects %#', async (input) => {
         await expect(validator.run(input)).rejects.toSatisfy(isValidupError);
     });
@@ -72,6 +101,12 @@ describe('NodeStatusReportValidator', () => {
 
 describe('NodeComponentReportValidator', () => {
     const validator = new NodeComponentReportValidator();
+
+    it('accepts uptime at the 32-bit maximum', async () => {
+        const input = { status: 'ok' as const, uptime: 2147483647 };
+
+        await expect(validator.run(input)).resolves.toEqual(input);
+    });
 
     it('accepts a report', async () => {
         const input = {
@@ -88,6 +123,7 @@ describe('NodeComponentReportValidator', () => {
         { status: 'ok', latency: null },
         { status: 'ok', checksSuccessful: 3 },
         { status: 'ok', checksTotal: 3 },
+        { status: 'ok', uptime: 2147483648 },
         {},
     ] as Record<string, any>[])('rejects %#', async (input) => {
         await expect(validator.run(input)).rejects.toSatisfy(isValidupError);

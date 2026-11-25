@@ -8,6 +8,7 @@
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { TypedContainer } from '@privateaim/kit';
+import { NODE_STATUS_REPORT_COMPONENTS_MAX } from './constants.ts';
 import { probeReportSchema } from './schemas.ts';
 import type { NodeStatusReport } from './types.ts';
 
@@ -29,6 +30,7 @@ export class NodeStatusReportValidator extends TypedContainer<NodeStatusReport> 
             createValidator(
                 z.array(probeReportSchema)
                     .min(1)
+                    .max(NODE_STATUS_REPORT_COMPONENTS_MAX)
                     .refine(
                         (list) => new Set(list.map((c) => c.name)).size === list.length,
                         { message: 'component names must be unique' },

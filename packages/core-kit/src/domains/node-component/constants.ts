@@ -12,3 +12,9 @@ export enum NodeComponentStatus {
 }
 
 export const NODE_COMPONENT_NAME_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
+
+/** The integer columns are 32-bit signed `int`: a larger value would fail the insert. */
+export const NODE_COMPONENT_INTEGER_MAX = 2147483647;
+
+/** The most components one status snapshot may carry. */
+export const NODE_STATUS_REPORT_COMPONENTS_MAX = 64;
