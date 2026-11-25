@@ -30,6 +30,12 @@ export interface INodeRepository extends IEntityRepository<Node> {
      * Remove all entities in one transaction: all or nothing.
      */
     removeMany(entities: Node[], ctx?: EntityPersistContext): Promise<void>;
+    /**
+     * Read the row under a write lock, let `fn` mutate it and save it, in one
+     * transaction. Resolves null when the row is missing (never inserts) or
+     * `fn` returned false (no save).
+     */
+    updateLocked(id: string, fn: (entity: Node) => boolean, ctx?: EntityPersistContext): Promise<Node | null>;
 }
 
 export interface IRegistryManager {

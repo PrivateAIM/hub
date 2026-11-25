@@ -235,4 +235,91 @@ describe('NodeStatusService', () => {
         expect(await service.markStaleNodesOffline()).toEqual([]);
         expect(nodeRepository.saves).toBe(0);
     });
+
+    it('keeps an admin edit that lands between the load and the node update', async () => {
+        const {
+            service,
+            node,
+            actor,
+            nodeRepository,
+            nodeComponentRepository,
+        } = await setup();
+
+        nodeComponentRepository.afterWrite = async (id) => {
+            const row = await nodeRepository.findOneById(id);
+
+            row.name = 'renamed';
+            row.hidden = true;
+            await nodeRepository.save(row);
+        };
+
+        await service.reportStatus(node.id, snapshot, actor);
+
+        const stored = await nodeRepository.findOneById(node.id);
+
+        expect(stored?.name).toBe('renamed');
+        expect(stored?.hidden).toBe(true);
+        expect(stored?.online).toBe(true);
+        expect(stored?.deploymentVersion).toBe('1.2.3');
+    });
+
+    it('does not re-create a node deleted before the node update', async () => {
+        const {
+            service,
+            node,
+            actor,
+            nodeRepository,
+            nodeComponentRepository,
+        } = await setup();
+
+        nodeComponentRepository.afterWrite = async (id) => {
+            await nodeRepository.remove(await nodeRepository.findOneById(id));
+        };
+
+        await service.reportStatus(node.id, snapshot, actor);
+
+        expect(await nodeRepository.findOneById(node.id)).toBeNull();
+        expect(nodeRepository.saves).toBe(0);
+    });
+
+    it('saves once per node the sweep marks offline', async () => {
+        const {
+            service,
+            node,
+            actor,
+            nodeRepository,
+        } = await setup();
+
+        await service.reportStatus(node.id, snapshot, actor);
+        nodeRepository.saves = 0;
+
+        await service.markStaleNodesOffline(new Date(Date.now() + NODE_OFFLINE_THRESHOLD_MS + 60_000));
+
+        expect(nodeRepository.saves).toBe(1);
+    });
+
+    it('skips a node that went offline between the stale query and the lock', async () => {
+        const {
+            service,
+            node,
+            actor,
+            nodeRepository,
+        } = await setup();
+
+        await service.reportStatus(node.id, snapshot, actor);
+
+        nodeRepository.beforeLockedUpdate = async (id) => {
+            const row = await nodeRepository.findOneById(id);
+
+            row.online = false;
+            await nodeRepository.save(row);
+        };
+        nodeRepository.saves = 0;
+
+        const changed = await service.markStaleNodesOffline(new Date(Date.now() + NODE_OFFLINE_THRESHOLD_MS + 60_000));
+
+        expect(changed).toEqual([]);
+        // only the hook's own save
+        expect(nodeRepository.saves).toBe(1);
+    });
 });

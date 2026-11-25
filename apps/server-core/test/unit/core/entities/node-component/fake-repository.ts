@@ -29,6 +29,13 @@ export class FakeNodeComponentRepository extends FakeEntityRepository<NodeCompon
         this.nodeRepository = nodeRepository;
     }
 
+    /**
+     * Runs once a write completed: stands in for another writer (an admin
+     * edit or delete) committing while the report is still in flight, between
+     * the service's node load and its node update.
+     */
+    afterWrite: ((nodeId: string) => Promise<void>) | undefined;
+
     async replaceForNode(nodeId: string, writes: NodeComponentWrite[], reportedAt: string): Promise<NodeComponent[]> {
         await this.assertNode(nodeId);
 
@@ -44,13 +51,23 @@ export class FakeNodeComponentRepository extends FakeEntityRepository<NodeCompon
         const output: NodeComponent[] = [];
 
         for (const write of writes) {
-            output.push(await this.upsertForNode(nodeId, write, reportedAt));
+            output.push(await this.upsertOne(nodeId, write, reportedAt));
         }
+
+        await this.afterWrite?.(nodeId);
 
         return output;
     }
 
     async upsertForNode(nodeId: string, write: NodeComponentWrite, reportedAt: string): Promise<NodeComponent> {
+        const output = await this.upsertOne(nodeId, write, reportedAt);
+
+        await this.afterWrite?.(nodeId);
+
+        return output;
+    }
+
+    protected async upsertOne(nodeId: string, write: NodeComponentWrite, reportedAt: string): Promise<NodeComponent> {
         await this.assertNode(nodeId);
 
         const current = await this.findOneBy({ nodeId, name: write.name });

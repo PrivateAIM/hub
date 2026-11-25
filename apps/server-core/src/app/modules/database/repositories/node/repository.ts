@@ -16,6 +16,7 @@ import {
 import type { IQuery } from '@rapiq/core';
 import { defineQuery } from '@rapiq/core';
 import { NodeEntity } from '../../../../../adapters/database/entities/node.ts';
+import { updateLockedEntity } from '../../../../../adapters/database/locked-update.ts';
 import type {
     EntityPersistContext,
     EntityRepositoryFindManyResult,
@@ -125,6 +126,10 @@ export class NodeRepositoryAdapter implements INodeRepository {
 
     async save(entity: Node, ctx?: EntityPersistContext): Promise<Node> {
         return this.repository.save(entity as NodeEntity, ctx);
+    }
+
+    async updateLocked(id: string, fn: (entity: Node) => boolean, ctx?: EntityPersistContext): Promise<Node | null> {
+        return updateLockedEntity(this.dataSource, NodeEntity, { id }, fn, ctx);
     }
 
     async remove(entity: Node, ctx?: EntityPersistContext): Promise<void> {

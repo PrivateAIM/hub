@@ -12,8 +12,7 @@ import {
     NodeStatusReportValidator,
 } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import type { ActorContext } from '@privateaim/server-kit';
-import { AbstractEntityService } from '@privateaim/server-kit';
+import type { ActorContext, EntityPersistContext } from '@privateaim/server-kit';
 import type { INodeComponentRepository } from '../../entities/node-component/types.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type { INodeStatusService, NodeStatusServiceContext } from './types.ts';
@@ -22,13 +21,12 @@ export const NODE_OFFLINE_THRESHOLD_MS = 5 * 60 * 1000;
 
 const NODE_COMPONENT_NAME_MAX_LENGTH = 64;
 
-export class NodeStatusService extends AbstractEntityService implements INodeStatusService {
+export class NodeStatusService implements INodeStatusService {
     protected nodeRepository: INodeRepository;
 
     protected nodeComponentRepository: INodeComponentRepository;
 
     constructor(ctx: NodeStatusServiceContext) {
-        super();
         this.nodeRepository = ctx.nodeRepository;
         this.nodeComponentRepository = ctx.nodeComponentRepository;
     }
@@ -43,7 +41,7 @@ export class NodeStatusService extends AbstractEntityService implements INodeSta
             new Date().toISOString(),
         );
 
-        await this.touchNode(node, report.deployment?.version);
+        await this.touchNode(node.id, { data: actor.metadata }, report.deployment?.version);
 
         return components;
     }
@@ -71,7 +69,7 @@ export class NodeStatusService extends AbstractEntityService implements INodeSta
             new Date().toISOString(),
         );
 
-        await this.touchNode(node);
+        await this.touchNode(node.id, { data: actor.metadata });
 
         return component;
     }
@@ -83,15 +81,19 @@ export class NodeStatusService extends AbstractEntityService implements INodeSta
         const changed: string[] = [];
 
         for (const id of ids) {
-            const node = await this.nodeRepository.findOneById(id);
+            const saved = await this.nodeRepository.updateLocked(id, (node) => {
+                if (!node.online) {
+                    return false;
+                }
 
-            if (!node || !node.online) {
-                continue;
+                node.online = false;
+
+                return true;
+            });
+
+            if (saved) {
+                changed.push(id);
             }
-
-            node.online = false;
-            await this.nodeRepository.save(node);
-            changed.push(id);
         }
 
         return changed;
@@ -118,22 +120,27 @@ export class NodeStatusService extends AbstractEntityService implements INodeSta
         return node;
     }
 
-    /** One save per report, and only when `online` or `deploymentVersion` changes. */
-    protected async touchNode(node: Node, deploymentVersion?: string): Promise<void> {
-        let changed = false;
+    /**
+     * At most one save per report, and only when `online` or
+     * `deploymentVersion` changes. The fields are set on the row as it is
+     * now, under a lock: a save of the copy read before the component write
+     * would revert a concurrent admin edit, and re-insert a deleted node.
+     */
+    protected async touchNode(nodeId: string, ctx: EntityPersistContext, deploymentVersion?: string): Promise<void> {
+        await this.nodeRepository.updateLocked(nodeId, (node) => {
+            let changed = false;
 
-        if (!node.online) {
-            node.online = true;
-            changed = true;
-        }
+            if (!node.online) {
+                node.online = true;
+                changed = true;
+            }
 
-        if (deploymentVersion !== undefined && node.deploymentVersion !== deploymentVersion) {
-            node.deploymentVersion = deploymentVersion;
-            changed = true;
-        }
+            if (deploymentVersion !== undefined && node.deploymentVersion !== deploymentVersion) {
+                node.deploymentVersion = deploymentVersion;
+                changed = true;
+            }
 
-        if (changed) {
-            await this.nodeRepository.save(node);
-        }
+            return changed;
+        }, ctx);
     }
 }
