@@ -26,6 +26,7 @@ import { DatabaseInjectionKey } from '../database/constants.ts';
 import { NodeClientService } from '../database/node-client.ts';
 import { NODE_CLIENT_SYNC_DATABASE_LOCK } from '../../components/node-client/constants.ts';
 import { createNodeClientComponent } from '../../components/node-client/module.ts';
+import { createNodeOfflineComponent } from '../../components/node-offline/module.ts';
 import { RegistryComponent } from '../../components/registry/module.ts';
 import { RegistryComponentDispatcher } from '../../components/registry/dispatcher/module.ts';
 import { RegistryTaskMessageBusRouting } from '../../components/registry/constants.ts';
@@ -81,6 +82,12 @@ export class ComponentsModule implements IModule {
                 logger,
             }));
         }
+
+        // Needs no bus: it only reads and updates node rows.
+        this.components.push(createNodeOfflineComponent({
+            service: container.resolve(DatabaseInjectionKey.NodeStatusService),
+            logger,
+        }));
 
         // Without an Authup client there are no node clients to sync.
         if (authupResult.success) {

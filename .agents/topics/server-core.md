@@ -42,7 +42,7 @@ apps/server-core/src/
 |--------|------|-------------|-----------|
 | ConfigModule | `config` | none | `ConfigInjectionKey` (typed env) |
 | DatabaseModule | `database` | `entityEvent`?, `authupClient`?, `taggedCache`?, `logger`? | `DataSource`, `QueryCache`, 12 repository adapters, `RegistryManager` |
-| ComponentsModule | `components` | `database`, `analysis`, `messageBus` | `RegistryComponentDispatcher` (bus dispatch, in-process only without a bus); starts the registry consumer and the node-client and analysis-reconciler scheduled components, stops them on teardown |
+| ComponentsModule | `components` | `database`, `analysis`, `messageBus` | `RegistryComponentDispatcher` (bus dispatch, in-process only without a bus); starts the registry consumer and the node-client, node-offline and analysis-reconciler scheduled components, stops them on teardown |
 | AnalysisModule | `analysis` | `database`, `messageBus` | `Builder`, `Configurator`, `Distributor`, `StorageManager`, 3 metadata recalculators |
 | HarborModule | `harbor` | `config`, `database` | nothing (sets up registry) |
 | AggregatorsModule | `aggregators` | `database`, `components`, `analysis`, `messageBus` | nothing (starts bus event consumers, stops them on teardown) |

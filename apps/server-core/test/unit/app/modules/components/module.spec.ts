@@ -18,6 +18,7 @@ import { Container } from 'eldin';
 import type { Message } from 'hubwire';
 import { MemoryMessageBusDriver, MessageBus } from 'hubwire';
 import { describe, expect, it } from 'vitest';
+import { IdleNodeStatusService } from './fake-node-status-service.ts';
 import { RegistryCommand } from '../../../../../src/core/domains/index.ts';
 import { AnalysisBuilder } from '../../../../../src/core/services/analysis-builder/module.ts';
 import { AnalysisDistributor } from '../../../../../src/core/services/analysis-distributor/module.ts';
@@ -117,6 +118,7 @@ describe('ComponentsModule', () => {
         container.register(LoggerInjectionKey, { useValue: logger });
         container.register(MessageBusInjectionKey, { useValue: messageBus });
         container.register(DatabaseInjectionKey.AnalysisRepository, { useValue: repository });
+        container.register(DatabaseInjectionKey.NodeStatusService, { useValue: new IdleNodeStatusService() });
         container.register(AnalysisInjectionKey.Builder, { useValue: new AnalysisBuilder({ ...dependencies, dispatcher: builderDispatcher }) });
         container.register(AnalysisInjectionKey.Distributor, {
             useValue: new AnalysisDistributor({
