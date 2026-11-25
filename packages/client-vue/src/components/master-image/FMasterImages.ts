@@ -6,7 +6,6 @@
  */
 
 import { DomainType } from '@privateaim/core-kit';
-import { hasOwnProperty } from '@privateaim/kit';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { MasterImage } from '@privateaim/core-kit';
@@ -17,6 +16,12 @@ import {
     defineListProps,
 } from '../../core';
 
+/**
+ * Free-text search goes through `FSearch` with `MASTER_IMAGE_SEARCH_FIELDS`,
+ * which sends `or(contains(name), contains(virtualPath))`. The list itself
+ * does not rewrite filters: an equality on `virtualPath` matched only the
+ * full path, so a partial term never found anything.
+ */
 export default defineComponent({
     props: defineListProps<MasterImage>(),
     emits: defineListEvents<MasterImage>(),
@@ -26,19 +31,6 @@ export default defineComponent({
             type: `${DomainType.MASTER_IMAGE}`,
             props,
             setup: ctx,
-            queryFilters: (filters) => {
-                const hasName = hasOwnProperty(filters, 'name') &&
-                    typeof filters.name === 'string' &&
-                    filters.name.length > 0;
-
-                if (!hasName) {
-                    return;
-                }
-
-                filters.virtualPath = filters.name;
-
-                delete filters.name;
-            },
             query: { sorts: { virtualPath: 'ASC' } },
         });
 

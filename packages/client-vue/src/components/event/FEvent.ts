@@ -44,7 +44,11 @@ export default defineComponent({
 
         message.push(' triggered.');
 
-        // todo: render entity.value.data depending on event name
+        // Worker failure events carry the reason as `data.error` (a string,
+        // cut to 512 characters by server-core's aggregators).
+        const error = typeof entity.value.data?.error === 'string' ?
+            entity.value.data.error :
+            undefined;
 
         return () => h(
             'div',
@@ -53,8 +57,11 @@ export default defineComponent({
                 h('div', { class: 'flex flex-row' }, [
                     h('div', { class: 'line-number' }, [props.index + 1]),
                     h('div', { class: 'line-content flex flex-row' }, [
-                        h('div', { class: ['line-message'] }, [
+                        h('div', { class: ['line-message', 'min-w-0'] }, [
                             message,
+                            ...(error ?
+                                [h('div', { class: 'text-error-600 whitespace-pre-wrap break-words', 'data-event-error': '' }, [error])] :
+                                []),
                         ]),
                         h('div', { class: 'ms-auto' }, [
                             h(VCTimeago, { datetime: entity.value.createdAt }),

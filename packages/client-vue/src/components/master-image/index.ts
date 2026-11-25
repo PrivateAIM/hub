@@ -10,3 +10,6 @@ export { FMasterImage } from './FMasterImage';
 export { default as FMasterImageCard } from './FMasterImageCard.vue';
 export { default as FMasterImages } from './FMasterImages';
 export { default as FMasterImagePicker } from './FMasterImagePicker.vue';
+export { default as FMasterImageStatusSummary } from './FMasterImageStatusSummary.vue';
+export * from './constants';
+export * from './utils';
