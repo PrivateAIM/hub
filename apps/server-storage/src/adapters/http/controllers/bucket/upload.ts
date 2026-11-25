@@ -18,6 +18,7 @@ import {
 import Busboy from 'busboy';
 import path from 'node:path';
 import type { IAppEvent } from 'routup';
+import { assertRequestContentType } from 'routup';
 import { BadRequestError } from '@privateaim/errors';
 import type { BucketFileComponent } from '../../../../app/components/bucket-file/module.ts';
 import type { BucketEntity } from '../../../database/index.ts';
@@ -30,11 +31,11 @@ export async function uploadRequestFilesToBucket(
     bucketFileComponent: BucketFileComponent,
     bucketFileEventDispatcher?: BucketFileEventDispatcher,
 ) {
-    const contentType = event.headers.get('content-type');
+    // 415 for a missing or other type, 400 for a malformed header.
+    assertRequestContentType(event, 'multipart/form-data');
 
-    if (!contentType || !contentType.startsWith('multipart/')) {
-        throw new BadRequestError('A multipart content-type header is required.');
-    }
+    // the full header: Busboy reads the boundary parameter.
+    const contentType = event.headers.get('content-type') ?? '';
 
     if (!event.request.body) {
         throw new BadRequestError('The request body is empty.');

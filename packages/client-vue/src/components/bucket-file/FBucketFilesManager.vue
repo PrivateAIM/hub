@@ -8,7 +8,7 @@
 <script lang="ts">
 import { provide } from '@authup/client-web-kit';
 import { VCButton } from '@vuecs/button';
-import { VCAlert } from '@vuecs/elements';
+import { VCEmptyState } from '@vuecs/elements';
 import { VCFormCheckbox } from '@vuecs/forms';
 import { VCIcon } from '@vuecs/icon';
 import {
@@ -37,7 +37,7 @@ export default defineComponent({
         FBucketFiles,
         FBucketFilesUpload,
         FBucketFile,
-        VCAlert,
+        VCEmptyState,
         VCButton,
         VCFormCheckbox,
         VCIcon,
@@ -264,16 +264,7 @@ export default defineComponent({
             >
                 <template #body="{ data, resolved, deleted }">
                     <template v-if="resolved && data.length === 0">
-                        <div class="flex flex-col gap-1">
-                            <VCAlert
-                                color="neutral"
-                                variant="soft"
-                                size="sm"
-                                class="mb-0"
-                            >
-                                No files found in bucket
-                            </VCAlert>
-                        </div>
+                        <VCEmptyState title="No files in this bucket yet" />
                     </template>
                     <template v-else>
                         <div class="flex flex-col">

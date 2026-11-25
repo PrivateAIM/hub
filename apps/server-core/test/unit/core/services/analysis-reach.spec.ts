@@ -5,11 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionError } from '@authup/access';
+import { PermissionError, appendQueryConditions } from '@authup/access';
 import type { Analysis, AnalysisNode, Node } from '@privateaim/core-kit';
 import { PermissionName } from '@privateaim/kit';
 import type { EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { appendQueryConditions } from '@privateaim/server-kit';
 import {
     Field,
     Fields,

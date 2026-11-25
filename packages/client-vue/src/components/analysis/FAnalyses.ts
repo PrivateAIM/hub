@@ -49,7 +49,7 @@ export default defineComponent({
                 },
             },
 
-            noMore: { content: 'No more analyses available...' },
+            noMore: { content: 'No analyses yet' },
         });
 
         return () => render();

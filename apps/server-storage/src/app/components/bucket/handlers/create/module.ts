@@ -15,8 +15,8 @@ import {
 import { BucketValidator, DomainType, assertBucketRefPairing } from '@privateaim/storage-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { Repository } from 'typeorm';
-import { IsNull, QueryFailedError } from 'typeorm';
-import { useDataSource } from 'typeorm-extension';
+import { IsNull } from 'typeorm';
+import { readDatabaseErrorCode, useDataSource } from 'typeorm-extension';
 import type { IStorageAdapter } from '../../../../../core/storage/types.ts';
 import { BucketEntity } from '../../../../../adapters/database/index.ts';
 import { toBucketName } from '../../../../../core/utils/bucket-name.ts';
@@ -175,9 +175,7 @@ export class BucketCreateHandler implements ComponentHandler<
 }
 
 function isUniqueViolation(e: unknown): boolean {
-    if (!(e instanceof QueryFailedError) || !e.driverError || !('code' in e.driverError)) {
-        return false;
-    }
+    const code = readDatabaseErrorCode(e);
 
-    return ['23505', 'ER_DUP_ENTRY', 'SQLITE_CONSTRAINT_UNIQUE'].includes(String(e.driverError.code));
+    return typeof code !== 'undefined' && ['23505', 'ER_DUP_ENTRY', 'SQLITE_CONSTRAINT_UNIQUE'].includes(code);
 }

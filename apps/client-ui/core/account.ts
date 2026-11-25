@@ -52,9 +52,9 @@ import type { AccountConsoleURLOptions } from './types';
 export function useAccountConsoleURL() : (options?: AccountConsoleURLOptions) => string | undefined {
     const runtimeConfig = useRuntimeConfig();
 
-    const authupUrl = ((runtimeConfig.public.authupUrl as string | undefined) ?? '')
+    const authupUrl = runtimeConfig.public.authupUrl
         .replace(/\/+$/, '');
-    const baseUrl = ((runtimeConfig.public.accountUrl as string | undefined) || (authupUrl ? `${authupUrl}/console/account` : ''))
+    const baseUrl = (runtimeConfig.public.accountUrl || (authupUrl ? `${authupUrl}/console/account` : ''))
         .replace(/\/+$/, '');
 
     const ref = encodeURIComponent(useRequestURL().origin);

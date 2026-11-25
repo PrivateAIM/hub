@@ -107,13 +107,19 @@ export default defineComponent({
                 color="warning"
                 variant="soft"
                 size="sm"
+                align="center"
                 class="mb-3"
             >
                 <template v-if="canRetry">
-                    <p>
-                        The {{ type }} bucket does not exist.
-                    </p>
-
+                    The {{ type }} bucket does not exist.
+                </template>
+                <template v-else>
+                    No {{ type }} files are available to you.
+                </template>
+                <template
+                    v-if="canRetry"
+                    #actions
+                >
                     <VCButton
                         size="xs"
                         color="neutral"
@@ -122,9 +128,6 @@ export default defineComponent({
                         <VCIcon name="fa6-solid:rotate-right" /> Retry
                     </VCButton>
                 </template>
-                <p v-else>
-                    No {{ type }} files are available to you.
-                </p>
             </VCAlert>
         </template>
     </FAnalysisBucket>

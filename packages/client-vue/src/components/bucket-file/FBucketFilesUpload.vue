@@ -7,7 +7,8 @@
 <script lang="ts">
 import { humanFileSize } from '@privateaim/kit';
 import { VCButton } from '@vuecs/button';
-import { VCAlert } from '@vuecs/elements';
+import { VCEmptyState } from '@vuecs/elements';
+import { VCFormRadio, VCFormRadioGroup } from '@vuecs/forms';
 import { VCIcon } from '@vuecs/icon';
 import { computed, defineComponent, ref } from 'vue';
 import { injectStorageHTTPClient, wrapFnWithBusyState } from '../../core';
@@ -73,8 +74,10 @@ async function collectEntry(entry: FileSystemEntry, out: StagedFile[]): Promise<
 export default defineComponent({
     components: {
         FBucketFileForm,
-        VCAlert,
+        VCEmptyState,
         VCButton,
+        VCFormRadio,
+        VCFormRadioGroup,
         VCIcon,
     },
     props: {
@@ -90,6 +93,12 @@ export default defineComponent({
         const busy = ref(false);
         const tempFiles = ref<StagedFile[]>([]);
         const directoryMode = ref<boolean>(true);
+        const mode = computed<'directories' | 'files'>({
+            get: () => (directoryMode.value ? 'directories' : 'files'),
+            set: (value) => {
+                directoryMode.value = value === 'directories';
+            },
+        });
         const dragOver = ref<boolean>(false);
 
         const totalSize = computed(
@@ -236,6 +245,7 @@ export default defineComponent({
 
         return {
             directoryMode,
+            mode,
             busy,
             dragOver,
             tempFiles,
@@ -255,26 +265,24 @@ export default defineComponent({
 <template>
     <div class="flex flex-col gap-3">
         <!-- Mode toggle -->
-        <div class="upload-mode">
-            <button
-                type="button"
-                class="upload-mode__btn"
-                :class="{ active: !directoryMode }"
-                :disabled="busy"
-                @click.prevent="directoryMode = false"
-            >
-                <VCIcon name="fa6-solid:file-lines" /> Files
-            </button>
-            <button
-                type="button"
-                class="upload-mode__btn"
-                :class="{ active: directoryMode }"
-                :disabled="busy"
-                @click.prevent="directoryMode = true"
-            >
-                <VCIcon name="fa6-solid:folder-open" /> Directories
-            </button>
-        </div>
+        <VCFormRadioGroup
+            v-model="mode"
+            segmented
+            :disabled="busy"
+            aria-label="Upload mode"
+            :theme-variant="{ size: 'sm' }"
+        >
+            <VCFormRadio value="files">
+                <template #label>
+                    <VCIcon name="fa6-solid:file-lines" /> Files
+                </template>
+            </VCFormRadio>
+            <VCFormRadio value="directories">
+                <template #label>
+                    <VCIcon name="fa6-solid:folder-open" /> Directories
+                </template>
+            </VCFormRadio>
+        </VCFormRadioGroup>
 
         <!-- Dropzone -->
         <label
@@ -313,14 +321,7 @@ export default defineComponent({
 
         <!-- Selection -->
         <template v-if="tempFiles.length === 0">
-            <VCAlert
-                color="info"
-                variant="soft"
-                size="sm"
-                class="mb-0"
-            >
-                No {{ directoryMode ? 'directories' : 'files' }} selected yet.
-            </VCAlert>
+            <VCEmptyState :title="`No ${mode} selected yet`" />
         </template>
         <template v-else>
             <div class="upload-summary">
@@ -365,54 +366,6 @@ export default defineComponent({
     </div>
 </template>
 <style scoped>
-/* ============================================================
-   Segmented mode toggle (Files / Directories)
-   ============================================================ */
-.upload-mode {
-    display: inline-flex;
-    align-self: flex-start;
-    gap: 0.2rem;
-    padding: 0.2rem;
-    border-radius: 0.55rem;
-    background: var(--vc-color-bg-muted);
-    border: 1px solid var(--vc-color-border);
-}
-
-.upload-mode__btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.3rem 0.8rem;
-    border: 0;
-    border-radius: 0.4rem;
-    background: transparent;
-    color: var(--vc-color-fg-muted);
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.upload-mode__btn:hover:not(:disabled):not(.active) {
-    color: var(--vc-color-fg);
-}
-
-.upload-mode__btn.active {
-    color: var(--vc-color-on-primary, #fff);
-    background: var(--vc-color-primary-600);
-    box-shadow: 0 2px 8px -2px color-mix(in oklab, var(--vc-color-primary-600) 60%, transparent);
-}
-
-/* Active button keeps its white label on hover — only the surface darkens. */
-.upload-mode__btn.active:hover:not(:disabled) {
-    background: var(--vc-color-primary-700);
-}
-
-.upload-mode__btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
 /* ============================================================
    Dropzone
    ============================================================ */
@@ -605,8 +558,7 @@ export default defineComponent({
 
 @media (prefers-reduced-motion: reduce) {
     .upload-dropzone,
-    .upload-dropzone__icon,
-    .upload-mode__btn {
+    .upload-dropzone__icon {
         transition: none;
     }
 

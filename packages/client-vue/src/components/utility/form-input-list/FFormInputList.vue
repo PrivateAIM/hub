@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { VCButton } from '@vuecs/button';
-import { VCAlert } from '@vuecs/elements';
+import { VCEmptyState } from '@vuecs/elements';
 import { VCIcon } from '@vuecs/icon';
 import type { PropType } from 'vue';
 import {
@@ -22,7 +22,7 @@ export default defineComponent({
     components: {
         FTranslationDefault,
         FFormInputListItem,
-        VCAlert,
+        VCEmptyState,
         VCButton,
         VCIcon,
     },
@@ -154,14 +154,10 @@ export default defineComponent({
         <div class="flex flex-col gap-1">
             <template v-if="items.length === 0">
                 <slot name="noItems">
-                    <VCAlert
-                        color="info"
-                        variant="soft"
-                        size="sm"
+                    <VCEmptyState
+                        title="No items yet"
                         class="mb-3"
-                    >
-                        The form list has no items yet
-                    </VCAlert>
+                    />
                 </slot>
             </template>
             <template

@@ -14,6 +14,7 @@ import type {
 } from '@privateaim/core-http-kit';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DDelete,
@@ -54,6 +55,7 @@ export class ProjectController {
     }
 
     @DPost('', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(201)
     async add(
         @DBody() data: ProjectCreatePayload,
@@ -77,6 +79,7 @@ export class ProjectController {
     }
 
     @DPost('/:id', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(202)
     async edit(
         @DPath('id') id: string,

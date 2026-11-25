@@ -51,7 +51,7 @@ const FProjects = defineComponent({
                 },
             },
 
-            noMore: { content: 'No more projects available...' },
+            noMore: { content: 'No projects yet' },
         });
 
         return () => render();

@@ -11,7 +11,7 @@ import { ProcessStatus } from '@privateaim/kit';
 import { withDataSourceLock } from '@privateaim/server-db-kit';
 import type { DataSource, EntityManager } from 'typeorm';
 import { In, Not } from 'typeorm';
-import { useDataSource } from 'typeorm-extension';
+import { isRowLockSupported, useDataSource } from 'typeorm-extension';
 import { AnalysisEntity } from '../../../../../../adapters/database/entities/analysis.ts';
 import { RegistryEntity } from '../../../../../../adapters/database/entities/registry.ts';
 import { RegistryProjectEntity } from '../../../../../../adapters/database/entities/registry-project.ts';
@@ -80,7 +80,7 @@ export class RegistryProjectRelinkStore implements IRegistryProjectRelinkStore {
                 .addSelect('project.accountSecret')
                 .where('project.id = :id', { id: source.project.id });
 
-            if (dataSource.options.type !== 'better-sqlite3') {
+            if (isRowLockSupported(manager)) {
                 qb.setLock('pessimistic_write');
             }
 

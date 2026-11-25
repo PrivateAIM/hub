@@ -12,11 +12,10 @@ import { EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult, ReadScope } from '@privateaim/server-kit';
 import {
     AbstractEntityService,
-    appendQueryConditions,
     findManyScoped,
     scopeReadQuery,
 } from '@privateaim/server-kit';
-import { evaluateRecord } from '@authup/access';
+import { appendQueryConditions, evaluateRecord } from '@authup/access';
 import type { IQuery } from '@rapiq/core';
 import { Query, eq } from '@rapiq/core';
 import { decodeQuery } from '../../query/index.ts';

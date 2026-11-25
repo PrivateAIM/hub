@@ -12,13 +12,11 @@ import { ProjectNodeApprovalStatus } from '@privateaim/core-kit';
 import type { QueryBuildInput } from '@rapiq/core';
 import type { Ref } from 'vue';
 import { computed, ref, watch } from 'vue';
-import type { SegmentItem } from '@privateaim/client-vue';
 import {
     FPagination,
     FProjectNodeInCard,
     FProjectNodeInCardSkeleton,
     FProjectNodes,
-    FSegments,
     FTitle,
     injectCoreHTTPClient,
 } from '@privateaim/client-vue';
@@ -29,7 +27,6 @@ import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 export default defineNuxtComponent({
     components: {
         FPagination,
-        FSegments,
         FTitle,
         FProjectNodes,
         FProjectNodeInCard,
@@ -53,14 +50,10 @@ export default defineNuxtComponent({
         const nodeId : Ref<string | null> = ref(null);
 
         const segment : Ref<string> = ref('pending');
-        const segments : SegmentItem[] = [
-            {
-                key: 'pending',
-                label: 'Pending',
-                emphasis: true,
-            },
-            { key: 'approved', label: 'Approved' },
-            { key: 'rejected', label: 'Rejected' },
+        const segments = [
+            { value: 'pending', label: 'Pending' },
+            { value: 'approved', label: 'Approved' },
+            { value: 'rejected', label: 'Rejected' },
         ];
 
         const query = computed<QueryBuildInput<ProjectNode, 3>>(() => ({
@@ -136,9 +129,12 @@ export default defineNuxtComponent({
                 <template #header>
                     <FTitle />
                     <div class="mb-3 mt-1">
-                        <FSegments
+                        <VCFormRadioGroup
                             v-model="segment"
-                            :items="segments"
+                            segmented
+                            aria-label="Approval status"
+                            :theme-variant="{ size: 'sm' }"
+                            :options="segments"
                         />
                     </div>
                 </template>

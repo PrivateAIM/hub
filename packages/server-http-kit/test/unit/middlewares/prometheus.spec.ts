@@ -25,7 +25,7 @@ describe('mountPrometheusMiddleware', () => {
         const text = await response.text();
 
         expect(text).toContain('path="/nodes/:id"');
-        expect(text).toContain('path="/{unmatched}"');
+        expect(text).toMatch(/path="\/\{unmatched\}"[^}]*status_code="404"|status_code="404"[^}]*path="\/\{unmatched\}"/);
         expect(text).not.toContain('b0b9a0f6');
         expect(text).not.toContain('wp-admin');
         expect(text).not.toContain('path="/metrics"');

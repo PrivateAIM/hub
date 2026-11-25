@@ -11,7 +11,7 @@ import { ErrorCode, HubError } from '@privateaim/errors';
 import { PermissionName } from '@privateaim/kit';
 import { rateLimit } from '@routup/rate-limit';
 import type { App, IAppEvent } from 'routup';
-import { defineCoreHandler, getRequestIP } from 'routup';
+import { getRequestIP } from 'routup';
 import { useRequestCapability, useRequestEnv, useRequestIdentity } from '../request';
 import type { MiddlewareRateLimitOptions, RateLimitPrincipal } from './types';
 
@@ -67,8 +67,8 @@ function stripPort(ip: string): string {
 }
 
 /**
- * The plugin's default key hardcodes `trustProxy: true`; this one follows the
- * app's TRUST_PROXY. Prefixed, as the key indexes a plain object.
+ * The client address under the app's TRUST_PROXY, without a port (routup's
+ * `getRequestIP` keeps it). Prefixed, as the key indexes a plain object.
  */
 function buildAddressKey(event: IAppEvent): string {
     return `ip:${stripPort(getRequestIP(event) || '127.0.0.1')}`;
@@ -113,72 +113,33 @@ async function isServiceClient(event: IAppEvent): Promise<boolean> {
     return verdicts.every(Boolean);
 }
 
-type FailedAuthenticationWindow = {
-    count: number,
-    resetAt: number,
-};
-
 /**
  * First stage, BEFORE authorization: counts failed authentications per
  * source address, so a flood of forged bearers is cut before it reaches
  * Authup introspection.
  *
- * A request is counted only once its response is a failed authentication;
- * valid, expired-token and still pending requests never use the budget, so
- * long-polls and uploads from one address cannot exhaust it. The limit is
- * checked before forwarding, so one parallel burst can overshoot it once
- * before it closes. Counters live per replica, in fixed windows.
+ * `countAfterResponse` counts a request only once its response is a failed
+ * authentication; valid, expired-token and still pending requests never use
+ * the budget, so long-polls and uploads from one address cannot exhaust it.
+ * The limit is checked before forwarding, so one parallel burst can
+ * overshoot it once before it closes. Counters live per replica, in fixed
+ * windows.
  */
 export function mountAuthenticationRateLimiterMiddleware(app: App) {
-    const windows = new Map<string, FailedAuthenticationWindow>();
-    let nextSweepAt = Date.now() + WINDOW_MS;
-
-    const sweep = (now: number) => {
-        if (now < nextSweepAt) {
-            return;
-        }
-
-        nextSweepAt = now + WINDOW_MS;
-
-        for (const [key, window] of windows) {
-            if (window.resetAt <= now) {
-                windows.delete(key);
-            }
-        }
-    };
-
-    app.use(defineCoreHandler(async (event) => {
-        const key = buildAddressKey(event);
-        const now = Date.now();
-
-        sweep(now);
-
-        const window = windows.get(key);
-
-        if (window && window.resetAt > now && window.count >= RATE_LIMIT_FAILED_AUTHENTICATION_MAX) {
-            event.response.headers.set('retry-after', `${Math.ceil((window.resetAt - now) / 1000)}`);
-
+    app.use(rateLimit({
+        windowMs: WINDOW_MS,
+        max: RATE_LIMIT_FAILED_AUTHENTICATION_MAX,
+        keyGenerator: buildAddressKey,
+        countAfterResponse: true,
+        skipSuccessfulRequest: true,
+        requestWasSuccessful: (event, response) => !isFailedAuthentication(event, response),
+        handler: () => {
             throw new HubError({
                 code: ErrorCode.THROTTLED,
                 status: 429,
                 message: 'Too many failed authentications, please try again later.',
             });
-        }
-
-        const response = await event.next();
-
-        if (response && isFailedAuthentication(event, response)) {
-            const finishedAt = Date.now();
-            const current = windows.get(key);
-
-            if (current && current.resetAt > finishedAt) {
-                current.count += 1;
-            } else {
-                windows.set(key, { count: 1, resetAt: finishedAt + WINDOW_MS });
-            }
-        }
-
-        return response;
+        },
     }));
 }
 

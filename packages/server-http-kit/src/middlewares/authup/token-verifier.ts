@@ -6,20 +6,12 @@
  */
 
 import type {
-    ITokenCache,
     ITokenVerifier,
     TokenVerificationData,
     TokenVerifyOptions,
 } from '@authup/server-adapter-kit';
-import {
-    MemoryTokenCache,
-    RedisTokenCache,
-    TokenVerifier,
-} from '@authup/server-adapter-kit';
-import { isUpstreamTimeoutError } from '@authup/errors';
-import { HubError } from '@privateaim/errors';
+import { MemoryTokenCache, TokenVerifier } from '@authup/server-adapter-kit';
 import { assertIntrospectableToken, createAuthupClientTokenCreator } from '@privateaim/server-kit';
-import { VouchlyErrorCode, isVouchlyError } from 'vouchly';
 import type { AuthTokenVerifierClientContext, AuthTokenVerifierCreateContext } from './types.ts';
 import { UnconfiguredTokenVerifier } from './unconfigured-token-verifier.ts';
 
@@ -33,9 +25,10 @@ import { UnconfiguredTokenVerifier } from './unconfigured-token-verifier.ts';
  * fallback, socket handshake — is covered from one place.
  *
  * The verifier introspects as the given client (REMOTE mode, client
- * credentials) and always has a result cache: Redis when the service has
- * one, else process memory. Entries live until the token's `exp` and are
- * namespaced per introspecting client (`buildCacheNamespace`):
+ * credentials) and always has a result cache: the given one (see
+ * `createAuthupTokenCache`), else process memory. Entries live until the
+ * token's `exp` and are namespaced per introspecting client
+ * (`buildCacheNamespace`):
  * authup answers `active: false` to a caller that may not introspect a token,
  * so a result is only valid for the client that asked. Services sharing one
  * Redis, one Authup URL and one client still share entries.
@@ -44,45 +37,11 @@ export class IntrospectableTokenVerifier extends TokenVerifier {
     override async verify(token: string, options?: TokenVerifyOptions): Promise<TokenVerificationData> {
         assertIntrospectableToken(token);
 
-        try {
-            return await super.verify(token, options);
-        } catch (e) {
-            throw toUpstreamError(e);
-        }
+        // authup answers a failed introspection request (unreachable, 5xx,
+        // 429, a refused service credential or token mint) with an
+        // UpstreamError (502), a timeout with an UpstreamTimeoutError (504).
+        return super.verify(token, options);
     }
-}
-
-/**
- * vouchly reports every failed introspection request (authup unreachable,
- * a 5xx or 429 answer, hub's own service credential refused, a failed token
- * mint) as `introspection_failed`, which authup's adapter maps onto
- * `invalid_token` — a 401 that makes every authup client hook drop its
- * session, although the caller's token was never judged. Such a failure is
- * answered 502 instead; a token authup did judge (inactive, expired,
- * malformed) keeps its 401. A request that ran out of time is authup's
- * `UpstreamTimeoutError` (504) and passes through unchanged, also when the
- * timed-out request was the token mint that vouchly reports as
- * `introspection_failed`.
- */
-function toUpstreamError(input: unknown): unknown {
-    if (isUpstreamTimeoutError(input)) {
-        return input;
-    }
-
-    if (
-        Error.isError(input) &&
-        isVouchlyError(input.cause) &&
-        input.cause.code === VouchlyErrorCode.INTROSPECTION_FAILED
-    ) {
-        return new HubError({
-            code: 'upstream_error',
-            status: 502,
-            message: input.message,
-            cause: input,
-        });
-    }
-
-    return input;
 }
 
 /**
@@ -101,16 +60,6 @@ export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext): 
         return new UnconfiguredTokenVerifier();
     }
 
-    let cache : ITokenCache;
-
-    if (ctx.cache) {
-        cache = ctx.cache;
-    } else if (ctx.redisClient) {
-        cache = new RedisTokenCache(ctx.redisClient);
-    } else {
-        cache = new MemoryTokenCache();
-    }
-
     return new IntrospectableTokenVerifier({
         baseURL: ctx.baseURL,
         // The creator and the namespace come from the one `client`, so the
@@ -121,7 +70,7 @@ export function createAuthupTokenVerifier(ctx: AuthTokenVerifierCreateContext): 
             clientSecret: ctx.client.secret,
             realm: ctx.client.realm,
         }),
-        cache,
+        cache: ctx.cache ?? new MemoryTokenCache(),
         cacheNamespace: buildCacheNamespace(ctx.baseURL, ctx.client),
     });
 }

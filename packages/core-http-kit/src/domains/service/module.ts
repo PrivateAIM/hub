@@ -11,6 +11,7 @@ import { BaseAPI } from 'hapic';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import type { APIRequestOptions } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { IServiceAPI } from './types';
 
 export class ServiceAPI extends BaseAPI implements IServiceAPI {
@@ -28,7 +29,7 @@ export class ServiceAPI extends BaseAPI implements IServiceAPI {
         data = data || {};
 
         await this.client.post(
-            `services/${id}/command`,
+            `services/${encodePathSegment(id)}/command`,
             nullifyEmptyObjectProperties({ command, ...data }),
             buildRequestConfig(options),
         );

@@ -89,7 +89,7 @@ The database is configured through `DB_TYPE` (`mysql`, `postgres` or `better-sql
 ## Notes
 
 - **The start fails without `REDIS_CONNECTION_STRING`.** The variable is read as required. When Redis is set but unreachable at start, the wakeup falls back to memory and wakes only clients on the same instance.
-- **Authup is mandatory.** Without it every request and socket connection answers 401. The service client reads Authup's authorization catalog on each authenticated request, so it needs `permission_read` ([Authup for server-messenger](https://hub.docs.privateaim.net/guide/deployment/configuration.html#server-messenger-authenticates-against-authup)).
+- **Authup is mandatory.** Without it every request and socket connection answers 401. The service client reads Authup's authorization catalog for authenticated requests (cached for 60 s), so it needs `permission_read` ([Authup for server-messenger](https://hub.docs.privateaim.net/guide/deployment/configuration.html#server-messenger-authenticates-against-authup)).
 - **Delivery is at least once.** A message stays in the mailbox until its recipient acknowledges it or it expires; a client that pulls and crashes before the ack receives it again.
 - **`/livez` and `/readyz` are anonymous** health probes; readiness checks only the database.
 

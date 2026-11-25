@@ -8,11 +8,12 @@
 import type { Realm } from '@authup/core-kit';
 import { CLIENT_ADMIN_CONSOLE_NAME } from '@authup/core-kit';
 import {
-    ARealmGrid,
+    ARealmPicker,
     buildAuthorizeURL,
     createPKCE,
     createState,
     injectHTTPClient,
+    resolveLoginRedirect,
     saveAuthorizationRequest,
 } from '@authup/client-web-kit';
 import { ref } from 'vue';
@@ -24,7 +25,7 @@ import { LayoutKey } from '../../config/layout';
 
 export default defineNuxtComponent({
     components: {
-        ARealmGrid,
+        ARealmPicker,
         Logo,
     },
     setup() {
@@ -56,7 +57,7 @@ export default defineNuxtComponent({
         // `account-console`. This UI is the admin surface, so it defaults to
         // the former; a deployment serving the UI from its own origin should
         // still register a dedicated client and set AUTHUP_CLIENT_ID.
-        const clientId = (runtimeConfig.public.authupClientId as string) || CLIENT_ADMIN_CONSOLE_NAME;
+        const clientId = runtimeConfig.public.authupClientId || CLIENT_ADMIN_CONSOLE_NAME;
 
         const realmGrid = ref<{ reset: () => void } | null>(null);
 
@@ -67,12 +68,15 @@ export default defineNuxtComponent({
 
                 // Preserve the post-login destination AND any sibling query
                 // params on the login URL (e.g. /login?redirect=/projects&x=1
-                // → /projects?x=1).
+                // → /projects?x=1). Only a site-relative path that is not the
+                // login/logout route survives `resolveLoginRedirect`
+                // (`//evil.com`, `/.//evil.com`, `/logout` are dropped).
                 const { redirect, ...rest } = route.query;
+                const destination = resolveLoginRedirect(redirect);
                 let target: string | undefined;
 
-                if (typeof redirect === 'string') {
-                    const url = new URL(redirect, window.location.origin);
+                if (destination) {
+                    const url = new URL(destination, window.location.origin);
 
                     for (const [key, value] of Object.entries(rest)) {
                         if (Array.isArray(value)) {
@@ -159,7 +163,7 @@ export default defineNuxtComponent({
         </div>
 
         <div class="login-realms">
-            <ARealmGrid
+            <ARealmPicker
                 ref="realmGrid"
                 @select="handleSelect"
             />
@@ -199,14 +203,14 @@ export default defineNuxtComponent({
 
 /* Cap the picker height so a many-realm deployment (production runs 26+)
    scrolls inside the card instead of pushing the page past the viewport.
-   ARealmGrid reveals its own search field past 8 realms to narrow the list. */
+   ARealmPicker reveals its own search field past 8 realms to narrow the list. */
 .login-realms {
     max-height: 52vh;
     overflow-y: auto;
     padding: 0.25rem;
 }
 
-/* Keep ARealmGrid's search pinned to the top of the scroll area so it stays
+/* Keep ARealmPicker's search pinned to the top of the scroll area so it stays
    reachable while browsing 26+ realms instead of scrolling out of view. The
    blurred backdrop hides tiles passing underneath. */
 .login-realms :deep(.a-realm-search) {

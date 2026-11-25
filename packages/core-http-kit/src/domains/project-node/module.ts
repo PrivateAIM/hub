@@ -11,6 +11,7 @@ import type { ProjectNode } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { IProjectNodeAPI, ProjectNodeCreatePayload, ProjectNodeUpdatePayload } from './types';
 
 export class ProjectNodeAPI extends BaseAPI implements IProjectNodeAPI {
@@ -29,7 +30,7 @@ export class ProjectNodeAPI extends BaseAPI implements IProjectNodeAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<ProjectNode>> {
         const response = await this.client.get(
-            `project-nodes/${id}${buildQueryString(record)}`,
+            `project-nodes/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 
@@ -48,7 +49,7 @@ export class ProjectNodeAPI extends BaseAPI implements IProjectNodeAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<ProjectNode>> {
         const response = await this.client.post(
-            `project-nodes/${id}`,
+            `project-nodes/${encodePathSegment(id)}`,
             nullifyEmptyObjectProperties(data),
             buildRequestConfig(options),
         );
@@ -57,7 +58,7 @@ export class ProjectNodeAPI extends BaseAPI implements IProjectNodeAPI {
     }
 
     async delete(id: ProjectNode['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<ProjectNode>> {
-        const response = await this.client.delete(`project-nodes/${id}`, buildRequestConfig(options));
+        const response = await this.client.delete(`project-nodes/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response.data;
     }

@@ -213,6 +213,6 @@ HTTP module of its own.
 - `@rapiq/cache`, `@rapiq/cache-redis` — Tagged read cache and its Redis driver (`TaggedCacheModule`)
 - `orkos` — Module system (`IModule`)
 - `eldin` — DI container (`TypedToken`)
-- `envix` — Reads `env` for the console transport's log level
+- `envix` — Reads `NODE_ENV` for the console transport's log level
 - `hubwire` — Message bus, components, dispatchers and workers
 - `@hubwire/amqp` — AMQP driver (brings `amqp-extension`), which `MessageBusModule` imports

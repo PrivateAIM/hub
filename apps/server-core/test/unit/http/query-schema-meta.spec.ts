@@ -112,16 +112,16 @@ describe('src/adapters/http/controllers/entities (query schema meta)', () => {
         expect(meta.schema.indexes).not.toBeNull();
         expect(meta.schema.filters.indexed).toEqual('anchor');
 
-        // rapiq >= 2.5 also describes `relations` (the sort relations, `null`
-        // when undeclared); compared apart so the rest stays an exact match.
-        const { relations, ...sorts } = meta.schema.sorts as typeof meta.schema.sorts & { relations?: string[] | null };
+        // `relations` (the sort relations, `null` when undeclared) is
+        // compared apart so the rest stays an exact match.
+        const { relations, ...sorts } = meta.schema.sorts;
 
         expect(sorts).toEqual({
             allowed: ['name', 'path', 'virtualPath', 'createdAt', 'updatedAt'],
             default: { path: 'ASC' },
             indexed: true,
         });
-        expect(relations ?? null).toBeNull();
+        expect(relations).toBeNull();
     });
 
     /**

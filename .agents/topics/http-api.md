@@ -78,6 +78,10 @@ records); `POST /buckets/:id/upload`.
 - No `send()`/`sendCreated()` helpers (only `sendStream` in storage): return the value
   and declare a non-200 success status with `@DStatus(n)`, never `event.response.status`
   (trapi documents only the decorator, so an assignment leaves the operation listed as 200).
+- **A JSON-body route declares `@DConsumes('application/json')` on the method**, never on the
+  class: on Node every non-GET/HEAD request carries a body stream, so a class-level declaration
+  answers a body-less DELETE (or a body-less POST) 415. Routes that accept an absent body (the
+  client-credential rotations, storage `clear`) and the multipart upload carry none.
 
 ## Field Selection Conventions
 

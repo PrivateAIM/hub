@@ -23,8 +23,12 @@ import {
 import { isPropertySet } from '@authup/kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
-import { evaluateRecord, evaluateRecordUpdate } from '@authup/access';
+import { AbstractEntityService } from '@privateaim/server-kit';
+import {
+    appendQueryConditions,
+    evaluateRecord,
+    evaluateRecordUpdate,
+} from '@authup/access';
 import type { IProjectRepository } from '../project/types.ts';
 import type { IProjectNodeRepository } from '../project-node/types.ts';
 import type { IAnalysisNodeMetadataRecalculator, IAnalysisNodeRepository } from '../analysis-node/types.ts';

@@ -191,41 +191,41 @@ export default defineComponent({
                 color: !isExternalNameUnchanged.value ? 'error' : 'info',
                 variant: 'soft',
                 size: 'sm',
+                align: 'center',
                 class: 'mb-3',
-            }, () => [
-                h('div', { class: 'mb-1' }, [
-                    (!isExternalNameUnchanged.value ?
-                        'Renaming queues an artifact copy and verification. The active namespace changes only after success; the source is retained. Pause registry writers before renaming.' :
-                        'Choose an externalName or generate one.'
-                    ),
-                ]),
-                h(VCButton, {
-                    color: 'neutral',
-                    size: 'xs',
-                    onClick($event: any) {
-                        $event.preventDefault();
+            }, {
+                default: () => (!isExternalNameUnchanged.value ?
+                    'Renaming queues an artifact copy and verification. The active namespace changes only after success; the source is retained. Pause registry writers before renaming.' :
+                    'Choose an externalName or generate one.'
+                ),
+                actions: () => [
+                    h(VCButton, {
+                        color: 'neutral',
+                        size: 'xs',
+                        onClick($event: any) {
+                            $event.preventDefault();
 
-                        generateAlias();
-                    },
-                }, () => [
-                    h(VCIcon, { name: 'fa6-solid:wrench', class: 'pe-1' }),
-                    'Generate',
-                ]),
-                h(VCButton, {
-                    color: 'neutral',
-                    size: 'xs',
-                    class: 'ms-1',
-                    disabled: isExternalNameUnchanged.value,
-                    onClick($event: any) {
-                        $event.preventDefault();
+                            generateAlias();
+                        },
+                    }, () => [
+                        h(VCIcon, { name: 'fa6-solid:wrench', class: 'pe-1' }),
+                        'Generate',
+                    ]),
+                    h(VCButton, {
+                        color: 'neutral',
+                        size: 'xs',
+                        disabled: isExternalNameUnchanged.value,
+                        onClick($event: any) {
+                            $event.preventDefault();
 
-                        resetAlias();
-                    },
-                }, () => [
-                    h(VCIcon, { name: 'fa6-solid:rotate-left', class: 'pe-1' }),
-                    'Reset',
-                ]),
-            ]);
+                            resetAlias();
+                        },
+                    }, () => [
+                        h(VCIcon, { name: 'fa6-solid:rotate-left', class: 'pe-1' }),
+                        'Reset',
+                    ]),
+                ],
+            });
 
             const type = h(
                 VCFormGroup,

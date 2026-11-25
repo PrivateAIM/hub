@@ -11,8 +11,8 @@ import { AnalysisBucketFileValidator, AnalysisBucketType } from '@privateaim/cor
 import { PermissionName, ValidatorGroup } from '@privateaim/kit';
 import { BadRequestError, EntityNotFoundError } from '@privateaim/errors';
 import type { ActorContext, EntityRepositoryFindManyResult } from '@privateaim/server-kit';
-import { AbstractEntityService, appendQueryConditions } from '@privateaim/server-kit';
-import { isPermissionError } from '@authup/access';
+import { AbstractEntityService } from '@privateaim/server-kit';
+import { appendQueryConditions, isPermissionError } from '@authup/access';
 import type { BucketFile } from '@privateaim/storage-kit';
 import type {
     AnalysisBucketUploadRemoval,

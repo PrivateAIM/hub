@@ -14,7 +14,6 @@ import { QUERY_CACHE_SCOPED_VALUE_NORMALIZER } from './constants.ts';
 import type {
     IQueryCache,
     QueryCacheContext,
-    QueryCacheInvalidator,
     QueryCacheQueryInput,
     QueryCacheReadOptions,
     QueryCacheSubscriberOptions,
@@ -22,31 +21,21 @@ import type {
 
 /**
  * Reads through a tag-invalidated cache (`@rapiq/cache`), or straight from
- * the database without one, inside an open transaction, and for one ttl
- * after a failed invalidation (authup/authup#3688).
+ * the database without one and inside an open transaction. A failed
+ * invalidation stays pending in the cache, which bypasses and replays it
+ * (tada5hi/rapiq#993); other processes sharing the store are not reached.
  */
 export class QueryCache implements IQueryCache {
     protected dataSource: DataSource;
 
     protected registry: SchemaRegistry;
 
-    protected ttl: number;
-
     protected cache: ITaggedCache | undefined;
-
-    protected now: () => number;
-
-    protected suspendedUntil: number | undefined;
-
-    /** How many invalidations were lost; part of every key from the first on. */
-    protected generation = 0;
 
     constructor(ctx: QueryCacheContext) {
         this.dataSource = ctx.dataSource;
         this.registry = ctx.registry;
-        this.ttl = ctx.ttl;
         this.cache = ctx.cache;
-        this.now = ctx.now ?? (() => Date.now());
     }
 
     async remember<T>(
@@ -55,11 +44,11 @@ export class QueryCache implements IQueryCache {
         read: () => Promise<T>,
         options: QueryCacheReadOptions = {},
     ): Promise<T> {
-        if (!this.cache || this.isBypassed(options)) {
+        if (!this.cache || this.isTransactionActive(options)) {
             return read();
         }
 
-        return this.cache.remember(this.buildKey(key), read, { tags });
+        return this.cache.remember(key, read, { tags });
     }
 
     async rememberQuery<T>(
@@ -67,44 +56,15 @@ export class QueryCache implements IQueryCache {
         read: () => Promise<T>,
         options: QueryCacheReadOptions = {},
     ): Promise<T> {
-        if (!this.cache || this.isBypassed(options)) {
+        if (!this.cache || this.isTransactionActive(options)) {
             return read();
         }
 
         return rememberQuery(this.cache, {
             ...input,
-            key: this.buildKey(input.key),
             registry: this.registry,
             normalizeScopedValue: QUERY_CACHE_SCOPED_VALUE_NORMALIZER,
         }, read);
-    }
-
-    /**
-     * What the invalidation subscriber bumps through. A rejected bump
-     * leaves the entries carrying those tags in the store, so this
-     * process reads past the cache until every such entry has lapsed,
-     * one entry ttl from the failure. A read in flight at the failure
-     * still fills the store after it, with a full ttl, so the keys move to
-     * a new generation that fill is not under. Other processes sharing the
-     * store are not reached (tada5hi/rapiq#993).
-     */
-    createInvalidator(): QueryCacheInvalidator {
-        return {
-            invalidate: async (tags: string[]) => {
-                if (!this.cache) {
-                    return;
-                }
-
-                try {
-                    await this.cache.invalidate(tags);
-                } catch (e) {
-                    this.suspendedUntil = this.now() + this.ttl;
-                    this.generation++;
-
-                    throw e;
-                }
-            },
-        };
     }
 
     /**
@@ -119,28 +79,12 @@ export class QueryCache implements IQueryCache {
         }
 
         return new CacheInvalidationSubscriber({
-            cache: this.createInvalidator(),
+            cache: this.cache,
             registry: this.registry,
             normalizeScopedValue: QUERY_CACHE_SCOPED_VALUE_NORMALIZER,
             resolveSchemaName: options.resolveSchemaName,
             onError: options.onError,
         });
-    }
-
-    /**
-     * The store key: the caller's key until an invalidation is lost, so
-     * processes share entries, and suffixed with the generation after.
-     */
-    protected buildKey(key: string): string {
-        return this.generation === 0 ? key : `${key}#${this.generation}`;
-    }
-
-    protected isBypassed(options: QueryCacheReadOptions): boolean {
-        return this.isSuspended() || this.isTransactionActive(options);
-    }
-
-    protected isSuspended(): boolean {
-        return typeof this.suspendedUntil !== 'undefined' && this.now() < this.suspendedUntil;
     }
 
     /**

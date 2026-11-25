@@ -19,11 +19,11 @@ import type {
 } from '@privateaim/server-kit';
 import {
     AbstractEntityService,
-    appendQueryConditions,
     findManyScoped,
     scopeReadQuery,
 } from '@privateaim/server-kit';
 import {
+    appendQueryConditions,
     evaluateRecord,
     evaluateRecordUpdate,
     isPermissionError,

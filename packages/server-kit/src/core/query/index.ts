@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './conditions.ts';
 export * from './describe.ts';
 export * from './filters.ts';
 export * from './projection.ts';

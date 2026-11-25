@@ -6,8 +6,7 @@
  */
 
 import type { AuthorizationEvaluatorInput, IPermissionEvaluator } from '@authup/access';
-import { createAuthorizationEvaluator } from '@authup/access';
-import type { IClient } from '@authup/core-http-kit';
+import type { IAuthorizationCatalogCache } from '@authup/server-kit/core';
 import { ScopeName } from '@authup/core-kit';
 import { unwrapOAuth2Scope } from '@authup/specs';
 import type { AuthupPolicySubject, AuthupTokenSubjectData } from './types.ts';
@@ -47,10 +46,15 @@ export function resolveAuthupPolicySubject(data: AuthupTokenSubjectData): Authup
     };
 }
 
-/** One catalog read per request/connection; all subsequent checks run locally. */
+/**
+ * An evaluator over the cached authorization catalog: the cache reads it at
+ * most once per `maxAge` (60 s by default) per process, so a policy edited in
+ * Authup applies within that window; a catalog a grant finds stale is re-read
+ * once. All checks of the evaluator run locally.
+ */
 export async function createAuthupPermissionEvaluator(
-    client: Pick<IClient, 'authorization'>,
+    cache: IAuthorizationCatalogCache,
     input: Omit<AuthorizationEvaluatorInput, 'catalog'>,
 ): Promise<IPermissionEvaluator> {
-    return createAuthorizationEvaluator({ ...input, catalog: await client.authorization.get() });
+    return cache.createEvaluator(input);
 }

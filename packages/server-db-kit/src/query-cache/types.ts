@@ -46,17 +46,8 @@ export type QueryCacheContext = {
     dataSource: DataSource,
     /** The schemas both the reader and the invalidation subscriber derive tags from. */
     registry: SchemaRegistry,
-    /** The entry ttl of the cache, and how long reads bypass it after a failed bump. */
-    ttl: number,
     /** Without a cache every read goes to the database. */
     cache?: ITaggedCache,
-    /** The clock the suspension window is measured on. Default: `Date.now()`. */
-    now?: () => number,
 };
-
-/**
- * What the invalidation subscriber bumps through.
- */
-export type QueryCacheInvalidator = Pick<ITaggedCache, 'invalidate'>;
 
 export type QueryCacheSubscriberOptions = Pick<CacheInvalidationSubscriberOptions, 'resolveSchemaName' | 'onError'>;

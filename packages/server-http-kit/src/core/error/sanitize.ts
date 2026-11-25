@@ -27,7 +27,7 @@ import {
     ParseError,
     ErrorCode as QueryErrorCode,
 } from '@rapiq/core';
-import { EntityRelationLookupError } from 'typeorm-extension';
+import { EntityRelationLookupError, readDatabaseErrorCode } from 'typeorm-extension';
 import { buildErrorMessageForAttributes, isValidupError, stringifyPath } from 'validup';
 
 /**
@@ -166,9 +166,7 @@ export function sanitizeError(input: unknown): HubError {
     }
 
     if (isObject(input)) {
-        const code = Object.prototype.hasOwnProperty.call(input, 'code') && typeof input.code === 'string' ?
-            input.code :
-            undefined;
+        const code = readDatabaseErrorCode(input);
 
         /**
          * @see https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html

@@ -10,6 +10,7 @@ import { buildQueryString } from '../../utils';
 import { nullifyEmptyObjectProperties } from '@privateaim/kit';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
 import { buildRequestConfig } from '../utils';
+import { encodePathSegment } from '@authup/core-http-kit';
 import type { BucketFile, IBucketFileAPI } from './types';
 import { StorageBaseAPI } from '../base';
 
@@ -29,7 +30,7 @@ export class BucketFileAPI extends StorageBaseAPI implements IBucketFileAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<BucketFile>> {
         const response = await this.client.get(
-            `bucket-files/${id}${buildQueryString(record)}`,
+            `bucket-files/${encodePathSegment(id)}${buildQueryString(record)}`,
             buildRequestConfig(options),
         );
 
@@ -43,7 +44,7 @@ export class BucketFileAPI extends StorageBaseAPI implements IBucketFileAPI {
     }
 
     async delete(id: BucketFile['id'], options?: APIRequestOptions): Promise<EntityRecordResponse<BucketFile>> {
-        const response = await this.client.delete(`bucket-files/${id}`, buildRequestConfig(options));
+        const response = await this.client.delete(`bucket-files/${encodePathSegment(id)}`, buildRequestConfig(options));
 
         return response.data;
     }
@@ -54,7 +55,7 @@ export class BucketFileAPI extends StorageBaseAPI implements IBucketFileAPI {
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<BucketFile>> {
         const response = await this.client.post(
-            `bucket-files/${id}`,
+            `bucket-files/${encodePathSegment(id)}`,
             nullifyEmptyObjectProperties(data),
             buildRequestConfig(options),
         );
@@ -63,7 +64,7 @@ export class BucketFileAPI extends StorageBaseAPI implements IBucketFileAPI {
     }
 
     getStreamPath(id: BucketFile['id']): string {
-        return `bucket-files/${id}/stream`;
+        return `bucket-files/${encodePathSegment(id)}/stream`;
     }
 
     getStreamURL(id: BucketFile['id']) : string {

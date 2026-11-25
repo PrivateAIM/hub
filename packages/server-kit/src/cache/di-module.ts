@@ -14,7 +14,7 @@ import {
     TAGGED_CACHE_MODULE_NAME,
     TaggedCacheInjectionKey,
 } from './constants';
-import { createTaggedCache } from './module';
+import { createTaggedCache, formatTaggedCacheError } from './module';
 import { throttle } from './throttle';
 import type { TaggedCacheModuleOptions } from './types';
 
@@ -45,9 +45,7 @@ export class TaggedCacheModule implements IModule {
                 return;
             }
 
-            const message = Error.isError(error) ? error.message : String(error);
-
-            logger.data.warn(`The tagged cache failed: ${message}`);
+            logger.data.warn(`The tagged cache failed: ${formatTaggedCacheError(error)}`);
         }, TAGGED_CACHE_ERROR_LOG_INTERVAL);
 
         const tagged = createTaggedCache({

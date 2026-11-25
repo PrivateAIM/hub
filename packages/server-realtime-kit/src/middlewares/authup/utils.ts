@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { IClient } from '@authup/core-http-kit';
+import type { IAuthorizationCatalogCache } from '@authup/server-kit/core';
 import { createAuthupPermissionEvaluator, resolveAuthupPolicySubject } from '@privateaim/server-kit';
 import type { TokenVerificationData } from '@authup/server-adapter-kit';
 import type { Socket } from '../../types';
@@ -23,7 +23,7 @@ type TokenVerificationDataMinimal = Pick<
 export async function applyTokenVerificationData(
     socket: Socket,
     data: TokenVerificationDataMinimal,
-    authupClient: IClient,
+    catalogCache: IAuthorizationCatalogCache,
 ) {
     socket.data.identity = {
         type: data.sub_kind,
@@ -32,5 +32,5 @@ export async function applyTokenVerificationData(
         realmName: data.realm_name,
     };
 
-    socket.data.permissionEvaluator = await createAuthupPermissionEvaluator(authupClient, resolveAuthupPolicySubject(data));
+    socket.data.permissionEvaluator = await createAuthupPermissionEvaluator(catalogCache, resolveAuthupPolicySubject(data));
 }

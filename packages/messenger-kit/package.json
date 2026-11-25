@@ -30,14 +30,14 @@
         "test:coverage": "cross-env NODE_ENV=test vitest run --config test/vitest.config.ts --coverage"
     },
     "dependencies": {
-        "@validup/zod": "^2.0.2",
-        "validup": "^2.0.1",
+        "@validup/zod": "^2.0.3",
+        "validup": "^2.0.2",
         "zod": "^4.6.7"
     },
     "devDependencies": {
         "@privateaim/core-kit": "^0.20.0",
         "@privateaim/kit": "^0.20.0",
-        "vitest": "^5.1.0"
+        "vitest": "^5.1.1"
     },
     "peerDependencies": {
         "@privateaim/core-kit": "^0.20.0",

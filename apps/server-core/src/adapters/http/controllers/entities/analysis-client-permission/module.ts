@@ -9,6 +9,7 @@ import type { ClientPermission } from '@authup/core-kit';
 import type { EntityRecordResponse } from '@privateaim/core-http-kit';
 import {
     DBody,
+    DConsumes,
     DContext,
     DController,
     DDelete,
@@ -47,6 +48,7 @@ export class AnalysisClientPermissionController {
     }
 
     @DPost('/:id/client/permissions', [ForceLoggedInMiddleware])
+    @DConsumes('application/json')
     @DStatus(201)
     async add(
         @DPath('id') id: string,

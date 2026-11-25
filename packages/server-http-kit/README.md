@@ -43,10 +43,19 @@ ESM only, Node.js `>=26.0.0`. `routup`, `redis-extension` and `typeorm-extension
 ## Usage
 
 ```typescript
-import { createAuthupTokenVerifier, mountErrorMiddleware, mountHealthRoutes, mountMiddlewares } from '@privateaim/server-http-kit';
+import {
+    createAuthupTokenCache,
+    createAuthupTokenVerifier,
+    mountErrorMiddleware,
+    mountHealthRoutes,
+    mountMiddlewares,
+} from '@privateaim/server-http-kit';
 import { App } from 'routup';
 
 const app = new App({ options: { trustProxy: config.trustProxy ?? true } });
+
+// a dedicated, bounded Redis client; call tokenCache.dispose() on teardown
+const tokenCache = createAuthupTokenCache({ redis: redisClient });
 
 // probes first: neither authenticated, rate limited nor counted
 mountHealthRoutes(app, health);
@@ -62,7 +71,7 @@ mountMiddlewares(app, {
         tokenVerifier: createAuthupTokenVerifier({
             baseURL: config.authupURL,
             client: { id: config.clientId, secret: config.clientSecret, realm: config.realm },
-            redisClient,
+            cache: tokenCache.cache,
         }),
     },
     swagger: { baseURL: config.publicURL },
@@ -99,7 +108,7 @@ const authorization = {
     tokenVerifier: createAuthupTokenVerifier({
         baseURL: config.authupURL,
         client: { id: config.clientId, secret: config.clientSecret, realm: config.realm },
-        redisClient,
+        cache: tokenCache.cache,
     }),
     capability: {
         verifier: createAuthupCapabilityTokenVerifier({
@@ -114,10 +123,12 @@ const authorization = {
 - **Credential precedence:** the `Authorization` header, then (only with `capability`) the query capability token (`?dt=`), then
   the `<cookiePrefix>access_token` cookie. Exactly one credential is verified per request.
 - **Access tokens** are introspected as the given `client` (client credentials). Results are cached until the token's `exp`, in
-  Redis with `redisClient` or in process memory, namespaced per introspecting client. A malformed bearer is refused before
+  the given `cache` or in process memory, namespaced per introspecting client. `createAuthupTokenCache({ redis })` builds
+  the Redis cache on a duplicate of `redis` with authup's `REDIS_TOKEN_CACHE_CLIENT_OPTIONS` (one retry, no offline queue,
+  500 ms command timeout), so an outage falls through to introspection instead of queueing; `dispose()` disconnects it. A malformed bearer is refused before
   introspection. An Authup failure answers 502, a timeout 504; only a token Authup judged answers 401.
-- **Identity requests** get the identity, scopes, the raw token and an `IPermissionEvaluator`, built from one authorization
-  catalog read. A token without the `global` scope keeps its identity but has no grants.
+- **Identity requests** get the identity, scopes, the raw token and an `IPermissionEvaluator`, built over the authorization
+  catalog, which the middleware caches for 60 s. A token without the `global` scope keeps its identity but has no grants.
 - **Capability tokens** are verified locally against Authup's `/jwks` (`aud`, `kind`, `exp`) and accepted only when the trusted
   client exchanged them (`act.sub`). A capability request gets `capability` and nothing else: no identity, no permission
   evaluator, no token. A query capability token may live at most 60 s, and only one may be passed.
@@ -198,7 +209,7 @@ See [error responses](https://hub.docs.privateaim.net/guide/development/api.html
 | `mountMiddlewares`, `MiddlewareMountOptions` | function | Mounts the enabled middleware in order |
 | `mountErrorMiddleware` | function | Error-to-response mapping; mount last |
 | `mountHealthRoutes` | function | `/livez` and `/readyz` |
-| `mountAuthorizationMiddleware`, `createAuthupTokenVerifier`, `createAuthupCapabilityTokenVerifier` | functions | Authentication |
+| `mountAuthorizationMiddleware`, `createAuthupTokenVerifier`, `createAuthupTokenCache`, `createAuthupCapabilityTokenVerifier` | functions | Authentication |
 | `IntrospectableTokenVerifier`, `CapabilityTokenVerifier`, `TrustedActorTokenVerifier` | classes | The verifiers the factories build |
 | `ForceLoggedInMiddleware`, `ForceIdentityOrCapabilityMiddleware`, `ForceIdentityOrStreamCapabilityMiddleware` | classes | Route guards |
 | `mountBasicMiddleware`, `mountCorsMiddleware`, `mountPrometheusMiddleware`, `mountSwaggerMiddleware`, `mountDecoratorsMiddleware` | functions | Single middleware |

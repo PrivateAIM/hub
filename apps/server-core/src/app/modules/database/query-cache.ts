@@ -10,8 +10,8 @@ import { QueryCache } from '@privateaim/server-db-kit';
 import {
     LoggerInjectionKey,
     TAGGED_CACHE_ERROR_LOG_INTERVAL,
-    TAGGED_CACHE_TTL,
     TaggedCacheInjectionKey,
+    formatTaggedCacheError,
     throttle,
 } from '@privateaim/server-kit';
 import type { IContainer } from 'eldin';
@@ -54,7 +54,6 @@ export function registerQueryCache(container: IContainer, dataSource: DataSource
     const queryCache = new QueryCache({
         dataSource,
         registry: schemaRegistry,
-        ttl: TAGGED_CACHE_TTL,
         cache: cacheResult.success ? cacheResult.data : undefined,
     });
 
@@ -65,7 +64,7 @@ export function registerQueryCache(container: IContainer, dataSource: DataSource
             const logger = container.tryResolve(LoggerInjectionKey);
 
             if (logger.success) {
-                logger.data.warn(`The cache invalidation failed: ${Error.isError(error) ? error.message : String(error)}`);
+                logger.data.warn(`The cache invalidation failed: ${formatTaggedCacheError(error)}`);
             }
         }, TAGGED_CACHE_ERROR_LOG_INTERVAL),
     });
