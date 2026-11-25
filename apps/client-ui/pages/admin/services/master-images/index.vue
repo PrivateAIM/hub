@@ -22,6 +22,7 @@ import {
     buildMasterImageStatusFilters,
     resolveTextColorClass,
 } from '@privateaim/client-vue';
+import type { ListLoadFn, ListMeta } from '@privateaim/client-vue';
 import type { MasterImage } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import { PermissionName, humanFileSize } from '@privateaim/kit';
@@ -43,6 +44,7 @@ import {
     watch,
 } from 'vue';
 import { definePageMeta } from '#imports';
+import { useRefreshKey } from '../../../../composables/refresh-key';
 import { useToast } from '../../../../composables/toast';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
@@ -119,7 +121,17 @@ export default defineComponent({
 
         const status = ref<`${MasterImageStatusFilter}`>(MasterImageStatusFilter.ALL);
         const summary = useTemplateRef<{ reload: () => Promise<void> }>('summary');
-        const list = useTemplateRef<{ load: () => Promise<void> }>('list');
+        const list = useTemplateRef<{ load: ListLoadFn<ListMeta<MasterImage>> }>('list');
+
+        // The list keeps only the combined filters, so the search FSearch
+        // last sent is remembered here and re-sent when the status changes.
+        let search: ListMeta<MasterImage>['filters'] = {};
+
+        const bindSearch = (load: ListLoadFn<ListMeta<MasterImage>>): ListLoadFn<ListMeta<MasterImage>> => (input) => {
+            search = input?.filters ?? {};
+
+            return load(input);
+        };
 
         const query = computed<QueryBuildInput<MasterImage, 3>>(() => {
             const filters = buildMasterImageStatusFilters(status.value);
@@ -132,9 +144,14 @@ export default defineComponent({
 
         // `flush: 'post'`: the list must have re-rendered with the new
         // `:query` before load() reads it, or it reloads with the old filter.
+        // Offset 0: a load without one keeps the current page, which a
+        // narrower status bucket may not have.
         watch(query, async () => {
             await nextTick();
-            await list.value?.load();
+            await list.value?.load({
+                filters: search,
+                pagination: { offset: 0 },
+            });
         }, { flush: 'post' });
 
         const syncEventQuery: QueryBuildInput<Event, 3> = {
@@ -151,8 +168,16 @@ export default defineComponent({
             pagination: { limit: 20 },
         };
 
-        const handleExecuted = () => {
+        // A sync runs in the worker for seconds to minutes, so its events
+        // and logs are re-read a few times after it was started.
+        const syncPanels = useRefreshKey();
+
+        const handleExecuted = (command: string) => {
             summary.value?.reload();
+
+            if (command === 'sync') {
+                syncPanels.refreshLater([5_000, 30_000, 90_000]);
+            }
         };
 
         const handleFailed = (e: Error) => {
@@ -166,6 +191,9 @@ export default defineComponent({
         return {
             MASTER_IMAGE_SEARCH_FIELDS,
             NuxtLink,
+            bindSearch,
+            refreshSyncPanels: syncPanels.refresh,
+            syncPanelsKey: syncPanels.key,
             columns,
             formatSize,
             handleExecuted,
@@ -237,7 +265,7 @@ export default defineComponent({
                         <FTitle />
                         <FSearch
                             :fields="MASTER_IMAGE_SEARCH_FIELDS"
-                            :load="props.load"
+                            :load="bindSearch(props.load)"
                             :meta="props.meta"
                         />
                     </template>
@@ -307,13 +335,32 @@ export default defineComponent({
                 </FMasterImages>
             </div>
             <div class="flex min-w-0 flex-col gap-3 lg:basis-1/3">
-                <div>
-                    <h6><VCIcon name="fa6-solid:rotate" /> Sync events</h6>
-                    <FEvents :query="syncEventQuery" />
+                <div class="flex items-center">
+                    <h6 class="mb-0">
+                        <VCIcon name="fa6-solid:rotate" /> Synchronization
+                    </h6>
+                    <VCButton
+                        class="ms-auto"
+                        size="xs"
+                        variant="outline"
+                        @click.prevent="refreshSyncPanels"
+                    >
+                        <VCIcon name="fa6-solid:arrows-rotate" /> <span class="ms-1">Refresh</span>
+                    </VCButton>
                 </div>
                 <div>
-                    <h6><VCIcon name="fa6-solid:terminal" /> Sync logs</h6>
-                    <FLogs :query="syncLogQuery" />
+                    <h6>Events</h6>
+                    <FEvents
+                        :key="'events-' + syncPanelsKey"
+                        :query="syncEventQuery"
+                    />
+                </div>
+                <div>
+                    <h6><VCIcon name="fa6-solid:terminal" /> Logs</h6>
+                    <FLogs
+                        :key="'logs-' + syncPanelsKey"
+                        :query="syncLogQuery"
+                    />
                 </div>
             </div>
         </div>

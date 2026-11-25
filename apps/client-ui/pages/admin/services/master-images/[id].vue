@@ -20,10 +20,11 @@ import { PermissionName, ProcessStatus, humanFileSize } from '@privateaim/kit';
 import type { Event, Log } from '@privateaim/telemetry-kit';
 import { LogFlag } from '@privateaim/telemetry-kit';
 import type { QueryBuildInput } from '@rapiq/core';
+import { VCButton } from '@vuecs/button';
 import { VCIcon } from '@vuecs/icon';
 import type { NavigationItem } from '@vuecs/navigation';
 import { VCTimeago } from '@vuecs/timeago';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 import {
     createError,
     definePageMeta,
@@ -31,6 +32,7 @@ import {
     useRoute,
     useToast,
 } from '#imports';
+import { useRefreshKey } from '../../../../composables/refresh-key';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 /**
@@ -44,6 +46,7 @@ export default defineComponent({
         FMasterImageCommand,
         FProcessStatus,
         FProgressBar,
+        VCButton,
         VCIcon,
         VCTimeago,
     },
@@ -67,6 +70,24 @@ export default defineComponent({
                     toast.show({ variant: 'warning', body: e.message }, { pos: 'top-center' });
                 }
             },
+        });
+
+        // Registered before the first await: lifecycle hooks and watchers
+        // need the component instance, which an async setup loses there.
+        // The status reaches the page over the entity socket, the telemetry
+        // behind the panels only after it: server-core saves the status
+        // before it dispatches the event, and worker logs travel separately.
+        // So a status change re-reads the panels now and twice more later.
+        const panels = useRefreshKey();
+
+        watch(() => manager.data.value?.buildStatus, (value, oldValue) => {
+            // `undefined` before: the initial resolve, whose panels mount fresh.
+            if (typeof oldValue === 'undefined' || value === oldValue) {
+                return;
+            }
+
+            panels.refresh();
+            panels.refreshLater([3_000, 10_000]);
         });
 
         await manager.resolve();
@@ -102,6 +123,7 @@ export default defineComponent({
         });
 
         const isFailed = computed(() => entity.value.buildStatus === ProcessStatus.FAILED);
+
 
         // `executionFailed` is the builder's failure event key; its `data.error`
         // holds the reason (server-core's master-image builder aggregator).
@@ -146,6 +168,8 @@ export default defineComponent({
             formatSize,
             handleFailed,
             handleUpdated: manager.updated,
+            panelsKey: panels.key,
+            refreshPanels: panels.refresh,
             isFailed,
             lastFailureQuery,
             logQuery,
@@ -194,8 +218,19 @@ export default defineComponent({
             />
         </div>
 
+        <div class="flex justify-end">
+            <VCButton
+                size="xs"
+                variant="outline"
+                @click.prevent="refreshPanels"
+            >
+                <VCIcon name="fa6-solid:arrows-rotate" /> <span class="ms-1">Refresh logs and events</span>
+            </VCButton>
+        </div>
+
         <FEvents
             v-if="isFailed"
+            :key="'failure-' + panelsKey"
             :query="lastFailureQuery"
         >
             <template #body="{ data }">
@@ -271,12 +306,18 @@ export default defineComponent({
                 </div>
                 <div>
                     <h6><VCIcon name="fa6-solid:terminal" /> Logs</h6>
-                    <FLogs :query="logQuery" />
+                    <FLogs
+                        :key="'logs-' + panelsKey"
+                        :query="logQuery"
+                    />
                 </div>
             </div>
             <div class="min-w-0 lg:basis-1/3">
                 <h6><VCIcon name="fa6-solid:bullhorn" /> Events</h6>
-                <FEvents :query="eventQuery" />
+                <FEvents
+                    :key="'events-' + panelsKey"
+                    :query="eventQuery"
+                />
             </div>
         </div>
     </div>
