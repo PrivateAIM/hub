@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { Client as AuthupClient } from '@authup/core-http-kit';
-import { createAuthupUserTokenCreator } from '@privateaim/server-kit';
+import { createAuthupClientTokenCreator, createAuthupUserTokenCreator } from '@privateaim/server-kit';
 import type { AuthupPermissionRow } from './types.ts';
 
 /**
@@ -122,6 +122,33 @@ export async function createRestrictedAccessToken(
         name,
         password,
         realm: 'master',
+    });
+
+    const response = await tokenCreator();
+
+    return response.access_token;
+}
+
+/**
+ * Mint an access token for an Authup client through the client_credentials
+ * grant, e.g. for the client bound to a node (`client.node.getClientCredentials`),
+ * so a suite can call a route as that node.
+ */
+export async function createClientAccessToken(
+    clientId: string,
+    clientSecret: string,
+    realm?: string,
+    baseURL = process.env.AUTHUP_URL,
+): Promise<string> {
+    if (!baseURL) {
+        throw new Error('The AUTHUP_URL is not configured — cannot mint a client access token.');
+    }
+
+    const tokenCreator = createAuthupClientTokenCreator({
+        baseURL,
+        clientId,
+        clientSecret,
+        realm,
     });
 
     const response = await tokenCreator();
