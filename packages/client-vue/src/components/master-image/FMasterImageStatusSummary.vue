@@ -99,7 +99,7 @@ export default defineComponent({
             v-for="tile in tiles"
             :key="tile.key"
             type="button"
-            class="flex flex-col items-start rounded-md border px-3 py-2 text-left transition-colors"
+            class="flex cursor-pointer flex-col items-start rounded-md border px-3 py-2 text-left transition-colors"
             :class="modelValue === tile.key ?
                 'border-primary-600 bg-bg-muted' :
                 'border-border bg-bg hover:bg-bg-muted'"
