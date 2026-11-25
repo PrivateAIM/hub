@@ -18,6 +18,8 @@ export * from './master-image/index.ts';
 export * from './master-image-group/index.ts';
 export * from './node/index.ts';
 export * from './node-client-credential/index.ts';
+export * from './node-component/index.ts';
+export * from './node-status/index.ts';
 export * from './project/index.ts';
 export * from './project-node/index.ts';
 export * from './registry/index.ts';

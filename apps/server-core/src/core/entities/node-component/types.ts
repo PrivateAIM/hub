@@ -6,7 +6,11 @@
  */
 
 import type { NodeComponent, NodeComponentProbeReport, NodeComponentReport } from '@privateaim/core-kit';
-import type { IEntityRepository } from '@privateaim/server-kit';
+import type {
+    ActorContext,
+    EntityRepositoryFindManyResult,
+    IEntityRepository,
+} from '@privateaim/server-kit';
 
 export type NodeComponentWrite = { name: string; report: NodeComponentReport | NodeComponentProbeReport };
 
@@ -18,3 +22,11 @@ export interface INodeComponentRepository extends IEntityRepository<NodeComponen
     /** Ids of nodes with online = true whose newest component reportedAt < before, or that have no components. */
     findStaleOnlineNodeIds(before: string): Promise<string[]>;
 }
+
+export interface INodeComponentService {
+    getMany(query: Record<string, any>, actor: ActorContext): Promise<EntityRepositoryFindManyResult<NodeComponent>>;
+}
+
+export type NodeComponentServiceContext = {
+    repository: INodeComponentRepository;
+};

@@ -24,6 +24,7 @@ import { analysisNodeEventSchema } from '../entities/analysis-node-event/schema.
 import { masterImageSchema } from '../entities/master-image/schema.ts';
 import { masterImageGroupSchema } from '../entities/master-image-group/schema.ts';
 import { nodeSchema } from '../entities/node/schema.ts';
+import { nodeComponentSchema } from '../entities/node-component/schema.ts';
 import { projectSchema } from '../entities/project/schema.ts';
 import { projectNodeSchema } from '../entities/project-node/schema.ts';
 import { registrySchema } from '../entities/registry/schema.ts';
@@ -67,6 +68,7 @@ export const entitySchemas: Schema<any>[] = [
     masterImageSchema,
     masterImageGroupSchema,
     nodeSchema,
+    nodeComponentSchema,
     projectSchema,
     projectNodeSchema,
     registrySchema,
