@@ -6,6 +6,7 @@
   -->
 
 <script lang="ts">
+import { isServerRuntime } from '@authup/client-web-kit';
 import type { MasterImage } from '@privateaim/core-kit';
 import { DomainType } from '@privateaim/core-kit';
 import { IFieldValidation } from '@ilingo/validup-vue';
@@ -94,7 +95,13 @@ export default defineComponent({
             form.masterImageId = props.entity.id;
         }
 
-        Promise.resolve().then(() => manager.resolve());
+        // Upstream: authup/authup#3924 (client only until a late server-render refresh is safe)
+        // The server render does not await this fetch, so its result never
+        // reached the HTML; a 401 on it refreshed the session after the
+        // response was sent and spent the refresh token.
+        if (!isServerRuntime()) {
+            Promise.resolve().then(() => manager.resolve());
+        }
 
         const v = useValidup(new MasterImagePickerValidator(), form, { detached: true });
 

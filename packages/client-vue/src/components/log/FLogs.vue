@@ -5,6 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { isServerRuntime } from '@authup/client-web-kit';
 import type {
     Log,
 } from '@privateaim/telemetry-kit';
@@ -62,7 +63,13 @@ export default defineComponent({
             },
         });
 
-        Promise.resolve().then(() => resolve(props.query));
+        // Upstream: authup/authup#3924 (client only until a late server-render refresh is safe)
+        // The server render does not await this fetch, so its result never
+        // reached the HTML; a 401 on it refreshed the session after the
+        // response was sent and spent the refresh token.
+        if (!isServerRuntime()) {
+            Promise.resolve().then(() => resolve(props.query));
+        }
 
         return {
             busy,
