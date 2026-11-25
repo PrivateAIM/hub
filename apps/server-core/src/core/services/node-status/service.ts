@@ -12,7 +12,7 @@ import {
     NodeStatusReportValidator,
 } from '@privateaim/core-kit';
 import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
-import type { ActorContext, EntityPersistContext } from '@privateaim/server-kit';
+import type { ActorContext } from '@privateaim/server-kit';
 import type { INodeComponentRepository } from '../../entities/node-component/types.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
 import type { INodeStatusService, NodeStatusServiceContext } from './types.ts';
@@ -20,6 +20,28 @@ import type { INodeStatusService, NodeStatusServiceContext } from './types.ts';
 export const NODE_OFFLINE_THRESHOLD_MS = 5 * 60 * 1000;
 
 const NODE_COMPONENT_NAME_MAX_LENGTH = 64;
+
+/**
+ * The node half of a report, applied to the locked node row in the same
+ * transaction as the component writes, so the stored deploymentVersion and
+ * component set always come from the same report. Saves (returns true) only
+ * when `online` or `deploymentVersion` changes: at most once per report.
+ */
+function touchNode(node: Node, deploymentVersion?: string): boolean {
+    let changed = false;
+
+    if (!node.online) {
+        node.online = true;
+        changed = true;
+    }
+
+    if (deploymentVersion !== undefined && node.deploymentVersion !== deploymentVersion) {
+        node.deploymentVersion = deploymentVersion;
+        changed = true;
+    }
+
+    return changed;
+}
 
 export class NodeStatusService implements INodeStatusService {
     protected nodeRepository: INodeRepository;
@@ -38,15 +60,15 @@ export class NodeStatusService implements INodeStatusService {
         const report = await new NodeStatusReportValidator().run(data);
         const node = await this.getWritableNode(nodeId, actor);
 
-        const components = await this.nodeComponentRepository.replaceForNode(
+        return this.nodeComponentRepository.replaceForNode(
             node.id,
             report.components.map((component) => ({ name: component.name, report: component })),
             new Date().toISOString(),
+            {
+                touch: (locked) => touchNode(locked, report.deployment?.version),
+                ctx: { data: actor.metadata },
+            },
         );
-
-        await this.touchNode(node.id, { data: actor.metadata }, report.deployment?.version);
-
-        return components;
     }
 
     async reportComponentStatus(
@@ -66,15 +88,15 @@ export class NodeStatusService implements INodeStatusService {
         const report = await new NodeComponentReportValidator().run(data);
         const node = await this.getWritableNode(nodeId, actor);
 
-        const component = await this.nodeComponentRepository.upsertForNode(
+        return this.nodeComponentRepository.upsertForNode(
             node.id,
             { name, report },
             new Date().toISOString(),
+            {
+                touch: (locked) => touchNode(locked),
+                ctx: { data: actor.metadata },
+            },
         );
-
-        await this.touchNode(node.id, { data: actor.metadata });
-
-        return component;
     }
 
     async markStaleNodesOffline(now: Date = new Date()): Promise<string[]> {
@@ -89,17 +111,9 @@ export class NodeStatusService implements INodeStatusService {
         const changed: string[] = [];
 
         for (const id of ids) {
-            const saved = await this.nodeRepository.updateLocked(id, (node) => {
-                if (!node.online) {
-                    return false;
-                }
-
-                node.online = false;
-
-                return true;
-            });
-
-            if (saved) {
+            // The candidate list is unlocked: a report may complete before the
+            // lock below is taken, so staleness is checked again under it.
+            if (await this.nodeComponentRepository.markOfflineIfStale(id, before)) {
                 changed.push(id);
             }
         }
@@ -126,29 +140,5 @@ export class NodeStatusService implements INodeStatusService {
         }
 
         return node;
-    }
-
-    /**
-     * At most one save per report, and only when `online` or
-     * `deploymentVersion` changes. The fields are set on the row as it is
-     * now, under a lock: a save of the copy read before the component write
-     * would revert a concurrent admin edit, and re-insert a deleted node.
-     */
-    protected async touchNode(nodeId: string, ctx: EntityPersistContext, deploymentVersion?: string): Promise<void> {
-        await this.nodeRepository.updateLocked(nodeId, (node) => {
-            let changed = false;
-
-            if (!node.online) {
-                node.online = true;
-                changed = true;
-            }
-
-            if (deploymentVersion !== undefined && node.deploymentVersion !== deploymentVersion) {
-                node.deploymentVersion = deploymentVersion;
-                changed = true;
-            }
-
-            return changed;
-        }, ctx);
     }
 }

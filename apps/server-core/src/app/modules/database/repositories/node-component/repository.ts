@@ -21,7 +21,11 @@ import type {
 import { isRowLockSupported, validateEntityJoinColumns } from 'typeorm-extension';
 import { NodeComponentEntity } from '../../../../../adapters/database/entities/node-component.ts';
 import { NodeEntity } from '../../../../../adapters/database/entities/node.ts';
-import type { INodeComponentRepository, NodeComponentWrite } from '../../../../../core/index.ts';
+import type {
+    INodeComponentRepository,
+    NodeComponentWrite,
+    NodeComponentWriteOptions,
+} from '../../../../../core/index.ts';
 import { mergeNodeComponent } from '../../../../../core/services/node-status/merge.ts';
 import { applyQuery } from '../query.ts';
 
@@ -63,8 +67,13 @@ export class NodeComponentRepositoryAdapter implements INodeComponentRepository 
         return this.repository.findBy(where);
     }
 
-    async replaceForNode(nodeId: string, writes: NodeComponentWrite[], reportedAt: string): Promise<NodeComponent[]> {
-        return this.withNodeLock(nodeId, async (manager, stored) => {
+    async replaceForNode(
+        nodeId: string,
+        writes: NodeComponentWrite[],
+        reportedAt: string,
+        options: NodeComponentWriteOptions = {},
+    ): Promise<NodeComponent[]> {
+        return this.withNodeLock(nodeId, async (manager, node, stored) => {
             const named = new Set(writes.map((write) => write.name));
             const removed = stored.filter((row) => !named.has(row.name));
 
@@ -78,15 +87,56 @@ export class NodeComponentRepositoryAdapter implements INodeComponentRepository 
                 output.push(await this.upsert(manager, nodeId, stored, write, reportedAt));
             }
 
+            await this.touch(manager, node, options);
+
             return output;
         });
     }
 
-    async upsertForNode(nodeId: string, write: NodeComponentWrite, reportedAt: string): Promise<NodeComponent> {
-        return this.withNodeLock(
-            nodeId,
-            async (manager, stored) => this.upsert(manager, nodeId, stored, write, reportedAt),
-        );
+    async upsertForNode(
+        nodeId: string,
+        write: NodeComponentWrite,
+        reportedAt: string,
+        options: NodeComponentWriteOptions = {},
+    ): Promise<NodeComponent> {
+        return this.withNodeLock(nodeId, async (manager, node, stored) => {
+            const output = await this.upsert(manager, nodeId, stored, write, reportedAt);
+
+            await this.touch(manager, node, options);
+
+            return output;
+        });
+    }
+
+    async markOfflineIfStale(nodeId: string, before: string, ctx?: EntityPersistContext): Promise<boolean> {
+        try {
+            return await this.withNodeLock(nodeId, async (manager, node, stored) => {
+                if (!node.online) {
+                    return false;
+                }
+
+                // `stored` is read after the lock, so it holds every report
+                // committed before this sweep got the node.
+                const threshold = new Date(before).getTime();
+                const fresh = stored.some((row) => new Date(row.reportedAt).getTime() >= threshold);
+
+                if (fresh) {
+                    return false;
+                }
+
+                node.online = false;
+                await manager.save(NodeEntity, node, ctx);
+
+                return true;
+            });
+        } catch (e) {
+            // deleted since the candidate query
+            if (e instanceof EntityNotFoundError) {
+                return false;
+            }
+
+            throw e;
+        }
     }
 
     async findStaleOnlineNodeIds(before: string): Promise<string[]> {
@@ -149,10 +199,25 @@ export class NodeComponentRepositoryAdapter implements INodeComponentRepository 
     }
 
     /**
+     * The node half of a write, on the locked row in the same transaction,
+     * so NodeSubscriber and the read-cache invalidation fire as for any save.
+     */
+    protected async touch(
+        manager: EntityManager,
+        node: NodeEntity,
+        options: NodeComponentWriteOptions,
+    ): Promise<void> {
+        if (options.touch && options.touch(node)) {
+            await manager.save(NodeEntity, node, options.ctx);
+        }
+    }
+
+    /**
      * Run `fn` in one transaction that holds a write lock on the node row, so
-     * a snapshot and a component report for the same node serialize, and
-     * hand it the node's components as they are after the lock was taken.
-     * Throws EntityNotFoundError when the node does not exist.
+     * snapshots, component reports and the offline sweep for the same node
+     * serialize, each with its node update. `fn` gets the locked node row and
+     * the node's components as they are after the lock was taken. Throws
+     * EntityNotFoundError when the node does not exist.
      *
      * better-sqlite3 has no row locks (typeorm throws
      * LockNotSupportedOnGivenDriverError), so it runs unlocked. Its one
@@ -162,7 +227,7 @@ export class NodeComponentRepositoryAdapter implements INodeComponentRepository 
      */
     protected async withNodeLock<T>(
         nodeId: string,
-        fn: (manager: EntityManager, stored: NodeComponentEntity[]) => Promise<T>,
+        fn: (manager: EntityManager, node: NodeEntity, stored: NodeComponentEntity[]) => Promise<T>,
     ): Promise<T> {
         return this.dataSource.transaction(async (manager) => {
             const lock: Pick<FindOneOptions, 'lock'> = isRowLockSupported(manager) ?
@@ -170,7 +235,6 @@ export class NodeComponentRepositoryAdapter implements INodeComponentRepository 
                 {};
 
             const node = await manager.findOne(NodeEntity, {
-                select: { id: true },
                 where: { id: nodeId },
                 ...lock,
             });
@@ -188,7 +252,7 @@ export class NodeComponentRepositoryAdapter implements INodeComponentRepository 
             // nodes in one gap deadlock on their first inserts (MySQL).
             const stored = await manager.find(NodeComponentEntity, { where: { nodeId } });
 
-            return fn(manager, stored);
+            return fn(manager, node, stored);
         });
     }
 

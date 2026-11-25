@@ -241,7 +241,7 @@ describe('NodeStatusService', () => {
         expect(nodeRepository.saves).toBe(0);
     });
 
-    it('keeps an admin edit that lands between the load and the node update', async () => {
+    it('keeps an admin edit that lands between the load and the lock', async () => {
         const {
             service,
             node,
@@ -250,7 +250,7 @@ describe('NodeStatusService', () => {
             nodeComponentRepository,
         } = await setup();
 
-        nodeComponentRepository.afterWrite = async (id) => {
+        nodeComponentRepository.beforeLock = async (id) => {
             const row = await nodeRepository.findOneById(id);
 
             row.name = 'renamed';
@@ -268,7 +268,7 @@ describe('NodeStatusService', () => {
         expect(stored?.deploymentVersion).toBe('1.2.3');
     });
 
-    it('does not re-create a node deleted before the node update', async () => {
+    it('answers 404 and re-creates nothing for a node deleted before the lock', async () => {
         const {
             service,
             node,
@@ -277,14 +277,88 @@ describe('NodeStatusService', () => {
             nodeComponentRepository,
         } = await setup();
 
-        nodeComponentRepository.afterWrite = async (id) => {
+        nodeComponentRepository.beforeLock = async (id) => {
             await nodeRepository.remove(await nodeRepository.findOneById(id));
         };
 
-        await service.reportStatus(node.id, snapshot, actor);
+        await expect(service.reportStatus(node.id, snapshot, actor)).rejects.toThrow(EntityNotFoundError);
 
         expect(await nodeRepository.findOneById(node.id)).toBeNull();
+        expect(nodeComponentRepository.getAll()).toHaveLength(0);
         expect(nodeRepository.saves).toBe(0);
+    });
+
+    it('pairs deploymentVersion and the component set from the same report', async () => {
+        const {
+            service,
+            node,
+            actor,
+            nodeRepository,
+            nodeComponentRepository,
+        } = await setup();
+
+        const first = {
+            deployment: { name: 'flame', version: '1' },
+            components: [{ name: 'storage', status: 'ok' }],
+        };
+        const second = {
+            deployment: { name: 'flame', version: '2' },
+            components: [{ name: 'broker', status: 'ok' }, { name: 'po', status: 'ok' }],
+        };
+
+        // The second report runs entirely after the first one's component
+        // write committed and before the first call returns: a node update
+        // made after that commit would pair version 1 with the second set.
+        nodeComponentRepository.afterWrite = async () => {
+            nodeComponentRepository.afterWrite = undefined;
+            await service.reportStatus(node.id, second, actor);
+        };
+
+        await service.reportStatus(node.id, first, actor);
+
+        expect((await nodeRepository.findOneById(node.id))?.deploymentVersion).toBe('2');
+        expect(nodeComponentRepository.getAll().map((row) => row.name).sort()).toEqual(['broker', 'po']);
+    });
+
+    it('serializes a report started while another holds the node lock', async () => {
+        const {
+            service,
+            node,
+            actor,
+            nodeRepository,
+            nodeComponentRepository,
+        } = await setup();
+
+        const first = {
+            deployment: { name: 'flame', version: '1' },
+            components: [{ name: 'storage', status: 'ok' }],
+        };
+        const second = {
+            deployment: { name: 'flame', version: '2' },
+            components: [{ name: 'broker', status: 'ok' }],
+        };
+
+        let pending: Promise<unknown> | undefined;
+
+        // inside the first report's lock, between its component write and
+        // its node update: the second one must wait for the whole first one
+        nodeComponentRepository.insideLock = async () => {
+            nodeComponentRepository.insideLock = undefined;
+            pending = service.reportStatus(node.id, second, actor);
+            await new Promise((resolve) => {
+                setImmediate(resolve);
+            });
+
+            expect(nodeComponentRepository.getAll().map((row) => row.name)).toEqual(['storage']);
+        };
+
+        await service.reportStatus(node.id, first, actor);
+        await pending;
+
+        expect((await nodeRepository.findOneById(node.id))?.deploymentVersion).toBe('2');
+        expect(nodeComponentRepository.getAll().map((row) => row.name)).toEqual(['broker']);
+        // one save per report: online + version 1, then version 2
+        expect(nodeRepository.saves).toBe(2);
     });
 
     it('saves once per node the sweep marks offline', async () => {
@@ -309,11 +383,12 @@ describe('NodeStatusService', () => {
             node,
             actor,
             nodeRepository,
+            nodeComponentRepository,
         } = await setup();
 
         await service.reportStatus(node.id, snapshot, actor);
 
-        nodeRepository.beforeLockedUpdate = async (id) => {
+        nodeComponentRepository.beforeLock = async (id) => {
             const row = await nodeRepository.findOneById(id);
 
             row.online = false;
@@ -326,6 +401,38 @@ describe('NodeStatusService', () => {
         expect(changed).toEqual([]);
         // only the hook's own save
         expect(nodeRepository.saves).toBe(1);
+    });
+
+    it('leaves a node online that reported between the stale query and the lock', async () => {
+        const {
+            service,
+            node,
+            actor,
+            nodeRepository,
+            nodeComponentRepository,
+        } = await setup({ online: true });
+
+        // silent for ten minutes: a sweep candidate
+        await nodeComponentRepository.save(nodeComponentRepository.create({
+            nodeId: node.id,
+            name: 'storage',
+            status: 'ok',
+            reportedAt: new Date(Date.now() - 2 * NODE_OFFLINE_THRESHOLD_MS).toISOString(),
+        }));
+
+        let reported = false;
+
+        // the node reports after the candidate query, before the sweep's lock
+        nodeComponentRepository.beforeLock = async () => {
+            nodeComponentRepository.beforeLock = undefined;
+            await service.reportComponentStatus(node.id, 'storage', { status: 'ok' }, actor);
+            reported = true;
+        };
+
+        expect(await service.markStaleNodesOffline()).toEqual([]);
+        expect(reported).toBe(true);
+        expect((await nodeRepository.findOneById(node.id))?.online).toBe(true);
+        expect(nodeRepository.saves).toBe(0);
     });
 
     it('does not sweep within the threshold after start, and sweeps after it', async () => {

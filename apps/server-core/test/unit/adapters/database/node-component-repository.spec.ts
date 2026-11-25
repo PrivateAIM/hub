@@ -216,4 +216,157 @@ describe('node component repository', () => {
 
         expect(await repository.findStaleOnlineNodeIds(minutesAgo(5))).not.toContain(node.id);
     });
+
+    function setVersion(version: string) {
+        return (node: Node): boolean => {
+            node.online = true;
+            node.deploymentVersion = version;
+
+            return true;
+        };
+    }
+
+    it('should apply touch to the current node row in the write transaction', async () => {
+        const node = await createNode({ online: false });
+
+        // another writer renames the node after the service loaded it
+        const current = await nodeRepository.findOneById(node.id);
+
+        current.name = 'renamed';
+        await nodeRepository.save(current);
+
+        await repository.replaceForNode(node.id, [
+            { name: 'a', report: { name: 'a', status: 'ok' } },
+        ], new Date().toISOString(), { touch: setVersion('1.2.3') });
+
+        const stored = await nodeRepository.findOneById(node.id);
+
+        expect(stored?.name).toBe('renamed');
+        expect(stored?.online).toBe(true);
+        expect(stored?.deploymentVersion).toBe('1.2.3');
+
+        await repository.upsertForNode(node.id, { name: 'b', report: { status: 'ok' } }, new Date().toISOString(), {
+            touch: (locked) => {
+                locked.name = 'discarded';
+
+                return false;
+            },
+        });
+
+        expect((await nodeRepository.findOneById(node.id))?.name).toBe('renamed');
+    });
+
+    it('should not call touch for a node that does not exist', async () => {
+        let called = false;
+
+        await expect(repository.replaceForNode(faker.string.uuid(), [], new Date().toISOString(), {
+            touch: () => {
+                called = true;
+
+                return true;
+            },
+        })).rejects.toThrow(EntityNotFoundError);
+        expect(called).toBe(false);
+    });
+
+    it.skipIf(!lockable)('should pair the deployment version and the component set of one snapshot', async () => {
+        for (let i = 0; i < 10; i++) {
+            const node = await createNode({ online: false });
+            const reportedAt = new Date().toISOString();
+
+            await Promise.all([dataSource.query('SELECT 1'), dataSource.query('SELECT 1')]);
+
+            await Promise.all([
+                repository.replaceForNode(node.id, [
+                    { name: 'one', report: { name: 'one', status: 'ok' } },
+                ], reportedAt, { touch: setVersion('1') }),
+                repository.replaceForNode(node.id, [
+                    { name: 'two-a', report: { name: 'two-a', status: 'ok' } },
+                    { name: 'two-b', report: { name: 'two-b', status: 'ok' } },
+                ], reportedAt, { touch: setVersion('2') }),
+            ]);
+
+            const stored = await nodeRepository.findOneById(node.id);
+            const expected = stored?.deploymentVersion === '1' ? ['one'] : ['two-a', 'two-b'];
+
+            expect(stored?.online).toBe(true);
+            expect(await names(node.id)).toEqual(expected);
+        }
+    });
+
+    it('should mark a node offline only while it is online and stale', async () => {
+        const stale = await createNode({ online: true });
+        const fresh = await createNode({ online: true });
+        const empty = await createNode({ online: true });
+        const offline = await createNode({ online: false });
+
+        await repository.replaceForNode(stale.id, [
+            { name: 'a', report: { name: 'a', status: 'ok' } },
+        ], minutesAgo(6));
+        await repository.replaceForNode(fresh.id, [
+            { name: 'a', report: { name: 'a', status: 'ok' } },
+        ], minutesAgo(1));
+
+        const before = minutesAgo(5);
+
+        expect(await repository.markOfflineIfStale(stale.id, before)).toBe(true);
+        expect(await repository.markOfflineIfStale(fresh.id, before)).toBe(false);
+        expect(await repository.markOfflineIfStale(empty.id, before)).toBe(true);
+        expect(await repository.markOfflineIfStale(offline.id, before)).toBe(false);
+        expect(await repository.markOfflineIfStale(faker.string.uuid(), before)).toBe(false);
+
+        expect((await nodeRepository.findOneById(stale.id))?.online).toBe(false);
+        expect((await nodeRepository.findOneById(fresh.id))?.online).toBe(true);
+        expect((await nodeRepository.findOneById(empty.id))?.online).toBe(false);
+    });
+
+    it('should keep a node online that reported after it was selected as stale', async () => {
+        const node = await createNode({ online: true });
+
+        await repository.replaceForNode(node.id, [
+            { name: 'a', report: { name: 'a', status: 'ok' } },
+        ], minutesAgo(6));
+
+        const before = minutesAgo(5);
+
+        expect(await repository.findStaleOnlineNodeIds(before)).toContain(node.id);
+
+        await repository.upsertForNode(node.id, { name: 'a', report: { status: 'ok' } }, new Date().toISOString());
+
+        expect(await repository.markOfflineIfStale(node.id, before)).toBe(false);
+        expect((await nodeRepository.findOneById(node.id))?.online).toBe(true);
+    });
+
+    it.skipIf(!lockable)('should never leave a freshly reported node offline when the sweep races the report', async () => {
+        for (let i = 0; i < 10; i++) {
+            const node = await createNode({ online: true });
+
+            await repository.replaceForNode(node.id, [
+                { name: 'a', report: { name: 'a', status: 'ok' } },
+            ], minutesAgo(6));
+
+            const before = minutesAgo(5);
+
+            expect(await repository.findStaleOnlineNodeIds(before)).toContain(node.id);
+
+            await Promise.all([dataSource.query('SELECT 1'), dataSource.query('SELECT 1')]);
+
+            await Promise.all([
+                repository.markOfflineIfStale(node.id, before),
+                repository.upsertForNode(node.id, { name: 'a', report: { status: 'ok' } }, new Date().toISOString(), {
+                    touch: (locked) => {
+                        if (locked.online) {
+                            return false;
+                        }
+
+                        locked.online = true;
+
+                        return true;
+                    },
+                }),
+            ]);
+
+            expect((await nodeRepository.findOneById(node.id))?.online).toBe(true);
+        }
+    });
 });
