@@ -18,6 +18,7 @@ export const masterImageSchema = defineSchema<MasterImage>({
         ['path'],
         ['virtualPath'],
         ['groupVirtualPath'],
+        ['buildStatus'],
         ['createdAt'],
         ['updatedAt'],
     ],
@@ -42,7 +43,10 @@ export const masterImageSchema = defineSchema<MasterImage>({
             'updatedAt',
         ],
     },
-    filters: { allowed: ['id', 'name', 'path', 'virtualPath', 'groupVirtualPath'], indexed: true },
+    filters: {
+        allowed: ['id', 'name', 'path', 'virtualPath', 'groupVirtualPath', 'buildStatus'],
+        indexed: true,
+    },
     // The allow-list was previously derived from the default (`['path']` only),
     // which silently ignored the `virtualPath` sort client-vue's FMasterImages
     // has been requesting all along — the explicit list makes it bind.
