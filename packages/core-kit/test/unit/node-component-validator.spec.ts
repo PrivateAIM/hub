@@ -51,7 +51,9 @@ describe('NodeComponentsReportValidator', () => {
     });
 
     it('drops unknown keys', async () => {
-        await expect(validator.run({ components: [{ ...component, extra: 1 }] })).resolves.toEqual({ components: [component] });
+        const input: Record<string, unknown> = { components: [{ ...component, extra: 1 }] };
+
+        await expect(validator.run(input)).resolves.toEqual({ components: [component] });
     });
 
     it('preserves null values', async () => {
