@@ -91,7 +91,7 @@ registry-project, master-image-group and login components carry no `F` prefix (`
 | Project | list, form, node management |
 | Node | list, details |
 | Registry | list, form, project management |
-| Master Image | list, picker, group management |
+| Master Image | list, picker, group management, build-status summary (`FMasterImageStatusSummary`); search with `FSearch` over `MASTER_IMAGE_SEARCH_FIELDS`, filter by status with `buildMasterImageStatusFilters()` |
 | Bucket File | list, upload, stream |
 | Event / Log | list, details |
 | Utility | `FEntityDelete`, `FProcessStatus`, `FContentAction`, `FTranslation`, `LoginForm` |
