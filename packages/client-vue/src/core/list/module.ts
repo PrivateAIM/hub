@@ -64,6 +64,14 @@ const merger = createMerger({
     priority: 'left',
 });
 
+function omitFilters<T extends { filters?: unknown }>(input: T) : Omit<T, 'filters'> {
+    const output = { ...input };
+
+    delete output.filters;
+
+    return output;
+}
+
 export function createListRaw<
     TYPE extends keyof DomainTypeMap,
     RECORD extends DomainTypeMap[TYPE],
@@ -196,15 +204,21 @@ export function createListRaw<
                 }
             }
 
+            // `filters` stay out of this merge (they combine below). smob
+            // merges a nested object INTO the first argument's own object,
+            // `inPlace: false` notwithstanding, so merging the caller's input
+            // wrote the page's filters into the caller's filters object: a
+            // caller re-sending that object (a remembered search) then
+            // carried the previous page filter on every later load.
             const nextQuery : ListMeta<RECORD> = merger(
-                input || {},
+                omitFilters(input || {}),
                 {
                     pagination: {
                         limit: meta.value.pagination?.limit,
                         offset: meta.value.pagination?.offset,
                     },
                 },
-                query || {},
+                omitFilters(query || {}),
             );
 
             // Not part of the merge above: an object merge of a search
