@@ -7,5 +7,5 @@
 
 export * from './constants';
 export * from './types';
-export * from './status-validator';
+export * from './components-validator';
 export * from './validator';

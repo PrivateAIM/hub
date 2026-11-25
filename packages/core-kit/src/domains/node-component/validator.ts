@@ -8,28 +8,25 @@
 import { createValidator } from '@validup/zod';
 import { z } from 'zod';
 import { TypedContainer } from '@privateaim/kit';
-import { reportShape } from './schemas.ts';
-import type { NodeComponentProbeReport, NodeComponentReport } from './types.ts';
+import { NODE_COMPONENT_INTEGER_MAX, NODE_COMPONENT_NAME_PATTERN, NodeComponentStatus } from './constants.ts';
+import type { NodeComponentReport } from './types.ts';
 
-// probe keys are mounted only to be rejected
-type ComponentReportInput = NodeComponentReport & Pick<NodeComponentProbeReport, 'latency' | 'checksTotal' | 'checksSuccessful'>;
+const count = () => z.number().int().min(0).max(NODE_COMPONENT_INTEGER_MAX).nullish();
 
-export class NodeComponentReportValidator extends TypedContainer<ComponentReportInput> {
+export class NodeComponentReportValidator extends TypedContainer<NodeComponentReport> {
     protected override initialize() {
         super.initialize();
 
-        this.mount('status', createValidator(reportShape.status));
-        this.mount('version', { optional: true }, createValidator(reportShape.version));
-        this.mount('message', { optional: true }, createValidator(reportShape.message));
-        this.mount('uptime', { optional: true }, createValidator(reportShape.uptime));
-
-        // probe fields are measured by the node's adapter and sent in a snapshot, never on a component report
-        for (const key of ['latency', 'checksTotal', 'checksSuccessful'] as const) {
-            this.mount(
-                key,
-                { optional: true },
-                createValidator(z.never({ error: 'probe fields are not accepted on a component report' })),
-            );
-        }
+        this.mount('name', createValidator(z.string().min(1).max(64).regex(NODE_COMPONENT_NAME_PATTERN)));
+        this.mount('status', createValidator(z.enum(NodeComponentStatus)));
+        this.mount('version', { optional: true }, createValidator(z.string().min(1).max(64).nullish()));
+        this.mount('message', { optional: true }, createValidator(z.string().max(1024).nullish()));
+        this.mount('latency', { optional: true }, createValidator(z.number().min(0).nullish()));
+        this.mount('uptime', { optional: true }, createValidator(count()));
+        this.mount('checksTotal', { optional: true }, createValidator(count()));
+        this.mount('checksSuccessful', { optional: true }, createValidator((ctx) => count().refine(
+            (value) => value == null || ctx.data.checksTotal == null || value <= ctx.data.checksTotal,
+            { message: 'checksSuccessful must not exceed checksTotal' },
+        )));
     }
 }

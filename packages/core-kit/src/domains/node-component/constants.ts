@@ -17,4 +17,4 @@ export const NODE_COMPONENT_NAME_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
 export const NODE_COMPONENT_INTEGER_MAX = 2147483647;
 
 /** The most components one status snapshot may carry. */
-export const NODE_STATUS_REPORT_COMPONENTS_MAX = 64;
+export const NODE_COMPONENTS_REPORT_MAX = 64;

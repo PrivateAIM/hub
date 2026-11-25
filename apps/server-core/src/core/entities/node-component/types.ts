@@ -8,7 +8,6 @@
 import type {
     Node,
     NodeComponent,
-    NodeComponentProbeReport,
     NodeComponentReport,
 } from '@privateaim/core-kit';
 import type {
@@ -18,7 +17,7 @@ import type {
     IEntityRepository,
 } from '@privateaim/server-kit';
 
-export type NodeComponentWrite = { name: string; report: NodeComponentReport | NodeComponentProbeReport };
+export type NodeComponentWrite = { name: string; report: NodeComponentReport };
 
 /**
  * Applied to the node row inside the write's transaction, after the

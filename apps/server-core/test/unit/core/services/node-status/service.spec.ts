@@ -10,6 +10,7 @@ import type { Node } from '@privateaim/core-kit';
 import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import { createAllowAllActor } from '@privateaim/server-test-kit';
+import { ValidupError } from 'validup';
 import { describe, expect, it } from 'vitest';
 import { NODE_OFFLINE_THRESHOLD_MS, NodeStatusService } from '../../../../../src/core/services/node-status/index.ts';
 import { FakeNodeComponentRepository } from '../../entities/node-component/fake-repository.ts';
@@ -175,30 +176,43 @@ describe('NodeStatusService', () => {
         expect(nodeComponentRepository.getAll().map((row) => row.name)).toEqual(['broker']);
     });
 
-    it('rejects probe fields on a component report and writes nothing', async () => {
+    it('accepts probe fields on a component report and stores them', async () => {
         const {
-            service, 
-            node, 
-            actor, 
-            nodeComponentRepository, 
+            service,
+            node,
+            actor,
+            nodeComponentRepository,
         } = await setup();
 
-        await expect(service.reportComponentStatus(node.id, 'storage', { status: 'ok', latency: 5 }, actor))
-            .rejects.toThrow();
-        expect(nodeComponentRepository.getAll()).toHaveLength(0);
+        await service.reportComponentStatus(node.id, 'storage', {
+            status: 'ok',
+            latency: 5,
+            checksTotal: 10,
+            checksSuccessful: 9,
+        }, actor);
+
+        expect(nodeComponentRepository.getAll()).toHaveLength(1);
+        expect(nodeComponentRepository.getAll()[0]).toMatchObject({
+            name: 'storage',
+            latency: 5,
+            checksTotal: 10,
+            checksSuccessful: 9,
+        });
     });
 
-    it('rejects an invalid component name', async () => {
+    it('rejects an invalid component name and writes nothing', async () => {
         const {
-            service, 
-            node, 
-            actor, 
+            service,
+            node,
+            actor,
+            nodeComponentRepository,
         } = await setup();
 
         await expect(service.reportComponentStatus(node.id, 'Bad Name', { status: 'ok' }, actor))
-            .rejects.toThrow('component name');
+            .rejects.toBeInstanceOf(ValidupError);
         await expect(service.reportComponentStatus(node.id, 'a'.repeat(65), { status: 'ok' }, actor))
-            .rejects.toThrow('component name');
+            .rejects.toBeInstanceOf(ValidupError);
+        expect(nodeComponentRepository.getAll()).toHaveLength(0);
     });
 
     it('marks silent nodes offline and a later report brings them back with one save', async () => {

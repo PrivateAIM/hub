@@ -10,7 +10,7 @@ import type {
     Node, 
     NodeComponent, 
     NodeComponentReport, 
-    NodeStatusReport, 
+    NodeComponentsReport, 
     Registry, 
     RegistryProject, 
 } from '@privateaim/core-kit';
@@ -60,13 +60,13 @@ export interface INodeAPI extends IEntityAPI<Node, NodeCreatePayload, NodeUpdate
 
     reportStatus(
         id: Node['id'],
-        data: NodeStatusReport,
+        data: NodeComponentsReport,
         options?: APIRequestOptions,
     ) : Promise<EntityCollectionResponse<NodeComponent>>;
     reportComponentStatus(
         id: Node['id'],
         name: string,
-        data: NodeComponentReport,
+        data: Omit<NodeComponentReport, 'name'>,
         options?: APIRequestOptions,
     ) : Promise<EntityRecordResponse<NodeComponent>>;
 }

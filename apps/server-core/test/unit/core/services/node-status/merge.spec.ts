@@ -32,7 +32,11 @@ function makeStored(overrides: Partial<NodeComponent> = {}): NodeComponent {
 
 describe('mergeNodeComponent', () => {
     it('fills unset columns with null when nothing is stored', () => {
-        expect(mergeNodeComponent(undefined, { status: 'ok', version: '0.5.1' }, reportedAt)).toEqual({
+        expect(mergeNodeComponent(undefined, {
+            name: 'hub-adapter', 
+            status: 'ok', 
+            version: '0.5.1', 
+        }, reportedAt)).toEqual({
             status: 'ok',
             version: '0.5.1',
             message: null,
@@ -45,30 +49,34 @@ describe('mergeNodeComponent', () => {
     });
 
     it('keeps the stored version for a null report value', () => {
-        const result = mergeNodeComponent(makeStored({ version: '0.5.1' }), { status: 'ok', version: null }, reportedAt);
+        const result = mergeNodeComponent(makeStored({ version: '0.5.1' }), {
+            name: 'hub-adapter', 
+            status: 'ok', 
+            version: null, 
+        }, reportedAt);
 
         expect(result.version).toBe('0.5.1');
     });
 
     it('keeps the stored version for an omitted report value', () => {
-        const result = mergeNodeComponent(makeStored({ version: '0.5.1' }), { status: 'ok' }, reportedAt);
+        const result = mergeNodeComponent(makeStored({ version: '0.5.1' }), { name: 'hub-adapter', status: 'ok' }, reportedAt);
 
         expect(result.version).toBe('0.5.1');
     });
 
-    it('keeps probe fields for a component report', () => {
-        const result = mergeNodeComponent(makeStored({ checksTotal: 1310 }), { status: 'ok' }, reportedAt);
+    it('keeps the stored checksTotal for an omitted report value', () => {
+        const result = mergeNodeComponent(makeStored({ checksTotal: 1310 }), { name: 'hub-adapter', status: 'ok' }, reportedAt);
 
         expect(result.checksTotal).toBe(1310);
     });
 
-    it('replaces probe fields when a probe report carries them', () => {
+    it('replaces a stored value the report carries and keeps one it nulls', () => {
         const result = mergeNodeComponent(
             makeStored({ latency: 5, checksTotal: 1 }),
             {
-                name: 'hub-adapter', 
-                status: 'ok', 
-                latency: 9, 
+                name: 'hub-adapter',
+                status: 'ok',
+                latency: 9,
                 checksTotal: null,
             },
             reportedAt,
@@ -79,19 +87,27 @@ describe('mergeNodeComponent', () => {
     });
 
     it('clears the stored message when the report has none', () => {
-        const result = mergeNodeComponent(makeStored({ status: 'error', message: 'timeout' }), { status: 'ok' }, reportedAt);
+        const result = mergeNodeComponent(makeStored({
+            name: 'hub-adapter', 
+            status: 'error', 
+            message: 'timeout', 
+        }), { name: 'hub-adapter', status: 'ok' }, reportedAt);
 
         expect(result.message).toBeNull();
     });
 
     it('takes the reported message', () => {
-        const result = mergeNodeComponent(undefined, { status: 'error', message: 'x' }, reportedAt);
+        const result = mergeNodeComponent(undefined, {
+            name: 'hub-adapter', 
+            status: 'error', 
+            message: 'x', 
+        }, reportedAt);
 
         expect(result.message).toBe('x');
     });
 
     it('stamps the passed reportedAt', () => {
-        const result = mergeNodeComponent(makeStored(), { status: 'ok' }, reportedAt);
+        const result = mergeNodeComponent(makeStored(), { name: 'hub-adapter', status: 'ok' }, reportedAt);
 
         expect(result.reportedAt).toBe(reportedAt);
     });

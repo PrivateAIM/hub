@@ -26,20 +26,17 @@ export type NodeComponent = {
 };
 
 export type NodeComponentReport = {
+    name: string;
     status: `${NodeComponentStatus}`;
     version?: string | null;
     message?: string | null;
-    uptime?: number | null;
-};
-
-export type NodeComponentProbeReport = NodeComponentReport & {
-    name: string;
     latency?: number | null;
+    uptime?: number | null;
     checksTotal?: number | null;
     checksSuccessful?: number | null;
 };
 
-export type NodeStatusReport = {
+export type NodeComponentsReport = {
     deployment?: { name: string; version: string };
-    components: NodeComponentProbeReport[];
+    components: NodeComponentReport[];
 };

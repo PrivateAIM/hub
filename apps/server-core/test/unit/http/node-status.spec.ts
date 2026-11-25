@@ -143,6 +143,25 @@ describe('node status reporting', () => {
         });
     });
 
+    it('accepts probe fields on a component report', async () => {
+        const response = await request('PUT', `/nodes/${node.id}/components/storage/status`, nodeToken, {
+            status: 'ok',
+            latency: 12,
+            checksTotal: 4,
+            checksSuccessful: 3,
+        });
+
+        expect(response.status).toBe(200);
+
+        const body = await response.json();
+
+        expect(body.data).toMatchObject({
+            name: 'storage', 
+            latency: 12, 
+            checksTotal: 4, 
+        });
+    });
+
     it('refuses a report from an admin user', async () => {
         const response = await request('PUT', `/nodes/${node.id}/status`, adminToken, validReport);
 

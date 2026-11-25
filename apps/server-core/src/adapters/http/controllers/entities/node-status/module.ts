@@ -8,7 +8,7 @@
 import type {
     NodeComponent,
     NodeComponentReport,
-    NodeStatusReport,
+    NodeComponentsReport,
 } from '@privateaim/core-kit';
 import type { EntityCollectionResponse, EntityRecordResponse } from '@privateaim/core-http-kit';
 import {
@@ -44,7 +44,7 @@ export class NodeStatusController {
     @DConsumes('application/json')
     async report(
         @DPath('id') id: string,
-        @DBody() data: NodeStatusReport,
+        @DBody() data: NodeComponentsReport,
         @DContext() event: IAppEvent,
     ): Promise<EntityCollectionResponse<NodeComponent>> {
         const entities = await this.service.reportStatus(id, data, buildActorContext(event));
@@ -57,7 +57,7 @@ export class NodeStatusController {
     async reportComponent(
         @DPath('id') id: string,
         @DPath('name') name: string,
-        @DBody() data: NodeComponentReport,
+        @DBody() data: Omit<NodeComponentReport, 'name'>,
         @DContext() event: IAppEvent,
     ): Promise<EntityRecordResponse<NodeComponent>> {
         const entity = await this.service.reportComponentStatus(id, name, data, buildActorContext(event));

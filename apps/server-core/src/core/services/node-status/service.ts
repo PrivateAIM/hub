@@ -7,11 +7,10 @@
 
 import type { Node, NodeComponent } from '@privateaim/core-kit';
 import {
-    NODE_COMPONENT_NAME_PATTERN,
     NodeComponentReportValidator,
-    NodeStatusReportValidator,
+    NodeComponentsReportValidator,
 } from '@privateaim/core-kit';
-import { BadRequestError, EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
+import { EntityNotFoundError, PermissionDeniedError } from '@privateaim/errors';
 import type { ActorContext } from '@privateaim/server-kit';
 import type { INodeComponentRepository } from '../../entities/node-component/types.ts';
 import type { INodeRepository } from '../../entities/node/types.ts';
@@ -19,7 +18,6 @@ import type { INodeStatusService, NodeStatusServiceContext } from './types.ts';
 
 export const NODE_OFFLINE_THRESHOLD_MS = 5 * 60 * 1000;
 
-const NODE_COMPONENT_NAME_MAX_LENGTH = 64;
 
 /**
  * The node half of a report, applied to the locked node row in the same
@@ -57,7 +55,7 @@ export class NodeStatusService implements INodeStatusService {
     }
 
     async reportStatus(nodeId: string, data: unknown, actor: ActorContext): Promise<NodeComponent[]> {
-        const report = await new NodeStatusReportValidator().run(data);
+        const report = await new NodeComponentsReportValidator().run(data);
         const node = await this.getWritableNode(nodeId, actor);
 
         return this.nodeComponentRepository.replaceForNode(
@@ -77,20 +75,16 @@ export class NodeStatusService implements INodeStatusService {
         data: unknown,
         actor: ActorContext,
     ): Promise<NodeComponent> {
-        if (
-            typeof name !== 'string' ||
-            name.length > NODE_COMPONENT_NAME_MAX_LENGTH ||
-            !NODE_COMPONENT_NAME_PATTERN.test(name)
-        ) {
-            throw new BadRequestError('The component name is invalid.');
-        }
-
-        const report = await new NodeComponentReportValidator().run(data);
+        // The name comes from the path and is validated with the body.
+        const input = typeof data === 'object' && data !== null && !Array.isArray(data) ?
+            { ...data, name } :
+            { name };
+        const report = await new NodeComponentReportValidator().run(input);
         const node = await this.getWritableNode(nodeId, actor);
 
         return this.nodeComponentRepository.upsertForNode(
             node.id,
-            { name, report },
+            { name: report.name, report },
             new Date().toISOString(),
             {
                 touch: (locked) => touchNode(locked),

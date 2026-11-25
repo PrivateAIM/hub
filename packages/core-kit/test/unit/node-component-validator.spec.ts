@@ -7,10 +7,10 @@
 
 import { describe, expect, it } from 'vitest';
 import { isValidupError } from 'validup';
-import { NodeComponentReportValidator, NodeStatusReportValidator } from '../../src';
+import { NodeComponentReportValidator, NodeComponentsReportValidator } from '../../src';
 
-describe('NodeStatusReportValidator', () => {
-    const validator = new NodeStatusReportValidator();
+describe('NodeComponentsReportValidator', () => {
+    const validator = new NodeComponentsReportValidator();
     const component = {
         name: 'pod-orchestrator',
         status: 'ok' as const,
@@ -50,6 +50,10 @@ describe('NodeStatusReportValidator', () => {
         await expect(validator.run(input)).resolves.toEqual(input);
     });
 
+    it('drops unknown keys', async () => {
+        await expect(validator.run({ components: [{ ...component, extra: 1 }] })).resolves.toEqual({ components: [component] });
+    });
+
     it('preserves null values', async () => {
         const input = {
             components: [{
@@ -82,7 +86,6 @@ describe('NodeStatusReportValidator', () => {
         { components: [{ ...component, latency: -1 }] },
         { components: [{ ...component, uptime: 1.5 }] },
         { components: [{ ...component, message: 'x'.repeat(1025) }] },
-        { components: [{ ...component, extra: 1 }] },
         { deployment: { name: 'x' }, components: [component] },
         { components: [{ ...component, uptime: 2147483648 }] },
         { components: [{ ...component, checksTotal: 2147483648 }] },
@@ -102,28 +105,50 @@ describe('NodeStatusReportValidator', () => {
 describe('NodeComponentReportValidator', () => {
     const validator = new NodeComponentReportValidator();
 
-    it('accepts uptime at the 32-bit maximum', async () => {
-        const input = { status: 'ok' as const, uptime: 2147483647 };
+    it('accepts a full report', async () => {
+        const input = {
+            name: 'storage',
+            status: 'ok' as const,
+            version: '0.5.1',
+            uptime: 4200,
+            latency: 3,
+            checksTotal: 10,
+            checksSuccessful: 9,
+        };
 
         await expect(validator.run(input)).resolves.toEqual(input);
     });
 
-    it('accepts a report', async () => {
+    it('accepts uptime at the 32-bit maximum', async () => {
         const input = {
+            name: 'storage', 
             status: 'ok' as const, 
-            version: '0.5.1', 
-            uptime: 4200, 
+            uptime: 2147483647, 
         };
 
         await expect(validator.run(input)).resolves.toEqual(input);
     });
 
     it.each([
-        { status: 'ok', latency: 3 },
-        { status: 'ok', latency: null },
-        { status: 'ok', checksSuccessful: 3 },
-        { status: 'ok', checksTotal: 3 },
-        { status: 'ok', uptime: 2147483648 },
+        { status: 'ok' },
+        { name: 'storage' },
+        { name: 'Bad Name', status: 'ok' },
+        {
+            name: 'storage', 
+            status: 'ok', 
+            uptime: 2147483648, 
+        },
+        {
+            name: 'storage', 
+            status: 'ok', 
+            checksTotal: 2, 
+            checksSuccessful: 3, 
+        },
+        {
+            name: 'storage', 
+            status: 'ok', 
+            latency: -1, 
+        },
         {},
     ] as Record<string, any>[])('rejects %#', async (input) => {
         await expect(validator.run(input)).rejects.toSatisfy(isValidupError);

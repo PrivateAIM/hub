@@ -71,7 +71,7 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 A node reports its health to the Hub, which keeps the **latest** state only. Two routes write it, both only for the node's own client (any other caller gets `403`, an unknown node `404`, an invalid body or component name `400`; the body is validated before authorization):
 
 - `PUT /nodes/:id/status` is the adapter's snapshot. It **replaces** the node's component set. Body: optional `deployment { name, version }` and a non-empty, unique-by-name `components[]`. Each component carries `name` (`^[a-z0-9]+(?:[-_][a-z0-9]+)*$`, at most 64 characters), `status` (`ok`, `error` or `disabled`) and optionally `version`, `message` (at most 1024 characters), `latency` (ms), `uptime` (s), `checksTotal` and `checksSuccessful` (probe counts of the last 24 hours). A snapshot carries at most 64 components; `uptime`, `checksTotal` and `checksSuccessful` are non-negative integers up to 2147483647, and `checksSuccessful` must not exceed `checksTotal`.
-- `PUT /nodes/:id/components/:name/status` is a component reporting itself. It **upserts** one row. Body: `status` and optionally `version`, `message`, `uptime`. The probe fields (`latency`, `checksTotal`, `checksSuccessful`) are rejected.
+- `PUT /nodes/:id/components/:name/status` is a component reporting itself. It **upserts** one row. Body: the snapshot component fields without `name`, which comes from the path (an invalid name answers `400`).
 
 An omitted or `null` field keeps the stored value, except `message`, which is replaced together with `status`. The Hub stamps `reportedAt` on receipt; the body carries no timestamps. The last write wins.
 

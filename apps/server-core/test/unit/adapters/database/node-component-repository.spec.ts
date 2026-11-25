@@ -95,7 +95,11 @@ describe('node component repository', () => {
 
         const storage = await repository.upsertForNode(node.id, {
             name: 'storage',
-            report: { status: 'ok', version: '0.5.1' },
+            report: {
+                name: 'storage', 
+                status: 'ok', 
+                version: '0.5.1', 
+            },
         }, reportedAt);
 
         expect(storage.nodeId).toEqual(node.id);
@@ -128,7 +132,11 @@ describe('node component repository', () => {
             ], reportedAt),
             repository.upsertForNode(node.id, {
                 name: 'a',
-                report: { status: 'ok', uptime: 5 },
+                report: {
+                    name: 'a', 
+                    status: 'ok', 
+                    uptime: 5, 
+                },
             }, reportedAt),
         ]);
 
@@ -172,7 +180,7 @@ describe('node component repository', () => {
 
         await expect(repository.upsertForNode(faker.string.uuid(), {
             name: 'a',
-            report: { status: 'ok' },
+            report: { name: 'a', status: 'ok' },
         }, reportedAt)).rejects.toThrow(EntityNotFoundError);
         await expect(repository.replaceForNode(faker.string.uuid(), [
             { name: 'a', report: { name: 'a', status: 'ok' } },
@@ -211,7 +219,7 @@ describe('node component repository', () => {
         ], minutesAgo(10));
         await repository.upsertForNode(node.id, {
             name: 'b',
-            report: { status: 'ok' },
+            report: { name: 'b', status: 'ok' },
         }, minutesAgo(1));
 
         expect(await repository.findStaleOnlineNodeIds(minutesAgo(5))).not.toContain(node.id);
@@ -245,7 +253,7 @@ describe('node component repository', () => {
         expect(stored?.online).toBe(true);
         expect(stored?.deploymentVersion).toBe('1.2.3');
 
-        await repository.upsertForNode(node.id, { name: 'b', report: { status: 'ok' } }, new Date().toISOString(), {
+        await repository.upsertForNode(node.id, { name: 'b', report: { name: 'b', status: 'ok' } }, new Date().toISOString(), {
             touch: (locked) => {
                 locked.name = 'discarded';
 
@@ -331,7 +339,7 @@ describe('node component repository', () => {
 
         expect(await repository.findStaleOnlineNodeIds(before)).toContain(node.id);
 
-        await repository.upsertForNode(node.id, { name: 'a', report: { status: 'ok' } }, new Date().toISOString());
+        await repository.upsertForNode(node.id, { name: 'a', report: { name: 'a', status: 'ok' } }, new Date().toISOString());
 
         expect(await repository.markOfflineIfStale(node.id, before)).toBe(false);
         expect((await nodeRepository.findOneById(node.id))?.online).toBe(true);
@@ -353,7 +361,7 @@ describe('node component repository', () => {
 
             await Promise.all([
                 repository.markOfflineIfStale(node.id, before),
-                repository.upsertForNode(node.id, { name: 'a', report: { status: 'ok' } }, new Date().toISOString(), {
+                repository.upsertForNode(node.id, { name: 'a', report: { name: 'a', status: 'ok' } }, new Date().toISOString(), {
                     touch: (locked) => {
                         if (locked.online) {
                             return false;

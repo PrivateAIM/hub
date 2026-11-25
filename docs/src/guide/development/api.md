@@ -301,7 +301,7 @@ milliseconds, `uptime` in seconds, `checksTotal` / `checksSuccessful` count the 
 `uptime`, `checksTotal` and `checksSuccessful` are non-negative integers up to 2147483647, with
 `checksSuccessful` ≤ `checksTotal`; a snapshot carries at most 64 components. An omitted or
 `null` field keeps the stored value, except `message`, which is replaced together with `status`.
-The component route rejects `latency`, `checksTotal` and `checksSuccessful`. The Hub stamps
+The component route takes the same fields as a snapshot entry, with `name` from the path. The Hub stamps
 `reportedAt`; bodies carry no timestamps. `GET /node-components` filters on `nodeId`, `name`,
 `version` and `status`, sorts on `name`, `version`, `updatedAt` and `createdAt`, and allows
 `include=node` (`node.registry` and `node.registryProject` need the matching read permissions).

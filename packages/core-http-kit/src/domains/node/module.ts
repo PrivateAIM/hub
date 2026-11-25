@@ -11,7 +11,7 @@ import type {
     Node,
     NodeComponent,
     NodeComponentReport,
-    NodeStatusReport,
+    NodeComponentsReport,
 } from '@privateaim/core-kit';
 import { BaseAPI } from 'hapic';
 import type { APIRequestOptions, EntityCollectionResponse, EntityRecordResponse } from '../types';
@@ -114,7 +114,7 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
 
     async reportStatus(
         id: Node['id'],
-        data: NodeStatusReport,
+        data: NodeComponentsReport,
         options?: APIRequestOptions,
     ): Promise<EntityCollectionResponse<NodeComponent>> {
         const response = await this.client.put(`nodes/${encodePathSegment(id)}/status`, data, buildRequestConfig(options));
@@ -125,7 +125,7 @@ export class NodeAPI extends BaseAPI implements INodeAPI {
     async reportComponentStatus(
         id: Node['id'],
         name: string,
-        data: NodeComponentReport,
+        data: Omit<NodeComponentReport, 'name'>,
         options?: APIRequestOptions,
     ): Promise<EntityRecordResponse<NodeComponent>> {
         const response = await this.client.put(
