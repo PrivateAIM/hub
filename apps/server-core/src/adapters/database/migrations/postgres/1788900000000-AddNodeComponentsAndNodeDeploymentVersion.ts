@@ -39,6 +39,12 @@ export class AddNodeComponentsAndNodeDeploymentVersion1788900000000 implements M
             CREATE INDEX "IDX_768287383be45669b7ef2f1a35" ON "node_components" ("name", "version")
         `);
         await queryRunner.query(`
+            CREATE INDEX "IDX_7a28d3c8878368baf6ef015ab1" ON "node_components" ("created_at")
+        `);
+        await queryRunner.query(`
+            CREATE INDEX "IDX_fae433536ef216a40efd7ab20b" ON "node_components" ("updated_at")
+        `);
+        await queryRunner.query(`
             ALTER TABLE "nodes"
             ADD "deployment_version" character varying(64)
         `);
@@ -60,6 +66,12 @@ export class AddNodeComponentsAndNodeDeploymentVersion1788900000000 implements M
         `);
         await queryRunner.query(`
             ALTER TABLE "nodes" DROP COLUMN "deployment_version"
+        `);
+        await queryRunner.query(`
+            DROP INDEX "public"."IDX_fae433536ef216a40efd7ab20b"
+        `);
+        await queryRunner.query(`
+            DROP INDEX "public"."IDX_7a28d3c8878368baf6ef015ab1"
         `);
         await queryRunner.query(`
             DROP INDEX "public"."IDX_768287383be45669b7ef2f1a35"

@@ -9,6 +9,7 @@ import type { IContainer } from 'eldin';
 import type { IQueryCache } from '@privateaim/server-db-kit';
 import type { DataSource } from 'typeorm';
 import { NodeRepositoryAdapter } from './repositories/node/index.ts';
+import { NodeComponentRepositoryAdapter } from './repositories/node-component/index.ts';
 import { RegistryRepositoryAdapter } from './repositories/registry/index.ts';
 import { MasterImageRepositoryAdapter } from './repositories/master-image/index.ts';
 import { MasterImageGroupRepositoryAdapter } from './repositories/master-image-group/index.ts';
@@ -26,6 +27,7 @@ import { DatabaseInjectionKey } from './constants.ts';
 
 export function registerRepositories(container: IContainer, dataSource: DataSource, queryCache: IQueryCache): void {
     container.register(DatabaseInjectionKey.NodeRepository, { useValue: new NodeRepositoryAdapter(dataSource, queryCache) });
+    container.register(DatabaseInjectionKey.NodeComponentRepository, { useValue: new NodeComponentRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.RegistryRepository, { useValue: new RegistryRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.MasterImageRepository, { useValue: new MasterImageRepositoryAdapter(dataSource) });
     container.register(DatabaseInjectionKey.MasterImageGroupRepository, { useValue: new MasterImageGroupRepositoryAdapter(dataSource) });

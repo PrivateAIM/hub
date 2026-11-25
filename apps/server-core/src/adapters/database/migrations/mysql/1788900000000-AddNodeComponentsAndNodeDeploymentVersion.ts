@@ -28,6 +28,8 @@ export class AddNodeComponentsAndNodeDeploymentVersion1788900000000 implements M
                 INDEX \`IDX_287daee5dda12fdbcad375a8d0\` (\`version\`),
                 INDEX \`IDX_ad578c225fcbee078620b90069\` (\`status\`),
                 INDEX \`IDX_768287383be45669b7ef2f1a35\` (\`name\`, \`version\`),
+                INDEX \`IDX_7a28d3c8878368baf6ef015ab1\` (\`created_at\`),
+                INDEX \`IDX_fae433536ef216a40efd7ab20b\` (\`updated_at\`),
                 UNIQUE INDEX \`IDX_86f12b561dcc7aa33e02e0e852\` (\`node_id\`, \`name\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
@@ -57,6 +59,12 @@ export class AddNodeComponentsAndNodeDeploymentVersion1788900000000 implements M
         `);
         await queryRunner.query(`
             DROP INDEX \`IDX_86f12b561dcc7aa33e02e0e852\` ON \`node_components\`
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_fae433536ef216a40efd7ab20b\` ON \`node_components\`
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_7a28d3c8878368baf6ef015ab1\` ON \`node_components\`
         `);
         await queryRunner.query(`
             DROP INDEX \`IDX_768287383be45669b7ef2f1a35\` ON \`node_components\`

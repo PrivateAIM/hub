@@ -16,6 +16,7 @@ import type {
     IAnalysisRepository,
     IMasterImageGroupRepository,
     IMasterImageRepository,
+    INodeComponentRepository,
     INodeRepository,
     IProjectNodeRepository,
     IProjectRepository,
@@ -29,6 +30,7 @@ export const DatabaseInjectionKey = {
     QueryCache: new TypedToken<IQueryCache>('QueryCache'),
 
     NodeRepository: new TypedToken<INodeRepository>('NodeRepository'),
+    NodeComponentRepository: new TypedToken<INodeComponentRepository>('NodeComponentRepository'),
     RegistryRepository: new TypedToken<IRegistryRepository>('RegistryRepository'),
     MasterImageRepository: new TypedToken<IMasterImageRepository>('MasterImageRepository'),
     MasterImageGroupRepository: new TypedToken<IMasterImageGroupRepository>('MasterImageGroupRepository'),
