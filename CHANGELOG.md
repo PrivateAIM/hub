@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.20.1](https://github.com/PrivateAIM/hub/compare/v0.20.0...v0.20.1) (2026-11-27)
+
+
+### Features
+
+* bump authup to 1.0.0-beta.77 and adopt new upstream features ([#2063](https://github.com/PrivateAIM/hub/issues/2063)) ([39985d0](https://github.com/PrivateAIM/hub/commit/39985d0c00bbff785bb4467eccbd36934b7fc22e))
+* redesign the master-image admin page with search, status filters and failure details ([#2069](https://github.com/PrivateAIM/hub/issues/2069)) ([ff51110](https://github.com/PrivateAIM/hub/commit/ff511100dcf6dd53aec2b59e6cee65d2b7ec6566))
+* **server-core-worker:** log the build output tail when an image build fails ([#2065](https://github.com/PrivateAIM/hub/issues/2065)) ([ecb3822](https://github.com/PrivateAIM/hub/commit/ecb3822cd7427b3cca872e69e0efd5bf5d963745))
+
+
+### Bug Fixes
+
+* **client-vue-theme:** center the empty-state description under its icon ([#2070](https://github.com/PrivateAIM/hub/issues/2070)) ([05076db](https://github.com/PrivateAIM/hub/commit/05076dbe656c3804807f62c2935248a8726634ea))
+* **client-vue:** keep list filters on search and realtime inserts ([#2052](https://github.com/PrivateAIM/hub/issues/2052)) ([f0077bf](https://github.com/PrivateAIM/hub/commit/f0077bf1c6cd84fe49102c4222fda0a157136289))
+* correct defects found in the README audit ([#2053](https://github.com/PrivateAIM/hub/issues/2053)) ([7c27fea](https://github.com/PrivateAIM/hub/commit/7c27fea2c7217236f557e2fac0d585214f321f79))
+* **deps:** bump github/codeql-action from 4.39.3 to 4.39.4 ([#2055](https://github.com/PrivateAIM/hub/issues/2055)) ([1717b68](https://github.com/PrivateAIM/hub/commit/1717b68553f17105ac8c2502d396714103a1e821))
+* **deps:** bump the minorandpatch group with 2 updates ([#2047](https://github.com/PrivateAIM/hub/issues/2047)) ([1a0b6ca](https://github.com/PrivateAIM/hub/commit/1a0b6ca4b8a7f8c73417f56c89f359bccbe09ed2))
+* **server-http-kit:** rate-limit capability requests by their subject ([#2044](https://github.com/PrivateAIM/hub/issues/2044)) ([cbb7f73](https://github.com/PrivateAIM/hub/commit/cbb7f733413d230b125fe34ecbeeacad85b1e8a3))
+
 ## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-11-19)
 
 

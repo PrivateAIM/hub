@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/messenger-kit",
     "type": "module",
-    "version": "0.20.0",
+    "version": "0.20.1",
     "license": "Apache-2.0",
     "description": "Contract types for the FLAME Hub messenger: durable messages, wakeup events and socket events.",
     "module": "./dist/index.mjs",
@@ -35,13 +35,13 @@
         "zod": "^4.6.7"
     },
     "devDependencies": {
-        "@privateaim/core-kit": "^0.20.0",
-        "@privateaim/kit": "^0.20.0",
+        "@privateaim/core-kit": "^0.20.1",
+        "@privateaim/kit": "^0.20.1",
         "vitest": "^5.1.1"
     },
     "peerDependencies": {
-        "@privateaim/core-kit": "^0.20.0",
-        "@privateaim/kit": "^0.20.0"
+        "@privateaim/core-kit": "^0.20.1",
+        "@privateaim/kit": "^0.20.1"
     },
     "publishConfig": {
         "access": "public"

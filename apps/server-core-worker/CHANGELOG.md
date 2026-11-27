@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.20.1](https://github.com/PrivateAIM/hub/compare/v0.20.0...v0.20.1) (2026-11-27)
+
+
+### Features
+
+* bump authup to 1.0.0-beta.77 and adopt new upstream features ([#2063](https://github.com/PrivateAIM/hub/issues/2063)) ([39985d0](https://github.com/PrivateAIM/hub/commit/39985d0c00bbff785bb4467eccbd36934b7fc22e))
+* redesign the master-image admin page with search, status filters and failure details ([#2069](https://github.com/PrivateAIM/hub/issues/2069)) ([ff51110](https://github.com/PrivateAIM/hub/commit/ff511100dcf6dd53aec2b59e6cee65d2b7ec6566))
+* **server-core-worker:** log the build output tail when an image build fails ([#2065](https://github.com/PrivateAIM/hub/issues/2065)) ([ecb3822](https://github.com/PrivateAIM/hub/commit/ecb3822cd7427b3cca872e69e0efd5bf5d963745))
+
+
+### Bug Fixes
+
+* **deps:** bump the minorandpatch group with 2 updates ([#2047](https://github.com/PrivateAIM/hub/issues/2047)) ([1a0b6ca](https://github.com/PrivateAIM/hub/commit/1a0b6ca4b8a7f8c73417f56c89f359bccbe09ed2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/core-http-kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/core-kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/server-core-worker-kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/server-kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/server-telemetry-kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/storage-kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/telemetry-kit bumped from ^0.20.0 to ^0.20.1
+
 ## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-11-19)
 
 

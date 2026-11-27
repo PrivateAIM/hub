@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.20.1](https://github.com/PrivateAIM/hub/compare/v0.20.0...v0.20.1) (2026-11-27)
+
+
+### Features
+
+* bump authup to 1.0.0-beta.77 and adopt new upstream features ([#2063](https://github.com/PrivateAIM/hub/issues/2063)) ([39985d0](https://github.com/PrivateAIM/hub/commit/39985d0c00bbff785bb4467eccbd36934b7fc22e))
+
+
+### Bug Fixes
+
+* **client-vue-theme:** center the empty-state description under its icon ([#2070](https://github.com/PrivateAIM/hub/issues/2070)) ([05076db](https://github.com/PrivateAIM/hub/commit/05076dbe656c3804807f62c2935248a8726634ea))
+
 ## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-11-19)
 
 

@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/server-db-kit",
     "type": "module",
-    "version": "0.20.0",
+    "version": "0.20.1",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
     "files": [
@@ -23,8 +23,8 @@
     "description": "TypeORM helpers for FLAME Hub services: UTC-pinned options, boot locks, a tagged read cache and event subscribers.",
     "dependencies": {
         "@authup/kit": "^1.0.0-beta.77",
-        "@privateaim/kit": "^0.20.0",
-        "@privateaim/server-kit": "^0.20.0",
+        "@privateaim/kit": "^0.20.1",
+        "@privateaim/server-kit": "^0.20.1",
         "@rapiq/cache": "^0.2.1",
         "@rapiq/core": "^2.5.1"
     },
