@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/errors",
     "type": "module",
-    "version": "0.20.0",
+    "version": "0.20.1",
     "description": "Hub error codes, a root HubError class, typed subclasses, a code-to-HTTP-status table and guards.",
     "license": "Apache-2.0",
     "exports": {

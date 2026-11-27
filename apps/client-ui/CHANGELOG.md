@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.20.1](https://github.com/PrivateAIM/hub/compare/v0.20.0...v0.20.1) (2026-11-27)
+
+
+### Features
+
+* bump authup to 1.0.0-beta.77 and adopt new upstream features ([#2063](https://github.com/PrivateAIM/hub/issues/2063)) ([39985d0](https://github.com/PrivateAIM/hub/commit/39985d0c00bbff785bb4467eccbd36934b7fc22e))
+* redesign the master-image admin page with search, status filters and failure details ([#2069](https://github.com/PrivateAIM/hub/issues/2069)) ([ff51110](https://github.com/PrivateAIM/hub/commit/ff511100dcf6dd53aec2b59e6cee65d2b7ec6566))
+
+
+### Bug Fixes
+
+* **client-vue:** keep list filters on search and realtime inserts ([#2052](https://github.com/PrivateAIM/hub/issues/2052)) ([f0077bf](https://github.com/PrivateAIM/hub/commit/f0077bf1c6cd84fe49102c4222fda0a157136289))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @privateaim/client-vue bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/client-vue-theme bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/core-kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/storage-kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/telemetry-kit bumped from ^0.20.0 to ^0.20.1
+
 ## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-11-19)
 
 

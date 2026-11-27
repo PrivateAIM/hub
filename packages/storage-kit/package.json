@@ -1,7 +1,7 @@
 {
     "name": "@privateaim/storage-kit",
     "type": "module",
-    "version": "0.20.0",
+    "version": "0.20.1",
     "license": "Apache-2.0",
     "description": "Bucket and file types, capability tokens and a typed HTTP client for the FLAME Hub storage service.",
     "exports": {
@@ -26,7 +26,7 @@
         "url": "https://github.com/tada5hi"
     },
     "dependencies": {
-        "@privateaim/errors": "^0.20.0",
+        "@privateaim/errors": "^0.20.1",
         "@validup/zod": "^2.0.3",
         "validup": "^2.0.2",
         "zod": "^4.6.7"
@@ -34,7 +34,7 @@
     "devDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.77",
         "@authup/core-kit": "^1.0.0-beta.77",
-        "@privateaim/kit": "^0.20.0",
+        "@privateaim/kit": "^0.20.1",
         "@rapiq/codec-url": "^2.5.1",
         "@rapiq/core": "^2.5.1",
         "hapic": "^3.1.0",
@@ -43,7 +43,7 @@
     "peerDependencies": {
         "@authup/core-http-kit": "^1.0.0-beta.77",
         "@authup/core-kit": "^1.0.0-beta.77",
-        "@privateaim/kit": "^0.20.0",
+        "@privateaim/kit": "^0.20.1",
         "@rapiq/codec-url": "^2.5.1",
         "@rapiq/core": "^2.5.1",
         "hapic": "^3.1.0"

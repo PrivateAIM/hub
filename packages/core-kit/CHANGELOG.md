@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.20.1](https://github.com/PrivateAIM/hub/compare/v0.20.0...v0.20.1) (2026-11-27)
+
+
+### Features
+
+* bump authup to 1.0.0-beta.77 and adopt new upstream features ([#2063](https://github.com/PrivateAIM/hub/issues/2063)) ([39985d0](https://github.com/PrivateAIM/hub/commit/39985d0c00bbff785bb4467eccbd36934b7fc22e))
+
+
+### Bug Fixes
+
+* correct defects found in the README audit ([#2053](https://github.com/PrivateAIM/hub/issues/2053)) ([7c27fea](https://github.com/PrivateAIM/hub/commit/7c27fea2c7217236f557e2fac0d585214f321f79))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @privateaim/errors bumped from ^0.20.0 to ^0.20.1
+  * devDependencies
+    * @privateaim/kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/telemetry-kit bumped from ^0.20.0 to ^0.20.1
+  * peerDependencies
+    * @privateaim/kit bumped from ^0.20.0 to ^0.20.1
+    * @privateaim/telemetry-kit bumped from ^0.20.0 to ^0.20.1
+
 ## [0.20.0](https://github.com/PrivateAIM/hub/compare/v0.19.2...v0.20.0) (2026-11-19)
 
 
