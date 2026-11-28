@@ -1,0 +1,158 @@
+/*
+ * Copyright (c) 2026.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import { describe, expect, it } from 'vitest';
+import { isValidupError } from 'validup';
+import { NodeComponentReportValidator, NodeComponentsReportValidator } from '../../src';
+
+describe('NodeComponentsReportValidator', () => {
+    const validator = new NodeComponentsReportValidator();
+    const component = {
+        name: 'pod-orchestrator',
+        status: 'ok' as const,
+        version: '0.2.2',
+        latency: 12.4,
+        uptime: 180000,
+        checksTotal: 1310,
+        checksSuccessful: 1308,
+    };
+
+    it('accepts a full snapshot unchanged', async () => {
+        await expect(validator.run({ components: [component] })).resolves.toEqual({ components: [component] });
+    });
+
+    it('accepts a deployment', async () => {
+        const input = { deployment: { name: 'flame', version: '1.0.0' }, components: [component] };
+
+        await expect(validator.run(input)).resolves.toEqual(input);
+    });
+
+    it('accepts integers at the 32-bit maximum', async () => {
+        const input = {
+            components: [{
+                ...component,
+                uptime: 2147483647,
+                checksTotal: 2147483647,
+                checksSuccessful: 2147483647,
+            }],
+        };
+
+        await expect(validator.run(input)).resolves.toEqual(input);
+    });
+
+    it('accepts 64 components', async () => {
+        const input = { components: Array.from({ length: 64 }, (_, i) => ({ name: `c${i}`, status: 'ok' as const })) };
+
+        await expect(validator.run(input)).resolves.toEqual(input);
+    });
+
+    it('drops unknown keys', async () => {
+        const input: Record<string, unknown> = { components: [{ ...component, extra: 1 }] };
+
+        await expect(validator.run(input)).resolves.toEqual({ components: [component] });
+    });
+
+    it('preserves null values', async () => {
+        const input = {
+            components: [{
+                name: 'a', 
+                status: 'ok' as const, 
+                version: null, 
+                message: null, 
+                uptime: null, 
+                latency: null, 
+                checksTotal: null, 
+                checksSuccessful: null,
+            }],
+        };
+
+        await expect(validator.run(input)).resolves.toEqual(input);
+    });
+
+    it.each([
+        { components: [] },
+        { components: [component, component] },
+        { components: [{ ...component, name: 'Pod Orch' }] },
+        { components: [{ ...component, status: 'down' }] },
+        {
+            components: [{
+                ...component, 
+                checksSuccessful: 5, 
+                checksTotal: 4, 
+            }], 
+        },
+        { components: [{ ...component, latency: -1 }] },
+        { components: [{ ...component, uptime: 1.5 }] },
+        { components: [{ ...component, message: 'x'.repeat(1025) }] },
+        { deployment: { name: 'x' }, components: [component] },
+        { components: [{ ...component, uptime: 2147483648 }] },
+        { components: [{ ...component, checksTotal: 2147483648 }] },
+        {
+            components: [{
+                ...component, 
+                checksTotal: null, 
+                checksSuccessful: 2147483648, 
+            }], 
+        },
+        { components: Array.from({ length: 65 }, (_, i) => ({ name: `c${i}`, status: 'ok' })) },
+    ] as Record<string, any>[])('rejects %#', async (input) => {
+        await expect(validator.run(input)).rejects.toSatisfy(isValidupError);
+    });
+});
+
+describe('NodeComponentReportValidator', () => {
+    const validator = new NodeComponentReportValidator();
+
+    it('accepts a full report', async () => {
+        const input = {
+            name: 'storage',
+            status: 'ok' as const,
+            version: '0.5.1',
+            uptime: 4200,
+            latency: 3,
+            checksTotal: 10,
+            checksSuccessful: 9,
+        };
+
+        await expect(validator.run(input)).resolves.toEqual(input);
+    });
+
+    it('accepts uptime at the 32-bit maximum', async () => {
+        const input = {
+            name: 'storage', 
+            status: 'ok' as const, 
+            uptime: 2147483647, 
+        };
+
+        await expect(validator.run(input)).resolves.toEqual(input);
+    });
+
+    it.each([
+        { status: 'ok' },
+        { name: 'storage' },
+        { name: 'Bad Name', status: 'ok' },
+        {
+            name: 'storage', 
+            status: 'ok', 
+            uptime: 2147483648, 
+        },
+        {
+            name: 'storage', 
+            status: 'ok', 
+            checksTotal: 2, 
+            checksSuccessful: 3, 
+        },
+        {
+            name: 'storage', 
+            status: 'ok', 
+            latency: -1, 
+        },
+        {},
+    ] as Record<string, any>[])('rejects %#', async (input) => {
+        await expect(validator.run(input)).rejects.toSatisfy(isValidupError);
+    });
+});

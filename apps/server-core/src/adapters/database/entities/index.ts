@@ -12,6 +12,7 @@ export * from './analysis.ts';
 export * from './analysis-node.ts';
 export * from './master-image-group.ts';
 export * from './master-image.ts';
+export * from './node-component.ts';
 export * from './node.ts';
 export * from './project-node.ts';
 export * from './project.ts';

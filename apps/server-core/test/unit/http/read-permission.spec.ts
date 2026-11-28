@@ -41,6 +41,9 @@ describe('read permission on global catalogs', () => {
 
     it.each([
         ['/nodes', PermissionName.NODE_READ],
+        // Node components are read like the nodes they belong to.
+        ['/node-components', PermissionName.NODE_READ],
+        ['/node-components?include=node', PermissionName.NODE_READ],
         ['/master-images', PermissionName.MASTER_IMAGE_READ],
         ['/master-image-groups', PermissionName.MASTER_IMAGE_GROUP_READ],
         ['/registries', PermissionName.REGISTRY_READ],
@@ -68,9 +71,22 @@ describe('read permission on global catalogs', () => {
         ['/nodes?include=registry', [PermissionName.NODE_READ], PermissionName.REGISTRY_READ],
         ['/nodes?include=registryProject', [PermissionName.NODE_READ], PermissionName.REGISTRY_PROJECT_READ],
         ['/registry-projects?include=registry', [PermissionName.REGISTRY_PROJECT_READ], PermissionName.REGISTRY_READ],
+        ['/node-components?include=node.registry', [PermissionName.NODE_READ], PermissionName.REGISTRY_READ],
+        ['/node-components?include=node.registryProject', [PermissionName.NODE_READ], PermissionName.REGISTRY_PROJECT_READ],
     ])('GET %s requires the related read permission', async (path, basePermissions, relatedPermission) => {
         expect(await status(path, await createRestrictedAccessToken(basePermissions))).toBe(403);
         expect(await status(path, await createRestrictedAccessToken([...basePermissions, relatedPermission]))).toBe(200);
+    });
+
+    // A relation the node-component read does not map is refused for every grant.
+    it('GET /node-components refuses an unmapped nested include', async () => {
+        const token = await createRestrictedAccessToken([
+            PermissionName.NODE_READ,
+            PermissionName.REGISTRY_READ,
+            PermissionName.REGISTRY_PROJECT_READ,
+        ]);
+
+        expect(await status('/node-components?include=node.registryProject.registry', token)).toBe(403);
     });
 
     it.each([

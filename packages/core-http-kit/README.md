@@ -55,7 +55,7 @@ const { data: removed } = await client.analysis.delete(analyses[0].id);
 
 `Client` takes hapic's client options (`baseURL`, `headers`, `timeout`, `transport`, …). The client exposes one sub-API per
 entity: `analysis`, `analysisBucket`, `analysisBucketFile`, `analysisLog`, `analysisNode`, `analysisNodeEvent`,
-`analysisNodeLog`, `masterImage`, `masterImageGroup`, `node`, `project`, `projectNode`, `registry`, `registryProject` and
+`analysisNodeLog`, `masterImage`, `masterImageGroup`, `node`, `nodeComponent`, `project`, `projectNode`, `registry`, `registryProject` and
 `service`.
 
 ## Responses
@@ -177,7 +177,8 @@ async function countOnlineNodes(client: ICoreClient) {
 | `analysisNode` | `IAnalysisNodeAPI` |
 | `analysisNodeEvent` | `IAnalysisNodeEventAPI` (read-only) |
 | `masterImage` / `masterImageGroup` | `IMasterImageAPI` / `IMasterImageGroupAPI` (`getMany`, `getOne`, `delete`; `masterImage` adds `runCommand`) |
-| `node` | `INodeAPI` (entity verbs plus credentials) |
+| `node` | `INodeAPI` (entity verbs, credentials, `reportStatus`, `reportComponentStatus`) |
+| `nodeComponent` | `INodeComponentAPI` (`getMany` only) |
 | `project` / `projectNode` | `IProjectAPI` / `IProjectNodeAPI` |
 | `registry` / `registryProject` | `IRegistryAPI` / `IRegistryProjectAPI` |
 | `service` | `IServiceAPI` (protocol surface, no entity shape) |

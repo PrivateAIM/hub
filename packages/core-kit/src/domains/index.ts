@@ -21,6 +21,7 @@ export * from './project-node';
 export * from './registry';
 export * from './registry-project';
 export * from './node';
+export * from './node-component';
 export * from './service';
 export * from './constants';
 export * from './types';

@@ -219,6 +219,8 @@ The client exposes a property per domain entity. These carry `getMany`, `getOne`
 
 `client.analysisBucket` has no `update`. `client.masterImage` and `client.masterImageGroup` have neither `create` nor `update` (master images arrive through `masterImage.runCommand('sync' | 'build')`), and `client.analysisNodeEvent` is read-only.
 
+`client.node.reportStatus(id, report)` sends the adapter snapshot (`PUT /nodes/:id/status`, replaces the component set) and resolves to the stored components as a collection. `client.node.reportComponentStatus(id, name, report)` upserts one component (`PUT /nodes/:id/components/:name/status`) and resolves to the record. Both are accepted only from the node's own client. `client.nodeComponent.getMany(query?)` lists reported components (read-only, no `getOne`).
+
 `client.service.runCommand(id, command, data?)` and `client.service.runRegistryCommand(command, data)` resolve to `void`.
 
 ## Migration
@@ -293,7 +295,8 @@ function doWork(client: ICoreClient) { /* … */ }
 | `analysisNodeLog` | `IAnalysisNodeLogAPI` (standalone) |
 | `masterImage` | `IMasterImageAPI` (no `create`, no `update`) |
 | `masterImageGroup` | `IMasterImageGroupAPI` (no `create`, no `update`) |
-| `node` | `INodeAPI` |
+| `node` | `INodeAPI` (adds `reportStatus`, `reportComponentStatus`) |
+| `nodeComponent` | `INodeComponentAPI` (`getMany` only) |
 | `project` | `IProjectAPI` |
 | `projectNode` | `IProjectNodeAPI` |
 | `registry` | `IRegistryAPI` |

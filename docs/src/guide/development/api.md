@@ -290,6 +290,22 @@ The **Shape** column tells you which envelope from [Response Shapes](#response-s
 | `POST` | `/nodes` | Create node | record, `meta: {}` |
 | `POST` | `/nodes/:id` | Update node | record, `meta: {}` |
 | `DELETE` | `/nodes/:id` | Delete node | record, `meta: {}` |
+| `PUT` | `/nodes/:id/status` | Adapter snapshot; replaces the node's components | collection, `meta: { total }` |
+| `PUT` | `/nodes/:id/components/:name/status` | One component reports itself (upsert) | record, `meta: {}` |
+| `GET` | `/node-components` | List node components | collection + `schema` |
+
+Both `PUT` routes are restricted to the node's own client (`403` otherwise, `404` for an unknown
+node, `400` for an invalid body or name; the body is validated first). Units: `latency` in
+milliseconds, `uptime` in seconds, `checksTotal` / `checksSuccessful` count the last 24 hours.
+`status` is `ok`, `error` or `disabled`; `message` holds at most 1024 characters.
+`uptime`, `checksTotal` and `checksSuccessful` are non-negative integers up to 2147483647, with
+`checksSuccessful` ≤ `checksTotal`; a snapshot carries at most 64 components. An omitted or
+`null` field keeps the stored value, except `message`, which is replaced together with `status`.
+The component route takes the same fields as a snapshot entry, with `name` from the path. The Hub stamps
+`reportedAt`; bodies carry no timestamps. `GET /node-components` filters on `nodeId`, `name`,
+`version` and `status`, sorts on `name`, `version`, `updatedAt` and `createdAt`, and allows
+`include=node` (`node.registry` and `node.registryProject` need the matching read permissions).
+Any other include path is refused with `403`.
 
 ### Registries
 

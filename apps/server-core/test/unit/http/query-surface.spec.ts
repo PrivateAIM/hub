@@ -56,6 +56,7 @@ const SCHEMA_ENDPOINTS: [string, string][] = [
     ['masterImage', 'master-images'],
     ['masterImageGroup', 'master-image-groups'],
     ['node', 'nodes'],
+    ['nodeComponent', 'node-components'],
     ['project', 'projects'],
     ['projectNode', 'project-nodes'],
     ['registry', 'registries'],

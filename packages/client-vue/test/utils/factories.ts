@@ -31,6 +31,7 @@ export function createTestNode(overrides: Partial<Node> = {}) : Node {
         hidden: false,
         type: `${NodeType.DEFAULT}`,
         online: false,
+        deploymentVersion: null,
         registryId: null,
         registry: null,
         registryProjectId: null,

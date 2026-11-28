@@ -106,6 +106,15 @@ export class NodeEntity implements Node {
     robotId: Client['id'] | null;
 
     @Index()
+    @Column({
+        name: 'deployment_version',
+        type: 'varchar',
+        length: 64,
+        nullable: true,
+    })
+    deploymentVersion: string | null;
+
+    @Index()
     @Column({ name: 'realm_id', type: 'uuid' })
     realmId: Realm['id'];
 

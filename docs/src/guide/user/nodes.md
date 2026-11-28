@@ -50,6 +50,18 @@ node's assignment.
 Deleting a registry or a registry project never deletes the nodes referencing
 it — those nodes are simply left unassigned and can be reconnected.
 
+## Online Status and Components
+
+A node reports the version of its deployment and the health of each of its components
+(`ok`, `error` or `disabled`, with version, uptime and, for probed components, latency and
+check counts). The Hub keeps the latest report only.
+
+- A node is **online** while any of its components reported within the last 5 minutes. The
+  Hub marks silent nodes offline once a minute, but not during the first 5 minutes after it
+  starts, so Hub downtime does not count as node downtime.
+- A component is **stale** when it has not reported for 5 minutes; its last values are shown
+  as of the last report.
+
 ## API Endpoints
 
 | Method | Endpoint | Description |

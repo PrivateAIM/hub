@@ -18,6 +18,7 @@ import type {
     IMasterImageAPI,
     IMasterImageGroupAPI,
     INodeAPI,
+    INodeComponentAPI,
     IProjectAPI,
     IProjectNodeAPI,
     IRegistryAPI,
@@ -50,6 +51,7 @@ export interface ICoreClient extends IBaseClient {
     readonly registry : IRegistryAPI;
     readonly registryProject : IRegistryProjectAPI;
     readonly node : INodeAPI;
+    readonly nodeComponent : INodeComponentAPI;
     readonly analysis : IAnalysisAPI;
     readonly analysisBucket : IAnalysisBucketAPI;
     readonly analysisBucketFile : IAnalysisBucketFileAPI;

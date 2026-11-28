@@ -57,11 +57,27 @@ See [Shared Configuration](/reference/#shared-configuration) and [Database Confi
 | `GET/POST/DELETE` | `/registries` | Registry CRUD |
 | `GET/DELETE` | `/master-images` | Master image read + delete (`POST /master-images/command` runs sync/build) |
 | `GET/POST` | `/nodes/:id/client/credentials` | Read / update the node's OAuth2 client credentials (secret, name, display name) — usable by the node's own client or a `NODE_UPDATE` manager |
+| `PUT` | `/nodes/:id/status` | A node's adapter reports a snapshot of its deployment and components (see [Node status reporting](#node-status-reporting)) |
+| `PUT` | `/nodes/:id/components/:name/status` | A node component reports itself |
+| `GET` | `/node-components` | List reported node components (filter by `nodeId`, `name`, `version`, `status`) |
 | `GET` | `/nodes/:id/registry/credentials` | Read the node's own registry project (Harbor robot) credentials — accessible to the node's own client without any management permission |
 | `GET/POST` | `/analyses/:id/client/credentials` | Read / rotate the analysis's OAuth2 client credentials |
 | `POST` | `/analyses/:id/storage/token` | Mint a storage capability token for buckets and files of the analysis (see below) |
 | `GET` | `/docs` | Swagger/OpenAPI documentation |
 | `GET`/`HEAD` | `/livez`, `/readyz` | Anonymous liveness and readiness probes (see [Health endpoints](/guide/deployment/configuration#health-endpoints)) |
+
+## Node Status Reporting
+
+A node reports its health to the Hub, which keeps the **latest** state only. Two routes write it, both only for the node's own client (any other caller gets `403`, an unknown node `404`, an invalid body or component name `400`; the body is validated before authorization):
+
+- `PUT /nodes/:id/status` is the adapter's snapshot. It **replaces** the node's component set. Body: optional `deployment { name, version }` and a non-empty, unique-by-name `components[]`. Each component carries `name` (`^[a-z0-9]+(?:[-_][a-z0-9]+)*$`, at most 64 characters), `status` (`ok`, `error` or `disabled`) and optionally `version`, `message` (at most 1024 characters), `latency` (ms), `uptime` (s), `checksTotal` and `checksSuccessful` (probe counts of the last 24 hours). A snapshot carries at most 64 components; `uptime`, `checksTotal` and `checksSuccessful` are non-negative integers up to 2147483647, and `checksSuccessful` must not exceed `checksTotal`.
+- `PUT /nodes/:id/components/:name/status` is a component reporting itself. It **upserts** one row. Body: the snapshot component fields without `name`, which comes from the path (an invalid name answers `400`).
+
+An omitted or `null` field keeps the stored value, except `message`, which is replaced together with `status`. The Hub stamps `reportedAt` on receipt; the body carries no timestamps. The last write wins.
+
+A report sets the node's `online` flag and, when the snapshot carries a `deployment`, `deploymentVersion`. A node is online while any of its components reported within the last 5 minutes. A scheduled job clears `online` on nodes that went silent, every minute. It changes nothing during the first 5 minutes after the Hub starts, so Hub downtime does not mark nodes offline.
+
+`GET /node-components` is readable with the same permission as nodes. `include=node` is allowed; `node.registry` and `node.registryProject` additionally need the registry and registry-project read permissions. Any other include path is refused with `403`.
 
 ## Response Shapes
 

@@ -25,6 +25,8 @@ export type Node = {
 
     online: boolean;
 
+    deploymentVersion: string | null;
+
     // ------------------------------------------------------------------
 
     registryId: Registry['id'] | null;

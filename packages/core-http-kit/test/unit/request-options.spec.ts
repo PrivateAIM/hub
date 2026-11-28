@@ -54,6 +54,8 @@ const METHODS : Record<string, MethodTable> = {
         getClientCredentials: (o) => [ID, o],
         setClientCredentials: (o) => [ID, undefined, o],
         getRegistryCredentials: (o) => [ID, o],
+        reportStatus: (o) => [ID, { components: [] }, o],
+        reportComponentStatus: (o) => [ID, 'storage', { status: 'ok' }, o],
     },
     service: {
         runCommand: (o) => ['registry', 'setup', undefined, o],

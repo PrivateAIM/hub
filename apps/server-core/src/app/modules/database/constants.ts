@@ -16,6 +16,7 @@ import type {
     IAnalysisRepository,
     IMasterImageGroupRepository,
     IMasterImageRepository,
+    INodeComponentRepository,
     INodeRepository,
     IProjectNodeRepository,
     IProjectRepository,
@@ -23,12 +24,14 @@ import type {
     IRegistryProjectRepository,
     IRegistryRepository,
 } from '../../../core/index.ts';
+import type { INodeStatusService } from '../../../core/services/node-status/index.ts';
 
 export const DatabaseInjectionKey = {
     DataSource: new TypedToken<DataSource>('DataSource'),
     QueryCache: new TypedToken<IQueryCache>('QueryCache'),
 
     NodeRepository: new TypedToken<INodeRepository>('NodeRepository'),
+    NodeComponentRepository: new TypedToken<INodeComponentRepository>('NodeComponentRepository'),
     RegistryRepository: new TypedToken<IRegistryRepository>('RegistryRepository'),
     MasterImageRepository: new TypedToken<IMasterImageRepository>('MasterImageRepository'),
     MasterImageGroupRepository: new TypedToken<IMasterImageGroupRepository>('MasterImageGroupRepository'),
@@ -40,6 +43,9 @@ export const DatabaseInjectionKey = {
     ProjectNodeRepository: new TypedToken<IProjectNodeRepository>('ProjectNodeRepository'),
     AnalysisNodeRepository: new TypedToken<IAnalysisNodeRepository>('AnalysisNodeRepository'),
     AnalysisNodeEventRepository: new TypedToken<IAnalysisNodeEventRepository>('AnalysisNodeEventRepository'),
+
+    /** Shared by the node status report routes and the offline sweep. */
+    NodeStatusService: new TypedToken<INodeStatusService>('NodeStatusService'),
 
     RegistryManager: new TypedToken<IRegistryManager>('RegistryManager'),
 } as const;

@@ -19,6 +19,7 @@ import {
     AnalysisService,
     MasterImageGroupService,
     MasterImageService,
+    NodeComponentService,
     NodeService,
     ProjectNodeService,
     ProjectService,
@@ -26,6 +27,8 @@ import {
     RegistryService,
 } from '../../../core/index.ts';
 import { NodeController } from '../../../adapters/http/controllers/entities/node/module.ts';
+import { NodeComponentController } from '../../../adapters/http/controllers/entities/node-component/module.ts';
+import { NodeStatusController } from '../../../adapters/http/controllers/entities/node-status/module.ts';
 import { RegistryController } from '../../../adapters/http/controllers/entities/registry/module.ts';
 import { MasterImageController } from '../../../adapters/http/controllers/entities/master-image/module.ts';
 import { MasterImageGroupController } from '../../../adapters/http/controllers/entities/master-image-group/module.ts';
@@ -62,6 +65,7 @@ import { ConfigInjectionKey } from '../config/constants.ts';
 export function createControllers(container: IContainer): Record<string, any>[] {
     // Resolve repositories from container
     const nodeRepository = container.resolve(DatabaseInjectionKey.NodeRepository);
+    const nodeComponentRepository = container.resolve(DatabaseInjectionKey.NodeComponentRepository);
     const registryRepository = container.resolve(DatabaseInjectionKey.RegistryRepository);
     const masterImageRepository = container.resolve(DatabaseInjectionKey.MasterImageRepository);
     const masterImageGroupRepository = container.resolve(DatabaseInjectionKey.MasterImageGroupRepository);
@@ -77,6 +81,8 @@ export function createControllers(container: IContainer): Record<string, any>[] 
 
     // Create services
     const nodeService = new NodeService({ repository: nodeRepository, registryManager });
+    const nodeComponentService = new NodeComponentService({ repository: nodeComponentRepository });
+    const nodeStatusService = container.resolve(DatabaseInjectionKey.NodeStatusService);
     const dispatcherResult = container.tryResolve(ComponentsInjectionKey.RegistryComponentDispatcher);
     const registryService = new RegistryService({
         repository: registryRepository,
@@ -179,6 +185,8 @@ export function createControllers(container: IContainer): Record<string, any>[] 
     const controllers: Record<string, any>[] = [
         new NodeController({ service: nodeService }),
         new NodeRegistryCredentialController({ service: nodeRegistryCredentialService }),
+        new NodeComponentController({ service: nodeComponentService }),
+        new NodeStatusController({ service: nodeStatusService }),
         new RegistryController({ service: registryService }),
         new MasterImageController({ service: masterImageService }),
         new MasterImageGroupController({ service: masterImageGroupService }),

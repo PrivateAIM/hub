@@ -14,3 +14,4 @@ export * from './analysis-distributor/index.ts';
 export * from './analysis-reconciler/index.ts';
 export * from './analysis-storage-manager/index.ts';
 export * from './master-image/index.ts';
+export * from './node-status/index.ts';
